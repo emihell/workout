@@ -1,0 +1,3453 @@
+{
+  "schemaVersion": 1,
+  "programs": [
+    {
+      "id": "prog-hypertrophy",
+      "name": "Gym",
+      "goal": "gain",
+      "sessions": [
+        {
+          "id": "sess-upper",
+          "name": "Upper Body",
+          "focus": "Machines",
+          "exercises": [
+            {
+              "exerciseId": "ex-rowing",
+              "sets": 1,
+              "targets": [
+                "5-8 min"
+              ],
+              "restSec": 0,
+              "notes": "Session warm-up",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-chest-press",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 90,
+              "notes": "Controlled, near failure",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                25,
+                30,
+                30
+              ]
+            },
+            {
+              "exerciseId": "ex-lat-pulldown",
+              "sets": 3,
+              "targets": [
+                "12",
+                "12",
+                "10"
+              ],
+              "restSec": 90,
+              "notes": "Full stretch + squeeze",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                35,
+                30,
+                35
+              ]
+            },
+            {
+              "exerciseId": "ex-shoulder-press",
+              "sets": 3,
+              "targets": [
+                "10",
+                "8",
+                "6"
+              ],
+              "restSec": 90,
+              "notes": "Core tight, no leaning back",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                20,
+                20,
+                20
+              ]
+            },
+            {
+              "exerciseId": "ex-biceps-curl",
+              "sets": 3,
+              "targets": [
+                "10",
+                "8",
+                "7"
+              ],
+              "restSec": 60,
+              "notes": "Elbows pinned, slow form",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                8,
+                10,
+                10
+              ]
+            },
+            {
+              "exerciseId": "ex-triceps-press",
+              "sets": 3,
+              "targets": [
+                "12",
+                "12",
+                "12"
+              ],
+              "restSec": 60,
+              "notes": "Controlled, squeeze at bottom",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                30,
+                35,
+                45
+              ]
+            },
+            {
+              "exerciseId": "ex-ab-machine",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "10"
+              ],
+              "restSec": 60,
+              "notes": "Controlled, no rushing",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                30,
+                30,
+                25
+              ]
+            },
+            {
+              "exerciseId": "ex-plank",
+              "sets": 1,
+              "targets": [
+                "60s"
+              ],
+              "restSec": 60,
+              "notes": "Straight bodyline, no sagging hips",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-push-ups",
+              "sets": 2,
+              "targets": [
+                "AMRAP",
+                "AMRAP"
+              ],
+              "restSec": 60,
+              "notes": "Finisher, to failure",
+              "warmup": null,
+              "suggestedWeights": null
+            }
+          ]
+        },
+        {
+          "id": "sess-lower",
+          "name": "Lower Body",
+          "focus": "Machines",
+          "exercises": [
+            {
+              "exerciseId": "ex-stairs",
+              "sets": 1,
+              "targets": [
+                "5-8 min"
+              ],
+              "restSec": 0,
+              "notes": "Session warm-up",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-leg-press",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 90,
+              "notes": "Heels drive, no knee lockout",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                60,
+                70,
+                60
+              ]
+            },
+            {
+              "exerciseId": "ex-leg-extension",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 60,
+              "notes": "Controlled, no kicking",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                20,
+                24,
+                24
+              ]
+            },
+            {
+              "exerciseId": "ex-leg-curl",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 60,
+              "notes": "Slow release, hips down",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                30,
+                30,
+                25
+              ]
+            },
+            {
+              "exerciseId": "ex-abduction",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 60,
+              "notes": "Squeeze at top, no bounce",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                32,
+                36,
+                52
+              ]
+            },
+            {
+              "exerciseId": "ex-adduction",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 60,
+              "notes": "Squeeze, controlled return",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                32,
+                28,
+                28
+              ]
+            },
+            {
+              "exerciseId": "ex-calf-raises",
+              "sets": 3,
+              "targets": [
+                "20",
+                "15",
+                "12"
+              ],
+              "restSec": 60,
+              "notes": "Full stretch + squeeze",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                50,
+                50,
+                40
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sess-push-pull",
+          "name": "Push / Pull",
+          "focus": "Free weights",
+          "exercises": [
+            {
+              "exerciseId": "ex-rowing",
+              "sets": 1,
+              "targets": [
+                "5-8 min"
+              ],
+              "restSec": 0,
+              "notes": "Session warm-up",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-incline-db-press",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 90,
+              "notes": "Control, elbows ~45°",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                18,
+                18,
+                18
+              ]
+            },
+            {
+              "exerciseId": "ex-one-arm-db-row",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 90,
+              "notes": "Pull to ribs, squeeze scapula",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                14,
+                14,
+                12
+              ]
+            },
+            {
+              "exerciseId": "ex-overhead-db-press",
+              "sets": 3,
+              "targets": [
+                "10",
+                "8",
+                "6"
+              ],
+              "restSec": 90,
+              "notes": "Elbows slightly forward",
+              "warmup": {
+                "reps": 12
+              },
+              "suggestedWeights": [
+                12,
+                10,
+                8
+              ]
+            },
+            {
+              "exerciseId": "ex-pull-ups",
+              "sets": 3,
+              "targets": [
+                "7",
+                "5",
+                "3"
+              ],
+              "restSec": 90,
+              "notes": "Max (6–10). Full range, no kipping. No warm-up set.",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-dips",
+              "sets": 3,
+              "targets": [
+                "10",
+                "8",
+                "6"
+              ],
+              "restSec": 90,
+              "notes": "Controlled, no bounce",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-hanging-knee-raises",
+              "sets": 3,
+              "targets": [
+                "12",
+                "10",
+                "8"
+              ],
+              "restSec": 60,
+              "notes": "Controlled, no swing",
+              "warmup": null,
+              "suggestedWeights": null
+            },
+            {
+              "exerciseId": "ex-push-ups",
+              "sets": 2,
+              "targets": [
+                "AMRAP",
+                "AMRAP"
+              ],
+              "restSec": 60,
+              "notes": "Finisher, to failure",
+              "warmup": null,
+              "suggestedWeights": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedule": {
+    "loopWeeks": 1,
+    "anchor": "2026-08-24",
+    "slots": [
+      {
+        "id": "slot-sess-upper",
+        "week": 0,
+        "weekday": 1,
+        "programId": "prog-hypertrophy",
+        "sessionId": "sess-upper"
+      },
+      {
+        "id": "slot-sess-lower",
+        "week": 0,
+        "weekday": 4,
+        "programId": "prog-hypertrophy",
+        "sessionId": "sess-lower"
+      },
+      {
+        "id": "slot-sess-push-pull",
+        "week": 0,
+        "weekday": 5,
+        "programId": "prog-hypertrophy",
+        "sessionId": "sess-push-pull"
+      }
+    ]
+  },
+  "exercises": [
+    {
+      "id": "ex-rowing",
+      "name": "Rowing",
+      "equipment": "Cardio Rower",
+      "weightStep": "n/a",
+      "muscles": "Mid-back, Lats, Biceps",
+      "cues": "Neutral spine; drive elbow back; squeeze shoulder blades; control return.",
+      "type": "cardio"
+    },
+    {
+      "id": "ex-chest-press",
+      "name": "Chest Press",
+      "equipment": "Chest Press (Star Trac)",
+      "weightStep": "5",
+      "muscles": "Chest, Triceps, Front Delts",
+      "cues": "Scaps retracted; elbows ~45°; slow lower; press through mid-palm; no bounce.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-lat-pulldown",
+      "name": "Lat Pulldown",
+      "equipment": "Lat Pulldown (Star Trac)",
+      "weightStep": "5",
+      "muscles": "Lats, Biceps, Upper Back",
+      "cues": "Lean back slightly; pull elbows to ribs; no swaying; full stretch at top.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-shoulder-press",
+      "name": "Shoulder Press",
+      "equipment": "Shoulder Press (Star Trac)",
+      "weightStep": "5",
+      "muscles": "Delts, Triceps",
+      "cues": "Brace core; no lower-back arch; press slightly forward; control descent.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-biceps-curl",
+      "name": "Biceps Curl",
+      "equipment": "Biceps Curl (Star Trac)",
+      "weightStep": "2",
+      "muscles": "Biceps, Forearms",
+      "cues": "Elbows fixed; full supination; slow eccentric; avoid swinging torso.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-triceps-press",
+      "name": "Triceps Press",
+      "equipment": "Triceps Press (Star Trac)",
+      "weightStep": "5",
+      "muscles": "Triceps",
+      "cues": "Keep elbows tucked; full lockout; control the bottom; no shoulder shrug.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-ab-machine",
+      "name": "Ab Machine",
+      "equipment": "Abdominal Crunch Machine (Star Trac)",
+      "weightStep": "5",
+      "muscles": "Core (Rectus Abdominis, Obliques)",
+      "cues": "Control tempo; full ROM; stable core; smooth breathing.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-plank",
+      "name": "Plank",
+      "equipment": "Bodyweight",
+      "weightStep": "n/a",
+      "muscles": "Core (Rectus Abdominis, Obliques)",
+      "cues": "Ribs down; glutes squeezed; neutral neck; steady breathing.",
+      "type": "bodyweight"
+    },
+    {
+      "id": "ex-push-ups",
+      "name": "Push-Ups",
+      "equipment": "Bodyweight",
+      "weightStep": "n/a",
+      "muscles": "Chest, Triceps, Front Delts",
+      "cues": "Control tempo; full ROM; stable core; smooth breathing.",
+      "type": "bodyweight"
+    },
+    {
+      "id": "ex-stairs",
+      "name": "Stairs",
+      "equipment": "Stair Climber",
+      "weightStep": "n/a",
+      "muscles": "Quads, Glutes, Calves",
+      "cues": "Upright torso; full steps; steady breathing.",
+      "type": "cardio"
+    },
+    {
+      "id": "ex-leg-press",
+      "name": "Leg Press",
+      "equipment": "Angled Leg Press (Star Trac)",
+      "weightStep": "10",
+      "muscles": "Quads, Glutes",
+      "cues": "Feet mid-sled; knees track toes; full depth without pelvis tilt; drive through heels.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-leg-extension",
+      "name": "Leg Extension",
+      "equipment": "Leg Extension (Star Trac)",
+      "weightStep": "Alt 4/5",
+      "muscles": "Quads",
+      "cues": "Pad above ankles; control up 1–2s; pause squeeze; slow 2–3s down.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-leg-curl",
+      "name": "Leg Curl",
+      "equipment": "Leg Curl (Star Trac)",
+      "weightStep": "5",
+      "muscles": "Hamstrings",
+      "cues": "Hips down; neutral spine; pull to full knee flexion; control eccentric.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-abduction",
+      "name": "Abduction",
+      "equipment": "Hip Abduction (Star Trac)",
+      "weightStep": "Alt 4/5",
+      "muscles": "Glute Medius, TFL",
+      "cues": "Neutral pelvis; slight forward lean; move from hip; avoid rolling torso.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-adduction",
+      "name": "Adduction",
+      "equipment": "Hip Adduction (Star Trac)",
+      "weightStep": "Alt 4/5",
+      "muscles": "Adductors (inner thigh)",
+      "cues": "Tall posture; squeeze inner thighs; slow eccentric; avoid knee cave.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-calf-raises",
+      "name": "Calf Raises (Leg Press)",
+      "equipment": "Calf Raises on Leg Press (Star Trac)",
+      "weightStep": "10",
+      "muscles": "Calves",
+      "cues": "Full stretch; pause; strong plantar flexion; no bouncing; knees soft.",
+      "type": "machine"
+    },
+    {
+      "id": "ex-incline-db-press",
+      "name": "Incline DB Press",
+      "equipment": "Dumbbells",
+      "weightStep": "2",
+      "muscles": "Chest, Triceps, Front Delts",
+      "cues": "Scaps retracted; elbows ~45°; slow lower; press through mid-palm; no bounce.",
+      "type": "free"
+    },
+    {
+      "id": "ex-one-arm-db-row",
+      "name": "One-Arm DB Row",
+      "equipment": "Dumbbells",
+      "weightStep": "2",
+      "muscles": "Mid-back, Lats, Biceps",
+      "cues": "Neutral spine; drive elbow back; squeeze shoulder blades; control return.",
+      "type": "free"
+    },
+    {
+      "id": "ex-overhead-db-press",
+      "name": "Overhead DB Press",
+      "equipment": "Dumbbells",
+      "weightStep": "2",
+      "muscles": "Delts, Triceps",
+      "cues": "Brace core; elbows slightly forward; control descent; no lower-back arch.",
+      "type": "free"
+    },
+    {
+      "id": "ex-pull-ups",
+      "name": "Pull-Ups (BW)",
+      "equipment": "Bodyweight",
+      "weightStep": "n/a",
+      "muscles": "Lats, Biceps, Upper Back",
+      "cues": "Full range, no kipping; pull elbows to ribs.",
+      "type": "bodyweight"
+    },
+    {
+      "id": "ex-dips",
+      "name": "Dips (BW)",
+      "equipment": "Bodyweight",
+      "weightStep": "n/a",
+      "muscles": "Chest, Triceps, Front Delts",
+      "cues": "Controlled, no bounce; full ROM; stable core.",
+      "type": "bodyweight"
+    },
+    {
+      "id": "ex-hanging-knee-raises",
+      "name": "Hanging Knee Raises",
+      "equipment": "Bodyweight",
+      "weightStep": "n/a",
+      "muscles": "Core",
+      "cues": "Posterior tilt; raise knees with abs; minimize swing; slow lower.",
+      "type": "bodyweight"
+    }
+  ],
+  "workouts": [
+    {
+      "id": "wo-w42-sess-upper",
+      "sessionId": "sess-upper",
+      "startedAt": "2025-10-13T18:00:00.000Z",
+      "finishedAt": "2025-10-13T18:00:00.000Z",
+      "overallNote": "week 42",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": 3,
+          "note": "1500/6:50"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "wu",
+          "weight": 10,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 35,
+          "reps": "11",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 35,
+          "reps": "9",
+          "rpe": 5,
+          "note": "failure at rep 7"
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "wu",
+          "weight": 20,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 40,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 40,
+          "reps": "11",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "wu",
+          "weight": 10,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 20,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 20,
+          "reps": "9",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 20,
+          "reps": "7",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "wu",
+          "weight": 4,
+          "reps": "12",
+          "rpe": null,
+          "note": "Increments of 5 kg, did 5kg"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 12,
+          "reps": "10",
+          "rpe": 4,
+          "note": "Increments of 5 kg, did 15 kg"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 12,
+          "reps": "9",
+          "rpe": 4,
+          "note": "Increments of 5 kg, did 15kg"
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 40,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 50,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 4,
+          "note": "10 reps"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 35,
+          "reps": "11",
+          "rpe": 4,
+          "note": "10 reps"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-plank",
+          "setType": "work",
+          "weight": 0,
+          "reps": "60 sec",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 5,
+          "note": "20 reps"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 5,
+          "note": "10 reps "
+        }
+      ]
+    },
+    {
+      "id": "wo-w41-sess-push-pull",
+      "sessionId": "sess-push-pull",
+      "startedAt": "2025-10-10T18:00:00.000Z",
+      "finishedAt": "2025-10-10T18:00:00.000Z",
+      "overallNote": "week 41",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "wu",
+          "weight": 8,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "10",
+          "rpe": 3,
+          "note": "Increments of 2, doing 18"
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "9",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "wu",
+          "weight": 6,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "12",
+          "rpe": 3,
+          "note": "Increments of 2, doing 14"
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "wu",
+          "weight": 8,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 12,
+          "reps": "10",
+          "rpe": 3,
+          "note": "Did 12"
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 10,
+          "reps": "8",
+          "rpe": 3,
+          "note": "Did 10"
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 8,
+          "reps": "5",
+          "rpe": 3,
+          "note": "Did 8"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "7",
+          "rpe": 5,
+          "note": "Did 7"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "5",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "3",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 4,
+          "note": "Did 10"
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "Did 20"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 3,
+          "note": "Did 7"
+        }
+      ]
+    },
+    {
+      "id": "wo-w41-sess-lower",
+      "sessionId": "sess-lower",
+      "startedAt": "2025-10-09T18:00:00.000Z",
+      "finishedAt": "2025-10-09T18:00:00.000Z",
+      "overallNote": "week 41",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-stairs",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": 2,
+          "note": "8 minutes"
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "wu",
+          "weight": 30,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 60,
+          "reps": "12",
+          "rpe": 3,
+          "note": "increments of 10, did 60"
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 70,
+          "reps": "11",
+          "rpe": 3,
+          "note": "icrements of 10, did 70"
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 70,
+          "reps": "10",
+          "rpe": 4,
+          "note": "increments of 10, did 70"
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "wu",
+          "weight": 9,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 18,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 4 then 5 then 4 again and so on, did 18"
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 22,
+          "reps": "12",
+          "rpe": 3,
+          "note": "did 23"
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 25,
+          "reps": "13",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 5, did 30"
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 3,
+          "note": "increments of 5, did 30"
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "wu",
+          "weight": 14,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 32,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 4 then 5 then 4 again and so on, did 32"
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 4 then 5 then 4 again and so on, did 36"
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 55,
+          "reps": "12",
+          "rpe": 3,
+          "note": "increments of 4 then 5 then 4 again and so on, did 55"
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "wu",
+          "weight": 18,
+          "reps": "12",
+          "rpe": null,
+          "note": "increments of 4 then 5 then 4 again and so on, did 18"
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 41,
+          "reps": "10",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "11",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "9",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "wu",
+          "weight": 20,
+          "reps": "12",
+          "rpe": null,
+          "note": "Increments of 10, did 20"
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 50,
+          "reps": "20",
+          "rpe": 3,
+          "note": "Increments of 10, did 50"
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 60,
+          "reps": "15",
+          "rpe": 4,
+          "note": "increments of 10, did 60"
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 60,
+          "reps": "16",
+          "rpe": 5,
+          "note": "increments of 10, did 60"
+        }
+      ]
+    },
+    {
+      "id": "wo-w41-sess-upper",
+      "sessionId": "sess-upper",
+      "startedAt": "2025-10-06T18:00:00.000Z",
+      "finishedAt": "2025-10-06T18:00:00.000Z",
+      "overallNote": "week 41",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": 3,
+          "note": "7:00 / 1500m"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "wu",
+          "weight": 10,
+          "reps": "12",
+          "rpe": null,
+          "note": "increments of 5, did 10"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 5, did 25"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "11",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "9",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": "there is no 18, its increments of 5, did 15"
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 3,
+          "note": "increments of 5, did 35"
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 4,
+          "note": "increments of 5, did 35"
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 40,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "wu",
+          "weight": 10,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "10",
+          "rpe": 5,
+          "note": "increments of 5, did 25"
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "9",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "7",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "wu",
+          "weight": 5,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "9",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 5, dud 30"
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 2,
+          "note": "increments of 5, did 35"
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 45,
+          "reps": "12",
+          "rpe": 3,
+          "note": "increments of 5, did 45"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 3,
+          "note": "incrementa of 5, did 30"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "11",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 4,
+          "note": "icrements of 5, did 30"
+        },
+        {
+          "exerciseId": "ex-plank",
+          "setType": "work",
+          "weight": 0,
+          "reps": "60 sec",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "20 reps"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "8 reps"
+        }
+      ]
+    },
+    {
+      "id": "wo-w40-sess-push-pull",
+      "sessionId": "sess-push-pull",
+      "startedAt": "2025-10-03T18:00:00.000Z",
+      "finishedAt": "2025-10-03T18:00:00.000Z",
+      "overallNote": "week 40",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "wu",
+          "weight": 8,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 19,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "9",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "wu",
+          "weight": 6,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 13,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "wu",
+          "weight": 7,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "8",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "5",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "7",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "5",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "3",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "12",
+          "rpe": null,
+          "note": "same here - no warm up needed here"
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "12",
+          "rpe": null,
+          "note": "same here - no wu needed - please remove this - did not do it"
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "12 rep"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "5 reps"
+        }
+      ]
+    },
+    {
+      "id": "wo-w40-sess-lower",
+      "sessionId": "sess-lower",
+      "startedAt": "2025-10-02T18:00:00.000Z",
+      "finishedAt": "2025-10-02T18:00:00.000Z",
+      "overallNote": "week 40",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-stairs",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": null,
+          "note": "On 7, 7 minutes"
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "wu",
+          "weight": 30,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 63,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 74,
+          "reps": "11",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 74,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "wu",
+          "weight": 9,
+          "reps": "12",
+          "rpe": null,
+          "note": "weigth is 9,14,18,23,27,32,36,41,46,50,55,59,64,68 and so on"
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 20,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 24,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 27,
+          "reps": "13",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 32,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 32,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "wu",
+          "weight": 14,
+          "reps": "12",
+          "rpe": null,
+          "note": "weigths is increments in 9, 14, 18, 23, 27, 32, 36, 41, 46,50,55,59,64,68,73,77,82,86,91"
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 52,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "wu",
+          "weight": 20,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 41,
+          "reps": "10",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "9",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "wu",
+          "weight": 25,
+          "reps": "12",
+          "rpe": null,
+          "note": "increments of 10 here"
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 52,
+          "reps": "20",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 63,
+          "reps": "15",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 63,
+          "reps": "16",
+          "rpe": 3,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "wo-w40-sess-upper",
+      "sessionId": "sess-upper",
+      "startedAt": "2025-09-29T18:00:00.000Z",
+      "finishedAt": "2025-09-29T18:00:00.000Z",
+      "overallNote": "week 40",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": null,
+          "note": "6:47, 1517m"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "wu",
+          "weight": 12,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 26,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "9",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "wu",
+          "weight": 18,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 37,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 37,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 40,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "wu",
+          "weight": 10,
+          "reps": "12",
+          "rpe": null,
+          "note": "only incremental by 5 kg"
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 26,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "9",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "7",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "wu",
+          "weight": 5,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "12",
+          "rpe": 3,
+          "note": "did 12, not 10 reps"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "10",
+          "rpe": 3,
+          "note": "10 reps instead of 8"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "9",
+          "rpe": 4,
+          "note": "8 instead of 7"
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 33,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 38,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 44,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 32,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 32,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-plank",
+          "setType": "work",
+          "weight": 0,
+          "reps": "60 sec",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "20 reps"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "10 reps"
+        }
+      ]
+    },
+    {
+      "id": "wo-w39-sess-push-pull",
+      "sessionId": "sess-push-pull",
+      "startedAt": "2025-09-26T18:00:00.000Z",
+      "finishedAt": "2025-09-26T18:00:00.000Z",
+      "overallNote": "week 39",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": null,
+          "note": "short run instead"
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "wu",
+          "weight": 8,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 16,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "wu",
+          "weight": 6,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 12,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "wu",
+          "weight": 7,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "5",
+          "rpe": 4,
+          "note": "did 6"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "12",
+          "rpe": null,
+          "note": "skipping warmup here - warmup should not be the hardest set"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "7",
+          "rpe": 5,
+          "note": "could only do 5"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "5",
+          "rpe": 5,
+          "note": "could only do 4"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "3",
+          "rpe": 5,
+          "note": "3"
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "12",
+          "rpe": null,
+          "note": "same here, warm up should not be hardest on these - where we cant conteoll the weigths"
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "12",
+          "rpe": null,
+          "note": "same with all these only body weigth sets, warm up shoulf be very short - skippinh this"
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "14 to failure"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "6 to failure"
+        }
+      ]
+    },
+    {
+      "id": "wo-w39-sess-lower",
+      "sessionId": "sess-lower",
+      "startedAt": "2025-09-25T18:00:00.000Z",
+      "finishedAt": "2025-09-25T18:00:00.000Z",
+      "overallNote": "week 39",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-stairs",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "wu",
+          "weight": 30,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 60,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 70,
+          "reps": "11",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 70,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "wu",
+          "weight": 9,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 18,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 23,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 27,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "wu",
+          "weight": 14,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 27,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 32,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 50,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "wu",
+          "weight": 20,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 41,
+          "reps": "10",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "wu",
+          "weight": 25,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 50,
+          "reps": "20",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 60,
+          "reps": "15",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 60,
+          "reps": "16",
+          "rpe": 5,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "wo-w39-sess-upper",
+      "sessionId": "sess-upper",
+      "startedAt": "2025-09-22T18:00:00.000Z",
+      "finishedAt": "2025-09-22T18:00:00.000Z",
+      "overallNote": "week 39",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5–8 min",
+          "rpe": null,
+          "note": "6:50 min, 1500m"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "wu",
+          "weight": 12,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "wu",
+          "weight": 18,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 40,
+          "reps": "10",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "wu",
+          "weight": 12,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "8",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "6",
+          "rpe": 3,
+          "note": "took longer break"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "wu",
+          "weight": 5,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "10",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "8",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "7",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 2,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 40,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "wu",
+          "weight": 15,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 4,
+          "note": "mostly hard becouse the legs are free in the machine, but maybe better technique is needed"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 3,
+          "note": "same"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 3,
+          "note": "same"
+        },
+        {
+          "exerciseId": "ex-plank",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "12",
+          "rpe": null,
+          "note": "maybe delete this, do i need a warm up for the plank? or matbe this should be the first set?"
+        },
+        {
+          "exerciseId": "ex-plank",
+          "setType": "work",
+          "weight": 0,
+          "reps": "60 sec",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "20 to failure"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "AMRAP",
+          "rpe": 4,
+          "note": "9 to failure"
+        }
+      ]
+    },
+    {
+      "id": "wo-w38-sess-push-pull",
+      "sessionId": "sess-push-pull",
+      "startedAt": "2025-09-19T18:00:00.000Z",
+      "finishedAt": "2025-09-19T18:00:00.000Z",
+      "overallNote": "week 38",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5-8 min",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "wu",
+          "weight": 8,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 16,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "10",
+          "rpe": 5,
+          "note": "Failure"
+        },
+        {
+          "exerciseId": "ex-incline-db-press",
+          "setType": "work",
+          "weight": 18,
+          "reps": "8",
+          "rpe": 5,
+          "note": "Failure"
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 12,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 4,
+          "note": "Left side harder"
+        },
+        {
+          "exerciseId": "ex-one-arm-db-row",
+          "setType": "work",
+          "weight": 14,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "12",
+          "rpe": 4,
+          "note": "Right shoulder discomfort"
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "10",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-overhead-db-press",
+          "setType": "work",
+          "weight": 14,
+          "reps": "8",
+          "rpe": 5,
+          "note": "To failure"
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "7",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "5",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-pull-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "3",
+          "rpe": 5,
+          "note": "Form dropped"
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-dips",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 5,
+          "note": "To failure"
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "8",
+          "rpe": 5,
+          "note": "Grip fatigue"
+        },
+        {
+          "exerciseId": "ex-hanging-knee-raises",
+          "setType": "work",
+          "weight": 0,
+          "reps": "6",
+          "rpe": 5,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "wo-w38-sess-lower",
+      "sessionId": "sess-lower",
+      "startedAt": "2025-09-18T18:00:00.000Z",
+      "finishedAt": "2025-09-18T18:00:00.000Z",
+      "overallNote": "week 38",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-stairs",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5-8 min",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "wu",
+          "weight": 30,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 60,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 70,
+          "reps": "11",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-press",
+          "setType": "work",
+          "weight": 70,
+          "reps": "10",
+          "rpe": 4,
+          "note": "Next time 80kg"
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 18,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 23,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-extension",
+          "setType": "work",
+          "weight": 27,
+          "reps": "12",
+          "rpe": 5,
+          "note": "Working weight"
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-leg-curl",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 27,
+          "reps": "12",
+          "rpe": 3,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 32,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-abduction",
+          "setType": "work",
+          "weight": 50,
+          "reps": "12",
+          "rpe": 5,
+          "note": "Start at 50 next time"
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 41,
+          "reps": "10",
+          "rpe": 5,
+          "note": "To failure"
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "10",
+          "rpe": 5,
+          "note": "Failure"
+        },
+        {
+          "exerciseId": "ex-adduction",
+          "setType": "work",
+          "weight": 36,
+          "reps": "8",
+          "rpe": 5,
+          "note": "Failure"
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 50,
+          "reps": "20",
+          "rpe": 3,
+          "note": "Burn"
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 60,
+          "reps": "15",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-calf-raises",
+          "setType": "work",
+          "weight": 60,
+          "reps": "16",
+          "rpe": 5,
+          "note": "To failure"
+        }
+      ]
+    },
+    {
+      "id": "wo-w38-sess-upper",
+      "sessionId": "sess-upper",
+      "startedAt": "2025-09-15T18:00:00.000Z",
+      "finishedAt": "2025-09-15T18:00:00.000Z",
+      "overallNote": "week 38",
+      "overallFeel": "",
+      "exerciseIndex": 99,
+      "extraSets": {},
+      "restEndsAt": null,
+      "restPausedRemaining": null,
+      "sets": [
+        {
+          "exerciseId": "ex-rowing",
+          "setType": "wu",
+          "weight": 0,
+          "reps": "5-8 min",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "wu",
+          "weight": 12,
+          "reps": "12",
+          "rpe": null,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "12",
+          "rpe": 4,
+          "note": "Form good"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 5,
+          "note": "To failure"
+        },
+        {
+          "exerciseId": "ex-chest-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 5,
+          "note": "Limit"
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-lat-pulldown",
+          "setType": "work",
+          "weight": 40,
+          "reps": "10",
+          "rpe": 5,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "10",
+          "rpe": 5,
+          "note": "To failure"
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "8",
+          "rpe": 5,
+          "note": "Hard"
+        },
+        {
+          "exerciseId": "ex-shoulder-press",
+          "setType": "work",
+          "weight": 25,
+          "reps": "6",
+          "rpe": 5,
+          "note": "Failure"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "10",
+          "rpe": 4,
+          "note": "Elbows stable"
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "8",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-biceps-curl",
+          "setType": "work",
+          "weight": 10,
+          "reps": "7",
+          "rpe": 4,
+          "note": "Also tested 15kg"
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 35,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-triceps-press",
+          "setType": "work",
+          "weight": 40,
+          "reps": "12",
+          "rpe": 5,
+          "note": "Also tested 50kg"
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "12",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 4,
+          "note": ""
+        },
+        {
+          "exerciseId": "ex-ab-machine",
+          "setType": "work",
+          "weight": 30,
+          "reps": "10",
+          "rpe": 5,
+          "note": "Also tested 40kg"
+        },
+        {
+          "exerciseId": "ex-plank",
+          "setType": "work",
+          "weight": 0,
+          "reps": "60s",
+          "rpe": 5,
+          "note": "Burn"
+        },
+        {
+          "exerciseId": "ex-push-ups",
+          "setType": "work",
+          "weight": 0,
+          "reps": "To Failure",
+          "rpe": null,
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "activeWorkout": null
+}
