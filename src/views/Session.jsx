@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FOCUS_OPTIONS } from '../ids'
+import { FOCUS_OPTIONS, SESSION_ROLES, roleLabel } from '../ids'
 import { go } from '../route'
 import { programById } from '../storage'
 import { useStore } from '../store-context'
@@ -39,7 +39,7 @@ export function SessionNew({ programId }) {
           <label>
             Name
             <br />
-            <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Easy run" />
+            <input value={name} onChange={(e) => setName(e.target.value)} required />
           </label>
         </p>
         <p>
@@ -99,7 +99,8 @@ export function SessionDetail({ programId, sessionId }) {
             <li key={item.id || `${item.exerciseId}-${index}`}>
               <a href={`#${sessionPath(program.id, sess.id, `/exercise/${item.id}`)}`}>{ex?.name || item.exerciseId}</a>
               {' — '}
-              {item.role || 'main'}
+              {roleLabel(item.role)}
+              {item.warmup ? ' · WU set' : ''}
               {item.restSec ? ` · ${item.restSec}s rest` : ''}
               {' '}
               <button type="button" onClick={() => store.moveSessionExercise(program.id, sess.id, index, -1)}>
@@ -219,7 +220,11 @@ export function SessionExercisePick({ programId, sessionId }) {
       ) : (
         <>
           <p>
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search" />
+            <label>
+              Search
+              <br />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} />
+            </label>
           </p>
           {matches.length === 0 ? <p>No matches.</p> : null}
           <ul>
@@ -258,13 +263,12 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
     >
       <p>
         <label>
-          Role
+          Role in this session
           <br />
           <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="warmup">Warm-up</option>
-            <option value="main">Main</option>
-            <option value="finisher">Finisher</option>
-            <option value="cardio">Cardio</option>
+            {SESSION_ROLES.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
           </select>
         </label>
       </p>
@@ -277,7 +281,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
       </p>
       <p>
         <label>
-          <input type="checkbox" checked={warmup} onChange={(e) => setWarmup(e.target.checked)} /> Warm-up set
+          <input type="checkbox" checked={warmup} onChange={(e) => setWarmup(e.target.checked)} /> WU set
         </label>
       </p>
       <p>
@@ -319,7 +323,7 @@ export function SessionExerciseNew({ programId, sessionId, exerciseId }) {
       <Back to={sessionPath(program.id, sess.id, '/exercise/new')} />
       <p>{program.name} · {sess.name} · session structure</p>
       <h1>{ex.name}</h1>
-      <p>Choose this exercise&apos;s role and guidance. Weights and reps are generated for each dated workout.</p>
+      <p>Choose this exercise&apos;s role in the session. A WU set is an easy set before working weight. Weights and reps are generated for each dated workout.</p>
       <ExerciseFields
         item={{ restSec: defaults.restSec, notes: '', warmup: ex.type === 'bodyweight' ? null : { reps: 12 }, role: defaults.role }}
         defaults={defaults}
@@ -361,7 +365,7 @@ export function SessionExerciseEdit({ programId, sessionId, itemId, backTo }) {
       <Back to={parent} />
       <p>{program.name} · {sess.name} · session structure</p>
       <h1>{ex?.name || item.exerciseId}</h1>
-      <p>Edit this exercise&apos;s role and guidance in the reusable session. Dated plans own weights and reps.</p>
+      <p>Edit this exercise&apos;s role in the reusable session. A WU set is an easy set before working weight. Dated plans own weights and reps.</p>
       <ExerciseFields
         key={`${sess.id}-${index}`}
         item={item}

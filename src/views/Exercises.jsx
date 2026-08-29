@@ -22,7 +22,11 @@ export function Exercises() {
         <a href="#/exercises/new">Add exercise</a>
       </p>
       <p>
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search" />
+        <label>
+          Search
+          <br />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} />
+        </label>
       </p>
       {list.length === 0 ? <p>No exercises yet.</p> : null}
       <ul>
@@ -149,7 +153,7 @@ export function ExerciseEdit({ exerciseId }) {
           <label>
             Weight step
             <br />
-            <input value={weightStep} onChange={(e) => setWeightStep(e.target.value)} placeholder="5 or Alt 4/5 or n/a" />
+            <input value={weightStep} onChange={(e) => setWeightStep(e.target.value)} />
           </label>
         </p>
         <p>

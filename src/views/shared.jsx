@@ -1,9 +1,9 @@
-import { go } from '../route'
+import { back } from '../route'
 
-export function Back({ to }) {
+export function Back() {
   return (
     <p>
-      <button type="button" onClick={() => go(to)}>
+      <button type="button" onClick={() => back()}>
         Back
       </button>
     </p>

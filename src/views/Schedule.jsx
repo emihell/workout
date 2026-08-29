@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LOOP_WEEKS, WEEKDAY_ORDER, formatTargets, parseTargets, weekdayName } from '../ids'
+import { LOOP_WEEKS, WEEKDAY_ORDER, formatTargets, parseTargets, roleLabel, weekdayName } from '../ids'
 import {
   addDays,
   clampLoopWeeks,
@@ -313,7 +313,10 @@ export function ScheduleSlot({ week, weekday, slotId }) {
                 {item.exerciseName}
               </a>
               {' — '}
-              {item.sets} set{item.sets === 1 ? '' : 's'} · {formatTargets(item.targets) || 'no targets'}
+              {roleLabel(item.role)}
+              {item.warmup ? ' · WU set' : ''}
+              {' · '}
+              {item.sets} {item.sets === 1 ? 'set' : 'sets'} · {formatTargets(item.targets) || 'no targets'}
               {kg ? ` · ${kg} kg` : ''}
               {item.calibrationRequired ? ' · find starting weight' : ''}
             </li>
@@ -394,6 +397,10 @@ function PlanItemForm({ plan, item, onSave, backTo }) {
       <Back to={backTo} />
       <p>Scheduled workout · {plan.date} · {plan.sessionName}</p>
       <h1>{item.exerciseName}</h1>
+      <p>
+        {roleLabel(item.role)}
+        {item.warmup ? ' · WU set' : ''}
+      </p>
       {item.calibrationRequired ? (
         <p>
           No history yet. Start light enough to complete the recommended reps with clean form. After each set,
@@ -422,7 +429,7 @@ function PlanItemForm({ plan, item, onSave, backTo }) {
       >
         <p><label>Sets<br /><input type="number" min="1" value={sets} onChange={(event) => setSets(event.target.value)} /></label></p>
         <p><label>Recommended reps<br /><input value={targets} onChange={(event) => setTargets(event.target.value)} /></label></p>
-        <p><label>Recommended kg<br /><input value={weights} onChange={(event) => setWeights(event.target.value)} placeholder={item.calibrationRequired ? 'Leave empty and find it during the workout' : ''} /></label></p>
+        <p><label>Recommended kg<br /><input value={weights} onChange={(event) => setWeights(event.target.value)} /></label></p>
         <p><label>Rest (sec)<br /><input type="number" min="0" value={restSec} onChange={(event) => setRestSec(event.target.value)} /></label></p>
         <p><label>Notes<br /><input value={notes} onChange={(event) => setNotes(event.target.value)} /></label></p>
         <p><button type="submit">Save</button> <button type="button" onClick={() => go(backTo)}>Cancel</button></p>

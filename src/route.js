@@ -1,10 +1,59 @@
 import { useEffect, useState } from 'react'
 
+const NAV_KEY = 'workout-mvp-nav'
+
+export function hashPath(hash) {
+  const raw = String(hash || '').replace(/^#/, '') || '/'
+  return raw.startsWith('/') ? raw : `/${raw}`
+}
+
+export function applyVisit(stack, path) {
+  const next = hashPath(path)
+  if (stack[stack.length - 1] === next) return stack
+  if (stack.length >= 2 && stack[stack.length - 2] === next) {
+    stack.pop()
+    return stack
+  }
+  stack.push(next)
+  return stack
+}
+
+function loadVisits() {
+  if (typeof sessionStorage === 'undefined') return []
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(NAV_KEY) || '[]')
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+const visits = loadVisits()
+
+function persistVisits() {
+  if (typeof sessionStorage === 'undefined') return
+  try {
+    sessionStorage.setItem(NAV_KEY, JSON.stringify(visits))
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+function remember(hash) {
+  applyVisit(visits, hash)
+  persistVisits()
+}
+
 export function useHashRoute() {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
 
   useEffect(() => {
-    const onHash = () => setHash(window.location.hash || '#/')
+    remember(window.location.hash || '#/')
+    const onHash = () => {
+      const next = window.location.hash || '#/'
+      setHash(next)
+      remember(next)
+    }
     window.addEventListener('hashchange', onHash)
     if (!window.location.hash) {
       window.location.hash = '#/'
@@ -19,6 +68,14 @@ export function useHashRoute() {
 export function go(path) {
   const next = path.startsWith('#') ? path : `#${path.startsWith('/') ? path : `/${path}`}`
   window.location.hash = next
+}
+
+export function back(fallback = '/') {
+  const current = hashPath(typeof window === 'undefined' ? fallback : window.location.hash)
+  if (visits[visits.length - 1] === current) visits.pop()
+  const prev = visits[visits.length - 1]
+  persistVisits()
+  go(prev || fallback)
 }
 
 export function parseRoute(path) {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RPE_OPTIONS, formatSetLine } from '../ids'
+import { RPE_OPTIONS, formatSetLine, roleLabel } from '../ids'
 import { go } from '../route'
 import { goalLabel, recommendNextPrescription } from '../progress'
 import { exerciseById, findSession, lastSetsForExercise } from '../storage'
@@ -60,7 +60,10 @@ export function Workout({ sessionId, scheduleSlotId = null, date = null }) {
         <ol>
           {plan.items.map((item) => (
             <li key={item.id}>
-              {item.exerciseName} — {item.sets} set{item.sets === 1 ? '' : 's'} · {(item.targets || []).join('/')}
+              {item.exerciseName} — {roleLabel(item.role)}
+              {item.warmup ? ' · WU set' : ''}
+              {' · '}
+              {item.sets} {item.sets === 1 ? 'set' : 'sets'} · {(item.targets || []).join('/')}
               {item.exerciseType === 'cardio' || item.exerciseType === 'bodyweight'
                 ? ''
                 : item.suggestedWeights?.some((weight) => Number(weight) > 0)
@@ -295,7 +298,7 @@ function ExerciseStep({ session, item, ex, index, total }) {
       <Back to="/" />
       <h1>{session.name}</h1>
       <p>
-        Exercise {index + 1} of {total}
+        Exercise {index + 1} of {total} · {roleLabel(item.role)}
       </p>
       <h2>{ex?.name || item.exerciseId}</h2>
       <p>
@@ -310,7 +313,7 @@ function ExerciseStep({ session, item, ex, index, total }) {
               restPausedRemaining: null,
             })}
           >
-            {candidateIndex + 1}. {candidate.exerciseName}
+            {candidateIndex + 1}. {candidate.exerciseName} · {roleLabel(candidate.role)}
           </button>
         ))}
       </p>
@@ -339,7 +342,7 @@ function ExerciseStep({ session, item, ex, index, total }) {
       )}
 
       <p>
-        Today&apos;s target: {item.warmup ? 'WU then ' : ''}
+        Today&apos;s target: {item.warmup ? 'WU set then ' : ''}
         {(item.targets || []).join(' / ')}
         {item.suggestedWeights?.length ? ` @ ${(item.suggestedWeights || []).join(' / ')} kg` : ''}
       </p>
@@ -378,7 +381,7 @@ function ExerciseStep({ session, item, ex, index, total }) {
         </p>
       ) : (
         <form key={`${item.exerciseId}-${currentType}-${currentWorkIndex}`} onSubmit={completeSet}>
-          <h3>{needsWu ? 'Warm-up' : `Set ${currentWorkIndex + 1} of ${workCount}`}</h3>
+          <h3>{needsWu ? 'WU set' : `Set ${currentWorkIndex + 1} of ${workCount}`}</h3>
           <p>Target: {target || '—'}</p>
           {usesWeight(ex) ? (
             <p>

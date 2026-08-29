@@ -35,6 +35,17 @@ export const RPE_OPTIONS = [
 
 export const EXERCISE_TYPES = ['machine', 'free', 'bodyweight', 'cardio']
 
+export const SESSION_ROLES = [
+  { value: 'warmup', label: 'WU session' },
+  { value: 'main', label: 'Main' },
+  { value: 'finisher', label: 'Finisher' },
+  { value: 'cardio', label: 'Cardio' },
+]
+
+export function roleLabel(role) {
+  return SESSION_ROLES.find((item) => item.value === (role || 'main'))?.label || 'Main'
+}
+
 export function weekdayName(value) {
   return WEEKDAYS.find((d) => d.value === Number(value))?.label ?? ''
 }
@@ -65,7 +76,7 @@ export function greeting() {
 
 export function formatSetLine(set) {
   const bits = []
-  if (set.setType === 'wu') bits.push('WU')
+  if (set.setType === 'wu') bits.push('WU set')
   if (set.weight != null && set.weight !== '' && Number(set.weight) !== 0) {
     bits.push(`${set.weight} kg`)
   }

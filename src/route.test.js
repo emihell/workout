@@ -1,6 +1,24 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseRoute } from './route.js'
+import { applyVisit, hashPath, parseRoute } from './route.js'
+
+describe('back visits the previous screen', () => {
+  it('normalizes hashes to paths', () => {
+    assert.equal(hashPath('#/programs'), '/programs')
+    assert.equal(hashPath('/schedule'), '/schedule')
+    assert.equal(hashPath(''), '/')
+  })
+
+  it('records new screens and treats a step back as returning, not a new visit', () => {
+    const stack = []
+    applyVisit(stack, '/')
+    applyVisit(stack, '/programs')
+    applyVisit(stack, '/programs/p')
+    assert.deepEqual(stack, ['/', '/programs', '/programs/p'])
+    applyVisit(stack, '/programs')
+    assert.deepEqual(stack, ['/', '/programs'])
+  })
+})
 
 describe('stable workflow routes', () => {
   it('parses dated schedule-plan item identities', () => {

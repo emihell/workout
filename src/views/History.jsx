@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { RPE_OPTIONS, formatSetLine } from '../ids'
+import { RPE_OPTIONS, formatSetLine, roleLabel } from '../ids'
 import { formatProgressionLine } from '../progress'
 import { go } from '../route'
+import { dateKey } from '../schedule'
 import {
   durationLabel,
   exerciseById,
@@ -22,6 +23,34 @@ function sessionTitle(program, session) {
 
 function whenLabel(workout) {
   return new Date(workout.finishedAt || workout.startedAt).toLocaleString()
+}
+
+function workoutDateKey(workout) {
+  if (workout.performedOn) return workout.performedOn
+  const stamp = workout.finishedAt || workout.startedAt
+  if (stamp) return dateKey(stamp)
+  return workout.scheduledFor || 'unknown'
+}
+
+function compactDate(key) {
+  if (key === 'unknown') return 'Unknown date'
+  const [year, month, day] = key.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function sortWorkoutsByDate(workouts) {
+  return [...(workouts || [])].sort((a, b) => {
+    const left = workoutDateKey(a)
+    const right = workoutDateKey(b)
+    if (left === 'unknown' && right !== 'unknown') return 1
+    if (right === 'unknown' && left !== 'unknown') return -1
+    if (left !== right) return right.localeCompare(left)
+    return new Date(b.finishedAt || b.startedAt || 0).getTime() - new Date(a.finishedAt || a.startedAt || 0).getTime()
+  })
 }
 
 function addSetToWorkout(store, workout, exerciseId, sessionItemId = null) {
@@ -76,29 +105,29 @@ function addSetToWorkout(store, workout, exerciseId, sessionItemId = null) {
 
 export function History() {
   const store = useStore()
-  const groups = groupWorkoutsBySession(store.workouts || [], store.programs)
+  const workouts = sortWorkoutsByDate(store.workouts || [])
 
   return (
     <section>
       <h1>History</h1>
-      <p>Past sessions, grouped the same way as the program.</p>
       <p>
         <a href="#/history/exercises">By exercise</a>
       </p>
-      {groups.length === 0 ? <p>None yet.</p> : null}
-      {groups.map((group) => (
-        <article key={group.groupId || group.sessionId}>
-          <h2>{sessionTitle(group.program, group.session)}</h2>
-          <ul>
-            {group.workouts.map((w) => (
-              <li key={w.id}>
-                <a href={`#/history/${w.id}`}>{whenLabel(w)}</a>
-                {w.overallFeel ? ` · ${w.overallFeel}` : ''}
-              </li>
-            ))}
-          </ul>
-        </article>
-      ))}
+      {workouts.length === 0 ? <p>None yet.</p> : null}
+      <ul>
+        {workouts.map((workout) => {
+          const { program, session } = findSession(store.programs, workout.sessionId)
+          const programName = workout.snapshot?.programName || program?.name || 'Program'
+          const sessionName = workout.snapshot?.sessionName || session?.name || 'Session'
+          return (
+            <li key={workout.id}>
+              <a href={`#/history/${workout.id}`}>
+                {compactDate(workoutDateKey(workout))} - {programName} - {sessionName}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
     </section>
   )
 }
@@ -204,7 +233,7 @@ export function HistoryDetail({ workoutId }) {
           return (
             <li key={group.sessionItemId}>
               <a href={`#/history/${workout.id}/exercise/${group.sessionItemId}`}>{snapshotItem?.exerciseName || ex?.name || group.exerciseId}</a>
-              {` — ${n} set${n === 1 ? '' : 's'}`}
+              {` — ${roleLabel(snapshotItem?.role)}${snapshotItem?.warmup ? ' · WU set' : ''} · ${n} set${n === 1 ? '' : 's'}`}
             </li>
           )
         })}
@@ -272,6 +301,10 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
     <section>
       <Back to={`/history/${workout.id}`} />
       <h1>{snapshotItem?.exerciseName || ex?.name || exerciseId}</h1>
+      <p>
+        {roleLabel(snapshotItem?.role)}
+        {snapshotItem?.warmup ? ' · WU set' : ''}
+      </p>
       <p>{whenLabel(workout)}</p>
       {items.length === 0 ? <p>No sets yet.</p> : null}
       <ol>
@@ -462,7 +495,7 @@ export function HistorySet({ workoutId, index }) {
             Type
             <br />
             <select value={setType} onChange={(e) => setSetType(e.target.value)}>
-              <option value="wu">Warm-up</option>
+              <option value="wu">WU set</option>
               <option value="work">Work</option>
             </select>
           </label>

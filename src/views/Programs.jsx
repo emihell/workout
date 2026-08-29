@@ -49,7 +49,7 @@ export function ProgramNew() {
           <label>
             Name
             <br />
-            <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Running" />
+            <input value={name} onChange={(e) => setName(e.target.value)} required />
           </label>
         </p>
         <GoalPicker value={goal} onChange={setGoal} />
