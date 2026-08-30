@@ -5,15 +5,85 @@ import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back } from './shared'
 
-export function Exercises() {
+const TYPE_LABELS = {
+  machine: 'Machine',
+  free: 'Free weights',
+  bodyweight: 'Bodyweight',
+  cardio: 'Cardio',
+}
+
+function typeLabel(type) {
+  return TYPE_LABELS[type] || type || 'Other'
+}
+
+function matchesQuery(ex, q) {
+  if (!q) return true
+  return `${ex.name} ${ex.equipment} ${ex.muscles} ${ex.type} ${typeLabel(ex.type)}`.toLowerCase().includes(q)
+}
+
+function groupedByType(exercises) {
+  const groups = EXERCISE_TYPES.map((type) => ({
+    type,
+    items: [],
+  }))
+  const other = { type: 'other', items: [] }
+  const index = Object.fromEntries(groups.map((group, i) => [group.type, i]))
+  for (const ex of exercises) {
+    const type = ex.type || 'free'
+    const group = groups[index[type]] || other
+    group.items.push(ex)
+  }
+  const named = [...groups, other].filter((group) => group.items.length)
+  for (const group of named) {
+    group.items.sort((a, b) => a.name.localeCompare(b.name))
+  }
+  return named
+}
+
+function ExerciseList({ exercises, showType = false }) {
+  if (exercises.length === 0) return null
+  return (
+    <ul>
+      {exercises.map((ex) => (
+        <li key={ex.id}>
+          <a href={`#/exercises/${ex.id}`}>{ex.name}</a> — {ex.equipment}
+          {showType ? ` (${typeLabel(ex.type)})` : ''}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function Exercises({ type = null }) {
   const store = useStore()
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
-  const list = store.exercises.filter((ex) => {
-    if (ex.archivedAt) return false
-    if (!q) return true
-    return `${ex.name} ${ex.equipment} ${ex.muscles}`.toLowerCase().includes(q)
-  })
+  const all = (store.exercises || []).filter((ex) => !ex.archivedAt)
+  const groups = groupedByType(all)
+
+  if (type) {
+    const group = groups.find((candidate) => candidate.type === type)
+    const items = (group?.items || []).filter((ex) => matchesQuery(ex, q))
+    return (
+      <section>
+        <Back />
+        <h1>{typeLabel(type)}</h1>
+        <p>
+          <label>
+            Search
+            <br />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} />
+          </label>
+        </p>
+        {items.length === 0 ? <p>{q ? 'No matches.' : 'No exercises in this type yet.'}</p> : null}
+        <ExerciseList exercises={items} />
+      </section>
+    )
+  }
+
+  const hits = q
+    ? all.filter((ex) => matchesQuery(ex, q)).sort((a, b) => a.name.localeCompare(b.name))
+    : []
 
   return (
     <section>
@@ -29,14 +99,23 @@ export function Exercises() {
           <input value={query} onChange={(e) => setQuery(e.target.value)} />
         </label>
       </p>
-      {list.length === 0 ? <p>No exercises yet.</p> : null}
-      <ul>
-        {list.map((ex) => (
-          <li key={ex.id}>
-            <a href={`#/exercises/${ex.id}`}>{ex.name}</a> — {ex.equipment}
-          </li>
-        ))}
-      </ul>
+      {q ? (
+        <>
+          {hits.length === 0 ? <p>No matches.</p> : null}
+          <ExerciseList exercises={hits} showType />
+        </>
+      ) : groups.length === 0 ? (
+        <p>No exercises yet.</p>
+      ) : (
+        <ul>
+          {groups.map((group) => (
+            <li key={group.type}>
+              <a href={`#/exercises/type/${group.type}`}>{typeLabel(group.type)}</a>
+              {` (${group.items.length})`}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }

@@ -102,6 +102,14 @@ describe('stable workflow routes', () => {
     assert.deepEqual(parseRoute('/exercises/new'), { name: 'exercise-new' })
     assert.deepEqual(parseRoute('/exercises/new/manual'), { name: 'exercise-new-manual' })
     assert.deepEqual(parseRoute('/exercises/new/search'), { name: 'exercise-new-search' })
+    assert.deepEqual(parseRoute('/exercises/type/machine'), {
+      name: 'exercises-type',
+      type: 'machine',
+    })
+    assert.deepEqual(parseRoute('/history/month/2026-08'), {
+      name: 'history-month',
+      month: '2026-08',
+    })
     assert.deepEqual(parseRoute('/routines/s/exercise/create'), {
       name: 'routine-exercise-create',
       routineId: 's',

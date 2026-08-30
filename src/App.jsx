@@ -106,6 +106,9 @@ function Screen() {
     return <RoutineDetail key={route.routineId} routineId={route.routineId} />
   }
   if (route.name === 'exercises') return <Exercises />
+  if (route.name === 'exercises-type') {
+    return <Exercises key={route.type} type={route.type} />
+  }
   if (route.name === 'exercise-new-manual') return <ExerciseNewManual />
   if (route.name === 'exercise-new-search') return <ExerciseNewSearch />
   if (route.name === 'exercise-new') return <ExerciseNew />
@@ -131,6 +134,7 @@ function Screen() {
   if (route.name === 'workout') return <Workout routineId={route.routineId} />
   if (route.name === 'start') return <StartWorkout />
   if (route.name === 'history') return <History />
+  if (route.name === 'history-month') return <History key={route.month} month={route.month} />
   if (route.name === 'history-exercises') return <HistoryExercises />
   if (route.name === 'history-exercise') return <HistoryExercise key={route.id} exerciseId={route.id} />
   if (route.name === 'history-workout-exercise') {

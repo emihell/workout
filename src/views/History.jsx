@@ -115,9 +115,76 @@ function addSetToWorkout(store, workout, exerciseId, routineItemId = null) {
   go(`/history/${workout.id}/set/${sets.length - 1}`)
 }
 
-export function History() {
+function workoutMonthKey(workout) {
+  const key = workoutDateKey(workout)
+  if (key === 'unknown' || !/^\d{4}-\d{2}/.test(key)) return 'unknown'
+  return key.slice(0, 7)
+}
+
+function monthLabel(key) {
+  if (key === 'unknown') return 'Unknown date'
+  const [year, month] = key.split('-').map(Number)
+  if (!year || !month) return key
+  return new Date(year, month - 1, 1).toLocaleDateString(undefined, {
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+function groupWorkoutsByMonth(workouts) {
+  const sorted = sortWorkoutsByDate(workouts)
+  const byMonth = new Map()
+  for (const workout of sorted) {
+    const key = workoutMonthKey(workout)
+    if (!byMonth.has(key)) byMonth.set(key, [])
+    byMonth.get(key).push(workout)
+  }
+  return [...byMonth.entries()]
+    .sort(([left], [right]) => {
+      if (left === 'unknown') return 1
+      if (right === 'unknown') return -1
+      return right.localeCompare(left)
+    })
+    .map(([key, items]) => ({ key, workouts: items }))
+}
+
+function WorkoutHistoryLink({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const programName = workout.snapshot?.programName
+  const name = workoutRoutineName(workout, routine)
+  const label = programName ? `${programName} - ${name}` : name
+  return (
+    <a href={`#/history/${workout.id}`}>
+      {compactDate(workoutDateKey(workout))} - {label}
+    </a>
+  )
+}
+
+export function History({ month = null }) {
   const store = useStore()
-  const workouts = sortWorkoutsByDate(store.workouts || [])
+  const months = groupWorkoutsByMonth(store.workouts || [])
+
+  if (month) {
+    const group = months.find((candidate) => candidate.key === month)
+    const workouts = group?.workouts || []
+    return (
+      <section>
+        <Back />
+        <h1>{monthLabel(month)}</h1>
+        {workouts.length === 0 ? (
+          <p>None in this month.</p>
+        ) : (
+          <ul>
+            {workouts.map((workout) => (
+              <li key={workout.id}>
+                <WorkoutHistoryLink store={store} workout={workout} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    )
+  }
 
   return (
     <section>
@@ -125,21 +192,14 @@ export function History() {
       <p>
         <a href="#/history/exercises">By exercise</a>
       </p>
-      {workouts.length === 0 ? <p>None yet.</p> : null}
+      {months.length === 0 ? <p>None yet.</p> : null}
       <ul>
-        {workouts.map((workout) => {
-          const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
-          const programName = workout.snapshot?.programName
-          const name = workoutRoutineName(workout, routine)
-          const label = programName ? `${programName} - ${name}` : name
-          return (
-            <li key={workout.id}>
-              <a href={`#/history/${workout.id}`}>
-                {compactDate(workoutDateKey(workout))} - {label}
-              </a>
-            </li>
-          )
-        })}
+        {months.map((group) => (
+          <li key={group.key}>
+            <a href={`#/history/month/${group.key}`}>{monthLabel(group.key)}</a>
+            {` (${group.workouts.length})`}
+          </li>
+        ))}
       </ul>
     </section>
   )

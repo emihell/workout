@@ -176,6 +176,9 @@ export function parseRoute(path) {
     return { name: 'exercise-new-search' }
   }
   if (parts[0] === 'exercises' && parts[1] === 'new') return { name: 'exercise-new' }
+  if (parts[0] === 'exercises' && parts[1] === 'type' && parts[2]) {
+    return { name: 'exercises-type', type: parts[2] }
+  }
   if (parts[0] === 'exercises' && parts[1] && parts[2] === 'edit') return { name: 'exercise-edit', id: parts[1] }
   if (parts[0] === 'exercises' && parts[1]) return { name: 'exercise', id: parts[1] }
   if (parts[0] === 'exercises') return { name: 'exercises' }
@@ -212,6 +215,9 @@ export function parseRoute(path) {
   if (parts[0] === 'history' && parts[1] === 'exercises') return { name: 'history-exercises' }
   if (parts[0] === 'history' && parts[1] === 'exercise' && parts[2]) {
     return { name: 'history-exercise', id: parts[2] }
+  }
+  if (parts[0] === 'history' && parts[1] === 'month' && parts[2]) {
+    return { name: 'history-month', month: parts[2] }
   }
   if (parts[0] === 'history' && parts[1] && parts[2] === 'exercise' && parts[3]) {
     return { name: 'history-workout-exercise', id: parts[1], exerciseId: parts[3] }
