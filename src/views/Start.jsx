@@ -1,20 +1,19 @@
 import { weekdayName } from '../ids'
 import { clampLoopWeeks, coveringWorkout, dateKey, remainingInLoop } from '../schedule'
-import { programById } from '../storage'
 import { useStore } from '../store-context'
 import { Back } from './shared'
 
-export function StartSession() {
+export function StartWorkout() {
   const store = useStore()
-  const programs = (store.programs || []).filter((program) => !program.archivedAt)
+  const routines = (store.routines || []).filter((routine) => !routine.archivedAt)
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
-  const upcoming = remainingInLoop(programs, store.schedule)
+  const upcoming = remainingInLoop(routines, store.schedule)
 
   return (
     <section>
-      <Back to="/" />
-      <h1>Start session</h1>
-      <p>Choose a scheduled workout to do early, or start an ad-hoc session that does not complete a future slot.</p>
+      <Back />
+      <h1>Start workout</h1>
+      <p>Choose a scheduled workout to do early, or start an ad-hoc workout that does not complete a future slot.</p>
 
       {(store.draftWorkouts || []).length ? (
         <>
@@ -22,12 +21,12 @@ export function StartSession() {
           <ul>
             {store.draftWorkouts.map((draft) => (
               <li key={draft.id}>
-                {draft.snapshot?.sessionName || 'Workout'} · {(draft.sets || []).length} logged sets{' '}
+                {draft.snapshot?.routineName || draft.snapshot?.sessionName || 'Workout'} · {(draft.sets || []).length} logged sets{' '}
                 <button
                   type="button"
                   onClick={() => {
                     store.resumeDraft(draft.id)
-                    window.location.hash = `#/workout/${draft.sessionId}`
+                    window.location.hash = `#/workout/${draft.routineId || draft.sessionId}`
                   }}
                 >
                   Resume
@@ -43,64 +42,35 @@ export function StartSession() {
       <ul>
         {upcoming.map((item) => {
           const when = dateKey(item.date)
-          const done = coveringWorkout(store.workouts, item.session.id, when, item.slot.id)
+          const done = coveringWorkout(store.workouts, item.routine.id, when, item.slot.id)
           return (
             <li key={`${item.slot.id}-${when}`}>
               {loop > 1 ? `Week ${item.week + 1} ` : ''}
-              {weekdayName(item.date.getDay())} — {item.program.name}: {item.session.name}{' '}
+              {weekdayName(item.date.getDay())} — {item.routine.name}{' '}
               {done ? (
-                <span>Session done on {dateKey(done.finishedAt)}</span>
+                <span>Workout done on {dateKey(done.finishedAt)}</span>
               ) : (
-                <a href={`#/workout/${item.session.id}/${item.slot.id}/${when}`}>View and do early</a>
+                <a href={`#/workout/${item.routine.id}/${item.slot.id}/${when}`}>View and do early</a>
               )}
             </li>
           )
         })}
       </ul>
 
-      <h2>Any session</h2>
-      {programs.length === 0 ? (
+      <h2>Any routine</h2>
+      {routines.length === 0 ? (
         <p>
-          No programs. <a href="#/programs">Create one</a>.
+          No routines. <a href="#/routines">Create one</a>.
         </p>
       ) : (
         <ul>
-          {programs.map((p) => (
-            <li key={p.id}>
-              <a href={`#/start/${p.id}`}>{p.name}</a> ({p.sessions.filter((session) => !session.archivedAt).length} sessions)
+          {routines.map((routine) => (
+            <li key={routine.id}>
+              <a href={`#/workout/${routine.id}`}>{routine.name}</a> ({routine.focus}, {routine.exercises.length} exercises)
             </li>
           ))}
         </ul>
       )}
-    </section>
-  )
-}
-
-export function StartProgram({ programId }) {
-  const store = useStore()
-  const program = programById(store.programs, programId)
-
-  if (!program) {
-    return (
-      <section>
-        <p>Program not found.</p>
-        <Back to="/start" />
-      </section>
-    )
-  }
-
-  return (
-    <section>
-      <Back to="/start" />
-      <h1>{program.name}</h1>
-      {program.sessions.filter((session) => !session.archivedAt).length === 0 ? <p>No sessions in this program.</p> : null}
-      <ul>
-        {program.sessions.filter((session) => !session.archivedAt).map((sess) => (
-          <li key={sess.id}>
-            <a href={`#/workout/${sess.id}`}>{sess.name}</a> ({sess.focus}, {sess.exercises.length} exercises)
-          </li>
-        ))}
-      </ul>
     </section>
   )
 }

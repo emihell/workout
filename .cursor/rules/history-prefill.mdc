@@ -1,0 +1,12 @@
+---
+description: Prefill logging reps from target and RPE moderate; other fields only from history
+alwaysApply: true
+---
+
+# Prefills
+
+On the live set log screen, prefill **Reps** from that set's target and **How hard was it?** with Moderate (RPE 3). Going back a set keeps the values just logged.
+
+Everywhere else, do not prefill from plans, recommendations, library cues, or type defaults. Prefill only when this exercise has previous **finished-workout** data for that same field (`historyPrescription` / `lastSetsForExercise` / `historySetPrefill`).
+
+Do not invent warmup (50% load, 12 reps), rest (90s), or notes (copy of `ex.cues`). Editing an existing record may show that record's saved values.

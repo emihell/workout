@@ -1,21 +1,33 @@
 import { useEffect, useState } from 'react'
 
-const NAV_KEY = 'workout-mvp-nav'
+const NAV_KEY = 'workout-mvp-nav-2'
 
 export function hashPath(hash) {
   const raw = String(hash || '').replace(/^#/, '') || '/'
   return raw.startsWith('/') ? raw : `/${raw}`
 }
 
-export function applyVisit(stack, path) {
+export function toHash(path) {
+  const next = hashPath(path)
+  return `#${next}`
+}
+
+export function applyVisit(stack, path, { replace = false } = {}) {
   const next = hashPath(path)
   if (stack[stack.length - 1] === next) return stack
-  if (stack.length >= 2 && stack[stack.length - 2] === next) {
-    stack.pop()
+  if (replace && stack.length) {
+    stack[stack.length - 1] = next
     return stack
   }
   stack.push(next)
+  if (stack.length > 50) stack.splice(0, stack.length - 50)
   return stack
+}
+
+export function applyBack(stack, currentHash, fallback = '/') {
+  const current = hashPath(currentHash)
+  if (stack[stack.length - 1] === current) stack.pop()
+  return stack[stack.length - 1] || fallback
 }
 
 function loadVisits() {
@@ -65,17 +77,23 @@ export function useHashRoute() {
   return parseRoute(path)
 }
 
-export function go(path) {
-  const next = path.startsWith('#') ? path : `#${path.startsWith('/') ? path : `/${path}`}`
-  window.location.hash = next
+export function go(path, { replace = false } = {}) {
+  const next = hashPath(path)
+  applyVisit(visits, next, { replace })
+  persistVisits()
+  if (typeof window !== 'undefined' && hashPath(window.location.hash) !== next) {
+    window.location.hash = toHash(next)
+  }
 }
 
 export function back(fallback = '/') {
-  const current = hashPath(typeof window === 'undefined' ? fallback : window.location.hash)
-  if (visits[visits.length - 1] === current) visits.pop()
-  const prev = visits[visits.length - 1]
+  const current = typeof window === 'undefined' ? fallback : window.location.hash
+  const prev = applyBack(visits, current, fallback)
   persistVisits()
-  go(prev || fallback)
+  if (typeof window !== 'undefined') {
+    window.location.hash = toHash(prev)
+  }
+  return prev
 }
 
 export function parseRoute(path) {
@@ -84,7 +102,7 @@ export function parseRoute(path) {
 
   if (parts[0] === 'schedule' && parts[1] === 'loop') return { name: 'schedule-loop' }
   if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null && parts[3] === 'add' && parts[4]) {
-    return { name: 'schedule-day-sessions', week: Number(parts[1]), weekday: Number(parts[2]), programId: parts[4] }
+    return { name: 'schedule-day-add', week: Number(parts[1]), weekday: Number(parts[2]) }
   }
   if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null && parts[3] === 'add') {
     return { name: 'schedule-day-add', week: Number(parts[1]), weekday: Number(parts[2]) }
@@ -124,57 +142,71 @@ export function parseRoute(path) {
   }
   if (parts[0] === 'schedule') return { name: 'schedule' }
 
-  if (parts[0] === 'programs' && parts[1] === 'new') return { name: 'program-new' }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'edit') return { name: 'program-edit', id: parts[1] }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'session' && parts[3] === 'new') {
-    return { name: 'session-new', programId: parts[1] }
-  }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'session' && parts[3] && parts[4] === 'exercise' && parts[5] === 'new' && parts[6]) {
-    return {
-      name: 'session-exercise-new',
-      programId: parts[1],
-      sessionId: parts[3],
-      exerciseId: parts[6],
+  if (parts[0] === 'routines') {
+    if (parts[1] === 'new') return { name: 'routine-new' }
+    if (parts[1] && parts[2] === 'edit') {
+      return { name: 'routine-edit', routineId: parts[1] }
     }
-  }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'session' && parts[3] && parts[4] === 'exercise' && parts[5] === 'new') {
-    return { name: 'session-exercise-pick', programId: parts[1], sessionId: parts[3] }
-  }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'session' && parts[3] && parts[4] === 'exercise' && parts[5] != null) {
-    return {
-      name: 'session-exercise',
-      programId: parts[1],
-      sessionId: parts[3],
-      itemId: parts[5],
+    if (parts[1] && parts[2] === 'exercise' && parts[3] === 'create' && parts[4] === 'manual') {
+      return { name: 'routine-exercise-create-manual', routineId: parts[1] }
     }
+    if (parts[1] && parts[2] === 'exercise' && parts[3] === 'create' && parts[4] === 'search') {
+      return { name: 'routine-exercise-create-search', routineId: parts[1] }
+    }
+    if (parts[1] && parts[2] === 'exercise' && parts[3] === 'create') {
+      return { name: 'routine-exercise-create', routineId: parts[1] }
+    }
+    if (parts[1] && parts[2] === 'exercise' && parts[3] === 'new' && parts[4]) {
+      return { name: 'routine-exercise-new', routineId: parts[1], exerciseId: parts[4] }
+    }
+    if (parts[1] && parts[2] === 'exercise' && parts[3] === 'new') {
+      return { name: 'routine-exercise-pick', routineId: parts[1] }
+    }
+    if (parts[1] && parts[2] === 'exercise' && parts[3] != null) {
+      return { name: 'routine-exercise', routineId: parts[1], itemId: parts[3] }
+    }
+    if (parts[1]) return { name: 'routine', routineId: parts[1] }
+    return { name: 'routines' }
   }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'session' && parts[3] && parts[4] === 'edit') {
-    return { name: 'session-edit', programId: parts[1], sessionId: parts[3] }
-  }
-  if (parts[0] === 'programs' && parts[1] && parts[2] === 'session' && parts[3]) {
-    return { name: 'session', programId: parts[1], sessionId: parts[3] }
-  }
-  if (parts[0] === 'programs' && parts[1]) return { name: 'program', id: parts[1] }
-  if (parts[0] === 'programs' || parts[0] === 'program') return { name: 'programs' }
 
+  if (parts[0] === 'exercises' && parts[1] === 'new' && parts[2] === 'manual') {
+    return { name: 'exercise-new-manual' }
+  }
+  if (parts[0] === 'exercises' && parts[1] === 'new' && parts[2] === 'search') {
+    return { name: 'exercise-new-search' }
+  }
   if (parts[0] === 'exercises' && parts[1] === 'new') return { name: 'exercise-new' }
   if (parts[0] === 'exercises' && parts[1] && parts[2] === 'edit') return { name: 'exercise-edit', id: parts[1] }
   if (parts[0] === 'exercises' && parts[1]) return { name: 'exercise', id: parts[1] }
   if (parts[0] === 'exercises') return { name: 'exercises' }
 
   if (parts[0] === 'workout' && parts[1] && parts[2] === 'set' && parts[3] != null) {
-    return { name: 'workout-set', sessionId: parts[1], index: Number(parts[3]) }
+    return { name: 'workout-set', routineId: parts[1], index: Number(parts[3]) }
+  }
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3] && parts[4] === 'done') {
+    return { name: 'workout-item-done', routineId: parts[1], itemId: parts[3] }
+  }
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3] && parts[4] === 'exercise') {
+    return { name: 'workout-item-exercise', routineId: parts[1], itemId: parts[3] }
+  }
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3] && parts[4] === 'log') {
+    return { name: 'workout-item-log', routineId: parts[1], itemId: parts[3] }
+  }
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3]) {
+    return { name: 'workout-item', routineId: parts[1], itemId: parts[3] }
+  }
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'finish') {
+    return { name: 'workout-finish', routineId: parts[1] }
   }
   if (parts[0] === 'workout' && parts[1] && parts[2] && parts[3]) {
     return {
       name: 'workout-preview',
-      sessionId: parts[1],
+      routineId: parts[1],
       scheduleSlotId: parts[2],
       date: parts[3],
     }
   }
-  if (parts[0] === 'workout' && parts[1]) return { name: 'workout', sessionId: parts[1] }
-  if (parts[0] === 'start' && parts[1]) return { name: 'start-program', id: parts[1] }
+  if (parts[0] === 'workout' && parts[1]) return { name: 'workout', routineId: parts[1] }
   if (parts[0] === 'start') return { name: 'start' }
 
   if (parts[0] === 'history' && parts[1] === 'exercises') return { name: 'history-exercises' }
@@ -199,6 +231,8 @@ export function parseRoute(path) {
   }
   if (parts[0] === 'history' && parts[1]) return { name: 'history-detail', id: parts[1] }
   if (parts[0] === 'history') return { name: 'history' }
+
+  if (parts[0] === 'settings') return { name: 'settings' }
 
   return { name: 'today' }
 }

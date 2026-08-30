@@ -1,7 +1,6 @@
-import { parseTargets } from './ids.js'
-import { GOAL_PROFILES, normalizeGoal, recommendNextPrescription } from './progress.js'
+import { recommendNextPrescription } from './progress.js'
 
-export const SCHEMA_VERSION = 6
+export const SCHEMA_VERSION = 8
 
 function inferRole(item, exercise, index) {
   if (item.role) return item.role
@@ -11,75 +10,141 @@ function inferRole(item, exercise, index) {
   return exercise?.type === 'cardio' ? 'cardio' : 'main'
 }
 
-function itemId(sessionId, item, index) {
-  return item.id || `si-${sessionId}-${index}-${item.exerciseId}`
+function itemId(routineId, item, index) {
+  return item.id || `si-${routineId}-${index}-${item.exerciseId}`
 }
 
-function workoutSnapshot(state, workout) {
-  const found = findSessionInState(state.programs, workout.sessionId)
+function migrateRoutine(routine, exercises, legacyRecommendations) {
+  return {
+    ...routine,
+    archivedAt: routine.archivedAt || null,
+    exercises: (routine.exercises || []).map((item, index) => {
+      const id = itemId(routine.id, item, index)
+      const ex = exercises.find((candidate) => candidate.id === item.exerciseId)
+      const legacy = legacyRecommendations[id]
+      if (!legacy && (item.targets?.length || item.suggestedWeights?.length)) {
+        legacyRecommendations[id] = {
+          targets: [...(item.targets || [])],
+          suggestedWeights: [...(item.suggestedWeights || [])],
+          sets: Number(item.sets) || (item.targets || []).length || 1,
+        }
+      }
+      const baseline = legacyRecommendations[id]
+      const targets = item.targets?.length ? [...item.targets] : [...(baseline?.targets || [])]
+      const suggestedWeights = item.suggestedWeights?.length
+        ? [...item.suggestedWeights]
+        : [...(baseline?.suggestedWeights || [])]
+      return {
+        id,
+        exerciseId: item.exerciseId,
+        role: inferRole(item, ex, index),
+        restSec: Number(item.restSec) || 0,
+        notes: item.notes || '',
+        warmup: item.warmup || null,
+        sets: Number(item.sets) || Number(baseline?.sets) || targets.length || 1,
+        targets,
+        suggestedWeights,
+      }
+    }),
+  }
+}
+
+function flattenRoutines(source, exercises, legacyRecommendations) {
+  const existing = source.routines?.length ? source.routines : source.sessions
+  if (Array.isArray(existing) && existing.length) {
+    return existing.map((routine) => migrateRoutine(routine, exercises, legacyRecommendations))
+  }
+  return (source.programs || []).flatMap((program) =>
+    (program.sessions || []).map((routine) => migrateRoutine(routine, exercises, legacyRecommendations)),
+  )
+}
+
+function programLabelFrom(source, routineId) {
+  for (const program of source.programs || []) {
+    if ((program.sessions || []).some((routine) => routine.id === routineId)) {
+      return { programId: program.id || null, programName: program.name || '' }
+    }
+  }
+  return { programId: null, programName: '' }
+}
+
+function workoutSnapshot(state, workout, origin = state) {
+  const routineId = workout.routineId || workout.sessionId
+  const found = findRoutineInState(state.routines, routineId)
   if (workout.snapshot) {
     const items = (workout.snapshot.items || []).map((item) => {
-      const templateItem = found.session?.exercises?.find(
+      const templateItem = found.routine?.exercises?.find(
         (candidate) =>
-          candidate.id === item.sessionItemId ||
+          candidate.id === (item.routineItemId || item.sessionItemId) ||
           candidate.exerciseId === item.exerciseId,
       )
-      const exercise = (state.exercises || []).find(
-        (candidate) => candidate.id === item.exerciseId,
-      )
-      const actualWorkingSets = (workout.sets || []).filter(
-        (set) =>
-          (set.sessionItemId === item.sessionItemId || set.exerciseId === item.exerciseId) &&
+      const exercise = (state.exercises || []).find((candidate) => candidate.id === item.exerciseId)
+      const actualWorkingSets = (workout.sets || []).filter((set) => {
+        const setItemId = set.routineItemId || set.sessionItemId
+        const itemIdValue = item.routineItemId || item.sessionItemId
+        return (
+          (setItemId === itemIdValue || set.exerciseId === item.exerciseId) &&
           set.setType !== 'wu' &&
-          String(set.reps || '').toLowerCase() !== 'skipped',
-      )
-      const baseline = templateItem?.id
-        ? state.legacyRecommendations?.[templateItem.id]
-        : null
+          String(set.reps || '').toLowerCase() !== 'skipped'
+        )
+      })
+      const baseline = templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
+      const { sessionItemId, ...rest } = item
       return {
-        ...item,
+        ...rest,
+        routineItemId: item.routineItemId || sessionItemId || templateItem?.id,
         exerciseName: item.exerciseName || exercise?.name || 'Deleted exercise',
         equipment: item.equipment || exercise?.equipment || '',
         exerciseType: item.exerciseType || exercise?.type || 'free',
         weightStep: item.weightStep || exercise?.weightStep || 'n/a',
-        targets:
-          item.targets?.length
-            ? item.targets
-            : [...(baseline?.targets || actualWorkingSets.map((set) => String(set.reps || '')))],
-        suggestedWeights:
-          item.suggestedWeights?.length
-            ? item.suggestedWeights
-            : actualWorkingSets.map((set) => Number(set.weight) || 0),
+        targets: item.targets?.length
+          ? item.targets
+          : [...(baseline?.targets || actualWorkingSets.map((set) => String(set.reps || '')))],
+        suggestedWeights: item.suggestedWeights?.length
+          ? item.suggestedWeights
+          : actualWorkingSets.map((set) => Number(set.weight) || 0),
       }
     })
     const itemByExercise = new Map(items.map((item) => [item.exerciseId, item]))
+    const snapshot = { ...workout.snapshot, items }
+    delete snapshot.sessionId
+    delete snapshot.sessionName
     return {
       ...workout,
       schemaVersion: SCHEMA_VERSION,
-      snapshot: { ...workout.snapshot, items },
-      sets: (workout.sets || []).map((set) => ({
-        ...set,
-        sessionItemId:
-          set.sessionItemId ||
-          itemByExercise.get(set.exerciseId)?.sessionItemId ||
-          `history-${workout.id}-${set.exerciseId}`,
-        targetReps: set.targetReps ?? '',
-        targetWeight: set.targetWeight ?? null,
-      })),
+      routineId,
+      completedItemIds: workout.completedItemIds || workout.completedSessionItemIds || [],
+      snapshot: {
+        ...snapshot,
+        routineId,
+        routineName:
+          workout.snapshot.routineName || workout.snapshot.sessionName || found.routine?.name || '',
+      },
+      sets: (workout.sets || []).map((set) => {
+        const { sessionItemId, ...rest } = set
+        return {
+          ...rest,
+          routineItemId:
+            set.routineItemId ||
+            sessionItemId ||
+            itemByExercise.get(set.exerciseId)?.routineItemId ||
+            `history-${workout.id}-${set.exerciseId}`,
+          targetReps: set.targetReps ?? '',
+          targetWeight: set.targetWeight ?? null,
+        }
+      }),
     }
   }
-  const programName = found.program?.name || workout.programName || 'Deleted program'
-  const sessionName = found.session?.name || workout.sessionName || 'Deleted session'
+  const routineName = found.routine?.name || workout.routineName || workout.sessionName || 'Deleted routine'
+  const legacyProgram = programLabelFrom(origin, routineId)
   const items = []
   const seen = new Set()
   for (const set of workout.sets || []) {
     if (seen.has(set.exerciseId)) continue
     seen.add(set.exerciseId)
     const ex = (state.exercises || []).find((x) => x.id === set.exerciseId)
-    const templateItem = found.session?.exercises?.find((x) => x.exerciseId === set.exerciseId)
-    const baseline = templateItem?.id
-      ? state.legacyRecommendations?.[templateItem.id]
-      : null
+    const templateItem = found.routine?.exercises?.find((x) => x.exerciseId === set.exerciseId)
+    const baseline = templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
     const actualWorkingSets = (workout.sets || []).filter(
       (candidate) =>
         candidate.exerciseId === set.exerciseId &&
@@ -87,14 +152,16 @@ function workoutSnapshot(state, workout) {
         String(candidate.reps || '').toLowerCase() !== 'skipped',
     )
     items.push({
-      sessionItemId: templateItem?.id || `history-${workout.id}-${set.exerciseId}`,
+      routineItemId: templateItem?.id || `history-${workout.id}-${set.exerciseId}`,
       exerciseId: set.exerciseId,
       exerciseName: ex?.name || set.exerciseName || 'Deleted exercise',
       equipment: ex?.equipment || '',
       exerciseType: ex?.type || 'free',
       weightStep: ex?.weightStep || 'n/a',
       role: templateItem?.role || 'main',
-      targets: [...(baseline?.targets || actualWorkingSets.map((candidate) => String(candidate.reps || '')))],
+      targets: templateItem?.targets?.length
+        ? [...templateItem.targets]
+        : [...(baseline?.targets || actualWorkingSets.map((candidate) => String(candidate.reps || '')))],
       suggestedWeights: actualWorkingSets.map((candidate) => Number(candidate.weight) || 0),
       restSec: templateItem?.restSec || 0,
       notes: templateItem?.notes || '',
@@ -105,210 +172,197 @@ function workoutSnapshot(state, workout) {
   return {
     ...workout,
     schemaVersion: SCHEMA_VERSION,
+    routineId,
     scheduleSlotId: workout.scheduleSlotId || null,
     occurrenceId:
       workout.occurrenceId ||
-      (workout.scheduledFor ? `${workout.scheduleSlotId || workout.sessionId}@${workout.scheduledFor}` : null),
+      (workout.scheduledFor ? `${workout.scheduleSlotId || routineId}@${workout.scheduledFor}` : null),
+    completedItemIds: workout.completedItemIds || workout.completedSessionItemIds || [],
     snapshot: {
-      programId: found.program?.id || workout.programId || null,
-      programName,
-      sessionId: workout.sessionId,
-      sessionName,
-      focus: found.session?.focus || '',
-      goal: normalizeGoal(found.program?.goal),
+      programId: workout.programId || legacyProgram.programId,
+      programName: workout.programName || workout.snapshot?.programName || legacyProgram.programName,
+      routineId,
+      routineName,
+      focus: found.routine?.focus || '',
       items,
     },
-    sets: (workout.sets || []).map((set) => ({
-      ...set,
-      sessionItemId:
-        set.sessionItemId ||
-        itemByExercise.get(set.exerciseId)?.sessionItemId ||
-        `history-${workout.id}-${set.exerciseId}`,
-      targetReps: set.targetReps ?? '',
-      targetWeight: set.targetWeight ?? null,
-    })),
+    sets: (workout.sets || []).map((set) => {
+      const { sessionItemId, ...rest } = set
+      return {
+        ...rest,
+        routineItemId:
+          set.routineItemId ||
+          sessionItemId ||
+          itemByExercise.get(set.exerciseId)?.routineItemId ||
+          `history-${workout.id}-${set.exerciseId}`,
+        targetReps: set.targetReps ?? '',
+        targetWeight: set.targetWeight ?? null,
+      }
+    }),
   }
 }
 
-export function findSessionInState(programs, sessionId) {
-  for (const program of programs || []) {
-    const session = (program.sessions || []).find((candidate) => candidate.id === sessionId)
-    if (session) return { program, session }
-  }
-  return { program: null, session: null }
+function stripLegacyWorkoutKeys(workout) {
+  if (!workout) return workout
+  const next = { ...workout }
+  delete next.sessionId
+  delete next.sessionName
+  delete next.completedSessionItemIds
+  return next
+}
+
+export function findRoutineInState(routines, routineId) {
+  const routine = (routines || []).find((candidate) => candidate.id === routineId) || null
+  return { routine }
 }
 
 export function migrateState(input) {
   const source = structuredClone(input || {})
   const exercises = Array.isArray(source.exercises) ? source.exercises : []
   const legacyRecommendations = { ...(source.legacyRecommendations || {}) }
-  const programs = (source.programs || []).map((program) => ({
-    ...program,
-    archivedAt: program.archivedAt || null,
-    goal: normalizeGoal(program.goal),
-    sessions: (program.sessions || []).map((session) => ({
-      ...session,
-      archivedAt: session.archivedAt || null,
-      exercises: (session.exercises || []).map((item, index) => {
-        const id = itemId(session.id, item, index)
-        const ex = exercises.find((candidate) => candidate.id === item.exerciseId)
-        if (!legacyRecommendations[id] && (item.targets?.length || item.suggestedWeights?.length)) {
-          legacyRecommendations[id] = {
-            targets: [...(item.targets || [])],
-            suggestedWeights: [...(item.suggestedWeights || [])],
-            sets: Number(item.sets) || (item.targets || []).length || 3,
-          }
-        }
-        return {
-          id,
-          exerciseId: item.exerciseId,
-          role: inferRole(item, ex, index),
-          restSec: Number(item.restSec) || 0,
-          notes: item.notes || '',
-          warmup: item.warmup || null,
-        }
-      }),
-    })),
-  }))
+  const routines = flattenRoutines(source, exercises, legacyRecommendations)
 
   const interim = {
     ...source,
     schemaVersion: SCHEMA_VERSION,
     exercises: exercises.map((exercise) => ({ ...exercise, archivedAt: exercise.archivedAt || null })),
-    programs,
+    routines,
     schedule: {
       ...(source.schedule || {}),
-      slots: (source.schedule?.slots || []).map((slot, index) => ({
-        ...slot,
-        id:
-          slot.id ||
-          `slot-${Number(slot.week) || 0}-${Number(slot.weekday) || 0}-${slot.sessionId}-${index}`,
-      })),
+      slots: (source.schedule?.slots || []).map((slot, index) => {
+        const routineId = slot.routineId || slot.sessionId
+        return {
+          id: slot.id || `slot-${Number(slot.week) || 0}-${Number(slot.weekday) || 0}-${routineId}-${index}`,
+          week: Number(slot.week) || 0,
+          weekday: Number(slot.weekday),
+          routineId,
+        }
+      }),
     },
-    plannedWorkouts: Array.isArray(source.plannedWorkouts) ? source.plannedWorkouts : [],
-    draftWorkouts: Array.isArray(source.draftWorkouts)
-      ? source.draftWorkouts.map((workout) => workoutSnapshot(source, workout))
-      : [],
+    plannedWorkouts: (Array.isArray(source.plannedWorkouts) ? source.plannedWorkouts : []).map((plan) => {
+      const items = (plan.items || []).map((item) => {
+        const { sessionItemId, ...rest } = item
+        return { ...rest, routineItemId: item.routineItemId || sessionItemId }
+      })
+      const { sessionId, sessionName, ...rest } = plan
+      return {
+        ...rest,
+        routineId: plan.routineId || sessionId,
+        routineName: plan.routineName || sessionName,
+        items,
+      }
+    }),
+    draftWorkouts: Array.isArray(source.draftWorkouts) ? source.draftWorkouts : [],
     legacyRecommendations,
   }
+  delete interim.sessions
+  delete interim.programs
 
   return {
     ...interim,
-    workouts: (source.workouts || []).map((workout) => workoutSnapshot(interim, workout)),
-    draftWorkouts: (source.draftWorkouts || []).map((workout) => workoutSnapshot(interim, workout)),
-    activeWorkout: source.activeWorkout ? workoutSnapshot(interim, source.activeWorkout) : null,
+    workouts: (source.workouts || []).map((workout) =>
+      stripLegacyWorkoutKeys(workoutSnapshot(interim, workout, source)),
+    ),
+    draftWorkouts: (source.draftWorkouts || []).map((workout) =>
+      stripLegacyWorkoutKeys(workoutSnapshot(interim, workout, source)),
+    ),
+    activeWorkout: source.activeWorkout
+      ? stripLegacyWorkoutKeys(workoutSnapshot(interim, source.activeWorkout, source))
+      : null,
   }
 }
 
-function latestWorkoutForItem(state, sessionId, sessionItemId, exerciseId, beforeDate) {
-  const candidates = [...(state.workouts || [])]
-    .filter((workout) => {
-      if (!workout.finishedAt) return false
-      if (beforeDate && String(workout.finishedAt).slice(0, 10) >= beforeDate) return false
-      return (workout.sets || []).some(
-        (set) =>
-          String(set.reps || '').toLowerCase() !== 'skipped' &&
-          ((set.sessionItemId && set.sessionItemId === sessionItemId) ||
-            (!set.sessionItemId && set.exerciseId === exerciseId) ||
-            set.exerciseId === exerciseId),
+export function applyProgressionToRoutines(routines, routineId, progression) {
+  const byKey = new Map((progression || []).map((item) => [item.routineItemId || item.sessionItemId, item]))
+  return (routines || []).map((routine) => {
+    if (routine.id !== routineId) return routine
+    return {
+      ...routine,
+      exercises: (routine.exercises || []).map((item) => {
+        const next = byKey.get(item.id)
+        if (!next) return item
+        const targets = next.targetsTo?.length ? [...next.targetsTo] : [...(item.targets || [])]
+        const suggestedWeights = Array.isArray(next.to) ? [...next.to] : [...(item.suggestedWeights || [])]
+        return {
+          ...item,
+          targets,
+          suggestedWeights,
+          sets: Math.max(Number(item.sets) || 1, targets.length, suggestedWeights.length),
+        }
+      }),
+    }
+  })
+}
+
+export function progressionFromWorkout(state, workout) {
+  return (workout?.snapshot?.items || []).map((item) => {
+    const exercise =
+      (state.exercises || []).find((candidate) => candidate.id === item.exerciseId) || {
+        type: item.exerciseType,
+        weightStep: item.weightStep,
+      }
+    const itemIdValue = item.routineItemId || item.sessionItemId || item.id
+    const sets = (workout.sets || []).filter((set) => {
+      const setItemId = set.routineItemId || set.sessionItemId
+      return (
+        set.setType !== 'wu' &&
+        (setItemId === itemIdValue || setItemId === item.id) &&
+        String(set.reps || '').toLowerCase() !== 'skipped'
       )
     })
-    .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)))
-  return (
-    candidates.find(
-      (workout) =>
-        workout.sessionId === sessionId &&
-        (workout.sets || []).some(
-          (set) =>
-            set.sessionItemId === sessionItemId &&
-            String(set.reps || '').toLowerCase() !== 'skipped',
-        ),
-    ) || candidates[0]
-  )
+    const recommendation = recommendNextPrescription({
+      targets: item.targets,
+      sets,
+      exercise,
+    })
+    return {
+      routineItemId: itemIdValue,
+      to: sets.length ? recommendation.weights : item.suggestedWeights || [],
+      targetsTo: sets.length ? recommendation.targets : item.targets || [],
+    }
+  })
 }
 
-export function goalPrescription(goal) {
-  const profile = GOAL_PROFILES[normalizeGoal(goal)]
-  const targets = parseTargets(profile.defaultTargets, 3)
-  return { targets, sets: targets.length }
-}
-
-export function buildPlannedWorkout(state, { sessionId, date, scheduleSlotId = null, occurrenceId = null }) {
-  const existing = (state.plannedWorkouts || []).find(
-    (plan) =>
-      plan.date === date &&
-      plan.sessionId === sessionId &&
-      (plan.scheduleSlotId || null) === (scheduleSlotId || null),
-  )
-  if (existing) return structuredClone(existing)
-
-  const { program, session } = findSessionInState(state.programs, sessionId)
-  if (!program || !session) return null
-  const base = goalPrescription(program.goal)
-  const items = (session.exercises || []).map((item) => {
+export function buildPlannedWorkout(state, { routineId, date, scheduleSlotId = null, occurrenceId = null }) {
+  const { routine } = findRoutineInState(state.routines, routineId)
+  if (!routine) return null
+  const items = (routine.exercises || []).map((item) => {
     const exercise = (state.exercises || []).find((candidate) => candidate.id === item.exerciseId)
-    const legacy = state.legacyRecommendations?.[item.id]
-    const latest = latestWorkoutForItem(state, session.id, item.id, item.exerciseId, date)
-    const workSets = (latest?.sets || []).filter(
-      (set) =>
-        set.setType !== 'wu' &&
-        (set.sessionItemId === item.id || set.exerciseId === item.exerciseId) &&
-        String(set.reps || '').toLowerCase() !== 'skipped',
-    )
-    const recommendation = workSets.length
-      ? recommendNextPrescription({
-          targets: base.targets,
-          sets: workSets,
-          exercise,
-        })
-      : null
-    const suggestedWeights =
-      recommendation?.weights?.length
-        ? recommendation.weights
-        : latest
-          ? workSets.map((set) => Number(set.weight) || 0)
-          : [...(legacy?.suggestedWeights || [])]
-    const targets =
-      recommendation?.targets?.length
-        ? recommendation.targets
-        : legacy?.targets?.length
-          ? [...legacy.targets]
-          : [...base.targets]
+    const targets = [...(item.targets || [])]
+    const suggestedWeights = [...(item.suggestedWeights || [])]
+    const sets = Number(item.sets) || targets.length || 1
     const weighted = exercise && exercise.type !== 'bodyweight' && exercise.type !== 'cardio'
     return {
       id: `pi-${item.id}`,
-      sessionItemId: item.id,
+      routineItemId: item.id,
       exerciseId: item.exerciseId,
       exerciseName: exercise?.name || 'Deleted exercise',
       equipment: exercise?.equipment || '',
       exerciseType: exercise?.type || 'free',
       weightStep: exercise?.weightStep || 'n/a',
       role: item.role || 'main',
-      sets: Number(legacy?.sets) || targets.length || base.sets,
+      sets,
       targets,
       suggestedWeights,
       restSec: item.restSec || 0,
       notes: item.notes || '',
       warmup: item.warmup || null,
       calibrationRequired: Boolean(weighted && !suggestedWeights.some((weight) => Number(weight) > 0)),
-      recommendationReason:
-        recommendation?.reason ||
-        (latest ? 'Based on the most recent completed workout.' : 'No history yet. Find a starting load.'),
+      recommendationReason: suggestedWeights.some((weight) => Number(weight) > 0)
+        ? 'From the routine.'
+        : 'No history yet. Find a starting load.',
     }
   })
 
   return {
-    id: occurrenceId || `${scheduleSlotId || `adhoc-${sessionId}`}@${date}`,
-    occurrenceId: occurrenceId || `${scheduleSlotId || `adhoc-${sessionId}`}@${date}`,
+    id: occurrenceId || `${scheduleSlotId || `adhoc-${routineId}`}@${date}`,
+    occurrenceId: occurrenceId || `${scheduleSlotId || `adhoc-${routineId}`}@${date}`,
     scheduleSlotId,
-    sessionId,
-    programId: program.id,
+    routineId,
     date,
     status: 'planned',
-    programName: program.name,
-    sessionName: session.name,
-    focus: session.focus,
-    goal: normalizeGoal(program.goal),
+    routineName: routine.name,
+    focus: routine.focus,
     items,
     manuallyEdited: false,
   }
@@ -316,12 +370,9 @@ export function buildPlannedWorkout(state, { sessionId, date, scheduleSlotId = n
 
 export function planSnapshot(plan) {
   return {
-    programId: plan.programId,
-    programName: plan.programName,
-    sessionId: plan.sessionId,
-    sessionName: plan.sessionName,
+    routineId: plan.routineId,
+    routineName: plan.routineName,
     focus: plan.focus,
-    goal: plan.goal,
     items: structuredClone(plan.items || []),
   }
 }

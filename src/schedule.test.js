@@ -8,23 +8,18 @@ import {
   occurrenceId,
 } from './schedule.js'
 
-const programs = [
-  {
-    id: 'p1',
-    sessions: [{ id: 'sess-upper', name: 'Upper' }],
-  },
-]
+const routines = [{ id: 'sess-upper', name: 'Upper' }]
 const schedule = {
   loopWeeks: 1,
   anchor: '2026-08-24',
-  slots: [{ id: 'slot-1', week: 0, weekday: 1, programId: 'p1', sessionId: 'sess-upper' }],
+  slots: [{ id: 'slot-1', week: 0, weekday: 1, routineId: 'sess-upper' }],
 }
 
 describe('coveringWorkout', () => {
   it('matches a workout tagged for that scheduled day', () => {
     const workouts = [
       {
-        sessionId: 'sess-upper',
+        routineId: 'sess-upper',
         scheduledFor: '2026-08-31',
         finishedAt: '2026-08-29T18:00:00',
       },
@@ -37,7 +32,7 @@ describe('coveringWorkout', () => {
   it('does not count an early finish against a different day', () => {
     const workouts = [
       {
-        sessionId: 'sess-upper',
+        routineId: 'sess-upper',
         scheduledFor: '2026-08-31',
         finishedAt: '2026-08-29T18:00:00',
       },
@@ -49,7 +44,7 @@ describe('coveringWorkout', () => {
 describe('nextOccurrence', () => {
   it('picks the next uncovered scheduled day', () => {
     const from = new Date(2026, 7, 29)
-    const next = nextOccurrence(programs, schedule, 'sess-upper', [], from)
+    const next = nextOccurrence(routines, schedule, 'sess-upper', [], from)
     assert.equal(next.key, '2026-08-31')
   })
 
@@ -57,12 +52,12 @@ describe('nextOccurrence', () => {
     const from = new Date(2026, 7, 29)
     const workouts = [
       {
-        sessionId: 'sess-upper',
+        routineId: 'sess-upper',
         scheduledFor: '2026-08-31',
         finishedAt: '2026-08-29T18:00:00',
       },
     ]
-    const next = nextOccurrence(programs, schedule, 'sess-upper', workouts, from)
+    const next = nextOccurrence(routines, schedule, 'sess-upper', workouts, from)
     assert.equal(next.key, '2026-09-07')
   })
 })
@@ -77,10 +72,10 @@ describe('schedule slot occurrences', () => {
     assert.equal(dateKey(date), '2026-08-31')
   })
 
-  it('does not let another slot cover the same session occurrence', () => {
+  it('does not let another slot cover the same routine occurrence', () => {
     const workouts = [
       {
-        sessionId: 'sess-upper',
+        routineId: 'sess-upper',
         scheduleSlotId: 'slot-one',
         scheduledFor: '2026-08-31',
         finishedAt: '2026-08-30T10:00:00.000Z',

@@ -1,6 +1,11 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildPlannedWorkout, migrateState, SCHEMA_VERSION } from './model.js'
+import {
+  applyProgressionToRoutines,
+  buildPlannedWorkout,
+  migrateState,
+  SCHEMA_VERSION,
+} from './model.js'
 
 function stateFixture() {
   return {
@@ -40,14 +45,40 @@ function stateFixture() {
 }
 
 describe('state migration', () => {
-  it('moves prescriptions out of sessions and keeps a stable baseline', () => {
+  it('keeps prescriptions on routine exercises', () => {
     const migrated = migrateState(stateFixture())
-    const item = migrated.programs[0].sessions[0].exercises[0]
+    const item = migrated.routines[0].exercises[0]
     assert.equal(migrated.schemaVersion, SCHEMA_VERSION)
+    assert.equal(migrated.routines[0].name, 'Push')
+    assert.equal(migrated.programs, undefined)
+    assert.equal(migrated.sessions, undefined)
+    assert.equal(migrated.schedule.slots[0].programId, undefined)
+    assert.equal(migrated.schedule.slots[0].routineId, 's-1')
     assert.equal(item.id, 'si-s-1-0-ex-1')
-    assert.equal('targets' in item, false)
-    assert.equal('suggestedWeights' in item, false)
+    assert.equal(item.sets, 3)
+    assert.deepEqual(item.targets, ['12', '10', '8'])
+    assert.deepEqual(item.suggestedWeights, [20, 25, 25])
     assert.deepEqual(migrated.legacyRecommendations[item.id].suggestedWeights, [20, 25, 25])
+  })
+
+  it('restores stripped routine fields from legacyRecommendations', () => {
+    const source = stateFixture()
+    source.legacyRecommendations = {
+      'si-s-1-0-ex-1': { sets: 1, targets: ['5-8 min'], suggestedWeights: [] },
+    }
+    source.programs[0].sessions[0].exercises[0] = {
+      id: 'si-s-1-0-ex-1',
+      exerciseId: 'ex-1',
+      role: 'cardio',
+      restSec: 0,
+      notes: '',
+      warmup: null,
+    }
+    const migrated = migrateState(source)
+    const item = migrated.routines[0].exercises[0]
+    assert.equal(item.sets, 1)
+    assert.deepEqual(item.targets, ['5-8 min'])
+    assert.deepEqual(item.suggestedWeights, [])
   })
 
   it('snapshots historical names and prescriptions', () => {
@@ -62,35 +93,95 @@ describe('state migration', () => {
     ]
     const migrated = migrateState(source)
     assert.equal(migrated.workouts[0].snapshot.programName, 'Gym')
-    assert.equal(migrated.workouts[0].snapshot.sessionName, 'Push')
+    assert.equal(migrated.workouts[0].snapshot.routineName, 'Push')
+    assert.equal(migrated.workouts[0].routineId, 's-1')
     assert.equal(migrated.workouts[0].snapshot.items[0].exerciseName, 'Chest press')
     assert.deepEqual(migrated.workouts[0].snapshot.items[0].targets, ['12', '10', '8'])
     assert.deepEqual(migrated.workouts[0].snapshot.items[0].suggestedWeights, [20])
-    assert.equal(migrated.workouts[0].sets[0].sessionItemId, 'si-s-1-0-ex-1')
+    assert.equal(migrated.workouts[0].sets[0].routineItemId, 'si-s-1-0-ex-1')
   })
 })
 
-describe('dated planned workouts', () => {
-  it('uses program reps and requests calibration when no weight history or baseline exists', () => {
+describe('routine snapshots', () => {
+  it('uses the routine prescription and asks for calibration when there is no weight', () => {
     const source = stateFixture()
-    delete source.programs[0].sessions[0].exercises[0].targets
-    delete source.programs[0].sessions[0].exercises[0].suggestedWeights
+    source.programs[0].sessions[0].exercises[0].suggestedWeights = []
     const state = migrateState(source)
     const plan = buildPlannedWorkout(state, {
-      sessionId: 's-1',
+      routineId: 's-1',
       date: '2026-08-31',
       scheduleSlotId: 'slot-1',
     })
     assert.equal(plan.occurrenceId, 'slot-1@2026-08-31')
+    assert.equal(plan.items[0].sets, 3)
     assert.deepEqual(plan.items[0].targets, ['12', '10', '8'])
     assert.deepEqual(plan.items[0].suggestedWeights, [])
     assert.equal(plan.items[0].calibrationRequired, true)
   })
 
-  it('keeps edits scoped to the exact date', () => {
+  it('does not pad cardio or duration work to a 3-set pattern', () => {
+    const source = {
+      exercises: [
+        { id: 'ex-row', name: 'Rowing', equipment: 'Rower', type: 'cardio', weightStep: 'n/a' },
+        { id: 'ex-plank', name: 'Plank', equipment: 'None', type: 'bodyweight', weightStep: 'n/a' },
+        { id: 'ex-push', name: 'Push-up', equipment: 'None', type: 'bodyweight', weightStep: 'n/a' },
+      ],
+      programs: [
+        {
+          id: 'p-1',
+          name: 'Gym',
+          sessions: [
+            {
+              id: 's-1',
+              name: 'Push',
+              focus: 'Mixed',
+              exercises: [
+                {
+                  exerciseId: 'ex-row',
+                  role: 'warmup',
+                  sets: 1,
+                  targets: ['5-8 min'],
+                  suggestedWeights: [],
+                  restSec: 0,
+                },
+                {
+                  exerciseId: 'ex-plank',
+                  role: 'finisher',
+                  sets: 1,
+                  targets: ['60s'],
+                  suggestedWeights: [],
+                  restSec: 0,
+                },
+                {
+                  exerciseId: 'ex-push',
+                  role: 'main',
+                  sets: 2,
+                  targets: ['AMRAP', 'AMRAP'],
+                  suggestedWeights: [],
+                  restSec: 60,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      schedule: { loopWeeks: 1, slots: [] },
+      workouts: [],
+    }
+    const state = migrateState(source)
+    const plan = buildPlannedWorkout(state, { routineId: 's-1', date: '2026-08-31' })
+    assert.equal(plan.items[0].sets, 1)
+    assert.deepEqual(plan.items[0].targets, ['5-8 min'])
+    assert.equal(plan.items[1].sets, 1)
+    assert.deepEqual(plan.items[1].targets, ['60s'])
+    assert.equal(plan.items[2].sets, 2)
+    assert.deepEqual(plan.items[2].targets, ['AMRAP', 'AMRAP'])
+  })
+
+  it('uses the routine prescription for every date', () => {
     const state = migrateState(stateFixture())
     const monday = buildPlannedWorkout(state, {
-      sessionId: 's-1',
+      routineId: 's-1',
       date: '2026-08-31',
       scheduleSlotId: 'slot-1',
     })
@@ -102,15 +193,33 @@ describe('dated planned workouts', () => {
       },
     ]
     const nextMonday = buildPlannedWorkout(state, {
-      sessionId: 's-1',
+      routineId: 's-1',
       date: '2026-09-07',
       scheduleSlotId: 'slot-1',
     })
-    assert.deepEqual(buildPlannedWorkout(state, {
-      sessionId: 's-1',
-      date: '2026-08-31',
-      scheduleSlotId: 'slot-1',
-    }).items[0].suggestedWeights, [99, 99, 99])
+    assert.deepEqual(
+      buildPlannedWorkout(state, {
+        routineId: 's-1',
+        date: '2026-08-31',
+        scheduleSlotId: 'slot-1',
+      }).items[0].suggestedWeights,
+      [20, 25, 25],
+    )
     assert.deepEqual(nextMonday.items[0].suggestedWeights, [20, 25, 25])
+  })
+
+  it('writes next kg and reps onto the routine exercise', () => {
+    const state = migrateState(stateFixture())
+    const item = state.routines[0].exercises[0]
+    const next = applyProgressionToRoutines(state.routines, 's-1', [
+      {
+        routineItemId: item.id,
+        to: [25, 30, 30],
+        targetsTo: ['12', '10', '8'],
+      },
+    ])
+    assert.deepEqual(next[0].exercises[0].suggestedWeights, [25, 30, 30])
+    assert.deepEqual(next[0].exercises[0].targets, ['12', '10', '8'])
+    assert.equal(next[0].exercises[0].sets, 3)
   })
 })

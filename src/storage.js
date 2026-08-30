@@ -1,36 +1,36 @@
-import db from './db.json'
-import { SCHEMA_VERSION, findSessionInState, migrateState } from './model'
-import { normalizeGoal } from './progress'
-import { defaultSchedule } from './schedule'
+import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
+import { defaultSchedule } from './schedule.js'
 
-const STORAGE_KEY = 'workout-mvp-v6'
-const LEGACY_KEYS = ['workout-mvp-v5']
+const STORAGE_KEY = 'workout-mvp-v8'
+const LEGACY_KEYS = ['workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
 
-export function loadDb() {
-  const data = structuredClone(db)
-  if (!data.programs) data.programs = []
-  if (!data.schedule) data.schedule = defaultSchedule()
-  data.programs = data.programs.map((p) => ({ ...p, goal: normalizeGoal(p.goal) }))
-  return migrateState(data)
+export function emptyState() {
+  return migrateState({
+    schemaVersion: SCHEMA_VERSION,
+    exercises: [],
+    routines: [],
+    schedule: defaultSchedule(),
+    workouts: [],
+    plannedWorkouts: [],
+    draftWorkouts: [],
+    activeWorkout: null,
+    legacyRecommendations: {},
+  })
 }
 
 export function loadState() {
   try {
-    const raw =
-      localStorage.getItem(STORAGE_KEY) ||
-      LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean)
-    if (!raw) return loadDb()
+    const current = localStorage.getItem(STORAGE_KEY)
+    const raw = current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean)
+    if (!raw) return emptyState()
     const parsed = JSON.parse(raw)
-    const base = loadDb()
-    const next = migrateState({ ...base, ...parsed })
-    if (!Array.isArray(next.programs)) next.programs = base.programs
-    if (!next.schedule) next.schedule = base.schedule
-    next.programs = next.programs.map((p) => ({ ...p, goal: normalizeGoal(p.goal) }))
-    next.schemaVersion = SCHEMA_VERSION
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-    return next
+    const state = migrateState({ ...emptyState(), ...parsed })
+    if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION) {
+      saveState(state)
+    }
+    return state
   } catch {
-    return loadDb()
+    return emptyState()
   }
 }
 
@@ -38,83 +38,80 @@ export function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
 
-export function programById(programs, programId) {
-  return (programs || []).find((p) => p.id === programId) ?? null
+export function routineById(routines, routineId) {
+  return (routines || []).find((routine) => routine.id === routineId) ?? null
 }
 
-export function findSession(programs, sessionId) {
-  return findSessionInState(programs, sessionId)
+export function findRoutine(routines, routineId) {
+  return findRoutineInState(routines, routineId)
 }
 
-export function groupWorkoutsBySession(workouts, programs) {
+export function groupWorkoutsByRoutine(workouts, routines) {
   const groups = []
-  const indexBySession = new Map()
+  const indexByRoutine = new Map()
   for (const w of workouts || []) {
-    const sessionId = w.sessionId || 'unknown'
-    const key = w.snapshot
-      ? `${sessionId}::${w.snapshot.programName}::${w.snapshot.sessionName}`
-      : sessionId
-    if (!indexBySession.has(key)) {
-      const { program, session } = findSession(programs, sessionId)
-      indexBySession.set(key, groups.length)
+    const routineId = w.routineId || w.sessionId || 'unknown'
+    const name = w.snapshot?.routineName || w.snapshot?.sessionName
+    const key = w.snapshot ? `${routineId}::${w.snapshot.programName || ''}::${name}` : routineId
+    if (!indexByRoutine.has(key)) {
+      const { routine } = findRoutine(routines, routineId)
+      indexByRoutine.set(key, groups.length)
       groups.push({
         groupId: key,
-        sessionId,
-        program: w.snapshot
+        routineId,
+        program: w.snapshot?.programName
           ? { id: w.snapshot.programId, name: w.snapshot.programName }
-          : program,
-        session: w.snapshot
-          ? { id: w.snapshot.sessionId, name: w.snapshot.sessionName, exercises: w.snapshot.items || [] }
-          : session,
+          : null,
+        routine: w.snapshot
+          ? {
+              id: w.snapshot.routineId || w.snapshot.sessionId,
+              name: w.snapshot.routineName || w.snapshot.sessionName,
+              exercises: w.snapshot.items || [],
+            }
+          : routine,
         workouts: [],
       })
     }
-    groups[indexBySession.get(key)].workouts.push(w)
+    groups[indexByRoutine.get(key)].workouts.push(w)
   }
   return groups
 }
 
-export function groupSetsByExercise(sets, session) {
+export function groupSetsByExercise(sets, routine) {
   const list = sets || []
-  const sessionItems = []
+  const routineItems = []
   const seen = new Set()
-  for (const item of session?.exercises || []) {
-    const key = item.sessionItemId || item.id || item.exerciseId
+  for (const item of routine?.exercises || []) {
+    const key = item.routineItemId || item.sessionItemId || item.id || item.exerciseId
     if (item.exerciseId && !seen.has(key)) {
       seen.add(key)
-      sessionItems.push({ key, exerciseId: item.exerciseId })
+      routineItems.push({ key, exerciseId: item.exerciseId })
     }
   }
   const extra = []
   for (const s of list) {
-    const key = s.sessionItemId || s.exerciseId
+    const key = s.routineItemId || s.sessionItemId || s.exerciseId
     if (s.exerciseId && !seen.has(key)) {
       seen.add(key)
       extra.push({ key, exerciseId: s.exerciseId })
     }
   }
-  return [...sessionItems, ...extra].map(({ key, exerciseId }) => ({
-    sessionItemId: key,
+  return [...routineItems, ...extra].map(({ key, exerciseId }) => ({
+    routineItemId: key,
     exerciseId,
     items: list
       .map((s, index) => ({ s, index }))
-      .filter((x) => (x.s.sessionItemId || x.s.exerciseId) === key),
+      .filter((x) => (x.s.routineItemId || x.s.sessionItemId || x.s.exerciseId) === key),
   }))
 }
 
-export function sessionsUsingExercise(programs, exerciseId) {
-  const out = []
-  for (const program of programs || []) {
-    for (const session of program.sessions || []) {
-      if ((session.exercises || []).some((item) => item.exerciseId === exerciseId)) {
-        out.push({ program, session })
-      }
-    }
-  }
-  return out
+export function routinesUsingExercise(routines, exerciseId) {
+  return (routines || []).filter((routine) =>
+    (routine.exercises || []).some((item) => item.exerciseId === exerciseId),
+  )
 }
 
-export function exercisesInHistory(workouts, exercises, programs) {
+export function exercisesInHistory(workouts, exercises, routines) {
   const ids = []
   const seen = new Set()
   for (const w of workouts || []) {
@@ -129,7 +126,7 @@ export function exercisesInHistory(workouts, exercises, programs) {
     .map((id) => ({
       id,
       exercise: (exercises || []).find((e) => e.id === id) || null,
-      sessions: sessionsUsingExercise(programs, id),
+      routines: routinesUsingExercise(routines, id),
     }))
     .sort((a, b) => (a.exercise?.name || a.id).localeCompare(b.exercise?.name || b.id))
 }
@@ -143,6 +140,44 @@ export function lastSetsForExercise(workouts, exerciseId) {
     if (sets.length) return { workout: w, sets }
   }
   return null
+}
+
+function isSkippedSet(set) {
+  return String(set?.reps || '').toLowerCase() === 'skipped'
+}
+
+function workingSetsFromHistory(sets) {
+  return (sets || []).filter((set) => set.setType !== 'wu' && !isSkippedSet(set))
+}
+
+export function historySetPrefill(last, { setType, workIndex } = {}) {
+  if (!last?.sets?.length) return { weight: '', reps: '' }
+  const set =
+    setType === 'wu'
+      ? last.sets.find((candidate) => candidate.setType === 'wu' && !isSkippedSet(candidate))
+      : workingSetsFromHistory(last.sets)[workIndex]
+  if (!set) return { weight: '', reps: '' }
+  const weight = set.weight != null && Number(set.weight) !== 0 ? String(set.weight) : ''
+  const reps = set.reps != null && set.reps !== '' ? String(set.reps) : ''
+  return { weight, reps }
+}
+
+export function historyPrescription(workouts, exerciseId) {
+  const last = lastSetsForExercise(workouts, exerciseId)
+  if (!last) return null
+  const work = workingSetsFromHistory(last.sets)
+  if (!work.length) return null
+  const weights = work.map((set) => Number(set.weight) || 0)
+  const snapshotItem = (last.workout?.snapshot?.items || []).find((item) => item.exerciseId === exerciseId)
+  const wu = last.sets.find((set) => set.setType === 'wu' && !isSkippedSet(set))
+  return {
+    sets: work.length,
+    targets: work.map((set) => String(set.reps ?? '')),
+    suggestedWeights: weights.some((weight) => weight > 0) ? weights : [],
+    restSec: snapshotItem?.restSec,
+    notes: snapshotItem?.notes || '',
+    warmup: wu ? { reps: wu.reps } : null,
+  }
 }
 
 export function workoutVolume(workout) {

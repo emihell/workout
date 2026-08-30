@@ -1,14 +1,15 @@
 import { greeting, weekdayName } from '../ids'
+import { go } from '../route'
 import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 
-function StartButton({ store, session, slot, date, label = 'Start' }) {
+function StartButton({ store, routine, slot, date, label = 'Start' }) {
   return (
     <button
       type="button"
       onClick={() =>
-        startOrContinue(store, session.id, {
+        startOrContinue(store, routine.id, {
           scheduledFor: date,
           scheduleSlotId: slot.id,
         })
@@ -19,29 +20,71 @@ function StartButton({ store, session, slot, date, label = 'Start' }) {
   )
 }
 
+function activeRoutineId(workout) {
+  return workout?.routineId || workout?.sessionId
+}
+
 export function Today() {
   const store = useStore()
   const now = new Date()
   const todayKey = dateKey(now)
   const schedule = store.schedule
-  const programs = store.programs || []
+  const routines = store.routines || []
   const todays = slotsOn(schedule, now)
-    .map((slot) => resolveSlot(programs, slot))
-    .filter((x) => x.session)
-  const upcoming = nextScheduled(programs, schedule, now)
+    .map((slot) => resolveSlot(routines, slot))
+    .filter((x) => x.routine)
+  const upcoming = nextScheduled(routines, schedule, now)
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
 
-  if (!programs.length) {
+  if (!routines.length) {
     return (
       <section>
         <h1>Today</h1>
-        <p>Create a program, put sessions on the schedule, then open Today and do what it says.</p>
+        <p>This device has no workout data yet.</p>
         <p>
-          <a href="#/programs">Programs</a>
+          Import a database backup to restore routines, schedule, and history. After that, this
+          browser keeps a copy. To use another phone or computer, export from Settings and import
+          there.
+        </p>
+        <p>
+          <label>
+            Import database
+            <br />
+            <input
+              type="file"
+              accept="application/json,.json"
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                event.target.value = ''
+                if (!file) return
+                file.text().then((text) => {
+                  try {
+                    const payload = JSON.parse(text)
+                    if (
+                      !window.confirm(
+                        'Replace all data on this device with this backup? Current routines, schedule, and history will be gone.',
+                      )
+                    ) {
+                      return
+                    }
+                    store.applyBackup(payload)
+                  } catch (err) {
+                    window.alert(err instanceof Error ? err.message : 'Could not import that file.')
+                  }
+                })
+              }}
+            />
+          </label>
+        </p>
+        <p>
+          Or start empty:{' '}
+          <a href="#/routines">Routines</a>
           {' · '}
           <a href="#/schedule">Schedule</a>
+          {' · '}
+          <a href="#/settings">Settings</a>
         </p>
       </section>
     )
@@ -50,45 +93,43 @@ export function Today() {
   return (
     <section>
       <h1>{greeting()}</h1>
-      <p>
-        Week {week + 1} of {loop}
-      </p>
+      {loop > 1 ? (
+        <p>
+          Week {week + 1} of {loop}
+        </p>
+      ) : null}
 
       {mine ? (
         <p>
-          Session in progress.{' '}
-          <button type="button" onClick={() => startOrContinue(store, mine.sessionId)}>
+          Workout in progress.{' '}
+          <button type="button" onClick={() => startOrContinue(store, activeRoutineId(mine))}>
             Continue
           </button>
         </p>
       ) : null}
 
       {todays.length ? (
-        todays.map(({ slot, program, session }) => {
-          const done = coveringWorkout(store.workouts, session.id, todayKey, slot.id)
+        todays.map(({ slot, routine }) => {
+          const done = coveringWorkout(store.workouts, routine.id, todayKey, slot.id)
           const inProgress =
-            mine?.sessionId === session.id &&
+            activeRoutineId(mine) === routine.id &&
             mine?.scheduleSlotId === slot.id &&
             mine.scheduledFor === todayKey
           return (
             <article key={slot.id}>
               <h2>
-                Today — {program.name}: {session.name}
+                Today — {routine.name}
               </h2>
               <p>
-                {session.focus} · {session.exercises.length} exercises
+                {routine.focus} · {routine.exercises.length} exercises
               </p>
               {done ? (
-                <p>Session done on {dateKey(done.finishedAt)}</p>
-              ) : inProgress ? (
+                <p>Workout done on {dateKey(done.finishedAt)}</p>
+              ) : inProgress ? null : (
                 <p>
-                  <StartButton store={store} session={session} slot={slot} date={todayKey} label="Continue" />
-                </p>
-              ) : (
-                <p>
-                  <StartButton store={store} session={session} slot={slot} date={todayKey} />
+                  <StartButton store={store} routine={routine} slot={slot} date={todayKey} />
                   {' '}
-                  <a href={`#/workout/${session.id}/${slot.id}/${todayKey}`}>View plan</a>
+                  <a href={`#/routines/${routine.id}`}>View plan</a>
                 </p>
               )}
             </article>
@@ -97,32 +138,28 @@ export function Today() {
       ) : upcoming ? (
         <>
           <p>Nothing on the calendar for {weekdayName(now.getDay())}.</p>
-          {upcoming.items.map(({ slot, program, session }) => {
+          {upcoming.items.map(({ slot, routine }) => {
             const when = dateKey(upcoming.date)
-            const done = coveringWorkout(store.workouts, session.id, when, slot.id)
+            const done = coveringWorkout(store.workouts, routine.id, when, slot.id)
             const inProgress =
-              mine?.sessionId === session.id &&
+              activeRoutineId(mine) === routine.id &&
               mine?.scheduleSlotId === slot.id &&
               mine.scheduledFor === when
             return (
               <article key={slot.id}>
                 <h2>
-                  Next — {program.name}: {session.name}
+                  Next — {routine.name}
                 </h2>
                 <p>
-                  {weekdayName(upcoming.date.getDay())} · {session.focus} · {session.exercises.length} exercises
+                  {weekdayName(upcoming.date.getDay())} · {routine.focus} · {routine.exercises.length} exercises
                 </p>
                 {done ? (
-                  <p>Session done on {dateKey(done.finishedAt)}</p>
-                ) : inProgress ? (
+                  <p>Workout done on {dateKey(done.finishedAt)}</p>
+                ) : inProgress ? null : (
                   <p>
-                    <StartButton store={store} session={session} slot={slot} date={when} label="Continue" />
-                  </p>
-                ) : (
-                  <p>
-                    <StartButton store={store} session={session} slot={slot} date={when} />
+                    <StartButton store={store} routine={routine} slot={slot} date={when} />
                     {' '}
-                    <a href={`#/workout/${session.id}/${slot.id}/${when}`}>View plan</a>
+                    <a href={`#/routines/${routine.id}`}>View plan</a>
                   </p>
                 )}
               </article>
@@ -130,11 +167,17 @@ export function Today() {
           })}
         </>
       ) : (
-        <p>Nothing scheduled. Add sessions in Schedule.</p>
+        <p>Nothing scheduled. Add routines in Schedule.</p>
       )}
 
       <p>
-        <a href="#/start">Start a different session</a>
+        <button
+          type="button"
+          disabled={Boolean(mine)}
+          onClick={() => go('/start')}
+        >
+          Start a different workout
+        </button>
       </p>
     </section>
   )

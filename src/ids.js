@@ -35,15 +35,15 @@ export const RPE_OPTIONS = [
 
 export const EXERCISE_TYPES = ['machine', 'free', 'bodyweight', 'cardio']
 
-export const SESSION_ROLES = [
-  { value: 'warmup', label: 'WU session' },
+export const ROUTINE_ROLES = [
+  { value: 'warmup', label: 'WU routine' },
   { value: 'main', label: 'Main' },
   { value: 'finisher', label: 'Finisher' },
   { value: 'cardio', label: 'Cardio' },
 ]
 
 export function roleLabel(role) {
-  return SESSION_ROLES.find((item) => item.value === (role || 'main'))?.label || 'Main'
+  return ROUTINE_ROLES.find((item) => item.value === (role || 'main'))?.label || 'Main'
 }
 
 export function weekdayName(value) {
@@ -56,7 +56,7 @@ export function parseTargets(text, setCount) {
     .split(/[/,]/)
     .map((s) => s.trim())
     .filter(Boolean)
-  if (parts.length === 0) return Array.from({ length: n }, () => '')
+  if (parts.length === 0) return []
   if (parts.length === 1) return Array.from({ length: n }, () => parts[0])
   const out = [...parts]
   while (out.length < n) out.push(out[out.length - 1])
@@ -64,7 +64,7 @@ export function parseTargets(text, setCount) {
 }
 
 export function formatTargets(targets) {
-  return (targets || []).join('/')
+  return (targets || []).map((value) => String(value).trim()).filter(Boolean).join('/')
 }
 
 export function greeting() {

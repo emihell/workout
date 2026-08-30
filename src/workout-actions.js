@@ -1,19 +1,23 @@
-import { go } from './route'
+import { go, hashPath } from './route'
 import { dateKey } from './schedule'
 
-export function startOrContinue(store, sessionId, options = {}) {
+export function startOrContinue(store, routineId, options = {}) {
   const config = typeof options === 'string' ? { scheduledFor: options } : options
   const scheduledFor = config.scheduledFor || dateKey(new Date())
   const scheduleSlotId = config.scheduleSlotId || null
-  if (store.activeWorkout && store.activeWorkout.sessionId !== sessionId) {
+  const activeId = store.activeWorkout?.routineId || store.activeWorkout?.sessionId
+  if (store.activeWorkout && activeId !== routineId) {
     if (!window.confirm('Save the workout in progress as a draft and start this one?')) return
   }
   if (
     !store.activeWorkout ||
-    store.activeWorkout.sessionId !== sessionId ||
+    activeId !== routineId ||
     (config.occurrenceId && store.activeWorkout.occurrenceId !== config.occurrenceId)
   ) {
-    store.startWorkout(sessionId, scheduledFor, scheduleSlotId, config.plan || null)
+    store.startWorkout(routineId, scheduledFor, scheduleSlotId, config.plan || null)
   }
-  go(`/workout/${sessionId}`)
+  const target = `/workout/${routineId}`
+  const here = hashPath(typeof window === 'undefined' ? '/' : window.location.hash)
+  const replace = here === target || here.startsWith(`${target}/`)
+  go(target, { replace })
 }
