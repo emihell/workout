@@ -41,6 +41,8 @@ node --test src/*.test.js
 
 Dev server: a single instance at http://localhost:5173/
 
+Live: https://emihell.github.io/workout/
+
 ## Deferred scope
 
 No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, social features, or visual-design pass are part of this MVP.
