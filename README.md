@@ -41,7 +41,7 @@ node --test src/*.test.js
 
 Dev server: a single instance at http://localhost:5173/
 
-Live: https://emihell.github.io/workout/
+Live (after GitHub Pages is set to the `gh-pages` branch): https://emihell.github.io/workout/
 
 ## Deferred scope
 
