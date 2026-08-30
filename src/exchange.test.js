@@ -85,6 +85,6 @@ describe('database backup', () => {
 
   it('rejects files that are not backups', () => {
     assert.equal(unwrapBackup({ kind: 'workout-mvp-export' }), null)
-    assert.throws(() => applyBackup({ kind: 'nope' }), /not a workout database backup/)
+    assert.throws(() => applyBackup({ kind: 'nope' }), /not a workout database backup/i)
   })
 })

@@ -33,18 +33,57 @@ describe('back visits the previous screen', () => {
 })
 
 describe('stable workflow routes', () => {
-  it('parses dated schedule-plan item identities', () => {
+  it('opens old schedule plan URLs as the day routine', () => {
     assert.deepEqual(
       parseRoute('/schedule/0/1/slot-a/plan/2026-08-31/item/pi-si-a'),
       {
-        name: 'schedule-plan-item',
+        name: 'schedule-slot',
         week: 0,
         weekday: 1,
         slotId: 'slot-a',
-        date: '2026-08-31',
-        itemId: 'pi-si-a',
+        screen: 'detail',
       },
     )
+  })
+
+  it('keeps scheduled routine screens under the day URL', () => {
+    assert.deepEqual(parseRoute('/schedule/0/1/slot-sess-upper'), {
+      name: 'schedule-slot',
+      week: 0,
+      weekday: 1,
+      slotId: 'slot-sess-upper',
+      screen: 'detail',
+    })
+    assert.deepEqual(parseRoute('/schedule/0/1/slot-sess-upper/edit'), {
+      name: 'schedule-slot',
+      week: 0,
+      weekday: 1,
+      slotId: 'slot-sess-upper',
+      screen: 'edit',
+    })
+    assert.deepEqual(parseRoute('/schedule/0/1/slot-sess-upper/exercise/new'), {
+      name: 'schedule-slot',
+      week: 0,
+      weekday: 1,
+      slotId: 'slot-sess-upper',
+      screen: 'exercise-pick',
+    })
+    assert.deepEqual(parseRoute('/schedule/0/1/slot-sess-upper/exercise/si-row'), {
+      name: 'schedule-slot',
+      week: 0,
+      weekday: 1,
+      slotId: 'slot-sess-upper',
+      screen: 'exercise',
+      itemId: 'si-row',
+    })
+    assert.deepEqual(parseRoute('/schedule/0/1/slot-sess-upper/exercise/new/ex-row'), {
+      name: 'schedule-slot',
+      week: 0,
+      weekday: 1,
+      slotId: 'slot-sess-upper',
+      screen: 'exercise-new',
+      exerciseId: 'ex-row',
+    })
   })
 
   it('parses a scheduled workout preview separately from an ad-hoc preview', () => {
@@ -77,6 +116,27 @@ describe('stable workflow routes', () => {
       name: 'workout-item-exercise',
       routineId: 'sess-upper',
       itemId: 'si-row',
+    })
+    assert.deepEqual(parseRoute('/workout/sess-upper/setup'), {
+      name: 'workout-setup',
+      routineId: 'sess-upper',
+      screen: 'detail',
+    })
+    assert.deepEqual(parseRoute('/workout/sess-upper/slot-a/2026-08-31/setup/exercise/new'), {
+      name: 'workout-setup',
+      routineId: 'sess-upper',
+      scheduleSlotId: 'slot-a',
+      date: '2026-08-31',
+      screen: 'exercise-pick',
+    })
+    assert.deepEqual(parseRoute('/history/wo-1/routine'), {
+      name: 'history-routine',
+      id: 'wo-1',
+      screen: 'detail',
+    })
+    assert.deepEqual(parseRoute('/history/wo-1/delete'), {
+      name: 'history-detail',
+      id: 'wo-1',
     })
   })
 

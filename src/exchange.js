@@ -155,11 +155,11 @@ export function unwrapBackup(payload) {
 export function applyBackup(payload) {
   const doc = unwrapBackup(payload)
   if (!doc) {
-    throw new Error('This file is not a workout database backup.')
+    throw new Error('Not a workout database backup.')
   }
   const raw = doc.kind === BACKUP_KIND ? doc.state : doc
   if (doc.kind === BACKUP_KIND && Number(doc.version) !== BACKUP_VERSION) {
-    throw new Error('This backup is not a workout-mvp-backup v1 document.')
+    throw new Error('Not a workout-mvp-backup v1 document.')
   }
   const state = migrateState({ ...emptyState(), ...raw })
   return {

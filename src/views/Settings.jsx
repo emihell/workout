@@ -15,7 +15,7 @@ function downloadJson(filename, data) {
 }
 
 function backupLines(summary) {
-  return `Restored ${summary.routines} routines, ${summary.exercises} exercises, ${summary.workouts} history workouts, ${summary.slots} schedule slots.`
+  return `${summary.routines} routines, ${summary.exercises} exercises, ${summary.workouts} workouts, ${summary.slots} slots.`
 }
 
 export function Settings() {
@@ -29,25 +29,15 @@ export function Settings() {
       <Back />
       <h1>Settings</h1>
       <p>
-        This app keeps data in this browser only. Export the whole database to move it, or to talk
-        through the file with an assistant. Import replaces everything on this device.
-      </p>
-      <p>
         <label>
           <input
             type="checkbox"
             checked={includeAssistant}
             onChange={(event) => setIncludeAssistant(event.target.checked)}
           />{' '}
-          Include assistant prompt
+          Assistant prompt
         </label>
       </p>
-      {includeAssistant ? (
-        <p>
-          The file will include a prompt so an AI can see how the app is set up, ask you about the
-          coming weeks, suggest routine and schedule changes, and return a file this app can import.
-        </p>
-      ) : null}
       <p>
         <button
           type="button"
@@ -57,19 +47,15 @@ export function Settings() {
               buildBackup(store, { includeAssistant }),
             )
             setError('')
-            setMessage(
-              includeAssistant
-                ? 'Database downloaded with assistant prompt.'
-                : 'Database backup downloaded.',
-            )
+            setMessage(includeAssistant ? 'Downloaded with prompt.' : 'Downloaded.')
           }}
         >
-          Export database
+          Export
         </button>
       </p>
       <p>
         <label>
-          Import database
+          Import
           <br />
           <input
             type="file"
@@ -81,19 +67,13 @@ export function Settings() {
               file.text().then((text) => {
                 try {
                   const payload = JSON.parse(text)
-                  if (
-                    !window.confirm(
-                      'Replace all data on this device with this backup? Current routines, schedule, and history will be gone.',
-                    )
-                  ) {
-                    return
-                  }
+                  if (!window.confirm('Replace all data on this device?')) return
                   const result = store.applyBackup(payload)
                   setError('')
                   setMessage(backupLines(result.summary))
                 } catch (err) {
                   setMessage('')
-                  setError(err instanceof Error ? err.message : 'Could not import that file.')
+                  setError(err instanceof Error ? err.message : 'Could not import.')
                 }
               })
             }}

@@ -3,7 +3,7 @@ import { catalogItemToExercise, loadExerciseCatalog, searchExerciseCatalog } fro
 import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
-import { Back } from './shared'
+import { Back, Missing } from './shared'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -47,7 +47,7 @@ function ExerciseList({ exercises, showType = false }) {
       {exercises.map((ex) => (
         <li key={ex.id}>
           <a href={`#/exercises/${ex.id}`}>{ex.name}</a> — {ex.equipment}
-          {showType ? ` (${typeLabel(ex.type)})` : ''}
+          {showType ? ` · ${typeLabel(ex.type)}` : ''}
         </li>
       ))}
     </ul>
@@ -75,7 +75,7 @@ export function Exercises({ type = null }) {
             <input value={query} onChange={(e) => setQuery(e.target.value)} />
           </label>
         </p>
-        {items.length === 0 ? <p>{q ? 'No matches.' : 'No exercises in this type yet.'}</p> : null}
+        {items.length === 0 ? <p>{q ? 'No matches.' : 'None.'}</p> : null}
         <ExerciseList exercises={items} />
       </section>
     )
@@ -88,7 +88,6 @@ export function Exercises({ type = null }) {
   return (
     <section>
       <h1>Exercises</h1>
-      <p>The library. Add movements here, then pick them when you build a routine.</p>
       <p>
         <a href="#/exercises/new">Add exercise</a>
       </p>
@@ -105,13 +104,13 @@ export function Exercises({ type = null }) {
           <ExerciseList exercises={hits} showType />
         </>
       ) : groups.length === 0 ? (
-        <p>No exercises yet.</p>
+        <p>None.</p>
       ) : (
         <ul>
           {groups.map((group) => (
             <li key={group.type}>
               <a href={`#/exercises/type/${group.type}`}>{typeLabel(group.type)}</a>
-              {` (${group.items.length})`}
+              {` — ${group.items.length}`}
             </li>
           ))}
         </ul>
@@ -120,14 +119,14 @@ export function Exercises({ type = null }) {
   )
 }
 
-function createPaths(returnRoutineId) {
-  if (returnRoutineId) {
+function createPaths(returnBase) {
+  if (returnBase) {
     return {
-      hub: `/routines/${returnRoutineId}/exercise/create`,
-      pick: `/routines/${returnRoutineId}/exercise/new`,
-      manual: `/routines/${returnRoutineId}/exercise/create/manual`,
-      search: `/routines/${returnRoutineId}/exercise/create/search`,
-      afterCreate: (exerciseId) => `/routines/${returnRoutineId}/exercise/new/${exerciseId}`,
+      hub: `${returnBase}/exercise/create`,
+      pick: `${returnBase}/exercise/new`,
+      manual: `${returnBase}/exercise/create/manual`,
+      search: `${returnBase}/exercise/create/search`,
+      afterCreate: (exerciseId) => `${returnBase}/exercise/new/${exerciseId}`,
     }
   }
   return {
@@ -139,25 +138,24 @@ function createPaths(returnRoutineId) {
   }
 }
 
-export function ExerciseNew({ returnRoutineId = null }) {
-  const paths = createPaths(returnRoutineId)
+export function ExerciseNew({ returnBase = null }) {
+  const paths = createPaths(returnBase)
   return (
     <section>
       <Back />
       <h1>Add exercise</h1>
-      <p>Add it yourself, or search a public exercise database and copy it into your library.</p>
       <p>
         <a href={`#${paths.manual}`}>Add manually</a>
         {' · '}
-        <a href={`#${paths.search}`}>Search database</a>
+        <a href={`#${paths.search}`}>Search</a>
       </p>
     </section>
   )
 }
 
-export function ExerciseNewManual({ returnRoutineId = null }) {
+export function ExerciseNewManual({ returnBase = null }) {
   const store = useStore()
-  const paths = createPaths(returnRoutineId)
+  const paths = createPaths(returnBase)
   const [name, setName] = useState('')
   const [type, setType] = useState('free')
 
@@ -186,7 +184,7 @@ export function ExerciseNewManual({ returnRoutineId = null }) {
             <select value={type} onChange={(e) => setType(e.target.value)}>
               {EXERCISE_TYPES.map((t) => (
                 <option key={t} value={t}>
-                  {t}
+                  {typeLabel(t)}
                 </option>
               ))}
             </select>
@@ -201,9 +199,9 @@ export function ExerciseNewManual({ returnRoutineId = null }) {
   )
 }
 
-export function ExerciseNewSearch({ returnRoutineId = null }) {
+export function ExerciseNewSearch({ returnBase = null }) {
   const store = useStore()
-  const paths = createPaths(returnRoutineId)
+  const paths = createPaths(returnBase)
   const [query, setQuery] = useState('')
   const [catalog, setCatalog] = useState(null)
   const [error, setError] = useState('')
@@ -216,7 +214,7 @@ export function ExerciseNewSearch({ returnRoutineId = null }) {
         if (!cancelled) setCatalog(list)
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Could not load the exercise database.')
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Could not load.')
       })
     return () => {
       cancelled = true
@@ -233,16 +231,9 @@ export function ExerciseNewSearch({ returnRoutineId = null }) {
   return (
     <section>
       <Back />
-      <h1>Search database</h1>
-      <p>
-        Two public catalogs, including bodyweight moves the first one skips. Picking one copies
-        name, equipment, muscles, and form cues into this device. You can edit the copy after.
-      </p>
-      <p>
-        Exercise data by <a href="https://repdb.co">RepDB</a>, plus the free-exercise-db catalog.
-      </p>
+      <h1>Search</h1>
       {error ? <p>{error}</p> : null}
-      {catalog === null && !error ? <p>Loading database…</p> : null}
+      {catalog === null && !error ? <p>Loading…</p> : null}
       {catalog ? (
         <>
           <p>
@@ -252,7 +243,6 @@ export function ExerciseNewSearch({ returnRoutineId = null }) {
               <input value={query} onChange={(e) => setQuery(e.target.value)} />
             </label>
           </p>
-          {query.trim().length < 2 ? <p>Type at least two letters.</p> : null}
           {query.trim().length >= 2 && hits.length === 0 ? <p>No matches.</p> : null}
           <ul>
             {hits.map((item) => {
@@ -263,8 +253,8 @@ export function ExerciseNewSearch({ returnRoutineId = null }) {
                   {existing ? (
                     <>
                       {' '}
-                      <a href={`#${returnRoutineId ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}`}>
-                        {returnRoutineId ? 'Add to routine' : 'Already in library'}
+                      <a href={`#${returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}`}>
+                        {returnBase ? 'Add to routine' : 'Already added'}
                       </a>
                     </>
                   ) : (
@@ -304,18 +294,13 @@ export function ExerciseEdit({ exerciseId }) {
   const [cues, setCues] = useState(ex?.cues || '')
 
   if (!ex) {
-    return (
-      <section>
-        <p>Exercise not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
     <section>
       <Back />
-      <h1>Exercise details</h1>
+      <h1>Details</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -344,7 +329,7 @@ export function ExerciseEdit({ exerciseId }) {
             <select value={type} onChange={(e) => setType(e.target.value)}>
               {EXERCISE_TYPES.map((t) => (
                 <option key={t} value={t}>
-                  {t}
+                  {typeLabel(t)}
                 </option>
               ))}
             </select>
@@ -366,7 +351,7 @@ export function ExerciseEdit({ exerciseId }) {
         </p>
         <p>
           <label>
-            Primary muscles
+            Muscles
             <br />
             <input value={muscles} onChange={(e) => setMuscles(e.target.value)} />
           </label>
@@ -391,12 +376,7 @@ export function ExerciseDetail({ exerciseId }) {
   const store = useStore()
   const ex = store.exercises.find((e) => e.id === exerciseId)
   if (!ex) {
-    return (
-      <section>
-        <p>Exercise not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
@@ -406,17 +386,21 @@ export function ExerciseDetail({ exerciseId }) {
       <p>
         <a href={`#/exercises/${ex.id}/edit`}>Edit</a>
       </p>
-      <p>Equipment: {ex.equipment}</p>
-      <p>Type: {ex.type}</p>
-      <p>Weight increments: {ex.weightStep}</p>
-      <p>Primary muscles: {ex.muscles || '—'}</p>
-      <h3>Form cues</h3>
-      <p>{ex.cues || '—'}</p>
+      <p>
+        {[ex.equipment, typeLabel(ex.type), ex.weightStep].filter(Boolean).join(' · ')}
+      </p>
+      {ex.muscles ? <p>{ex.muscles}</p> : null}
+      {ex.cues ? (
+        <>
+          <h2>Form cues</h2>
+          <p>{ex.cues}</p>
+        </>
+      ) : null}
       <p>
         <button
           type="button"
           onClick={() => {
-            if (!window.confirm(`Delete ${ex.name}? It will leave active routines, while completed history keeps its original name and sets.`)) return
+            if (!window.confirm(`Delete ${ex.name}?`)) return
             store.removeExercise(ex.id)
             go('/exercises')
           }}

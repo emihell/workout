@@ -3,10 +3,31 @@ import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, parseTargets, roleLabel } 
 import { go } from '../route'
 import { routineById, historyPrescription } from '../storage'
 import { useStore } from '../store-context'
-import { Back } from './shared'
+import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
+import { Back, Missing } from './shared'
 
 function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
+}
+
+export function navForBase(base, done, { extra = null, showDelete = true } = {}) {
+  return {
+    base,
+    done,
+    extra,
+    showDelete,
+    edit: `${base}/edit`,
+    pick: `${base}/exercise/new`,
+    create: `${base}/exercise/create`,
+    createManual: `${base}/exercise/create/manual`,
+    createSearch: `${base}/exercise/create/search`,
+    newItem: (exerciseId) => `${base}/exercise/new/${exerciseId}`,
+    item: (itemId) => `${base}/exercise/${itemId}`,
+  }
+}
+
+function pathsFor(routineId, paths) {
+  return paths || navForBase(`/routines/${routineId}`, '/routines')
 }
 
 export function Routines() {
@@ -16,16 +37,16 @@ export function Routines() {
   return (
     <section>
       <h1>Routines</h1>
-      <p>Reusable workouts. Put them on a weekday in Schedule.</p>
       <p>
         <a href="#/routines/new">Add routine</a>
       </p>
-      {routines.length === 0 ? <p>None yet.</p> : null}
+      {routines.length === 0 ? <p>None.</p> : null}
       <ul>
         {routines.map((routine) => (
           <li key={routine.id}>
-            <a href={`#${routinePath(routine.id)}`}>{routine.name}</a>{' '}
-            ({routine.focus}, {routine.exercises.length} exercises)
+            <a href={`#${routinePath(routine.id)}`}>{routine.name}</a>
+            {' — '}
+            {routine.focus}
           </li>
         ))}
       </ul>
@@ -33,81 +54,88 @@ export function Routines() {
   )
 }
 
-export function RoutineNew() {
-  const store = useStore()
+export function RoutineNewForm({ onSave, onCancel, submitLabel = 'Next' }) {
   const [name, setName] = useState('')
   const [focus, setFocus] = useState('Machines')
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSave({ name, focus })
+      }}
+    >
+      <p>
+        <label>
+          Name
+          <br />
+          <input value={name} onChange={(e) => setName(e.target.value)} required />
+        </label>
+      </p>
+      <p>
+        <label>
+          Focus
+          <br />
+          <select value={focus} onChange={(e) => setFocus(e.target.value)}>
+            {FOCUS_OPTIONS.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </label>
+      </p>
+      <p>
+        <button type="submit">{submitLabel}</button>{' '}
+        <button type="button" onClick={onCancel}>Cancel</button>
+      </p>
+    </form>
+  )
+}
+
+export function RoutineNew() {
+  const store = useStore()
 
   return (
     <section>
       <Back />
       <h1>Add routine</h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
+      <RoutineNewForm
+        onSave={({ name, focus }) => {
           const id = store.addRoutine({ name, focus })
           go(routinePath(id))
         }}
-      >
-        <p>
-          <label>
-            Name
-            <br />
-            <input value={name} onChange={(e) => setName(e.target.value)} required />
-          </label>
-        </p>
-        <p>
-          <label>
-            Focus
-            <br />
-            <select value={focus} onChange={(e) => setFocus(e.target.value)}>
-              {FOCUS_OPTIONS.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </label>
-        </p>
-        <p>
-          <button type="submit">Next</button>{' '}
-          <button type="button" onClick={() => go('/routines')}>Cancel</button>
-        </p>
-      </form>
+        onCancel={() => go('/routines')}
+      />
     </section>
   )
 }
 
-export function RoutineDetail({ routineId }) {
+export function RoutineDetail({ routineId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
+  const nav = pathsFor(routineId, paths)
 
   if (!routine) {
-    return (
-      <section>
-        <p>Routine not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
+
+  const meta = [nav.extra, routine.focus].filter(Boolean).join(' · ')
 
   return (
     <section>
       <Back />
       <h1>{routine.name}</h1>
       <p>
-        {routine.focus}
-        {' · '}
-        <a href={`#${routinePath(routine.id, '/edit')}`}>Edit name and focus</a>
+        {meta}
+        {meta ? ' · ' : ''}
+        <a href={`#${nav.edit}`}>Edit</a>
       </p>
       <h2>Exercises</h2>
-      <p>Sets, kg, rest, and notes live here and tick up after you finish a workout.</p>
       <p>
-        <button type="button" onClick={() => go(routinePath(routine.id, '/exercise/new'))}>
-          Add exercise
-        </button>
+        <a href={`#${nav.pick}`}>Add exercise</a>
       </p>
-      {routine.exercises.length === 0 ? <p>None yet.</p> : null}
+      {routine.exercises.length === 0 ? <p>None.</p> : null}
       <ol>
         {routine.exercises.map((item, index) => {
           const ex = store.exercises.find((e) => e.id === item.exerciseId)
@@ -116,13 +144,12 @@ export function RoutineDetail({ routineId }) {
             : ''
           return (
             <li key={item.id || `${item.exerciseId}-${index}`}>
-              <a href={`#${routinePath(routine.id, `/exercise/${item.id}`)}`}>{ex?.name || item.exerciseId}</a>
+              <a href={`#${nav.item(item.id)}`}>{ex?.name || item.exerciseId}</a>
               {' — '}
               {roleLabel(item.role)}
               {item.warmup ? ' · WU set' : ''}
               {' · '}
               {item.sets || 1} {(item.sets || 1) === 1 ? 'set' : 'sets'}
-              {formatTargets(item.targets) ? ` · ${formatTargets(item.targets)}` : ''}
               {kg}
               {' '}
               <button type="button" onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>
@@ -136,45 +163,48 @@ export function RoutineDetail({ routineId }) {
         })}
       </ol>
       <p>
-        <button
-          type="button"
-          onClick={() => {
-            if (!window.confirm(`Delete ${routine.name}? It will leave the schedule, while completed history is preserved.`)) return
-            store.removeRoutine(routine.id)
-            go('/routines')
-          }}
-        >
-          Delete routine
+        <button type="button" onClick={() => go(nav.done)}>
+          Done
         </button>
       </p>
+      {nav.showDelete ? (
+        <p>
+          <button
+            type="button"
+            onClick={() => {
+              if (!window.confirm(`Delete ${routine.name}?`)) return
+              store.removeRoutine(routine.id)
+              go(nav.done)
+            }}
+          >
+            Delete
+          </button>
+        </p>
+      ) : null}
     </section>
   )
 }
 
-export function RoutineEdit({ routineId }) {
+export function RoutineEdit({ routineId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
+  const nav = pathsFor(routineId, paths)
   const [name, setName] = useState(routine?.name || '')
   const [focus, setFocus] = useState(routine?.focus || 'Machines')
 
   if (!routine) {
-    return (
-      <section>
-        <p>Routine not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
     <section>
       <Back />
-      <h1>Name and focus</h1>
+      <h1>Name</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault()
           store.updateRoutine(routine.id, { name: name.trim() || routine.name, focus })
-          go(routinePath(routine.id))
+          go(nav.base)
         }}
       >
         <p>
@@ -199,25 +229,21 @@ export function RoutineEdit({ routineId }) {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go(routinePath(routine.id))}>Cancel</button>
+          <button type="button" onClick={() => go(nav.base)}>Cancel</button>
         </p>
       </form>
     </section>
   )
 }
 
-export function RoutineExercisePick({ routineId }) {
+export function RoutineExercisePick({ routineId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
+  const nav = pathsFor(routineId, paths)
   const [query, setQuery] = useState('')
 
   if (!routine) {
-    return (
-      <section>
-        <p>Routine not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   const matches = store.exercises.filter((ex) => {
@@ -231,12 +257,11 @@ export function RoutineExercisePick({ routineId }) {
     <section>
       <Back />
       <h1>Add exercise</h1>
-      <p>Pick from the library, then set sets, reps, kg, and rest.</p>
       <p>
-        <a href={`#${routinePath(routine.id, '/exercise/create')}`}>Create exercise</a>
+        <a href={`#${nav.create}`}>Create exercise</a>
       </p>
       {store.exercises.length === 0 ? (
-        <p>Library empty. Create an exercise first.</p>
+        <p>None.</p>
       ) : (
         <>
           <p>
@@ -250,10 +275,11 @@ export function RoutineExercisePick({ routineId }) {
           <ul>
             {matches.map((ex) => (
               <li key={ex.id}>
-                <a href={`#${routinePath(routine.id, `/exercise/new/${ex.id}`)}`}>
+                <a href={`#${nav.newItem(ex.id)}`}>
                   {ex.name}
-                </a>{' '}
-                ({ex.equipment})
+                </a>
+                {' — '}
+                {ex.equipment}
               </li>
             ))}
           </ul>
@@ -314,7 +340,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
     >
       <p>
         <label>
-          Role in this routine
+          Role
           <br />
           <select value={role} onChange={(e) => setRole(e.target.value)}>
             {ROUTINE_ROLES.map((option) => (
@@ -351,7 +377,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
       </p>
       <p>
         <label>
-          Rest between sets (sec)
+          Rest (s)
           <br />
           <input type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
         </label>
@@ -371,9 +397,10 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
   )
 }
 
-export function RoutineExerciseNew({ routineId, exerciseId }) {
+export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
+  const nav = pathsFor(routineId, paths)
   const ex = store.exercises.find((e) => e.id === exerciseId)
   const history = historyPrescription(store.workouts, ex?.id)
   const defaults = {
@@ -385,12 +412,7 @@ export function RoutineExerciseNew({ routineId, exerciseId }) {
   }
 
   if (!routine || !ex) {
-    return (
-      <section>
-        <p>Not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
@@ -398,7 +420,6 @@ export function RoutineExerciseNew({ routineId, exerciseId }) {
       <Back />
       <p>{routine.name}</p>
       <h1>{ex.name}</h1>
-      <p>Sets, kg, rest, and notes live here. After you finish a workout they tick up for next time. A WU set is an easy set before working weight.</p>
       <ExerciseFields
         item={{
           role: defaults.role,
@@ -410,31 +431,27 @@ export function RoutineExerciseNew({ routineId, exerciseId }) {
           suggestedWeights: defaults.suggestedWeights,
         }}
         defaults={defaults}
-        onCancel={() => go(routinePath(routine.id, '/exercise/new'))}
+        onCancel={() => go(nav.pick)}
         onChange={(patch) => {
           store.addRoutineExercise(routine.id, { exerciseId: ex.id, ...patch })
-          go(routinePath(routine.id))
+          go(nav.base)
         }}
       />
     </section>
   )
 }
 
-export function RoutineExerciseEdit({ routineId, itemId }) {
+export function RoutineExerciseEdit({ routineId, itemId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
+  const nav = pathsFor(routineId, paths)
   const index = routine?.exercises?.findIndex((candidate) => candidate.id === itemId)
   const item = routine?.exercises?.[index]
   const ex = store.exercises.find((e) => e.id === item?.exerciseId)
-  const parent = routine ? routinePath(routine.id) : '/routines'
+  const parent = routine ? nav.base : '/routines'
 
   if (!routine || index < 0 || !item) {
-    return (
-      <section>
-        <p>Exercise not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   const defaults = {
@@ -450,7 +467,6 @@ export function RoutineExerciseEdit({ routineId, itemId }) {
       <Back />
       <p>{routine.name}</p>
       <h1>{ex?.name || item.exerciseId}</h1>
-      <p>This is next time&apos;s prescription. It updates when you finish a workout. A WU set is an easy set before working weight.</p>
       <ExerciseFields
         key={`${routine.id}-${index}`}
         item={item}
@@ -465,14 +481,29 @@ export function RoutineExerciseEdit({ routineId, itemId }) {
         <button
           type="button"
           onClick={() => {
-            if (!window.confirm(`Remove ${ex?.name || 'this exercise'} from the routine?`)) return
+            if (!window.confirm(`Remove ${ex?.name || 'this exercise'}?`)) return
             store.removeRoutineExercise(routine.id, index)
             go(parent)
           }}
         >
-          Remove from routine
+          Remove
         </button>
       </p>
     </section>
   )
+}
+
+export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, exerciseId }) {
+  if (screen === 'edit') return <RoutineEdit routineId={routineId} paths={paths} />
+  if (screen === 'exercise-pick') return <RoutineExercisePick routineId={routineId} paths={paths} />
+  if (screen === 'exercise-create') return <ExerciseNew returnBase={paths.base} />
+  if (screen === 'exercise-create-manual') return <ExerciseNewManual returnBase={paths.base} />
+  if (screen === 'exercise-create-search') return <ExerciseNewSearch returnBase={paths.base} />
+  if (screen === 'exercise-new') {
+    return <RoutineExerciseNew routineId={routineId} exerciseId={exerciseId} paths={paths} />
+  }
+  if (screen === 'exercise') {
+    return <RoutineExerciseEdit routineId={routineId} itemId={itemId} paths={paths} />
+  }
+  return <RoutineDetail routineId={routineId} paths={paths} />
 }

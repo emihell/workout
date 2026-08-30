@@ -96,6 +96,25 @@ export function back(fallback = '/') {
   return prev
 }
 
+function parseRoutineNested(rest) {
+  if (!rest.length) return { screen: 'detail' }
+  if (rest[0] === 'plan') return null
+  if (rest[0] === 'edit') return { screen: 'edit' }
+  if (rest[0] === 'exercise' && rest[1] === 'create' && rest[2] === 'manual') {
+    return { screen: 'exercise-create-manual' }
+  }
+  if (rest[0] === 'exercise' && rest[1] === 'create' && rest[2] === 'search') {
+    return { screen: 'exercise-create-search' }
+  }
+  if (rest[0] === 'exercise' && rest[1] === 'create') return { screen: 'exercise-create' }
+  if (rest[0] === 'exercise' && rest[1] === 'new' && rest[2]) {
+    return { screen: 'exercise-new', exerciseId: rest[2] }
+  }
+  if (rest[0] === 'exercise' && rest[1] === 'new') return { screen: 'exercise-pick' }
+  if (rest[0] === 'exercise' && rest[1] != null) return { screen: 'exercise', itemId: rest[1] }
+  return { screen: 'detail' }
+}
+
 export function parseRoute(path) {
   const parts = path.split('/').filter(Boolean)
   if (parts.length === 0) return { name: 'today' }
@@ -107,35 +126,41 @@ export function parseRoute(path) {
   if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null && parts[3] === 'add') {
     return { name: 'schedule-day-add', week: Number(parts[1]), weekday: Number(parts[2]) }
   }
-  if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null && parts[3] && parts[4] === 'exercise' && parts[5] != null) {
-    return {
-      name: 'schedule-slot',
-      week: Number(parts[1]),
-      weekday: Number(parts[2]),
-      slotId: parts[3],
-    }
-  }
   if (
     parts[0] === 'schedule' &&
     parts[1] != null &&
     parts[2] != null &&
     parts[3] &&
-    parts[4] === 'plan' &&
-    parts[5] &&
-    parts[6] === 'item' &&
-    parts[7]
+    parts[4] === 'plan'
   ) {
     return {
-      name: 'schedule-plan-item',
+      name: 'schedule-slot',
       week: Number(parts[1]),
       weekday: Number(parts[2]),
       slotId: parts[3],
-      date: parts[5],
-      itemId: parts[7],
+      screen: 'detail',
+    }
+  }
+  if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null && parts[3] && parts[4]) {
+    const nested = parseRoutineNested(parts.slice(4))
+    if (nested) {
+      return {
+        name: 'schedule-slot',
+        week: Number(parts[1]),
+        weekday: Number(parts[2]),
+        slotId: parts[3],
+        ...nested,
+      }
     }
   }
   if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null && parts[3]) {
-    return { name: 'schedule-slot', week: Number(parts[1]), weekday: Number(parts[2]), slotId: parts[3] }
+    return {
+      name: 'schedule-slot',
+      week: Number(parts[1]),
+      weekday: Number(parts[2]),
+      slotId: parts[3],
+      screen: 'detail',
+    }
   }
   if (parts[0] === 'schedule' && parts[1] != null && parts[2] != null) {
     return { name: 'schedule-day', week: Number(parts[1]), weekday: Number(parts[2]) }
@@ -201,6 +226,18 @@ export function parseRoute(path) {
   if (parts[0] === 'workout' && parts[1] && parts[2] === 'finish') {
     return { name: 'workout-finish', routineId: parts[1] }
   }
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'setup') {
+    return { name: 'workout-setup', routineId: parts[1], ...parseRoutineNested(parts.slice(3)) }
+  }
+  if (parts[0] === 'workout' && parts[1] && parts[2] && parts[3] && parts[4] === 'setup') {
+    return {
+      name: 'workout-setup',
+      routineId: parts[1],
+      scheduleSlotId: parts[2],
+      date: parts[3],
+      ...parseRoutineNested(parts.slice(5)),
+    }
+  }
   if (parts[0] === 'workout' && parts[1] && parts[2] && parts[3]) {
     return {
       name: 'workout-preview',
@@ -226,8 +263,8 @@ export function parseRoute(path) {
   if (parts[0] === 'history' && parts[1] && parts[2] === 'recalculate') {
     return { name: 'history-recalculate', id: parts[1] }
   }
-  if (parts[0] === 'history' && parts[1] && parts[2] === 'delete') {
-    return { name: 'history-delete', id: parts[1] }
+  if (parts[0] === 'history' && parts[1] && parts[2] === 'routine') {
+    return { name: 'history-routine', id: parts[1], ...parseRoutineNested(parts.slice(3)) }
   }
   if (parts[0] === 'history' && parts[1] && parts[2] === 'set' && parts[3] === 'new') {
     return { name: 'history-set-new', id: parts[1] }

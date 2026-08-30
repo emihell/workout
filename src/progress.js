@@ -97,10 +97,10 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
     targets: nextTargets,
     action: movedDown ? 'down' : movedUp ? 'up' : 'keep',
     reason: movedDown
-      ? 'Reduced one available load step after missed reps or failure.'
+      ? 'Load down.'
       : movedUp
-        ? 'Raised one available load step after an easy completed set.'
-        : 'Kept the most recent loads.',
+        ? 'Load up.'
+        : 'Same load.',
   }
 }
 

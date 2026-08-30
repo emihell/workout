@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RPE_OPTIONS, formatSetLine, roleLabel } from '../ids'
+import { RPE_OPTIONS, formatSetLine, roleLabel, rpeOptionValue } from '../ids'
 import { formatProgressionLine } from '../progress'
 import { go } from '../route'
 import { dateKey } from '../schedule'
@@ -13,7 +13,8 @@ import {
   workoutVolume,
 } from '../storage'
 import { useStore } from '../store-context'
-import { Back } from './shared'
+import { RoutineScreens, navForBase } from './Routine'
+import { Back, Missing } from './shared'
 
 function itemIdOf(obj) {
   return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''
@@ -33,10 +34,6 @@ function routineTitle(program, routine) {
   return 'Routine'
 }
 
-function whenLabel(workout) {
-  return new Date(workout.finishedAt || workout.startedAt).toLocaleString()
-}
-
 function workoutDateKey(workout) {
   if (workout.performedOn) return workout.performedOn
   const stamp = workout.finishedAt || workout.startedAt
@@ -45,13 +42,17 @@ function workoutDateKey(workout) {
 }
 
 function compactDate(key) {
-  if (key === 'unknown') return 'Unknown date'
+  if (key === 'unknown') return 'Unknown'
   const [year, month, day] = key.split('-').map(Number)
   return new Date(year, month - 1, day).toLocaleDateString(undefined, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
+}
+
+function whenLabel(workout) {
+  return compactDate(workoutDateKey(workout))
 }
 
 function sortWorkoutsByDate(workouts) {
@@ -122,7 +123,7 @@ function workoutMonthKey(workout) {
 }
 
 function monthLabel(key) {
-  if (key === 'unknown') return 'Unknown date'
+  if (key === 'unknown') return 'Unknown'
   const [year, month] = key.split('-').map(Number)
   if (!year || !month) return key
   return new Date(year, month - 1, 1).toLocaleDateString(undefined, {
@@ -152,11 +153,13 @@ function WorkoutHistoryLink({ store, workout }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   const programName = workout.snapshot?.programName
   const name = workoutRoutineName(workout, routine)
-  const label = programName ? `${programName} - ${name}` : name
+  const label = programName ? `${programName} — ${name}` : name
   return (
-    <a href={`#/history/${workout.id}`}>
-      {compactDate(workoutDateKey(workout))} - {label}
-    </a>
+    <>
+      <a href={`#/history/${workout.id}`}>{label}</a>
+      {' — '}
+      {compactDate(workoutDateKey(workout))}
+    </>
   )
 }
 
@@ -172,7 +175,7 @@ export function History({ month = null }) {
         <Back />
         <h1>{monthLabel(month)}</h1>
         {workouts.length === 0 ? (
-          <p>None in this month.</p>
+          <p>None.</p>
         ) : (
           <ul>
             {workouts.map((workout) => (
@@ -192,12 +195,12 @@ export function History({ month = null }) {
       <p>
         <a href="#/history/exercises">By exercise</a>
       </p>
-      {months.length === 0 ? <p>None yet.</p> : null}
+      {months.length === 0 ? <p>None.</p> : null}
       <ul>
         {months.map((group) => (
           <li key={group.key}>
             <a href={`#/history/month/${group.key}`}>{monthLabel(group.key)}</a>
-            {` (${group.workouts.length})`}
+            {` — ${group.workouts.length}`}
           </li>
         ))}
       </ul>
@@ -213,15 +216,14 @@ export function HistoryExercises() {
     <section>
       <Back />
       <h1>By exercise</h1>
-      <p>Each exercise, and the routines it belongs to.</p>
-      {list.length === 0 ? <p>No logged exercises yet.</p> : null}
+      {list.length === 0 ? <p>None.</p> : null}
       <ul>
         {list.map((item) => (
           <li key={item.id}>
             <a href={`#/history/exercise/${item.id}`}>{item.exercise?.name || item.id}</a>
             {item.routines.length
               ? ` — ${item.routines.map((routine) => routine.name).join(', ')}`
-              : ' — not on a routine'}
+              : ''}
           </li>
         ))}
       </ul>
@@ -239,12 +241,12 @@ export function HistoryExercise({ exerciseId }) {
     <section>
       <Back />
       <h1>{ex?.name || exerciseId}</h1>
-      {groups.length === 0 ? <p>No logged sets.</p> : null}
+      {groups.length === 0 ? <p>None.</p> : null}
       {groups.map((group) => (
         <article key={group.groupId || group.routineId}>
           <h2>{routineTitle(group.program, group.routine)}</h2>
           <ul>
-            {group.workouts.map((w) => {
+            {sortWorkoutsByDate(group.workouts).map((w) => {
               const count = (w.sets || []).filter((s) => s.exerciseId === exerciseId).length
               return (
                 <li key={w.id}>
@@ -264,12 +266,7 @@ export function HistoryDetail({ workoutId }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
   if (!workout) {
-    return (
-      <section>
-        <p>Not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
@@ -289,20 +286,25 @@ export function HistoryDetail({ workoutId }) {
             : workoutRoutineName(workout, routine)
           : routineTitle(null, routine)}
       </h1>
-      <p>{whenLabel(workout)}</p>
       <p>
-        Duration: {durationLabel(workout.startedAt, workout.finishedAt) || '—'} · Sets: {sets.length} · Volume:{' '}
-        {workoutVolume(workout)} kg
+        {[
+          whenLabel(workout),
+          durationLabel(workout.startedAt, workout.finishedAt),
+          `${sets.length} sets`,
+          `${workoutVolume(workout)} kg`,
+        ]
+          .filter(Boolean)
+          .join(' · ')}
       </p>
       <p>
-        {workout.overallFeel ? `Felt ${workout.overallFeel}. ` : ''}
-        <a href={`#/history/${workout.id}/edit`}>Correct workout</a>
+        {workout.overallFeel ? `${workout.overallFeel} · ` : ''}
+        <a href={`#/history/${workout.id}/edit`}>Correct</a>
       </p>
       {workout.overallNote ? <p>{workout.overallNote}</p> : null}
 
       <h2>Exercises</h2>
-      {groups.length === 0 ? <p>No sets logged.</p> : null}
-      <ul>
+      {groups.length === 0 ? <p>None.</p> : null}
+      <ol>
         {groups.map((group) => {
           const ex = exerciseById(store.exercises, group.exerciseId)
           const snapshotItem = snapshot?.items?.find(
@@ -316,35 +318,42 @@ export function HistoryDetail({ workoutId }) {
             </li>
           )
         })}
-      </ul>
+      </ol>
       <p>
-        <a href={`#/history/${workout.id}/set/new`}>Correct log: add exercise</a>
+        <a href={`#/history/${workout.id}/set/new`}>Add set</a>
       </p>
 
       {workout.progression?.length ? (
-        <div>
-          <h3>Recommendation recorded at finish</h3>
-          <p>Correcting sets can preview and apply a recalculation for future automatic plans.</p>
+        <>
+          <h2>Next time</h2>
           <ul>
-            {workout.progression.map((c) => (
-              <li key={itemIdOf(c) || c.exerciseId}>
-                {c.to
-                  ? `${c.name}: ${c.to.length ? `${c.to.join('/')} kg` : (c.targetsTo || []).join('/')} — ${c.reason}`
-                  : formatProgressionLine(c)}
-              </li>
-            ))}
+            {workout.progression.map((c) => {
+              const none = c.reason === 'Skipped.' || c.reason === 'None.'
+              const next = none
+                ? c.reason
+                : c.to?.length
+                  ? `${c.to.join('/')} kg`
+                  : (c.targetsTo || []).filter(Boolean).join('/') || formatProgressionLine(c).replace(`${c.name}: `, '')
+              return (
+                <li key={itemIdOf(c) || c.exerciseId}>
+                  {c.name} — {next}
+                </li>
+              )
+            })}
           </ul>
-        </div>
+        </>
       ) : null}
 
       <p>
         <button
           type="button"
           onClick={() => {
-            go(`/history/${workout.id}/delete`)
+            if (!window.confirm(`Delete ${workoutRoutineName(workout, routine)}?`)) return
+            store.removeWorkout(workout.id)
+            go('/history')
           }}
         >
-          Delete workout
+          Delete
         </button>
       </p>
     </section>
@@ -368,12 +377,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
     )
 
   if (!workout) {
-    return (
-      <section>
-        <p>Not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
@@ -381,11 +385,11 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
       <Back />
       <h1>{snapshotItem?.exerciseName || ex?.name || exerciseId}</h1>
       <p>
-        {roleLabel(snapshotItem?.role)}
-        {snapshotItem?.warmup ? ' · WU set' : ''}
+        {[roleLabel(snapshotItem?.role), snapshotItem?.warmup ? 'WU set' : null, whenLabel(workout)]
+          .filter(Boolean)
+          .join(' · ')}
       </p>
-      <p>{whenLabel(workout)}</p>
-      {items.length === 0 ? <p>No sets yet.</p> : null}
+      {items.length === 0 ? <p>None.</p> : null}
       <ol>
         {items.map(({ s, index }) => (
           <li key={index}>
@@ -410,19 +414,13 @@ export function HistoryEdit({ workoutId }) {
   const [overallNote, setOverallNote] = useState(workout?.overallNote || '')
 
   if (!workout) {
-    return (
-      <section>
-        <p>Not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
     <section>
       <Back />
-      <h1>Correct workout</h1>
-      <p>Correct the overall note and feel here. Open an exercise to correct individual sets.</p>
+      <h1>Correct</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -430,9 +428,10 @@ export function HistoryEdit({ workoutId }) {
           go(`/history/${workout.id}`)
         }}
       >
+        <p>Feel</p>
         <p>
           {['', 'Easy', 'Good', 'Hard', 'Exhausting'].map((f) => (
-            <label key={f || 'none'} style={{ marginRight: '0.75rem' }}>
+            <label key={f || 'none'}>
               <input type="radio" name="feel" checked={overallFeel === f} onChange={() => setOverallFeel(f)} /> {f || '—'}
             </label>
           ))}
@@ -458,12 +457,7 @@ export function HistorySetNew({ workoutId }) {
   const workout = store.workouts.find((x) => x.id === workoutId)
 
   if (!workout) {
-    return (
-      <section>
-        <p>Not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
@@ -509,8 +503,7 @@ export function HistorySetNew({ workoutId }) {
     <section>
       <Back />
       <h1>Add set</h1>
-      <p>Pick the exercise.</p>
-      {choices.length === 0 ? <p>No exercises to add a set for.</p> : null}
+      {choices.length === 0 ? <p>None.</p> : null}
       <ul>
         {choices.map((choice) => {
           return (
@@ -533,22 +526,17 @@ export function HistorySet({ workoutId, index }) {
   const [setType, setSetType] = useState(set?.setType || 'work')
   const [weight, setWeight] = useState(set?.weight ?? '')
   const [reps, setReps] = useState(set?.reps ?? '')
-  const [rpe, setRpe] = useState(set?.rpe ?? '')
+  const [rpe, setRpe] = useState(() => (set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : ''))
   const [note, setNote] = useState(set?.note || '')
 
   if (!workout || !set) {
-    return (
-      <section>
-        <p>Set not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
     <section>
       <Back />
-      <p>{workoutRoutineName(workout, null)} · history correction</p>
+      <p>{workoutRoutineName(workout, null)}</p>
       <h1>Set</h1>
       <form
         onSubmit={(e) => {
@@ -595,13 +583,13 @@ export function HistorySet({ workoutId, index }) {
         </p>
         <p>
           <label>
-            RPE
+            Effort
             <br />
             <select value={rpe} onChange={(e) => setRpe(e.target.value)}>
               <option value="">—</option>
               {RPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.value} {opt.label}
+                  {opt.label}
                 </option>
               ))}
             </select>
@@ -623,12 +611,12 @@ export function HistorySet({ workoutId, index }) {
         <button
           type="button"
           onClick={() => {
-            if (!window.confirm('Remove this set?')) return
+            if (!window.confirm('Remove set?')) return
             store.updateWorkout(workout.id, { sets: (workout.sets || []).filter((_, i) => i !== index) })
             go(`/history/${workout.id}/recalculate`)
           }}
         >
-          Remove set
+          Remove
         </button>
       </p>
     </section>
@@ -639,25 +627,24 @@ export function HistoryRecalculate({ workoutId }) {
   const store = useStore()
   const workout = store.workouts.find((candidate) => candidate.id === workoutId)
   if (!workout) {
-    return (
-      <section>
-        <Back />
-        <p>Workout not found.</p>
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
   const routineHref = workoutRoutineId(workout)
-    ? `#/routines/${workoutRoutineId(workout)}`
-    : '#/routines'
+    ? `#/history/${workout.id}/routine`
+    : null
 
   return (
     <section>
       <Back />
-      <h1>Recalculate next prescription?</h1>
-      <p>The correction is saved. Recalculation writes next kg and reps onto the routine from this workout.</p>
+      <h1>Update?</h1>
       <p>
-        <a href={routineHref}>Open the routine</a>
+        {workoutRoutineName(workout, null)} — {whenLabel(workout)}
       </p>
+      {routineHref ? (
+        <p>
+          <a href={routineHref}>Routine</a>
+        </p>
+      ) : null}
       <p>
         <button
           type="button"
@@ -666,43 +653,32 @@ export function HistoryRecalculate({ workoutId }) {
             go(`/history/${workout.id}`)
           }}
         >
-          Apply recalculation
+          Apply
         </button>{' '}
-        <button type="button" onClick={() => go(`/history/${workout.id}`)}>Keep routine as is</button>
+        <button type="button" onClick={() => go(`/history/${workout.id}`)}>Skip</button>
       </p>
     </section>
   )
 }
 
-export function HistoryDelete({ workoutId }) {
+export function HistoryRoutine({ workoutId, screen = 'detail', itemId, exerciseId }) {
   const store = useStore()
   const workout = store.workouts.find((candidate) => candidate.id === workoutId)
-  if (!workout) {
-    return (
-      <section>
-        <Back />
-        <p>Workout not found.</p>
-      </section>
-    )
+  const routineId = workoutRoutineId(workout)
+  if (!workout || !routineId) {
+    return <Missing>Not found.</Missing>
   }
+  const paths = navForBase(`/history/${workoutId}/routine`, `/history/${workoutId}/recalculate`, {
+    extra: whenLabel(workout),
+    showDelete: false,
+  })
   return (
-    <section>
-      <Back />
-      <h1>Delete completed workout?</h1>
-      <p>{workoutRoutineName(workout, null)} · {whenLabel(workout)}</p>
-      <p>This removes the history record. The routine keeps its current prescription.</p>
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            store.removeWorkout(workout.id)
-            go('/history')
-          }}
-        >
-          Delete workout
-        </button>{' '}
-        <button type="button" onClick={() => go(`/history/${workout.id}`)}>Cancel</button>
-      </p>
-    </section>
+    <RoutineScreens
+      routineId={routineId}
+      paths={paths}
+      screen={screen}
+      itemId={itemId}
+      exerciseId={exerciseId}
+    />
   )
 }

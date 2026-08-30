@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { RPE_OPTIONS, formatSetLine, roleLabel } from '../ids'
+import { RPE_OPTIONS, formatSetLine, roleLabel, rpeOptionValue } from '../ids'
 import { go } from '../route'
 import { recommendNextPrescription } from '../progress'
 import { exerciseById, findRoutine, historySetPrefill, lastSetsForExercise } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex } from '../workout-log'
-import { Back } from './shared'
+import { navForBase, RoutineScreens } from './Routine'
+import { Back, Missing } from './shared'
 
 function usesWeight(ex) {
   return ex && ex.type !== 'bodyweight' && ex.type !== 'cardio'
@@ -17,8 +18,8 @@ function isDurationTarget(target) {
   return t.includes('min') || t.includes('sec') || /s$/.test(t.replace(/\s/g, ''))
 }
 
-function exerciseLabel(item) {
-  return `${item.exerciseName || 'Exercise'} (${roleLabel(item.role)})`
+function exerciseName(item) {
+  return item.exerciseName || 'Exercise'
 }
 
 function findItem(items, itemId) {
@@ -26,7 +27,7 @@ function findItem(items, itemId) {
 }
 
 function abandonWorkout(store) {
-  if (!window.confirm('Abandon this workout? Logged sets will be lost.')) return
+  if (!window.confirm('Abandon?')) return
   store.abandonWorkout()
   go('/')
 }
@@ -43,32 +44,40 @@ function liveExercise(store, item) {
   )
 }
 
-function weightStepLine(ex) {
-  const equipment = ex?.equipment || 'Unknown'
-  const step = String(ex?.weightStep || 'n/a').trim() || 'n/a'
-  if (step === 'n/a') return `${equipment} - weight step n/a`
-  if (/kg/i.test(step) || /^alt\b/i.test(step)) return `${equipment} - weight step ${step}`
-  return `${equipment} - weight step ${step} kg`
+function exerciseEditorPath(routineId, item) {
+  return `/workout/${routineId}/item/${itemKey(item)}/exercise`
 }
 
-function ExerciseSetupHeader({ routineId, item, ex }) {
+function setProgressLabel(item, state, currentType, currentWorkIndex) {
+  const hasWu = Boolean(item?.warmup)
+  const total = (hasWu ? 1 : 0) + state.workCount
+  const current = currentType === 'wu' ? 1 : (hasWu ? 1 : 0) + currentWorkIndex + 1
+  return `${current}/${total}`
+}
+
+function ExerciseTitle({ routineId, item, ex, bits }) {
   const inLibrary = Boolean(item?.exerciseId && ex?.id === item.exerciseId)
-  const line = weightStepLine(ex)
+  const name = exerciseName(item)
+  const meta = (bits || []).filter(Boolean).join(' · ')
   return (
     <>
-      <p>
+      <h1>
         {inLibrary ? (
-          <button
-            type="button"
-            onClick={() => go(`/workout/${routineId}/item/${itemKey(item)}/exercise`)}
-          >
-            {line}
-          </button>
+          <a href={`#${exerciseEditorPath(routineId, item)}`}>{name}</a>
         ) : (
-          line
+          name
         )}
-      </p>
-      {item?.notes ? <p>Notes: {item.notes}</p> : null}
+      </h1>
+      {meta ? <p>{meta}</p> : null}
+    </>
+  )
+}
+
+function ExerciseSetupHeader({ item, ex, showNotes = true }) {
+  return (
+    <>
+      {ex?.equipment ? <p>{ex.equipment}</p> : null}
+      {showNotes && item?.notes ? <p>{item.notes}</p> : null}
     </>
   )
 }
@@ -91,36 +100,27 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     : null
 
   if (!routine && !mine) {
-    return (
-      <section>
-        <p>Routine not found.</p>
-        <Back />
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   if (!mine) {
     if (!plan) {
-      return (
-        <section>
-          <Back />
-          <p>Workout plan not found.</p>
-        </section>
-      )
+      return <Missing>Not found.</Missing>
     }
     return (
       <section>
         <Back />
-        <p>{scheduleSlotId ? `Scheduled workout · ${plan.date}` : `Ad-hoc workout · ${plan.date}`}</p>
         <h1>{plan.routineName}</h1>
-        <p>{plan.focus} · {plan.items.length} exercises</p>
+        <p>{[plan.focus, plan.date].filter(Boolean).join(' · ')}</p>
         <ol>
           {plan.items.map((item) => (
             <li key={item.id}>
-              {exerciseLabel(item)}
+              {exerciseName(item)}
+              {' — '}
+              {roleLabel(item.role)}
               {item.warmup ? ' · WU set' : ''}
               {' · '}
-              {item.sets} {item.sets === 1 ? 'set' : 'sets'} · {(item.targets || []).join('/')}
+              {item.sets} {item.sets === 1 ? 'set' : 'sets'}
             </li>
           ))}
         </ol>
@@ -137,11 +137,11 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
                 })
               }
             >
-              {scheduleSlotId ? 'Start scheduled workout' : 'Start ad-hoc workout'}
+              Start
             </button>
           </p>
         ) : (
-          <p><a href={`#/routines/${plan.routineId}`}>Add exercises before starting</a></p>
+          <p><a href={`#${scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`}`}>Add exercises</a></p>
         )}
       </section>
     )
@@ -154,9 +154,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
       <section>
         <Back />
         <h1>{active.snapshot?.routineName || active.snapshot?.sessionName || 'Workout'}</h1>
-        <p>This routine has no exercises.</p>
+        <p>No exercises.</p>
         <p>
-          <button type="button" onClick={() => abandonWorkout(store)}>Abandon workout</button>
+          <button type="button" onClick={() => abandonWorkout(store)}>Abandon</button>
         </p>
       </section>
     )
@@ -166,39 +166,25 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     <section>
       <Back />
       <h1>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</h1>
-      <p>
-        Pick an exercise. You do not have to follow this order. Anything you never open is skipped
-        when you finish.
-      </p>
-      <ul>
+      <ol>
         {items.map((item) => {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone
-          const label = exerciseLabel(item)
+          const path = completed ? itemDonePath(routineId, item) : itemLogPath(routineId, item)
           return (
             <li key={itemKey(item) || item.id}>
-              <button
-                type="button"
-                onClick={() =>
-                  go(
-                    completed
-                      ? `/workout/${routineId}/item/${itemKey(item)}/done`
-                      : `/workout/${routineId}/item/${itemKey(item)}`,
-                  )
-                }
-              >
-                {completed ? `${label} · done` : label}
-              </button>
+              <a href={`#${path}`}>{exerciseName(item)}</a>
+              {' — '}
+              {roleLabel(item.role)}
+              {completed ? ' · done' : ''}
             </li>
           )
         })}
-      </ul>
+      </ol>
       <p>
-        <button type="button" onClick={() => go(`/workout/${routineId}/finish`)}>
-          Finish workout
-        </button>
+        <a href={`#/workout/${routineId}/finish`}>Finish</a>
       </p>
       <p>
-        <button type="button" onClick={() => abandonWorkout(store)}>Abandon workout</button>
+          <button type="button" onClick={() => abandonWorkout(store)}>Abandon</button>
       </p>
     </section>
   )
@@ -224,12 +210,7 @@ function goToItemReview(routineId, item) {
 }
 
 function MissingItem() {
-  return (
-    <section>
-      <Back />
-      <p>Exercise not found in this workout.</p>
-    </section>
-  )
+  return <Missing>Not found.</Missing>
 }
 
 export function WorkoutItem({ routineId, itemId }) {
@@ -242,27 +223,12 @@ export function WorkoutItem({ routineId, itemId }) {
   )
 
   useEffect(() => {
-    if (item && completed) go(itemDonePath(routineId, item), { replace: true })
+    if (!item) return
+    go(completed ? itemDonePath(routineId, item) : itemLogPath(routineId, item), { replace: true })
   }, [completed, routineId, item])
 
   if (!mine || !item) return <MissingItem />
-  if (completed) return null
-
-  const ex = liveExercise(store, item)
-
-  return (
-    <section>
-      <Back />
-      <h1>{exerciseLabel(item)}</h1>
-      <ExerciseSetupHeader routineId={routineId} item={item} ex={ex} />
-      {ex?.cues ? <p>{ex.cues}</p> : null}
-      <p>
-        <button type="button" onClick={() => go(itemLogPath(routineId, item))}>
-          Start
-        </button>
-      </p>
-    </section>
-  )
+  return null
 }
 
 export function WorkoutItemLog({ routineId, itemId }) {
@@ -340,7 +306,7 @@ function WorkoutItemLive({ routineId, item }) {
 
   function completeSet({ weight, reps, rpe, note }) {
     if (currentType === 'work' && ex?.type !== 'cardio' && !rpe) {
-      window.alert('Pick an effort (RPE) for working sets.')
+      window.alert('Pick effort.')
       return
     }
     const done = finishAfterThisSet()
@@ -401,12 +367,22 @@ function WorkoutItemLive({ routineId, item }) {
   return (
     <section>
       <Back />
+      <ExerciseTitle
+        routineId={routineId}
+        item={item}
+        ex={ex}
+        bits={[
+          roleLabel(item.role),
+          currentType === 'wu' ? 'WU set' : null,
+          setProgressLabel(item, state, currentType, currentWorkIndex),
+        ]}
+      />
       {resting ? (
         <>
-          <RestBox remainingMs={remainingMs} paused={active.restPausedRemaining != null} restSec={item.restSec} />
+          <RestBox remainingMs={remainingMs} paused={active.restPausedRemaining != null} />
           {canGoBack ? (
             <p>
-              <button type="button" onClick={previousSet}>Previous set</button>
+              <button type="button" onClick={previousSet}>Previous</button>
             </p>
           ) : null}
         </>
@@ -415,7 +391,6 @@ function WorkoutItemLive({ routineId, item }) {
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
           ex={ex}
           last={last}
-          state={state}
           currentType={currentType}
           currentWorkIndex={currentWorkIndex}
           target={target}
@@ -427,11 +402,8 @@ function WorkoutItemLive({ routineId, item }) {
         />
       )}
 
-      {item.calibrationRequired && currentType === 'work' ? (
-        <p>
-          Calibration: choose a conservative starting load and complete the recommended reps with clean form.
-        </p>
-      ) : null}
+      <ExerciseSetupHeader item={item} ex={ex} showNotes={false} />
+      {ex?.cues ? <p>{ex.cues}</p> : null}
     </section>
   )
 }
@@ -439,7 +411,6 @@ function WorkoutItemLive({ routineId, item }) {
 function SetLogForm({
   ex,
   last,
-  state,
   currentType,
   currentWorkIndex,
   target,
@@ -449,7 +420,6 @@ function SetLogForm({
   onSkip,
   onPrevious,
 }) {
-  const needsWu = currentType === 'wu'
   const history = historySetPrefill(last, { setType: currentType, workIndex: currentWorkIndex })
   const fromRestore =
     restore &&
@@ -458,9 +428,13 @@ function SetLogForm({
   const seed = fromRestore ? restore : history
   const [weight, setWeight] = useState(() => (usesWeight(ex) ? seed.weight : ''))
   const [reps, setReps] = useState(() => (fromRestore ? restore.reps : target || ''))
-  const [rpe, setRpe] = useState(() => (fromRestore ? restore.rpe : '3'))
+  const [rpe, setRpe] = useState(() =>
+    fromRestore && restore.rpe != null && restore.rpe !== ''
+      ? String(rpeOptionValue(restore.rpe) || restore.rpe)
+      : '3',
+  )
   const [note, setNote] = useState(() => (fromRestore ? restore.note : ''))
-  const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration / reps' : 'Reps'
+  const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
 
   return (
     <form
@@ -469,19 +443,15 @@ function SetLogForm({
         onComplete({ weight, reps, rpe, note })
       }}
     >
-      <h2>{needsWu ? 'WU set' : `Set ${currentWorkIndex + 1} of ${state.workCount}`}</h2>
-      <p>Target: {target || '—'}</p>
       {usesWeight(ex) ? (
         <p>
           <label>
-            Weight (kg)
+            kg
             <br />
             <input value={weight} onChange={(e) => setWeight(e.target.value)} inputMode="decimal" />
           </label>
         </p>
-      ) : (
-        <p>{ex?.type === 'cardio' ? 'No load' : 'Bodyweight / no load'}</p>
-      )}
+      ) : null}
       <p>
         <label>
           {repsLabel}
@@ -491,10 +461,10 @@ function SetLogForm({
       </p>
       {currentType === 'work' && ex?.type !== 'cardio' ? (
         <>
-          <p>How hard was it?</p>
+          <p>Effort</p>
           <p>
             {RPE_OPTIONS.map((opt) => (
-              <label key={opt.value} style={{ display: 'inline-block', marginRight: '0.75rem' }}>
+              <label key={opt.value}>
                 <input
                   type="radio"
                   name="rpe"
@@ -502,7 +472,7 @@ function SetLogForm({
                   checked={String(rpe) === String(opt.value)}
                   onChange={() => setRpe(opt.value)}
                 />{' '}
-                {opt.value} {opt.label}
+                {opt.label}
               </label>
             ))}
           </p>
@@ -516,12 +486,12 @@ function SetLogForm({
         </label>
       </p>
       <p>
-        <button type="submit">Complete set</button>{' '}
-        <button type="button" onClick={onSkip}>Skip set</button>
+        <button type="submit">Complete</button>{' '}
+        <button type="button" onClick={onSkip}>Skip</button>
         {canGoBack ? (
           <>
             {' '}
-            <button type="button" onClick={onPrevious}>Previous set</button>
+            <button type="button" onClick={onPrevious}>Previous</button>
           </>
         ) : null}
       </p>
@@ -543,37 +513,30 @@ export function WorkoutItemDone({ routineId, itemId }) {
   return (
     <section>
       <Back />
-      <h1>{exerciseLabel(item)}</h1>
-      <ExerciseSetupHeader routineId={routineId} item={item} ex={liveExercise(store, item)} />
       <h2>Today</h2>
       {today.length ? (
-        <ul>
+        <ol>
           {today.map((set, index) => {
             const setIndex = (active.sets || []).indexOf(set)
             return (
               <li key={index}>
-                <button
-                  type="button"
-                  onClick={() => go(`/workout/${routineId}/set/${setIndex}`)}
-                >
-                  {formatSetLine(set)}
-                </button>
+                <a href={`#/workout/${routineId}/set/${setIndex}`}>{formatSetLine(set)}</a>
               </li>
             )
           })}
-        </ul>
+        </ol>
       ) : (
-        <p>Nothing logged.</p>
+        <p>None.</p>
       )}
       <h2>Previous</h2>
       {previous ? (
-        <ul>
+        <ol>
           {previous.sets.map((set, index) => (
             <li key={index}>{formatSetLine(set)}</li>
           ))}
-        </ul>
+        </ol>
       ) : (
-        <p>No previous log for this exercise.</p>
+        <p>None.</p>
       )}
       <p>
         <button
@@ -606,6 +569,13 @@ export function WorkoutItemDone({ routineId, itemId }) {
           Add set
         </button>
       </p>
+      <ExerciseTitle
+        routineId={routineId}
+        item={item}
+        ex={liveExercise(store, item)}
+        bits={[roleLabel(item.role)]}
+      />
+      <ExerciseSetupHeader item={item} ex={liveExercise(store, item)} />
     </section>
   )
 }
@@ -620,20 +590,15 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   const [cues, setCues] = useState(ex?.cues || '')
 
   if (!mine || !item) {
-    return (
-      <section>
-        <Back />
-        <p>Exercise not found in this workout.</p>
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   if (!ex) {
     return (
       <section>
         <Back />
-        <h1>{exerciseLabel(item)}</h1>
-        <p>This exercise is not in the library, so weight step and form cues cannot be edited here.</p>
+        <h1>{exerciseName(item)}</h1>
+        <p>Not found.</p>
       </section>
     )
   }
@@ -641,7 +606,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   return (
     <section>
       <Back />
-      <h1>{exerciseLabel(item)}</h1>
+      <h1>{exerciseName(item)}</h1>
       <p>{ex.equipment}</p>
       <form
         onSubmit={(event) => {
@@ -650,7 +615,12 @@ export function WorkoutItemExercise({ routineId, itemId }) {
             weightStep: weightStep.trim() || 'n/a',
             cues: cues.trim(),
           })
-          go(`/workout/${routineId}/item/${itemKey(item)}`, { replace: true })
+          go(
+            itemLoggingState(active, item).plannedDone
+              ? itemDonePath(routineId, item)
+              : itemLogPath(routineId, item),
+            { replace: true },
+          )
         }}
       >
         <p>
@@ -668,7 +638,19 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           </label>
         </p>
         <p>
-          <button type="submit">Save</button>
+          <button type="submit">Save</button>{' '}
+          <button
+            type="button"
+            onClick={() =>
+              go(
+                itemLoggingState(active, item).plannedDone
+                  ? itemDonePath(routineId, item)
+                  : itemLogPath(routineId, item),
+              )
+            }
+          >
+            Cancel
+          </button>
         </p>
       </form>
     </section>
@@ -678,24 +660,43 @@ export function WorkoutItemExercise({ routineId, itemId }) {
 export function WorkoutFinish({ routineId }) {
   const store = useStore()
   if (!isActiveFor(store.activeWorkout, routineId)) {
-    return (
-      <section>
-        <Back />
-        <p>Workout not found.</p>
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
   return <FinishScreen />
 }
 
-function RestBox({ remainingMs, paused, restSec }) {
+export function WorkoutSetup({
+  routineId,
+  scheduleSlotId = null,
+  date = null,
+  screen = 'detail',
+  itemId,
+  exerciseId,
+}) {
+  const preview =
+    scheduleSlotId && date
+      ? `/workout/${routineId}/${scheduleSlotId}/${date}`
+      : `/workout/${routineId}`
+  const paths = navForBase(`${preview}/setup`, preview, { showDelete: false })
+  return (
+    <RoutineScreens
+      routineId={routineId}
+      paths={paths}
+      screen={screen}
+      itemId={itemId}
+      exerciseId={exerciseId}
+    />
+  )
+}
+
+function RestBox({ remainingMs, paused }) {
   const store = useStore()
   const sec = Math.ceil(remainingMs / 1000)
   return (
-    <div>
-      <h3>Rest</h3>
+    <>
+      <h2>Rest</h2>
       <p>
-        {paused ? 'Paused' : 'Resting'}: {sec}s (planned {restSec}s)
+        {paused ? 'Paused' : 'Rest'} {sec}s
       </p>
       <p>
         {paused ? (
@@ -724,7 +725,7 @@ function RestBox({ remainingMs, paused, restSec }) {
           </button>
         )}{' '}
         <button type="button" onClick={() => store.patchActive({ restEndsAt: null, restPausedRemaining: null })}>
-          Skip rest
+          Skip
         </button>{' '}
         <button
           type="button"
@@ -736,10 +737,10 @@ function RestBox({ remainingMs, paused, restSec }) {
             }
           }}
         >
-          +30 seconds
+          +30s
         </button>
       </p>
-    </div>
+    </>
   )
 }
 
@@ -754,24 +755,19 @@ export function WorkoutSetEdit({ routineId, index }) {
   const usesRpe = set?.setType !== 'wu' && item?.exerciseType !== 'cardio'
   const [weight, setWeight] = useState(set?.weight ?? '')
   const [reps, setReps] = useState(set?.reps ?? '')
-  const [rpe, setRpe] = useState(set?.rpe ?? '')
+  const [rpe, setRpe] = useState(() => (set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : ''))
   const [note, setNote] = useState(set?.note || '')
   const itemPath = itemSetsPath(routineId, item, workout)
 
   if (!workout || !set) {
-    return (
-      <section>
-        <Back />
-        <p>Active set not found.</p>
-      </section>
-    )
+    return <Missing>Not found.</Missing>
   }
 
   return (
     <section>
       <Back />
-      <p>Active workout · {workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
-      <h1>Edit set</h1>
+      <p>{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
+      <h1>Set</h1>
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -784,13 +780,15 @@ export function WorkoutSetEdit({ routineId, index }) {
           go(itemPath)
         }}
       >
-        {usesLoad ? <p><label>Weight (kg)<br /><input value={weight} onChange={(event) => setWeight(event.target.value)} inputMode="decimal" /></label></p> : null}
-        <p><label>Reps / duration<br /><input value={reps} onChange={(event) => setReps(event.target.value)} /></label></p>
+        {usesLoad ? <p><label>kg<br /><input value={weight} onChange={(event) => setWeight(event.target.value)} inputMode="decimal" /></label></p> : null}
+        <p><label>Reps<br /><input value={reps} onChange={(event) => setReps(event.target.value)} /></label></p>
         {usesRpe ? <p>
-          <label>RPE<br />
+          <label>Effort<br />
             <select value={rpe} onChange={(event) => setRpe(event.target.value)}>
               <option value="">—</option>
-              {RPE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.value} {option.label}</option>)}
+              {RPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </select>
           </label>
         </p> : null}
@@ -804,7 +802,7 @@ export function WorkoutSetEdit({ routineId, index }) {
 function FinishScreen() {
   const store = useStore()
   const [overallNote, setOverallNote] = useState('')
-  const [overallFeel, setOverallFeel] = useState('Good')
+  const [overallFeel, setOverallFeel] = useState('')
   const active = store.activeWorkout
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
   const [minutes] = useState(() => Math.max(1, Math.round((Date.now() - started.getTime()) / 60000)))
@@ -839,36 +837,43 @@ function FinishScreen() {
       targetsFrom: item.targets || [],
       targetsTo: recommendation.targets,
       action: recommendation.action,
-      reason:
-        !sets.length && skippedForItem
-          ? 'No completed sets; the previous recommendation is kept.'
-          : !sets.length
-            ? 'No sets logged; the previous recommendation is kept.'
-            : recommendation.reason,
+      reason: sets.length ? recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
     }
   })
+
+  const name = active?.snapshot?.routineName || active?.snapshot?.sessionName
 
   return (
     <section>
       <Back />
-      <h1>Workout done</h1>
-      <p>{active?.snapshot?.routineName || active?.snapshot?.sessionName}</p>
+      <h1>Finish</h1>
       <p>
-        Duration: {minutes} min · Exercises: {items.length} · Sets: {setCount}
+        {name} — {minutes} min · {setCount} sets
       </p>
-      <h3>Recommended next time</h3>
-      <ul>
-        {progression.map((item) => (
-          <li key={item.routineItemId}>
-            {item.name}: {item.to.length ? `${item.to.join('/')} kg` : item.targetsTo.join('/')} — {item.reason}
-          </li>
-        ))}
-      </ul>
-      <p>These recommendations are saved with this workout and written onto the routine for next time.</p>
-      <p>How did it feel overall?</p>
+      <h2>Next time</h2>
+      {progression.length === 0 ? (
+        <p>None.</p>
+      ) : (
+        <ul>
+          {progression.map((item) => {
+            const none = item.reason === 'Skipped.' || item.reason === 'None.'
+            const next = none
+              ? item.reason
+              : item.to.length
+                ? `${item.to.join('/')} kg`
+                : (item.targetsTo || []).filter(Boolean).join('/') || item.reason
+            return (
+              <li key={item.routineItemId}>
+                {item.name} — {next}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+      <p>Feel</p>
       <p>
         {['Easy', 'Good', 'Hard', 'Exhausting'].map((f) => (
-          <label key={f} style={{ marginRight: '0.75rem' }}>
+          <label key={f}>
             <input type="radio" name="feel" checked={overallFeel === f} onChange={() => setOverallFeel(f)} /> {f}
           </label>
         ))}
@@ -888,7 +893,7 @@ function FinishScreen() {
             go('/')
           }}
         >
-          Save and finish
+          Save
         </button>
       </p>
     </section>

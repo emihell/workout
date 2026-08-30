@@ -11,7 +11,7 @@ let catalogPromise = null
 
 function fetchJson(url) {
   return fetch(url).then((response) => {
-    if (!response.ok) throw new Error('Could not load the exercise database.')
+    if (!response.ok) throw new Error('Could not load.')
     return response.json()
   })
 }
@@ -64,7 +64,7 @@ export function loadExerciseCatalog() {
         const repdbPayload = results[1].status === 'fulfilled' ? results[1].value : null
         const repdb = Array.isArray(repdbPayload?.exercises) ? repdbPayload.exercises.map(fromRepdbItem) : []
         const merged = mergeCatalogs(freeDb, [...repdb, ...EXTRA_EXERCISES])
-        if (!merged.length) throw new Error('Could not load the exercise database.')
+        if (!merged.length) throw new Error('Could not load.')
         return merged
       },
     ).catch((error) => {

@@ -1,5 +1,4 @@
 import { greeting, weekdayName } from '../ids'
-import { go } from '../route'
 import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
@@ -24,6 +23,29 @@ function activeRoutineId(workout) {
   return workout?.routineId || workout?.sessionId
 }
 
+function WorkoutRow({ store, routine, slot, date, extra }) {
+  const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
+  const mine = store.activeWorkout
+  const inProgress =
+    activeRoutineId(mine) === routine.id &&
+    mine?.scheduleSlotId === slot.id &&
+    mine.scheduledFor === date
+  const bits = [extra, routine.focus].filter(Boolean)
+  return (
+    <li>
+      {routine.name} — {bits.join(' · ')}
+      {done ? (
+        <> — Done {dateKey(done.finishedAt)}</>
+      ) : inProgress ? null : (
+        <>
+          {' '}
+          <StartButton store={store} routine={routine} slot={slot} date={date} />
+        </>
+      )}
+    </li>
+  )
+}
+
 export function Today() {
   const store = useStore()
   const now = new Date()
@@ -42,15 +64,11 @@ export function Today() {
     return (
       <section>
         <h1>Today</h1>
-        <p>This device has no workout data yet.</p>
-        <p>
-          Import a database backup to restore routines, schedule, and history. After that, this
-          browser keeps a copy. To use another phone or computer, export from Settings and import
-          there.
-        </p>
+        <p>No data.</p>
+        <p>Import, or start empty.</p>
         <p>
           <label>
-            Import database
+            Import
             <br />
             <input
               type="file"
@@ -64,14 +82,14 @@ export function Today() {
                     const payload = JSON.parse(text)
                     if (
                       !window.confirm(
-                        'Replace all data on this device with this backup? Current routines, schedule, and history will be gone.',
+                        'Replace all data on this device?',
                       )
                     ) {
                       return
                     }
                     store.applyBackup(payload)
                   } catch (err) {
-                    window.alert(err instanceof Error ? err.message : 'Could not import that file.')
+                    window.alert(err instanceof Error ? err.message : 'Could not import.')
                   }
                 })
               }}
@@ -79,7 +97,7 @@ export function Today() {
           </label>
         </p>
         <p>
-          Or start empty:{' '}
+          Or{' '}
           <a href="#/routines">Routines</a>
           {' · '}
           <a href="#/schedule">Schedule</a>
@@ -101,7 +119,7 @@ export function Today() {
 
       {mine ? (
         <p>
-          Workout in progress.{' '}
+          In progress.{' '}
           <button type="button" onClick={() => startOrContinue(store, activeRoutineId(mine))}>
             Continue
           </button>
@@ -109,76 +127,40 @@ export function Today() {
       ) : null}
 
       {todays.length ? (
-        todays.map(({ slot, routine }) => {
-          const done = coveringWorkout(store.workouts, routine.id, todayKey, slot.id)
-          const inProgress =
-            activeRoutineId(mine) === routine.id &&
-            mine?.scheduleSlotId === slot.id &&
-            mine.scheduledFor === todayKey
-          return (
-            <article key={slot.id}>
-              <h2>
-                Today — {routine.name}
-              </h2>
-              <p>
-                {routine.focus} · {routine.exercises.length} exercises
-              </p>
-              {done ? (
-                <p>Workout done on {dateKey(done.finishedAt)}</p>
-              ) : inProgress ? null : (
-                <p>
-                  <StartButton store={store} routine={routine} slot={slot} date={todayKey} />
-                  {' '}
-                  <a href={`#/routines/${routine.id}`}>View plan</a>
-                </p>
-              )}
-            </article>
-          )
-        })
+        <>
+          <h2>Today</h2>
+          <ul>
+            {todays.map(({ slot, routine }) => (
+              <WorkoutRow key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
+            ))}
+          </ul>
+        </>
       ) : upcoming ? (
         <>
-          <p>Nothing on the calendar for {weekdayName(now.getDay())}.</p>
-          {upcoming.items.map(({ slot, routine }) => {
-            const when = dateKey(upcoming.date)
-            const done = coveringWorkout(store.workouts, routine.id, when, slot.id)
-            const inProgress =
-              activeRoutineId(mine) === routine.id &&
-              mine?.scheduleSlotId === slot.id &&
-              mine.scheduledFor === when
-            return (
-              <article key={slot.id}>
-                <h2>
-                  Next — {routine.name}
-                </h2>
-                <p>
-                  {weekdayName(upcoming.date.getDay())} · {routine.focus} · {routine.exercises.length} exercises
-                </p>
-                {done ? (
-                  <p>Workout done on {dateKey(done.finishedAt)}</p>
-                ) : inProgress ? null : (
-                  <p>
-                    <StartButton store={store} routine={routine} slot={slot} date={when} />
-                    {' '}
-                    <a href={`#/routines/${routine.id}`}>View plan</a>
-                  </p>
-                )}
-              </article>
-            )
-          })}
+        <p>None today.</p>
+          <h2>Next</h2>
+          <ul>
+            {upcoming.items.map(({ slot, routine }) => (
+              <WorkoutRow
+                key={slot.id}
+                store={store}
+                routine={routine}
+                slot={slot}
+                date={dateKey(upcoming.date)}
+                extra={weekdayName(upcoming.date.getDay())}
+              />
+            ))}
+          </ul>
         </>
       ) : (
-        <p>Nothing scheduled. Add routines in Schedule.</p>
+        <p>None.</p>
       )}
 
-      <p>
-        <button
-          type="button"
-          disabled={Boolean(mine)}
-          onClick={() => go('/start')}
-        >
-          Start a different workout
-        </button>
-      </p>
+      {mine ? null : (
+        <p>
+          <a href="#/start">Other</a>
+        </p>
+      )}
     </section>
   )
 }

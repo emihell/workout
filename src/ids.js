@@ -26,12 +26,27 @@ export const FOCUS_OPTIONS = [
 ]
 
 export const RPE_OPTIONS = [
-  { value: 1, label: 'Very Easy' },
-  { value: 2, label: 'Light' },
+  { value: 2, label: 'Easy' },
   { value: 3, label: 'Moderate' },
   { value: 4, label: 'Hard' },
   { value: 5, label: 'Failure' },
 ]
+
+export function rpeLabel(value) {
+  const n = Number(value)
+  if (!Number.isFinite(n) || n === 0) return ''
+  if (n <= 2) return 'Easy'
+  if (n >= 5) return 'Failure'
+  return RPE_OPTIONS.find((opt) => opt.value === n)?.label || ''
+}
+
+export function rpeOptionValue(stored) {
+  const n = Number(stored)
+  if (!Number.isFinite(n) || n === 0) return ''
+  if (n <= 2) return 2
+  if (n >= 5) return 5
+  return n
+}
 
 export const EXERCISE_TYPES = ['machine', 'free', 'bodyweight', 'cardio']
 
@@ -81,6 +96,6 @@ export function formatSetLine(set) {
     bits.push(`${set.weight} kg`)
   }
   if (set.reps != null && set.reps !== '') bits.push(`${set.reps}`)
-  if (set.rpe) bits.push(`RPE ${set.rpe}`)
+  if (set.rpe) bits.push(rpeLabel(set.rpe) || 'logged')
   return bits.join(' · ') || 'logged'
 }

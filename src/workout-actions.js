@@ -7,7 +7,7 @@ export function startOrContinue(store, routineId, options = {}) {
   const scheduleSlotId = config.scheduleSlotId || null
   const activeId = store.activeWorkout?.routineId || store.activeWorkout?.sessionId
   if (store.activeWorkout && activeId !== routineId) {
-    if (!window.confirm('Save the workout in progress as a draft and start this one?')) return
+    if (!window.confirm('Save draft?')) return
   }
   if (
     !store.activeWorkout ||

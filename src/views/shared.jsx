@@ -9,3 +9,12 @@ export function Back() {
     </p>
   )
 }
+
+export function Missing({ children = 'Not found.' }) {
+  return (
+    <section>
+      <Back />
+      <p>{children}</p>
+    </section>
+  )
+}

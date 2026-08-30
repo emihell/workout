@@ -10,10 +10,10 @@ import {
   RoutineExerciseNew,
   RoutineExerciseEdit,
 } from './views/Routine'
-import { Schedule, ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot, SchedulePlanItem } from './views/Schedule'
+import { Schedule, ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
-import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutSetEdit, WorkoutFinish } from './views/Workout'
-import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryDelete } from './views/History'
+import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/Workout'
+import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/History'
 import { StartWorkout } from './views/Start'
 import { Settings } from './views/Settings'
 
@@ -45,25 +45,16 @@ function Screen() {
   if (route.name === 'schedule-day-add') {
     return <ScheduleDayAdd key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} />
   }
-  if (route.name === 'schedule-plan-item') {
-    return (
-      <SchedulePlanItem
-        key={`${route.week}-${route.weekday}-${route.slotId}-${route.date}-${route.itemId}`}
-        week={route.week}
-        weekday={route.weekday}
-        slotId={route.slotId}
-        date={route.date}
-        itemId={route.itemId}
-      />
-    )
-  }
   if (route.name === 'schedule-slot') {
     return (
       <ScheduleSlot
-        key={`${route.week}-${route.weekday}-${route.slotId}`}
+        key={`${route.week}-${route.weekday}-${route.slotId}-${route.screen}-${route.itemId}-${route.exerciseId}`}
         week={route.week}
         weekday={route.weekday}
         slotId={route.slotId}
+        screen={route.screen}
+        itemId={route.itemId}
+        exerciseId={route.exerciseId}
       />
     )
   }
@@ -76,13 +67,13 @@ function Screen() {
     return <RoutineExercisePick key={route.routineId} routineId={route.routineId} />
   }
   if (route.name === 'routine-exercise-create') {
-    return <ExerciseNew key={route.routineId} returnRoutineId={route.routineId} />
+    return <ExerciseNew key={route.routineId} returnBase={`/routines/${route.routineId}`} />
   }
   if (route.name === 'routine-exercise-create-manual') {
-    return <ExerciseNewManual key={route.routineId} returnRoutineId={route.routineId} />
+    return <ExerciseNewManual key={route.routineId} returnBase={`/routines/${route.routineId}`} />
   }
   if (route.name === 'routine-exercise-create-search') {
-    return <ExerciseNewSearch key={route.routineId} returnRoutineId={route.routineId} />
+    return <ExerciseNewSearch key={route.routineId} returnBase={`/routines/${route.routineId}`} />
   }
   if (route.name === 'routine-exercise-new') {
     return (
@@ -128,6 +119,19 @@ function Screen() {
     return <WorkoutItem key={`${route.routineId}-${route.itemId}`} routineId={route.routineId} itemId={route.itemId} />
   }
   if (route.name === 'workout-finish') return <WorkoutFinish key={route.routineId} routineId={route.routineId} />
+  if (route.name === 'workout-setup') {
+    return (
+      <WorkoutSetup
+        key={`${route.routineId}-${route.scheduleSlotId}-${route.date}-${route.screen}-${route.itemId}-${route.exerciseId}`}
+        routineId={route.routineId}
+        scheduleSlotId={route.scheduleSlotId}
+        date={route.date}
+        screen={route.screen}
+        itemId={route.itemId}
+        exerciseId={route.exerciseId}
+      />
+    )
+  }
   if (route.name === 'workout-preview') {
     return <Workout key={`${route.routineId}-${route.scheduleSlotId}-${route.date}`} routineId={route.routineId} scheduleSlotId={route.scheduleSlotId} date={route.date} />
   }
@@ -148,7 +152,17 @@ function Screen() {
   }
   if (route.name === 'history-edit') return <HistoryEdit key={route.id} workoutId={route.id} />
   if (route.name === 'history-recalculate') return <HistoryRecalculate key={route.id} workoutId={route.id} />
-  if (route.name === 'history-delete') return <HistoryDelete key={route.id} workoutId={route.id} />
+  if (route.name === 'history-routine') {
+    return (
+      <HistoryRoutine
+        key={`${route.id}-${route.screen}-${route.itemId}-${route.exerciseId}`}
+        workoutId={route.id}
+        screen={route.screen}
+        itemId={route.itemId}
+        exerciseId={route.exerciseId}
+      />
+    )
+  }
   if (route.name === 'history-set-new') return <HistorySetNew key={route.id} workoutId={route.id} />
   if (route.name === 'history-set') return <HistorySet key={`${route.id}-${route.index}`} workoutId={route.id} index={route.index} />
   if (route.name === 'history-detail') return <HistoryDetail workoutId={route.id} />
