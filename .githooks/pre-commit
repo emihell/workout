@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# handoff/ is written by the planning session, not by code agents.
+# Emilio lands planning changes with:  HANDOFF=1 git commit ...
+if [ -n "$HANDOFF" ]; then
+  exit 0
+fi
+
+staged=$(git diff --cached --name-only --diff-filter=ACDMR -- handoff/)
+
+if [ -n "$staged" ]; then
+  echo "Refusing: this commit modifies handoff/" >&2
+  echo "$staged" | sed 's/^/  /' >&2
+  echo >&2
+  echo "If a code agent did this, recover with:" >&2
+  echo "  git restore --staged --worktree handoff/" >&2
+  echo "If this is intentional planning work:" >&2
+  echo "  HANDOFF=1 git commit ..." >&2
+  exit 1
+fi

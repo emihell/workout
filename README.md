@@ -46,3 +46,21 @@ Live (after GitHub Pages is set to the `gh-pages` branch): https://emihell.githu
 ## Deferred scope
 
 No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, social features, or visual-design pass are part of this MVP.
+
+## Planning workflow
+
+This repo uses a two-worktree planning/build loop. Start at **`START-HERE.md`** — it
+has the boot prompts and the loop. In short: a Cowork "planning" session writes specs
+into `handoff/` (read-only to the builder, enforced by a pre-commit hook), Claude Code
+builds each `req-N` on its own branch, and `./plan` publishes/merges/closes.
+
+```
+./check          the gate: lint + tests + build (must pass before code reaches main)
+./plan status    where the two worktrees stand
+./plan publish   merge planning -> main
+./plan closeout req-N   merge a built branch, flip its doc, publish, push, clean up
+```
+
+`handoff/` is written only by the planning session; `WORKOUT_SKIP_CHECK=1` is the one
+explicit, echoed bypass of the gate. Full rules live in `handoff/` (`PLANNING.md`,
+`rules/WORKFLOW.md`, `rules/CLOSEOUT.md`).

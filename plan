@@ -1,0 +1,543 @@
+#!/usr/bin/env bash
+# One executable for the two-worktree workflow (req-06). Not a git frontend —
+# anything this doesn't cover, use git directly.
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+plan save "message"    commit handoff/ changes from the planning worktree
+plan publish           merge planning into main, safely
+plan status            where everything is, and what's unpublished
+plan next              the single next command to run, and why
+plan sync              both directions of staleness: unpublished planning
+                        AND the planning worktree's own code falling behind
+plan closeout req-N    merge a built branch, flip its doc status, publish,
+                        push both branches, delete the branch — one command
+EOF
+}
+
+# req-12: is a Claude Code session running at all? Not *whether it's mid-task*
+# — there's no signal for that, and inventing one (a marker file) fails open
+# the moment it's forgotten (L-014). This only answers the cheap, honest
+# question: does a `claude` process exist.
+#
+# `-x` (exact process-name match) rather than `-f` (substring of the full
+# command line) deliberately: an editor or wrapper can carry the word
+# "claude" somewhere in its command line — an installed extension path,
+# for instance — without a Claude Code session actually running, and `-f`
+# would warn on that every time (req-12 criterion 6).
+#
+# Fails closed (L-014's correction, not its mistake): if the detection
+# command is missing or errors, that's an unknown state, and unknown is not
+# safe, so this returns "running" rather than "not running".
+claude_code_running() {
+  if ! command -v pgrep >/dev/null 2>&1; then
+    return 0
+  fi
+  pgrep -x claude >/dev/null 2>&1
+  case "$?" in
+    0) return 0 ;;  # a claude process exists
+    1) return 1 ;;  # cleanly: no match
+    *) return 0 ;;  # pgrep itself errored — unknown, not safe
+  esac
+}
+
+# Sets PLANNING_DIR / CODE_DIR from `git worktree list`, keyed on branch name
+# rather than a hardcoded path — req-02 may move things, Emilio may rename
+# either checkout directory.
+find_worktrees() {
+  PLANNING_DIR=""
+  CODE_DIR=""
+  local path=""
+  while IFS= read -r line; do
+    case "$line" in
+      worktree\ *)
+        path="${line#worktree }"
+        ;;
+      branch\ refs/heads/planning)
+        PLANNING_DIR="$path"
+        ;;
+      branch\ refs/heads/*)
+        CODE_DIR="$path"
+        ;;
+    esac
+  done < <(git worktree list --porcelain)
+
+  if [ -z "$PLANNING_DIR" ]; then
+    echo "plan: no worktree is checked out on branch 'planning'" >&2
+    exit 1
+  fi
+  if [ -z "$CODE_DIR" ]; then
+    echo "plan: found the planning worktree but no second (code) worktree" >&2
+    exit 1
+  fi
+}
+
+cmd_save() {
+  local message="${1:-}"
+  if [ -z "$message" ]; then
+    echo 'plan save: needs a message, e.g. ./plan save "DEC-035"' >&2
+    exit 1
+  fi
+
+  find_worktrees
+  local here
+  here="$(git rev-parse --show-toplevel)"
+
+  if [ "$here" != "$PLANNING_DIR" ]; then
+    echo "plan save: run this from the planning worktree ($PLANNING_DIR), not $here" >&2
+    exit 1
+  fi
+
+  git add -A
+
+  local staged
+  staged="$(git diff --cached --name-only)"
+
+  if [ -z "$staged" ]; then
+    echo "plan save: nothing to commit"
+    exit 0
+  fi
+
+  local outside
+  outside="$(printf '%s\n' "$staged" | grep -v '^handoff/' || true)"
+
+  if [ -n "$outside" ]; then
+    git reset >/dev/null
+    echo "plan save: refusing — staged changes outside handoff/:" >&2
+    printf '%s\n' "$outside" | sed 's/^/  /' >&2
+    exit 1
+  fi
+
+  HANDOFF=1 git commit -m "$message" >/dev/null
+  echo "plan save: committed ($(git rev-parse --short HEAD)) $message"
+}
+
+cmd_publish() {
+  find_worktrees
+
+  local code_branch
+  code_branch="$(git -C "$CODE_DIR" rev-parse --abbrev-ref HEAD)"
+  if [ "$code_branch" != "main" ]; then
+    echo "plan publish: refusing — code worktree is on '$code_branch', not main. Claude Code may be mid-task." >&2
+    exit 1
+  fi
+
+  if [ -n "$(git -C "$CODE_DIR" status --porcelain)" ]; then
+    echo "plan publish: refusing — code worktree has uncommitted changes." >&2
+    exit 1
+  fi
+
+  if [ -n "$(git -C "$PLANNING_DIR" status --porcelain)" ]; then
+    echo "plan publish: refusing — planning worktree has unsaved edits. Run ./plan save first." >&2
+    exit 1
+  fi
+
+  # req-72: main must be green before we publish onto it. Unlike the handoff
+  # drift check below — a warning, because a stale line number shouldn't block
+  # a publish (req-34) — a red suite is a real breakage, so this refuses. The
+  # gate is ./check; its explicit WORKOUT_SKIP_CHECK=1 bypass flows
+  # through here and echoes, so a skip is never silent (req-72 criterion 3).
+  if ! ( cd "$CODE_DIR" && ./check ); then
+    echo "plan publish: refusing — the test gate (./check) failed on $CODE_DIR." >&2
+    echo "plan publish: fix the suite, or bypass explicitly:" >&2
+    echo "  WORKOUT_SKIP_CHECK=1 ./plan publish" >&2
+    exit 1
+  fi
+
+  local before
+  before="$(git -C "$CODE_DIR" rev-parse HEAD)"
+
+  git -C "$CODE_DIR" merge planning --no-edit >/dev/null
+
+  local moved
+  moved="$(git -C "$CODE_DIR" log --oneline "$before"..HEAD)"
+
+  if [ -z "$moved" ]; then
+    echo "plan publish: main already up to date with planning"
+  else
+    echo "plan publish: merged —"
+    printf '%s\n' "$moved" | sed 's/^/  /'
+  fi
+
+  # req-34: a warning, not a refusal — this is the moment handoff/ becomes
+  # truth for Claude Code, so it's the right place to notice drift, but a
+  # publish blocked by a stale line number is a tool that gets bypassed.
+  local drift_output
+  drift_output="$(python3 "$CODE_DIR/scripts/check_handoff.py" --repo "$CODE_DIR")" || true
+  if [ -n "$drift_output" ]; then
+    echo "plan publish: handoff drift found (published anyway) —"
+    printf '%s\n' "$drift_output" | sed 's/^/  /'
+  fi
+
+  # req-153: advance planning to main so the planning worktree never drifts.
+  # The planning->main merge above makes planning an ancestor of main, so this
+  # is a clean fast-forward with no merge commit; nothing new -> "Already up to
+  # date." (exit 0). Runs locally where git in the planning worktree works; the
+  # cloud sandbox never runs publish, so no cloud-side variant. If it ever
+  # refuses (planning somehow not an ancestor of main), the main merge has
+  # already landed — the important half — so we warn and still succeed, never
+  # leaving main half-published (mirrors the check_handoff drift precedent).
+  if git -C "$PLANNING_DIR" merge --ff-only main >/dev/null 2>&1; then
+    echo "plan publish: planning advanced to main"
+  else
+    echo "plan publish: WARNING — could not fast-forward planning to main (main merge is done; planning left as-is). Investigate: planning is not an ancestor of main." >&2
+  fi
+}
+
+cmd_next() {
+  find_worktrees
+
+  local code_branch
+  code_branch="$(git -C "$CODE_DIR" rev-parse --abbrev-ref HEAD)"
+  local code_dirty=""
+  [ -n "$(git -C "$CODE_DIR" status --porcelain)" ] && code_dirty=1
+
+  # Same order as cmd_publish's checks, so the two commands never disagree
+  # about what's blocking. With two conditions true at once, whichever check
+  # runs first is the one reported.
+
+  if [ "$code_branch" != "main" ]; then
+    if [ -n "$code_dirty" ]; then
+      echo "  code worktree is on $code_branch with uncommitted changes"
+    else
+      echo "  code worktree is on $code_branch"
+    fi
+    echo "  ->  nothing — Claude Code is mid-task. Wait, or commit that branch first."
+    return 0
+  fi
+
+  if [ -n "$code_dirty" ]; then
+    echo "  code worktree (main) has uncommitted changes"
+    echo "  ->  nothing — commit or stash those changes first."
+    return 0
+  fi
+
+  if [ -n "$(git -C "$PLANNING_DIR" status --porcelain)" ]; then
+    echo "  planning has unsaved edits"
+    echo "  ->  cd $PLANNING_DIR && $CODE_DIR/plan save \"message\""
+    return 0
+  fi
+
+  local unpublished
+  unpublished="$(git -C "$CODE_DIR" log --oneline main..planning)"
+  if [ -n "$unpublished" ]; then
+    local n
+    n="$(printf '%s\n' "$unpublished" | wc -l | tr -d ' ')"
+    echo "  $n planning commit(s) not on main; code worktree clean on main"
+    echo "  ->  ./plan publish"
+    if claude_code_running; then
+      echo "      a Claude Code session is running — safe only if it is idle."
+      echo "      an audit or a build reads handoff/, and publish rewrites it mid-read."
+    fi
+    return 0
+  fi
+
+  echo "  both worktrees clean, planning fully published"
+  echo "  ->  nothing pending. Pick a READY requirement from handoff/NOW.md."
+}
+
+cmd_status() {
+  find_worktrees
+
+  local code_branch code_dirty planning_dirty unpublished
+  code_branch="$(git -C "$CODE_DIR" rev-parse --abbrev-ref HEAD)"
+
+  if [ -n "$(git -C "$CODE_DIR" status --porcelain)" ]; then
+    code_dirty="$(git -C "$CODE_DIR" status --porcelain | wc -l | tr -d ' ') files changed"
+  else
+    code_dirty="clean"
+  fi
+
+  if [ -n "$(git -C "$PLANNING_DIR" status --porcelain)" ]; then
+    planning_dirty="$(git -C "$PLANNING_DIR" status --porcelain | wc -l | tr -d ' ') files changed"
+  else
+    planning_dirty="clean"
+  fi
+
+  unpublished="$(git -C "$CODE_DIR" log --oneline main..planning)"
+
+  # req-34: every Status: line against git, BACKLOG.md's index against the
+  # tier files' own headings, every size claim against a real wc -l — folded
+  # in here rather than a separate `plan check`, since the failure mode this
+  # fixes is nobody running the check at all.
+  local drift_output drift_failed=""
+  if drift_output="$(python3 "$CODE_DIR/scripts/check_handoff.py" --repo "$CODE_DIR")"; then
+    :
+  else
+    drift_failed=1
+  fi
+
+  if [ "$code_branch" = "main" ] && [ "$code_dirty" = "clean" ] && [ "$planning_dirty" = "clean" ] \
+     && [ -z "$unpublished" ] && [ -z "$drift_output" ]; then
+    echo "plan status: planning is fully merged, both worktrees clean."
+    return 0
+  fi
+
+  echo "code worktree      $code_branch, $code_dirty"
+  echo "planning worktree  planning, $planning_dirty"
+  if [ -z "$unpublished" ]; then
+    echo "unpublished        none"
+  else
+    local n
+    n="$(printf '%s\n' "$unpublished" | wc -l | tr -d ' ')"
+    echo "unpublished        $n commit(s) on planning not in main"
+    printf '%s\n' "$unpublished" | sed 's/^/                     /'
+  fi
+
+  if [ -n "$drift_output" ]; then
+    echo "handoff drift:"
+    printf '%s\n' "$drift_output" | sed 's/^/  /'
+  fi
+
+  [ -z "$drift_failed" ]
+}
+
+cmd_sync() {
+  find_worktrees
+
+  local unpublished stale_code
+
+  unpublished="$(git -C "$CODE_DIR" log --oneline main..planning)"
+  stale_code="$(git -C "$CODE_DIR" log --oneline planning..main)"
+
+  if [ -z "$unpublished" ] && [ -z "$stale_code" ]; then
+    echo "plan sync: planning and main match exactly, both directions."
+    return 0
+  fi
+
+  if [ -z "$unpublished" ]; then
+    echo "unpublished planning (main..planning)   none — handoff is fully published"
+  else
+    local n
+    n="$(printf '%s\n' "$unpublished" | wc -l | tr -d ' ')"
+    echo "unpublished planning (main..planning)   $n commit(s)"
+    echo "  ->  ./plan publish"
+  fi
+
+  if [ -z "$stale_code" ]; then
+    echo "stale planning code (planning..main)   none — its checkout matches main"
+  else
+    local n2
+    n2="$(printf '%s\n' "$stale_code" | wc -l | tr -d ' ')"
+    echo "stale planning code (planning..main)   $n2 commit(s) not in the planning worktree"
+    echo "  the planning session's own \"rescan the code\" step reads that checkout —"
+    echo "  a requirement written now can describe code that's already moved."
+    echo "  read-only report. This does not merge main into planning."
+  fi
+}
+
+# req-138: the close-out was a fixed sequence run by hand, and by hand it
+# failed the same ways every time — a stale .git/index.lock blocking the
+# checkout, the doc Status flipped to "merged" before the merge actually
+# landed (drift), the block retyped slightly differently each time. This makes
+# it one deterministic command. It replaces the manual block in
+# rules/CLOSEOUT.md; scope is merge + status-flip + publish + push + cleanup,
+# NOT the DEC-/L-/NOW.md/SHIPPED.md recording (that stays planning's own pass).
+#
+# Re-runnable: if req-N is already on main, the merge is skipped and it just
+# reconciles the doc + publishes + pushes.
+flip_status() {
+  # Replace the first **Status: ...** bold span in $1 with the exact text $2,
+  # keeping everything after it. A Python one-liner rather than sed: the
+  # replacement carries backticks and an em-dash, and the match spans possible
+  # line wraps — re.subn with a function replacement sidesteps every quoting
+  # and backreference trap sed would introduce.
+  python3 - "$1" "$2" <<'PY'
+import re, sys
+path, newtag = sys.argv[1], sys.argv[2]
+with open(path, encoding="utf-8") as fh:
+    text = fh.read()
+new, count = re.subn(r"\*\*Status:.*?\*\*", lambda m: newtag, text, count=1, flags=re.S)
+if count == 0:
+    sys.stderr.write(f"plan closeout: no **Status: ...** span found in {path}\n")
+    sys.exit(1)
+with open(path, "w", encoding="utf-8") as fh:
+    fh.write(new)
+PY
+}
+
+cmd_closeout() {
+  local arg="${1:-}"
+  if [ -z "$arg" ]; then
+    echo 'plan closeout: needs a requirement, e.g. ./plan closeout req-138' >&2
+    exit 1
+  fi
+  local n reqid
+  n="${arg#req-}"
+  if ! [[ "$n" =~ ^[0-9]+$ ]]; then
+    echo "plan closeout: '$arg' is not a requirement id (expected req-N or N)" >&2
+    exit 1
+  fi
+  reqid="req-$n"
+
+  find_worktrees
+
+  # 1. Stale-lock guard, FIRST — a cloud session may have left a lock that
+  # blocks the checkout. Harmless if absent. This is the line that always got
+  # forgotten by hand, so it is line 1 here on purpose (CLOSEOUT.md's own note).
+  local code_gitdir
+  code_gitdir="$(git -C "$CODE_DIR" rev-parse --absolute-git-dir)"
+  rm -f "$code_gitdir/index.lock"
+
+  # Locate the requirement doc in the PLANNING worktree: handoff/ is authored
+  # there, and the status-flip has to land on the planning branch for
+  # ./plan save to commit it. File form first, folder/README second.
+  local doc="" f
+  for f in "$PLANNING_DIR"/handoff/work/"$reqid"-*.md; do
+    [ -e "$f" ] && { doc="$f"; break; }
+  done
+  if [ -z "$doc" ]; then
+    for f in "$PLANNING_DIR"/handoff/work/"$reqid"-*/README.md; do
+      [ -e "$f" ] && { doc="$f"; break; }
+    done
+  fi
+
+  # Resolve the branch to close out (req-146): bare `req-N` if it exists, else
+  # the single local `req-N-<slug>` branch — CC names branches either form
+  # (req-139 was `req-139-classify-tag-built-not-merged`). More than one match
+  # is ambiguous and refused below (never guess which to merge); zero matches is
+  # the re-run case, where the branch is already merged and gone. The
+  # for-each-ref patterns are exact: `req-146-*` matches `req-146-slug` but the
+  # bare `req-146` matches neither `req-1460` nor `req-146x` (verified).
+  local -a branches=()
+  local b
+  while IFS= read -r b; do
+    [ -n "$b" ] && branches+=("$b")
+  done < <(git -C "$CODE_DIR" for-each-ref --format='%(refname:short)' \
+             "refs/heads/$reqid" "refs/heads/$reqid-*")
+
+  local branch="" branch_exists="" ambiguous=""
+  if [ "${#branches[@]}" -gt 1 ]; then
+    ambiguous=1
+  elif [ "${#branches[@]}" -eq 1 ]; then
+    branch="${branches[0]}"
+    branch_exists=1
+  fi
+
+  # Merge state. "Already merged" is either a real `Merge branch 'req-N'` or
+  # `Merge branch 'req-N-<slug>'` commit on main (the grep matches both forms,
+  # req-146), or the branch being an ancestor of main — the re-run case, where
+  # the branch may already be gone.
+  local merge_commit=""
+  merge_commit="$(git -C "$CODE_DIR" log main --merges --format=%H -E --grep="^Merge branch '$reqid(-.*)?'$" -1 2>/dev/null || true)"
+  local already_merged=""
+  if [ -n "$merge_commit" ]; then
+    already_merged=1
+  elif [ -n "$branch_exists" ] && git -C "$CODE_DIR" merge-base --is-ancestor "$branch" main 2>/dev/null; then
+    already_merged=1
+  fi
+
+  # 2. Refusals (spec step 2). The ambiguity refusal comes before the
+  # no-branch one: on ambiguity `branch_exists` is empty, so the no-branch
+  # refusal would otherwise fire with the wrong message.
+  if [ -z "$doc" ]; then
+    echo "plan closeout: refusing — no requirement doc handoff/work/$reqid-*.md in $PLANNING_DIR" >&2
+    exit 1
+  fi
+  if [ -n "$ambiguous" ]; then
+    echo "plan closeout: refusing — more than one branch matches '$reqid'; rename or delete all but one:" >&2
+    printf '  %s\n' "${branches[@]}" >&2
+    exit 1
+  fi
+  if [ -z "$branch_exists" ] && [ -z "$already_merged" ]; then
+    echo "plan closeout: refusing — no branch '$reqid', and it isn't on main; nothing to close out." >&2
+    exit 1
+  fi
+  if [ -n "$(git -C "$CODE_DIR" status --porcelain)" ]; then
+    echo "plan closeout: refusing — code worktree ($CODE_DIR) has uncommitted changes." >&2
+    exit 1
+  fi
+
+  # Capture the branch's commit range for the status line. In the normal path
+  # this must be read BEFORE the merge (main..req-N is empty once merged); on
+  # re-run it comes from the merge commit's two parents.
+  local -a commits=()
+  local h
+  if [ -z "$already_merged" ]; then
+    while IFS= read -r h; do [ -n "$h" ] && commits+=("$h"); done \
+      < <(git -C "$CODE_DIR" log "main..$branch" --format=%h)
+  elif [ -n "$merge_commit" ]; then
+    while IFS= read -r h; do [ -n "$h" ] && commits+=("$h"); done \
+      < <(git -C "$CODE_DIR" log "$merge_commit^1..$merge_commit^2" --format=%h)
+  fi
+
+  # 3. Merge (skip if already on main).
+  git -C "$CODE_DIR" checkout main >/dev/null 2>&1
+  if [ -z "$already_merged" ]; then
+    echo "plan closeout: merging $branch into main (--no-ff)"
+    git -C "$CODE_DIR" merge --no-ff "$branch" -m "Merge branch '$branch'"
+    merge_commit="$(git -C "$CODE_DIR" rev-parse HEAD)"
+  else
+    echo "plan closeout: $reqid is already on main — skipping merge, reconciling docs."
+  fi
+
+  # 4. Flip the doc Status — ONLY now, with the merge already an ancestor of
+  # main, so the doc never claims "merged" before git agrees (criterion 3).
+  if [ "${#commits[@]}" -gt 0 ]; then
+    local first last count today word status_line
+    last="${commits[0]}"                        # git log prints newest first
+    first="${commits[$(( ${#commits[@]} - 1 ))]}"
+    count="${#commits[@]}"
+    today="$(date +%F)"
+    word="commits"; [ "$count" -eq 1 ] && word="commit"
+    status_line="**Status: BUILT AND MERGED, ${today} — branch \`${reqid}\` (\`${first}\`…\`${last}\`, ${count} ${word}).**"
+    flip_status "$doc" "$status_line"
+    echo "plan closeout: flipped $(basename "$doc") -> BUILT AND MERGED (${first}…${last}, ${count} ${word})"
+  else
+    echo "plan closeout: WARNING — could not compute the commit range; leaving the doc Status unchanged." >&2
+  fi
+
+  # 5. Save the flip on planning, publish planning->main (runs ./check), push
+  # both branches, drop the branch. ./plan save must run from the planning
+  # worktree, so it is invoked there in a subshell.
+  ( cd "$PLANNING_DIR" && "$CODE_DIR/plan" save "$reqid merged" )
+  "$CODE_DIR/plan" publish
+  git -C "$CODE_DIR" push origin main planning
+  if [ -n "$branch_exists" ]; then
+    git -C "$CODE_DIR" branch -d "$branch"
+  fi
+
+  # 6.
+  echo
+  "$CODE_DIR/plan" status || true
+}
+
+case "${1:-}" in
+  save)
+    shift
+    cmd_save "$@"
+    ;;
+  publish)
+    cmd_publish
+    ;;
+  status)
+    cmd_status
+    ;;
+  next)
+    cmd_next
+    ;;
+  sync)
+    cmd_sync
+    ;;
+  closeout)
+    shift
+    # closeout checks out / merges mid-run, which rewrites this very file on
+    # disk (a req that touches `plan` — like req-138 itself — or a run from a
+    # non-main branch). Bash reads a script file incrementally, so a file that
+    # changes underfoot corrupts execution. Re-exec once from a stable temp
+    # copy so the on-disk source can change freely; the copy cleans itself up.
+    if [ "${_PLAN_REEXEC:-}" != "1" ]; then
+      _PLAN_SELF="$(mktemp "${TMPDIR:-/tmp}/plan-closeout.XXXXXX")"
+      cat "$0" > "$_PLAN_SELF"
+      export _PLAN_REEXEC=1 _PLAN_SELF
+      exec bash "$_PLAN_SELF" closeout "$@"
+    fi
+    trap 'rm -f "${_PLAN_SELF:-}"' EXIT
+    cmd_closeout "$@"
+    ;;
+  *)
+    usage
+    exit 0
+    ;;
+esac

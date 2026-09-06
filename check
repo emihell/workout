@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# The test gate. Runs the full checks and exits non-zero on any red. This is
+# the mechanical gate that must pass before code reaches main — telling a
+# session to "run the tests" is an instruction it can optimise past; a gate
+# it cannot. `./plan publish` runs it before merging and refuses on failure.
+#
+# Three gates, cheap to expensive: lint, unit tests, production build. The
+# build is a real gate here, not a nicety — main auto-deploys to GitHub Pages
+# on every push (.github/workflows/deploy.yml), so a main that doesn't build
+# ships a broken site.
+#
+# The bypass is one explicit, echoed env flag, mirroring the handoff hook's
+# HANDOFF=1: WORKOUT_SKIP_CHECK=1 skips the checks and says so loudly on
+# stderr. There is NO quiet default — a skip is always a visible choice.
+#
+# A gate can't be narrowed from the command line: arguments are ignored and
+# the full gate always runs (so `./check clean` runs the gate, it doesn't
+# error).
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ -n "${WORKOUT_SKIP_CHECK:-}" ]; then
+  echo "check: SKIPPED — nothing was run (WORKOUT_SKIP_CHECK=$WORKOUT_SKIP_CHECK)" >&2
+  echo "check: explicit bypass of the gate; main is unverified." >&2
+  exit 0
+fi
+
+if [ "$#" -gt 0 ]; then
+  echo "check: ignoring arguments ($*) — the gate always runs the full set." >&2
+fi
+
+cd "$HERE"
+
+# A gate that runs zero tests and passes is worse than no gate. Refuse if the
+# glob matches nothing rather than letting node --test exit 0 on an empty run.
+shopt -s nullglob
+testfiles=(src/*.test.js)
+shopt -u nullglob
+if [ "${#testfiles[@]}" -eq 0 ]; then
+  echo "check: RED — no test files matched src/*.test.js; refusing." >&2
+  echo "check: a gate that runs nothing must not pass. Check the path." >&2
+  exit 5
+fi
+
+fail() {
+  echo "check: RED — $1 failed; refusing." >&2
+  echo "check: fix it, or bypass explicitly with WORKOUT_SKIP_CHECK=1." >&2
+  exit 1
+}
+
+# 1. Lint (oxlint) — fast, catches the rules-of-hooks / dead-export class.
+echo "check: linting (oxlint)…"
+npm run --silent lint || fail "lint (oxlint)"
+
+# 2. Unit tests (node --test) — the behaviour gate.
+echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
+node --test "${testfiles[@]}" || fail "the test suite"
+
+# 3. Production build (vite) — main must stay deployable to Pages.
+echo "check: building (vite build)…"
+npm run --silent build >/dev/null || fail "the production build"
+
+echo "check: green — lint, ${#testfiles[@]} test file(s), and the build all passed."
