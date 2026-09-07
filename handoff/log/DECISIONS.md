@@ -23,3 +23,13 @@ export a backup") that stays until the next successful save. Emilio decided (cho
 transient toast (B) and console-only (C)). Why: this app's whole value is a trustworthy
 record, so silent data loss is the one unacceptable outcome, and a toast can be missed.
 Drives `req-01`.
+
+## DEC-002 — no-history exercise carries entered kg + reps to later sets  (2026-09-07)
+
+For an exercise with no finished-workout history, logging a working set seeds the next
+working set from the most recently logged (non-skipped) working set of that item in the
+current workout — **both kg and reps** carry, and it follows the **most recent** set (so
+adjusting mid-exercise flows forward). Emilio decided both forks (kg+reps over kg-only;
+most-recent over always-set-1). Not invented data — it's the user's own input this
+session, filling what would otherwise be blank; stays an editable prefill. Effort does
+not carry. Exercises with history keep their per-set history prefill. Drives `req-02`.

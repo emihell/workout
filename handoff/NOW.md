@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-07 (gym-flow review done). Keep under 50 lines; **what is done lives in
+Updated 2026-09-07 (req-02 READY). Keep under 50 lines; **what is done lives in
 `log/SHIPPED.md`**. Full req list: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
 
 ## Milestone — in Emilio's words (2026-09-07)
@@ -20,6 +20,10 @@ Phase 3  database + users, own exercise DB, animations, AI, full styling
 mode) and lose data silently; the floor under a "flawless" flow. Fix + persistent
 banner (DEC-001) + failure-case tests. Spec: `work/req-01-guard-savestate.md`.
 **Ready to build in Claude Code.**
+
+`req-02` **carry kg + reps across sets for a no-history exercise** — type it in set 1, it
+follows the rest (DEC-002). Phase-1, independent of `req-01`. Spec:
+`work/req-02-carry-value-no-history.md`. **Ready to build.**
 
 ## Next planning step
 
