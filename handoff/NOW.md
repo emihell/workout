@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-07 (direction set). Keep under 50 lines; **what is done lives in
+Updated 2026-09-07 (gym-flow review done). Keep under 50 lines; **what is done lives in
 `log/SHIPPED.md`**. Full req list: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
 
 ## Milestone — in Emilio's words (2026-09-07)
@@ -21,11 +21,12 @@ mode) and lose data silently; the floor under a "flawless" flow. Fix + persisten
 banner (DEC-001) + failure-case tests. Spec: `work/req-01-guard-savestate.md`.
 **Ready to build in Claude Code.**
 
-## Next planning step (after req-01)
+## Next planning step
 
-**A hands-on gym-flow review** — walk `Start → Today → Workout → log → Finish` and turn
-each bit of friction into a small Phase-1 req. "Flawless" gets found by using it, not
-guessed. This is the real start of Phase 1.
+**Gym-flow review is done** (2026-09-07) — findings are Phase-1 candidates in
+`work/BACKLOG.md`. Headline: the logic layer is sound; "flawless" is mostly a design/UX
+pass on ~4 screens (the app has **zero CSS** today) plus a rest-end cue + wake-lock and
+replacing native modals. Next: **sequence the Phase-1 items with Emilio**, then spec one.
 
 ## Needs decisions — parked until their phase
 
