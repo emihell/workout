@@ -1,37 +1,42 @@
 # Now
 
-Updated 2026-09-07 (first code review done). Keep under 50 lines; **what is done lives
-in `log/SHIPPED.md`** — this is only what is next. Full req list: `work/req-*.md`.
+Updated 2026-09-07 (direction set). Keep under 50 lines; **what is done lives in
+`log/SHIPPED.md`**. Full req list: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
 
-## Milestone
+## Milestone — in Emilio's words (2026-09-07)
 
-> **The one loop is trustworthy.** Set up exercises and routines, schedule them,
-> start a workout, log sets, keep an editable record — with the record never wrong
-> and never invented. Deploys clean to Pages.
+> Make the **in-gym usage flow flawless** first. Then the **program-creation flow**
+> (the hard one). Only then the heavy build. Nothing heavy before the flow is flawless.
 
-## Where we're at
-
-The app exists and works: React + Vite, browser-only, `localStorage` (`workout-mvp-v8`),
-54 unit tests green, auto-deploys to Pages. First planning-workflow review done
-(2026-09-07): the logic core is solid (recommendation engine correct, "no invented
-data" enforced, archive-vs-delete right). Findings folded into `work/BACKLOG.md`.
+```
+Phase 1  in-gym flow flawless    ← now (browser-only, UX hardening)
+Phase 2  program-creation flow   ← next
+Phase 3  database + users, own exercise DB, animations, AI, full styling
+```
 
 ## Next — READY (only READY goes to CC)
 
-*(none yet.)* `req-01` is drafted but `NEEDS DECISIONS` — one question below answers it.
+`req-01` **guard `saveState`** — the persist path can throw (quota / Safari private
+mode) and lose data silently; the floor under a "flawless" flow. Fix + persistent
+banner (DEC-001) + failure-case tests. Spec: `work/req-01-guard-savestate.md`.
+**Ready to build in Claude Code.**
 
-## Needs decisions — the near ones
+## Next planning step (after req-01)
 
-- **`req-01` guard `saveState`** — the one real data-integrity gap: the persist path
-  can throw (quota / Safari private mode) and lose data silently. Spec is written
-  (`work/req-01-guard-savestate.md`); the only open question is **how a save failure
-  is surfaced** — planning recommends a persistent banner (option A). Confirm A (or
-  pick B/C) → it flips to READY → hand to CC as the first real loop.
-- **History recalc from a non-latest workout** (behaviour call) — see BACKLOG. Decide
-  before speccing.
+**A hands-on gym-flow review** — walk `Start → Today → Workout → log → Finish` and turn
+each bit of friction into a small Phase-1 req. "Flawless" gets found by using it, not
+guessed. This is the real start of Phase 1.
+
+## Needs decisions — parked until their phase
+
+- **The backend fork (gates all of Phase 3):** stay browser-only, or add a
+  database/server? "A database" and "users" are one decision; an AI key can't live in
+  a browser. Decide before any Phase-3 build — not now.
+- **History recalc from a non-latest workout** (Phase 1 behaviour call) — see BACKLOG.
+- **Program model** (Phase 2) — define program vs routine vs schedule before speccing.
 
 ## Where to read
 
-**Start every session at `START-HERE.md`** (read-order + close-out; `rules/CLOSEOUT.md`
-before any merge). `work/BACKLOG.md` for candidates. `rules/DESIGN.md` before any
-UI/UX; `rules/WORKFLOW.md` for process. `README.md` is the product contract.
+`START-HERE.md` (read-order + close-out) → `work/BACKLOG.md` (the phased plan) →
+`rules/DESIGN.md` before UI/UX → `rules/WORKFLOW.md` for process. `README.md` is the
+product contract.
