@@ -35,11 +35,17 @@ Emilio writes the code — in Claude Code, not here.
   ./plan status                where things stand (read-only)
   ```
 
-  **Publish is NOT yours.** `./plan publish` runs *in* the code worktree, merges
-  `planning → main`, and moves `main` — that is planning touching code. Prepare it
-  and **hand Emilio the line**; never run it. Same for anything else that writes in
-  the code worktree, and for `plan closeout` (which merges a built feature branch —
-  the "nothing merges until Emilio has used it" gate, `CLOSEOUT.md`).
+  **The merge is yours, after Emilio's use-it OK (DEC-006).** `./plan closeout req-N`
+  merges a built branch into `main` and is now yours to run — but only once Emilio
+  has used that branch in a real browser and given the go for it. Never merge on
+  green tests alone; never merge a branch he hasn't OK'd. The use-it gate is his;
+  the mechanical closeout is yours.
+
+  **Standalone `plan publish` is not in your grant.** Doc-only changes to `main`
+  either ride the next `closeout` (which publishes) or get handed to Emilio as a
+  publish line. You can run `closeout` (it touches the code worktree on purpose, for
+  the merge — DEC-006's scoped relaxation of the isolation line) but not a bare
+  `publish` or `git push origin main`.
 
   **Read-only looking at the code worktree is fine** — `git -C <code>
   --no-optional-locks log main..<branch>` to confirm a build landed is reading, not
