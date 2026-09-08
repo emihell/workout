@@ -21,6 +21,8 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 - `req-03` **persistent rest timer** — counter vanished when leaving the set screen; make it a workout-level bar, keep pause/resume/skip/+30s (DEC-003).
 - `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. (infra)
 - `req-05` **error boundary** — a render crash blanks the app mid-workout; catch it, reassure data is saved, offer reload. (hardening)
+- `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. (persisted-data)
+- `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. (persisted-data)
 
 Each has a full spec in `work/`. Suggested order: `req-01` first (safety), then `02`/`03`.
 

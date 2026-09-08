@@ -65,8 +65,9 @@ pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
 - **Auto-backup before a destructive import** — import replaces all state after a
   confirm without offering to download current state first. Also **consolidate the
   duplicated import path** (Today empty-state + Settings both do confirm + applyBackup).
+  Speced READY: `work/req-07-backup-before-import.md` (DEC-004: auto-download current state first).
 - **Legacy `localStorage` key cleanup** — `workout-mvp-v5..v7` read for migration but
-  never removed. Low severity.
+  never removed. Low severity. Speced READY: `work/req-06-legacy-key-cleanup.md`.
 
 **Next planning step:** sequence these with Emilio (which first), then spec them one at
 a time. Most are small; the styling pass is the big one and wants iteration.

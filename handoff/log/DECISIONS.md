@@ -43,3 +43,15 @@ keeping Pause/Resume/Skip/+30s. Emilio confirmed the reproduction (disappears af
 the set screen) and chose the persistent bar over a minimal fix; declined auto-starting rest
 between exercises. Audible/haptic end-cue + wake-lock stay a separate Phase-1 item. Drives
 `req-03`.
+
+## DEC-004 — a destructive import auto-downloads current state first  (2026-09-08)
+
+Both import sites (`Settings.jsx`, `Today.jsx`) replace all state after one native confirm
+with no recovery of the overwritten data. Fix: on the confirm's OK, automatically download a
+`buildBackup` of current state (the Export file) before applying the incoming payload — the
+download is fired, not blocked on. Emilio chose auto-download over offer-and-wait: offer-first
+wants real inline UI and would pull the separate "replace native alert/confirm with inline UI"
+backlog item into scope, and its respect-intent benefit is largely moot at Today's empty-state
+importer (nothing to lose). This req is a data-safety net, not a UX pass. Both sites route
+through one shared import helper (consolidates the duplicated confirm→apply path). Drives
+`req-07`.
