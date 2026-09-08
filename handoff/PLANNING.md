@@ -23,20 +23,28 @@ Emilio writes the code — in Claude Code, not here.
 - **Work from the planning worktree**, `~/projects/workout-app/workout-app-planning`,
   on branch `planning`. Never edit `handoff/` in the code worktree — that's Claude
   Code's checkout. `rules/WORKFLOW.md` explains why.
-- **Don't run git commands that write.** The sandbox can create files under `.git/`
-  but can't always unlink them, which can leave an `index.lock` behind and block
-  Emilio's commit. Read-only git is fine — use `--no-optional-locks`. Hand Emilio
-  the write commands, and hand him **`./plan`** rather than raw git:
+- **You own the planning worktree's git (DEC-005). The worktrees stay isolated:
+  planning never touches code, code never touches planning.** Yours to run:
+  `commit`, `./plan save`, and `git push origin planning` — all planning-branch
+  only. Git writes work from the planning worktree (proven 2026-09-08); use
+  `--no-optional-locks` for read-only queries.
 
   ```
-  ./plan save "message"    commit handoff/, from the planning worktree
-  ./plan publish           merge planning -> main, from the code worktree
-  ./plan status            where things stand
+  ./plan save "message"        commit handoff/ to the planning branch (planning tree only)
+  git push origin planning     publish the planning branch to the remote
+  ./plan status                where things stand (read-only)
   ```
 
-  Git commands may not work at all from inside the planning worktree in the
-  sandbox — its `.git` file can record an absolute host path the mount doesn't
-  share. Verify planning edits by diffing the two `handoff/` copies instead.
+  **Publish is NOT yours.** `./plan publish` runs *in* the code worktree, merges
+  `planning → main`, and moves `main` — that is planning touching code. Prepare it
+  and **hand Emilio the line**; never run it. Same for anything else that writes in
+  the code worktree, and for `plan closeout` (which merges a built feature branch —
+  the "nothing merges until Emilio has used it" gate, `CLOSEOUT.md`).
+
+  **Read-only looking at the code worktree is fine** — `git -C <code>
+  --no-optional-locks log main..<branch>` to confirm a build landed is reading, not
+  touching. The other thing you hand Emilio is a **build prompt for the
+  code-worktree CC** — you don't drive that session (see below).
 
 ## The loop
 
@@ -85,71 +93,44 @@ detail out to `SHIPPED.md` or `work/`.
 
 ## Close the loop before opening a new one
 
-**At the start of every turn, before answering anything: did the last command
-run?**
+**At the start of every turn, before answering anything: is anything unsaved or
+unpublished from last turn?**
 
 ```
-git -C <code> --no-optional-locks log --oneline main..planning     did a save land?
-diff -rq <code>/handoff <planning>/handoff                          uncommitted edits?
+git --no-optional-locks status --porcelain                          uncommitted planning edits?
+git -C <code> --no-optional-locks log --oneline main..planning      saved but unpublished?
 ```
 
-The second is the only way to see the planning worktree's state — git may not work
-there from the sandbox, so **the diff is the instrument**, not a fallback.
-
-If something is outstanding, **say so first**, name what is unsaved, and re-issue
-the command. Then answer the question. An answer moves the conversation on, and a
-command that arrives after it reads as optional. **Emilio should never have to
-remember which commands he has run.**
+Saving is yours; publish is Emilio's. So: if `handoff/` edits are uncommitted,
+**save (and push) them yourself before answering** — that's your side, don't leave it
+undone. If work is saved but unpublished, that's waiting on Emilio's publish; check
+the gate and **re-hand him the publish line** rather than assuming he ran it.
 
 A skipped `plan save` costs only accumulation — the next save catches it. A skipped
 **`plan publish` is the real one**: Claude Code then reads a stale `handoff/`, and
-every stale-document lesson starts that way.
+every stale-document lesson starts that way — so chase the publish, don't let a saved
+requirement sit unpublished.
 
-## Check the state before giving any command
+## The publish gate — check it before handing Emilio a publish
 
-Before handing over any command, check what actually happened since the last one.
-Read-only git in both worktrees; it takes seconds.
-
-- **did the previous command run?** Don't assume it did.
-- **is Claude Code mid-task?** If the code worktree is on a feature branch,
-  anything touching `main` is off the table.
-- **which worktree does it belong in?** `plan save` is always safe; it only
-  touches the planning tree. `plan publish` needs a clean `main` in the code tree.
+Publish is Emilio's, but don't hand it over blind. Check the gate read-only first —
+looking at the code worktree is not touching it:
 
 ```
-git -C <code> --no-optional-locks branch --show-current
-git -C <code> --no-optional-locks status --short
-git -C <code> --no-optional-locks log --oneline main..planning
+git -C <code> --no-optional-locks branch --show-current     on 'main' → safe to hand over
+git -C <code> --no-optional-locks status --porcelain        code tree clean?
+git -C <code> --no-optional-locks log --oneline main..planning   what would merge
 ```
 
-`main..planning` is how you know whether a `plan save` actually ran. Empty means
-it didn't. **Don't ask Emilio whether he ran something. Look.**
+- **code worktree on a branch → don't hand over a publish.** CC is (probably)
+  mid-build; publishing would `git checkout`/merge under it. Say so, wait.
+- **code worktree dirty → say so.** `plan publish` refuses a dirty code tree anyway.
+- **on `main`, clean → hand over the publish line**, noting what it assumes: the
+  guard sees a branch, not activity, so a read-only `/audit` on `main` passes it —
+  *"safe if CC isn't mid-task."*
 
-## What can run alongside what
-
-The sandbox cannot see what Claude Code is doing. Git shows a branch and a dirty
-tree; it shows nothing about a read-only task. So this is stated, not detected,
-every time a command goes over.
-
-```
-plan save        touches only the planning worktree        ALWAYS SAFE
-plan next        read-only                                  always safe
-plan status      read-only                                  always safe
-plan publish     rewrites handoff/ and moves main           CONDITIONAL
-git checkout     swaps files under Claude Code              CONDITIONAL
-```
-
-| Claude Code is | safe in parallel | must wait |
-| --- | --- | --- |
-| idle | everything | — |
-| running `/audit` | planning edits, `plan save` | **`plan publish`** — it reads all of `handoff/` and would report a mixture of before and after |
-| building a requirement | planning edits, `plan save` | `plan publish`, `git checkout`, editing that requirement |
-| answering / reporting | most things | `publish`, if the answer depends on `handoff/` |
-
-**A `publish` refusal is trustworthy; an acceptance is not.** The guard detects a
-branch, not activity — a read-only audit runs on `main` and creates no branch, so
-the guard passes at exactly the moment the table says to wait. When handing over
-anything conditional, say what it assumes: *"safe if Claude Code isn't mid-task."*
+After Emilio runs it, `main..planning` empty is how you confirm it landed. Look,
+don't assume.
 
 ## What Claude Code knows
 
@@ -186,35 +167,37 @@ things the requirement asserts: file paths, function names, counts. Say explicit
 that it still applies, or fix it first. Step 2 is a re-check: if the tag says
 `NEEDS DECISIONS`, it doesn't go over at all.
 
-## The command block is pure paste, and the output is the receipt
+## You run the planning git; you hand over publish and CC prompts
 
-- one fenced block per message. never two.
-- nothing but commands inside it.
-- one command, unless every line is verified and order-safe.
-- a destination label on the line directly above it (`→ terminal` / `→ Claude Code`).
+Planning-worktree git is yours — run it in your own tool calls, don't paste it into a
+fenced block for Emilio:
 
-A prompt for Claude Code is **not** a command — it goes in its own message. Fenced
-blocks are for commands and code only; comparisons and tables go in prose, never in
+```
+../workout-app-codebase/plan save "message"     # commit handoff/ to planning
+git push origin planning                        # push the planning branch
+```
+
+Run these as separate tool calls, not one long `&&` chain — a wrapped paste splits on
+the terminal's line breaks and misfires, and separate calls each get their own
+receipt. Report what landed in one line; don't narrate every step.
+
+**Two things you hand to Emilio, each pure paste in its own block:**
+
+- **the publish line** — `cd <code> && ./plan publish && git push origin main
+  planning` — after you've checked the gate above. Publish crosses into the code
+  worktree, so it is his to run.
+- **a build prompt for the code-worktree CC** — you don't drive that session.
+
+Fenced blocks are for those and for code; comparisons and tables go in prose, never in
 a fence used to align columns.
 
-**Publish is followed by push — chain it, don't rely on remembering.** When nothing
-needs checking in between:
+**A prompt sent mid-branch must be self-contained** (see the CC-knows section) and
+**names its branch** — the code worktree may not be on the requirement's branch when
+a test is due, so say which branch, don't assume Emilio infers it.
 
-```
-cd <planning> && ../workout-app-codebase/plan save "message" && \
-cd <code> && ./plan publish && git push origin main planning
-```
-
-Each step carries its own safety check, so chaining skips no check — it just stops
-a working sequence from depending on memory between messages.
-
-**A test request names its branch.** The code worktree may not be sitting on the
-requirement's branch when a test is due — say which branch, don't assume he'll
-infer it.
-
-**Verifying a prompt was actually sent:** git tells you whether a shell command
-ran; for a prompt there is no such receipt, so **look for the artifact it would
-have produced** — a new commit, a changed line — never ask, never assume.
+**Verifying a prompt was actually pasted:** a shell command you run leaves its own
+result; a prompt handed to Emilio does not, so **look for the artifact it would have
+produced** — a new commit on the branch — never ask, never assume.
 
 ```
 git -C <code> --no-optional-locks log --oneline main..<branch>     new commit?
@@ -247,11 +230,15 @@ and *what now*; the file says *why*.
 1. the answer                     1-3 sentences
 2. detail, only if it changes     optional
    his decision
-3. one command block, last        nothing after it
+3. a handover block, last         a publish line or a CC prompt; its own
+                                  block, nothing after it
 ```
 
-The test before sending: **does this sentence change what Emilio does next?** If
-no, it belongs in a file.
+You run the planning git yourself, so most turns end with a one-line note of what you
+saved and pushed — not a command block. A fenced block appears only when there's
+something for Emilio to run: the publish line, or a CC build prompt. The test before
+sending: **does this sentence change what Emilio does next?** If no, it belongs in a
+file.
 
 ## Reports come back in `reports/`, not in `handoff/`
 

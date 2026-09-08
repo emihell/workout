@@ -55,3 +55,32 @@ backlog item into scope, and its respect-intent benefit is largely moot at Today
 importer (nothing to lose). This req is a data-safety net, not a UX pass. Both sites route
 through one shared import helper (consolidates the duplicated confirm→apply path). Drives
 `req-07`.
+
+## DEC-005 — the planning session owns planning-worktree git; the worktrees stay isolated  (2026-09-08)
+
+Previously the planning session wrote `handoff/` but handed every git write to Emilio, on the
+stated belief that sandbox git writes from the planning worktree were unreliable. Proven false
+2026-09-08: `git reset`, `git commit`, and `git push` all succeed from the planning worktree
+and `git rev-parse --git-dir` resolves.
+
+**The governing rule (Emilio, 2026-09-08): planning never touches code, and code never touches
+planning.** So ownership is drawn at the worktree boundary, not at "git vs no git":
+
+- **Planning session owns everything inside the planning worktree** — edit `handoff/`, `commit`,
+  `./plan save` (commits `handoff/` to the planning branch; runs from and affects only the
+  planning tree), and `git push origin planning`. All planning-branch only.
+- **Publish is NOT planning's.** `./plan publish` runs *in* the code worktree, merges
+  `planning → main`, and moves `main` — that is planning touching code. It stays Emilio's one
+  bridge command; the planning session prepares it and hands it over, never runs it. (This
+  overrides the earlier in-session answer "I own publish too", which the isolation rule
+  dissolves.)
+- **Read-only inspection of the code worktree is fine** (e.g. `git log main..<branch>` to
+  confirm a build landed) — reading is not touching.
+- **Build prompts for the code-worktree CC are handed to Emilio to paste** — planning does not
+  drive that session.
+
+Granted via fixed `Bash` allow-rules in planning's `.claude/settings.json`, scoped to
+planning-only writes (`git add/commit/reset/restore`, `git push origin planning`,
+`../workout-app-codebase/plan save`, `plan status`) — deliberately **not** `plan publish` or a
+bare `git push`. The deny on editing the settings files stays. Supersedes the "Don't run git
+commands that write" rule in `PLANNING.md`.
