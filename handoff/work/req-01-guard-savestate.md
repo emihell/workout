@@ -1,6 +1,6 @@
 # req-01 — guard saveState against a failed write
 
-**Status: READY** — decision made (DEC-001: persistent banner). Safe to build.
+**Status: BUILT AND MERGED, 2026-09-08 — branch `req-01` (`85d3887`…`85d3887`, 1 commit).** — decision made (DEC-001: persistent banner). Safe to build.
 
 ## Why
 
