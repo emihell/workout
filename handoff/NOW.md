@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-07 (req-03 READY). Keep under 50 lines; **done lives in `log/SHIPPED.md`**.
+Updated 2026-09-07 (reqs 01-05 READY). Keep under 50 lines; **done lives in `log/SHIPPED.md`**.
 Full reqs: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -19,6 +19,8 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 - `req-01` **guard `saveState`** — persist path can throw and lose data silently; the safety floor. Banner on failure (DEC-001).
 - `req-02` **carry kg+reps for a no-history exercise** — type it in set 1, follows the rest (DEC-002).
 - `req-03` **persistent rest timer** — counter vanished when leaving the set screen; make it a workout-level bar, keep pause/resume/skip/+30s (DEC-003).
+- `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. (infra)
+- `req-05` **error boundary** — a render crash blanks the app mid-workout; catch it, reassure data is saved, offer reload. (hardening)
 
 Each has a full spec in `work/`. Suggested order: `req-01` first (safety), then `02`/`03`.
 
