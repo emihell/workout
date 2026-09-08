@@ -4,6 +4,29 @@ import { defaultSchedule } from './schedule.js'
 const STORAGE_KEY = 'workout-mvp-v8'
 const LEGACY_KEYS = ['workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
 
+// "Last save failed" signal. saveState writes are unguarded against a throwing
+// localStorage.setItem (quota exceeded, Safari/iOS private mode), and the write
+// runs inside the store's setState updater — an escaped throw would lose data
+// silently. We swallow the throw here and expose the failure as a subscribable
+// external store so the app can show a persistent banner until a save succeeds.
+let saveFailed = false
+const saveFailedListeners = new Set()
+
+function setSaveFailed(value) {
+  if (saveFailed === value) return
+  saveFailed = value
+  for (const listener of saveFailedListeners) listener()
+}
+
+export function getSaveFailed() {
+  return saveFailed
+}
+
+export function subscribeSaveFailed(listener) {
+  saveFailedListeners.add(listener)
+  return () => saveFailedListeners.delete(listener)
+}
+
 export function emptyState() {
   return migrateState({
     schemaVersion: SCHEMA_VERSION,
@@ -35,7 +58,14 @@ export function loadState() {
 }
 
 export function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    setSaveFailed(false)
+    return true
+  } catch {
+    setSaveFailed(true)
+    return false
+  }
 }
 
 export function routineById(routines, routineId) {

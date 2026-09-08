@@ -1,4 +1,6 @@
+import { useSyncExternalStore } from 'react'
 import { StoreProvider } from './store'
+import { getSaveFailed, subscribeSaveFailed } from './storage'
 import { useHashRoute } from './route'
 import { Today } from './views/Today'
 import {
@@ -16,6 +18,16 @@ import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExerc
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/History'
 import { StartWorkout } from './views/Start'
 import { Settings } from './views/Settings'
+
+function SaveFailedBanner() {
+  const failed = useSyncExternalStore(subscribeSaveFailed, getSaveFailed, getSaveFailed)
+  if (!failed) return null
+  return (
+    <div role="alert">
+      Couldn't save your last change. Your data may not persist — export a backup from Settings.
+    </div>
+  )
+}
 
 function Nav() {
   return (
@@ -173,6 +185,7 @@ function Screen() {
 export default function App() {
   return (
     <StoreProvider>
+      <SaveFailedBanner />
       <Nav />
       <main>
         <Screen />

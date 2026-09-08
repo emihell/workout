@@ -1,6 +1,53 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { emptyState, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
+import { emptyState, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
+
+// Swap in a localStorage whose setItem either records normally or throws.
+function withLocalStorage({ throwOnSet = false } = {}, run) {
+  const previous = globalThis.localStorage
+  const map = new Map()
+  globalThis.localStorage = {
+    getItem: (key) => (map.has(key) ? map.get(key) : null),
+    setItem: (key, value) => {
+      if (throwOnSet) throw new Error('QuotaExceededError')
+      map.set(key, String(value))
+    },
+  }
+  try {
+    return run(map)
+  } finally {
+    globalThis.localStorage = previous
+  }
+}
+
+describe('saveState guards a failed write', () => {
+  it('does not throw and sets the failure signal when setItem throws', () => {
+    withLocalStorage({ throwOnSet: true }, () => {
+      assert.doesNotThrow(() => saveState(emptyState()))
+      assert.equal(getSaveFailed(), true)
+    })
+  })
+
+  it('a normal save leaves the failure signal clear', () => {
+    withLocalStorage({}, () => {
+      saveState(emptyState())
+      assert.equal(getSaveFailed(), false)
+    })
+  })
+
+  it('a throwing save followed by a succeeding one ends clear', () => {
+    // First a failure: signal goes true.
+    withLocalStorage({ throwOnSet: true }, () => {
+      saveState(emptyState())
+      assert.equal(getSaveFailed(), true)
+    })
+    // Then a success: signal clears.
+    withLocalStorage({}, () => {
+      saveState(emptyState())
+      assert.equal(getSaveFailed(), false)
+    })
+  })
+})
 
 describe('blank device storage', () => {
   it('starts with no routines, exercises, or history', () => {
