@@ -22,6 +22,7 @@ autoloop.
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
 - `req-12` **navigation consistency** — pure-nav buttons → one shared `<a href>` nav-link component; `<button>` reserved for actions/submits (DEC-016). Behaviour-preserving; do before the styling pass. **[functional → planning closes]**
+- `req-13` **component library (+ showcase)** — extract every UI element into a minimal, colorless, tap-friendly, Apple-inspired primitive set + a `#/components` showcase to iterate on; no app migration yet (DEC-017). The styling foundation. **[ux-feel → Emilio's hands; expect iteration]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
 reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.

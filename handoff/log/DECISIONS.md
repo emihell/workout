@@ -289,3 +289,21 @@ Pause, Import, applyBackup, etc.). The repeated `<button onClick={() => go(X)}>L
 / aligns with req-11's `ExercisesLink`). **Only PURE-navigation buttons convert**; a button that also
 mutates state stays a button. Best done *before* the styling pass so styling lands on consistent
 semantics (links and buttons will style differently). Drives req-12.
+
+## DEC-017 — a minimal, colorless, Apple-inspired component library as the styling foundation  (Emilio, 2026-09-09)
+
+The app has zero CSS. Before the full styling pass, build a **component library** — extract every UI
+element type into a small set of reusable primitives (drives req-13). First-iteration principles
+(Emilio: "as simple and as little code as possible, no colors, as raw as possible, easy to press,
+inspiration from Apple apps"):
+- **Colorless.** Grayscale only (white / black / grays); **no color or theme** yet. Whitespace, type
+  weight, and hairline dividers do all the visual work.
+- **System font** (`-apple-system, …`); a small type scale (title / section / body / caption).
+- **Easy to press.** Tap targets **≥ 44px** (Apple HIG); generous padding; an 8px spacing rhythm.
+- **Apple-inspired** structure: grouped lists with hairline dividers + chevrons, segmented controls,
+  large legible numbers (gym), buttons as rounded rects distinguished by weight/border not color.
+- **As little code/CSS as possible** — a small `src/ui/` of components + one minimal grayscale
+  stylesheet. No design system, no tokens beyond spacing/size, no build changes.
+- **First iteration = the library + a `#/components` showcase page** to view every component and
+  iterate; **the app screens are NOT migrated to it yet** (that's the subsequent per-screen styling
+  pass). Mobile-first (DEC-010). Expect heavy iteration; ux-feel gate.
