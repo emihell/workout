@@ -122,6 +122,41 @@ export function lastLoggedSetIndex(workout, item) {
   return (workout.sets || []).lastIndexOf(lastSet)
 }
 
+function isSkippedSet(set) {
+  return String(set?.reps || '').toLowerCase() === 'skipped'
+}
+
+// The most recent non-skipped working set already logged this session, scanning
+// newest-first. Returns null when there is nothing to carry (no working set
+// logged yet, or every one was skipped). The source for req-02's no-history
+// carry (DEC-002): the next set follows the most recently logged set, and a
+// skipped set is never the source. Pure, so the carry is testable without the DOM.
+export function carriedWorkingSet(workLogged) {
+  const sets = workLogged || []
+  for (let i = sets.length - 1; i >= 0; i--) {
+    if (!isSkippedSet(sets[i])) return sets[i]
+  }
+  return null
+}
+
+// kg + reps to prefill the set-log form, in priority order (req-02 / DEC-002):
+//   restore (un-logging via "Previous")  →  carried last live set (NO-history
+//   exercise only)  →  history prefill weight + target reps (has-history, and
+//   the first set of a no-history exercise). `weighted` gates kg — bodyweight /
+//   cardio never seed a weight. `carry` is expected to be null whenever the
+//   exercise has history, so the with-history path never carries; the explicit
+//   `!hasHistory` guard keeps that scope rule visible and testable. Pure so the
+//   prefill decision is inspectable, the way the history-prefill rule is.
+export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target }) {
+  if (fromRestore) {
+    return { weight: weighted ? restore.weight : '', reps: restore.reps }
+  }
+  if (!hasHistory && carry) {
+    return { weight: weighted ? carry.weight : '', reps: carry.reps }
+  }
+  return { weight: weighted ? history.weight : '', reps: target || '' }
+}
+
 // Pure rest-timer state, derived from the persisted workout-level fields
 // (activeWorkout.restEndsAt / restPausedRemaining) and the current time. Kept
 // side-effect-free so the "remaining time is recomputed from restEndsAt, not

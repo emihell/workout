@@ -5,7 +5,7 @@ import { recommendNextPrescription } from '../progress'
 import { exerciseById, findRoutine, historySetPrefill, lastSetsForExercise } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
-import { itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, restRemaining } from '../workout-log'
+import { carriedWorkingSet, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, restRemaining, setLogSeed } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
 import { Back, Missing } from './shared'
 
@@ -249,6 +249,21 @@ export function WorkoutItemLog({ routineId, itemId }) {
   return <WorkoutItemLive routineId={routineId} item={item} />
 }
 
+// req-02 / DEC-002: for an exercise with NO finished-workout history, the kg+reps
+// carried onto the next working set — the most recent non-skipped working set
+// logged this session. Null for a with-history exercise (`last` present), a
+// warm-up set, or when nothing has been logged yet, so the existing history /
+// blank-kg / target-reps paths stay untouched.
+function carryFor(ex, last, currentType, workLogged) {
+  if (last || currentType !== 'work') return null
+  const src = carriedWorkingSet(workLogged)
+  if (!src) return null
+  return {
+    weight: src.weight != null && Number(src.weight) !== 0 ? String(src.weight) : '',
+    reps: src.reps != null && src.reps !== '' ? String(src.reps) : '',
+  }
+}
+
 function restoreFromLoggedSet(set) {
   const skipped = String(set?.reps || '').toLowerCase() === 'skipped'
   return {
@@ -377,6 +392,7 @@ function WorkoutItemLive({ routineId, item }) {
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
           ex={ex}
           last={last}
+          carry={carryFor(ex, last, currentType, state.workLogged)}
           currentType={currentType}
           currentWorkIndex={currentWorkIndex}
           target={target}
@@ -397,6 +413,7 @@ function WorkoutItemLive({ routineId, item }) {
 function SetLogForm({
   ex,
   last,
+  carry,
   currentType,
   currentWorkIndex,
   target,
@@ -411,9 +428,17 @@ function SetLogForm({
     restore &&
     restore.setType === currentType &&
     (currentType === 'wu' || restore.workIndex === currentWorkIndex)
-  const seed = fromRestore ? restore : history
-  const [weight, setWeight] = useState(() => (usesWeight(ex) ? seed.weight : ''))
-  const [reps, setReps] = useState(() => (fromRestore ? restore.reps : target || ''))
+  const seed = setLogSeed({
+    weighted: usesWeight(ex),
+    fromRestore,
+    restore,
+    hasHistory: Boolean(last),
+    history,
+    carry,
+    target,
+  })
+  const [weight, setWeight] = useState(() => seed.weight)
+  const [reps, setReps] = useState(() => seed.reps)
   const [rpe, setRpe] = useState(() =>
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? String(rpeOptionValue(restore.rpe) || restore.rpe)

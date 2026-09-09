@@ -9,6 +9,8 @@ import {
   addWorkingSetToState,
   withSkippedUnloggedSets,
   restRemaining,
+  carriedWorkingSet,
+  setLogSeed,
 } from './workout-log.js'
 
 const item = {
@@ -146,5 +148,119 @@ describe('restRemaining (rest timer recompute)', () => {
     })
     // and tolerates a missing/absent active workout
     assert.equal(restRemaining(null, 5_000).resting, false)
+  })
+})
+
+// req-02 / DEC-002 — a no-history exercise carries the entered kg + reps forward.
+describe('carriedWorkingSet (req-02 source)', () => {
+  it('carries the most recent logged working set', () => {
+    const src = carriedWorkingSet([
+      { setType: 'work', weight: 40, reps: '10' },
+      { setType: 'work', weight: 42.5, reps: '8' },
+    ])
+    assert.deepEqual({ weight: src.weight, reps: src.reps }, { weight: 42.5, reps: '8' })
+  })
+
+  it('nothing logged yet → null (first set is not seeded)', () => {
+    assert.equal(carriedWorkingSet([]), null)
+    assert.equal(carriedWorkingSet(undefined), null)
+  })
+
+  it('skips over a skipped set to the last non-skipped one (failure case)', () => {
+    const src = carriedWorkingSet([
+      { setType: 'work', weight: 40, reps: '10' },
+      { setType: 'work', weight: 0, reps: 'skipped' },
+    ])
+    assert.deepEqual({ weight: src.weight, reps: src.reps }, { weight: 40, reps: '10' })
+  })
+
+  it('all sets skipped → null (falls back to blank/target, never carries "skipped")', () => {
+    assert.equal(
+      carriedWorkingSet([{ setType: 'work', weight: 0, reps: 'skipped' }]),
+      null,
+    )
+  })
+})
+
+describe('setLogSeed (req-02 prefill order)', () => {
+  const history = { weight: '', reps: '' }
+
+  it('carry (main): no history, weighted → carried kg + reps both prefill', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: false,
+      history,
+      carry: { weight: '40', reps: '10' },
+      target: '10',
+    })
+    assert.deepEqual(seed, { weight: '40', reps: '10' })
+  })
+
+  it('reps carry overrides the per-set target', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: false,
+      history,
+      carry: { weight: '42.5', reps: '8' },
+      target: '10',
+    })
+    assert.equal(seed.reps, '8')
+  })
+
+  it('first working set of a no-history exercise: blank kg, target reps', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: false,
+      history,
+      carry: null,
+      target: '10',
+    })
+    assert.deepEqual(seed, { weight: '', reps: '10' })
+  })
+
+  it('scope guard: an exercise WITH history uses history weight + target reps, never the carry', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history: { weight: '60', reps: '5' },
+      // a carry is never even computed with history, but assert it is ignored if present
+      carry: { weight: '99', reps: '99' },
+      target: '5',
+    })
+    assert.deepEqual(seed, { weight: '60', reps: '5' })
+  })
+
+  it('bodyweight (not weighted): kg stays blank even when a carry exists', () => {
+    const seed = setLogSeed({
+      weighted: false,
+      fromRestore: false,
+      restore: null,
+      hasHistory: false,
+      history,
+      carry: { weight: '', reps: '12' },
+      target: '12',
+    })
+    assert.deepEqual(seed, { weight: '', reps: '12' })
+  })
+
+  it('restore (Previous) wins over any carry', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: true,
+      restore: { weight: '35', reps: '9' },
+      hasHistory: false,
+      history,
+      carry: { weight: '40', reps: '10' },
+      target: '10',
+    })
+    assert.deepEqual(seed, { weight: '35', reps: '9' })
   })
 })
