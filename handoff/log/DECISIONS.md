@@ -307,3 +307,12 @@ inspiration from Apple apps"):
 - **First iteration = the library + a `#/components` showcase page** to view every component and
   iterate; **the app screens are NOT migrated to it yet** (that's the subsequent per-screen styling
   pass). Mobile-first (DEC-010). Expect heavy iteration; ux-feel gate.
+
+## DEC-018 — primary mobile nav is Today + Schedule; the rest go in a menu  (Emilio, 2026-09-10)
+
+Six flat nav items is too many for mobile. **Primary / always-visible: Today** (now) **+ Schedule**
+(this week) — the daily-use pairing. **Behind a simple menu** (a "Menu"/"More" affordance):
+**Routines, Exercises, History, Settings**. History is review-not-daily, so it moves into the menu
+(one tap deeper). The menu can be a plain list for the raw first iteration; grouping (e.g.
+Routines/Exercises as a "Plan" area) is refinable later, and analytics (req-08) can validate which
+items actually get used. Shapes req-13's `NavBar`.

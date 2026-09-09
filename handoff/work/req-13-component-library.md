@@ -63,9 +63,11 @@ showcase):
 - **`List` + `Row`** — Apple grouped list: full-bleed rows, hairline dividers **between** rows,
   ≥44px row height, content left / optional value or `›` chevron right. Covers exercise lists,
   history, schedule, today's rows, the workout overview list.
-- **`NavBar`** — the top section nav (Today · Schedule · Routines · Exercises · History · Settings) as
-  a clean, evenly-spaced row. **Suggestion for later (note, don't build now):** a bottom tab bar is
-  the Apple-mobile idiom and worth considering in the styling pass.
+- **`NavBar`** — **primary: Today + Schedule** always visible; the rest (**Routines, Exercises,
+  History, Settings**) behind a simple **`Menu`** affordance (DEC-018). For the raw first iteration
+  the menu can be a plain toggled list of those four links — no fancy drawer. So the bar reads
+  roughly `Today · Schedule · Menu`. (Bottom tab bar is the Apple-mobile idiom worth considering
+  later; not now.)
 - **`Banner`** — a full-width notice strip (grayscale), for the save-failed banner (req-01) and
   error-boundary fallback (req-05).
 
@@ -87,7 +89,12 @@ showcase):
 ## Out of scope (first iteration)
 
 - **Migrating the app's screens** to use the library — that's the subsequent per-screen styling pass,
-  one screen at a time. This req only *creates* the library + showcase.
+  one screen at a time. This req only *creates* the library + showcase. **One exception: the
+  `NavBar`.** It is the global app shell, so its DEC-018 regroup (Today + Schedule primary; Routines
+  / Exercises / History / Settings behind a `Menu`) is **wired into `App.jsx` now**, replacing the
+  current flat six-item nav — otherwise the IA change wouldn't take effect. Expect a transient look
+  mismatch (a tidier nav above still-unstyled screens); that's fine, it declutters regardless of
+  styling.
 - **Any color / theme / dark mode** — grayscale only.
 - The bottom-tab-bar restructure (noted as a later suggestion).
 - Replacing native `alert`/`confirm` (separate item).
