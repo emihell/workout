@@ -48,6 +48,20 @@ exercise forces an extra review screen before you can move on.
 - The **whole-routine summary is unchanged** — it's the existing Finish screen (`FinishScreen`),
   reached from the overview's "Finish" once all exercises are done.
 
+### 5. Remove the redundant Back from the top-level nav screens (DEC-015; folded in by Emilio 2026-09-09)
+- The persistent top nav (Today · Schedule · Routines · Exercises · History · Settings) is on every
+  screen, so a top-level *destination* reached from the nav doesn't need a history-`<Back/>` — it's
+  redundant with the nav. Today and the Routines main already have none; the others inconsistently
+  carry one.
+- **Remove `<Back/>` from the top-level section MAIN screens only:** Settings (`Settings.jsx`),
+  the Schedule main (route `schedule`), the Exercises main (route `exercises`), the History main
+  (route `history`).
+- **Keep `<Back/>` on every drill-down / sub-screen** (exercise detail, history detail/edit,
+  routine detail, schedule-day/slot, etc.) — there it's the way back to the list. Each of those
+  files has Back on both the main and sub-screens; remove it from the main component only.
+- This is app-wide nav (not in-gym), folded into req-11 at Emilio's direction because it's the
+  same back-button-cleanup thread.
+
 ## Out of scope
 
 - Any restyle beyond these button/label/visibility changes (the full styling pass is separate).
@@ -93,6 +107,10 @@ exercise forces an extra review screen before you can move on.
 - **All-done → Finish still works (domino):** with every exercise completed via the new
   auto-mark-done path, the overview's "Finish" reaches the routine summary and the workout finishes
   and saves correctly. Assert the completion state drives Finish exactly as before (regression).
+- **Top-level nav screens have no Back (scope 5):** Settings, Schedule main, Exercises main, and
+  History main render **no** `<Back/>` (you leave via the top nav); their drill-down sub-screens
+  **still** render Back. Show it in the diff + a spot browser check that each main screen is
+  reachable and leavable via the nav.
 - `./check` green; paste the line.
 
 ## Notes

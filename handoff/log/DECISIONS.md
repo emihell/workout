@@ -262,3 +262,13 @@ un-checks it ("done" disappears in the overview) until the added set is logged, 
 done. CC surfaced this during req-11; it is the only way to keep "Add set" working under
 auto-mark-done, and it reads sensibly (you're doing more work on it, so it isn't "done" until you
 finish). Part of req-11.
+
+## DEC-015 — no Back on top-level nav destinations; keep it on drill-down sub-screens  (Emilio, 2026-09-09)
+
+The persistent top nav (Today · Schedule · Routines · Exercises · History · Settings) is on every
+screen, so a top-level destination reached from the nav needs no history-`<Back/>` — it's
+redundant with the nav (you leave by tapping another nav item). Rule: remove `<Back/>` from the
+section MAIN screens (Settings, Schedule main, Exercises main, History main; Today and Routines
+mains already have none); keep `<Back/>` on drill-down / detail sub-screens, where it's the way
+back to a list. Emilio asked ("do we need a back button in settings main page?") and directed
+folding it into req-11 (same back-button-cleanup thread as DEC-013). Part of req-11.
