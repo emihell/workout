@@ -201,6 +201,12 @@ fresh `claude` session per req (which changes the messaging address each time). 
 `/clear`. So at each close tell Emilio: *"req-NN closed — `/clear` code CC, then say build the
 next."* Don't re-investigate automating it.
 
+**Default is `/clear` between every req. A batch is the exception and needs Emilio's OK first.**
+For a run of smaller reqs he may choose to build several back-to-back *without* a clear between
+them — but only when he has explicitly approved that batch in advance. Absent that OK, always
+prompt for the clear at each close. Never skip it on your own initiative, and never assume a
+prior batch approval carries to the next one.
+
 **Either side stops** for a question; you stop at a human gate. **Loop-hang recovery:** if the
 idle notice fires but the branch has no ready commit, CC probably stopped to ask Emilio in its own
 session — surface *"CC went idle without a ready branch — did it hit a question?"*, don't wait blind.
