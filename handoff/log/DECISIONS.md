@@ -174,3 +174,15 @@ used it":
   if no ready commit, surface "code CC went idle without a ready branch — did it hit a question?"
 - **Reflection cadence:** report workflow issues *during* the process, and reflect + patch the
   workflow (`PLANNING.md`, a `DEC-`/`L-`) at the end of a run. The workflow improves by use.
+
+## DEC-010 — mobile is the primary platform; the live workout is mobile-only  (Emilio, 2026-09-09)
+
+This app is primarily a **mobile** app. The only things reasonably done on a computer are setup —
+creating routines, exercises, and the schedule — and even those must be fully doable on mobile
+too. The **actual in-gym workout** (Start → log sets → rest → Finish) is **mobile-only** in
+practice. Web/desktop is secondary. Every UX/design and prioritization call weighs mobile first:
+the "flawless gym flow" pass (`DESIGN.md`) is a mobile, one-handed, screen-on target — wake-lock,
+big tap targets, thumb reach, legible numbers are mobile concerns before desktop. A native app is
+planned for later; the browser-only version is the current form, and browser features chosen now
+(e.g. the Screen Wake Lock API for keep-awake — confirmed feasible on Android Chrome / iOS Safari
+16.4+) should be ones that carry over. Drives how DESIGN.md is applied and how reqs are ranked.
