@@ -77,3 +77,19 @@ the req-04 merge `32fddd2` (touched `deploy.yml`) triggered a deploy run; the ve
 doc-only maintenance publish `c10867e` (handoff/ + reports/ only), triggered **no run** — the
 `paths` filter skipped it. Earlier doc pushes deployed only because they predate the filter
 landing on `main`.
+
+## req-09 — keep the screen awake during a workout  (merged 2026-09-09; real-device check pending)
+
+Screen Wake Lock while a workout is active. A shell-level `WakeLock` component (`src/wake-lock.js`,
+mounted in `App.jsx` inside `StoreProvider`) reads `useStore().activeWorkout`; while active it holds
+`navigator.wakeLock.request('screen')`, releases on workout end/unmount, and re-acquires on
+`visibilitychange→visible` only when the sentinel was auto-released (browsers drop it on
+backgrounding). Feature-detected + fail-silent — an in-flight request resolving after cleanup is
+released via a `cancelled` flag, and any reject is swallowed; a wake-lock failure never touches the
+workout. Scoped to an active workout, never app-wide. 8 react-test-renderer tests. Merge `6807154`
+(branch `req-09-wakelock-during-workout`, `119e251`). `./check` green, 81 tests. **Merged BEFORE the
+device check** by Emilio's explicit merge-then-verify-live approval — the device-verified gate needs
+a secure context (`navigator.wakeLock` runs only on HTTPS/localhost), which a pre-merge LAN branch
+can't give a phone; the feature is fail-silent + scoped, so the risk is low (see L-003). **Outstanding:
+Emilio's real-phone check on the live HTTPS site** — screen stays on idle mid-workout, resumes normal
+sleep on Finish/Abandon, survives backgrounding. Revert if it misbehaves (isolated).

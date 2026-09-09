@@ -1,7 +1,8 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01, req-02, req-03, req-04, req-05** (see `log/SHIPPED.md`). Keep
-under 50 lines; done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`.
+Updated 2026-09-09. **Shipped: req-01–05, req-09** (req-09 merged; **Emilio's real-phone wake-lock
+check still outstanding** — see SHIPPED/L-003). Done lives in `log/SHIPPED.md`. Full reqs:
+`work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -22,7 +23,6 @@ autoloop.
 - `req-08` **usage analytics** — count screens, screen→screen transitions, and primary button presses in a separate `workout-mvp-analytics` key; export from Settings (DEC-011). Fail-silent writes, isolated from workout history. **[functional → planning closes; browser check must confirm a workout is unaffected]**
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
-- `req-09` **keep screen awake during a workout** — Screen Wake Lock while `activeWorkout` is set, re-acquire on visibility, fail-silent (DEC-010). **[device-verified → Emilio's real-device check before merge]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
