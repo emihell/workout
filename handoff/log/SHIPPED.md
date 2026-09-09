@@ -125,3 +125,20 @@ path-collapse, fail-silent, export, isolation). Merge `72d7be9` (branch `req-08-
 incremented screens + transitions (`>>` separator), logging a set recorded `complete-set:1` AND
 saved to the workout normally, and `workout-mvp-v8` had no analytics field (isolation confirmed).
 Impl notes: separator `>>`; `complete-set` counts after the effort guard, `abandon` after the confirm.
+
+## req-06 — remove legacy localStorage keys after a confirmed v8 write  (merged 2026-09-09; phone-verify pending)
+
+`loadState` (`src/storage.js`) migrated `v7/v6/v5` → `v8` but never removed the legacy keys,
+leaving stale duplicate copies. New `removeLegacyKeysIfV8Persisted()` (called at the end of
+`loadState`) deletes the legacy keys **only after reading `workout-mvp-v8` back and getting
+non-null** — a silent-fail write (setItem stores nothing without throwing) leaves `getItem` null →
+no delete, so the only surviving copy of the user's history is never destroyed. Never touches `v8`;
+wrapped so a throwing read/remove degrades to "legacy stays" (never `emptyState`). The v8 write path
+is byte-for-byte unchanged. Runs on both the migrate path and the already-v8 path (reclaims a
+leftover legacy key from an interrupted cleanup). Merge `9c36887` (branch `req-06-legacy-key-cleanup`,
+`f0c6253`). `./check` green, 96 tests, including the two required failure cases (throwing write +
+silent no-op → legacy key survives). Verified: happy path in a real browser (seeded `v7` → migrated
+to `v8`, legacy removed); the read-back gate + silent-fail survival by the genuine unit tests. Merged
+on Emilio's merge-then-verify-on-phone approval (persisted-data; his phone store can't be inspected
+pre-merge, and it never deletes `v8`). **Outstanding: Emilio confirms his workouts are intact next
+time he opens the app on his phone.**

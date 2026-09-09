@@ -1,7 +1,8 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01–05, req-08, req-09, req-11** (all fully done). Done lives in
-`log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-09. **Shipped: req-01–06, req-08, req-09, req-11** (req-06 merged; Emilio to confirm
+phone data intact on next open). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
+`work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -19,7 +20,6 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 Each req is tagged with its merge gate (DEC-009); only READY reqs (no open questions) enter the
 autoloop.
 
-- `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
 
