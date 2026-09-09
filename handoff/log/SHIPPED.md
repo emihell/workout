@@ -142,3 +142,17 @@ to `v8`, legacy removed); the read-back gate + silent-fail survival by the genui
 on Emilio's merge-then-verify-on-phone approval (persisted-data; his phone store can't be inspected
 pre-merge, and it never deletes `v8`). **Outstanding: Emilio confirms his workouts are intact next
 time he opens the app on his phone.**
+
+## req-07 — back up current data before a destructive import  (merged 2026-09-09)
+
+Both import sites (`Settings.jsx`, `Today.jsx`) replaced all state after one native confirm with no
+recovery of the overwritten data. New shared helper `importWithBackup` (`src/import-backup.js`):
+confirm → **download a `buildBackup` of CURRENT state** (`workout-database-<date>.json`, the Export
+file) **before** `applyBackup`, so an accidental overwrite is recoverable; returns null on cancel.
+Both sites route through it (duplicated confirm→apply bodies removed); `downloadJson` deduped into
+the module. Purely additive — `applyBackup` behaviour is unchanged, and a malformed payload
+propagates its throw with current state untouched (same error as today). Completes the persisted-data
+safety trio: req-01 (guarded save) stops silent write loss, req-06 (legacy cleanup) stops orphaned
+copies, req-07 stops an import erasing history with no recourse. 3 helper tests
+(backup-precedes-replace, malformed-leaves-data-unchanged, cancel), `./check` green, 99 tests. Merge
+`1119f45` (branch `req-07-backup-before-import`, `1a934a7`). Emilio confirmed it works ("works"), merged.
