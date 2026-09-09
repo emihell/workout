@@ -161,7 +161,42 @@ always       the rule, the measurements, and the reasoning, in the prompt itself
 And do not describe a draft as sent. A prompt shown here is a draft until Emilio
 pastes it; he reads them first and sometimes doesn't send them.
 
-## Handing over a requirement — always these four, in this order
+## The two-agent build loop (DEC-009)
+
+The primary way build work flows now: **you ping code CC directly** (`SendMessage` to its
+session, e.g. `workout-app-codebase-a4`), it builds and reports back, you verify and close.
+The full cycle:
+
+```
+1. publish first    the req's doc + a current NOW.md must be on main — CC only sees the last publish
+2. ping             SendMessage "build req-NN"; CC reads handoff/work/req-NN-*.md itself
+3. build            CC builds on a branch, reports back (SendMessage); notify_when_idle as backstop
+4. review           read the diff + the failure-case test yourself — "done" is a signal, not proof
+5. loop back        gaps → SendMessage CC to fix (still its branch); not a new decision, just the spec
+6. verify           run the gate; browser-test where behaviour only shows in the running app
+7. merge gate       by kind (below)
+8. closeout         plan closeout req-NN  (yours, after the gate)
+9. maintain         immediately: prune NOW.md, write SHIPPED, publish — before anything else
+10. stop            do not auto-start the next; wait for Emilio's trigger
+```
+
+**The merge gate, by kind:**
+- **Functional** (logic/bug fix you can fully browser-verify) → you close it.
+- **UX / feel** (styling, one-handed gym flow) → verify + present; **Emilio uses it**; merge on his OK.
+- **Persisted-data** (schema/migration/bulk write — req-06/07 and kin) → **always** Emilio's hands
+  first, never auto-closed (CLAUDE.md's migration ask-gate).
+
+**`/clear` code CC between reqs.** You can't force it (a message "/clear" is text, not a command),
+so at each close tell Emilio: *"req-NN closed — `/clear` code CC, then say build the next."*
+
+**Either side stops** for a question; you stop at a human gate. **Loop-hang recovery:** if the
+idle notice fires but the branch has no ready commit, CC probably stopped to ask Emilio in its own
+session — surface *"CC went idle without a ready branch — did it hit a question?"*, don't wait blind.
+
+**Report findings during the run and reflect at the end** — patch this file / a `DEC-`/`L-`. The
+loop improves by use.
+
+## Handing over a requirement — the four parts (still used when Emilio pastes, not the loop)
 
 ```
 1. what it's about        2-4 sentences, plain

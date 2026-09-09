@@ -139,3 +139,38 @@ mid-build); `plan publish` also refuses a dirty code tree, and does not push (fo
 published req doc, not in a pasted prompt** — after each closeout the planning session publishes
 the next `NOW.md`/req state, and Emilio's trigger to code CC collapses to "build req-NN". The
 human-use merge gate (DEC-006) is unchanged; this is only about getting docs to `main`.
+
+## DEC-009 — the two-agent build loop, and the merge gate by req kind  (2026-09-09)
+
+The build loop is now: planning session pings code CC (`SendMessage`) to build the next req →
+code CC builds on a branch and reports back → planning reviews the diff + tests, loops it back to
+code CC for gaps, verifies independently → the merge gate (below) → planning closes out → planning
+prunes `NOW.md`/writes `SHIPPED`/publishes → **stop** (does not auto-start the next). Either side
+stops for a question, and planning stops at a human gate. First full run: req-03 (2026-09-09).
+
+**Merge gate by kind (Emilio, 2026-09-09).** Refines DEC-006's "nothing merges until a human has
+used it":
+- **Functional reqs** (logic/bug fixes the planning session can fully verify in a browser) —
+  planning browser-verifies and merges itself.
+- **UX / feel reqs** (styling, one-handed gym flow — how it *feels*) — planning verifies and
+  presents; **Emilio uses it**; planning merges on his OK. The feel is his to judge.
+- **Persisted-data reqs** (schema/migration/bulk write — e.g. req-06, req-07) — **always** wait
+  for Emilio's hands before merge, never auto-closed. Ties to CLAUDE.md's migration ask-gate.
+
+**Operating rules that came out of the first runs:**
+- **`/clear` code CC between reqs** (Emilio's ask). Keeps code CC's context clean per build. The
+  planning session **cannot** force it (a message named "/clear" arrives as text, not a command),
+  so Emilio triggers it: at each close, planning says "req-NN closed — `/clear` code CC, then
+  say build the next." A harness hook on code CC's side could automate it later.
+- **Post-closeout maintenance is immediate and mandatory.** `plan closeout` flips the req doc's
+  status but does NOT prune `NOW.md` or write `SHIPPED` — planning must, and publish, before doing
+  anything else, or code CC reads a stale queue. (Slipped once after req-01/05.)
+- **Never ping "build req-NN" until that req's doc and a current `NOW.md` are published to `main`**
+  — code CC only sees the last publish.
+- **"Done" from code CC is a signal, not proof** — always read the diff, check the failure-case
+  test, and run the gate. (Caught req-03's missing recompute test this way.)
+- **Loop-hang recovery:** if code CC goes idle without a ready branch (e.g. it stopped to ask
+  Emilio a question in its own session), don't wait blind — on the idle notice, check the branch;
+  if no ready commit, surface "code CC went idle without a ready branch — did it hit a question?"
+- **Reflection cadence:** report workflow issues *during* the process, and reflect + patch the
+  workflow (`PLANNING.md`, a `DEC-`/`L-`) at the end of a run. The workflow improves by use.
