@@ -58,6 +58,25 @@ last-set path. This is an implementation decision the spec left open (behaviour 
 adding a set to a finished exercise un-checks it in the overview until the added set is logged) —
 **flagging for a DEC/his confirmation.** Both patches are pure and unit-tested.
 
+### 5. Remove the redundant Back from top-level main screens (DEC-015, folded in)
+The persistent top nav reaches every top-level destination, so a history-`<Back/>` on a top-level
+**main** screen is redundant; keep it only on drill-downs that return to a list.
+
+**Finding — three of the four were already clean.** Only `Settings` actually had `<Back/>` on its
+main screen; removed it (and its now-unused `Back` import). The other three mains already render no
+`<Back/>`:
+- **Schedule** main (`Schedule.jsx:26`) — no Back. The `<Back/>` at `:75` is in `ScheduleLoop` (a
+  sub-screen), kept.
+- **Exercises** main (`Exercises.jsx` return at `:88`) — no Back. The `<Back/>` at `:69` is inside
+  the `if (type)` branch (`exercises-type` sub-screen), kept.
+- **History** main (`History.jsx` return at `:192`) — no Back. The `<Back/>` at `:175` is inside the
+  `if (month)` branch (`history-month` drill-down), kept.
+
+So the peer instruction's premise ("each file has Back on both the main and sub-screens") held only
+for Settings; the stated acceptance ("Settings / Schedule main / Exercises main / History main
+render no `<Back/>`; their sub-screens still do") is met by the single Settings edit. All
+drill-down / sub-screens across the four files keep their `<Back/>` unchanged.
+
 ## Verification
 
 `./check` — green:

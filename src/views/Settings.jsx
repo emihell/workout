@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { buildBackup } from '../exchange.js'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
-import { Back } from './shared'
 
 function downloadJson(filename, data) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -26,7 +25,6 @@ export function Settings() {
 
   return (
     <section>
-      <Back />
       <h1>Settings</h1>
       <p>
         <label>
