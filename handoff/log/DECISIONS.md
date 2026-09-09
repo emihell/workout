@@ -251,3 +251,14 @@ Several workout-flow refinements (drive req-11):
 Behaviour change to watch: "mark done" moves from the review's Done button to last-set completion;
 the overview's completion state, the all-done→Finish path, and re-entry "Add set" must all still
 work. Gate: ux-feel → Emilio's hands. Drives req-11.
+
+## DEC-014 — adding a set to a finished exercise reopens it until that set is logged  (2026-09-09)
+
+Emergent from req-11's mark-done-timing change (DEC-013): since an exercise is auto-marked done on
+its last set, re-entering it and tapping "Add set" must first REMOVE its key from
+`completedItemIds` (`reopenItemPatch`), or the log screen's `markedDone` guard bounces straight
+back to the overview and "Add set" is dead. Visible behaviour: adding a set to a finished exercise
+un-checks it ("done" disappears in the overview) until the added set is logged, which re-marks it
+done. CC surfaced this during req-11; it is the only way to keep "Add set" working under
+auto-mark-done, and it reads sensibly (you're doing more work on it, so it isn't "done" until you
+finish). Part of req-11.
