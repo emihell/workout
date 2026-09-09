@@ -104,3 +104,24 @@ closeout:*)` to `settings.local.json` (gitignored, planning-worktree-local; the 
 the planning session from writing its own grant, so Emilio pastes it). Standalone `plan publish`
 of doc-only changes is still not in the grant — those ride the next closeout or are handed over —
 which can be widened later if the hand-off proves annoying.
+
+## DEC-007 — error-boundary fallback auto-recovers on navigation; react-test-renderer adopted for render-tests  (2026-09-09)
+
+Two calls from `req-05` (error boundary):
+
+- **The fallback clears its error on navigation, not only on Reload.** A caught React error
+  boundary does not reset itself — once `hasError` is true it keeps showing the fallback even as
+  the route changes, so the spec's "Back to Today" link (and the still-visible Nav) would be
+  inert without a reset. The boundary listens for `hashchange` and clears `hasError`, so
+  navigating to a working screen recovers the app with no reload; navigating back to a
+  still-broken screen re-throws and re-catches (no loop). This is deliberately one step beyond
+  the literal spec (message + Reload + Today link); kept because it makes "the user can navigate
+  out" real. Verified in a real browser 2026-09-09 (fallback rendered in place with Nav intact;
+  clicking Routines recovered the app). CC surfaced it rather than burying it.
+- **`react-test-renderer` (devDependency) is the repo's tool for rendering a component in a
+  test.** Emilio chose it over dropping the render-test (weaker — wouldn't prove React actually
+  catches a render throw) or adding jsdom + testing-library (heavier). It is devDep-only (not in
+  the production bundle), the DOM-free way to run the real reconciler where boundaries actually
+  work; it is deprecated in React 19 (cosmetic console warning, filtered in the test). This is
+  the repo's **first** React render-test setup — the next component render-test should reuse it
+  rather than adding a second approach, unless we deliberately revisit the standard.
