@@ -1,6 +1,6 @@
 # req-03 — persistent workout-level rest timer (fixes the disappearing counter)
 
-**Status: READY** — decided (DEC-003). Independent of `req-01`/`req-02` (touches the rest UI / workout shell, not the save or seed paths).
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-03` (`8b5cc68`…`7ed39e3`, 2 commits).** — decided (DEC-003). Independent of `req-01`/`req-02` (touches the rest UI / workout shell, not the save or seed paths).
 
 ## The bug
 
