@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { recordScreen } from './analytics.js'
 
 const NAV_KEY = 'workout-mvp-nav-2'
 
@@ -52,8 +53,14 @@ function persistVisits() {
 }
 
 function remember(hash) {
+  const path = hashPath(hash)
+  // Only a real move to a new path counts as a screen view — mirrors applyVisit's
+  // consecutive-dedupe, so returning to the same screen isn't recounted and the
+  // initial '#/' redirect doesn't double-count `today`. req-08: fail-silent.
+  const changed = visits[visits.length - 1] !== path
   applyVisit(visits, hash)
   persistVisits()
+  if (changed) recordScreen(parseRoute(path).name)
 }
 
 export function useHashRoute() {
