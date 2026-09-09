@@ -2,15 +2,21 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { emptyState, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
 
-// Swap in a localStorage whose setItem either records normally or throws.
-function withLocalStorage({ throwOnSet = false } = {}, run) {
+// Swap in a localStorage whose setItem records normally, throws, or silently
+// no-ops (the iOS/Safari Private Mode failure the req-06 read-back defends
+// against). `seed` pre-populates keys; removeItem deletes from the same map.
+function withLocalStorage({ throwOnSet = false, silentSet = false, seed = {} } = {}, run) {
   const previous = globalThis.localStorage
-  const map = new Map()
+  const map = new Map(Object.entries(seed))
   globalThis.localStorage = {
     getItem: (key) => (map.has(key) ? map.get(key) : null),
     setItem: (key, value) => {
       if (throwOnSet) throw new Error('QuotaExceededError')
+      if (silentSet) return
       map.set(key, String(value))
+    },
+    removeItem: (key) => {
+      map.delete(key)
     },
   }
   try {
@@ -148,6 +154,75 @@ describe('blank device storage', () => {
     } finally {
       globalThis.localStorage = previous
     }
+  })
+})
+
+// req-06 — legacy keys are removed only after v8 is confirmed persisted by a
+// read-back. The failure-case tests are the point: a failed or silent upgrade
+// must leave the legacy copy intact, because it is the only surviving history.
+describe('req-06 legacy-key cleanup', () => {
+  const legacyV7 = JSON.stringify({
+    schemaVersion: 7,
+    exercises: [{ id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5' }],
+    routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
+  })
+  const validV8 = JSON.stringify({
+    ...emptyState(),
+    routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
+  })
+
+  it('happy path: migrates v7, writes v8, and removes every legacy key', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v7': legacyV7 } }, (map) => {
+      const state = loadState()
+      assert.equal(state.routines[0].name, 'Upper')
+      assert.ok(map.get('workout-mvp-v8')) // v8 was written
+      assert.equal(map.get('workout-mvp-v7') ?? null, null) // legacy gone
+      assert.equal(map.get('workout-mvp-v6') ?? null, null)
+      assert.equal(map.get('workout-mvp-v5') ?? null, null)
+    })
+  })
+
+  it('failure — throwing write: v7 survives a failed upgrade', () => {
+    withLocalStorage({ throwOnSet: true, seed: { 'workout-mvp-v7': legacyV7 } }, (map) => {
+      const state = loadState()
+      assert.equal(state.routines[0].name, 'Upper') // load still returns usable state
+      assert.equal(map.get('workout-mvp-v8') ?? null, null) // nothing persisted
+      assert.ok(map.get('workout-mvp-v7')) // legacy copy is still here
+    })
+  })
+
+  it('failure — silent no-op write: v7 survives (the read-back is the whole point)', () => {
+    // setItem does nothing and does NOT throw, so getItem('...v8') stays null.
+    // A cleanup keyed on "saveState didn't throw" would wrongly delete v7 here.
+    withLocalStorage({ silentSet: true, seed: { 'workout-mvp-v7': legacyV7 } }, (map) => {
+      const state = loadState()
+      assert.equal(state.routines[0].name, 'Upper')
+      assert.equal(map.get('workout-mvp-v8') ?? null, null) // silently stored nothing
+      assert.ok(map.get('workout-mvp-v7')) // legacy copy still present — not deleted
+    })
+  })
+
+  it('already on v8, no legacy: unchanged, nothing removed, no throw', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v8': validV8 } }, (map) => {
+      const before = map.get('workout-mvp-v8')
+      let state
+      assert.doesNotThrow(() => {
+        state = loadState()
+      })
+      assert.equal(state.routines[0].name, 'Upper')
+      assert.equal(map.get('workout-mvp-v8'), before) // v8 write path untouched
+    })
+  })
+
+  it('already on v8 with a leftover legacy key: reclaims the legacy copy', () => {
+    withLocalStorage(
+      { seed: { 'workout-mvp-v8': validV8, 'workout-mvp-v7': legacyV7 } },
+      (map) => {
+        loadState()
+        assert.ok(map.get('workout-mvp-v8')) // v8 intact
+        assert.equal(map.get('workout-mvp-v7') ?? null, null) // interrupted cleanup finished
+      },
+    )
   })
 })
 
