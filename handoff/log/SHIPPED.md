@@ -62,3 +62,16 @@ with-history scope guard, restore-wins). Merge `97412d8` (branch `req-02-carry-v
 `ea0c12c`). `./check` green, 73 tests (10 new). Browser gate (planning session, functional): set 1
 showed blank kg + target reps; entered 99 kg × 7; set 2 prefilled 99 × 7, editable — carry
 confirmed end-to-end.
+
+## req-04 — deploy to Pages only when build inputs change  (merged 2026-09-09)
+
+`.github/workflows/deploy.yml` triggered on every push to `main`, redeploying the live app even
+for planning-doc-only publishes that change nothing built (the recurring waste the loop kept
+hitting). Added a `paths` include-list to the push trigger — `src/**`, `public/**`, `index.html`,
+`package.json`, `package-lock.json`, `vite.config.js`, and the workflow itself — so doc-only
+pushes (`handoff/**`, `reports/**`) no longer deploy; build + publish steps unchanged. Verified the
+list covers every real build input (`vite.config.js` filename confirmed, `public/` present).
+Merge `ec104e5` (branch `req-04-deploy-only-on-build-changes`, `571bcef`). `./check` green, 73
+tests. Real-push confirmation (infra can't be proven by `./check`): the req-04 merge touched
+`deploy.yml` so it should deploy; the doc-only maintenance publish right after should NOT — being
+observed on the Actions tab.

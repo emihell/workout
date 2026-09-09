@@ -1,7 +1,7 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01, req-02, req-03, req-05** (see `log/SHIPPED.md`). Keep under
-50 lines; done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased plan: `work/BACKLOG.md`.
+Updated 2026-09-09. **Shipped: req-01, req-02, req-03, req-04, req-05** (see `log/SHIPPED.md`). Keep
+under 50 lines; done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -16,12 +16,10 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY (all Phase 1; independent; build in any order)
 
-**→ Next up: `req-04`** (recommended — infra, **functional** gate so the loop can close it, and it
-stops the pointless live redeploy on every doc-only publish). Each req is tagged with its merge
-gate (DEC-009); **only READY reqs with no open questions enter the autoloop** — resolve any
-`NEEDS DECISION` with Emilio first.
+**Only the two persisted-data reqs remain — both need Emilio's hands before merge (DEC-009).** I
+build + verify them, but stop for your use-it before closing. Each is tagged; only READY reqs
+(no open questions) enter the autoloop.
 
-- `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. **[infra → planning closes; confirm on real pushes]**
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
 
