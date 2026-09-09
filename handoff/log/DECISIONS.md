@@ -206,3 +206,24 @@ Decisions:
   history is not.
 - **Limitation (accepted):** browser-only analytics is **per-device** — Emilio sees only his own
   device's data (or a tester's exported file); cross-user aggregation needs the backend (Phase 3).
+
+## DEC-012 — first-time-exercise "setup" is guided calibration from the user's own sets  (Emilio, 2026-09-09)
+
+For an exercise with no history, reaching its first working set **auto-prompts** "First time — set
+it up, or enter manually?" (drives req-10). The two paths:
+- **"Set it up" = guided calibration, never an invented number.** The user picks the first weight
+  themselves — the app suggests nothing to start, so the core "never invent a starting weight" rule
+  (DESIGN.md) holds. They log the set with an effort rating on the existing scale (Easy/Moderate/
+  Hard/Failure, `ids.js`), and the app suggests the **next** set's weight by applying its existing
+  effort→load-step rule: `moveToValidWeight(±1)` with the `recommendNextPrescription` thresholds
+  (Easy → up one valid step; Hard/Failure or missed reps → down; else keep). The suggestion is an
+  **editable prefill with its reasoning shown**, never a lock. Calibration sets are logged as
+  normal sets (they're real — honest).
+- **"I'll enter it" = the existing manual blank form** + req-02's flat carry.
+
+Rejected: the app proposing an initial weight from a heuristic (bodyweight %, similar lifts) —
+that invents a starting weight and breaks the core rule. Bodyweight exercises calibrate **reps**
+(per `recommendNextPrescription`'s bodyweight branch); cardio/duration exercises are not offered
+setup (nothing to calibrate). Integrates with req-02: in setup mode the carry to the next set is
+**effort-adjusted** rather than flat. Gate: ux-feel (a mobile in-gym flow) → Emilio's hands before
+merge. Drives req-10.
