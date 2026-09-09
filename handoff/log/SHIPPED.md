@@ -72,6 +72,8 @@ hitting). Added a `paths` include-list to the push trigger — `src/**`, `public
 pushes (`handoff/**`, `reports/**`) no longer deploy; build + publish steps unchanged. Verified the
 list covers every real build input (`vite.config.js` filename confirmed, `public/` present).
 Merge `ec104e5` (branch `req-04-deploy-only-on-build-changes`, `571bcef`). `./check` green, 73
-tests. Real-push confirmation (infra can't be proven by `./check`): the req-04 merge touched
-`deploy.yml` so it should deploy; the doc-only maintenance publish right after should NOT — being
-observed on the Actions tab.
+tests. Real-push confirmation (infra can't be proven by `./check`) — **confirmed via GitHub Actions**:
+the req-04 merge `32fddd2` (touched `deploy.yml`) triggered a deploy run; the very next push, the
+doc-only maintenance publish `c10867e` (handoff/ + reports/ only), triggered **no run** — the
+`paths` filter skipped it. Earlier doc pushes deployed only because they predate the filter
+landing on `main`.
