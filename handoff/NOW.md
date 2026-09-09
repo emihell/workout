@@ -24,6 +24,7 @@ autoloop.
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
+- `req-11` **in-gym flow cleanup** — rest bar [Pause·+30s]…[Next]; hide cues during rest; "‹ Exercises" replaces generic Back (keep Previous); drop the per-exercise review from the flow (auto-mark-done → overview), keep it for re-entry (DEC-013). **[ux-feel → Emilio's hands before merge]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
 reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.

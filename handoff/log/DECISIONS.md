@@ -227,3 +227,27 @@ that invents a starting weight and breaks the core rule. Bodyweight exercises ca
 setup (nothing to calibrate). Integrates with req-02: in setup mode the carry to the next set is
 **effort-adjusted** rather than flat. Gate: ux-feel (a mobile in-gym flow) → Emilio's hands before
 merge. Drives req-10.
+
+## DEC-013 — in-gym flow cleanup: rest buttons, Back/Previous, drop the per-exercise review  (Emilio, 2026-09-09)
+
+Several workout-flow refinements (drive req-11):
+- **Rest bar buttons:** group `[Pause/Resume]` with `[+30s]`; rename **Skip → "Next"** and place it
+  **far right** (Next = end the rest and advance to the next set — the current Skip behaviour).
+- **Bottom info:** hide the equipment/setup line + exercise **cues during the REST phase only**;
+  keep them on the set-logging screen (cues help right before you lift).
+- **Back vs Previous:** today a generic history "Back" sits alongside "Previous" (set-undo) on the
+  in-exercise screens — two back-ish buttons doing different things. Resolve by convention (Emilio:
+  "do what most similar apps do"): on the in-exercise screens replace the generic "Back" with a
+  clear semantic link to the workout overview — **"‹ Exercises"** (the overview IS the exercise
+  menu) — and keep **"Previous"** for undoing the last set. One labelled exit, one labelled
+  set-undo; no generic history-Back mid-exercise.
+- **Per-exercise summary:** today finishing an exercise's sets auto-navigates to a review screen
+  (`WorkoutItemDone`) where you tap "Done" to mark it complete. **Remove that from the flow** — on
+  completing the last set, auto-mark the exercise done and go **straight to the workout overview**
+  (the exercise menu) to pick the next. **Keep `WorkoutItemDone` reachable by re-entering a
+  completed exercise** from the overview (view its summary / add a set). The **whole-routine summary
+  already exists** (the Finish screen) — unchanged.
+
+Behaviour change to watch: "mark done" moves from the review's Done button to last-set completion;
+the overview's completion state, the all-done→Finish path, and re-entry "Add set" must all still
+work. Gate: ux-feel → Emilio's hands. Drives req-11.
