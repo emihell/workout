@@ -1,6 +1,6 @@
 # req-09 — keep the screen awake during an active workout (Screen Wake Lock)
 
-**Status: READY** — scope confirmed (active workout only, Emilio 2026-09-09); no open decisions.
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-09` (`119e251`…`119e251`, 1 commit).** — scope confirmed (active workout only, Emilio 2026-09-09); no open decisions.
 Independent of all other reqs.
 
 **Gate: device-verified → Emilio's hands before merge** (DEC-009 spirit). The wiring — the lock is
