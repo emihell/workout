@@ -272,3 +272,20 @@ section MAIN screens (Settings, Schedule main, Exercises main, History main; Tod
 mains already have none); keep `<Back/>` on drill-down / detail sub-screens, where it's the way
 back to a list. Emilio asked ("do we need a back button in settings main page?") and directed
 folding it into req-11 (same back-button-cleanup thread as DEC-013). Part of req-11.
+
+## DEC-016 — navigation is links, buttons are actions only; one shared nav-link component  (Emilio, 2026-09-09)
+
+A consistency audit (2026-09-09) found the codebase already semantically sound in most respects —
+**actions are all `<button>`** (no `<div>`/`<span>` fake-buttons), **lists use `<ul>/<ol>/<li>`**,
+**screens are `<section>`s with one `<h1>` + `<h2>` sub-sections** — verified consistent, no change.
+The one real inconsistency: **navigation is done two ways** — `<a href="#/…">` links AND
+`<button onClick={() => go(…)}>` (9 "Cancel" buttons plus Skip / screen-nav across Exercises,
+History, Schedule, Routine, Workout).
+
+Rule (Emilio): **pure route navigation → `<a href>` link** (semantic, keyboard/a11y-correct, matches
+the hash router); **`<button>` reserved for state changes / submits** (Complete, Save, Delete, Add,
+Pause, Import, applyBackup, etc.). The repeated `<button onClick={() => go(X)}>Label</button>` shape
+→ **one shared nav-link component** (renders `<a href={toHash(X)}>`), reused across sites (generalizes
+/ aligns with req-11's `ExercisesLink`). **Only PURE-navigation buttons convert**; a button that also
+mutates state stays a button. Best done *before* the styling pass so styling lands on consistent
+semantics (links and buttons will style differently). Drives req-12.
