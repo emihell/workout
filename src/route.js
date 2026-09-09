@@ -283,6 +283,7 @@ export function parseRoute(path) {
   if (parts[0] === 'history') return { name: 'history' }
 
   if (parts[0] === 'settings') return { name: 'settings' }
+  if (parts[0] === 'components') return { name: 'components' }
 
   return { name: 'today' }
 }

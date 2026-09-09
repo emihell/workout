@@ -4,8 +4,18 @@ import { back, toHash } from '../route'
 // another screen", no state change) is an <a href>, not a <button>; <button> is
 // reserved for actions and submits. `to` is a route path (e.g. '/schedule' or
 // `/history/${id}`); toHash turns it into the hash the router reads.
-export function NavLink({ to, children }) {
-  return <a href={toHash(to)}>{children}</a>
+//
+// req-13 added optional `className` (so the ui library can style it) and
+// `chevron` ('back' → leading ‹, 'forward' → trailing ›). Both default off, so
+// every existing call (`<NavLink to>label</NavLink>`) is unchanged.
+export function NavLink({ to, children, className, chevron }) {
+  return (
+    <a href={toHash(to)} className={className || undefined}>
+      {chevron === 'back' ? '‹ ' : null}
+      {children}
+      {chevron === 'forward' ? ' ›' : null}
+    </a>
+  )
 }
 
 export function Back() {
