@@ -115,6 +115,35 @@ export function itemIsMarkedDone(workout, item) {
   return ids.includes(key)
 }
 
+// req-11 / DEC-013 — the activeWorkout patch that marks an exercise done. Since
+// req-11 this fires on completing the last set (was: the review screen's "Done"
+// button), so the mark-done transition is a pure, testable patch rather than
+// inline in the completion handler. Adds the item key to completedItemIds and
+// clears any rest (the last set ends the exercise, no rest after it).
+export function markItemDonePatch(workout, item) {
+  const key = itemKey(item)
+  return {
+    completedItemIds: [
+      ...new Set([...(workout?.completedItemIds || workout?.completedSessionItemIds || []), key]),
+    ],
+    restEndsAt: null,
+    restPausedRemaining: null,
+  }
+}
+
+// req-11 / DEC-013 — the inverse patch: "Add set" on an already-done exercise
+// reopens it (removes the key from completedItemIds) so the log screen renders
+// again instead of the markedDone guard bouncing back to the overview. The set
+// itself is added separately (addWorkingSet); this only clears the done mark.
+export function reopenItemPatch(workout, item) {
+  const key = itemKey(item)
+  return {
+    completedItemIds: (workout?.completedItemIds || workout?.completedSessionItemIds || []).filter(
+      (id) => id !== key,
+    ),
+  }
+}
+
 export function lastLoggedSetIndex(workout, item) {
   const logged = setsForItem(workout?.sets, item)
   const lastSet = logged[logged.length - 1]

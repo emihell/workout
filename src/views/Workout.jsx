@@ -5,9 +5,9 @@ import { recommendNextPrescription } from '../progress'
 import { exerciseById, findRoutine, historySetPrefill, lastSetsForExercise } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
-import { carriedWorkingSet, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, restRemaining, setLogSeed } from '../workout-log'
+import { carriedWorkingSet, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, markItemDonePatch, reopenItemPatch, restRemaining, setLogSeed } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
-import { Back, Missing } from './shared'
+import { Back, ExercisesLink, Missing } from './shared'
 
 function usesWeight(ex) {
   return ex && ex.type !== 'bodyweight' && ex.type !== 'cardio'
@@ -206,8 +206,13 @@ function itemSetsPath(routineId, item, workout) {
     : itemLogPath(routineId, item)
 }
 
-function goToItemReview(routineId, item) {
-  go(itemDonePath(routineId, item), { replace: true })
+// req-11 / DEC-013 — completing the last set marks the exercise done and returns
+// to the workout overview (the exercise menu), replacing the old per-exercise
+// review screen in the flow. WorkoutItemDone stays reachable by re-entering a
+// completed exercise from the overview.
+function markDoneAndGoToOverview(store, workout, routineId, item) {
+  store.patchActive(markItemDonePatch(workout, item))
+  go(`/workout/${routineId}`, { replace: true })
 }
 
 function MissingItem() {
@@ -291,8 +296,8 @@ function WorkoutItemLive({ routineId, item }) {
   const { resting } = useRestCountdown(active)
 
   useEffect(() => {
-    if (!resting && plannedDone) goToItemReview(routineId, item)
-  }, [resting, plannedDone, routineId, item])
+    if (!resting && plannedDone) markDoneAndGoToOverview(store, active, routineId, item)
+  }, [resting, plannedDone, routineId, item, store, active])
 
   function finishAfterThisSet() {
     if (needsWu) return false
@@ -331,7 +336,7 @@ function WorkoutItemLive({ routineId, item }) {
       },
       restAfterSet(done),
     )
-    if (done) goToItemReview(routineId, item)
+    if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
 
   function skipSet() {
@@ -352,7 +357,7 @@ function WorkoutItemLive({ routineId, item }) {
       },
       restAfterSet(done, true),
     )
-    if (done) goToItemReview(routineId, item)
+    if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
 
   function previousSet() {
@@ -369,7 +374,7 @@ function WorkoutItemLive({ routineId, item }) {
 
   return (
     <section>
-      <Back />
+      <ExercisesLink routineId={routineId} />
       <RestBar />
       <ExerciseTitle
         routineId={routineId}
@@ -404,8 +409,12 @@ function WorkoutItemLive({ routineId, item }) {
         />
       )}
 
-      <ExerciseSetupHeader item={item} ex={ex} showNotes={false} />
-      {ex?.cues ? <p>{ex.cues}</p> : null}
+      {resting ? null : (
+        <>
+          <ExerciseSetupHeader item={item} ex={ex} showNotes={false} />
+          {ex?.cues ? <p>{ex.cues}</p> : null}
+        </>
+      )}
     </section>
   )
 }
@@ -523,7 +532,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
 
   return (
     <section>
-      <Back />
+      <ExercisesLink routineId={routineId} />
       <RestBar />
       <h2>Today</h2>
       {today.length ? (
@@ -554,26 +563,9 @@ export function WorkoutItemDone({ routineId, itemId }) {
         <button
           type="button"
           onClick={() => {
-            const key = itemKey(item)
-            store.patchActive({
-              completedItemIds: [
-                ...new Set([
-                  ...(active.completedItemIds || active.completedSessionItemIds || []),
-                  key,
-                ]),
-              ],
-              restEndsAt: null,
-              restPausedRemaining: null,
-            })
-            go(`/workout/${routineId}`, { replace: true })
-          }}
-        >
-          Done
-        </button>
-        {' '}
-        <button
-          type="button"
-          onClick={() => {
+            // Re-opening a completed exercise: clear the done mark first so the
+            // log screen's markedDone guard doesn't bounce straight back here.
+            store.patchActive(reopenItemPatch(active, item))
             store.addWorkingSet(itemKey(item))
             go(itemLogPath(routineId, item), { replace: true })
           }}
@@ -733,48 +725,53 @@ function RestBar() {
       <p>
         {paused ? 'Paused' : 'Rest'} {sec}s
       </p>
-      <p>
-        {paused ? (
+      {/* req-11 / DEC-013: group [Pause/Resume] + [+30s] on the left; "Next"
+          (was "Skip" — same handler: end the rest and advance to the next set)
+          on the far right. */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>
+          {paused ? (
+            <button
+              type="button"
+              onClick={() =>
+                store.patchActive({
+                  restEndsAt: Date.now() + (store.activeWorkout.restPausedRemaining || 0),
+                  restPausedRemaining: null,
+                })
+              }
+            >
+              Resume
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() =>
+                store.patchActive({
+                  restPausedRemaining: Math.max(0, (store.activeWorkout.restEndsAt || Date.now()) - Date.now()),
+                  restEndsAt: null,
+                })
+              }
+            >
+              Pause
+            </button>
+          )}{' '}
           <button
             type="button"
-            onClick={() =>
-              store.patchActive({
-                restEndsAt: Date.now() + (store.activeWorkout.restPausedRemaining || 0),
-                restPausedRemaining: null,
-              })
-            }
+            onClick={() => {
+              if (paused) {
+                store.patchActive({ restPausedRemaining: (store.activeWorkout.restPausedRemaining || 0) + 30000 })
+              } else {
+                store.patchActive({ restEndsAt: (store.activeWorkout.restEndsAt || Date.now()) + 30000 })
+              }
+            }}
           >
-            Resume
+            +30s
           </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() =>
-              store.patchActive({
-                restPausedRemaining: Math.max(0, (store.activeWorkout.restEndsAt || Date.now()) - Date.now()),
-                restEndsAt: null,
-              })
-            }
-          >
-            Pause
-          </button>
-        )}{' '}
+        </span>
         <button type="button" onClick={() => store.patchActive({ restEndsAt: null, restPausedRemaining: null })}>
-          Skip
-        </button>{' '}
-        <button
-          type="button"
-          onClick={() => {
-            if (paused) {
-              store.patchActive({ restPausedRemaining: (store.activeWorkout.restPausedRemaining || 0) + 30000 })
-            } else {
-              store.patchActive({ restEndsAt: (store.activeWorkout.restEndsAt || Date.now()) + 30000 })
-            }
-          }}
-        >
-          +30s
+          Next
         </button>
-      </p>
+      </div>
     </div>
   )
 }
