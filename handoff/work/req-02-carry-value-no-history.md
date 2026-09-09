@@ -1,6 +1,6 @@
 # req-02 — carry the entered kg + reps across sets for a no-history exercise
 
-**Status: READY** — decisions made (DEC-002). Independent of `req-01`; can build in either order.
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-02` (`ea0c12c`…`ea0c12c`, 1 commit).** — decisions made (DEC-002). Independent of `req-01`; can build in either order.
 
 **Gate: functional** (DEC-009) — logging/flow behaviour the planning session can browser-verify; planning closes it without a human gate.
 
