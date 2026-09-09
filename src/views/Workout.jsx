@@ -5,7 +5,7 @@ import { recommendNextPrescription } from '../progress'
 import { exerciseById, findRoutine, historySetPrefill, lastSetsForExercise } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
-import { itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex } from '../workout-log'
+import { itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, restRemaining } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
 import { Back, Missing } from './shared'
 
@@ -690,15 +690,7 @@ function useRestCountdown(active) {
     const t = setInterval(() => setNow(Date.now()), 250)
     return () => clearInterval(t)
   }, [restEndsAt, restPausedRemaining])
-  const remainingMs =
-    restPausedRemaining != null
-      ? restPausedRemaining
-      : restEndsAt
-        ? Math.max(0, restEndsAt - now)
-        : 0
-  const paused = restPausedRemaining != null
-  const resting = remainingMs > 0 || paused
-  return { remainingMs, paused, resting }
+  return restRemaining(active, now)
 }
 
 // The single, persistent rest UI. Self-contained: it reads only activeWorkout rest

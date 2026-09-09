@@ -8,6 +8,7 @@ import {
   withOneMoreSet,
   addWorkingSetToState,
   withSkippedUnloggedSets,
+  restRemaining,
 } from './workout-log.js'
 
 const item = {
@@ -112,5 +113,38 @@ describe('workout logging', () => {
     assert.equal(next.sets[1].reps, 'skipped')
     assert.equal(next.sets[2].reps, 'skipped')
     assert.deepEqual(next.completedItemIds, ['si-row'])
+  })
+})
+
+describe('restRemaining (rest timer recompute)', () => {
+  it('(a) active countdown recomputes from restEndsAt for any now, not frozen/reset', () => {
+    const active = { restEndsAt: 10_000, restPausedRemaining: null }
+    // Different `now` values yield different remaining — proves it is recomputed,
+    // which is what keeps navigating away and back showing the correct time.
+    assert.deepEqual(restRemaining(active, 2_000), { remainingMs: 8_000, paused: false, resting: true })
+    assert.deepEqual(restRemaining(active, 7_500), { remainingMs: 2_500, paused: false, resting: true })
+    assert.equal(restRemaining(active, 9_999).remainingMs, 1)
+  })
+
+  it('(b) paused: remaining is the frozen paused value, regardless of now', () => {
+    const active = { restEndsAt: null, restPausedRemaining: 4_200 }
+    assert.deepEqual(restRemaining(active, 0), { remainingMs: 4_200, paused: true, resting: true })
+    assert.deepEqual(restRemaining(active, 1_000_000), { remainingMs: 4_200, paused: true, resting: true })
+  })
+
+  it('(c) expired: now at/after restEndsAt clamps to 0 and stops resting', () => {
+    const active = { restEndsAt: 10_000, restPausedRemaining: null }
+    assert.deepEqual(restRemaining(active, 10_000), { remainingMs: 0, paused: false, resting: false })
+    assert.deepEqual(restRemaining(active, 12_345), { remainingMs: 0, paused: false, resting: false })
+  })
+
+  it('(d) no rest: both fields null → not resting', () => {
+    assert.deepEqual(restRemaining({ restEndsAt: null, restPausedRemaining: null }, 5_000), {
+      remainingMs: 0,
+      paused: false,
+      resting: false,
+    })
+    // and tolerates a missing/absent active workout
+    assert.equal(restRemaining(null, 5_000).resting, false)
   })
 })

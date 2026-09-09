@@ -12,11 +12,15 @@ The rest state was already workout-level and persisted (`activeWorkout.restEndsA
 screen unmounted the only thing drawing the countdown, so the timer "vanished" though rest kept
 running underneath.
 
-### What changed (all in `src/views/Workout.jsx`)
-- **New `useRestCountdown(active)` hook** — encapsulates the tick (`setInterval` at 250 ms, only
-  while a rest is active/paused) and the remaining/`paused`/`resting` computation, so that logic
-  lives in one place. Reads only `activeWorkout.restEndsAt` / `restPausedRemaining`. Byte-for-byte
-  the same computation the old inline code used.
+### What changed
+- **New pure `restRemaining(active, now)` in `src/workout-log.js`** — returns
+  `{ remainingMs, paused, resting }` from the persisted fields (`restEndsAt` /
+  `restPausedRemaining`) and the current time. Side-effect-free, so the recompute is unit-testable
+  (added after review — see below).
+- **New `useRestCountdown(active)` hook (`Workout.jsx`)** — owns only the tick (`setInterval` at
+  250 ms, running solely while a rest is active/paused) and delegates the computation to
+  `restRemaining(active, now)`. So the display logic lives in one place and the math lives outside
+  React.
 - **`RestBox` → `RestBar`** — the single, self-contained rest UI. It reads `store.activeWorkout`,
   uses the hook, and **returns `null` when there is no active workout or no rest**, so it can be
   dropped into any screen and shows only during a rest. It carries the existing controls unchanged
@@ -47,29 +51,36 @@ running underneath.
 ### Acceptance criteria — status
 - **One rest UI (right mechanism):** `grep -rn RestBox src/` → none; one `RestBar` component. Met,
   provable from the diff.
+- **Failure case — correct remaining time recomputed from `restEndsAt`, not frozen/reset:** now a
+  unit test (added at review request), not only a use-it gate. `restRemaining` is covered by four
+  cases in `src/workout-log.test.js`: (a) active countdown recomputes for different `now` values
+  (`10_000 - now`), (b) paused returns the frozen paused value regardless of `now`, (c) expired
+  (`now >= restEndsAt`) clamps to `0` and `resting === false`, (d) no rest → `resting === false`
+  (and tolerates a null active workout).
 - **`./check` green:** pasted below.
-- **Persists across navigation / controls work from anywhere / correct remaining time on
-  return / end condition unchanged:** these are the human "use it" gates the spec calls for
-  (interval + navigation behaviour in the running app) — see the checklist below. The correctness
-  argument: every screen mounts a fresh `RestBar` that recomputes remaining from the persisted
-  `restEndsAt` and a freshly-ticking `now`, so navigation/reload can't freeze or reset it; the
-  controls write the same persisted fields as before.
+- **Persists across navigation / controls work from anywhere / end condition unchanged:** human
+  "use it" gates (interval + navigation behaviour in the running app) — see the checklist below.
+  The correctness argument now rests on the tested `restRemaining`: every screen mounts a fresh
+  `RestBar` that calls it with a freshly-ticking `now`, so navigation/reload can't freeze or reset
+  the value; the controls write the same persisted fields as before.
 
 ### Verification (receipts)
-`grep -rn 'RestBox' src/` → (no output). `./check`:
+`grep -rn 'RestBox' src/` → (no output). New tests:
+```
+# Subtest: restRemaining (rest timer recompute)
+ok 2 - restRemaining (rest timer recompute)
+```
+`./check`:
 ```
 check: running 10 test file(s) (node --test)…
-# tests 59
-# suites 19
-# pass 59
+# tests 63
+# suites 20
+# pass 63
 # fail 0
 check: building (vite build)…
 check: green — lint, 10 test file(s), and the build all passed.
 ```
-Pre-existing oxlint warning (`src/views/Routine.jsx:13`) is unrelated and untouched. No unit test
-added: the behaviour is interval- and navigation-driven (the repo's tests are logic-level), and
-the req frames verification as human use-it gates plus the structural "one component" check, which
-the diff satisfies.
+Pre-existing oxlint warning (`src/views/Routine.jsx:13`) is unrelated and untouched.
 
 ### What I could not verify myself (needs the running app)
 1. Start a between-sets rest, navigate to overview / next exercise / item review / finish — the

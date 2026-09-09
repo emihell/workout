@@ -121,3 +121,22 @@ export function lastLoggedSetIndex(workout, item) {
   if (!lastSet) return -1
   return (workout.sets || []).lastIndexOf(lastSet)
 }
+
+// Pure rest-timer state, derived from the persisted workout-level fields
+// (activeWorkout.restEndsAt / restPausedRemaining) and the current time. Kept
+// side-effect-free so the "remaining time is recomputed from restEndsAt, not
+// frozen or reset across navigation/reload" rule is unit-testable; the
+// useRestCountdown hook is just this function plus a tick.
+export function restRemaining(active, now) {
+  const restEndsAt = active?.restEndsAt ?? null
+  const restPausedRemaining = active?.restPausedRemaining ?? null
+  const remainingMs =
+    restPausedRemaining != null
+      ? restPausedRemaining
+      : restEndsAt
+        ? Math.max(0, restEndsAt - now)
+        : 0
+  const paused = restPausedRemaining != null
+  const resting = remainingMs > 0 || paused
+  return { remainingMs, paused, resting }
+}
