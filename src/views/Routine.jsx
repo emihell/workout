@@ -4,7 +4,7 @@ import { go } from '../route'
 import { routineById, historyPrescription } from '../storage'
 import { useStore } from '../store-context'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
-import { Back, Missing } from './shared'
+import { Back, Missing, NavLink } from './shared'
 
 function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
@@ -163,9 +163,7 @@ export function RoutineDetail({ routineId, paths }) {
         })}
       </ol>
       <p>
-        <button type="button" onClick={() => go(nav.done)}>
-          Done
-        </button>
+        <NavLink to={nav.done}>Done</NavLink>
       </p>
       {nav.showDelete ? (
         <p>
@@ -229,7 +227,7 @@ export function RoutineEdit({ routineId, paths }) {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go(nav.base)}>Cancel</button>
+          <NavLink to={nav.base}>Cancel</NavLink>
         </p>
       </form>
     </section>

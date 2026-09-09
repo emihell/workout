@@ -3,7 +3,7 @@ import { clampLoopWeeks, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../
 import { go } from '../route'
 import { useStore } from '../store-context'
 import { RoutineNewForm, RoutineScreens, navForBase } from './Routine'
-import { Back, Missing } from './shared'
+import { Back, Missing, NavLink } from './shared'
 
 function dayHref(week, weekday, extra = '') {
   return `#/schedule/${week}/${weekday}${extra}`
@@ -103,7 +103,7 @@ export function ScheduleLoop() {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go('/schedule')}>Cancel</button>
+          <NavLink to="/schedule">Cancel</NavLink>
         </p>
       </form>
     </section>
@@ -145,9 +145,7 @@ export function ScheduleDay({ week, weekday }) {
         <a href={dayHref(week, weekday, '/add')}>Add routine</a>
       </p>
       <p>
-        <button type="button" onClick={() => go('/schedule')}>
-          Done
-        </button>
+        <NavLink to="/schedule">Done</NavLink>
       </p>
     </section>
   )

@@ -14,7 +14,7 @@ import {
 } from '../storage'
 import { useStore } from '../store-context'
 import { RoutineScreens, navForBase } from './Routine'
-import { Back, Missing } from './shared'
+import { Back, Missing, NavLink } from './shared'
 
 function itemIdOf(obj) {
   return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''
@@ -445,7 +445,7 @@ export function HistoryEdit({ workoutId }) {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go(`/history/${workout.id}`)}>Cancel</button>
+          <NavLink to={`/history/${workout.id}`}>Cancel</NavLink>
         </p>
       </form>
     </section>
@@ -604,7 +604,7 @@ export function HistorySet({ workoutId, index }) {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go(`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`)}>Cancel</button>
+          <NavLink to={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`}>Cancel</NavLink>
         </p>
       </form>
       <p>
@@ -655,7 +655,7 @@ export function HistoryRecalculate({ workoutId }) {
         >
           Apply
         </button>{' '}
-        <button type="button" onClick={() => go(`/history/${workout.id}`)}>Skip</button>
+        <NavLink to={`/history/${workout.id}`}>Skip</NavLink>
       </p>
     </section>
   )
