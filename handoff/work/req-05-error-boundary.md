@@ -1,6 +1,6 @@
 # req-05 — error boundary so a render crash doesn't blank the app mid-workout
 
-**Status: READY** — a UI hardening req; intent + constraints settled (exact copy is polish, refined at review). Independent of all other reqs.
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-05` (`1e23f0e`…`1e23f0e`, 1 commit).** — a UI hardening req; intent + constraints settled (exact copy is polish, refined at review). Independent of all other reqs.
 
 ## Why
 
