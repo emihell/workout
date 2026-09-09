@@ -1,6 +1,6 @@
 # req-12 — navigation consistency: nav is links, buttons are actions; one shared nav component
 
-**Status: READY** — decision settled (DEC-016). A code + UI-semantics consistency pass, no design.
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-12` (`c735e47`…`c735e47`, 1 commit).** — decision settled (DEC-016). A code + UI-semantics consistency pass, no design.
 Touches most view files but is behaviour-preserving (navigation still navigates).
 
 **Gate: functional** (DEC-009) — behaviour-preserving (each converted control still goes to the same
