@@ -156,3 +156,17 @@ safety trio: req-01 (guarded save) stops silent write loss, req-06 (legacy clean
 copies, req-07 stops an import erasing history with no recourse. 3 helper tests
 (backup-precedes-replace, malformed-leaves-data-unchanged, cancel), `./check` green, 99 tests. Merge
 `1119f45` (branch `req-07-backup-before-import`, `1a934a7`). Emilio confirmed it works ("works"), merged.
+
+## req-12 — navigation consistency  (merged 2026-09-10)
+
+Navigation was done two ways — `<a href>` links and `<button onClick={() => go()}>`. Added one
+`NavLink` primitive (`shared.jsx`, `<a href={toHash(to)}>`); `ExercisesLink` (req-11) now renders
+through it. Converted all 10 pure-navigation buttons (Cancel/Skip across Exercises/History/Schedule/
+Routine/Workout) to `NavLink`; `<button>` is now reserved for actions/submits (the mutate-then-
+navigate handlers — Apply, Remove, Delete, Resume, StartButton, submits — correctly stayed buttons).
+Behaviour-preserving: `toHash(to)` yields the identical hash the old button navigated to. Merge
+`a56e8b2` (branch `req-12-nav-consistency`, `c735e47`). `./check` green, 99 tests. Grep receipt: no
+navigation-only `onClick` left on a button. Converted Cancel/Skip render as link text until the
+styling pass (expected). Boundary left for later: `Schedule.jsx` `RoutineNewForm`'s `onCancel` prop
+is navigation but the form owns its Cancel button — form-cancel semantics can be unified in the
+styling pass.
