@@ -41,6 +41,25 @@ export function emptyState() {
   })
 }
 
+// req-06 — remove the superseded legacy keys, but ONLY after the v8 value is
+// confirmed persisted by reading it back. A save that fails *silently* (iOS/Safari
+// Private Mode has historically accepted the write and stored nothing) must never
+// trigger a delete — that is the one path that could destroy the only surviving
+// copy of the user's history. "saveState didn't throw" is NOT confirmation; the
+// read-back is the entire safety mechanism. Best-effort and self-contained: a
+// throwing removeItem/getItem is swallowed here so a cleanup failure degrades to
+// "legacy stays", never to loadState returning emptyState and orphaning the data.
+function removeLegacyKeysIfV8Persisted() {
+  try {
+    if (localStorage.getItem(STORAGE_KEY) == null) return
+    for (const key of LEGACY_KEYS) {
+      localStorage.removeItem(key)
+    }
+  } catch {
+    // read-back or removeItem threw — leave every legacy key in place.
+  }
+}
+
 export function loadState() {
   try {
     const current = localStorage.getItem(STORAGE_KEY)
@@ -51,6 +70,10 @@ export function loadState() {
     if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION) {
       saveState(state)
     }
+    // Only reached when this device had data (fresh migration, or already v8 with
+    // a legacy copy left over from an interrupted cleanup). The read-back gate
+    // decides whether any legacy key is actually removed.
+    removeLegacyKeysIfV8Persisted()
     return state
   } catch {
     return emptyState()
