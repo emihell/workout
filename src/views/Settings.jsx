@@ -1,18 +1,9 @@
 import { useState } from 'react'
 import { exportAnalytics, recordButton } from '../analytics'
 import { buildBackup } from '../exchange.js'
+import { downloadJson, importWithBackup } from '../import-backup'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
-
-function downloadJson(filename, data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const href = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = href
-  link.download = filename
-  link.click()
-  URL.revokeObjectURL(href)
-}
 
 function backupLines(summary) {
   return `${summary.routines} routines, ${summary.exercises} exercises, ${summary.workouts} workouts, ${summary.slots} slots.`
@@ -80,9 +71,9 @@ export function Settings() {
               file.text().then((text) => {
                 try {
                   const payload = JSON.parse(text)
-                  if (!window.confirm('Replace all data on this device?')) return
+                  const result = importWithBackup({ store, payload })
+                  if (!result) return // cancelled at the confirm
                   recordButton('import')
-                  const result = store.applyBackup(payload)
                   setError('')
                   setMessage(backupLines(result.summary))
                 } catch (err) {

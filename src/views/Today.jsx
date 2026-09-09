@@ -1,4 +1,5 @@
 import { recordButton } from '../analytics'
+import { importWithBackup } from '../import-backup'
 import { greeting, weekdayName } from '../ids'
 import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
 import { useStore } from '../store-context'
@@ -81,15 +82,9 @@ export function Today() {
                 file.text().then((text) => {
                   try {
                     const payload = JSON.parse(text)
-                    if (
-                      !window.confirm(
-                        'Replace all data on this device?',
-                      )
-                    ) {
-                      return
-                    }
+                    const result = importWithBackup({ store, payload })
+                    if (!result) return // cancelled at the confirm
                     recordButton('import')
-                    store.applyBackup(payload)
                   } catch (err) {
                     window.alert(err instanceof Error ? err.message : 'Could not import.')
                   }
