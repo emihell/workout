@@ -22,6 +22,7 @@ autoloop.
 - `req-08` **usage analytics** — count screens, screen→screen transitions, and primary button presses in a separate `workout-mvp-analytics` key; export from Settings (DEC-011). Fail-silent writes, isolated from workout history. **[functional → planning closes; browser check must confirm a workout is unaffected]**
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
+- `req-09` **keep screen awake during a workout** — Screen Wake Lock while `activeWorkout` is set, re-acquire on visibility, fail-silent (DEC-010). **[device-verified → Emilio's real-device check before merge]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
 reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.
