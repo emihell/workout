@@ -1,6 +1,6 @@
 # req-08 — local usage analytics: screen + transition + button counts, exportable
 
-**Status: READY** — decisions settled (DEC-011). Independent of all other reqs.
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-08` (`f824ce9`…`f824ce9`, 1 commit).** — decisions settled (DEC-011). Independent of all other reqs.
 
 **Gate: functional** (DEC-009) — records to a *separate*, isolated `localStorage` key that can't
 touch workout history, with fail-silent writes; the planning session can browser-verify counting
