@@ -31,3 +31,19 @@ working screen recovers without a reload (DEC-007). `react-test-renderer` added 
 to prove the catch on a real render throw. Merge `013beb6` (branch `req-05-error-boundary`,
 `1e23f0e`). `./check` green, 59 tests (2 new). Browser gate: fallback rendered in place with Nav
 intact, and clicking Routines recovered the app (verified 2026-09-09).
+
+## req-03 — persistent workout-level rest timer  (merged 2026-09-09)
+
+The rest counter used to vanish the moment you left the single set-logging screen: rest state
+was workout-level and persisted (`activeWorkout.restEndsAt` / `restPausedRemaining`), but the
+countdown UI and its 250ms tick lived only inside `WorkoutItemLive`. Fixed (DEC-003) by lifting
+it into one self-hiding `RestBar` rendered on every in-workout screen (overview, item log,
+review, finish, plus exercise-edit and set-edit — the two extra mid-rest-reachable screens),
+driven by the shared `useRestCountdown` hook; `RestBox` removed so there is exactly one rest UI.
+The pure recompute was extracted to `restRemaining(active, now)` in `workout-log.js` and
+unit-tested (recompute-not-frozen, paused, expiry, no-rest). No auto-start between exercises
+(declined, DEC-003). Merge `f54aa86` (branch `req-03-persistent-rest-timer`, `7ed39e3`).
+`./check` green, 63 tests (4 new). Browser gate (run by the planning session at Emilio's
+direction, 2026-09-09): counter persisted 88s→75s across item→overview navigation, Pause on the
+overview showed "Paused" on the Finish screen with the controls, Skip cleared the bar, and the
+bar self-hid when no rest was active.

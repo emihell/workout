@@ -1,7 +1,7 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01, req-05** (see `log/SHIPPED.md`). Keep under 50 lines;
-done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
+Updated 2026-09-09. **Shipped: req-01, req-03, req-05** (see `log/SHIPPED.md`). Keep under 50
+lines; done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased plan: `work/BACKLOG.md`.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -16,9 +16,9 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY (all Phase 1; independent; build in any order)
 
-**→ Next up: `req-03`** (recommended pick — the one concrete in-gym bug left).
+**→ Next up: `req-02`** (recommended — continues the in-gym flow). `req-06` is the best pure-logic
+loop candidate (tests fully cover it, no human gate needed to close).
 
-- `req-03` **persistent rest timer** — counter vanished when leaving the set screen; make it a workout-level bar, keep pause/resume/skip/+30s (DEC-003).
 - `req-02` **carry kg+reps for a no-history exercise** — type it in set 1, follows the rest (DEC-002).
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. (persisted-data)
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. (persisted-data)
