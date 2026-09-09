@@ -1,7 +1,7 @@
 # Now
 
-Updated 2026-09-07 (reqs 01-05 READY). Keep under 50 lines; **done lives in `log/SHIPPED.md`**.
-Full reqs: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
+Updated 2026-09-09. **Shipped: req-01, req-05** (see `log/SHIPPED.md`). Keep under 50 lines;
+done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; the phased plan: `work/BACKLOG.md`.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -16,15 +16,16 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY (all Phase 1; independent; build in any order)
 
-- `req-01` **guard `saveState`** — persist path can throw and lose data silently; the safety floor. Banner on failure (DEC-001).
-- `req-02` **carry kg+reps for a no-history exercise** — type it in set 1, follows the rest (DEC-002).
+**→ Next up: `req-03`** (recommended pick — the one concrete in-gym bug left).
+
 - `req-03` **persistent rest timer** — counter vanished when leaving the set screen; make it a workout-level bar, keep pause/resume/skip/+30s (DEC-003).
-- `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. (infra)
-- `req-05` **error boundary** — a render crash blanks the app mid-workout; catch it, reassure data is saved, offer reload. (hardening)
+- `req-02` **carry kg+reps for a no-history exercise** — type it in set 1, follows the rest (DEC-002).
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. (persisted-data)
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. (persisted-data)
+- `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. (infra)
 
-Each has a full spec in `work/`. Suggested order: `req-01` first (safety), then `02`/`03`.
+Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
+reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.
 
 ## Needs decisions — parked until their phase
 
