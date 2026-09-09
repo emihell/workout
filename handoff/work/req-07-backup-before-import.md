@@ -1,6 +1,6 @@
 # req-07 — back up current data before a destructive import
 
-**Status: READY** — decision made (DEC-004: auto-download current state before the replace).
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-07` (`1a934a7`…`1a934a7`, 1 commit).** — decision made (DEC-004: auto-download current state before the replace).
 Independent of all other reqs. Safe to build.
 
 **Gate: persisted-data** (DEC-009) — wraps a wholesale replace of stored state. **Always waits for Emilio's hands before merge; never auto-closed** by the planning session (CLAUDE.md migration ask-gate).
