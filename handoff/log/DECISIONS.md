@@ -186,3 +186,23 @@ big tap targets, thumb reach, legible numbers are mobile concerns before desktop
 planned for later; the browser-only version is the current form, and browser features chosen now
 (e.g. the Screen Wake Lock API for keep-awake — confirmed feasible on Android Chrome / iOS Safari
 16.4+) should be ones that carry over. Drives how DESIGN.md is applied and how reqs are ranked.
+
+## DEC-011 — usage analytics: separate key, transition + button counts, export button  (Emilio, 2026-09-09)
+
+A local press/navigation counter to learn the most-used flows and buttons (drives req-08).
+Decisions:
+- **Storage: a separate `localStorage` key `workout-mvp-analytics`**, isolated from
+  `workout-mvp-v8` — never in the workout backup, no schema migration, and a corrupt/oversized
+  analytics blob can't touch workout history.
+- **Shape: bounded aggregate counts** — `{ screens: {routeName: n}, transitions: {"from>to": n},
+  buttons: {name: n} }`. NOT an ordered event log (rejected: unbounded growth + write-on-every-
+  press quota risk). Flows are captured as pairwise screen transitions; screens are keyed by the
+  parsed route **name** (~44 bounded names), never the id-bearing path.
+- **Readout: an Export button in Settings** (reuse `downloadJson`) → `workout-analytics-<date>.json`,
+  analyzed off-device. No in-app dashboard yet (mobile-primary, pre-styling — DEC-010).
+- **Writes are best-effort and MUST fail silently** — an analytics write that throws (quota /
+  private mode) is swallowed, never interferes with the workout or its save-failure banner. This
+  is the *opposite* of req-01's surfaced save failure: losing analytics is acceptable, losing
+  history is not.
+- **Limitation (accepted):** browser-only analytics is **per-device** — Emilio sees only his own
+  device's data (or a tester's exported file); cross-user aggregation needs the backend (Phase 3).

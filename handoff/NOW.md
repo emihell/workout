@@ -16,10 +16,10 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY (all Phase 1; independent; build in any order)
 
-**Only the two persisted-data reqs remain — both need Emilio's hands before merge (DEC-009).** I
-build + verify them, but stop for your use-it before closing. Each is tagged; only READY reqs
-(no open questions) enter the autoloop.
+Each req is tagged with its merge gate (DEC-009); only READY reqs (no open questions) enter the
+autoloop.
 
+- `req-08` **usage analytics** — count screens, screen→screen transitions, and primary button presses in a separate `workout-mvp-analytics` key; export from Settings (DEC-011). Fail-silent writes, isolated from workout history. **[functional → planning closes; browser check must confirm a workout is unaffected]**
 - `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
 - `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
 
