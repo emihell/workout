@@ -47,3 +47,18 @@ unit-tested (recompute-not-frozen, paused, expiry, no-rest). No auto-start betwe
 direction, 2026-09-09): counter persisted 88s→75s across item→overview navigation, Pause on the
 overview showed "Paused" on the Finish screen with the controls, Skip cleared the bar, and the
 bar self-hid when no rest was active.
+
+## req-02 — carry entered kg+reps to the next set for a no-history exercise  (merged 2026-09-09)
+
+For an exercise with no finished-workout history, logging a working set now seeds the next
+working set's kg + reps from the most recent non-skipped working set logged this session
+(DEC-002) — an editable prefill of the user's own input, not invented data. With-history
+exercises keep their existing per-set history prefill: the new `setLogSeed` fallback is
+byte-identical to the old history path, and `carryFor` returns null whenever history is present,
+so the core "history is the source of truth" rule is untouched. Warm-up and effort unaffected.
+Pure helpers `carriedWorkingSet` + `setLogSeed` in `workout-log.js`, unit-tested (carry,
+follows-most-recent, skipped-source-ignored, all-skipped→null, first-set blank/target,
+with-history scope guard, restore-wins). Merge `97412d8` (branch `req-02-carry-value-no-history`,
+`ea0c12c`). `./check` green, 73 tests (10 new). Browser gate (planning session, functional): set 1
+showed blank kg + target reps; entered 99 kg × 7; set 2 prefilled 99 × 7, editable — carry
+confirmed end-to-end.
