@@ -3,7 +3,7 @@ import { catalogItemToExercise, loadExerciseCatalog, searchExerciseCatalog } fro
 import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
-import { Back, Missing } from './shared'
+import { Back, Missing, NavLink } from './shared'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -192,7 +192,7 @@ export function ExerciseNewManual({ returnBase = null }) {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go(paths.hub)}>Cancel</button>
+          <NavLink to={paths.hub}>Cancel</NavLink>
         </p>
       </form>
     </section>
@@ -365,7 +365,7 @@ export function ExerciseEdit({ exerciseId }) {
         </p>
         <p>
           <button type="submit">Save</button>{' '}
-          <button type="button" onClick={() => go(`/exercises/${ex.id}`)}>Cancel</button>
+          <NavLink to={`/exercises/${ex.id}`}>Cancel</NavLink>
         </p>
       </form>
     </section>

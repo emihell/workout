@@ -8,7 +8,7 @@ import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { carriedWorkingSet, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, markItemDonePatch, reopenItemPatch, restRemaining, setLogSeed } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
-import { Back, ExercisesLink, Missing } from './shared'
+import { Back, ExercisesLink, Missing, NavLink } from './shared'
 
 function usesWeight(ex) {
   return ex && ex.type !== 'bodyweight' && ex.type !== 'cardio'
@@ -840,7 +840,7 @@ export function WorkoutSetEdit({ routineId, index }) {
           </label>
         </p> : null}
         <p><label>Note<br /><input value={note} onChange={(event) => setNote(event.target.value)} /></label></p>
-        <p><button type="submit">Save</button> <button type="button" onClick={() => go(itemPath)}>Cancel</button></p>
+        <p><button type="submit">Save</button> <NavLink to={itemPath}>Cancel</NavLink></p>
       </form>
     </section>
   )
