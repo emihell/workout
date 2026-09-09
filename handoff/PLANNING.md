@@ -41,11 +41,14 @@ Emilio writes the code — in Claude Code, not here.
   green tests alone; never merge a branch he hasn't OK'd. The use-it gate is his;
   the mechanical closeout is yours.
 
-  **Standalone `plan publish` is not in your grant.** Doc-only changes to `main`
-  either ride the next `closeout` (which publishes) or get handed to Emilio as a
-  publish line. You can run `closeout` (it touches the code worktree on purpose, for
-  the merge — DEC-006's scoped relaxation of the isolation line) but not a bare
-  `publish` or `git push origin main`.
+  **`plan publish` is yours too (DEC-008).** Doc-only changes to `main` — a `NOW.md`
+  pointer, a new/updated req, a `DEC-`/`L-` — you publish yourself so code CC always
+  reads a current `handoff/`. Same gate as closeout (code worktree on `main` first;
+  `plan publish` also refuses a dirty code tree). `plan publish` does not push, so
+  follow it with `git push origin main planning`. This is the deliberate relaxation
+  of DEC-005's isolation line: publish and closeout both move `main` in the code
+  worktree, on purpose. **Keep handoff current between builds** — after each closeout,
+  publish the next `NOW.md`/req state so "build req-NN" is all Emilio has to say.
 
   **Read-only looking at the code worktree is fine** — `git -C <code>
   --no-optional-locks log main..<branch>` to confirm a build landed is reading, not

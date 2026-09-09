@@ -125,3 +125,17 @@ Two calls from `req-05` (error boundary):
   work; it is deprecated in React 19 (cosmetic console warning, filtered in the test). This is
   the repo's **first** React render-test setup — the next component render-test should reuse it
   rather than adding a second approach, unless we deliberately revisit the standard.
+
+## DEC-008 — the planning session also owns `plan publish`; keeps handoff current between builds  (2026-09-09)
+
+Supersedes DEC-006's "standalone `plan publish` stays handed-over." The hand-off proved to be the
+bottleneck for the flow Emilio wants — code CC reads the published `handoff/` (the req doc + a
+current `NOW.md`) to know what to build, so doc-only updates must reach `main` between builds
+without Emilio relaying a publish. `plan publish` is now in the planning session's grant
+(`settings.local.json`), alongside a broadened `git push`. It is strictly less than `closeout`
+(no code merge), gated identically: publish only with the code worktree on `main` (code CC not
+mid-build); `plan publish` also refuses a dirty code tree, and does not push (follow with
+`git push origin main planning`). Consequence for the workflow: **the build spec lives in the
+published req doc, not in a pasted prompt** — after each closeout the planning session publishes
+the next `NOW.md`/req state, and Emilio's trigger to code CC collapses to "build req-NN". The
+human-use merge gate (DEC-006) is unchanged; this is only about getting docs to `main`.
