@@ -24,3 +24,13 @@ very likely empty — but the principle is the project's core: never overwrite p
 without a way back. Rule: before seeding/overwriting `localStorage` for a browser test, first read
 the existing value and restore it afterward (or drive the real UI, or use a throwaway browser
 profile). Applies to the planning session's own browser tests, not to app code.
+
+## L-002 — an ownership-changing DEC needs a same-turn doc sweep  (2026-09-09)
+
+DEC-008 moved `plan publish` from Emilio to the planning session, but the change wasn't
+propagated in the same pass — about five spots in `PLANNING.md` still read "hand Emilio the
+publish line" and sat contradicting the DEC until a later full-folder scan caught them. Cause:
+recording a decision without sweeping the docs that reference what it changed. Rule: when a
+`DEC-` changes ownership or a standing rule, immediately `grep handoff/` for the old model's
+phrasing and reconcile every hit in the same turn — never let the DEC and the prose disagree,
+because whoever reads the prose won't know a DEC overrode it.
