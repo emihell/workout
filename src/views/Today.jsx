@@ -1,3 +1,4 @@
+import { recordButton } from '../analytics'
 import { greeting, weekdayName } from '../ids'
 import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
 import { useStore } from '../store-context'
@@ -87,6 +88,7 @@ export function Today() {
                     ) {
                       return
                     }
+                    recordButton('import')
                     store.applyBackup(payload)
                   } catch (err) {
                     window.alert(err instanceof Error ? err.message : 'Could not import.')

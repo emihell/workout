@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { exportAnalytics, recordButton } from '../analytics'
 import { buildBackup } from '../exchange.js'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
@@ -40,6 +41,7 @@ export function Settings() {
         <button
           type="button"
           onClick={() => {
+            recordButton('export-database')
             downloadJson(
               `workout-database-${dateKey(new Date())}.json`,
               buildBackup(store, { includeAssistant }),
@@ -49,6 +51,19 @@ export function Settings() {
           }}
         >
           Export
+        </button>
+      </p>
+      <p>
+        <button
+          type="button"
+          onClick={() => {
+            recordButton('export-analytics')
+            downloadJson(`workout-analytics-${dateKey(new Date())}.json`, exportAnalytics())
+            setError('')
+            setMessage('Analytics downloaded.')
+          }}
+        >
+          Export analytics
         </button>
       </p>
       <p>
@@ -66,6 +81,7 @@ export function Settings() {
                 try {
                   const payload = JSON.parse(text)
                   if (!window.confirm('Replace all data on this device?')) return
+                  recordButton('import')
                   const result = store.applyBackup(payload)
                   setError('')
                   setMessage(backupLines(result.summary))

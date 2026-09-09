@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { RPE_OPTIONS, formatSetLine, roleLabel, rpeOptionValue } from '../ids'
 import { go } from '../route'
+import { recordButton } from '../analytics'
 import { recommendNextPrescription } from '../progress'
 import { exerciseById, findRoutine, historySetPrefill, lastSetsForExercise } from '../storage'
 import { useStore } from '../store-context'
@@ -28,6 +29,7 @@ function findItem(items, itemId) {
 
 function abandonWorkout(store) {
   if (!window.confirm('Abandon?')) return
+  recordButton('abandon-workout')
   store.abandonWorkout()
   go('/')
 }
@@ -317,6 +319,7 @@ function WorkoutItemLive({ routineId, item }) {
       window.alert('Pick effort.')
       return
     }
+    recordButton('complete-set')
     const done = finishAfterThisSet()
     setRestore(null)
     store.completeSet(
@@ -340,6 +343,7 @@ function WorkoutItemLive({ routineId, item }) {
   }
 
   function skipSet() {
+    recordButton('skip-set')
     setRestore(null)
     const done = finishAfterThisSet()
     store.completeSet(
@@ -364,6 +368,7 @@ function WorkoutItemLive({ routineId, item }) {
     const index = lastLoggedSetIndex(active, item)
     const lastLogged = index >= 0 ? active.sets[index] : null
     if (!lastLogged) return
+    recordButton('previous-set')
     const next = restoreFromLoggedSet(lastLogged)
     next.workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
     setRestore(next)
@@ -733,24 +738,26 @@ function RestBar() {
           {paused ? (
             <button
               type="button"
-              onClick={() =>
+              onClick={() => {
+                recordButton('rest-resume')
                 store.patchActive({
                   restEndsAt: Date.now() + (store.activeWorkout.restPausedRemaining || 0),
                   restPausedRemaining: null,
                 })
-              }
+              }}
             >
               Resume
             </button>
           ) : (
             <button
               type="button"
-              onClick={() =>
+              onClick={() => {
+                recordButton('rest-pause')
                 store.patchActive({
                   restPausedRemaining: Math.max(0, (store.activeWorkout.restEndsAt || Date.now()) - Date.now()),
                   restEndsAt: null,
                 })
-              }
+              }}
             >
               Pause
             </button>
@@ -758,6 +765,7 @@ function RestBar() {
           <button
             type="button"
             onClick={() => {
+              recordButton('rest-plus-30')
               if (paused) {
                 store.patchActive({ restPausedRemaining: (store.activeWorkout.restPausedRemaining || 0) + 30000 })
               } else {
@@ -768,7 +776,13 @@ function RestBar() {
             +30s
           </button>
         </span>
-        <button type="button" onClick={() => store.patchActive({ restEndsAt: null, restPausedRemaining: null })}>
+        <button
+          type="button"
+          onClick={() => {
+            recordButton('rest-next')
+            store.patchActive({ restEndsAt: null, restPausedRemaining: null })
+          }}
+        >
           Next
         </button>
       </div>
@@ -923,6 +937,7 @@ function FinishScreen() {
         <button
           type="button"
           onClick={() => {
+            recordButton('finish-workout')
             store.finishWorkout({ overallNote, overallFeel, progression })
             go('/')
           }}
