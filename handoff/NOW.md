@@ -1,8 +1,8 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01–05, req-09** (req-09 merged; **Emilio's real-phone wake-lock
-check still outstanding** — see SHIPPED/L-003). Done lives in `log/SHIPPED.md`. Full reqs:
-`work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-09. **Shipped: req-01–05, req-09** (all fully done — req-09 wake-lock device-confirmed
+on Emilio's phone). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
+`work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
