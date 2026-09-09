@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { StoreProvider } from './store'
 import { getSaveFailed, subscribeSaveFailed } from './storage'
+import { ErrorBoundary } from './error-boundary'
 import { useHashRoute } from './route'
 import { Today } from './views/Today'
 import {
@@ -188,7 +189,9 @@ export default function App() {
       <SaveFailedBanner />
       <Nav />
       <main>
-        <Screen />
+        <ErrorBoundary>
+          <Screen />
+        </ErrorBoundary>
       </main>
     </StoreProvider>
   )
