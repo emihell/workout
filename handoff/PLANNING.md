@@ -165,6 +165,13 @@ pastes it; he reads them first and sometimes doesn't send them.
 
 The primary way build work flows now: **you ping code CC directly** (`SendMessage` to its
 session, e.g. `workout-app-codebase-a4`), it builds and reports back, you verify and close.
+
+**Precondition — only READY, tagged reqs enter the loop.** A req is pingable only when it is
+`READY` (no open decisions) and carries its **Gate** tag (functional / ux-feel / persisted-data /
+infra — set in the req header at spec time). A `NEEDS DECISION` req is resolved with Emilio
+*before* it enters the loop — never ping an underspecified req and let code CC stall on the
+question mid-build.
+
 The full cycle:
 
 ```

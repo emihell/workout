@@ -2,6 +2,8 @@
 
 **Status: READY** — infra hygiene, no user-visible behaviour. Independent of all other reqs.
 
+**Gate: infra** (DEC-009) — CI/workflow change, no app behaviour or stored data touched; planning verifies the workflow file and confirms the effect on the next real push. Planning closes it (no human gate), but it can only be *fully* confirmed by observing real pushes (a doc-only push should not deploy; a build push should).
+
 ## Why
 
 `.github/workflows/deploy.yml` triggers on **any** push to `main`:

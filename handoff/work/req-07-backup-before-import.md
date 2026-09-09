@@ -3,6 +3,8 @@
 **Status: READY** — decision made (DEC-004: auto-download current state before the replace).
 Independent of all other reqs. Safe to build.
 
+**Gate: persisted-data** (DEC-009) — wraps a wholesale replace of stored state. **Always waits for Emilio's hands before merge; never auto-closed** by the planning session (CLAUDE.md migration ask-gate).
+
 ## Why
 
 Both import entry points replace the entire database after a single native confirm, with

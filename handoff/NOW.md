@@ -16,13 +16,14 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY (all Phase 1; independent; build in any order)
 
-**→ Next up: `req-02`** (recommended — continues the in-gym flow). `req-06` is the best pure-logic
-loop candidate (tests fully cover it, no human gate needed to close).
+**→ Next up: `req-02`** (recommended — in-gym flow, and a **functional** gate so the loop can take it
+to merge). Each req is tagged with its merge gate (DEC-009); **only READY reqs with no open
+questions enter the autoloop** — resolve any `NEEDS DECISION` with Emilio first.
 
-- `req-02` **carry kg+reps for a no-history exercise** — type it in set 1, follows the rest (DEC-002).
-- `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. (persisted-data)
-- `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. (persisted-data)
-- `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. (infra)
+- `req-02` **carry kg+reps for a no-history exercise** — type it in set 1, follows the rest (DEC-002). **[functional → planning closes]**
+- `req-06` **legacy-key cleanup** — remove `workout-mvp-v5..v7` after the v8 write is confirmed persisted (read-back gate); failed/silent save never deletes the legacy copy. **[persisted-data → Emilio's hands before merge]**
+- `req-07` **backup before a destructive import** — auto-download current state before `applyBackup` replaces it (DEC-004); one shared helper for both import sites. **[persisted-data → Emilio's hands before merge]**
+- `req-04` **deploy only on build changes** — planning publishes currently redeploy the live app for nothing; filter the Pages trigger to build inputs. **[infra → planning closes; confirm on real pushes]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
 reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.

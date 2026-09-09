@@ -2,6 +2,8 @@
 
 **Status: READY** — decisions made (DEC-002). Independent of `req-01`; can build in either order.
 
+**Gate: functional** (DEC-009) — logging/flow behaviour the planning session can browser-verify; planning closes it without a human gate.
+
 ## Why
 
 For an exercise with **no finished-workout history**, the live log seeds no weight (and reps only from the per-set target), so the user retypes the same kg on every set while calibrating. Emilio: *"övning utan historik: skriv in första värdet i första settet, värdet följer med resten av setsen"* — type the value in set 1, it follows to the rest.

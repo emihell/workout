@@ -3,6 +3,8 @@
 **Status: READY** — decision-free; the only behaviour rule (never delete a legacy copy
 until v8 is confirmed persisted) is the requirement itself. Independent of all other reqs.
 
+**Gate: persisted-data** (DEC-009) — deletes stored `localStorage` keys. **Always waits for Emilio's hands before merge; never auto-closed** by the planning session (CLAUDE.md migration ask-gate).
+
 ## Why
 
 `loadState` (`src/storage.js:21-35`) reads three legacy keys to migrate forward:
