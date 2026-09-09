@@ -107,3 +107,21 @@ DEC-015; the other mains were already clean). Mark-done/reopen patches unit-test
 end-to-end (scope 1–4) and diff-verified (scope 5). Merge `77a1161` (branch
 `req-11-ingym-flow-cleanup`, `c14f284`…`9d444ff`, 2 commits). `./check` green, 84 tests. Emilio
 approved merge on the planning session's verification.
+
+## req-08 — local usage analytics  (merged 2026-09-09)
+
+A separate `localStorage` key `workout-mvp-analytics` (`src/analytics.js`), isolated from
+`workout-mvp-v8` — never in the workout backup, no migration. Bounded aggregate counts
+`{ screens, transitions ("from>>to"), buttons }`, keyed by the parsed route name (never id-bearing
+paths, so it stays bounded). Screens + transitions recorded at `route.js`'s `remember()` seam (once
+per real nav, self-transition skipped); 12 primary action buttons instrumented via `recordButton`
+(complete-set, skip-set, previous-set, rest-pause/resume/plus-30/next, finish/abandon-workout,
+export-database, export-analytics, import). Writes are **fail-silent** (load/persist/record all
+try/catch) — the opposite of req-01's surfaced save failure: losing analytics is acceptable, the
+workout is sacred. "Export analytics" button in Settings → `workout-analytics-<date>.json`. Pure
+`applyScreen`/`applyButton` unit-tested; 7 analytics tests (counts, self-transition skip,
+path-collapse, fail-silent, export, isolation). Merge `72d7be9` (branch `req-08-usage-analytics`,
+`f824ce9`). `./check` green, 91 tests. Browser-verified (planning session, functional): navigating
+incremented screens + transitions (`>>` separator), logging a set recorded `complete-set:1` AND
+saved to the workout normally, and `workout-mvp-v8` had no analytics field (isolation confirmed).
+Impl notes: separator `>>`; `complete-set` counts after the effort guard, `abandon` after the confirm.
