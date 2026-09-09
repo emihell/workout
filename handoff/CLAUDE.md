@@ -102,12 +102,17 @@ One requirement at a time, as `handoff/work/req-NN-name.md` (a folder of the sam
 name once it passes ~200 lines). It states scope, what is explicitly **out** of
 scope, ordered steps, and acceptance criteria written before implementation.
 
-Implement on a branch named after the requirement. Emilio reviews the diff and
-merges. **Do not merge, and do not start the next requirement.**
+You may be asked to build one by the **planning session** (a cross-session message —
+the usual path now) or by Emilio directly. Either way: implement on a branch named
+after the requirement, run `./check`, write `reports/req-NN.md`, and **report back to
+whoever asked** (reply to the planning session's message if it pinged you). **Do not
+merge, and do not start the next requirement.** Review and merge are handled for you:
+the planning session reviews the diff and closes out, merging by req type — Emilio
+uses UX and persisted-data reqs himself first.
 
-`./plan` at the repository root is Emilio's tool for publishing planning docs.
-**Don't run `plan save`, `plan publish`, or `plan closeout`** — they commit,
-merge, and push on his behalf. `./plan status` is read-only and safe if you need
+`./plan` at the repository root is the **planning session's** tool.
+**Don't run `plan save`, `plan publish`, or `plan closeout`** — those are the planning
+session's to run, never yours. `./plan status` is read-only and safe if you need
 to know where things stand.
 
 If a requirement contradicts the code in front of you, the code wins — stop and

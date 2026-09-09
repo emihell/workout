@@ -3,7 +3,7 @@
 How this project gets built, and the rules for the files in `handoff/`.
 
 **Owns:** the durable build/engineering rules and the planning micro-loop. The
-cross-session loop and the copy-paste prompts are in `START-HERE.md`; the planning
+two-agent build loop is in `PLANNING.md` (loop specifics in `DEC-009`); the planning
 role is in `PLANNING.md`; Claude Code's operational guide is `CLAUDE.md`. This is a
 **reference — load a section on demand, don't read end-to-end.** It states durable
 rules, not current code-state — mechanisms and what each req changed live in the
@@ -213,8 +213,9 @@ work/req-NN-name.md      the requirement
 git branch req-NN-name   the work
 ```
 
-Claude Code implements on the branch, Emilio reviews the diff, Emilio merges. Git is
-the ticket system.
+Claude Code implements on the branch; the planning session reviews the diff and closes
+out, merging by req type (DEC-009) — Emilio uses UX and persisted-data reqs himself
+first. Git is the ticket system.
 
 ## After each requirement lands
 
@@ -238,11 +239,13 @@ commented-out blocks "just in case". Git holds the history; the working tree hol
 only what's live. A recurring finding (the same dead thing flagged twice) is a
 lesson, not an incident.
 
-## Never hand over a composed sequence you haven't verified
+## Verify a composed sequence before you run it or hand it over
 
-A command block Emilio pastes is run verbatim. One command per block unless every
-line is order-safe and checked. A prompt for Claude Code is not a command — separate
-message. The output he pastes back is the receipt; a green line beats a claim.
+The planning session runs its own git/publish/closeout — a command you run must be
+order-safe and checked *before* you run it, and its receipt is the tool output you get
+back (a green `./check` line beats a claim). On the rare command you hand Emilio (a
+`/clear`, or something your own grant blocks), the same rule holds: one command per
+block, order-safe, verified — it's pasted and run verbatim.
 
 ## A view owns its behaviour; shared things are named
 

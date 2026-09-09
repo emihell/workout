@@ -42,5 +42,6 @@ CSS**) + rest-end cue/wake-lock + inline modals. Candidates in `work/BACKLOG.md`
 
 ## Where to read
 
-`START-HERE.md` (read-order + close-out) → `work/BACKLOG.md` → `rules/DESIGN.md` before UI/UX →
-`rules/WORKFLOW.md` for process. `README.md` is the product contract.
+`PLANNING.md` (planning role + the two-agent build loop) → `work/BACKLOG.md` → `rules/DESIGN.md`
+before UI/UX → `rules/WORKFLOW.md` for process → `rules/CLOSEOUT.md` to close a req. `README.md`
+is the product contract.

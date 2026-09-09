@@ -1,8 +1,11 @@
 # Closing out a requirement
 
 The ONE process for merging a built branch and recording it. Identical every time.
-Emilio owns the merge; the assistant records the req and hands over the command. No
-freehand variants.
+The **planning session runs closeout**, after the merge gate (DEC-009): it closes
+**functional** reqs itself once it has browser-verified them; **UX-feel** and
+**persisted-data** reqs wait for Emilio's use-it OK first, then the planning session
+runs closeout. The planning session records the req and runs the command. No freehand
+variants.
 
 This whole sequence is one command — `./plan closeout req-N`. The manual block below
 is the fallback if `closeout` can't run.
@@ -16,7 +19,7 @@ is the fallback if `closeout` can't run.
 - **The req doc stays "NOT merged" right up until close-out.** Do not pre-flip —
   `closeout` flips it, computed from git, only once the merge is an ancestor of main.
 
-## The command (Emilio runs, from either worktree)
+## The command (the planning session runs, from either worktree — after the gate)
 ```
 ./plan closeout req-N
 ```
@@ -35,10 +38,10 @@ pushed, the branch is not deleted, and a re-run after fixing the gate recovers f
    to Recently shipped, `SHIPPED.md` narrative). Keep any "Spawned by:"-style note
    **after** the closing `**` of the Status span — `closeout` replaces the whole Status
    bold and would drop a note living inside it.
-2. Confirm state read-only from the CODE worktree: `git rev-parse --short req-N`,
-   `git log main..req-N --oneline`. Do NOT run `git status`/`checkout`/`merge` from the
-   cloud.
-3. Hand Emilio `./plan closeout req-N`. Nothing else.
+2. Confirm state read-only: `git -C <code> --no-optional-locks rev-parse --short req-N`,
+   `git -C <code> --no-optional-locks log main..req-N --oneline`. Let `closeout` do the
+   checkout/merge/publish/push — don't run those by hand.
+3. Run `./plan closeout req-N` yourself (after the merge gate). Nothing else.
 
 ## Done when
 `./plan status` prints "planning is fully merged, both worktrees clean." If it shows

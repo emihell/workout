@@ -6,10 +6,10 @@ then `NOW.md`.
 This is the counterpart to `CLAUDE.md`. That file tells Claude Code how to build;
 this one says how to think alongside Emilio without getting in the way.
 
-**Owns:** how the planning session thinks and works. The cross-session loop
-(plan → build → close) and the copy-paste prompts live in `START-HERE.md`; the
-durable build rules in `rules/WORKFLOW.md`; how Claude Code builds in `CLAUDE.md`.
-Defer to those rather than restating them here.
+**Owns:** how the planning session thinks and works, including the two-agent build
+loop (the loop section below, and `DEC-009`). The durable build rules are in
+`rules/WORKFLOW.md`; closing out a req in `rules/CLOSEOUT.md`; how Claude Code builds
+in `CLAUDE.md`. Defer to those rather than restating them here.
 
 ## The role
 
@@ -52,8 +52,9 @@ Emilio writes the code — in Claude Code, not here.
 
   **Read-only looking at the code worktree is fine** — `git -C <code>
   --no-optional-locks log main..<branch>` to confirm a build landed is reading, not
-  touching. The other thing you hand Emilio is a **build prompt for the
-  code-worktree CC** — you don't drive that session (see below).
+  touching. You drive the code-worktree CC by **pinging it directly** (`SendMessage`)
+  in the two-agent build loop (see the loop section and `DEC-009`) — not by handing
+  Emilio a prompt to paste.
 
 ## The loop
 
@@ -64,7 +65,7 @@ talk  →  references  →  idea  →  bare-bones test  →  rescan the code
 ```
 
 Full version in `rules/WORKFLOW.md`. This is the planning-craft micro-loop; the
-cross-session plan → build → close stages and the prompts are in `START-HERE.md`.
+cross-session plan → build → close stages are the two-agent build loop below (and `DEC-009`).
 The two steps that get skipped are testing the riskiest assumption *before*
 speccing, and rescanning the code immediately before writing.
 
@@ -110,46 +111,48 @@ git --no-optional-locks status --porcelain                          uncommitted 
 git -C <code> --no-optional-locks log --oneline main..planning      saved but unpublished?
 ```
 
-Saving is yours; publish is Emilio's. So: if `handoff/` edits are uncommitted,
-**save (and push) them yourself before answering** — that's your side, don't leave it
-undone. If work is saved but unpublished, that's waiting on Emilio's publish; check
-the gate and **re-hand him the publish line** rather than assuming he ran it.
+Save, push, and publish are all yours (DEC-008). So: if `handoff/` edits are
+uncommitted, **save and push them before answering**. If work is saved but unpublished
+and the gate is open, **publish it yourself** — don't leave a saved requirement
+sitting unpublished (code CC reads only the last publish). Publish only doc-only
+changes code CC actually needs promptly; a planning-internal note can ride the next
+closeout to avoid a needless redeploy (until req-04).
 
 A skipped `plan save` costs only accumulation — the next save catches it. A skipped
 **`plan publish` is the real one**: Claude Code then reads a stale `handoff/`, and
-every stale-document lesson starts that way — so chase the publish, don't let a saved
-requirement sit unpublished.
+every stale-document lesson starts that way — so chase the publish, don't let a needed
+change sit unpublished.
 
-## The publish gate — check it before handing Emilio a publish
+## The publish gate — check it before you publish
 
-Publish is Emilio's, but don't hand it over blind. Check the gate read-only first —
-looking at the code worktree is not touching it:
+You publish (DEC-008), so check the gate yourself, read-only, every time:
 
 ```
-git -C <code> --no-optional-locks branch --show-current     on 'main' → safe to hand over
+git -C <code> --no-optional-locks branch --show-current     on 'main' → gate open
 git -C <code> --no-optional-locks status --porcelain        code tree clean?
 git -C <code> --no-optional-locks log --oneline main..planning   what would merge
 ```
 
-- **code worktree on a branch → don't hand over a publish.** CC is (probably)
-  mid-build; publishing would `git checkout`/merge under it. Say so, wait.
-- **code worktree dirty → say so.** `plan publish` refuses a dirty code tree anyway.
-- **on `main`, clean → hand over the publish line**, noting what it assumes: the
-  guard sees a branch, not activity, so a read-only `/audit` on `main` passes it —
-  *"safe if CC isn't mid-task."*
+- **code worktree on a branch → do NOT publish.** CC is (probably) mid-build;
+  publishing would `git checkout`/merge under it. Wait; tell Emilio.
+- **code worktree dirty → don't.** `plan publish` refuses a dirty code tree anyway.
+- **on `main`, clean → publish**, aware of what it assumes: the guard sees a branch,
+  not activity, so a read-only `/audit` on `main` passes it. If on `main` but you
+  can't rule out CC being mid-task, ask Emilio first.
 
-After Emilio runs it, `main..planning` empty is how you confirm it landed. Look,
+After you publish, `main..planning` empty is how you confirm it landed. Look,
 don't assume.
 
 ## What Claude Code knows
 
-**Claude Code's knowledge is exactly: the last `plan publish`, plus the prompts
-Emilio actually pasted.** Nothing else. It cannot see this conversation, and it
-cannot see a requirement written since the last publish. Publishing is blocked
-whenever CC is on a branch — which is whenever it is building — so a prompt sent
-mid-branch lands on a `handoff/` that is behind by whatever was decided today.
+**Claude Code's knowledge is exactly: the last `plan publish`, plus the pings/prompts
+it receives** (from you via `SendMessage`, or from Emilio). Nothing else. It cannot see
+this conversation, and it cannot see a requirement written since the last publish — so
+the loop's rule holds: **publish the req doc + a current `NOW.md` before you ping**
+"build req-NN". A ping sent while CC is mid-branch lands on a `handoff/` behind by
+whatever was decided today, so it must carry what it needs.
 
-A prompt sent mid-branch must be **self-contained**:
+A ping/prompt must be **self-contained**:
 
 ```
 never        "the idea you floated"        it was floated here
@@ -229,33 +232,30 @@ things the requirement asserts: file paths, function names, counts. Say explicit
 that it still applies, or fix it first. Step 2 is a re-check: if the tag says
 `NEEDS DECISIONS`, it doesn't go over at all.
 
-## You run the planning git; you hand over publish and CC prompts
+## You run the git yourself — save, push, publish, closeout
 
-Planning-worktree git is yours — run it in your own tool calls, don't paste it into a
-fenced block for Emilio:
+All of it is yours (DEC-005/006/008/009) — run it in your own tool calls, never paste it
+into a fenced block for Emilio:
 
 ```
-../workout-app-codebase/plan save "message"     # commit handoff/ to planning
-git push origin planning                        # push the planning branch
+../workout-app-codebase/plan save "message"                 # commit handoff/ to planning
+git push origin planning                                    # push the planning branch
+cd <code> && ./plan publish && git push origin main planning   # publish docs to main (after the gate)
+../workout-app-codebase/plan closeout req-NN                # merge a built branch (after the merge gate)
 ```
 
-Run these as separate tool calls, not one long `&&` chain — a wrapped paste splits on
-the terminal's line breaks and misfires, and separate calls each get their own
-receipt. Report what landed in one line; don't narrate every step.
+Run each as a separate tool call, not one long `&&` chain across a paste boundary. Report
+what landed in one line; don't narrate every step.
 
-**Two things you hand to Emilio, each pure paste in its own block:**
+**You drive the code-worktree CC by pinging it** (`SendMessage`), not by handing Emilio a
+prompt (the two-agent loop). A ping **must be self-contained** (see the CC-knows section)
+and **name its branch** — the code worktree may not be on the requirement's branch when a
+test is due.
 
-- **the publish line** — `cd <code> && ./plan publish && git push origin main
-  planning` — after you've checked the gate above. Publish crosses into the code
-  worktree, so it is his to run.
-- **a build prompt for the code-worktree CC** — you don't drive that session.
-
-Fenced blocks are for those and for code; comparisons and tables go in prose, never in
-a fence used to align columns.
-
-**A prompt sent mid-branch must be self-contained** (see the CC-knows section) and
-**names its branch** — the code worktree may not be on the requirement's branch when
-a test is due, so say which branch, don't assume Emilio infers it.
+**The only things you hand Emilio now:** the `/clear` reminder at each close, a use-it
+gate for UX/persisted-data reqs, a genuine decision, or a command your own grant blocks.
+Fenced blocks are for those and for code; comparisons and tables go in prose, never in a
+fence used to align columns.
 
 **Verifying a prompt was actually pasted:** a shell command you run leaves its own
 result; a prompt handed to Emilio does not, so **look for the artifact it would have
@@ -292,15 +292,14 @@ and *what now*; the file says *why*.
 1. the answer                     1-3 sentences
 2. detail, only if it changes     optional
    his decision
-3. a handover block, last         a publish line or a CC prompt; its own
-                                  block, nothing after it
+3. what's next, if anything       a `/clear` reminder, a use-it gate, or a
+                                  decision he owns — else nothing
 ```
 
-You run the planning git yourself, so most turns end with a one-line note of what you
-saved and pushed — not a command block. A fenced block appears only when there's
-something for Emilio to run: the publish line, or a CC build prompt. The test before
-sending: **does this sentence change what Emilio does next?** If no, it belongs in a
-file.
+You run the git and drive the loop yourself, so most turns end with a one-line note of
+what you saved/published/merged — not a command block. Emilio has to act only for a
+`/clear`, a use-it gate (UX/persisted-data), or a decision. The test before sending:
+**does this sentence change what Emilio does next?** If no, it belongs in a file.
 
 ## Reports come back in `reports/`, not in `handoff/`
 
