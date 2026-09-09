@@ -93,3 +93,17 @@ a secure context (`navigator.wakeLock` runs only on HTTPS/localhost), which a pr
 can't give a phone; the feature is fail-silent + scoped, so the risk was low (see L-003).
 **Device-confirmed on the live HTTPS site (Emilio, 2026-09-09): "works well"** — screen stays on
 during a workout as intended. Gate fully closed.
+
+## req-11 — in-gym flow cleanup  (merged 2026-09-09)
+
+Five workout-flow refinements: rest bar regrouped to `[Pause/Resume · +30s]` … `[Next]` (Skip
+renamed, far right); equipment/cues hidden during rest only; the generic `<Back/>` replaced by a
+semantic "‹ Exercises" link on the in-exercise screens (Previous kept) — no more double
+back-button; the per-exercise review screen dropped from the completion flow (the last set
+auto-marks the exercise done via pure `markItemDonePatch` and goes straight to the overview), kept
+reachable by re-entering a completed exercise ("Add set" reopens it via `reopenItemPatch` — DEC-014);
+and the redundant `<Back/>` removed from the Settings main (the only top-level main that had one —
+DEC-015; the other mains were already clean). Mark-done/reopen patches unit-tested; browser-verified
+end-to-end (scope 1–4) and diff-verified (scope 5). Merge `77a1161` (branch
+`req-11-ingym-flow-cleanup`, `c14f284`…`9d444ff`, 2 commits). `./check` green, 84 tests. Emilio
+approved merge on the planning session's verification.
