@@ -1,6 +1,6 @@
 # req-11 — in-gym flow cleanup: rest buttons, Back/Previous, drop the per-exercise review
 
-**Status: READY** — decisions settled (DEC-013). A UI/flow req — READY on intent + constraints,
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-11` (`c14f284`…`9d444ff`, 2 commits).** — decisions settled (DEC-013). A UI/flow req — READY on intent + constraints,
 appearance refined at the use-it review. Touches the live-workout screens (`src/views/Workout.jsx`,
 `src/views/shared.jsx`). Builds on `req-03` (rest bar) and the completion flow.
 
