@@ -5,6 +5,8 @@ import {
   itemKey,
   itemLoggingState,
   lastLoggedSetIndex,
+  markItemDonePatch,
+  reopenItemPatch,
   withOneMoreSet,
   addWorkingSetToState,
   withSkippedUnloggedSets,
@@ -36,9 +38,39 @@ describe('workout logging', () => {
     assert.equal(done.plannedDone, true)
   })
 
-  it('marks an exercise done only after the review screen', () => {
+  it('an exercise is marked done by completedItemIds membership', () => {
     assert.equal(itemIsMarkedDone({ completedItemIds: [] }, item), false)
     assert.equal(itemIsMarkedDone({ completedItemIds: ['si-row'] }, item), true)
+  })
+
+  // req-11 / DEC-013 — the mark-done transition moved from the review screen's
+  // "Done" button to completing the last set. These test the pure patch.
+  it('completing the last set marks the exercise done (adds its key, clears rest)', () => {
+    // A single-set exercise: after that set is logged, plannedDone is true and
+    // the completion path fires markItemDonePatch.
+    const workout = {
+      completedItemIds: [],
+      restEndsAt: 123456,
+      restPausedRemaining: null,
+      sets: [{ routineItemId: 'si-row', exerciseId: 'ex-rowing', setType: 'work', reps: '10' }],
+    }
+    assert.equal(itemLoggingState(workout, item).plannedDone, true)
+    const patch = markItemDonePatch(workout, item)
+    assert.deepEqual(patch.completedItemIds, ['si-row'])
+    assert.equal(patch.restEndsAt, null)
+    assert.equal(patch.restPausedRemaining, null)
+    assert.equal(itemIsMarkedDone({ completedItemIds: patch.completedItemIds }, item), true)
+  })
+
+  it('mark-done is idempotent and preserves other completed ids', () => {
+    const patch = markItemDonePatch({ completedItemIds: ['si-other', 'si-row'] }, item)
+    assert.deepEqual(patch.completedItemIds, ['si-other', 'si-row'])
+  })
+
+  it('"Add set" reopens a done exercise (removes only its key)', () => {
+    const patch = reopenItemPatch({ completedItemIds: ['si-other', 'si-row'] }, item)
+    assert.deepEqual(patch.completedItemIds, ['si-other'])
+    assert.equal(itemIsMarkedDone({ completedItemIds: patch.completedItemIds }, item), false)
   })
 
   it('finds the last logged set for this exercise so you can go back', () => {
