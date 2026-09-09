@@ -165,6 +165,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   return (
     <section>
       <Back />
+      <RestBar />
       <h1>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</h1>
       <ol>
         {items.map((item) => {
@@ -271,21 +272,8 @@ function WorkoutItemLive({ routineId, item }) {
   const target = needsWu
     ? String(item.warmup?.reps ?? 12)
     : item.targets?.[currentWorkIndex] ?? item.targets?.[item.targets.length - 1] ?? ''
-  const [now, setNow] = useState(() => Date.now())
   const [restore, setRestore] = useState(null)
-
-  useEffect(() => {
-    if (!active.restEndsAt && !active.restPausedRemaining) return undefined
-    const t = setInterval(() => setNow(Date.now()), 250)
-    return () => clearInterval(t)
-  }, [active.restEndsAt, active.restPausedRemaining])
-
-  const remainingMs = active.restPausedRemaining != null
-    ? active.restPausedRemaining
-    : active.restEndsAt
-      ? Math.max(0, active.restEndsAt - now)
-      : 0
-  const resting = remainingMs > 0 || active.restPausedRemaining != null
+  const { resting } = useRestCountdown(active)
 
   useEffect(() => {
     if (!resting && plannedDone) goToItemReview(routineId, item)
@@ -367,6 +355,7 @@ function WorkoutItemLive({ routineId, item }) {
   return (
     <section>
       <Back />
+      <RestBar />
       <ExerciseTitle
         routineId={routineId}
         item={item}
@@ -378,14 +367,11 @@ function WorkoutItemLive({ routineId, item }) {
         ]}
       />
       {resting ? (
-        <>
-          <RestBox remainingMs={remainingMs} paused={active.restPausedRemaining != null} />
-          {canGoBack ? (
-            <p>
-              <button type="button" onClick={previousSet}>Previous</button>
-            </p>
-          ) : null}
-        </>
+        canGoBack ? (
+          <p>
+            <button type="button" onClick={previousSet}>Previous</button>
+          </p>
+        ) : null
       ) : plannedDone ? null : (
         <SetLogForm
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
@@ -513,6 +499,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
   return (
     <section>
       <Back />
+      <RestBar />
       <h2>Today</h2>
       {today.length ? (
         <ol>
@@ -606,6 +593,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   return (
     <section>
       <Back />
+      <RestBar />
       <h1>{exerciseName(item)}</h1>
       <p>{ex.equipment}</p>
       <form
@@ -689,11 +677,41 @@ export function WorkoutSetup({
   )
 }
 
-function RestBox({ remainingMs, paused }) {
+// Reads the workout-level rest state (restEndsAt / restPausedRemaining, both
+// already persisted on activeWorkout) and ticks a display clock while a rest is
+// running. Used by the persistent RestBar for display and by WorkoutItemLive for
+// its set-flow gating, so the countdown logic lives in one place.
+function useRestCountdown(active) {
+  const restEndsAt = active?.restEndsAt ?? null
+  const restPausedRemaining = active?.restPausedRemaining ?? null
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    if (!restEndsAt && restPausedRemaining == null) return undefined
+    const t = setInterval(() => setNow(Date.now()), 250)
+    return () => clearInterval(t)
+  }, [restEndsAt, restPausedRemaining])
+  const remainingMs =
+    restPausedRemaining != null
+      ? restPausedRemaining
+      : restEndsAt
+        ? Math.max(0, restEndsAt - now)
+        : 0
+  const paused = restPausedRemaining != null
+  const resting = remainingMs > 0 || paused
+  return { remainingMs, paused, resting }
+}
+
+// The single, persistent rest UI. Self-contained: it reads only activeWorkout rest
+// state and renders nothing when no rest is active, so it can be dropped into any
+// in-workout screen and the counter keeps ticking regardless of which screen shows.
+function RestBar() {
   const store = useStore()
+  const active = store.activeWorkout
+  const { remainingMs, paused, resting } = useRestCountdown(active)
+  if (!active || !resting) return null
   const sec = Math.ceil(remainingMs / 1000)
   return (
-    <>
+    <div role="status">
       <h2>Rest</h2>
       <p>
         {paused ? 'Paused' : 'Rest'} {sec}s
@@ -740,7 +758,7 @@ function RestBox({ remainingMs, paused }) {
           +30s
         </button>
       </p>
-    </>
+    </div>
   )
 }
 
@@ -766,6 +784,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   return (
     <section>
       <Back />
+      <RestBar />
       <p>{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
       <h1>Set</h1>
       <form
@@ -846,6 +865,7 @@ function FinishScreen() {
   return (
     <section>
       <Back />
+      <RestBar />
       <h1>Finish</h1>
       <p>
         {name} — {minutes} min · {setCount} sets
