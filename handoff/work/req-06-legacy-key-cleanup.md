@@ -1,6 +1,6 @@
 # req-06 — remove superseded legacy localStorage keys after a confirmed v8 write
 
-**Status: READY** — decision-free; the only behaviour rule (never delete a legacy copy
+**Status: BUILT AND MERGED, 2026-09-09 — branch `req-06` (`f0c6253`…`f0c6253`, 1 commit).** — decision-free; the only behaviour rule (never delete a legacy copy
 until v8 is confirmed persisted) is the requirement itself. Independent of all other reqs.
 
 **Gate: persisted-data** (DEC-009) — deletes stored `localStorage` keys. **Always waits for Emilio's hands before merge; never auto-closed** by the planning session (CLAUDE.md migration ask-gate).
