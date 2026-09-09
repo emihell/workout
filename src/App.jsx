@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { StoreProvider } from './store'
 import { getSaveFailed, subscribeSaveFailed } from './storage'
 import { ErrorBoundary } from './error-boundary'
+import { WakeLock } from './wake-lock'
 import { useHashRoute } from './route'
 import { Today } from './views/Today'
 import {
@@ -186,6 +187,7 @@ function Screen() {
 export default function App() {
   return (
     <StoreProvider>
+      <WakeLock />
       <SaveFailedBanner />
       <Nav />
       <main>
