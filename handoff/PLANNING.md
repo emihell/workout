@@ -193,8 +193,13 @@ The full cycle:
 - **Persisted-data** (schema/migration/bulk write — req-06/07 and kin) → **always** Emilio's hands
   first, never auto-closed (CLAUDE.md's migration ask-gate).
 
-**`/clear` code CC between reqs.** You can't force it (a message "/clear" is text, not a command),
-so at each close tell Emilio: *"req-NN closed — `/clear` code CC, then say build the next."*
+**`/clear` code CC between reqs — a manual step, confirmed unavoidable.** You can't force it: the
+claude-code-guide confirmed (2026-09-09) there is NO programmatic `/clear` — not via the model,
+hooks (shell only), settings, custom commands, or cross-session messages (a "/clear" message
+arrives as plain text, never executed). The only alternatives are Emilio typing `/clear`, or a
+fresh `claude` session per req (which changes the messaging address each time). We keep the manual
+`/clear`. So at each close tell Emilio: *"req-NN closed — `/clear` code CC, then say build the
+next."* Don't re-investigate automating it.
 
 **Either side stops** for a question; you stop at a human gate. **Loop-hang recovery:** if the
 idle notice fires but the branch has no ready commit, CC probably stopped to ask Emilio in its own
