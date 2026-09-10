@@ -117,19 +117,21 @@ export function itemIsMarkedDone(workout, item) {
   return ids.includes(key)
 }
 
-// req-11 / DEC-013 — the activeWorkout patch that marks an exercise done. Since
-// req-11 this fires on completing the last set (was: the review screen's "Done"
-// button), so the mark-done transition is a pure, testable patch rather than
-// inline in the completion handler. Adds the item key to completedItemIds and
-// clears any rest (the last set ends the exercise, no rest after it).
+// req-11 / DEC-013, refined by req-25 — the activeWorkout patch that marks an
+// exercise done. Since req-11 this fires on completing the last set (was: the
+// review screen's "Done" button), so the mark-done transition is a pure, testable
+// patch rather than inline in the completion handler. Adds the item key to
+// completedItemIds. It deliberately does NOT touch restEndsAt/restPausedRemaining:
+// req-25 arms a rest on the last set too (rest-on-overview), and this patch runs
+// right after the rest patch — clearing rest here would wipe the armed countdown
+// before the overview's RestBar renders. Suppression of rest belongs to the skip
+// path (restPatchAfterSet), not to marking done.
 export function markItemDonePatch(workout, item) {
   const key = itemKey(item)
   return {
     completedItemIds: [
       ...new Set([...(workout?.completedItemIds || workout?.completedSessionItemIds || []), key]),
     ],
-    restEndsAt: null,
-    restPausedRemaining: null,
   }
 }
 
@@ -202,6 +204,23 @@ export function initialSetFields({ weighted, fromRestore, restore, hasHistory, h
       : 3
   const note = fromRestore ? restore.note : ''
   return { weight, reps, effort, note }
+}
+
+// req-25 — the rest-patch decision, made pure so "when does rest run after a set"
+// is inspectable and testable outside the component (DESIGN rule). Rest is armed
+// by *completion*, not suppressed by whether it's the last set (that was the bug:
+// the final, usually hardest, set got no rest). Only a *skipped* set suppresses
+// rest; restSec === 0 means the exercise never rests. Shapes match what the store
+// merges into activeWorkout: an armed rest sets restEndsAt (a future ms timestamp)
+// and clears any paused value; restSec === 0 leaves restEndsAt untouched (it is
+// never armed for such an item, so there is nothing to clear). Uses Date.now() so
+// callers stay trivial; tests assert restEndsAt is in the future rather than exact.
+export function restPatchAfterSet({ restSec, skipped = false }) {
+  if (skipped) return { restEndsAt: null, restPausedRemaining: null }
+  if (restSec > 0) {
+    return { restEndsAt: Date.now() + restSec * 1000, restPausedRemaining: null }
+  }
+  return { restPausedRemaining: null }
 }
 
 // Pure rest-timer state, derived from the persisted workout-level fields
