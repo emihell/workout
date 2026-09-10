@@ -1,6 +1,6 @@
 # req-20 — let a link `Row` carry a right-aligned `value` beside its chevron
 
-**Status: READY.** Small additive `ui/` primitive fix. Sourced from `reports/req-15-findings.md` #4
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-20` (`1ef1bb7`…`1ef1bb7`, 1 commit).** Small additive `ui/` primitive fix. Sourced from `reports/req-15-findings.md` #4
 (DEC-021).
 
 **Gate: code-only** (DEC-009, functional), but it touches `ui/Row` which many screens use — planning
