@@ -4,6 +4,7 @@ import { buildBackup } from '../exchange.js'
 import { downloadJson, importWithBackup } from '../import-backup'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
+import { Banner, Button, Checkbox, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
 
 function backupLines(summary) {
   return `${summary.routines} routines, ${summary.exercises} exercises, ${summary.workouts} workouts, ${summary.slots} slots.`
@@ -16,21 +17,11 @@ export function Settings() {
   const [includeAssistant, setIncludeAssistant] = useState(false)
 
   return (
-    <section>
-      <h1>Settings</h1>
-      <p>
-        <label>
-          <input
-            type="checkbox"
-            checked={includeAssistant}
-            onChange={(event) => setIncludeAssistant(event.target.checked)}
-          />{' '}
-          Assistant prompt
-        </label>
-      </p>
-      <p>
-        <button
-          type="button"
+    <Screen>
+      <Title>Settings</Title>
+      <Checkbox label="Assistant prompt" checked={includeAssistant} onChange={setIncludeAssistant} />
+      <div className="ui-actions">
+        <Button
           onClick={() => {
             recordButton('export-database')
             downloadJson(
@@ -42,11 +33,8 @@ export function Settings() {
           }}
         >
           Export
-        </button>
-      </p>
-      <p>
-        <button
-          type="button"
+        </Button>
+        <Button
           onClick={() => {
             recordButton('export-analytics')
             downloadJson(`workout-analytics-${dateKey(new Date())}.json`, exportAnalytics())
@@ -55,42 +43,35 @@ export function Settings() {
           }}
         >
           Export analytics
-        </button>
-      </p>
-      <p>
-        <label>
-          Import
-          <br />
-          <input
-            type="file"
-            accept="application/json,.json"
-            onChange={(event) => {
-              const file = event.target.files?.[0]
-              event.target.value = ''
-              if (!file) return
-              file.text().then((text) => {
-                try {
-                  const payload = JSON.parse(text)
-                  const result = importWithBackup({ store, payload })
-                  if (!result) return // cancelled at the confirm
-                  recordButton('import')
-                  setError('')
-                  setMessage(backupLines(result.summary))
-                } catch (err) {
-                  setMessage('')
-                  setError(err instanceof Error ? err.message : 'Could not import.')
-                }
-              })
-            }}
-          />
-        </label>
-      </p>
-      {message ? <p>{message}</p> : null}
-      {error ? <p>{error}</p> : null}
+        </Button>
+        <FileButton
+          label="Import"
+          accept="application/json,.json"
+          onFiles={(files) => {
+            const file = files?.[0]
+            if (!file) return
+            file.text().then((text) => {
+              try {
+                const payload = JSON.parse(text)
+                const result = importWithBackup({ store, payload })
+                if (!result) return // cancelled at the confirm
+                recordButton('import')
+                setError('')
+                setMessage(backupLines(result.summary))
+              } catch (err) {
+                setMessage('')
+                setError(err instanceof Error ? err.message : 'Could not import.')
+              }
+            })
+          }}
+        />
+      </div>
+      {message ? <Banner>{message}</Banner> : null}
+      {error ? <Banner role="alert">{error}</Banner> : null}
       {/* req-13 — entry to the component-library showcase (iteration surface). */}
-      <p>
-        <a href="#/components">Components</a>
-      </p>
-    </section>
+      <List>
+        <Row to="/components">Components</Row>
+      </List>
+    </Screen>
   )
 }

@@ -83,7 +83,10 @@ export function FileButton({ label = 'Import', accept, onFiles, variant = 'secon
         type="file"
         accept={accept}
         style={{ display: 'none' }}
-        onChange={(e) => onFiles?.(e.target.files)}
+        onChange={(e) => {
+          onFiles?.(e.target.files)
+          e.target.value = '' // allow re-selecting the same file (re-fires change)
+        }}
       />
     </label>
   )
