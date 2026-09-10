@@ -283,13 +283,9 @@ function WorkoutItemLive({ routineId, item }) {
           onPrevious={previousSet}
         />
       )}
-
-      {resting ? null : (
-        <>
-          <ExerciseSetupHeader item={item} ex={ex} showNotes={false} />
-          {ex?.cues ? <p className="ui-sub">{ex.cues}</p> : null}
-        </>
-      )}
+      {/* req-26 — the equipment + cues block that sat under the buttons is removed
+          to declutter the mid-set screen. Cues stay reachable: the exercise Title
+          is a link to the exercise editor (which shows them). */}
     </Screen>
   )
 }

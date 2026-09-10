@@ -314,6 +314,11 @@ export function SetLogForm({
   const [reps, setReps] = useState(initialReps)
   const [effort, setEffort] = useState(initialEffort)
   const [note, setNote] = useState(initialNote)
+  // req-26 — the note is hidden behind an "Add note" affordance to declutter the
+  // mid-set screen. Start expanded only when a note already exists (a restored /
+  // seeded note), so it is never lost; otherwise show the button. The submitted
+  // value is unchanged — `note` stays '' until the field is opened and typed in.
+  const [showNote, setShowNote] = useState(Boolean(initialNote))
   return (
     <form
       className="ui-setlog"
@@ -340,7 +345,20 @@ export function SetLogForm({
           <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
         </>
       ) : null}
-      <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} />
+      {showNote ? (
+        // autoFocus only when revealed by tapping (initialNote empty at mount);
+        // a pre-existing note starts expanded but does not grab focus / the keyboard.
+        <Field
+          label="Note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          autoFocus={!initialNote}
+        />
+      ) : (
+        <Button variant="quiet" onClick={() => setShowNote(true)}>
+          Add note
+        </Button>
+      )}
       <div className="ui-setlog__actions">
         <Button type="submit" variant="primary">
           Complete
