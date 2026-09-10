@@ -220,3 +220,15 @@ parity test recomputes the old inline expressions and asserts `deepEqual` over r
 so the DEC-009 functional gate was met deterministically rather than by click-through. Default effort
 confirmed as `3` (Moderate) from the inline code; no inline/`setLogSeed` discrepancy found. Merge
 `632fb33` (branch `req-17`, `80e746c`). `./check` green, 105 tests (6 new in `workout-log.test.js`).
+
+## req-16 — collapse the done/log item-path branch into `itemCurrentPath`  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #9, DEC-021). The expression "done → done screen, else log screen"
+was hand-written at five sites in `Workout.jsx`, each spelling out both `itemDonePath`/`itemLogPath`.
+One helper `itemCurrentPath(routineId, item, done)` now owns the branch; the five callers pass their
+own boolean verbatim (`completed` = marked-done+plannedDone at the overview/redirect; `plannedDone`
+alone at itemSetsPath + setup Save/Cancel — deliberately *not* unified, since that would change
+navigation). `itemSetsPath` collapsed to a one-liner. The standalone unconditional redirect at :511
+correctly left alone (not a done/log branch). Pure, behaviour-neutral, no test edits — verified: the
+two path helpers now appear only in their defs + inside `itemCurrentPath` + that one redirect. Merge
+`1787773` (branch `req-16`, `403cb85`). `./check` green, 105 tests.
