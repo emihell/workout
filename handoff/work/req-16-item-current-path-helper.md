@@ -1,6 +1,6 @@
 # req-16 — collapse the done/log item-path branch into one `itemCurrentPath` helper
 
-**Status: READY.** Pure refactor, no behaviour change, no persisted-data touch. Independent of
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-16` (`403cb85`…`403cb85`, 1 commit).** Pure refactor, no behaviour change, no persisted-data touch. Independent of
 all other reqs. Sourced from `reports/req-15-findings.md` #9 (DEC-021 follow-up cleanup).
 
 **Gate: code-only** (DEC-009) — no UX or persisted-data change; the planning session can review
