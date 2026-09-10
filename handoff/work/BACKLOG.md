@@ -69,6 +69,58 @@ pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
 - **Legacy `localStorage` key cleanup** — `workout-mvp-v5..v7` read for migration but
   never removed. Low severity. Speced READY: `work/req-06-legacy-key-cleanup.md`.
 
+### Gym-flow notes — Emilio, 2026-09-10 (from real gym use)
+
+Raw notes captured while using the styled app in the gym. All Phase 1 (gym-flow flawless).
+Grounded against the code; disposition + open questions noted. **Not yet specced as reqs** —
+several need a behaviour call from Emilio first. Sequencing insight below.
+
+1. **Show the "upcoming" set's weight during rest, editable while resting.** While the rest
+   timer runs, surface the next set's prescribed weight and let it be changed then (not only
+   once you're back on the log screen). [measured] rest is a workout-level countdown shown by
+   `RestBar` (`Workout.jsx:630+`); the next set's seed is `initialSetFields` (req-17). *Disp:*
+   READY-able. *Q:* show upcoming only when the weight **changes** from the last set, or always?
+2. **Remove the informational text under the buttons.** The lines under the log buttons
+   (effort/held/target hints) are clutter mid-set. [measured] set-log form + hint lines in
+   `WorkoutItemLive`/`SetLogForm` (`Workout.jsx:~455–460`, the `ExerciseSetupHeader`/cues lines).
+   *Disp:* READY-able, small. Pairs with the "effort = hold legible" item above — decide together.
+3. **Hide the note field behind an "Add note" button.** Note input is always shown; make it a
+   button that reveals the field. [measured] `SetLogForm` renders the note `Textarea` inline.
+   *Disp:* READY-able, small. Ties to req-18 (set-edit forms) — see sequencing.
+4. **Spatial button rule — forward/primary right, back/previous left.** RECORDED as a rule in
+   `rules/DESIGN.md §4` (2026-09-10). *Disp:* needs an **audit req** — sweep every two-action
+   screen and fix sides. Touches the same rows/forms as req-20/23/18.
+5. **BUG — rest timer doesn't fire on a re-done set after Previous.** "Go Previous after a set,
+   then forward → no timer; and a timer that already ran won't run again for that set."
+   [measured] `previousSet` (`Workout.jsx:379`) calls `removeActiveSet`, which clears
+   `restEndsAt`/`restPausedRemaining` (`store.jsx:311`); re-completing calls `completeSet` →
+   `restAfterSet(done)` (`Workout.jsx:321`), which returns **no rest when `done` is true**
+   (`finishAfterThisSet`). Likely: after the restore the set counts as the last one, so `done`
+   suppresses rest. *Disp:* real bug — spec as a fix req; CC to repro + root-cause. Relates to
+   req-03 (persistent rest timer).
+6. **Timed exercises (duration sets) — e.g. plank.** Any exercise should be able to carry a
+   **weight and/or a timer**; a timed exercise shows a count-**down** during the set that you
+   start, with a sound when done. [measured] exercises have `restSec` already (`model.js:41`) but
+   no per-set *work* duration; `EXERCISE_TYPES = ['machine','free','bodyweight','cardio']`
+   (`ids.js:51`) has no "timed" concept. *Disp:* **biggest of the batch — persisted-data +
+   model + UI.** Needs a decision (below). The "sound when done" reuses the still-open rest-end-cue
+   backlog item.
+7. **Show completed routines on the main (Today) page.** [measured] `Today`/`WorkoutRow` already
+   marks a slot `Done {date}` when a covering workout exists (`Today.jsx:29–38`); the ask is a
+   visible list/section of what's been completed, not just the per-slot label. *Disp:* READY-able.
+   *Q:* today's completed only, or a recent-history glance?
+
+**Decision needed (Emilio) — #6 timed exercises:** is "timed" a **flag + duration field
+orthogonal to weight** (an exercise/set can be weighted, timed, or both — matches "sometimes
+both") or a **new `EXERCISE_TYPES` value**? This sets the schema shape and gates the migration
+(persisted-data ask-gate). Recommend the orthogonal flag; confirm before speccing.
+
+**Sequencing insight:** notes #2, #3, #4 all touch the live set-log / set-edit forms and the
+row buttons — the exact surfaces the refactor batch is about to rewrite (req-18 merge set-edit
+forms, req-20 Row value, req-23 ActionRow). Doing the refactor and *then* re-touching these is
+wasted work. Options: (a) fold the UX changes into those reqs, or (b) do the small UX notes
+first and let the refactor land on the final shape. Worth deciding before req-18/23 build.
+
 **Next planning step:** sequence these with Emilio (which first), then spec them one at
 a time. Most are small; the styling pass is the big one and wants iteration.
 

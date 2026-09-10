@@ -89,6 +89,14 @@ Back               returns to the previous screen.
 A "Delete" on a relationship page (should be Remove), or a "Save" that doesn't commit,
 breaks the contract even if it works.
 
+**Spatial rule (Emilio, 2026-09-10):** a control's *side* is part of its meaning.
+Every **primary / forward** action — the one that moves you deeper into the flow
+(Start, Save, Complete, Next, Continue) — sits on the **right**. Every **back /
+previous / cancel** action sits on the **left**. This holds on every screen, so the
+thumb learns one map: right advances, left retreats. **The test:** on any screen with
+two actions, is the forward one on the right and the retreat one on the left? (Applies
+retroactively — existing screens must be audited against it, not just new ones.)
+
 ## 5. Feel — a floor, not a budget
 
 For the MVP there is no visual-design pass, so "feel" means: the loop doesn't fight
