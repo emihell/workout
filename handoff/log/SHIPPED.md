@@ -282,3 +282,20 @@ correct exclusions (like req-21): Schedule "assign" row left alone (its `<Button
 label, not a trailing action). **One deliberate visual change, accepted:** Routine Up/Down had no
 gap before; `.ui-row__action` gives `gap:s2` — the consistency the req exists for, not a regression.
 Merge `3b643fe` (branch `req-23`, `e4905b5`). `./check` green, 105 tests.
+
+## req-18 — merge the set-edit forms into a shared `SetEditForm`  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #2, DEC-021). New `src/views/set-edit.jsx` holds `SetEditForm`
+(kg/reps/effort/note + optional set-type toggle); `WorkoutSetEdit` and `HistorySet` are now thin
+wrappers passing `showLoad`/`showEffort` gates, `setTypeOptions` (History-only), `onSave(rawValues)`,
+`cancelTo`. Lives in a new view-layer file (not shared.jsx, which is kept ui/-import-free to avoid a
+shared→ui→shared cycle). The two paths' **behavioural differences are expressed as props, not papered
+over** — the form emits raw field values and each caller does its own coercion: empty weight → 0 in
+the live set (`weight === '' ? 0`), stays '' in history (`weight === '' ? ''`); [measured] both match
+`main` byte-for-byte (Workout main:723, History main:543/545). Distinct store mutations
+(updateActiveSet vs rebuild sets[]+updateWorkout) and post-save routes kept per caller. Effort uses
+req-22 `clearable`. `SetLogForm` left separate (different lifecycle, crosses ui/↔views — noted as a
+follow-up). **Planning browser-verified** the History edit path on real data (Chest Press set: Type=
+Work, kg=30, Reps=12, Effort=Hard all seed correctly; set-type toggle + clearable effort present) —
+read-only, no save. Save-path parity proven by diff rather than a mutating click. Merge `821eb96`
+(branch `req-18`, `8e47ed6`). `./check` green, 105 tests.
