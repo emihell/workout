@@ -61,3 +61,16 @@ speccing — but the pattern is clear: a findings doc written "observe, don't do
 looked true mid-task, not a verified spec. Rule: when turning a finding into a req, re-run its own
 `grep`/read and confirm the premise holds; spec against the code, not the finding's summary. (Also why
 `req-21` capped the demo migration at provably byte-identical sites instead of "convert all 50".)
+
+## L-005 — `./check` does not catch a missing import of a *local* symbol  (2026-09-10)
+
+Found while merging req-19 (a by-hand split of two view files into folders). oxlint does **not** flag
+undefined identifiers, and esbuild treats a bare undefined identifier as a global reference — so a
+module that uses a helper it forgot to import **passes `./check`** (lint + tests + build all green)
+and only blank-screens at runtime on the screen that calls it. The green gate is therefore *not*
+sufficient evidence that a file-move/split is correct. Rule: for any refactor that relocates symbols
+across modules (a split, an extraction, a barrel), the receipts are (1) an import-block-stripped
+old-vs-new **body diff** proving the executable lines are unchanged, plus (2) an explicit **import
+audit** (every used symbol resolves to an import or a local def; every JSX tag imported), plus (3) a
+**browser walk** of the affected screens — not the `./check` line. CC ran all three here and flagged
+the blind spot; worth building the audit into how we review splits.

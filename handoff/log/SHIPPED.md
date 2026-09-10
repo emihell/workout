@@ -299,3 +299,18 @@ follow-up). **Planning browser-verified** the History edit path on real data (Ch
 Work, kg=30, Reps=12, Effort=Hard all seed correctly; set-type toggle + clearable effort present) —
 read-only, no save. Save-path parity proven by diff rather than a mutating click. Merge `821eb96`
 (branch `req-18`, `8e47ed6`). `./check` green, 105 tests.
+
+## req-19 — split Workout.jsx / History.jsx into per-screen folders  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #1, DEC-021) — the last of the batch. Pure move: `Workout.jsx` →
+`views/workout/` {helpers, rest, overview, item (the 397-line live flow), setup, finish, index-barrel};
+`History.jsx` → `views/history/` {helpers, list, detail, edit, recalc, index-barrel}. Each barrel
+re-exports exactly the 8 workout + 10 history screens App.jsx imports (WorkoutItemLive stays internal);
+App.jsx's two import lines repointed to the folders (the only importer); single-use helpers kept local,
+shared ones in helpers. **Proven pure move:** import-block-stripped body diff of old-vs-new = zero diff
+both files (Workout 456 uniq body lines, History 345). **Planning browser-verified** (the gate can't
+catch a missing local-import — see L-005): walked live overview, the log screen (item.jsx, prefill
+working), Finish, and History detail — all render; started + cleanly Abandoned a throwaway workout
+(activeWorkout confirmed back to null, no history touched). Merge `bb3f724` (branch `req-19`,
+`b6b63f5`). `./check` green, 105 tests. **This closes the req-15-findings refactor batch (req-16, 17,
+18, 20, 21, 22, 23, 19).**

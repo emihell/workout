@@ -1,7 +1,8 @@
 # Now
 
-Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15–18, req-20–23** (all except req-10). Done
-lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15–23** (all except req-10). The req-15
+refactor batch is fully done. Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
+`work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -14,12 +15,13 @@ Phase 2  program-creation flow   ← next
 Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated on the backend fork)
 ```
 
-## Next — READY (build in the order below; full spec in each `work/req-NN-*.md`; one at a time, DEC-009)
+## Next — READY
 
-**Refactor batch (req-15 findings, DEC-021 — all code-only, planning verifies + merges).** Order
-avoids file conflicts (they touch the same files). ~~req-16, 17, 18, 20, 21, 22, 23~~ shipped. Running
-self-driving (Emilio uninvolved, no /clear between): CC builds → planning merges → releases next. **Last: req-19.**
-1. `req-19` split the two oversized view files (pure move) — ← last of the batch
+**Refactor batch (req-15 findings, DEC-021): DONE** — all 8 shipped self-driving (req-16, 17, 18,
+19, 20, 21, 22, 23), planning-verified + merged. Findings #8 no-op, #10 rejected. Next up are the
+**gym-flow notes** (Emilio 2026-09-10, `work/BACKLOG.md`): decided *refactor-first, notes-after*, so
+these are now unblocked. Spec them one at a time — **bug #5 (rest timer) first** (a real defect,
+independent of UI). Not yet written as req-NN.
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
