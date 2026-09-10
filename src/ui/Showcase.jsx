@@ -147,6 +147,17 @@ export function Showcase() {
           <Row to="/exercises">Exercises</Row>
           <Row to="/exercises" value="12">Exercises</Row>
           <Row value="82.5 kg">Last top set</Row>
+          <Row action={<Button>Start</Button>}>Push day — Chest</Row>
+          <Row
+            action={
+              <>
+                <Button>Up</Button>
+                <Button>Down</Button>
+              </>
+            }
+          >
+            Bench press — Work · 3 sets
+          </Row>
         </List>
       </Block>
 

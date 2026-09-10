@@ -131,7 +131,7 @@ export function RoutineDetail({ routineId, paths }) {
           return (
             <Row
               key={item.id || `${item.exerciseId}-${index}`}
-              value={
+              action={
                 <>
                   <Button onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>Up</Button>
                   <Button onClick={() => store.moveRoutineExercise(routine.id, index, 1)}>Down</Button>

@@ -120,7 +120,7 @@ export function ScheduleDay({ week, weekday }) {
         {slots.map((slot) => (
           <Row
             key={slot.id}
-            value={
+            action={
               <Button
                 onClick={() => {
                   if (!window.confirm(`Remove ${slotLabel(routines, slot)}?`)) return

@@ -173,12 +173,17 @@ export function SectionHeader({ children }) {
 
 // List + Row — Apple grouped list: hairline dividers between rows, ≥44px height.
 // A row with `to` is a navigable link (trailing › chevron); either kind may
-// carry a right-aligned `value` (on a link it sits before the chevron).
+// carry a right-aligned informational `value` (on a link it sits before the
+// chevron). A plain row may also carry a trailing `action` node (a control —
+// e.g. a <Button>) in its own slot; when both are present they render in order
+// `children … value action`. `action` is a plain-row affordance (link rows have
+// no caller that needs it); multiple controls in one `action` are laid out with
+// a consistent gap.
 export function List({ children }) {
   return <ul className="ui-list">{children}</ul>
 }
 
-export function Row({ children, value, to }) {
+export function Row({ children, value, action, to }) {
   if (to) {
     return (
       <li className="ui-row">
@@ -194,6 +199,7 @@ export function Row({ children, value, to }) {
     <li className="ui-row">
       <span>{children}</span>
       {value != null ? <span className="ui-row__value">{value}</span> : null}
+      {action != null ? <span className="ui-row__action">{action}</span> : null}
     </li>
   )
 }

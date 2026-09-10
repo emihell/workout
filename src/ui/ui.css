@@ -274,6 +274,14 @@ a:active {
 .ui-row__value {
   color: var(--ui-ink-2);
 }
+/* Trailing action slot: one or more controls (e.g. a <Button>), pushed right by
+ * the row's space-between, laid out with a consistent gap when there's more than
+ * one (e.g. Up/Down). Buttons keep their own styling. */
+.ui-row__action {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-s2);
+}
 .ui-row__chev {
   color: var(--ui-ink-3);
 }
