@@ -14,13 +14,10 @@ Phase 2  program-creation flow   ← next
 Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated on the backend fork)
 ```
 
-## Next — READY (build in the order below; each has a full spec in `work/`)
+## Next — READY (build in the order below; full spec in each `work/req-NN-*.md`; one at a time, DEC-009)
 
-Each req is tagged with its merge gate (DEC-009). Code CC builds one at a time by reading its
-`work/req-NN-*.md`.
-
-**Refactor batch (req-15 findings, DEC-021 — all code-only, planning verifies + merges).** Build
-order chosen to avoid file conflicts (they touch the same files):
+**Refactor batch (req-15 findings, DEC-021 — all code-only, planning verifies + merges).** Order
+avoids file conflicts (they touch the same files):
 1. `req-17` extract `initialSetFields` (seed logic → pure/tested; shrinks Workout.jsx) — do first
 2. `req-16` `itemCurrentPath` helper (tiny, Workout.jsx)
 3. `req-20` link-`Row` `value` · `req-21` `Title subtitle` · `req-22` `SegmentedControl clearable` (ui/ additive)
