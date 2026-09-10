@@ -20,6 +20,8 @@ import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExerc
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/History'
 import { StartWorkout } from './views/Start'
 import { Settings } from './views/Settings'
+import { NavBar } from './ui/index.jsx'
+import { Showcase } from './ui/Showcase.jsx'
 
 function SaveFailedBanner() {
   const failed = useSyncExternalStore(subscribeSaveFailed, getSaveFailed, getSaveFailed)
@@ -28,24 +30,6 @@ function SaveFailedBanner() {
     <div role="alert">
       Couldn't save your last change. Your data may not persist — export a backup from Settings.
     </div>
-  )
-}
-
-function Nav() {
-  return (
-    <nav>
-      <a href="#/">Today</a>
-      {' · '}
-      <a href="#/schedule">Schedule</a>
-      {' · '}
-      <a href="#/routines">Routines</a>
-      {' · '}
-      <a href="#/exercises">Exercises</a>
-      {' · '}
-      <a href="#/history">History</a>
-      {' · '}
-      <a href="#/settings">Settings</a>
-    </nav>
   )
 }
 
@@ -181,6 +165,7 @@ function Screen() {
   if (route.name === 'history-set') return <HistorySet key={`${route.id}-${route.index}`} workoutId={route.id} index={route.index} />
   if (route.name === 'history-detail') return <HistoryDetail workoutId={route.id} />
   if (route.name === 'settings') return <Settings />
+  if (route.name === 'components') return <Showcase />
   return <Today />
 }
 
@@ -189,7 +174,7 @@ export default function App() {
     <StoreProvider>
       <WakeLock />
       <SaveFailedBanner />
-      <Nav />
+      <NavBar />
       <main>
         <ErrorBoundary>
           <Screen />

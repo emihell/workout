@@ -87,6 +87,10 @@ export function Settings() {
       </p>
       {message ? <p>{message}</p> : null}
       {error ? <p>{error}</p> : null}
+      {/* req-13 — entry to the component-library showcase (iteration surface). */}
+      <p>
+        <a href="#/components">Components</a>
+      </p>
     </section>
   )
 }
