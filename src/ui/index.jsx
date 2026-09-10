@@ -158,8 +158,8 @@ export function SectionHeader({ children }) {
 }
 
 // List + Row — Apple grouped list: hairline dividers between rows, ≥44px height.
-// A row with `to` is a navigable link (trailing › chevron); otherwise a plain
-// row with optional right-aligned `value`.
+// A row with `to` is a navigable link (trailing › chevron); either kind may
+// carry a right-aligned `value` (on a link it sits before the chevron).
 export function List({ children }) {
   return <ul className="ui-list">{children}</ul>
 }
@@ -169,7 +169,8 @@ export function Row({ children, value, to }) {
     return (
       <li className="ui-row">
         <NavLink to={to} className="ui-row__link">
-          <span>{children}</span>
+          <span className="ui-row__label">{children}</span>
+          {value != null ? <span className="ui-row__value">{value}</span> : null}
           <span className="ui-row__chev">›</span>
         </NavLink>
       </li>
