@@ -323,3 +323,17 @@ Two visible items (Today + Schedule) + a Menu felt unbalanced. Revised: the **Na
 trigger**; **all** nav items (Today, Schedule, Routines, Exercises, History, Settings) live inside
 the menu. The menu **closes when an item is clicked, and when the user clicks outside it**.
 Supersedes DEC-018's "Today + Schedule always visible". Part of the req-13 iteration.
+
+## DEC-020 — a fixed named type scale; all text uses it  (Emilio, 2026-09-10)
+
+Text sizes must come from **one fixed scale**, not ad-hoc per component. Define the scale as CSS
+custom properties in `ui.css` and make every component + the showcase reference **only** these — no
+loose `font-size` values. Named tiers (concrete px = CC's call, consolidating the current sizes;
+suggested Apple-ish starting point):
+- **caption** ~13px — eyebrow labels ("BUTTON"), field labels, captions.
+- **body** ~17px — default text, buttons, inputs, list rows.
+- **section** ~22px — `SectionHeader` (h2).
+- **title** ~32px — `Title` (h1) screen titles.
+- **display** ~40px — big data numbers (e.g. the kg number).
+- The **RestBar time number is doubled** from its current size (its own large step above display).
+Single source of truth for text sizes; part of the req-13 iteration.

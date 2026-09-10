@@ -19,8 +19,10 @@ possible, easy to press, Apple-inspired.
 
 - **Colorless** — grayscale only (white / black / grays), no theme. Whitespace, type weight, and
   hairline (1px light-gray) dividers do the work.
-- **System font** (`-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`); a small
-  scale: title / section / body / caption.
+- **System font** (`-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`); a **fixed
+  named type scale** (DEC-020) — caption / body / section / title / display, defined as CSS custom
+  properties in `ui.css`, and **every** component references only these (no ad-hoc `font-size`). The
+  RestBar time number is **double** its earlier size (a large step above display).
 - **Easy to press** — every interactive target **≥ 44px** tall; generous padding; 8px spacing rhythm.
 - **Apple-inspired** — grouped lists with hairline dividers + a `›` chevron on navigable rows;
   segmented controls; large legible numbers; buttons as rounded rects set apart by weight/border.
