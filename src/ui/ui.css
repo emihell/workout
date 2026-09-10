@@ -61,6 +61,20 @@
   color: var(--ui-ink);
   margin: var(--ui-s4) 0 var(--ui-s2);
 }
+/* secondary line under a Title/Row — meta, subtitles, short status text. Body
+ * size, secondary ink; token-driven like everything else (DEC-020). */
+.ui-sub {
+  font-size: var(--ui-text-body);
+  color: var(--ui-ink-2);
+  margin: 0 0 var(--ui-s2);
+}
+/* a horizontal group of buttons (Save / Cancel, Add set, …). */
+.ui-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-s2);
+  margin-top: var(--ui-s3);
+}
 /* small uppercase caption/eyebrow label (e.g. the showcase block labels) */
 .ui-eyebrow {
   font-size: var(--ui-text-caption);

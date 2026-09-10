@@ -9,6 +9,20 @@ import { startOrContinue } from '../workout-actions'
 import { carriedWorkingSet, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, markItemDonePatch, reopenItemPatch, restRemaining, setLogSeed } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
 import { Back, ExercisesLink, Missing, NavLink } from './shared'
+import {
+  Button,
+  Field,
+  List,
+  NumberField,
+  RestBar as UIRestBar,
+  Row,
+  Screen,
+  SectionHeader,
+  SegmentedControl,
+  SetLogForm,
+  Textarea,
+  Title,
+} from '../ui/index.jsx'
 
 function usesWeight(ex) {
   return ex && ex.type !== 'bodyweight' && ex.type !== 'cardio'
@@ -63,14 +77,14 @@ function ExerciseTitle({ routineId, item, ex, bits }) {
   const meta = (bits || []).filter(Boolean).join(' · ')
   return (
     <>
-      <h1>
+      <Title>
         {inLibrary ? (
           <a href={`#${exerciseEditorPath(routineId, item)}`}>{name}</a>
         ) : (
           name
         )}
-      </h1>
-      {meta ? <p>{meta}</p> : null}
+      </Title>
+      {meta ? <p className="ui-sub">{meta}</p> : null}
     </>
   )
 }
@@ -78,8 +92,8 @@ function ExerciseTitle({ routineId, item, ex, bits }) {
 function ExerciseSetupHeader({ item, ex, showNotes = true }) {
   return (
     <>
-      {ex?.equipment ? <p>{ex.equipment}</p> : null}
-      {showNotes && item?.notes ? <p>{item.notes}</p> : null}
+      {ex?.equipment ? <p className="ui-sub">{ex.equipment}</p> : null}
+      {showNotes && item?.notes ? <p className="ui-sub">{item.notes}</p> : null}
     </>
   )
 }
@@ -109,43 +123,43 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     if (!plan) {
       return <Missing>Not found.</Missing>
     }
+    const previewMeta = [plan.focus, plan.date].filter(Boolean).join(' · ')
     return (
-      <section>
+      <Screen>
         <Back />
-        <h1>{plan.routineName}</h1>
-        <p>{[plan.focus, plan.date].filter(Boolean).join(' · ')}</p>
-        <ol>
+        <Title>{plan.routineName}</Title>
+        {previewMeta ? <p className="ui-sub">{previewMeta}</p> : null}
+        <List>
           {plan.items.map((item) => (
-            <li key={item.id}>
-              {exerciseName(item)}
-              {' — '}
-              {roleLabel(item.role)}
+            <Row key={item.id} value={`${item.sets} ${item.sets === 1 ? 'set' : 'sets'}`}>
+              {exerciseName(item)} — {roleLabel(item.role)}
               {item.warmup ? ' · WU set' : ''}
-              {' · '}
-              {item.sets} {item.sets === 1 ? 'set' : 'sets'}
-            </li>
+            </Row>
           ))}
-        </ol>
+        </List>
         {plan.items.length ? (
-          <p>
-            <button
-              type="button"
-              onClick={() =>
-                startOrContinue(store, routineId, {
-                  scheduledFor: plan.date,
-                  scheduleSlotId: plan.scheduleSlotId,
-                  occurrenceId: plan.occurrenceId,
-                  plan,
-                })
-              }
-            >
-              Start
-            </button>
-          </p>
+          <Button
+            variant="primary"
+            block
+            onClick={() =>
+              startOrContinue(store, routineId, {
+                scheduledFor: plan.date,
+                scheduleSlotId: plan.scheduleSlotId,
+                occurrenceId: plan.occurrenceId,
+                plan,
+              })
+            }
+          >
+            Start
+          </Button>
         ) : (
-          <p><a href={`#${scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`}`}>Add exercises</a></p>
+          <p>
+            <NavLink to={scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`}>
+              Add exercises
+            </NavLink>
+          </p>
         )}
-      </section>
+      </Screen>
     )
   }
 
@@ -153,43 +167,41 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
 
   if (items.length === 0) {
     return (
-      <section>
+      <Screen>
         <Back />
-        <h1>{active.snapshot?.routineName || active.snapshot?.sessionName || 'Workout'}</h1>
-        <p>No exercises.</p>
-        <p>
-          <button type="button" onClick={() => abandonWorkout(store)}>Abandon</button>
-        </p>
-      </section>
+        <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || 'Workout'}</Title>
+        <p className="ui-sub">No exercises.</p>
+        <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
+          Abandon
+        </Button>
+      </Screen>
     )
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
       <RestBar />
-      <h1>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</h1>
-      <ol>
+      <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</Title>
+      <List>
         {items.map((item) => {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone
           const path = completed ? itemDonePath(routineId, item) : itemLogPath(routineId, item)
           return (
-            <li key={itemKey(item) || item.id}>
-              <a href={`#${path}`}>{exerciseName(item)}</a>
-              {' — '}
-              {roleLabel(item.role)}
+            <Row key={itemKey(item) || item.id} to={path}>
+              {exerciseName(item)} — {roleLabel(item.role)}
               {completed ? ' · done' : ''}
-            </li>
+            </Row>
           )
         })}
-      </ol>
-      <p>
-        <a href={`#/workout/${routineId}/finish`}>Finish</a>
-      </p>
-      <p>
-          <button type="button" onClick={() => abandonWorkout(store)}>Abandon</button>
-      </p>
-    </section>
+      </List>
+      <List>
+        <Row to={`/workout/${routineId}/finish`}>Finish</Row>
+      </List>
+      <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
+        Abandon
+      </Button>
+    </Screen>
   )
 }
 
@@ -376,9 +388,34 @@ function WorkoutItemLive({ routineId, item }) {
   }
 
   const canGoBack = state.logged.length > 0
+  const weighted = usesWeight(ex)
+  const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
+  const showEffort = currentType === 'work' && ex?.type !== 'cardio'
+  // Seed the set-log fields from the same sources the app has always used —
+  // restore (Previous), then carry (no-history working set), then history /
+  // target. Domain logic stays here; the ui/ SetLogForm only holds the values.
+  const historyPrefill = historySetPrefill(last, { setType: currentType, workIndex: currentWorkIndex })
+  const fromRestore =
+    restore &&
+    restore.setType === currentType &&
+    (currentType === 'wu' || restore.workIndex === currentWorkIndex)
+  const seed = setLogSeed({
+    weighted,
+    fromRestore,
+    restore,
+    hasHistory: Boolean(last),
+    history: historyPrefill,
+    carry: carryFor(ex, last, currentType, state.workLogged),
+    target,
+  })
+  const initialEffort =
+    fromRestore && restore.rpe != null && restore.rpe !== ''
+      ? rpeOptionValue(restore.rpe) || restore.rpe
+      : 3
+  const initialNote = fromRestore ? restore.note : ''
 
   return (
-    <section>
+    <Screen>
       <ExercisesLink routineId={routineId} />
       <RestBar />
       <ExerciseTitle
@@ -393,22 +430,23 @@ function WorkoutItemLive({ routineId, item }) {
       />
       {resting ? (
         canGoBack ? (
-          <p>
-            <button type="button" onClick={previousSet}>Previous</button>
-          </p>
+          <Button variant="quiet" onClick={previousSet}>
+            Previous
+          </Button>
         ) : null
       ) : plannedDone ? null : (
         <SetLogForm
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
-          ex={ex}
-          last={last}
-          carry={carryFor(ex, last, currentType, state.workLogged)}
-          currentType={currentType}
-          currentWorkIndex={currentWorkIndex}
-          target={target}
-          restore={restore}
+          weighted={weighted}
+          showEffort={showEffort}
+          repsLabel={repsLabel}
+          effortOptions={RPE_OPTIONS}
+          initialWeight={seed.weight}
+          initialReps={seed.reps}
+          initialEffort={initialEffort}
+          initialNote={initialNote}
           canGoBack={canGoBack}
-          onComplete={completeSet}
+          onComplete={({ weight, reps, effort, note }) => completeSet({ weight, reps, rpe: effort, note })}
           onSkip={skipSet}
           onPrevious={previousSet}
         />
@@ -417,110 +455,10 @@ function WorkoutItemLive({ routineId, item }) {
       {resting ? null : (
         <>
           <ExerciseSetupHeader item={item} ex={ex} showNotes={false} />
-          {ex?.cues ? <p>{ex.cues}</p> : null}
+          {ex?.cues ? <p className="ui-sub">{ex.cues}</p> : null}
         </>
       )}
-    </section>
-  )
-}
-
-function SetLogForm({
-  ex,
-  last,
-  carry,
-  currentType,
-  currentWorkIndex,
-  target,
-  restore,
-  canGoBack,
-  onComplete,
-  onSkip,
-  onPrevious,
-}) {
-  const history = historySetPrefill(last, { setType: currentType, workIndex: currentWorkIndex })
-  const fromRestore =
-    restore &&
-    restore.setType === currentType &&
-    (currentType === 'wu' || restore.workIndex === currentWorkIndex)
-  const seed = setLogSeed({
-    weighted: usesWeight(ex),
-    fromRestore,
-    restore,
-    hasHistory: Boolean(last),
-    history,
-    carry,
-    target,
-  })
-  const [weight, setWeight] = useState(() => seed.weight)
-  const [reps, setReps] = useState(() => seed.reps)
-  const [rpe, setRpe] = useState(() =>
-    fromRestore && restore.rpe != null && restore.rpe !== ''
-      ? String(rpeOptionValue(restore.rpe) || restore.rpe)
-      : '3',
-  )
-  const [note, setNote] = useState(() => (fromRestore ? restore.note : ''))
-  const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
-
-  return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        onComplete({ weight, reps, rpe, note })
-      }}
-    >
-      {usesWeight(ex) ? (
-        <p>
-          <label>
-            kg
-            <br />
-            <input value={weight} onChange={(e) => setWeight(e.target.value)} inputMode="decimal" />
-          </label>
-        </p>
-      ) : null}
-      <p>
-        <label>
-          {repsLabel}
-          <br />
-          <input value={reps} onChange={(e) => setReps(e.target.value)} required />
-        </label>
-      </p>
-      {currentType === 'work' && ex?.type !== 'cardio' ? (
-        <>
-          <p>Effort</p>
-          <p>
-            {RPE_OPTIONS.map((opt) => (
-              <label key={opt.value}>
-                <input
-                  type="radio"
-                  name="rpe"
-                  value={opt.value}
-                  checked={String(rpe) === String(opt.value)}
-                  onChange={() => setRpe(opt.value)}
-                />{' '}
-                {opt.label}
-              </label>
-            ))}
-          </p>
-        </>
-      ) : null}
-      <p>
-        <label>
-          Note
-          <br />
-          <input value={note} onChange={(e) => setNote(e.target.value)} />
-        </label>
-      </p>
-      <p>
-        <button type="submit">Complete</button>{' '}
-        <button type="button" onClick={onSkip}>Skip</button>
-        {canGoBack ? (
-          <>
-            {' '}
-            <button type="button" onClick={onPrevious}>Previous</button>
-          </>
-        ) : null}
-      </p>
-    </form>
+    </Screen>
   )
 }
 
@@ -536,48 +474,45 @@ export function WorkoutItemDone({ routineId, itemId }) {
   const previous = lastSetsForExercise(store.workouts, item.exerciseId)
 
   return (
-    <section>
+    <Screen>
       <ExercisesLink routineId={routineId} />
       <RestBar />
-      <h2>Today</h2>
+      <SectionHeader>Today</SectionHeader>
       {today.length ? (
-        <ol>
+        <List>
           {today.map((set, index) => {
             const setIndex = (active.sets || []).indexOf(set)
             return (
-              <li key={index}>
-                <a href={`#/workout/${routineId}/set/${setIndex}`}>{formatSetLine(set)}</a>
-              </li>
+              <Row key={index} to={`/workout/${routineId}/set/${setIndex}`}>
+                {formatSetLine(set)}
+              </Row>
             )
           })}
-        </ol>
+        </List>
       ) : (
-        <p>None.</p>
+        <p className="ui-sub">None.</p>
       )}
-      <h2>Previous</h2>
+      <SectionHeader>Previous</SectionHeader>
       {previous ? (
-        <ol>
+        <List>
           {previous.sets.map((set, index) => (
-            <li key={index}>{formatSetLine(set)}</li>
+            <Row key={index}>{formatSetLine(set)}</Row>
           ))}
-        </ol>
+        </List>
       ) : (
-        <p>None.</p>
+        <p className="ui-sub">None.</p>
       )}
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            // Re-opening a completed exercise: clear the done mark first so the
-            // log screen's markedDone guard doesn't bounce straight back here.
-            store.patchActive(reopenItemPatch(active, item))
-            store.addWorkingSet(itemKey(item))
-            go(itemLogPath(routineId, item), { replace: true })
-          }}
-        >
-          Add set
-        </button>
-      </p>
+      <Button
+        onClick={() => {
+          // Re-opening a completed exercise: clear the done mark first so the
+          // log screen's markedDone guard doesn't bounce straight back here.
+          store.patchActive(reopenItemPatch(active, item))
+          store.addWorkingSet(itemKey(item))
+          go(itemLogPath(routineId, item), { replace: true })
+        }}
+      >
+        Add set
+      </Button>
       <ExerciseTitle
         routineId={routineId}
         item={item}
@@ -585,7 +520,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
         bits={[roleLabel(item.role)]}
       />
       <ExerciseSetupHeader item={item} ex={liveExercise(store, item)} />
-    </section>
+    </Screen>
   )
 }
 
@@ -604,20 +539,20 @@ export function WorkoutItemExercise({ routineId, itemId }) {
 
   if (!ex) {
     return (
-      <section>
+      <Screen>
         <Back />
-        <h1>{exerciseName(item)}</h1>
-        <p>Not found.</p>
-      </section>
+        <Title>{exerciseName(item)}</Title>
+        <p className="ui-sub">Not found.</p>
+      </Screen>
     )
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
       <RestBar />
-      <h1>{exerciseName(item)}</h1>
-      <p>{ex.equipment}</p>
+      <Title>{exerciseName(item)}</Title>
+      <p className="ui-sub">{ex.equipment}</p>
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -633,24 +568,22 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           )
         }}
       >
-        <p>
-          <label>
-            Weight step
-            <br />
-            <input value={weightStep} onChange={(event) => setWeightStep(event.target.value)} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Form cues
-            <br />
-            <textarea value={cues} onChange={(event) => setCues(event.target.value)} rows={3} />
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
-          <button
-            type="button"
+        <Field
+          label="Weight step"
+          value={weightStep}
+          onChange={(event) => setWeightStep(event.target.value)}
+        />
+        <Textarea
+          label="Form cues"
+          value={cues}
+          onChange={(event) => setCues(event.target.value)}
+          rows={3}
+        />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+          <Button
             onClick={() =>
               go(
                 itemLoggingState(active, item).plannedDone
@@ -660,10 +593,10 @@ export function WorkoutItemExercise({ routineId, itemId }) {
             }
           >
             Cancel
-          </button>
-        </p>
+          </Button>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -724,69 +657,44 @@ function RestBar() {
   const { remainingMs, paused, resting } = useRestCountdown(active)
   if (!active || !resting) return null
   const sec = Math.ceil(remainingMs / 1000)
+  // req-11 / DEC-013: [Pause/Resume] [+30s] on the left, "Next" (end the rest and
+  // advance) as the primary on the right. The handlers are unchanged from the
+  // inline version — only the markup moved onto the ui/ RestBar molecule.
+  const onPauseResume = () => {
+    if (paused) {
+      recordButton('rest-resume')
+      store.patchActive({
+        restEndsAt: Date.now() + (store.activeWorkout.restPausedRemaining || 0),
+        restPausedRemaining: null,
+      })
+    } else {
+      recordButton('rest-pause')
+      store.patchActive({
+        restPausedRemaining: Math.max(0, (store.activeWorkout.restEndsAt || Date.now()) - Date.now()),
+        restEndsAt: null,
+      })
+    }
+  }
+  const onAddTime = () => {
+    recordButton('rest-plus-30')
+    if (paused) {
+      store.patchActive({ restPausedRemaining: (store.activeWorkout.restPausedRemaining || 0) + 30000 })
+    } else {
+      store.patchActive({ restEndsAt: (store.activeWorkout.restEndsAt || Date.now()) + 30000 })
+    }
+  }
+  const onNext = () => {
+    recordButton('rest-next')
+    store.patchActive({ restEndsAt: null, restPausedRemaining: null })
+  }
   return (
-    <div role="status">
-      <h2>Rest</h2>
-      <p>
-        {paused ? 'Paused' : 'Rest'} {sec}s
-      </p>
-      {/* req-11 / DEC-013: group [Pause/Resume] + [+30s] on the left; "Next"
-          (was "Skip" — same handler: end the rest and advance to the next set)
-          on the far right. */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>
-          {paused ? (
-            <button
-              type="button"
-              onClick={() => {
-                recordButton('rest-resume')
-                store.patchActive({
-                  restEndsAt: Date.now() + (store.activeWorkout.restPausedRemaining || 0),
-                  restPausedRemaining: null,
-                })
-              }}
-            >
-              Resume
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                recordButton('rest-pause')
-                store.patchActive({
-                  restPausedRemaining: Math.max(0, (store.activeWorkout.restEndsAt || Date.now()) - Date.now()),
-                  restEndsAt: null,
-                })
-              }}
-            >
-              Pause
-            </button>
-          )}{' '}
-          <button
-            type="button"
-            onClick={() => {
-              recordButton('rest-plus-30')
-              if (paused) {
-                store.patchActive({ restPausedRemaining: (store.activeWorkout.restPausedRemaining || 0) + 30000 })
-              } else {
-                store.patchActive({ restEndsAt: (store.activeWorkout.restEndsAt || Date.now()) + 30000 })
-              }
-            }}
-          >
-            +30s
-          </button>
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            recordButton('rest-next')
-            store.patchActive({ restEndsAt: null, restPausedRemaining: null })
-          }}
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <UIRestBar
+      seconds={sec}
+      paused={paused}
+      onPauseResume={onPauseResume}
+      onAddTime={onAddTime}
+      onNext={onNext}
+    />
   )
 }
 
@@ -810,11 +718,11 @@ export function WorkoutSetEdit({ routineId, index }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
       <RestBar />
-      <p>{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
-      <h1>Set</h1>
+      <p className="ui-sub">{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
+      <Title>Set</Title>
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -827,22 +735,31 @@ export function WorkoutSetEdit({ routineId, index }) {
           go(itemPath)
         }}
       >
-        {usesLoad ? <p><label>kg<br /><input value={weight} onChange={(event) => setWeight(event.target.value)} inputMode="decimal" /></label></p> : null}
-        <p><label>Reps<br /><input value={reps} onChange={(event) => setReps(event.target.value)} /></label></p>
-        {usesRpe ? <p>
-          <label>Effort<br />
-            <select value={rpe} onChange={(event) => setRpe(event.target.value)}>
-              <option value="">—</option>
-              {RPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-        </p> : null}
-        <p><label>Note<br /><input value={note} onChange={(event) => setNote(event.target.value)} /></label></p>
-        <p><button type="submit">Save</button> <NavLink to={itemPath}>Cancel</NavLink></p>
+        {usesLoad ? (
+          <NumberField label="kg" value={weight} onChange={(event) => setWeight(event.target.value)} />
+        ) : null}
+        <Field label="Reps" value={reps} onChange={(event) => setReps(event.target.value)} />
+        {usesRpe ? (
+          <>
+            <SectionHeader>Effort</SectionHeader>
+            {/* leading '—' keeps effort clearable, as the old <select> did */}
+            <SegmentedControl
+              options={[{ value: '', label: '—' }, ...RPE_OPTIONS]}
+              value={rpe}
+              onChange={setRpe}
+              ariaLabel="Effort"
+            />
+          </>
+        ) : null}
+        <Field label="Note" value={note} onChange={(event) => setNote(event.target.value)} />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+          <NavLink to={itemPath}>Cancel</NavLink>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -891,18 +808,18 @@ function FinishScreen() {
   const name = active?.snapshot?.routineName || active?.snapshot?.sessionName
 
   return (
-    <section>
+    <Screen>
       <Back />
       <RestBar />
-      <h1>Finish</h1>
-      <p>
+      <Title>Finish</Title>
+      <p className="ui-sub">
         {name} — {minutes} min · {setCount} sets
       </p>
-      <h2>Next time</h2>
+      <SectionHeader>Next time</SectionHeader>
       {progression.length === 0 ? (
-        <p>None.</p>
+        <p className="ui-sub">None.</p>
       ) : (
-        <ul>
+        <List>
           {progression.map((item) => {
             const none = item.reason === 'Skipped.' || item.reason === 'None.'
             const next = none
@@ -911,40 +828,32 @@ function FinishScreen() {
                 ? `${item.to.join('/')} kg`
                 : (item.targetsTo || []).filter(Boolean).join('/') || item.reason
             return (
-              <li key={item.routineItemId}>
-                {item.name} — {next}
-              </li>
+              <Row key={item.routineItemId} value={next}>
+                {item.name}
+              </Row>
             )
           })}
-        </ul>
+        </List>
       )}
-      <p>Feel</p>
-      <p>
-        {['Easy', 'Good', 'Hard', 'Exhausting'].map((f) => (
-          <label key={f}>
-            <input type="radio" name="feel" checked={overallFeel === f} onChange={() => setOverallFeel(f)} /> {f}
-          </label>
-        ))}
-      </p>
-      <p>
-        <label>
-          Note
-          <br />
-          <textarea value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
-        </label>
-      </p>
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            recordButton('finish-workout')
-            store.finishWorkout({ overallNote, overallFeel, progression })
-            go('/')
-          }}
-        >
-          Save
-        </button>
-      </p>
-    </section>
+      <SectionHeader>Feel</SectionHeader>
+      <SegmentedControl
+        options={['Easy', 'Good', 'Hard', 'Exhausting']}
+        value={overallFeel}
+        onChange={setOverallFeel}
+        ariaLabel="Feel"
+      />
+      <Textarea label="Note" value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
+      <Button
+        variant="primary"
+        block
+        onClick={() => {
+          recordButton('finish-workout')
+          store.finishWorkout({ overallNote, overallFeel, progression })
+          go('/')
+        }}
+      >
+        Save
+      </Button>
+    </Screen>
   )
 }

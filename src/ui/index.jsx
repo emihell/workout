@@ -232,27 +232,41 @@ export function RestBar({ seconds = 0, paused = false, onPauseResume, onAddTime,
   )
 }
 
-// SetLogForm — the single most important gym surface: kg + reps NumberFields, an
-// effort SegmentedControl, a note Field, and Complete/Skip/Previous Buttons.
-// Presentational + self-contained (local state) so the showcase renders it
-// standalone; the real workout screen owns its own state/handlers for now.
+// SetLogForm — the single most important gym surface: a kg NumberField, a big reps
+// field, an effort SegmentedControl, a note, and Complete/Skip/Previous Buttons.
+// Presentational: it owns only the in-progress field values (local state, seeded
+// from the `initial*` props), remounted per-set by the caller with a `key`. All
+// the domain logic — history prefill, carry, restore, targets, the effort→RPE
+// mapping — lives in the caller (the workout screen), which passes the seeds in
+// and reads {weight, reps, effort, note} back out of onComplete.
+//
+// Props: `weighted` shows the kg field; `showEffort` shows the effort control
+// (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
+// "Duration"; `effortOptions` overrides the segments. The reps field is a full
+// keyboard (not decimal-only) so durations like "30 min" can be typed.
 export function SetLogForm({
   weighted = true,
+  showEffort = true,
+  repsLabel = 'Reps',
   effortOptions = [
     { value: 2, label: 'Easy' },
     { value: 3, label: 'Moderate' },
     { value: 4, label: 'Hard' },
     { value: 5, label: 'Failure' },
   ],
+  initialWeight = '',
+  initialReps = '',
+  initialEffort = 3,
+  initialNote = '',
   canGoBack = true,
   onComplete,
   onSkip,
   onPrevious,
 }) {
-  const [weight, setWeight] = useState('')
-  const [reps, setReps] = useState('')
-  const [effort, setEffort] = useState(3)
-  const [note, setNote] = useState('')
+  const [weight, setWeight] = useState(initialWeight)
+  const [reps, setReps] = useState(initialReps)
+  const [effort, setEffort] = useState(initialEffort)
+  const [note, setNote] = useState(initialNote)
   return (
     <form
       className="ui-setlog"
@@ -265,10 +279,20 @@ export function SetLogForm({
         {weighted ? (
           <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
         ) : null}
-        <NumberField label="Reps" value={reps} onChange={(e) => setReps(e.target.value)} required />
+        <Field
+          label={repsLabel}
+          className="ui-input--num"
+          value={reps}
+          onChange={(e) => setReps(e.target.value)}
+          required
+        />
       </div>
-      <SectionHeader>Effort</SectionHeader>
-      <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
+      {showEffort ? (
+        <>
+          <SectionHeader>Effort</SectionHeader>
+          <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
+        </>
+      ) : null}
       <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} />
       <div className="ui-setlog__actions">
         <Button type="submit" variant="primary">
