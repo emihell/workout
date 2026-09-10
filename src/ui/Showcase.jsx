@@ -88,6 +88,11 @@ export function Showcase() {
         <TypeScale />
       </Block>
 
+      <Block heading="Title + subtitle">
+        <Title subtitle="A muted caption bound to the title">Title with subtitle</Title>
+        <Title>Title, no subtitle</Title>
+      </Block>
+
       <Block heading="Button">
         <Button variant="primary">Primary</Button>
         <p className="ui-field__label">variants: primary / secondary / quiet</p>

@@ -149,8 +149,17 @@ export function Screen({ className, children }) {
   return <section className={cx('ui-screen', className)}>{children}</section>
 }
 
-export function Title({ children }) {
-  return <h1 className="ui-title">{children}</h1>
+// Title + optional bound caption. `subtitle` renders the same `.ui-sub` markup
+// screens used to hand-write under the title; empty/null renders just the <h1>,
+// byte-identical to a bare Title. Standalone `.ui-sub` (empty-state captions,
+// multi-line meta not bound to a title) stays a raw <p className="ui-sub">.
+export function Title({ children, subtitle }) {
+  return (
+    <>
+      <h1 className="ui-title">{children}</h1>
+      {subtitle != null && subtitle !== '' ? <p className="ui-sub">{subtitle}</p> : null}
+    </>
+  )
 }
 
 export function SectionHeader({ children }) {
