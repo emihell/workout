@@ -35,8 +35,6 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 - **`req-24` native confirm/alert → inline UI** (from req-15 finding #11) — 10 sites; needs the
   inline-confirm *pattern* decided first (bar/sheet vs two-tap vs undo). **[ux-feel]** Spec: `work/req-24-inline-confirm-alert.md`.
-- Refactor backlog now specced as **req-16..23** (see READY above). Finding #8 (Select) no-op;
-  finding #10 (merge the two header helpers) **rejected** — not actually always rendered together (see `work/req-16`).
 - **`req-14` nav/menu redesign** — Emilio isn't a fan of req-13's placeholder menu; redesign it, but
   the *direction* (bottom tab bar / slide-up sheet / drawer / cleaner top menu) needs deciding first.
   Current menu stays meanwhile. `work/req-14-nav-menu-redesign.md`. **[ux-feel]**
