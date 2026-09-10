@@ -11,6 +11,7 @@ import {
   withOneMoreSet,
   addWorkingSetToState,
   withSkippedUnloggedSets,
+  restPatchAfterSet,
   restRemaining,
   carriedWorkingSet,
   setLogSeed,
@@ -47,7 +48,12 @@ describe('workout logging', () => {
 
   // req-11 / DEC-013 — the mark-done transition moved from the review screen's
   // "Done" button to completing the last set. These test the pure patch.
-  it('completing the last set marks the exercise done (adds its key, clears rest)', () => {
+  // req-25 update: the patch no longer clears rest. Before req-25 it set
+  // restEndsAt/restPausedRemaining to null (the old "no rest after the last set"
+  // behaviour). req-25 arms a rest on the last set too (rest-on-overview) and this
+  // patch runs right after the rest patch, so it must NOT wipe the armed rest —
+  // this test now asserts the patch leaves the rest fields untouched (domino check).
+  it('completing the last set marks the exercise done and does NOT touch rest', () => {
     // A single-set exercise: after that set is logged, plannedDone is true and
     // the completion path fires markItemDonePatch.
     const workout = {
@@ -59,8 +65,9 @@ describe('workout logging', () => {
     assert.equal(itemLoggingState(workout, item).plannedDone, true)
     const patch = markItemDonePatch(workout, item)
     assert.deepEqual(patch.completedItemIds, ['si-row'])
-    assert.equal(patch.restEndsAt, null)
-    assert.equal(patch.restPausedRemaining, null)
+    // The patch must not carry rest keys, so merging it preserves the armed rest.
+    assert.equal('restEndsAt' in patch, false)
+    assert.equal('restPausedRemaining' in patch, false)
     assert.equal(itemIsMarkedDone({ completedItemIds: patch.completedItemIds }, item), true)
   })
 
@@ -149,6 +156,35 @@ describe('workout logging', () => {
     assert.equal(next.sets[1].reps, 'skipped')
     assert.equal(next.sets[2].reps, 'skipped')
     assert.deepEqual(next.completedItemIds, ['si-row'])
+  })
+})
+
+// req-25 — rest is armed by completion, not suppressed on the last set; only a
+// skipped set (or restSec 0) suppresses it. The bug was the final set getting no
+// rest. This pins the pure decision the view delegates to.
+describe('restPatchAfterSet (req-25 rest-on-completion)', () => {
+  it('a completed set with restSec > 0 arms a future rest (last set or not)', () => {
+    const before = Date.now()
+    const patch = restPatchAfterSet({ restSec: 90, skipped: false })
+    assert.ok(patch.restEndsAt >= before + 90 * 1000)
+    assert.equal(patch.restPausedRemaining, null)
+  })
+
+  it('a skipped set never rests (no over-fix on skip)', () => {
+    assert.deepEqual(restPatchAfterSet({ restSec: 90, skipped: true }), {
+      restEndsAt: null,
+      restPausedRemaining: null,
+    })
+  })
+
+  it('restSec 0 never arms rest (leaves restEndsAt untouched to merge)', () => {
+    const patch = restPatchAfterSet({ restSec: 0, skipped: false })
+    assert.equal('restEndsAt' in patch, false)
+    assert.equal(patch.restPausedRemaining, null)
+  })
+
+  it('skipped defaults to false: restSec > 0 arms rest when skipped is omitted', () => {
+    assert.ok(restPatchAfterSet({ restSec: 60 }).restEndsAt > Date.now())
   })
 })
 

@@ -13,6 +13,7 @@ import {
   lastLoggedSetIndex,
   markItemDonePatch,
   reopenItemPatch,
+  restPatchAfterSet,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing } from '../shared'
@@ -155,12 +156,11 @@ function WorkoutItemLive({ routineId, item }) {
     return currentWorkIndex + 1 >= workCount
   }
 
-  function restAfterSet(done, skipped = false) {
-    if (done || skipped) return { restEndsAt: null, restPausedRemaining: null }
-    if (item.restSec > 0) {
-      return { restEndsAt: Date.now() + item.restSec * 1000, restPausedRemaining: null }
-    }
-    return { restPausedRemaining: null }
+  // req-25 — rest is armed by completion, not suppressed on the last set; the
+  // pure decision lives in restPatchAfterSet. `done` (last set) no longer affects
+  // rest, only navigation (see completeSet), so it is not passed here anymore.
+  function restAfterSet(skipped = false) {
+    return restPatchAfterSet({ restSec: item.restSec, skipped })
   }
 
   function completeSet({ weight, reps, rpe, note }) {
@@ -186,7 +186,7 @@ function WorkoutItemLive({ routineId, item }) {
             ? item.suggestedWeights[currentWorkIndex]
             : null,
       },
-      restAfterSet(done),
+      restAfterSet(),
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -208,7 +208,7 @@ function WorkoutItemLive({ routineId, item }) {
         targetWeight:
           currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
       },
-      restAfterSet(done, true),
+      restAfterSet(true),
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
