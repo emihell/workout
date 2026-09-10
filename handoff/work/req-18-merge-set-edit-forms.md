@@ -1,6 +1,6 @@
 # req-18 — merge the near-duplicate set-edit forms into one shared `SetEditForm`
 
-**Status: READY.** Behaviour-neutral consolidation of the most-duplicated surface in the views.
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-18` (`8e47ed6`…`8e47ed6`, 1 commit).** Behaviour-neutral consolidation of the most-duplicated surface in the views.
 Sourced from `reports/req-15-findings.md` #2 (DEC-021).
 
 **Gate: code-only** (DEC-009, functional) — no user-visible change; planning browser-verifies both
