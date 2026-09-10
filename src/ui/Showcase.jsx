@@ -130,6 +130,7 @@ export function Showcase() {
       <Block heading="Grouped list + row">
         <List>
           <Row to="/exercises">Exercises</Row>
+          <Row to="/exercises" value="12">Exercises</Row>
           <Row value="82.5 kg">Last top set</Row>
         </List>
       </Block>
