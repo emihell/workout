@@ -15,6 +15,19 @@ import {
 import { useStore } from '../store-context'
 import { RoutineScreens, navForBase } from './Routine'
 import { Back, Missing, NavLink } from './shared'
+import {
+  Button,
+  Field,
+  List,
+  NumberField,
+  Row,
+  Screen,
+  SectionHeader,
+  SegmentedControl,
+  Select,
+  Textarea,
+  Title,
+} from '../ui/index.jsx'
 
 function itemIdOf(obj) {
   return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''
@@ -149,17 +162,15 @@ function groupWorkoutsByMonth(workouts) {
     .map(([key, items]) => ({ key, workouts: items }))
 }
 
-function WorkoutHistoryLink({ store, workout }) {
+function WorkoutHistoryRow({ store, workout }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   const programName = workout.snapshot?.programName
   const name = workoutRoutineName(workout, routine)
   const label = programName ? `${programName} — ${name}` : name
   return (
-    <>
-      <a href={`#/history/${workout.id}`}>{label}</a>
-      {' — '}
-      {compactDate(workoutDateKey(workout))}
-    </>
+    <Row to={`/history/${workout.id}`}>
+      {label} — {compactDate(workoutDateKey(workout))}
+    </Row>
   )
 }
 
@@ -171,40 +182,37 @@ export function History({ month = null }) {
     const group = months.find((candidate) => candidate.key === month)
     const workouts = group?.workouts || []
     return (
-      <section>
+      <Screen>
         <Back />
-        <h1>{monthLabel(month)}</h1>
+        <Title>{monthLabel(month)}</Title>
         {workouts.length === 0 ? (
-          <p>None.</p>
+          <p className="ui-sub">None.</p>
         ) : (
-          <ul>
+          <List>
             {workouts.map((workout) => (
-              <li key={workout.id}>
-                <WorkoutHistoryLink store={store} workout={workout} />
-              </li>
+              <WorkoutHistoryRow key={workout.id} store={store} workout={workout} />
             ))}
-          </ul>
+          </List>
         )}
-      </section>
+      </Screen>
     )
   }
 
   return (
-    <section>
-      <h1>History</h1>
+    <Screen>
+      <Title>History</Title>
       <p>
-        <a href="#/history/exercises">By exercise</a>
+        <NavLink to="/history/exercises">By exercise</NavLink>
       </p>
-      {months.length === 0 ? <p>None.</p> : null}
-      <ul>
+      {months.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {months.map((group) => (
-          <li key={group.key}>
-            <a href={`#/history/month/${group.key}`}>{monthLabel(group.key)}</a>
-            {` — ${group.workouts.length}`}
-          </li>
+          <Row key={group.key} to={`/history/month/${group.key}`} value={String(group.workouts.length)}>
+            {monthLabel(group.key)}
+          </Row>
         ))}
-      </ul>
-    </section>
+      </List>
+    </Screen>
   )
 }
 
@@ -213,21 +221,19 @@ export function HistoryExercises() {
   const list = exercisesInHistory(store.workouts || [], store.exercises, store.routines)
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>By exercise</h1>
-      {list.length === 0 ? <p>None.</p> : null}
-      <ul>
+      <Title>By exercise</Title>
+      {list.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {list.map((item) => (
-          <li key={item.id}>
-            <a href={`#/history/exercise/${item.id}`}>{item.exercise?.name || item.id}</a>
-            {item.routines.length
-              ? ` — ${item.routines.map((routine) => routine.name).join(', ')}`
-              : ''}
-          </li>
+          <Row key={item.id} to={`/history/exercise/${item.id}`}>
+            {item.exercise?.name || item.id}
+            {item.routines.length ? ` — ${item.routines.map((routine) => routine.name).join(', ')}` : ''}
+          </Row>
         ))}
-      </ul>
-    </section>
+      </List>
+    </Screen>
   )
 }
 
@@ -238,27 +244,26 @@ export function HistoryExercise({ exerciseId }) {
   const groups = groupWorkoutsByRoutine(visits, store.routines)
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>{ex?.name || exerciseId}</h1>
-      {groups.length === 0 ? <p>None.</p> : null}
+      <Title>{ex?.name || exerciseId}</Title>
+      {groups.length === 0 ? <p className="ui-sub">None.</p> : null}
       {groups.map((group) => (
-        <article key={group.groupId || group.routineId}>
-          <h2>{routineTitle(group.program, group.routine)}</h2>
-          <ul>
+        <div key={group.groupId || group.routineId}>
+          <SectionHeader>{routineTitle(group.program, group.routine)}</SectionHeader>
+          <List>
             {sortWorkoutsByDate(group.workouts).map((w) => {
               const count = (w.sets || []).filter((s) => s.exerciseId === exerciseId).length
               return (
-                <li key={w.id}>
-                  <a href={`#/history/${w.id}/exercise/${exerciseId}`}>{whenLabel(w)}</a>
-                  {` — ${count} set${count === 1 ? '' : 's'}`}
-                </li>
+                <Row key={w.id} to={`/history/${w.id}/exercise/${exerciseId}`} value={`${count} set${count === 1 ? '' : 's'}`}>
+                  {whenLabel(w)}
+                </Row>
               )
             })}
-          </ul>
-        </article>
+          </List>
+        </div>
       ))}
-    </section>
+    </Screen>
   )
 }
 
@@ -277,16 +282,16 @@ export function HistoryDetail({ workoutId }) {
   })
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>
+      <Title>
         {snapshot
           ? snapshot.programName
             ? `${snapshot.programName} — ${workoutRoutineName(workout, routine)}`
             : workoutRoutineName(workout, routine)
           : routineTitle(null, routine)}
-      </h1>
-      <p>
+      </Title>
+      <p className="ui-sub">
         {[
           whenLabel(workout),
           durationLabel(workout.startedAt, workout.finishedAt),
@@ -296,15 +301,15 @@ export function HistoryDetail({ workoutId }) {
           .filter(Boolean)
           .join(' · ')}
       </p>
-      <p>
+      <p className="ui-sub">
         {workout.overallFeel ? `${workout.overallFeel} · ` : ''}
-        <a href={`#/history/${workout.id}/edit`}>Correct</a>
+        <NavLink to={`/history/${workout.id}/edit`}>Correct</NavLink>
       </p>
-      {workout.overallNote ? <p>{workout.overallNote}</p> : null}
+      {workout.overallNote ? <p className="ui-sub">{workout.overallNote}</p> : null}
 
-      <h2>Exercises</h2>
-      {groups.length === 0 ? <p>None.</p> : null}
-      <ol>
+      <SectionHeader>Exercises</SectionHeader>
+      {groups.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {groups.map((group) => {
           const ex = exerciseById(store.exercises, group.exerciseId)
           const snapshotItem = snapshot?.items?.find(
@@ -312,21 +317,21 @@ export function HistoryDetail({ workoutId }) {
           )
           const n = group.items.length
           return (
-            <li key={group.routineItemId}>
-              <a href={`#/history/${workout.id}/exercise/${group.routineItemId}`}>{snapshotItem?.exerciseName || ex?.name || group.exerciseId}</a>
+            <Row key={group.routineItemId} to={`/history/${workout.id}/exercise/${group.routineItemId}`}>
+              {snapshotItem?.exerciseName || ex?.name || group.exerciseId}
               {` — ${roleLabel(snapshotItem?.role)}${snapshotItem?.warmup ? ' · WU set' : ''} · ${n} set${n === 1 ? '' : 's'}`}
-            </li>
+            </Row>
           )
         })}
-      </ol>
+      </List>
       <p>
-        <a href={`#/history/${workout.id}/set/new`}>Add set</a>
+        <NavLink to={`/history/${workout.id}/set/new`}>Add set</NavLink>
       </p>
 
       {workout.progression?.length ? (
         <>
-          <h2>Next time</h2>
-          <ul>
+          <SectionHeader>Next time</SectionHeader>
+          <List>
             {workout.progression.map((c) => {
               const none = c.reason === 'Skipped.' || c.reason === 'None.'
               const next = none
@@ -335,28 +340,25 @@ export function HistoryDetail({ workoutId }) {
                   ? `${c.to.join('/')} kg`
                   : (c.targetsTo || []).filter(Boolean).join('/') || formatProgressionLine(c).replace(`${c.name}: `, '')
               return (
-                <li key={itemIdOf(c) || c.exerciseId}>
-                  {c.name} — {next}
-                </li>
+                <Row key={itemIdOf(c) || c.exerciseId} value={next}>
+                  {c.name}
+                </Row>
               )
             })}
-          </ul>
+          </List>
         </>
       ) : null}
 
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            if (!window.confirm(`Delete ${workoutRoutineName(workout, routine)}?`)) return
-            store.removeWorkout(workout.id)
-            go('/history')
-          }}
-        >
-          Delete
-        </button>
-      </p>
-    </section>
+      <Button
+        onClick={() => {
+          if (!window.confirm(`Delete ${workoutRoutineName(workout, routine)}?`)) return
+          store.removeWorkout(workout.id)
+          go('/history')
+        }}
+      >
+        Delete
+      </Button>
+    </Screen>
   )
 }
 
@@ -381,29 +383,27 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>{snapshotItem?.exerciseName || ex?.name || exerciseId}</h1>
-      <p>
+      <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
+      <p className="ui-sub">
         {[roleLabel(snapshotItem?.role), snapshotItem?.warmup ? 'WU set' : null, whenLabel(workout)]
           .filter(Boolean)
           .join(' · ')}
       </p>
-      {items.length === 0 ? <p>None.</p> : null}
-      <ol>
+      {items.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {items.map(({ s, index }) => (
-          <li key={index}>
-            <a href={`#/history/${workout.id}/set/${index}`}>{formatSetLine(s)}</a>
+          <Row key={index} to={`/history/${workout.id}/set/${index}`}>
+            {formatSetLine(s)}
             {s.note ? ` — ${s.note}` : ''}
-          </li>
+          </Row>
         ))}
-      </ol>
-      <p>
-        <button type="button" onClick={() => addSetToWorkout(store, workout, actualExerciseId, itemIdOf(snapshotItem))}>
-          Add set
-        </button>
-      </p>
-    </section>
+      </List>
+      <Button onClick={() => addSetToWorkout(store, workout, actualExerciseId, itemIdOf(snapshotItem))}>
+        Add set
+      </Button>
+    </Screen>
   )
 }
 
@@ -418,9 +418,9 @@ export function HistoryEdit({ workoutId }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Correct</h1>
+      <Title>Correct</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -428,27 +428,28 @@ export function HistoryEdit({ workoutId }) {
           go(`/history/${workout.id}`)
         }}
       >
-        <p>Feel</p>
-        <p>
-          {['', 'Easy', 'Good', 'Hard', 'Exhausting'].map((f) => (
-            <label key={f || 'none'}>
-              <input type="radio" name="feel" checked={overallFeel === f} onChange={() => setOverallFeel(f)} /> {f || '—'}
-            </label>
-          ))}
-        </p>
-        <p>
-          <label>
-            Note
-            <br />
-            <textarea value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
+        <SectionHeader>Feel</SectionHeader>
+        <SegmentedControl
+          options={[
+            { value: '', label: '—' },
+            'Easy',
+            'Good',
+            'Hard',
+            'Exhausting',
+          ]}
+          value={overallFeel}
+          onChange={setOverallFeel}
+          ariaLabel="Feel"
+        />
+        <Textarea label="Note" value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
           <NavLink to={`/history/${workout.id}`}>Cancel</NavLink>
-        </p>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -500,22 +501,20 @@ export function HistorySetNew({ workoutId }) {
   const choices = [...byKey.values()]
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Add set</h1>
-      {choices.length === 0 ? <p>None.</p> : null}
-      <ul>
-        {choices.map((choice) => {
-          return (
-            <li key={choice.routineItemId || choice.exerciseId}>
-              <button type="button" onClick={() => addSetToWorkout(store, workout, choice.exerciseId, choice.routineItemId)}>
-                {choice.name || choice.exerciseId}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-    </section>
+      <Title>Add set</Title>
+      {choices.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
+        {choices.map((choice) => (
+          <Row key={choice.routineItemId || choice.exerciseId}>
+            <Button onClick={() => addSetToWorkout(store, workout, choice.exerciseId, choice.routineItemId)}>
+              {choice.name || choice.exerciseId}
+            </Button>
+          </Row>
+        ))}
+      </List>
+    </Screen>
   )
 }
 
@@ -534,10 +533,10 @@ export function HistorySet({ workoutId, index }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <p>{workoutRoutineName(workout, null)}</p>
-      <h1>Set</h1>
+      <p className="ui-sub">{workoutRoutineName(workout, null)}</p>
+      <Title>Set</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -557,69 +556,44 @@ export function HistorySet({ workoutId, index }) {
           go(`/history/${workout.id}/recalculate`)
         }}
       >
-        <p>
-          <label>
-            Type
-            <br />
-            <select value={setType} onChange={(e) => setSetType(e.target.value)}>
-              <option value="wu">WU set</option>
-              <option value="work">Work</option>
-            </select>
-          </label>
-        </p>
-        <p>
-          <label>
-            kg
-            <br />
-            <input value={weight} onChange={(e) => setWeight(e.target.value)} inputMode="decimal" />
-          </label>
-        </p>
-        <p>
-          <label>
-            Reps
-            <br />
-            <input value={reps} onChange={(e) => setReps(e.target.value)} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Effort
-            <br />
-            <select value={rpe} onChange={(e) => setRpe(e.target.value)}>
-              <option value="">—</option>
-              {RPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </p>
-        <p>
-          <label>
-            Note
-            <br />
-            <input value={note} onChange={(e) => setNote(e.target.value)} />
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
+        <SectionHeader>Type</SectionHeader>
+        <SegmentedControl
+          options={[
+            { value: 'wu', label: 'WU set' },
+            { value: 'work', label: 'Work' },
+          ]}
+          value={setType}
+          onChange={setSetType}
+          ariaLabel="Type"
+        />
+        <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
+        <Field label="Reps" value={reps} onChange={(e) => setReps(e.target.value)} />
+        <SectionHeader>Effort</SectionHeader>
+        {/* leading '—' keeps effort clearable, as the old <select> did */}
+        <SegmentedControl
+          options={[{ value: '', label: '—' }, ...RPE_OPTIONS]}
+          value={rpe}
+          onChange={setRpe}
+          ariaLabel="Effort"
+        />
+        <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
           <NavLink to={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`}>Cancel</NavLink>
-        </p>
+        </div>
       </form>
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            if (!window.confirm('Remove set?')) return
-            store.updateWorkout(workout.id, { sets: (workout.sets || []).filter((_, i) => i !== index) })
-            go(`/history/${workout.id}/recalculate`)
-          }}
-        >
-          Remove
-        </button>
-      </p>
-    </section>
+      <Button
+        onClick={() => {
+          if (!window.confirm('Remove set?')) return
+          store.updateWorkout(workout.id, { sets: (workout.sets || []).filter((_, i) => i !== index) })
+          go(`/history/${workout.id}/recalculate`)
+        }}
+      >
+        Remove
+      </Button>
+    </Screen>
   )
 }
 
@@ -629,35 +603,33 @@ export function HistoryRecalculate({ workoutId }) {
   if (!workout) {
     return <Missing>Not found.</Missing>
   }
-  const routineHref = workoutRoutineId(workout)
-    ? `#/history/${workout.id}/routine`
-    : null
+  const routinePath = workoutRoutineId(workout) ? `/history/${workout.id}/routine` : null
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Update?</h1>
-      <p>
+      <Title>Update?</Title>
+      <p className="ui-sub">
         {workoutRoutineName(workout, null)} — {whenLabel(workout)}
       </p>
-      {routineHref ? (
+      {routinePath ? (
         <p>
-          <a href={routineHref}>Routine</a>
+          <NavLink to={routinePath}>Routine</NavLink>
         </p>
       ) : null}
-      <p>
-        <button
-          type="button"
+      <div className="ui-actions">
+        <Button
+          variant="primary"
           onClick={() => {
             store.recalculateFuturePlans(workout.id)
             go(`/history/${workout.id}`)
           }}
         >
           Apply
-        </button>{' '}
+        </Button>
         <NavLink to={`/history/${workout.id}`}>Skip</NavLink>
-      </p>
-    </section>
+      </div>
+    </Screen>
   )
 }
 
