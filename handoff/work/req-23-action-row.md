@@ -1,6 +1,6 @@
 # req-23 — formalize the "row with a trailing action button" pattern
 
-**Status: READY.** Small `ui/` consolidation. The finding left "component vs convention" open;
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-23` (`e4905b5`…`e4905b5`, 1 commit).** Small `ui/` consolidation. The finding left "component vs convention" open;
 **decided here: an `action` prop on `Row`** (rationale below). Sourced from
 `reports/req-15-findings.md` #5 (DEC-021).
 
