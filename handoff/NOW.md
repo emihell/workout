@@ -21,12 +21,14 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 #10 rejected.
 
 **Now: gym-flow notes** (Emilio 2026-09-10, `work/BACKLOG.md`; refactor-first-notes-after decided).
-- `req-25` **bug #5 — last set of an exercise starts no rest** ← in build. Reproduced live: only the
-  *last* set is affected (arms rest on the overview via the persistent RestBar; DEC-013 refined).
-  Decided rest-on-overview. **[functional + gym-flow feel → Emilio feels before merge]**
-- Still to spec (quick wins): #1 upcoming weight during rest, #2 remove info-under-buttons, #3 hide
-  note behind a button, #7 completed on Today, #4 button-placement audit (DESIGN §4). #6 timed
-  exercises PARKED (model TBD).
+All ux-feel → **Emilio feels each before merge** (build serially, not self-driving).
+- `req-25` **bug #5 — last set starts no rest** ← in build. Reproduced live (only the last set); arms
+  rest on the overview RestBar (DEC-013 refined, rest-on-overview decided).
+- `req-26` declutter set-log (#2+#3: note behind "Add note", drop info-under-buttons)
+- `req-27` upcoming weight during rest, editable (#1) — hardest of the notes
+- `req-28` completed workouts on Today (#7)
+- `req-29` button-placement audit — DESIGN §4 forward=right/back=left (#4)
+- #6 timed exercises PARKED (model TBD).
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
