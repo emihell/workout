@@ -110,19 +110,20 @@ several need a behaviour call from Emilio first. Sequencing insight below.
    visible list/section of what's been completed, not just the per-slot label. *Disp:* READY-able.
    *Q:* today's completed only, or a recent-history glance?
 
-**Decision needed (Emilio) — #6 timed exercises:** is "timed" a **flag + duration field
-orthogonal to weight** (an exercise/set can be weighted, timed, or both — matches "sometimes
-both") or a **new `EXERCISE_TYPES` value**? This sets the schema shape and gates the migration
-(persisted-data ask-gate). Recommend the orthogonal flag; confirm before speccing.
+**#6 timed exercises — PARKED (Emilio, 2026-09-10).** Model shape (orthogonal weight/duration
+flag vs a new `EXERCISE_TYPES` value) is **not decided yet**; captured as a Phase-1/2 feature but
+not to be specced until Emilio picks the shape. Persisted-data ask-gate applies when it revives.
 
-**Sequencing insight:** notes #2, #3, #4 all touch the live set-log / set-edit forms and the
-row buttons — the exact surfaces the refactor batch is about to rewrite (req-18 merge set-edit
-forms, req-20 Row value, req-23 ActionRow). Doing the refactor and *then* re-touching these is
-wasted work. Options: (a) fold the UX changes into those reqs, or (b) do the small UX notes
-first and let the refactor land on the final shape. Worth deciding before req-18/23 build.
+**Sequencing — DECIDED (Emilio, 2026-09-10): refactor fully first, gym-flow notes after.** Finish
+the refactor batch (req-16..19) as specced — **pure refactors, no UX change folded in** — then
+spec these notes fresh against the refactored code. Cleaner diffs; accepts touching the same files
+twice. So notes #1/#2/#3/#4/#5/#7 stay parked here until req-16..19 (at least req-18/23/20) land.
+Note: bug #5 is a *logic* defect (rest timer), not a form-layout change, so it does **not** collide
+with the UI refactor and could be pulled forward if the timer misbehaviour bites — default is still
+after the batch.
 
-**Next planning step:** sequence these with Emilio (which first), then spec them one at
-a time. Most are small; the styling pass is the big one and wants iteration.
+**Next planning step:** after the refactor batch closes, spec these one at a time (bug #5 first —
+it's independent and a real defect). Timed exercises wait on Emilio's model decision.
 
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
