@@ -108,6 +108,16 @@ export function Showcase() {
         <SegmentedControl options={EFFORT} value={effort} onChange={setEffort} ariaLabel="Effort" />
       </Block>
 
+      <Block heading="Segmented control (clearable)">
+        <SegmentedControl
+          clearable
+          options={EFFORT}
+          value={effort}
+          onChange={setEffort}
+          ariaLabel="Effort (clearable)"
+        />
+      </Block>
+
       <Block heading="Checkbox">
         <Checkbox label="Assistant prompt" checked={checked} onChange={setChecked} />
       </Block>

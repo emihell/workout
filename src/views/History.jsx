@@ -430,13 +430,8 @@ export function HistoryEdit({ workoutId }) {
       >
         <SectionHeader>Feel</SectionHeader>
         <SegmentedControl
-          options={[
-            { value: '', label: '—' },
-            'Easy',
-            'Good',
-            'Hard',
-            'Exhausting',
-          ]}
+          clearable
+          options={['Easy', 'Good', 'Hard', 'Exhausting']}
           value={overallFeel}
           onChange={setOverallFeel}
           ariaLabel="Feel"
@@ -569,9 +564,10 @@ export function HistorySet({ workoutId, index }) {
         <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
         <Field label="Reps" value={reps} onChange={(e) => setReps(e.target.value)} />
         <SectionHeader>Effort</SectionHeader>
-        {/* leading '—' keeps effort clearable, as the old <select> did */}
+        {/* clearable keeps effort resettable, as the old <select> did */}
         <SegmentedControl
-          options={[{ value: '', label: '—' }, ...RPE_OPTIONS]}
+          clearable
+          options={RPE_OPTIONS}
           value={rpe}
           onChange={setRpe}
           ariaLabel="Effort"
