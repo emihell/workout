@@ -1,6 +1,6 @@
 # req-19 — split the two oversized view files into per-screen folders
 
-**Status: READY.** Mechanical file reorganisation, no behaviour change. Sourced from
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-19` (`b6b63f5`…`b6b63f5`, 1 commit).** Mechanical file reorganisation, no behaviour change. Sourced from
 `reports/req-15-findings.md` #1 (DEC-021).
 
 **Gate: code-only** (DEC-009, functional) — pure move; planning verifies the app still renders every
