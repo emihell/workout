@@ -186,7 +186,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
       <List>
         {items.map((item) => {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone
-          const path = completed ? itemDonePath(routineId, item) : itemLogPath(routineId, item)
+          const path = itemCurrentPath(routineId, item, completed)
           return (
             <Row key={itemKey(item) || item.id} to={path}>
               {exerciseName(item)} — {roleLabel(item.role)}
@@ -213,11 +213,16 @@ function itemDonePath(routineId, item) {
   return `/workout/${routineId}/item/${itemKey(item)}/done`
 }
 
+// One branch, written once: a done exercise goes to its done screen, otherwise
+// its log screen. The `done` boolean varies by caller (marked-done+plannedDone
+// on the overview, plannedDone alone on the setup form), so it stays an argument.
+function itemCurrentPath(routineId, item, done) {
+  return done ? itemDonePath(routineId, item) : itemLogPath(routineId, item)
+}
+
 function itemSetsPath(routineId, item, workout) {
   if (!item) return `/workout/${routineId}`
-  return itemLoggingState(workout, item).plannedDone
-    ? itemDonePath(routineId, item)
-    : itemLogPath(routineId, item)
+  return itemCurrentPath(routineId, item, itemLoggingState(workout, item).plannedDone)
 }
 
 // req-11 / DEC-013 — completing the last set marks the exercise done and returns
@@ -244,7 +249,7 @@ export function WorkoutItem({ routineId, itemId }) {
 
   useEffect(() => {
     if (!item) return
-    go(completed ? itemDonePath(routineId, item) : itemLogPath(routineId, item), { replace: true })
+    go(itemCurrentPath(routineId, item, completed), { replace: true })
   }, [completed, routineId, item])
 
   if (!mine || !item) return <MissingItem />
@@ -556,9 +561,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
             cues: cues.trim(),
           })
           go(
-            itemLoggingState(active, item).plannedDone
-              ? itemDonePath(routineId, item)
-              : itemLogPath(routineId, item),
+            itemCurrentPath(routineId, item, itemLoggingState(active, item).plannedDone),
             { replace: true },
           )
         }}
@@ -580,11 +583,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           </Button>
           <Button
             onClick={() =>
-              go(
-                itemLoggingState(active, item).plannedDone
-                  ? itemDonePath(routineId, item)
-                  : itemLogPath(routineId, item),
-              )
+              go(itemCurrentPath(routineId, item, itemLoggingState(active, item).plannedDone))
             }
           >
             Cancel
