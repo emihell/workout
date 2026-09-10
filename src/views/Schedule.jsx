@@ -4,9 +4,10 @@ import { go } from '../route'
 import { useStore } from '../store-context'
 import { RoutineNewForm, RoutineScreens, navForBase } from './Routine'
 import { Back, Missing, NavLink } from './shared'
+import { Button, List, Row, Screen, SectionHeader, Select, Title } from '../ui/index.jsx'
 
-function dayHref(week, weekday, extra = '') {
-  return `#/schedule/${week}/${weekday}${extra}`
+function dayPathOf(week, weekday, extra = '') {
+  return `/schedule/${week}/${weekday}${extra}`
 }
 
 function slotLabel(routines, slot) {
@@ -31,38 +32,36 @@ export function Schedule() {
   const routines = activeRoutines(store)
 
   return (
-    <section>
-      <h1>Schedule</h1>
+    <Screen>
+      <Title>Schedule</Title>
       <p>
-        <a href="#/schedule/loop">Loop · {loop} week{loop === 1 ? '' : 's'}</a>
+        <NavLink to="/schedule/loop">
+          Loop · {loop} week{loop === 1 ? '' : 's'}
+        </NavLink>
       </p>
       {Array.from({ length: loop }, (_, week) => (
-        <article key={week}>
+        <div key={week}>
           {loop > 1 ? (
-            <h2>
+            <SectionHeader>
               Week {week + 1} of {loop}
               {week === currentWeek ? ' (this week)' : ''}
-            </h2>
+            </SectionHeader>
           ) : null}
-          <ul>
+          <List>
             {WEEKDAY_ORDER.map((weekday) => {
               const slots = slotsForWeekDay(schedule, week, weekday)
               const names = slots.map((slot) => slotLabel(routines, slot)).join(', ')
               return (
-                <li key={weekday}>
-                  <a href={dayHref(week, weekday)}>{weekdayName(weekday)}</a>
-                  {' — '}
-                  {names || 'Rest'}
-                </li>
+                <Row key={weekday} to={dayPathOf(week, weekday)}>
+                  {weekdayName(weekday)} — {names || 'Rest'}
+                </Row>
               )
             })}
-          </ul>
-        </article>
+          </List>
+        </div>
       ))}
-      {routines.length === 0 ? (
-        <p>No routines.</p>
-      ) : null}
-    </section>
+      {routines.length === 0 ? <p className="ui-sub">No routines.</p> : null}
+    </Screen>
   )
 }
 
@@ -71,16 +70,14 @@ export function ScheduleLoop() {
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Loop</h1>
+      <Title>Loop</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
           const value = Number(new FormData(e.target).get('loop'))
-          const removed = (store.schedule?.slots || []).filter(
-            (slot) => Number(slot.week) >= value,
-          ).length
+          const removed = (store.schedule?.slots || []).filter((slot) => Number(slot.week) >= value).length
           if (removed && !window.confirm(`Remove ${removed} scheduled routine${removed === 1 ? '' : 's'}?`)) {
             return
           }
@@ -88,25 +85,20 @@ export function ScheduleLoop() {
           go('/schedule')
         }}
       >
-        <p>
-          <label>
-            Weeks
-            <br />
-            <select name="loop" defaultValue={loop}>
-              {LOOP_WEEKS.map((n) => (
-                <option key={n} value={n}>
-                  {n} week{n === 1 ? '' : 's'}
-                </option>
-              ))}
-            </select>
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
+        <Select
+          label="Weeks"
+          name="loop"
+          defaultValue={loop}
+          options={LOOP_WEEKS.map((n) => ({ value: n, label: `${n} week${n === 1 ? '' : 's'}` }))}
+        />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
           <NavLink to="/schedule">Cancel</NavLink>
-        </p>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -117,37 +109,39 @@ export function ScheduleDay({ week, weekday }) {
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>
+      <Title>
         {weekdayName(weekday)}
         {loop > 1 ? ` · week ${week + 1}` : ''}
-      </h1>
-      {slots.length === 0 ? <p>None.</p> : null}
-      <ul>
+      </Title>
+      {slots.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {slots.map((slot) => (
-          <li key={slot.id}>
-            <a href={dayHref(week, weekday, `/${slot.id}`)}>{slotLabel(routines, slot)}</a>
-            {' '}
-            <button
-              type="button"
-              onClick={() => {
-                if (!window.confirm(`Remove ${slotLabel(routines, slot)}?`)) return
-                store.removeSlot(slot.id)
-              }}
-            >
-              Remove
-            </button>
-          </li>
+          <Row
+            key={slot.id}
+            value={
+              <Button
+                onClick={() => {
+                  if (!window.confirm(`Remove ${slotLabel(routines, slot)}?`)) return
+                  store.removeSlot(slot.id)
+                }}
+              >
+                Remove
+              </Button>
+            }
+          >
+            <NavLink to={dayPathOf(week, weekday, `/${slot.id}`)}>{slotLabel(routines, slot)}</NavLink>
+          </Row>
         ))}
-      </ul>
+      </List>
       <p>
-        <a href={dayHref(week, weekday, '/add')}>Add routine</a>
+        <NavLink to={dayPathOf(week, weekday, '/add')}>Add routine</NavLink>
       </p>
       <p>
         <NavLink to="/schedule">Done</NavLink>
       </p>
-    </section>
+    </Screen>
   )
 }
 
@@ -157,9 +151,9 @@ export function ScheduleDayAdd({ week, weekday }) {
   const dayPath = `/schedule/${week}/${weekday}`
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Add routine</h1>
+      <Title>Add routine</Title>
       {routines.length === 0 ? (
         <RoutineNewForm
           onSave={({ name, focus }) => {
@@ -170,7 +164,7 @@ export function ScheduleDayAdd({ week, weekday }) {
           onCancel={() => go(dayPath)}
         />
       ) : (
-        <ul>
+        <List>
           {routines.map((routine) => {
             const assigned = (store.schedule?.slots || []).some(
               (slot) =>
@@ -179,9 +173,8 @@ export function ScheduleDayAdd({ week, weekday }) {
                 slotRoutineId(slot) === routine.id,
             )
             return (
-              <li key={routine.id}>
-                <button
-                  type="button"
+              <Row key={routine.id} value={routine.focus}>
+                <Button
                   disabled={assigned}
                   onClick={() => {
                     store.addSlot({ week, weekday, routineId: routine.id })
@@ -189,15 +182,13 @@ export function ScheduleDayAdd({ week, weekday }) {
                   }}
                 >
                   {routine.name}
-                </button>
-                {' — '}
-                {routine.focus}
-              </li>
+                </Button>
+              </Row>
             )
           })}
-        </ul>
+        </List>
       )}
-    </section>
+    </Screen>
   )
 }
 

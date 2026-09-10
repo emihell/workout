@@ -4,11 +4,12 @@ import { greeting, weekdayName } from '../ids'
 import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
+import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { NavLink } from './shared'
 
 function StartButton({ store, routine, slot, date, label = 'Start' }) {
   return (
-    <button
-      type="button"
+    <Button
       onClick={() =>
         startOrContinue(store, routine.id, {
           scheduledFor: date,
@@ -17,7 +18,7 @@ function StartButton({ store, routine, slot, date, label = 'Start' }) {
       }
     >
       {label}
-    </button>
+    </Button>
   )
 }
 
@@ -33,18 +34,15 @@ function WorkoutRow({ store, routine, slot, date, extra }) {
     mine?.scheduleSlotId === slot.id &&
     mine.scheduledFor === date
   const bits = [extra, routine.focus].filter(Boolean)
+  const action = done ? (
+    `Done ${dateKey(done.finishedAt)}`
+  ) : inProgress ? null : (
+    <StartButton store={store} routine={routine} slot={slot} date={date} />
+  )
   return (
-    <li>
+    <Row value={action}>
       {routine.name} — {bits.join(' · ')}
-      {done ? (
-        <> — Done {dateKey(done.finishedAt)}</>
-      ) : inProgress ? null : (
-        <>
-          {' '}
-          <StartButton store={store} routine={routine} slot={slot} date={date} />
-        </>
-      )}
-    </li>
+    </Row>
   )
 }
 
@@ -64,79 +62,66 @@ export function Today() {
 
   if (!routines.length) {
     return (
-      <section>
-        <h1>Today</h1>
-        <p>No data.</p>
-        <p>Import, or start empty.</p>
-        <p>
-          <label>
-            Import
-            <br />
-            <input
-              type="file"
-              accept="application/json,.json"
-              onChange={(event) => {
-                const file = event.target.files?.[0]
-                event.target.value = ''
-                if (!file) return
-                file.text().then((text) => {
-                  try {
-                    const payload = JSON.parse(text)
-                    const result = importWithBackup({ store, payload })
-                    if (!result) return // cancelled at the confirm
-                    recordButton('import')
-                  } catch (err) {
-                    window.alert(err instanceof Error ? err.message : 'Could not import.')
-                  }
-                })
-              }}
-            />
-          </label>
-        </p>
-        <p>
-          Or{' '}
-          <a href="#/routines">Routines</a>
-          {' · '}
-          <a href="#/schedule">Schedule</a>
-          {' · '}
-          <a href="#/settings">Settings</a>
-        </p>
-      </section>
+      <Screen>
+        <Title>Today</Title>
+        <p className="ui-sub">No data. Import, or start empty.</p>
+        <FileButton
+          label="Import"
+          accept="application/json,.json"
+          onFiles={(files) => {
+            const file = files?.[0]
+            if (!file) return
+            file.text().then((text) => {
+              try {
+                const payload = JSON.parse(text)
+                const result = importWithBackup({ store, payload })
+                if (!result) return // cancelled at the confirm
+                recordButton('import')
+              } catch (err) {
+                window.alert(err instanceof Error ? err.message : 'Could not import.')
+              }
+            })
+          }}
+        />
+        <List>
+          <Row to="/routines">Routines</Row>
+          <Row to="/schedule">Schedule</Row>
+          <Row to="/settings">Settings</Row>
+        </List>
+      </Screen>
     )
   }
 
   return (
-    <section>
-      <h1>{greeting()}</h1>
+    <Screen>
+      <Title>{greeting()}</Title>
       {loop > 1 ? (
-        <p>
+        <p className="ui-sub">
           Week {week + 1} of {loop}
         </p>
       ) : null}
 
       {mine ? (
-        <p>
+        <p className="ui-sub">
           In progress.{' '}
-          <button type="button" onClick={() => startOrContinue(store, activeRoutineId(mine))}>
-            Continue
-          </button>
+          <Button onClick={() => startOrContinue(store, activeRoutineId(mine))}>Continue</Button>
         </p>
       ) : null}
 
       {todays.length ? (
         <>
-          <h2>Today</h2>
-          <ul>
+          <SectionHeader>Today</SectionHeader>
+          <List>
             {todays.map(({ slot, routine }) => (
               <WorkoutRow key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
             ))}
-          </ul>
+          </List>
         </>
       ) : upcoming ? (
         <>
-        <p>None today.</p>
-          <h2>Next</h2>
-          <ul>
+          <p className="ui-sub">None today.</p>
+          <SectionHeader>Next</SectionHeader>
+          <List>
             {upcoming.items.map(({ slot, routine }) => (
               <WorkoutRow
                 key={slot.id}
@@ -147,17 +132,17 @@ export function Today() {
                 extra={weekdayName(upcoming.date.getDay())}
               />
             ))}
-          </ul>
+          </List>
         </>
       ) : (
-        <p>None.</p>
+        <p className="ui-sub">None.</p>
       )}
 
       {mine ? null : (
         <p>
-          <a href="#/start">Other</a>
+          <NavLink to="/start">Other</NavLink>
         </p>
       )}
-    </section>
+    </Screen>
   )
 }

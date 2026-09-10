@@ -83,7 +83,10 @@ export function FileButton({ label = 'Import', accept, onFiles, variant = 'secon
         type="file"
         accept={accept}
         style={{ display: 'none' }}
-        onChange={(e) => onFiles?.(e.target.files)}
+        onChange={(e) => {
+          onFiles?.(e.target.files)
+          e.target.value = '' // allow re-selecting the same file (re-fires change)
+        }}
       />
     </label>
   )
@@ -112,6 +115,29 @@ export function Textarea({ label, rows = 3, ...rest }) {
     <label className="ui-field">
       {label ? <span className="ui-field__label">{label}</span> : null}
       <textarea className="ui-input ui-input--area" rows={rows} {...rest} />
+    </label>
+  )
+}
+
+// Select — a native <select> styled to match Field, with a grayscale caret and a
+// ≥44px hit area. `options` is a list of strings or { value, label }. A native
+// select (not a SegmentedControl) because these lists (focus, type, weeks) have
+// more options than fit a row on mobile. Passes value/defaultValue/name through.
+export function Select({ label, options, className, ...rest }) {
+  return (
+    <label className="ui-field">
+      {label ? <span className="ui-field__label">{label}</span> : null}
+      <select className={cx('ui-input', 'ui-select', className)} {...rest}>
+        {options.map((opt) => {
+          const value = typeof opt === 'object' ? opt.value : opt
+          const text = typeof opt === 'object' ? opt.label : opt
+          return (
+            <option key={value} value={value}>
+              {text}
+            </option>
+          )
+        })}
+      </select>
     </label>
   )
 }
@@ -232,27 +258,41 @@ export function RestBar({ seconds = 0, paused = false, onPauseResume, onAddTime,
   )
 }
 
-// SetLogForm — the single most important gym surface: kg + reps NumberFields, an
-// effort SegmentedControl, a note Field, and Complete/Skip/Previous Buttons.
-// Presentational + self-contained (local state) so the showcase renders it
-// standalone; the real workout screen owns its own state/handlers for now.
+// SetLogForm — the single most important gym surface: a kg NumberField, a big reps
+// field, an effort SegmentedControl, a note, and Complete/Skip/Previous Buttons.
+// Presentational: it owns only the in-progress field values (local state, seeded
+// from the `initial*` props), remounted per-set by the caller with a `key`. All
+// the domain logic — history prefill, carry, restore, targets, the effort→RPE
+// mapping — lives in the caller (the workout screen), which passes the seeds in
+// and reads {weight, reps, effort, note} back out of onComplete.
+//
+// Props: `weighted` shows the kg field; `showEffort` shows the effort control
+// (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
+// "Duration"; `effortOptions` overrides the segments. The reps field is a full
+// keyboard (not decimal-only) so durations like "30 min" can be typed.
 export function SetLogForm({
   weighted = true,
+  showEffort = true,
+  repsLabel = 'Reps',
   effortOptions = [
     { value: 2, label: 'Easy' },
     { value: 3, label: 'Moderate' },
     { value: 4, label: 'Hard' },
     { value: 5, label: 'Failure' },
   ],
+  initialWeight = '',
+  initialReps = '',
+  initialEffort = 3,
+  initialNote = '',
   canGoBack = true,
   onComplete,
   onSkip,
   onPrevious,
 }) {
-  const [weight, setWeight] = useState('')
-  const [reps, setReps] = useState('')
-  const [effort, setEffort] = useState(3)
-  const [note, setNote] = useState('')
+  const [weight, setWeight] = useState(initialWeight)
+  const [reps, setReps] = useState(initialReps)
+  const [effort, setEffort] = useState(initialEffort)
+  const [note, setNote] = useState(initialNote)
   return (
     <form
       className="ui-setlog"
@@ -265,10 +305,20 @@ export function SetLogForm({
         {weighted ? (
           <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
         ) : null}
-        <NumberField label="Reps" value={reps} onChange={(e) => setReps(e.target.value)} required />
+        <Field
+          label={repsLabel}
+          className="ui-input--num"
+          value={reps}
+          onChange={(e) => setReps(e.target.value)}
+          required
+        />
       </div>
-      <SectionHeader>Effort</SectionHeader>
-      <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
+      {showEffort ? (
+        <>
+          <SectionHeader>Effort</SectionHeader>
+          <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
+        </>
+      ) : null}
       <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} />
       <div className="ui-setlog__actions">
         <Button type="submit" variant="primary">

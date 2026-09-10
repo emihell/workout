@@ -39,6 +39,17 @@
   --ui-text-rest: 112px; /* rest countdown — one step above display */
 }
 
+/* Base link treatment (req-15): the app is fully migrated onto the library, so
+ * links are grayscale everywhere — inherit the ink color, never the browser
+ * blue/purple. Underline stays as the affordance for plain content links; the
+ * nav primitives (.ui-navlink, .ui-row__link) drop it explicitly below. */
+a,
+a:visited,
+a:hover,
+a:active {
+  color: inherit;
+}
+
 /* ---- Screen container + type scale ---- */
 .ui-screen {
   font-family: var(--ui-font);
@@ -60,6 +71,20 @@
   font-weight: 600;
   color: var(--ui-ink);
   margin: var(--ui-s4) 0 var(--ui-s2);
+}
+/* secondary line under a Title/Row — meta, subtitles, short status text. Body
+ * size, secondary ink; token-driven like everything else (DEC-020). */
+.ui-sub {
+  font-size: var(--ui-text-body);
+  color: var(--ui-ink-2);
+  margin: 0 0 var(--ui-s2);
+}
+/* a horizontal group of buttons (Save / Cancel, Add set, …). */
+.ui-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-s2);
+  margin-top: var(--ui-s3);
 }
 /* small uppercase caption/eyebrow label (e.g. the showcase block labels) */
 .ui-eyebrow {
@@ -201,6 +226,14 @@
 .ui-input--area {
   min-height: 88px;
   resize: vertical;
+}
+/* native select styled like an input; ui-input already hides the OS arrow
+ * (appearance:none), so draw a grayscale caret and pad space for it. */
+.ui-select {
+  padding-right: var(--ui-s4);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236b6b6b' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--ui-s3) center;
 }
 
 /* ---- List + Row (Apple grouped list) ---- */
