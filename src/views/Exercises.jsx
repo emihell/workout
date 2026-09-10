@@ -4,6 +4,7 @@ import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing, NavLink } from './shared'
+import { Banner, Button, Field, List, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -15,6 +16,8 @@ const TYPE_LABELS = {
 function typeLabel(type) {
   return TYPE_LABELS[type] || type || 'Other'
 }
+
+const TYPE_OPTIONS = EXERCISE_TYPES.map((t) => ({ value: t, label: typeLabel(t) }))
 
 function matchesQuery(ex, q) {
   if (!q) return true
@@ -43,14 +46,14 @@ function groupedByType(exercises) {
 function ExerciseList({ exercises, showType = false }) {
   if (exercises.length === 0) return null
   return (
-    <ul>
+    <List>
       {exercises.map((ex) => (
-        <li key={ex.id}>
-          <a href={`#/exercises/${ex.id}`}>{ex.name}</a> — {ex.equipment}
+        <Row key={ex.id} to={`/exercises/${ex.id}`}>
+          {ex.name} — {ex.equipment}
           {showType ? ` · ${typeLabel(ex.type)}` : ''}
-        </li>
+        </Row>
       ))}
-    </ul>
+    </List>
   )
 }
 
@@ -65,19 +68,13 @@ export function Exercises({ type = null }) {
     const group = groups.find((candidate) => candidate.type === type)
     const items = (group?.items || []).filter((ex) => matchesQuery(ex, q))
     return (
-      <section>
+      <Screen>
         <Back />
-        <h1>{typeLabel(type)}</h1>
-        <p>
-          <label>
-            Search
-            <br />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} />
-          </label>
-        </p>
-        {items.length === 0 ? <p>{q ? 'No matches.' : 'None.'}</p> : null}
+        <Title>{typeLabel(type)}</Title>
+        <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
+        {items.length === 0 ? <p className="ui-sub">{q ? 'No matches.' : 'None.'}</p> : null}
         <ExerciseList exercises={items} />
-      </section>
+      </Screen>
     )
   }
 
@@ -86,36 +83,29 @@ export function Exercises({ type = null }) {
     : []
 
   return (
-    <section>
-      <h1>Exercises</h1>
+    <Screen>
+      <Title>Exercises</Title>
       <p>
-        <a href="#/exercises/new">Add exercise</a>
+        <NavLink to="/exercises/new">Add exercise</NavLink>
       </p>
-      <p>
-        <label>
-          Search
-          <br />
-          <input value={query} onChange={(e) => setQuery(e.target.value)} />
-        </label>
-      </p>
+      <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
       {q ? (
         <>
-          {hits.length === 0 ? <p>No matches.</p> : null}
+          {hits.length === 0 ? <p className="ui-sub">No matches.</p> : null}
           <ExerciseList exercises={hits} showType />
         </>
       ) : groups.length === 0 ? (
-        <p>None.</p>
+        <p className="ui-sub">None.</p>
       ) : (
-        <ul>
+        <List>
           {groups.map((group) => (
-            <li key={group.type}>
-              <a href={`#/exercises/type/${group.type}`}>{typeLabel(group.type)}</a>
-              {` — ${group.items.length}`}
-            </li>
+            <Row key={group.type} to={`/exercises/type/${group.type}`} value={String(group.items.length)}>
+              {typeLabel(group.type)}
+            </Row>
           ))}
-        </ul>
+        </List>
       )}
-    </section>
+    </Screen>
   )
 }
 
@@ -141,15 +131,14 @@ function createPaths(returnBase) {
 export function ExerciseNew({ returnBase = null }) {
   const paths = createPaths(returnBase)
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Add exercise</h1>
-      <p>
-        <a href={`#${paths.manual}`}>Add manually</a>
-        {' · '}
-        <a href={`#${paths.search}`}>Search</a>
-      </p>
-    </section>
+      <Title>Add exercise</Title>
+      <List>
+        <Row to={paths.manual}>Add manually</Row>
+        <Row to={paths.search}>Search</Row>
+      </List>
+    </Screen>
   )
 }
 
@@ -160,9 +149,9 @@ export function ExerciseNewManual({ returnBase = null }) {
   const [type, setType] = useState('free')
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Add exercise</h1>
+      <Title>Add exercise</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -170,32 +159,16 @@ export function ExerciseNewManual({ returnBase = null }) {
           go(paths.afterCreate(id), { replace: true })
         }}
       >
-        <p>
-          <label>
-            Name
-            <br />
-            <input value={name} onChange={(e) => setName(e.target.value)} required />
-          </label>
-        </p>
-        <p>
-          <label>
-            Type
-            <br />
-            <select value={type} onChange={(e) => setType(e.target.value)}>
-              {EXERCISE_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {typeLabel(t)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
+        <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
           <NavLink to={paths.hub}>Cancel</NavLink>
-        </p>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -229,57 +202,44 @@ export function ExerciseNewSearch({ returnBase = null }) {
   )
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Search</h1>
-      {error ? <p>{error}</p> : null}
-      {catalog === null && !error ? <p>Loading…</p> : null}
+      <Title>Search</Title>
+      {error ? <Banner role="alert">{error}</Banner> : null}
+      {catalog === null && !error ? <p className="ui-sub">Loading…</p> : null}
       {catalog ? (
         <>
-          <p>
-            <label>
-              Search
-              <br />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} />
-            </label>
-          </p>
-          {query.trim().length >= 2 && hits.length === 0 ? <p>No matches.</p> : null}
-          <ul>
+          <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
+          {query.trim().length >= 2 && hits.length === 0 ? <p className="ui-sub">No matches.</p> : null}
+          <List>
             {hits.map((item) => {
               const existing = libraryNames.get(String(item.name || '').trim().toLowerCase())
+              const action = existing ? (
+                <NavLink to={returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}>
+                  {returnBase ? 'Add to routine' : 'Already added'}
+                </NavLink>
+              ) : (
+                <Button
+                  disabled={busyId === item.id}
+                  onClick={() => {
+                    setBusyId(item.id)
+                    const id = store.addExercise(catalogItemToExercise(item))
+                    go(paths.afterCreate(id), { replace: true })
+                  }}
+                >
+                  Add
+                </Button>
+              )
               return (
-                <li key={item.id || item.name}>
+                <Row key={item.id || item.name} value={action}>
                   {item.name} — {item.equipment || 'bodyweight'}
-                  {existing ? (
-                    <>
-                      {' '}
-                      <a href={`#${returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}`}>
-                        {returnBase ? 'Add to routine' : 'Already added'}
-                      </a>
-                    </>
-                  ) : (
-                    <>
-                      {' '}
-                      <button
-                        type="button"
-                        disabled={busyId === item.id}
-                        onClick={() => {
-                          setBusyId(item.id)
-                          const id = store.addExercise(catalogItemToExercise(item))
-                          go(paths.afterCreate(id), { replace: true })
-                        }}
-                      >
-                        Add
-                      </button>
-                    </>
-                  )}
-                </li>
+                </Row>
               )
             })}
-          </ul>
+          </List>
         </>
       ) : null}
-    </section>
+    </Screen>
   )
 }
 
@@ -298,9 +258,9 @@ export function ExerciseEdit({ exerciseId }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Details</h1>
+      <Title>Details</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -315,60 +275,20 @@ export function ExerciseEdit({ exerciseId }) {
           go(`/exercises/${ex.id}`)
         }}
       >
-        <p>
-          <label>
-            Name
-            <br />
-            <input value={name} onChange={(e) => setName(e.target.value)} required />
-          </label>
-        </p>
-        <p>
-          <label>
-            Type
-            <br />
-            <select value={type} onChange={(e) => setType(e.target.value)}>
-              {EXERCISE_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {typeLabel(t)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </p>
-        <p>
-          <label>
-            Equipment
-            <br />
-            <input value={equipment} onChange={(e) => setEquipment(e.target.value)} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Weight step
-            <br />
-            <input value={weightStep} onChange={(e) => setWeightStep(e.target.value)} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Muscles
-            <br />
-            <input value={muscles} onChange={(e) => setMuscles(e.target.value)} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Form cues
-            <br />
-            <textarea value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
+        <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
+        <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
+        <Field label="Weight step" value={weightStep} onChange={(e) => setWeightStep(e.target.value)} />
+        <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
+        <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
           <NavLink to={`/exercises/${ex.id}`}>Cancel</NavLink>
-        </p>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -380,34 +300,29 @@ export function ExerciseDetail({ exerciseId }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>{ex.name}</h1>
+      <Title>{ex.name}</Title>
       <p>
-        <a href={`#/exercises/${ex.id}/edit`}>Edit</a>
+        <NavLink to={`/exercises/${ex.id}/edit`}>Edit</NavLink>
       </p>
-      <p>
-        {[ex.equipment, typeLabel(ex.type), ex.weightStep].filter(Boolean).join(' · ')}
-      </p>
-      {ex.muscles ? <p>{ex.muscles}</p> : null}
+      <p className="ui-sub">{[ex.equipment, typeLabel(ex.type), ex.weightStep].filter(Boolean).join(' · ')}</p>
+      {ex.muscles ? <p className="ui-sub">{ex.muscles}</p> : null}
       {ex.cues ? (
         <>
-          <h2>Form cues</h2>
-          <p>{ex.cues}</p>
+          <SectionHeader>Form cues</SectionHeader>
+          <p className="ui-sub">{ex.cues}</p>
         </>
       ) : null}
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            if (!window.confirm(`Delete ${ex.name}?`)) return
-            store.removeExercise(ex.id)
-            go('/exercises')
-          }}
-        >
-          Delete
-        </button>
-      </p>
-    </section>
+      <Button
+        onClick={() => {
+          if (!window.confirm(`Delete ${ex.name}?`)) return
+          store.removeExercise(ex.id)
+          go('/exercises')
+        }}
+      >
+        Delete
+      </Button>
+    </Screen>
   )
 }

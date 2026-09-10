@@ -5,6 +5,7 @@ import { routineById, historyPrescription } from '../storage'
 import { useStore } from '../store-context'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing, NavLink } from './shared'
+import { Button, Checkbox, Field, List, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 
 function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
@@ -35,22 +36,20 @@ export function Routines() {
   const routines = (store.routines || []).filter((routine) => !routine.archivedAt)
 
   return (
-    <section>
-      <h1>Routines</h1>
+    <Screen>
+      <Title>Routines</Title>
       <p>
-        <a href="#/routines/new">Add routine</a>
+        <NavLink to="/routines/new">Add routine</NavLink>
       </p>
-      {routines.length === 0 ? <p>None.</p> : null}
-      <ul>
+      {routines.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {routines.map((routine) => (
-          <li key={routine.id}>
-            <a href={`#${routinePath(routine.id)}`}>{routine.name}</a>
-            {' — '}
-            {routine.focus}
-          </li>
+          <Row key={routine.id} to={routinePath(routine.id)}>
+            {routine.name} — {routine.focus}
+          </Row>
         ))}
-      </ul>
-    </section>
+      </List>
+    </Screen>
   )
 }
 
@@ -65,30 +64,14 @@ export function RoutineNewForm({ onSave, onCancel, submitLabel = 'Next' }) {
         onSave({ name, focus })
       }}
     >
-      <p>
-        <label>
-          Name
-          <br />
-          <input value={name} onChange={(e) => setName(e.target.value)} required />
-        </label>
-      </p>
-      <p>
-        <label>
-          Focus
-          <br />
-          <select value={focus} onChange={(e) => setFocus(e.target.value)}>
-            {FOCUS_OPTIONS.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-        </label>
-      </p>
-      <p>
-        <button type="submit">{submitLabel}</button>{' '}
-        <button type="button" onClick={onCancel}>Cancel</button>
-      </p>
+      <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+      <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
+      <div className="ui-actions">
+        <Button type="submit" variant="primary">
+          {submitLabel}
+        </Button>
+        <Button onClick={onCancel}>Cancel</Button>
+      </div>
     </form>
   )
 }
@@ -97,9 +80,9 @@ export function RoutineNew() {
   const store = useStore()
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Add routine</h1>
+      <Title>Add routine</Title>
       <RoutineNewForm
         onSave={({ name, focus }) => {
           const id = store.addRoutine({ name, focus })
@@ -107,7 +90,7 @@ export function RoutineNew() {
         }}
         onCancel={() => go('/routines')}
       />
-    </section>
+    </Screen>
   )
 }
 
@@ -123,63 +106,58 @@ export function RoutineDetail({ routineId, paths }) {
   const meta = [nav.extra, routine.focus].filter(Boolean).join(' · ')
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>{routine.name}</h1>
-      <p>
+      <Title>{routine.name}</Title>
+      <p className="ui-sub">
         {meta}
         {meta ? ' · ' : ''}
-        <a href={`#${nav.edit}`}>Edit</a>
+        <NavLink to={nav.edit}>Edit</NavLink>
       </p>
-      <h2>Exercises</h2>
+      <SectionHeader>Exercises</SectionHeader>
       <p>
-        <a href={`#${nav.pick}`}>Add exercise</a>
+        <NavLink to={nav.pick}>Add exercise</NavLink>
       </p>
-      {routine.exercises.length === 0 ? <p>None.</p> : null}
-      <ol>
+      {routine.exercises.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {routine.exercises.map((item, index) => {
           const ex = store.exercises.find((e) => e.id === item.exerciseId)
           const kg = (item.suggestedWeights || []).some((weight) => Number(weight) > 0)
             ? ` · ${(item.suggestedWeights || []).join('/')} kg`
             : ''
+          const itemMeta = `${roleLabel(item.role)}${item.warmup ? ' · WU set' : ''} · ${item.sets || 1} ${
+            (item.sets || 1) === 1 ? 'set' : 'sets'
+          }${kg}`
           return (
-            <li key={item.id || `${item.exerciseId}-${index}`}>
-              <a href={`#${nav.item(item.id)}`}>{ex?.name || item.exerciseId}</a>
-              {' — '}
-              {roleLabel(item.role)}
-              {item.warmup ? ' · WU set' : ''}
-              {' · '}
-              {item.sets || 1} {(item.sets || 1) === 1 ? 'set' : 'sets'}
-              {kg}
-              {' '}
-              <button type="button" onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>
-                Up
-              </button>{' '}
-              <button type="button" onClick={() => store.moveRoutineExercise(routine.id, index, 1)}>
-                Down
-              </button>
-            </li>
+            <Row
+              key={item.id || `${item.exerciseId}-${index}`}
+              value={
+                <>
+                  <Button onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>Up</Button>
+                  <Button onClick={() => store.moveRoutineExercise(routine.id, index, 1)}>Down</Button>
+                </>
+              }
+            >
+              <NavLink to={nav.item(item.id)}>{ex?.name || item.exerciseId}</NavLink> — {itemMeta}
+            </Row>
           )
         })}
-      </ol>
+      </List>
       <p>
         <NavLink to={nav.done}>Done</NavLink>
       </p>
       {nav.showDelete ? (
-        <p>
-          <button
-            type="button"
-            onClick={() => {
-              if (!window.confirm(`Delete ${routine.name}?`)) return
-              store.removeRoutine(routine.id)
-              go(nav.done)
-            }}
-          >
-            Delete
-          </button>
-        </p>
+        <Button
+          onClick={() => {
+            if (!window.confirm(`Delete ${routine.name}?`)) return
+            store.removeRoutine(routine.id)
+            go(nav.done)
+          }}
+        >
+          Delete
+        </Button>
       ) : null}
-    </section>
+    </Screen>
   )
 }
 
@@ -195,9 +173,9 @@ export function RoutineEdit({ routineId, paths }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Name</h1>
+      <Title>Name</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -205,32 +183,16 @@ export function RoutineEdit({ routineId, paths }) {
           go(nav.base)
         }}
       >
-        <p>
-          <label>
-            Name
-            <br />
-            <input value={name} onChange={(e) => setName(e.target.value)} />
-          </label>
-        </p>
-        <p>
-          <label>
-            Focus
-            <br />
-            <select value={focus} onChange={(e) => setFocus(e.target.value)}>
-              {FOCUS_OPTIONS.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </label>
-        </p>
-        <p>
-          <button type="submit">Save</button>{' '}
+        <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
+        <div className="ui-actions">
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
           <NavLink to={nav.base}>Cancel</NavLink>
-        </p>
+        </div>
       </form>
-    </section>
+    </Screen>
   )
 }
 
@@ -252,38 +214,28 @@ export function RoutineExercisePick({ routineId, paths }) {
   })
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Add exercise</h1>
+      <Title>Add exercise</Title>
       <p>
-        <a href={`#${nav.create}`}>Create exercise</a>
+        <NavLink to={nav.create}>Create exercise</NavLink>
       </p>
       {store.exercises.length === 0 ? (
-        <p>None.</p>
+        <p className="ui-sub">None.</p>
       ) : (
         <>
-          <p>
-            <label>
-              Search
-              <br />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} />
-            </label>
-          </p>
-          {matches.length === 0 ? <p>No matches.</p> : null}
-          <ul>
+          <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
+          {matches.length === 0 ? <p className="ui-sub">No matches.</p> : null}
+          <List>
             {matches.map((ex) => (
-              <li key={ex.id}>
-                <a href={`#${nav.newItem(ex.id)}`}>
-                  {ex.name}
-                </a>
-                {' — '}
-                {ex.equipment}
-              </li>
+              <Row key={ex.id} to={nav.newItem(ex.id)}>
+                {ex.name} — {ex.equipment}
+              </Row>
             ))}
-          </ul>
+          </List>
         </>
       )}
-    </section>
+    </Screen>
   )
 }
 
@@ -336,61 +288,19 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
         })
       }}
     >
-      <p>
-        <label>
-          Role
-          <br />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            {ROUTINE_ROLES.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-        </label>
-      </p>
-      <p>
-        <label>
-          <input type="checkbox" checked={warmup} onChange={(e) => setWarmup(e.target.checked)} /> WU set
-        </label>
-      </p>
-      <p>
-        <label>
-          Sets
-          <br />
-          <input type="number" min="1" value={sets} onChange={(e) => setSets(e.target.value)} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Reps
-          <br />
-          <input value={targets} onChange={(e) => setTargets(e.target.value)} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Kg
-          <br />
-          <input value={weights} onChange={(e) => setWeights(e.target.value)} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Rest (s)
-          <br />
-          <input type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
-        </label>
-      </p>
-      <p>
-        <label>
-          Notes
-          <br />
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
-        </label>
-      </p>
-      <p>
-        <button type="submit">Save</button>{' '}
-        <button type="button" onClick={onCancel}>Cancel</button>
-      </p>
+      <Select label="Role" options={ROUTINE_ROLES} value={role} onChange={(e) => setRole(e.target.value)} />
+      <Checkbox label="WU set" checked={warmup} onChange={setWarmup} />
+      <Field label="Sets" type="number" min="1" value={sets} onChange={(e) => setSets(e.target.value)} />
+      <Field label="Reps" value={targets} onChange={(e) => setTargets(e.target.value)} />
+      <Field label="Kg" value={weights} onChange={(e) => setWeights(e.target.value)} />
+      <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
+      <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
+      <div className="ui-actions">
+        <Button type="submit" variant="primary">
+          Save
+        </Button>
+        <Button onClick={onCancel}>Cancel</Button>
+      </div>
     </form>
   )
 }
@@ -414,10 +324,10 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <p>{routine.name}</p>
-      <h1>{ex.name}</h1>
+      <p className="ui-sub">{routine.name}</p>
+      <Title>{ex.name}</Title>
       <ExerciseFields
         item={{
           role: defaults.role,
@@ -435,7 +345,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
           go(nav.base)
         }}
       />
-    </section>
+    </Screen>
   )
 }
 
@@ -461,10 +371,10 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
   }
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <p>{routine.name}</p>
-      <h1>{ex?.name || item.exerciseId}</h1>
+      <p className="ui-sub">{routine.name}</p>
+      <Title>{ex?.name || item.exerciseId}</Title>
       <ExerciseFields
         key={`${routine.id}-${index}`}
         item={item}
@@ -475,19 +385,16 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
           go(parent)
         }}
       />
-      <p>
-        <button
-          type="button"
-          onClick={() => {
-            if (!window.confirm(`Remove ${ex?.name || 'this exercise'}?`)) return
-            store.removeRoutineExercise(routine.id, index)
-            go(parent)
-          }}
-        >
-          Remove
-        </button>
-      </p>
-    </section>
+      <Button
+        onClick={() => {
+          if (!window.confirm(`Remove ${ex?.name || 'this exercise'}?`)) return
+          store.removeRoutineExercise(routine.id, index)
+          go(parent)
+        }}
+      >
+        Remove
+      </Button>
+    </Screen>
   )
 }
 
