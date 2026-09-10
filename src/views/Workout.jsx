@@ -735,9 +735,10 @@ export function WorkoutSetEdit({ routineId, index }) {
         {usesRpe ? (
           <>
             <SectionHeader>Effort</SectionHeader>
-            {/* leading '—' keeps effort clearable, as the old <select> did */}
+            {/* clearable keeps effort resettable, as the old <select> did */}
             <SegmentedControl
-              options={[{ value: '', label: '—' }, ...RPE_OPTIONS]}
+              clearable
+              options={RPE_OPTIONS}
               value={rpe}
               onChange={setRpe}
               ariaLabel="Effort"

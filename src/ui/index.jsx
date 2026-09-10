@@ -35,10 +35,15 @@ export function NavLink({ className, ...rest }) {
 
 // SegmentedControl — radio group as equal-width segments; selected set apart by
 // fill/weight (grayscale). Covers effort (Easy/Moderate/Hard/Failure) and feel.
-export function SegmentedControl({ options, value, onChange, ariaLabel }) {
+// `clearable` prepends a leading "none" segment (`—`, value `''`) that resets the
+// control to empty — the idiom three call sites used to hand-roll. Off by default,
+// so non-clearable controls are unchanged. The `—` label / `''` value are the
+// convention; picking it fires onChange('').
+export function SegmentedControl({ options, value, onChange, ariaLabel, clearable }) {
+  const segments = clearable ? [{ value: '', label: '—' }, ...options] : options
   return (
     <div className="ui-seg" role="radiogroup" aria-label={ariaLabel}>
-      {options.map((opt) => {
+      {segments.map((opt) => {
         const optValue = typeof opt === 'object' ? opt.value : opt
         const optLabel = typeof opt === 'object' ? opt.label : opt
         const selected = String(optValue) === String(value)
