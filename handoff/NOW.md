@@ -20,6 +20,7 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 Each req is tagged with its merge gate (DEC-009); only READY reqs (no open questions) enter the
 autoloop.
 
+- `req-15` **styling pass** — migrate the WHOLE app onto the `ui/` library (grayscale, DEC-017); behaviour-preserving. Small/necessary/duplicate fixes inline; bigger merge/separate/restructure ideas → a findings report, not done (DEC-021). The big one; screen-by-screen, heavy iteration. **[ux-feel → Emilio's hands; iterative]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by

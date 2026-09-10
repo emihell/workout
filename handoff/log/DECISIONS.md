@@ -337,3 +337,20 @@ suggested Apple-ish starting point):
 - **display** ~40px — big data numbers (e.g. the kg number).
 - The **RestBar time number is doubled** from its current size (its own large step above display).
 Single source of truth for text sizes; part of the req-13 iteration.
+
+## DEC-021 — the styling pass: one req styles the whole app; bigger refactors are observed, not done  (Emilio, 2026-09-10)
+
+The styling pass (drives req-15) migrates the **entire app**'s screens off raw HTML and onto the
+req-13 `ui/` component library (Screen, Title/SectionHeader, List/Row, Button, NavLink, Field,
+NumberField, SegmentedControl, Checkbox, Textarea, Banner, RestBar, SetLogForm). Grayscale still
+(DEC-017 — no color/theme yet). Discipline while migrating:
+- **Do inline:** small unintrusive tweaks; changes **required** because the app now uses the
+  components; fixing **logical or duplicate functions** (e.g. the app's inline RestBar/SetLogForm →
+  the `ui/` ones, deduped helpers).
+- **Observe, don't do:** anything **bigger** — what could be **merged**, **separated**, or
+  **restructured** in the code/architecture. These go into an **improvement findings report
+  delivered at the end** (not acted on during the req), so Emilio reviews it and we spec follow-up
+  req(s) for the worthwhile ones.
+- Migrate **screen-by-screen** (own commit per screen-group) for reviewability. Gate: ux-feel,
+  heavy iteration on Emilio's phone. Big diff expected — behaviour unchanged, only the presentation
+  moves onto the components.
