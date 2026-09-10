@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RPE_OPTIONS, formatSetLine, roleLabel, rpeOptionValue } from '../ids'
+import { formatSetLine, roleLabel } from '../ids'
 import { formatProgressionLine } from '../progress'
 import { go } from '../route'
 import { dateKey } from '../schedule'
@@ -14,12 +14,11 @@ import {
 } from '../storage'
 import { useStore } from '../store-context'
 import { RoutineScreens, navForBase } from './Routine'
+import { SetEditForm } from './set-edit'
 import { Back, Missing, NavLink } from './shared'
 import {
   Button,
-  Field,
   List,
-  NumberField,
   Row,
   Screen,
   SectionHeader,
@@ -517,11 +516,6 @@ export function HistorySet({ workoutId, index }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
   const set = workout?.sets?.[index]
-  const [setType, setSetType] = useState(set?.setType || 'work')
-  const [weight, setWeight] = useState(set?.weight ?? '')
-  const [reps, setReps] = useState(set?.reps ?? '')
-  const [rpe, setRpe] = useState(() => (set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : ''))
-  const [note, setNote] = useState(set?.note || '')
 
   if (!workout || !set) {
     return <Missing>Not found.</Missing>
@@ -532,9 +526,16 @@ export function HistorySet({ workoutId, index }) {
       <Back />
       <p className="ui-sub">{workoutRoutineName(workout, null)}</p>
       <Title>Set</Title>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
+      <SetEditForm
+        set={set}
+        showLoad
+        showEffort
+        setTypeOptions={[
+          { value: 'wu', label: 'WU set' },
+          { value: 'work', label: 'Work' },
+        ]}
+        cancelTo={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`}
+        onSave={({ weight, reps, rpe, note, setType }) => {
           const sets = (workout.sets || []).map((s, i) =>
             i === index
               ? {
@@ -550,36 +551,7 @@ export function HistorySet({ workoutId, index }) {
           store.updateWorkout(workout.id, { sets })
           go(`/history/${workout.id}/recalculate`)
         }}
-      >
-        <SectionHeader>Type</SectionHeader>
-        <SegmentedControl
-          options={[
-            { value: 'wu', label: 'WU set' },
-            { value: 'work', label: 'Work' },
-          ]}
-          value={setType}
-          onChange={setSetType}
-          ariaLabel="Type"
-        />
-        <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
-        <Field label="Reps" value={reps} onChange={(e) => setReps(e.target.value)} />
-        <SectionHeader>Effort</SectionHeader>
-        {/* clearable keeps effort resettable, as the old <select> did */}
-        <SegmentedControl
-          clearable
-          options={RPE_OPTIONS}
-          value={rpe}
-          onChange={setRpe}
-          ariaLabel="Effort"
-        />
-        <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} />
-        <div className="ui-actions">
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-          <NavLink to={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`}>Cancel</NavLink>
-        </div>
-      </form>
+      />
       <Button
         onClick={() => {
           if (!window.confirm('Remove set?')) return
