@@ -314,3 +314,18 @@ working), Finish, and History detail — all render; started + cleanly Abandoned
 (activeWorkout confirmed back to null, no history touched). Merge `bb3f724` (branch `req-19`,
 `b6b63f5`). `./check` green, 105 tests. **This closes the req-15-findings refactor batch (req-16, 17,
 18, 20, 21, 22, 23, 19).**
+
+## req-25 — bug #5: the last set of an exercise now rests (rest-on-overview)  (merged 2026-09-10)
+
+First of Emilio's 2026-09-10 gym-flow notes. Bug: completing the final set of an exercise armed no
+rest — the `restAfterSet(done, skipped)` guard suppressed rest when `done` (last set), so the hardest
+set got no timer and the app jumped to the exercise list. Reproduced live before fixing (Chest Press
+restSec 90: every set rested except the last). Fix: rest is armed by *completion* — extracted a pure,
+unit-tested `restPatchAfterSet({restSec, skipped})` in `workout-log.js` where only a skipped set /
+restSec 0 suppress rest; `restAfterSet` delegates to it and dropped the now-inert `done` param;
+navigation unchanged. **Domino caught a second bug:** `markItemDonePatch` also cleared rest (ran right
+after the rest patch), which would have wiped the armed countdown — it no longer touches rest. Last
+set now drops to the overview with the persistent RestBar ticking there (rest-on-overview, Emilio's
+call; refines DEC-013). **Planning browser-verified:** Chest Press restSec 90 last set → rest bar on
+overview, ticked 87→72s; Rowing restSec 0 → no rest (no over-fix). Merge `64fa26e` (branch `req-25`,
+`59dfff9`). `./check` green, 109 tests (4 new + 1 justified update).

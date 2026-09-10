@@ -122,8 +122,12 @@ Note: bug #5 is a *logic* defect (rest timer), not a form-layout change, so it d
 with the UI refactor and could be pulled forward if the timer misbehaviour bites — default is still
 after the batch.
 
-**Next planning step:** after the refactor batch closes, spec these one at a time (bug #5 first —
-it's independent and a real defect). Timed exercises wait on Emilio's model decision.
+**Status (2026-09-10):** bug #5 **shipped as req-25** (rest-on-overview; reproduced + fixed +
+verified; see SHIPPED / DEC-013 refinement). The rest specced and queued (all ux-feel, serial):
+#2+#3 → **req-26** (declutter set-log), #1 → **req-27** (upcoming weight during rest), #7 → **req-28**
+(completed on Today), #4 → **req-29** (button-placement audit, DESIGN §4). Timed exercises (#6) still
+PARKED on Emilio's model decision — note: Rowing already uses a "Duration" field (cardio), so a
+duration concept partly exists; may inform #6.
 
 ## Phase 2 — the program-creation flow  (next; the hard one)
 

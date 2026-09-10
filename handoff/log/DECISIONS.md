@@ -252,6 +252,16 @@ Behaviour change to watch: "mark done" moves from the review's Done button to la
 the overview's completion state, the all-done→Finish path, and re-entry "Add set" must all still
 work. Gate: ux-feel → Emilio's hands. Drives req-11.
 
+**Refined by req-25 (Emilio, 2026-09-10):** the "last set → straight to overview" transition above
+now **carries a running rest**. Bug #5 was that completing the last set of an exercise armed no rest
+(the `done`-suppresses-rest guard), so the final — usually hardest — set got no timer. Fixed: rest is
+armed by *completion* (only a skipped set / restSec 0 suppress it), and the last set drops to the
+overview with the persistent RestBar counting down there ("rest on the overview") while you pick the
+next exercise. Rest suppression now lives solely in the pure `restPatchAfterSet` (`workout-log.js`);
+`markItemDonePatch` no longer clears rest (it was a second clearing site that would have wiped the
+armed countdown). Verified in-browser (Chest Press restSec 90 → rest bar on overview, ticking;
+Rowing restSec 0 → no rest).
+
 ## DEC-014 — adding a set to a finished exercise reopens it until that set is logged  (2026-09-09)
 
 Emergent from req-11's mark-done-timing change (DEC-013): since an exercise is auto-marked done on
