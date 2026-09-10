@@ -1,3 +1,5 @@
+import { rpeOptionValue } from './ids.js'
+
 export function itemKey(item) {
   return item?.routineItemId || item?.sessionItemId || item?.id || ''
 }
@@ -184,6 +186,22 @@ export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history
     return { weight: weighted ? carry.weight : '', reps: carry.reps }
   }
   return { weight: weighted ? history.weight : '', reps: target || '' }
+}
+
+// Everything the live set-log form starts from, decided from inputs alone — the
+// history-is-truth rule made testable outside the component (req-17 / DEC-021).
+// weight + reps go through the existing setLogSeed (never invents a kg it doesn't
+// have); effort and note come from the restore payload only, else the defaults
+// (effort 3 "Moderate", empty note). Same priority order as setLogSeed: restore
+// (un-logging via "Previous") wins. Pure, so the prefill decision is inspectable.
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target }) {
+  const { weight, reps } = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target })
+  const effort =
+    fromRestore && restore.rpe != null && restore.rpe !== ''
+      ? rpeOptionValue(restore.rpe) || restore.rpe
+      : 3
+  const note = fromRestore ? restore.note : ''
+  return { weight, reps, effort, note }
 }
 
 // Pure rest-timer state, derived from the persisted workout-level fields

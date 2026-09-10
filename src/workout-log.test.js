@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
+import { rpeOptionValue } from './ids.js'
 import {
   itemIsMarkedDone,
   itemKey,
@@ -13,6 +14,7 @@ import {
   restRemaining,
   carriedWorkingSet,
   setLogSeed,
+  initialSetFields,
 } from './workout-log.js'
 
 const item = {
@@ -294,5 +296,103 @@ describe('setLogSeed (req-02 prefill order)', () => {
       target: '10',
     })
     assert.deepEqual(seed, { weight: '35', reps: '9' })
+  })
+})
+
+// req-17 / DEC-021 — the whole live set-log seed (weight, reps, effort, note),
+// extracted from WorkoutItemLive so the history-is-truth rule is unit-testable.
+describe('initialSetFields (req-17 seed extraction)', () => {
+  const history = { weight: '', reps: '' }
+
+  it('no-invent: weighted, NO history, no restore → blank weight, never a guessed kg', () => {
+    const fields = initialSetFields({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: false,
+      history,
+      carry: null,
+      target: '10',
+    })
+    assert.deepEqual(fields, { weight: '', reps: '10', effort: 3, note: '' })
+  })
+
+  it('history prefill (weighted): weight = history-derived kg, effort/note stay at defaults', () => {
+    const fields = initialSetFields({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history: { weight: '60', reps: '5' },
+      carry: { weight: '99', reps: '99' },
+      target: '5',
+    })
+    assert.deepEqual(fields, { weight: '60', reps: '5', effort: 3, note: '' })
+  })
+
+  it('history prefill (bodyweight): weight stays blank, reps from history', () => {
+    const fields = initialSetFields({
+      weighted: false,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history: { weight: '60', reps: '12' },
+      carry: null,
+      target: '12',
+    })
+    assert.deepEqual(fields, { weight: '', reps: '12', effort: 3, note: '' })
+  })
+
+  it('restore wins when fromRestore: weight/reps/effort/note all come from the restore payload', () => {
+    const fields = initialSetFields({
+      weighted: true,
+      fromRestore: true,
+      restore: { weight: '35', reps: '9', rpe: '4', note: 'felt strong' },
+      hasHistory: true,
+      history: { weight: '60', reps: '5' },
+      carry: { weight: '40', reps: '10' },
+      target: '5',
+    })
+    assert.deepEqual(fields, { weight: '35', reps: '9', effort: 4, note: 'felt strong' })
+  })
+
+  it('empty restore.rpe falls back to the current default effort (3)', () => {
+    const fields = initialSetFields({
+      weighted: true,
+      fromRestore: true,
+      restore: { weight: '35', reps: '9', rpe: '', note: '' },
+      hasHistory: false,
+      history,
+      carry: null,
+      target: '10',
+    })
+    assert.equal(fields.effort, 3)
+  })
+
+  // Parity: initialSetFields(x) must equal exactly what the old inline expressions
+  // in WorkoutItemLive produced. Recompute the pre-req-17 inline path here and
+  // assert equality over representative inputs, so a future edit that changes the
+  // seed is caught as a parity break, not a silent behaviour change.
+  it('parity with the old inline WorkoutItemLive expressions', () => {
+    const oldInline = ({ weighted, fromRestore, restore, hasHistory, history, carry, target }) => {
+      const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target })
+      const initialEffort =
+        fromRestore && restore.rpe != null && restore.rpe !== ''
+          ? rpeOptionValue(restore.rpe) || restore.rpe
+          : 3
+      const initialNote = fromRestore ? restore.note : ''
+      return { weight: seed.weight, reps: seed.reps, effort: initialEffort, note: initialNote }
+    }
+    const cases = [
+      // no-history, weighted, first set: blank kg, target reps, default effort
+      { weighted: true, fromRestore: false, restore: null, hasHistory: false, history, carry: null, target: '10' },
+      // has-history, weighted: history weight, target reps
+      { weighted: true, fromRestore: false, restore: null, hasHistory: true, history: { weight: '60', reps: '5' }, carry: null, target: '5' },
+      // fromRestore with a real rpe + note: everything from restore
+      { weighted: true, fromRestore: true, restore: { weight: '35', reps: '9', rpe: '5', note: 'x' }, hasHistory: false, history, carry: { weight: '40', reps: '10' }, target: '10' },
+    ]
+    for (const input of cases) {
+      assert.deepEqual(initialSetFields(input), oldInline(input))
+    }
   })
 })
