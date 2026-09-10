@@ -316,3 +316,10 @@ Six flat nav items is too many for mobile. **Primary / always-visible: Today** (
 (one tap deeper). The menu can be a plain list for the raw first iteration; grouping (e.g.
 Routines/Exercises as a "Plan" area) is refinable later, and analytics (req-08) can validate which
 items actually get used. Shapes req-13's `NavBar`.
+
+## DEC-019 — nav: everything goes in the menu; menu closes on item-click or outside-click  (Emilio, 2026-09-10) — supersedes DEC-018's primary items
+
+Two visible items (Today + Schedule) + a Menu felt unbalanced. Revised: the **NavBar is just a Menu
+trigger**; **all** nav items (Today, Schedule, Routines, Exercises, History, Settings) live inside
+the menu. The menu **closes when an item is clicked, and when the user clicks outside it**.
+Supersedes DEC-018's "Today + Schedule always visible". Part of the req-13 iteration.
