@@ -1,7 +1,7 @@
 # Now
 
-Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15** (all except req-10). Done lives in
-`log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15, req-17** (all except req-10). Done lives
+in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -17,13 +17,12 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 ## Next — READY (build in the order below; full spec in each `work/req-NN-*.md`; one at a time, DEC-009)
 
 **Refactor batch (req-15 findings, DEC-021 — all code-only, planning verifies + merges).** Order
-avoids file conflicts (they touch the same files):
-1. `req-17` extract `initialSetFields` (seed logic → pure/tested; shrinks Workout.jsx) — do first
-2. `req-16` `itemCurrentPath` helper (tiny, Workout.jsx)
-3. `req-20` link-`Row` `value` · `req-21` `Title subtitle` · `req-22` `SegmentedControl clearable` (ui/ additive)
-4. `req-23` `ActionRow`/trailing-action (ui/; lowest value, optional)
-5. `req-18` merge set-edit forms (Workout+History)
-6. `req-19` split the two oversized view files (pure move) — **do last**, after 17/18 settle
+avoids file conflicts (they touch the same files). ~~req-17~~ shipped; **next: req-16**.
+1. `req-16` `itemCurrentPath` helper (tiny, Workout.jsx) ← next
+2. `req-20` link-`Row` `value` · `req-21` `Title subtitle` · `req-22` `SegmentedControl clearable` (ui/ additive)
+3. `req-23` `ActionRow`/trailing-action (ui/; lowest value, optional)
+4. `req-18` merge set-edit forms (Workout+History)
+5. `req-19` split the two oversized view files (pure move) — **do last**, after 18 settles
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**

@@ -207,3 +207,16 @@ link rows, formalize the action-row/clearable-segment patterns, ~10 native confi
 inline-dialog work). Merge `2d0dfc0` (branch `req-15-styling-pass`, `a403182`…`0230dd0`, 8 commits).
 `./check` green. Emilio reviewed the styled app on his phone and approved. The app is now grayscale-
 styled end to end; color/theme is a later pass.
+
+## req-17 — extract the set-log seed/prefill into a pure, tested `initialSetFields`  (merged 2026-09-10)
+
+First of the req-15-findings refactor batch (DEC-021, finding #3). The live set-log form's seed —
+the **history-is-truth rule** ("prefills come only from finished-workout data; never invent a value")
+— was computed inline inside `WorkoutItemLive` (`Workout.jsx`), where it couldn't be unit-tested. It
+now lives in a pure `initialSetFields({...})` in `workout-log.js` returning `{weight,reps,effort,note}`:
+weight/reps delegate to the untouched `setLogSeed`, effort/note (and the `fromRestore` "Previous"
+branch) moved verbatim; the component keeps zero seed branching. Behaviour-neutral by contract — a
+parity test recomputes the old inline expressions and asserts `deepEqual` over representative inputs,
+so the DEC-009 functional gate was met deterministically rather than by click-through. Default effort
+confirmed as `3` (Moderate) from the inline code; no inline/`setLogSeed` discrepancy found. Merge
+`632fb33` (branch `req-17`, `80e746c`). `./check` green, 105 tests (6 new in `workout-log.test.js`).
