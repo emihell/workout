@@ -18,10 +18,13 @@ export function NavLink({ to, children, className, chevron }) {
   )
 }
 
+// req-15 — styled as a quiet library button. Uses the ui-btn classes directly
+// (not the Button component) because ui/index.jsx imports NavLink from this file;
+// keeping shared.jsx free of ui/ imports keeps that dependency one-way.
 export function Back() {
   return (
     <p>
-      <button type="button" onClick={() => back()}>
+      <button type="button" className="ui-btn ui-btn--quiet" onClick={() => back()}>
         Back
       </button>
     </p>
@@ -35,16 +38,16 @@ export function Back() {
 export function ExercisesLink({ routineId }) {
   return (
     <p>
-      <NavLink to={`/workout/${routineId}`}>‹ Exercises</NavLink>
+      <NavLink to={`/workout/${routineId}`} className="ui-navlink">‹ Exercises</NavLink>
     </p>
   )
 }
 
 export function Missing({ children = 'Not found.' }) {
   return (
-    <section>
+    <section className="ui-screen">
       <Back />
-      <p>{children}</p>
+      <p className="ui-sub">{children}</p>
     </section>
   )
 }

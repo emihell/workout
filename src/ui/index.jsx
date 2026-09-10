@@ -116,6 +116,29 @@ export function Textarea({ label, rows = 3, ...rest }) {
   )
 }
 
+// Select — a native <select> styled to match Field, with a grayscale caret and a
+// ≥44px hit area. `options` is a list of strings or { value, label }. A native
+// select (not a SegmentedControl) because these lists (focus, type, weeks) have
+// more options than fit a row on mobile. Passes value/defaultValue/name through.
+export function Select({ label, options, className, ...rest }) {
+  return (
+    <label className="ui-field">
+      {label ? <span className="ui-field__label">{label}</span> : null}
+      <select className={cx('ui-input', 'ui-select', className)} {...rest}>
+        {options.map((opt) => {
+          const value = typeof opt === 'object' ? opt.value : opt
+          const text = typeof opt === 'object' ? opt.label : opt
+          return (
+            <option key={value} value={value}>
+              {text}
+            </option>
+          )
+        })}
+      </select>
+    </label>
+  )
+}
+
 // ---- Structure ----
 
 // Screen — the page container: mobile-first, side padding, centered max-width.

@@ -15,6 +15,7 @@ import {
   Row,
   Screen,
   SegmentedControl,
+  Select,
   SetLogForm,
   Textarea,
   Title,
@@ -120,6 +121,10 @@ export function Showcase() {
 
       <Block heading="Textarea">
         <Textarea label="Note" value={note} onChange={(e) => setNote(e.target.value)} />
+      </Block>
+
+      <Block heading="Select">
+        <Select label="Focus" options={['Machines', 'Free weights', 'Bodyweight', 'Cardio']} defaultValue="Machines" />
       </Block>
 
       <Block heading="Grouped list + row">
