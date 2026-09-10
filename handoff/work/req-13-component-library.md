@@ -1,6 +1,6 @@
 # req-13 — a minimal, colorless, Apple-inspired component library (+ showcase)
 
-**Status: READY** — direction settled (DEC-017). The first styling foundation. First iteration is
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-13` (`4007683`…`11a68bf`, 4 commits).** — direction settled (DEC-017). The first styling foundation. First iteration is
 deliberately bare; expect iteration from the showcase.
 
 **Gate: ux-feel** (DEC-009) — it defines the app's look. The planning session can verify the showcase
@@ -19,8 +19,10 @@ possible, easy to press, Apple-inspired.
 
 - **Colorless** — grayscale only (white / black / grays), no theme. Whitespace, type weight, and
   hairline (1px light-gray) dividers do the work.
-- **System font** (`-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`); a small
-  scale: title / section / body / caption.
+- **System font** (`-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`); a **fixed
+  named type scale** (DEC-020) — caption / body / section / title / display, defined as CSS custom
+  properties in `ui.css`, and **every** component references only these (no ad-hoc `font-size`). The
+  RestBar time number is **double** its earlier size (a large step above display).
 - **Easy to press** — every interactive target **≥ 44px** tall; generous padding; 8px spacing rhythm.
 - **Apple-inspired** — grouped lists with hairline dividers + a `›` chevron on navigable rows;
   segmented controls; large legible numbers; buttons as rounded rects set apart by weight/border.
@@ -36,7 +38,7 @@ showcase):
 **Controls**
 - **`Button`** (action / submit) — rounded rect, ≥44px tall, generous horizontal padding, often
   full-width on mobile. Variants by weight, not color: **primary** (solid hairline border + bold
-  label, or light-gray fill) / **secondary** (plain, lighter) / **quiet** (text-only). Covers the 44
+  label, or light-gray fill) / **secondary** (plain, lighter) / **quiet** (a **hairline border**, lightest weight — Emilio 2026-09-10: quiet needs a border, not text-only). Covers the 44
   `type="button"` + 11 `type="submit"` uses (Complete, Save, Skip, Add, Delete, Start, Abandon,
   Pause/Resume, +30s, Next, Import, Export…).
 - **`NavLink`** — text navigation link; optional leading `‹` (back) or trailing `›` (forward)
@@ -63,17 +65,17 @@ showcase):
 - **`List` + `Row`** — Apple grouped list: full-bleed rows, hairline dividers **between** rows,
   ≥44px row height, content left / optional value or `›` chevron right. Covers exercise lists,
   history, schedule, today's rows, the workout overview list.
-- **`NavBar`** — **primary: Today + Schedule** always visible; the rest (**Routines, Exercises,
-  History, Settings**) behind a simple **`Menu`** affordance (DEC-018). For the raw first iteration
-  the menu can be a plain toggled list of those four links — no fancy drawer. So the bar reads
-  roughly `Today · Schedule · Menu`. (Bottom tab bar is the Apple-mobile idiom worth considering
-  later; not now.)
+- **`NavBar`** — **everything in the menu (DEC-019, supersedes DEC-018).** The bar is just a **`Menu`**
+  trigger; the menu holds **all** nav items (Today, Schedule, Routines, Exercises, History, Settings).
+  The menu **closes when an item is clicked and when the user clicks outside it**. (Bottom tab bar is
+  the Apple-mobile idiom worth considering later; not now.)
 - **`Banner`** — a full-width notice strip (grayscale), for the save-failed banner (req-01) and
   error-boundary fallback (req-05).
 
 **Molecules (app-specific, compose the atoms)**
-- **`RestBar`** — the rest countdown: a **large** remaining-time number, `Pause/Resume` + `+30s`
-  grouped left, `Next` right (req-11 layout), as one tidy bar. Restyle the existing one.
+- **`RestBar`** (revised, Emilio 2026-09-10) — a **big remaining-time number on its own** (prominent,
+  full-width), then **a row of 3 equal-width buttons** `[Pause/Resume] [+30s] [Next]` — each takes a
+  third, **`Next` is the primary** and sits **at the right**.
 - **`SetLogForm`** — kg + reps `NumberField`s, the effort `SegmentedControl`, note `Field`, and the
   Complete/Skip/Previous `Button`s — the single most important gym surface; make it big and thumb-reachable.
 
@@ -82,8 +84,8 @@ showcase):
 - Create `src/ui/` (name CC's call) with the components above, plus **one minimal grayscale
   stylesheet**. No colors, no tokens beyond spacing/sizing/type, no dependencies.
 - Add a **showcase route `#/components`** (a plain screen, reachable e.g. from Settings or by URL)
-  that renders **every** component in its states (button variants, a list, a segmented control, the
-  fields, the RestBar, a banner) so Emilio can see and iterate. This is the iteration surface.
+  that renders **one example of each component** (Emilio 2026-09-10: just one of each, not every
+  state) so Emilio can see and iterate. This is the iteration surface.
 - Keep it **tiny** — first iteration favours "too little" over "too much"; we add on looking at it.
 
 ## Out of scope (first iteration)

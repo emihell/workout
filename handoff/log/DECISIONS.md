@@ -316,3 +316,24 @@ Six flat nav items is too many for mobile. **Primary / always-visible: Today** (
 (one tap deeper). The menu can be a plain list for the raw first iteration; grouping (e.g.
 Routines/Exercises as a "Plan" area) is refinable later, and analytics (req-08) can validate which
 items actually get used. Shapes req-13's `NavBar`.
+
+## DEC-019 — nav: everything goes in the menu; menu closes on item-click or outside-click  (Emilio, 2026-09-10) — supersedes DEC-018's primary items
+
+Two visible items (Today + Schedule) + a Menu felt unbalanced. Revised: the **NavBar is just a Menu
+trigger**; **all** nav items (Today, Schedule, Routines, Exercises, History, Settings) live inside
+the menu. The menu **closes when an item is clicked, and when the user clicks outside it**.
+Supersedes DEC-018's "Today + Schedule always visible". Part of the req-13 iteration.
+
+## DEC-020 — a fixed named type scale; all text uses it  (Emilio, 2026-09-10)
+
+Text sizes must come from **one fixed scale**, not ad-hoc per component. Define the scale as CSS
+custom properties in `ui.css` and make every component + the showcase reference **only** these — no
+loose `font-size` values. Named tiers (concrete px = CC's call, consolidating the current sizes;
+suggested Apple-ish starting point):
+- **caption** ~13px — eyebrow labels ("BUTTON"), field labels, captions.
+- **body** ~17px — default text, buttons, inputs, list rows.
+- **section** ~22px — `SectionHeader` (h2).
+- **title** ~32px — `Title` (h1) screen titles.
+- **display** ~40px — big data numbers (e.g. the kg number).
+- The **RestBar time number is doubled** from its current size (its own large step above display).
+Single source of truth for text sizes; part of the req-13 iteration.
