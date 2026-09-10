@@ -1,6 +1,6 @@
 # req-13 — a minimal, colorless, Apple-inspired component library (+ showcase)
 
-**Status: READY** — direction settled (DEC-017). The first styling foundation. First iteration is
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-13` (`4007683`…`11a68bf`, 4 commits).** — direction settled (DEC-017). The first styling foundation. First iteration is
 deliberately bare; expect iteration from the showcase.
 
 **Gate: ux-feel** (DEC-009) — it defines the app's look. The planning session can verify the showcase
