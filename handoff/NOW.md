@@ -17,11 +17,16 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY
 
-**Refactor batch (req-15 findings, DEC-021): DONE** — all 8 shipped self-driving (req-16, 17, 18,
-19, 20, 21, 22, 23), planning-verified + merged. Findings #8 no-op, #10 rejected. Next up are the
-**gym-flow notes** (Emilio 2026-09-10, `work/BACKLOG.md`): decided *refactor-first, notes-after*, so
-these are now unblocked. Spec them one at a time — **bug #5 (rest timer) first** (a real defect,
-independent of UI). Not yet written as req-NN.
+**Refactor batch (req-15 findings, DEC-021): DONE** — all 8 shipped (req-16–23). Findings #8 no-op,
+#10 rejected.
+
+**Now: gym-flow notes** (Emilio 2026-09-10, `work/BACKLOG.md`; refactor-first-notes-after decided).
+- `req-25` **bug #5 — last set of an exercise starts no rest** ← in build. Reproduced live: only the
+  *last* set is affected (arms rest on the overview via the persistent RestBar; DEC-013 refined).
+  Decided rest-on-overview. **[functional + gym-flow feel → Emilio feels before merge]**
+- Still to spec (quick wins): #1 upcoming weight during rest, #2 remove info-under-buttons, #3 hide
+  note behind a button, #7 completed on Today, #4 button-placement audit (DESIGN §4). #6 timed
+  exercises PARKED (model TBD).
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
