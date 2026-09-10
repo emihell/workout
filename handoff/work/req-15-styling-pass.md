@@ -1,6 +1,6 @@
 # req-15 — the styling pass: migrate the whole app onto the component library (+ findings report)
 
-**Status: READY** — approach settled (DEC-021). The big one. Behaviour-preserving visual migration;
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-15` (`a403182`…`0230dd0`, 8 commits).** — approach settled (DEC-021). The big one. Behaviour-preserving visual migration;
 a large diff and heavy iteration expected.
 
 **Gate: ux-feel** (DEC-009) — it restyles the entire app. Emilio judges the look, on his phone, and
