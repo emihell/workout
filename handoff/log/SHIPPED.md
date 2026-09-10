@@ -232,3 +232,15 @@ navigation). `itemSetsPath` collapsed to a one-liner. The standalone uncondition
 correctly left alone (not a done/log branch). Pure, behaviour-neutral, no test edits — verified: the
 two path helpers now appear only in their defs + inside `itemCurrentPath` + that one redirect. Merge
 `1787773` (branch `req-16`, `403cb85`). `./check` green, 105 tests.
+
+## req-20 — link `Row` can carry a right-aligned `value` beside the chevron  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #4, DEC-021). `Row`'s `to` branch previously rendered only
+`children + ›` and dropped `value`; now it renders `children … value ›` (label wrapped in
+`.ui-row__label` with `flex:1 1 auto; min-width:0` so value+chevron group at the right). Value-less
+links stay pixel-identical — `flex:1` just fills the space `justify-content:space-between` already
+left empty. Whole-row tap target preserved (value span lives inside the NavLink). One Showcase demo
+row added; no real callers converted (every inlined-meta candidate would change wording/wrapping —
+left for a later sweep, noted in the report). **Planning browser-verified** on the Showcase: value-
+less link unchanged, value-link shows the value right-aligned before the chevron, plain value row
+unchanged. Merge `b15d7d6` (branch `req-20`, `1ef1bb7`). `./check` green, 105 tests.
