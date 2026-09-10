@@ -268,3 +268,17 @@ old markup. Off by default → non-clearable controls untouched. All three sites
 convention. Verified by construction (identical rendered segments, no other control touched) + the
 idiom grep returning none + build/tests. Merge `81b3692` (branch `req-22`, `4303905`). `./check`
 green, 105 tests.
+
+## req-23 — `action` slot on `Row` (trailing-action pattern)  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #5, DEC-021). `Row` gains an optional `action` slot (plain rows only)
+with `.ui-row__action { display:flex; align-items:center; gap:s2 }`, pushed right by the row's
+existing space-between; interaction rule `children … value action` (both may coexist — Today needs
+both). Five sites migrated from `value={<Button>}` to `action=`: Today (its polymorphic `value`
+split into `value={doneLabel}` + `action={startAction}`, behaviour-preserving), Start Resume,
+Schedule Remove, Routine Up/Down, Exercises Add. **Planning browser-verified** on the Showcase:
+single-button rows pixel-identical, Up/Down two-button row aligns right with a clean gap. Two
+correct exclusions (like req-21): Schedule "assign" row left alone (its `<Button>` is the row's
+label, not a trailing action). **One deliberate visual change, accepted:** Routine Up/Down had no
+gap before; `.ui-row__action` gives `gap:s2` — the consistency the req exists for, not a regression.
+Merge `3b643fe` (branch `req-23`, `e4905b5`). `./check` green, 105 tests.

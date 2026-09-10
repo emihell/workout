@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15–17, req-20–22** (all except req-10). Done
+Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15–17, req-20–23** (all except req-10). Done
 lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -17,11 +17,10 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 ## Next — READY (build in the order below; full spec in each `work/req-NN-*.md`; one at a time, DEC-009)
 
 **Refactor batch (req-15 findings, DEC-021 — all code-only, planning verifies + merges).** Order
-avoids file conflicts (they touch the same files). ~~req-16, 17, 20, 21, 22~~ shipped. Running self-
-driving (Emilio uninvolved, no /clear between): CC builds → planning merges → releases next. **Next: req-23.**
-1. `req-23` `ActionRow`/trailing-action ← next (ui/; lowest value, optional)
-2. `req-18` merge set-edit forms (Workout+History)
-3. `req-19` split the two oversized view files (pure move) — **do last**, after 18 settles
+avoids file conflicts (they touch the same files). ~~req-16, 17, 20, 21, 22, 23~~ shipped. Running self-
+driving (Emilio uninvolved, no /clear between): CC builds → planning merges → releases next. **Next: req-18.**
+1. `req-18` merge set-edit forms (Workout+History) ← next
+2. `req-19` split the two oversized view files (pure move) — **do last**, after 18 settles
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
