@@ -6,7 +6,7 @@ import { recommendNextPrescription } from '../progress'
 import { exerciseById, findRoutine, historySetPrefill, lastSetsForExercise } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
-import { carriedWorkingSet, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, markItemDonePatch, reopenItemPatch, restRemaining, setLogSeed } from '../workout-log'
+import { carriedWorkingSet, initialSetFields, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, markItemDonePatch, reopenItemPatch, restRemaining } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
 import { Back, ExercisesLink, Missing, NavLink } from './shared'
 import {
@@ -399,7 +399,7 @@ function WorkoutItemLive({ routineId, item }) {
     restore &&
     restore.setType === currentType &&
     (currentType === 'wu' || restore.workIndex === currentWorkIndex)
-  const seed = setLogSeed({
+  const seed = initialSetFields({
     weighted,
     fromRestore,
     restore,
@@ -408,11 +408,6 @@ function WorkoutItemLive({ routineId, item }) {
     carry: carryFor(ex, last, currentType, state.workLogged),
     target,
   })
-  const initialEffort =
-    fromRestore && restore.rpe != null && restore.rpe !== ''
-      ? rpeOptionValue(restore.rpe) || restore.rpe
-      : 3
-  const initialNote = fromRestore ? restore.note : ''
 
   return (
     <Screen>
@@ -443,8 +438,8 @@ function WorkoutItemLive({ routineId, item }) {
           effortOptions={RPE_OPTIONS}
           initialWeight={seed.weight}
           initialReps={seed.reps}
-          initialEffort={initialEffort}
-          initialNote={initialNote}
+          initialEffort={seed.effort}
+          initialNote={seed.note}
           canGoBack={canGoBack}
           onComplete={({ weight, reps, effort, note }) => completeSet({ weight, reps, rpe: effort, note })}
           onSkip={skipSet}
