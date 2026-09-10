@@ -1,6 +1,6 @@
 # req-22 — a `clearable` affordance on `SegmentedControl`
 
-**Status: READY.** Small additive `ui/` primitive. Sourced from `reports/req-15-findings.md` #7
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-22` (`4303905`…`4303905`, 1 commit).** Small additive `ui/` primitive. Sourced from `reports/req-15-findings.md` #7
 (DEC-021).
 
 **Gate: code-only** (DEC-009, functional) — additive; planning verifies the three call sites and
