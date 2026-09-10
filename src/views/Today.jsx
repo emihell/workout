@@ -63,8 +63,7 @@ export function Today() {
   if (!routines.length) {
     return (
       <Screen>
-        <Title>Today</Title>
-        <p className="ui-sub">No data. Import, or start empty.</p>
+        <Title subtitle="No data. Import, or start empty.">Today</Title>
         <FileButton
           label="Import"
           accept="application/json,.json"

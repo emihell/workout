@@ -127,8 +127,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     return (
       <Screen>
         <Back />
-        <Title>{plan.routineName}</Title>
-        {previewMeta ? <p className="ui-sub">{previewMeta}</p> : null}
+        <Title subtitle={previewMeta}>{plan.routineName}</Title>
         <List>
           {plan.items.map((item) => (
             <Row key={item.id} value={`${item.sets} ${item.sets === 1 ? 'set' : 'sets'}`}>
