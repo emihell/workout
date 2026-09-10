@@ -1,6 +1,6 @@
 # req-17 — extract the set-log seed/prefill logic into a pure, tested `initialSetFields`
 
-**Status: READY.** Behaviour-neutral refactor that moves the history-is-truth prefill rule out of a
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-17` (`80e746c`…`80e746c`, 1 commit).** Behaviour-neutral refactor that moves the history-is-truth prefill rule out of a
 component into a unit-tested pure function. Sourced from `reports/req-15-findings.md` #3 (DEC-021).
 
 **Gate: code-only** (DEC-009, functional) — no user-visible change if done right; planning
