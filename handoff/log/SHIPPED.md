@@ -244,3 +244,16 @@ row added; no real callers converted (every inlined-meta candidate would change 
 left for a later sweep, noted in the report). **Planning browser-verified** on the Showcase: value-
 less link unchanged, value-link shows the value right-aligned before the chevron, plain value row
 unchanged. Merge `b15d7d6` (branch `req-20`, `1ef1bb7`). `./check` green, 105 tests.
+
+## req-21 — `subtitle` prop on `Title`  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #6, DEC-021). `Title` gains an optional `subtitle` that renders the
+existing `.ui-sub` markup after the h1, guarded `subtitle != null && subtitle !== ''` so empty/null
+renders just the h1 (DOM-identical to a bare Title). `.ui-sub` stays valid standalone. Two demo sites
+migrated, both provably byte-identical (Workout.jsx preview `previewMeta`, Today empty-state literal);
+the other ~10 `.ui-sub` sites correctly left — most are empty-state list captions, not title
+subtitles, and one (`Workout.jsx` `{ex.equipment}`) renders an empty `<p>` the prop's guard would
+drop. Verified by DOM-equivalence analysis (no layout change — re-renders identical existing markup)
++ build/tests, not a pixel check. **Correction recorded (L-004):** finding #6's "~50 → prop" framing
+was wrong; the sweep is a handful, the utility class stays. Merge `16ad096` (branch `req-21`,
+`658f498`). `./check` green, 105 tests.
