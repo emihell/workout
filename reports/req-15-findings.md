@@ -1,63 +1,72 @@
 # req-15 — improvement findings (observe-don't-do, DEC-021)
 
-Bigger merge / separate / restructure ideas surfaced while migrating, **not acted
-on** in req-15. Ranked by value. Grows as later screen-groups are migrated — the
-list below is from the **workout-flow** group (`Workout.jsx`).
+Bigger merge / separate / restructure ideas surfaced while migrating the **whole
+app** onto `ui/`, **not acted on** in req-15. Ranked by value. These become the
+follow-up cleanup req(s) Emilio specs after review.
 
-## Separate
+## High value
 
-1. **`src/views/Workout.jsx` is oversized (~820 lines).** It holds nine exported
-   screens (`Workout`, `WorkoutItem`, `WorkoutItemLog`, `WorkoutItemLive`,
-   `WorkoutItemDone`, `WorkoutItemExercise`, `WorkoutFinish`/`FinishScreen`,
-   `WorkoutSetup`, `WorkoutSetEdit`), the store-connected `RestBar`, the
-   `useRestCountdown` hook, and ~8 helper functions. Split into a
-   `views/workout/` folder (one file per screen-group + `rest-bar.jsx` +
-   `helpers.js`). **Highest value** — it's the largest view and the in-gym flow
-   we iterate on most. Rough size: mechanical move, ~1 session.
+1. **Split the two oversized view files.** `Workout.jsx` (~820 lines, 9 screens +
+   RestBar + `useRestCountdown` + ~8 helpers) and `History.jsx` (~660 lines, 9
+   screens + date/month grouping + `addSetToWorkout`). Each should become a
+   folder (`views/workout/`, `views/history/`) with one file per screen-group and
+   a helpers module. Mechanical, high payoff on the files we touch most.
 
-## Restructure
+2. **Merge the three set-editing forms into one component.** `WorkoutSetEdit`
+   (`Workout.jsx`), `HistorySet` (`History.jsx`), and the live `SetLogForm` all
+   edit kg / reps / effort / note with small differences (HistorySet adds a
+   set-type toggle; the live form adds skip/previous + seeding). At minimum
+   `WorkoutSetEdit` and `HistorySet` are near-duplicates and could share a
+   `SetEditForm`. Medium-high value; reduces the most-duplicated surface.
 
-2. **Set-log seed/prefill logic lives in a view.** `WorkoutItemLive`
-   (`Workout.jsx:390-415`) computes `historyPrefill` / `fromRestore` / `seed` /
-   `initialEffort` / `initialNote` — real domain logic (the history-is-truth
-   rule) sitting in a component. Extract to a pure `initialSetFields(...)` beside
-   `setLogSeed` in `workout-log.js`, unit-tested. Fits the "make the reasoning
-   visible / testable" rule. Medium value; ~half a session incl. tests.
+3. **Extract the set-log seed/prefill logic out of the view.** `WorkoutItemLive`
+   (`Workout.jsx`) computes `historyPrefill` / `fromRestore` / `seed` /
+   `initialEffort` / `initialNote` — the history-is-truth rule living in a
+   component. Move to a pure, unit-tested `initialSetFields(...)` beside
+   `setLogSeed` in `workout-log.js`. Fits the "make the reasoning testable" rule.
 
-3. **The `plannedDone ? itemDonePath : itemLogPath` branch is repeated.**
-   `WorkoutItem` (`:235`), `itemSetsPath` (`:206`), `WorkoutItemExercise`
-   (`:565`, `:582`). One helper `itemCurrentPath(routineId, item, workout)` would
-   dedupe. Low value, tiny.
+## Medium value (mostly ui/ component gaps)
 
-## Merge / component gaps (touch `src/ui/`)
+4. **`Row` can't show a right-aligned `value` next to a link chevron.** When `to`
+   is set, `Row` renders `children + ›` and ignores `value`. Overview / history /
+   month rows had to inline their meta into the row text instead of aligning it
+   right. Let link rows carry a `value`. Touches every `Row` call — verify all.
 
-4. **`Row`'s link variant can't show a right-aligned `value` + chevron.**
-   `ui/index.jsx` `Row`: when `to` is set it renders `children + ›` only and
-   ignores `value`. The workout overview and item-done lists want *name* left,
-   *role/done* right, *chevron* trailing — so the migration had to inline the
-   meta into the row text (`Workout.jsx:180`) instead of aligning it. Enhancing
-   `Row` to allow `value` on link rows would clean up overview / done / (likely)
-   History rows. Medium value; small ui change but check every `Row` call.
+5. **Formalize the "row with a trailing action button" pattern.** It recurs a lot
+   — Today (`Start`/`Resume`/`Done`), Start drafts, Schedule day (`Remove`) and
+   add (`assign`), Routine detail (`Up`/`Down`), Exercise search (`Add`). All are
+   done by stuffing a `<Button>` into the `Row` `value`. An `ActionRow` (or a
+   documented convention) would make these consistent.
 
-5. **No first-class subtitle/caption element.** Many screens are a `Title` + a
-   secondary line (routine focus·date, exercise equipment, finish summary). I
-   added a `.ui-sub` utility class for this pass; once all screens are migrated
-   and the frequency is known, consider a `Subtitle` component or a `subtitle`
-   prop on `Title`. Medium-low value; decide after the whole app is migrated.
+6. **No first-class subtitle/caption element.** Nearly every screen is `Title` +
+   a `.ui-sub` line (I added `.ui-sub` as a utility this pass). Now that the
+   frequency is clear (~all screens), consider a `Subtitle` component or a
+   `subtitle` prop on `Title`.
 
-6. **`ExerciseTitle` + `ExerciseSetupHeader`** (`Workout.jsx:60-85`) are two tiny
-   header helpers always rendered together on the live/done screens. Could merge
-   into one `ExerciseHeader`. Low value.
+7. **`SegmentedControl` "clearable" via a leading `—` option** is hand-rolled in
+   three places (`WorkoutSetEdit`, `HistorySet`, `HistoryEdit` feel). A
+   `clearable` prop (or an explicit "none" affordance) would remove the repeated
+   `[{value:'',label:'—'}, ...opts]` idiom.
 
-## Cross-references (already tracked elsewhere)
+## Lower value
 
-7. **Native `window.confirm` / `window.alert`** — `abandonWorkout` (`:31`) and the
-   "Pick effort." guard in `completeSet` (`:330`). Out of scope here (req-15 note:
-   "native alert/confirm → inline UI" is a separate item). Flagging so the
-   inline-dialog req picks up these two call sites.
+8. **`Select` was a missing primitive** — added this pass (native select styled
+   like `Field`, grayscale caret). Noted here only so the follow-up knows the
+   library grew by one component; nothing to change.
 
-8. **Shared nav primitives are unstyled** — `Back` (raw `<button>`),
-   `ExercisesLink`, `NavLink`, `Missing` in `shared.jsx`. Not a finding: `shared.jsx`
-   is **step 5** of this same req. Listed so the workout-flow screens' remaining
-   unstyled affordances (the Back button, the Cancel link) are understood as
-   pending, not missed.
+9. **Repeated `plannedDone ? itemDonePath : itemLogPath` branch** in `Workout.jsx`
+   (`WorkoutItem`, `itemSetsPath`, `WorkoutItemExercise` ×2) → one
+   `itemCurrentPath` helper. Tiny.
+
+10. **`ExerciseTitle` + `ExerciseSetupHeader`** (`Workout.jsx`) are two tiny
+    header helpers always rendered together → could merge to one `ExerciseHeader`.
+    Tiny.
+
+## Cross-references (tracked elsewhere, not for this cleanup)
+
+11. **Native `window.confirm` / `window.alert`** now appears across the migrated
+    app — delete routine/exercise/workout/set/slot, abandon, loop-weeks removal,
+    the "Pick effort." guard, import errors (~10 call sites). Out of scope here
+    (the req-15 note names "native alert/confirm → inline UI" as a separate item).
+    Listing the count so that req is sized correctly; the `Banner` component is
+    already the natural home for the inline version.
