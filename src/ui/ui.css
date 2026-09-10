@@ -85,7 +85,7 @@
 .ui-btn--quiet {
   background: transparent;
   color: var(--ui-ink);
-  border-color: transparent;
+  border-color: var(--ui-line); /* hairline, so it still reads as a button */
 }
 .ui-btn--block {
   display: flex;
@@ -231,9 +231,6 @@
   padding: var(--ui-s1) var(--ui-s3);
   border-bottom: 1px solid var(--ui-line);
 }
-.ui-navbar__spacer {
-  flex: 1 1 auto;
-}
 .ui-navbar__menu {
   list-style: none;
   margin: 0;
@@ -258,26 +255,26 @@
 
 /* ---- RestBar (molecule) ---- */
 .ui-restbar {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-s3);
-  padding: var(--ui-s2) var(--ui-s3);
+  padding: var(--ui-s3);
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius);
   font-family: var(--ui-font);
 }
 .ui-restbar__time {
-  font-size: 40px;
+  display: block;
+  text-align: center;
+  font-size: 56px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  min-width: 2.5em;
+  line-height: 1;
+  margin-bottom: var(--ui-s3);
 }
-.ui-restbar__group {
+.ui-restbar__actions {
   display: flex;
   gap: var(--ui-s2);
 }
-.ui-restbar__spacer {
-  flex: 1 1 auto;
+.ui-restbar__actions .ui-btn {
+  flex: 1 1 0; /* exactly three equal-width thirds */
 }
 
 /* ---- SetLogForm (molecule) ---- */

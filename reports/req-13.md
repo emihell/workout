@@ -3,6 +3,30 @@
 Branch: `req-13-component-library`. Gate: ux-feel (DEC-017/018) — Emilio judges the
 look at `#/components` and merges; expect iteration.
 
+## Iteration 2 (Emilio review, 2026-09-10)
+
+Emilio reviewed the showcase; four changes, all on this branch. `./check` green;
+re-verified each in Chrome (no console errors).
+
+1. **NavBar — all six items in the menu (supersedes DEC-018).** The bar is now just a
+   `Menu` trigger; nothing is shown outside the menu. The menu holds Today, Schedule,
+   Routines, Exercises, History, Settings. It closes on item click (`<ul onClick>`) and
+   on click-outside (a `document` mousedown outside the `<nav>`, via a ref + effect).
+   `[measured]` in Chrome: Menu opens all six; clicking the page body closes it.
+2. **Quiet button** — `.ui-btn--quiet` given a hairline border (`--ui-line`); still the
+   lightest weight, grayscale, but reads as a button (visible on set-log "Previous").
+3. **Showcase** — trimmed to **one example of each** component (was multiple states):
+   one primary Button (+ a variants note), one nav link, one segmented control, one
+   RestBar, etc. The grouped list keeps one navigable row + one value row to show `Row`'s
+   two forms.
+4. **RestBar redesign** — a big remaining-time number (56px) on its own full-width line,
+   then a row of exactly three equal-width buttons `[Pause/Resume] [+30s] [Next]`
+   (`flex: 1 1 0` thirds), with `Next` the primary button, rightmost. `[measured]`:
+   renders as specified.
+
+The sections below describe the original build; the four points above override where they
+conflict (NavBar layout, quiet border, showcase breadth, RestBar layout).
+
 ## Technical
 
 ### What was added

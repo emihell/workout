@@ -6,7 +6,7 @@
 // showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
@@ -157,11 +157,14 @@ export function Row({ children, value, to }) {
   )
 }
 
-// NavBar — the global shell (DEC-018). Primary: Today + Schedule, always visible.
-// The rest (Routines / Exercises / History / Settings) behind a simple Menu — a
-// plain toggled list for the raw first iteration. This is the ONE component wired
-// into App.jsx now; the IA regroup takes effect immediately.
-const MENU_ITEMS = [
+// NavBar — the global shell (Emilio 2026-09-10, supersedes DEC-018). The bar is
+// just a Menu trigger; ALL six nav items live in the menu (nothing shown outside
+// it). The menu closes when an item is clicked (the <ul> onClick) and when the
+// user clicks outside it (a document mousedown outside the <nav>). This is the ONE
+// component wired into App.jsx.
+const NAV_ITEMS = [
+  { to: '/', label: 'Today' },
+  { to: '/schedule', label: 'Schedule' },
   { to: '/routines', label: 'Routines' },
   { to: '/exercises', label: 'Exercises' },
   { to: '/history', label: 'History' },
@@ -170,19 +173,25 @@ const MENU_ITEMS = [
 
 export function NavBar() {
   const [open, setOpen] = useState(false)
+  const navRef = useRef(null)
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [open])
   return (
-    <nav>
+    <nav ref={navRef}>
       <div className="ui-navbar">
-        <NavLink to="/">Today</NavLink>
-        <NavLink to="/schedule">Schedule</NavLink>
-        <span className="ui-navbar__spacer" />
         <Button variant="quiet" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           Menu
         </Button>
       </div>
       {open ? (
-        <ul className="ui-navbar__menu">
-          {MENU_ITEMS.map((item) => (
+        <ul className="ui-navbar__menu" onClick={() => setOpen(false)}>
+          {NAV_ITEMS.map((item) => (
             <li key={item.to}>
               <NavLink to={item.to}>{item.label}</NavLink>
             </li>
@@ -204,21 +213,21 @@ export function Banner({ children, role = 'status' }) {
 
 // ---- Molecules (compose the atoms) ----
 
-// RestBar — the rest countdown: large remaining-time number, Pause/Resume + +30s
-// grouped left, Next on the right (req-11 layout). Presentational: the real
-// screen wires the handlers; the showcase passes stubs.
+// RestBar — the rest countdown (Emilio 2026-09-10): a big remaining-time number on
+// its own full-width line, then a row of exactly three equal-width buttons —
+// [Pause/Resume] [+30s] [Next] — with Next the primary button, rightmost.
+// Presentational: the real screen wires the handlers; the showcase passes stubs.
 export function RestBar({ seconds = 0, paused = false, onPauseResume, onAddTime, onNext }) {
   return (
     <div className="ui-restbar" role="status">
-      <span className="ui-restbar__time">{seconds}s</span>
-      <div className="ui-restbar__group">
+      <div className="ui-restbar__time">{seconds}s</div>
+      <div className="ui-restbar__actions">
         <Button onClick={onPauseResume}>{paused ? 'Resume' : 'Pause'}</Button>
         <Button onClick={onAddTime}>+30s</Button>
+        <Button variant="primary" onClick={onNext}>
+          Next
+        </Button>
       </div>
-      <span className="ui-restbar__spacer" />
-      <Button variant="primary" onClick={onNext}>
-        Next
-      </Button>
     </div>
   )
 }
