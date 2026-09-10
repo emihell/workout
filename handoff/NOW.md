@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01–09, req-11, req-12** (all except req-10). req-06 merged — Emilio to
+Updated 2026-09-09. **Shipped: req-01–09, req-11–13** (all except req-10). req-06 merged — Emilio to
 confirm phone data intact on next open. Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`;
 phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -21,7 +21,6 @@ Each req is tagged with its merge gate (DEC-009); only READY reqs (no open quest
 autoloop.
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
-- `req-13` **component library (+ showcase)** — extract every UI element into a minimal, colorless, tap-friendly, Apple-inspired primitive set + a `#/components` showcase to iterate on; no app migration yet (DEC-017). The styling foundation. **[ux-feel → Emilio's hands; expect iteration]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
 reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.

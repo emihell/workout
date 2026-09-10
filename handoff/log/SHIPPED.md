@@ -170,3 +170,22 @@ navigation-only `onClick` left on a button. Converted Cancel/Skip render as link
 styling pass (expected). Boundary left for later: `Schedule.jsx` `RoutineNewForm`'s `onCancel` prop
 is navigation but the form owns its Cancel button — form-cancel semantics can be unified in the
 styling pass.
+
+## req-13 — component library + showcase  (merged 2026-09-10)
+
+The first styling foundation: `src/ui/` — a small, **grayscale (colorless)**, Apple-inspired
+component library + a `#/components` showcase. Primitives: Button (primary/secondary/quiet-bordered),
+NavLink, SegmentedControl, Checkbox, FileButton, Field, NumberField, Textarea, Screen, Title,
+SectionHeader, List/Row (grouped, hairline dividers, `›` chevrons), NavBar, Banner; molecules RestBar
++ SetLogForm. One grayscale stylesheet, every selector `.ui-`scoped → unstyled screens untouched
+(additive by construction). **Fixed named type scale (DEC-020):** caption 13 / body 17 / section 22 /
+title 32 / display 40 / rest 112, as CSS custom properties every component references (no ad-hoc
+`font-size`; grep-verified). **NavBar (DEC-019, supersedes DEC-018)** is the one component wired into
+`App.jsx`: a single `Menu` holding all six nav items, closing on item-click + outside-click. RestBar:
+big 112px number + 3 equal buttons, Next primary right. Showcase = one example of each + a Type Scale
+section. **No app-screen migration** (that's the per-screen styling pass). Four iterations with Emilio
+via the showcase (nav-in-menu, quiet border, one-of-each, RestBar redesign, type scale, doubled rest
+number, type-scale section). Merged on `main` 2026-09-10 (branch `req-13-component-library`,
+`4007683`…`11a68bf`, 4 commits). `./check` green, 99 tests. Emilio judged the look across iterations
+and approved the merge. Follow-ups: req-14 (menu redesign — he's not a fan of the placeholder menu);
+the per-screen styling pass migrates screens onto the library.
