@@ -310,6 +310,30 @@
   flex: 1 1 0;
 }
 
+/* ---- Type-scale sampler (showcase only) ---- */
+.ui-typescale {
+  list-style: none;
+  margin: var(--ui-s2) 0;
+  padding: 0;
+}
+.ui-typescale__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-s1);
+  padding: var(--ui-s2) 0;
+  border-bottom: 1px solid var(--ui-line);
+}
+.ui-typescale__label {
+  font-size: var(--ui-text-caption);
+  color: var(--ui-ink-2);
+}
+.ui-typescale__sample {
+  display: block;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow-x: auto; /* the 112px sample scrolls rather than widening the page */
+}
+
 /* ---- Showcase scaffolding only ---- */
 .ui-showcase__block {
   margin-bottom: var(--ui-s4);

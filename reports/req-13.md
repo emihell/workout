@@ -3,6 +3,17 @@
 Branch: `req-13-component-library`. Gate: ux-feel (DEC-017/018) — Emilio judges the
 look at `#/components` and merges; expect iteration.
 
+## Iteration 4 (Emilio review, 2026-09-10)
+
+Added a **TYPE SCALE** section at the top of the `#/components` showcase — every named
+text size at a glance, one row per token: a caption-size label (`caption · 13px` …
+`rest · 112px`) above an `Aa 123` sample rendered at that size. Fully token-driven: the
+sample uses `style={{ fontSize: 'var(--ui-text-*)' }}` (no hardcoded px) and each px in the
+label is read back from the token at runtime via `getComputedStyle(document.documentElement)
+.getPropertyValue(token)`, so it always matches the scale. `./check` green; `[measured]` in
+Chrome: all six rows render with correct sizes + px, no console errors. (The 112px `rest`
+sample scrolls inside its own `overflow-x:auto` row rather than widening the page.)
+
 ## Iteration 3 (Emilio review, 2026-09-10 — DEC-020)
 
 Two changes on this branch. `./check` green; re-verified in Chrome (no console errors).
