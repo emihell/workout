@@ -1,6 +1,6 @@
 # req-25 — bug: the last set of an exercise starts no rest timer
 
-**Status: READY.** Fixes gym-flow bug #5 (Emilio's 2026-09-10 notes, `work/BACKLOG.md`). The
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-25` (`59dfff9`…`59dfff9`, 1 commit).** Fixes gym-flow bug #5 (Emilio's 2026-09-10 notes, `work/BACKLOG.md`). The
 behaviour call below is **decided** (Emilio, 2026-09-10).
 
 **Gate: functional bug-fix, but gym-flow feel** (DEC-009) — planning verifies the timer now runs
