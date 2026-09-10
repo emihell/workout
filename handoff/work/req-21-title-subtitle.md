@@ -1,6 +1,6 @@
 # req-21 — a first-class subtitle: `subtitle` prop on `Title`
 
-**Status: READY.** Small additive `ui/` primitive. The finding left "component vs prop" open;
+**Status: BUILT AND MERGED, 2026-09-10 — branch `req-21` (`658f498`…`658f498`, 1 commit).** Small additive `ui/` primitive. The finding left "component vs prop" open;
 **decided here: a `subtitle` prop on `Title`** (rationale below). Sourced from
 `reports/req-15-findings.md` #6 (DEC-021).
 
