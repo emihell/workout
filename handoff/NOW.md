@@ -1,8 +1,7 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01–09, req-11–13, req-15** (all except req-10). req-06 merged — Emilio to
-confirm phone data intact on next open. Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`;
-phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15** (all except req-10). Done lives in
+`log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -15,19 +14,29 @@ Phase 2  program-creation flow   ← next
 Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated on the backend fork)
 ```
 
-## Next — READY (all Phase 1; independent; build in any order)
+## Next — READY (build in the order below; each has a full spec in `work/`)
 
-Each req is tagged with its merge gate (DEC-009); only READY reqs (no open questions) enter the
-autoloop.
+Each req is tagged with its merge gate (DEC-009). Code CC builds one at a time by reading its
+`work/req-NN-*.md`.
 
-- `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
+**Refactor batch (req-15 findings, DEC-021 — all code-only, planning verifies + merges).** Build
+order chosen to avoid file conflicts (they touch the same files):
+1. `req-17` extract `initialSetFields` (seed logic → pure/tested; shrinks Workout.jsx) — do first
+2. `req-16` `itemCurrentPath` helper (tiny, Workout.jsx)
+3. `req-20` link-`Row` `value` · `req-21` `Title subtitle` · `req-22` `SegmentedControl clearable` (ui/ additive)
+4. `req-23` `ActionRow`/trailing-action (ui/; lowest value, optional)
+5. `req-18` merge set-edit forms (Workout+History)
+6. `req-19` split the two oversized view files (pure move) — **do last**, after 17/18 settle
 
-Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
-reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.
+- `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
+  the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
 
 ## Needs decisions — parked until their phase
 
-- **Refactor backlog (from req-15 findings)** — `reports/req-15-findings.md` (on main): split Workout.jsx/History.jsx, merge the 3 set-editing forms, extract set-log seed helper, Row value-on-link-rows, ~10 native confirm/alert → inline dialogs. To become follow-up req(s) (per DEC-021).
+- **`req-24` native confirm/alert → inline UI** (from req-15 finding #11) — 10 sites; needs the
+  inline-confirm *pattern* decided first (bar/sheet vs two-tap vs undo). **[ux-feel]** Spec: `work/req-24-inline-confirm-alert.md`.
+- Refactor backlog now specced as **req-16..23** (see READY above). Finding #8 (Select) no-op;
+  finding #10 (merge the two header helpers) **rejected** — not actually always rendered together (see `work/req-16`).
 - **`req-14` nav/menu redesign** — Emilio isn't a fan of req-13's placeholder menu; redesign it, but
   the *direction* (bottom tab bar / slide-up sheet / drawer / cleaner top menu) needs deciding first.
   Current menu stays meanwhile. `work/req-14-nav-menu-redesign.md`. **[ux-feel]**
@@ -35,11 +44,6 @@ reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.
   "users" are one decision; an AI key can't live in a browser. Decide before any Phase-3 build.
 - **History recalc from a non-latest workout** (Phase 1 behaviour) — see BACKLOG.
 - **Program model** (Phase 2) — define program vs routine vs schedule before speccing.
-
-## Gym-flow review (2026-09-07)
-
-Done. Logic layer is sound; "flawless" is mostly a design pass on ~4 screens (app has **zero
-CSS**) + rest-end cue/wake-lock + inline modals. Candidates in `work/BACKLOG.md` Phase 1.
 
 ## Where to read
 
