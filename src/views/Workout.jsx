@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RPE_OPTIONS, formatSetLine, roleLabel, rpeOptionValue } from '../ids'
+import { RPE_OPTIONS, formatSetLine, roleLabel } from '../ids'
 import { go } from '../route'
 import { recordButton } from '../analytics'
 import { recommendNextPrescription } from '../progress'
@@ -8,12 +8,12 @@ import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { carriedWorkingSet, initialSetFields, itemIsMarkedDone, itemKey, itemLoggingState, lastLoggedSetIndex, markItemDonePatch, reopenItemPatch, restRemaining } from '../workout-log'
 import { navForBase, RoutineScreens } from './Routine'
+import { SetEditForm } from './set-edit'
 import { Back, ExercisesLink, Missing, NavLink } from './shared'
 import {
   Button,
   Field,
   List,
-  NumberField,
   RestBar as UIRestBar,
   Row,
   Screen,
@@ -700,10 +700,6 @@ export function WorkoutSetEdit({ routineId, index }) {
   )
   const usesLoad = item?.exerciseType !== 'cardio' && item?.exerciseType !== 'bodyweight'
   const usesRpe = set?.setType !== 'wu' && item?.exerciseType !== 'cardio'
-  const [weight, setWeight] = useState(set?.weight ?? '')
-  const [reps, setReps] = useState(set?.reps ?? '')
-  const [rpe, setRpe] = useState(() => (set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : ''))
-  const [note, setNote] = useState(set?.note || '')
   const itemPath = itemSetsPath(routineId, item, workout)
 
   if (!workout || !set) {
@@ -716,9 +712,12 @@ export function WorkoutSetEdit({ routineId, index }) {
       <RestBar />
       <p className="ui-sub">{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
       <Title>Set</Title>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault()
+      <SetEditForm
+        set={set}
+        showLoad={usesLoad}
+        showEffort={usesRpe}
+        cancelTo={itemPath}
+        onSave={({ weight, reps, rpe, note }) => {
           store.updateActiveSet(index, {
             weight: weight === '' ? 0 : Number(weight),
             reps,
@@ -727,32 +726,7 @@ export function WorkoutSetEdit({ routineId, index }) {
           })
           go(itemPath)
         }}
-      >
-        {usesLoad ? (
-          <NumberField label="kg" value={weight} onChange={(event) => setWeight(event.target.value)} />
-        ) : null}
-        <Field label="Reps" value={reps} onChange={(event) => setReps(event.target.value)} />
-        {usesRpe ? (
-          <>
-            <SectionHeader>Effort</SectionHeader>
-            {/* clearable keeps effort resettable, as the old <select> did */}
-            <SegmentedControl
-              clearable
-              options={RPE_OPTIONS}
-              value={rpe}
-              onChange={setRpe}
-              ariaLabel="Effort"
-            />
-          </>
-        ) : null}
-        <Field label="Note" value={note} onChange={(event) => setNote(event.target.value)} />
-        <div className="ui-actions">
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-          <NavLink to={itemPath}>Cancel</NavLink>
-        </div>
-      </form>
+      />
     </Screen>
   )
 }
