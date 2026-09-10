@@ -34,13 +34,15 @@ function WorkoutRow({ store, routine, slot, date, extra }) {
     mine?.scheduleSlotId === slot.id &&
     mine.scheduledFor === date
   const bits = [extra, routine.focus].filter(Boolean)
-  const action = done ? (
-    `Done ${dateKey(done.finishedAt)}`
-  ) : inProgress ? null : (
-    <StartButton store={store} routine={routine} slot={slot} date={date} />
-  )
+  // `Done …` is informational (value slot); the Start control is a trailing
+  // action. These are mutually exclusive, and inProgress shows neither.
+  const doneLabel = done ? `Done ${dateKey(done.finishedAt)}` : null
+  const startAction =
+    !done && !inProgress ? (
+      <StartButton store={store} routine={routine} slot={slot} date={date} />
+    ) : null
   return (
-    <Row value={action}>
+    <Row value={doneLabel} action={startAction}>
       {routine.name} — {bits.join(' · ')}
     </Row>
   )

@@ -24,7 +24,7 @@ export function StartWorkout() {
             {store.draftWorkouts.map((draft) => (
               <Row
                 key={draft.id}
-                value={
+                action={
                   <Button
                     onClick={() => {
                       store.resumeDraft(draft.id)

@@ -231,7 +231,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
                 </Button>
               )
               return (
-                <Row key={item.id || item.name} value={action}>
+                <Row key={item.id || item.name} action={action}>
                   {item.name} — {item.equipment || 'bodyweight'}
                 </Row>
               )
