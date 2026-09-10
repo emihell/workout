@@ -28,6 +28,15 @@
   --ui-tap: 44px; /* Apple HIG minimum tap target */
   --ui-radius: 10px;
   --ui-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* type scale (DEC-020) — the ONE source of truth for text sizes. Every
+   * component references these; there are no ad-hoc font-size values anywhere. */
+  --ui-text-caption: 13px; /* eyebrow labels, field labels, captions */
+  --ui-text-body: 17px; /* default text, buttons, inputs, list rows */
+  --ui-text-section: 22px; /* SectionHeader / h2 */
+  --ui-text-title: 32px; /* Title / h1 screen titles */
+  --ui-text-display: 40px; /* big data numbers (e.g. kg NumberField) */
+  --ui-text-rest: 112px; /* rest countdown — one step above display */
 }
 
 /* ---- Screen container + type scale ---- */
@@ -41,13 +50,20 @@
   -webkit-text-size-adjust: 100%;
 }
 .ui-title {
-  font-size: 28px;
+  font-size: var(--ui-text-title);
   font-weight: 700;
   line-height: 1.2;
   margin: var(--ui-s3) 0 var(--ui-s2);
 }
 .ui-section {
-  font-size: 13px;
+  font-size: var(--ui-text-section);
+  font-weight: 600;
+  color: var(--ui-ink);
+  margin: var(--ui-s4) 0 var(--ui-s2);
+}
+/* small uppercase caption/eyebrow label (e.g. the showcase block labels) */
+.ui-eyebrow {
+  font-size: var(--ui-text-caption);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -58,7 +74,7 @@
 /* ---- Button ---- */
 .ui-btn {
   font-family: var(--ui-font);
-  font-size: 17px;
+  font-size: var(--ui-text-body);
   line-height: 1;
   min-height: var(--ui-tap);
   padding: 0 var(--ui-s3);
@@ -99,7 +115,7 @@
 /* ---- NavLink (the shared primitive, styled) ---- */
 .ui-navlink {
   font-family: var(--ui-font);
-  font-size: 17px;
+  font-size: var(--ui-text-body);
   color: var(--ui-ink);
   text-decoration: none;
   display: inline-flex;
@@ -119,7 +135,7 @@
   flex: 1 1 0;
   min-height: var(--ui-tap);
   font-family: var(--ui-font);
-  font-size: 15px;
+  font-size: var(--ui-text-body);
   border: 0;
   border-left: 1px solid var(--ui-line);
   background: var(--ui-bg);
@@ -142,7 +158,7 @@
   gap: var(--ui-s2);
   min-height: var(--ui-tap);
   font-family: var(--ui-font);
-  font-size: 17px;
+  font-size: var(--ui-text-body);
   cursor: pointer;
 }
 .ui-check__box {
@@ -158,7 +174,7 @@
 }
 .ui-field__label {
   display: block;
-  font-size: 13px;
+  font-size: var(--ui-text-caption);
   color: var(--ui-ink-2);
   margin-bottom: var(--ui-s1);
 }
@@ -166,7 +182,7 @@
   width: 100%;
   box-sizing: border-box;
   font-family: var(--ui-font);
-  font-size: 17px;
+  font-size: var(--ui-text-body);
   min-height: var(--ui-tap);
   padding: var(--ui-s2) var(--ui-s3);
   border: 1px solid var(--ui-line);
@@ -177,7 +193,7 @@
   appearance: none;
 }
 .ui-input--num {
-  font-size: 34px;
+  font-size: var(--ui-text-display);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -203,7 +219,7 @@
   padding: var(--ui-s2) 0;
   border-bottom: 1px solid var(--ui-line);
   font-family: var(--ui-font);
-  font-size: 17px;
+  font-size: var(--ui-text-body);
 }
 .ui-row__link {
   display: flex;
@@ -244,7 +260,7 @@
 /* ---- Banner ---- */
 .ui-banner {
   font-family: var(--ui-font);
-  font-size: 15px;
+  font-size: var(--ui-text-body);
   padding: var(--ui-s2) var(--ui-s3);
   background: var(--ui-fill);
   border: 1px solid var(--ui-line);
@@ -263,7 +279,7 @@
 .ui-restbar__time {
   display: block;
   text-align: center;
-  font-size: 56px;
+  font-size: var(--ui-text-rest);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;

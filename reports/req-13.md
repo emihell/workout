@@ -3,6 +3,42 @@
 Branch: `req-13-component-library`. Gate: ux-feel (DEC-017/018) — Emilio judges the
 look at `#/components` and merges; expect iteration.
 
+## Iteration 3 (Emilio review, 2026-09-10 — DEC-020)
+
+Two changes on this branch. `./check` green; re-verified in Chrome (no console errors).
+
+1. **Fixed type scale — one source of truth.** Added a named scale to `:root` in `ui.css`
+   and pointed every component at it (no ad-hoc `font-size` anywhere):
+
+   ```
+   --ui-text-caption: 13px;  /* eyebrow labels, field labels, captions */
+   --ui-text-body:    17px;  /* default text, buttons, inputs, list rows */
+   --ui-text-section: 22px;  /* SectionHeader / h2 */
+   --ui-text-title:   32px;  /* Title / h1 screen titles */
+   --ui-text-display: 40px;  /* big data numbers (e.g. kg NumberField) */
+   --ui-text-rest:   112px;  /* rest countdown — one step above display */
+   ```
+
+   Consolidated the prior ad-hoc sizes into the tiers: the two 15px values (segmented
+   control, banner) folded into **body**; the 34px NumberField and the 28px Title moved to
+   **display**/**title**. `SectionHeader` moved from the old 13px uppercase-eyebrow style to
+   the real **22px** h2 tier; the small uppercase label style is now `.ui-eyebrow` (caption),
+   which the showcase's block labels use — so "BUTTON"/"REST BAR" stay small while
+   `SectionHeader` (e.g. "Effort" in the set-log form) is the 22px tier. This was the one
+   knock-on: the showcase `Block` renders `.ui-eyebrow` instead of `SectionHeader`.
+
+   **Receipt** — every `font-size` in `src/ui/` is now a scale reference (grep):
+
+   ```
+   ui.css: --ui-text-title / --ui-text-section / --ui-text-caption / --ui-text-body (×6)
+           / --ui-text-display / --ui-text-rest
+   grep "font-size:[^;]*px" src/ui/  →  NONE
+   ```
+
+2. **RestBar time doubled** — `--ui-text-rest: 112px` (was 56px), a dedicated tier one step
+   above `display`. The three equal-width buttons + Next-primary-right layout is unchanged.
+   `[measured]` in Chrome: renders as a large full-width number above the button row.
+
 ## Iteration 2 (Emilio review, 2026-09-10)
 
 Emilio reviewed the showcase; four changes, all on this branch. `./check` green;

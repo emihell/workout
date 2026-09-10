@@ -14,7 +14,6 @@ import {
   RestBar,
   Row,
   Screen,
-  SectionHeader,
   SegmentedControl,
   SetLogForm,
   Textarea,
@@ -28,10 +27,12 @@ const EFFORT = [
   { value: 5, label: 'Failure' },
 ]
 
+// The block label is a small eyebrow caption (e.g. "BUTTON"), not a section
+// header — SectionHeader is the 22px h2 tier, demonstrated inside the set-log form.
 function Block({ heading, children }) {
   return (
     <div className="ui-showcase__block">
-      <SectionHeader>{heading}</SectionHeader>
+      <p className="ui-eyebrow">{heading}</p>
       {children}
     </div>
   )
