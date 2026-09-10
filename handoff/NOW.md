@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-09. **Shipped: req-01–09, req-11–13** (all except req-10). req-06 merged — Emilio to
+Updated 2026-09-09. **Shipped: req-01–09, req-11–13, req-15** (all except req-10). req-06 merged — Emilio to
 confirm phone data intact on next open. Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`;
 phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -20,7 +20,6 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 Each req is tagged with its merge gate (DEC-009); only READY reqs (no open questions) enter the
 autoloop.
 
-- `req-15` **styling pass** — migrate the WHOLE app onto the `ui/` library (grayscale, DEC-017); behaviour-preserving. Small/necessary/duplicate fixes inline; bigger merge/separate/restructure ideas → a findings report, not done (DEC-021). The big one; screen-by-screen, heavy iteration. **[ux-feel → Emilio's hands; iterative]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt "set it up / enter manually" on a no-history exercise; guided calibration reusing the effort→load-step rule, never invents the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
 
 Each has a full spec in `work/`. Code CC builds the one named above (or the one Emilio names) by
@@ -28,6 +27,7 @@ reading its `work/req-NN-*.md` — the spec lives there, not in a pasted prompt.
 
 ## Needs decisions — parked until their phase
 
+- **Refactor backlog (from req-15 findings)** — `reports/req-15-findings.md` (on main): split Workout.jsx/History.jsx, merge the 3 set-editing forms, extract set-log seed helper, Row value-on-link-rows, ~10 native confirm/alert → inline dialogs. To become follow-up req(s) (per DEC-021).
 - **`req-14` nav/menu redesign** — Emilio isn't a fan of req-13's placeholder menu; redesign it, but
   the *direction* (bottom tab bar / slide-up sheet / drawer / cleaner top menu) needs deciding first.
   Current menu stays meanwhile. `work/req-14-nav-menu-redesign.md`. **[ux-feel]**

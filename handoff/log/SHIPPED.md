@@ -189,3 +189,21 @@ number, type-scale section). Merged on `main` 2026-09-10 (branch `req-13-compone
 `4007683`…`11a68bf`, 4 commits). `./check` green, 99 tests. Emilio judged the look across iterations
 and approved the merge. Follow-ups: req-14 (menu redesign — he's not a fan of the placeholder menu);
 the per-screen styling pass migrates screens onto the library.
+
+## req-15 — styling pass: the whole app migrated onto the component library  (merged 2026-09-10)
+
+The entire app moved off raw HTML onto the req-13 `ui/` components, screen-by-screen (8 commits):
+workout flow, Today, Settings, Routines/Exercises, Schedule, History, + a global commit for two
+defects — **all links forced grayscale** (no more browser blue/purple) and the raw workout-overview
+**Back styled**. Grayscale + type-scale tokens throughout; behaviour-preserving (99 tests green;
+planning session walked Today/Exercises/Settings/workout-flow). Added a **Select** primitive (the
+app's native dropdowns had nowhere to map). Judgment calls (in `reports/req-15.md`): reps stays a
+full-keyboard **text** field (durations like "30 min" — a NumberField would break that); kg is a
+NumberField; effort/feel SegmentedControls keep a clearable "—"; dropdowns→Select, few-option
+toggles→SegmentedControl. Bigger refactors were **observed, not done** (DEC-021) and delivered in
+`reports/req-15-findings.md`: split `Workout.jsx` / `History.jsx`, merge the three near-duplicate
+set-editing forms, extract the set-log seed logic to a tested helper, let `Row` carry a value on
+link rows, formalize the action-row/clearable-segment patterns, ~10 native confirm/alert sites (the
+inline-dialog work). Merge `2d0dfc0` (branch `req-15-styling-pass`, `a403182`…`0230dd0`, 8 commits).
+`./check` green. Emilio reviewed the styled app on his phone and approved. The app is now grayscale-
+styled end to end; color/theme is a later pass.
