@@ -4,6 +4,7 @@ import { clampLoopWeeks, coveringWorkout, dateKey, remainingInLoop } from '../sc
 import { useStore } from '../store-context'
 import { RoutineNewForm } from './Routine'
 import { Back } from './shared'
+import { Button, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 
 export function StartWorkout() {
   const store = useStore()
@@ -12,59 +13,55 @@ export function StartWorkout() {
   const upcoming = remainingInLoop(routines, store.schedule)
 
   return (
-    <section>
+    <Screen>
       <Back />
-      <h1>Start</h1>
+      <Title>Start</Title>
 
       {(store.draftWorkouts || []).length ? (
         <>
-          <h2>Drafts</h2>
-          <ul>
+          <SectionHeader>Drafts</SectionHeader>
+          <List>
             {store.draftWorkouts.map((draft) => (
-              <li key={draft.id}>
-                {draft.snapshot?.routineName || draft.snapshot?.sessionName || 'Workout'} — {(draft.sets || []).length} sets{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    store.resumeDraft(draft.id)
-                    go(`/workout/${draft.routineId || draft.sessionId}`)
-                  }}
-                >
-                  Resume
-                </button>
-              </li>
+              <Row
+                key={draft.id}
+                value={
+                  <Button
+                    onClick={() => {
+                      store.resumeDraft(draft.id)
+                      go(`/workout/${draft.routineId || draft.sessionId}`)
+                    }}
+                  >
+                    Resume
+                  </Button>
+                }
+              >
+                {draft.snapshot?.routineName || draft.snapshot?.sessionName || 'Workout'} — {(draft.sets || []).length} sets
+              </Row>
             ))}
-          </ul>
+          </List>
         </>
       ) : null}
 
-      <h2>Scheduled</h2>
-      {upcoming.length === 0 ? <p>None.</p> : null}
-      <ul>
+      <SectionHeader>Scheduled</SectionHeader>
+      {upcoming.length === 0 ? <p className="ui-sub">None.</p> : null}
+      <List>
         {upcoming.map((item) => {
           const when = dateKey(item.date)
           const done = coveringWorkout(store.workouts, item.routine.id, when, item.slot.id)
-          return (
-            <li key={`${item.slot.id}-${when}`}>
-              {done ? (
-                <>
-                  {item.routine.name} — {loop > 1 ? `Week ${item.week + 1} · ` : ''}
-                  {weekdayName(item.date.getDay())} — Done {dateKey(done.finishedAt)}
-                </>
-              ) : (
-                <>
-                  <a href={`#/workout/${item.routine.id}/${item.slot.id}/${when}`}>{item.routine.name}</a>
-                  {' — '}
-                  {loop > 1 ? `Week ${item.week + 1} · ` : ''}
-                  {weekdayName(item.date.getDay())}
-                </>
-              )}
-            </li>
+          const meta = `${loop > 1 ? `Week ${item.week + 1} · ` : ''}${weekdayName(item.date.getDay())}`
+          return done ? (
+            <Row key={`${item.slot.id}-${when}`} value={`Done ${dateKey(done.finishedAt)}`}>
+              {item.routine.name} — {meta}
+            </Row>
+          ) : (
+            <Row key={`${item.slot.id}-${when}`} to={`/workout/${item.routine.id}/${item.slot.id}/${when}`}>
+              {item.routine.name} — {meta}
+            </Row>
           )
         })}
-      </ul>
+      </List>
 
-      <h2>Any routine</h2>
+      <SectionHeader>Any routine</SectionHeader>
       {routines.length === 0 ? (
         <RoutineNewForm
           onSave={({ name, focus }) => {
@@ -74,14 +71,14 @@ export function StartWorkout() {
           onCancel={() => go('/')}
         />
       ) : (
-        <ul>
+        <List>
           {routines.map((routine) => (
-            <li key={routine.id}>
-              <a href={`#/workout/${routine.id}`}>{routine.name}</a> — {routine.focus}
-            </li>
+            <Row key={routine.id} to={`/workout/${routine.id}`}>
+              {routine.name} — {routine.focus}
+            </Row>
           ))}
-        </ul>
+        </List>
       )}
-    </section>
+    </Screen>
   )
 }
