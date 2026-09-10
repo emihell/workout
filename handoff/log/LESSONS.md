@@ -47,3 +47,17 @@ verified + 8 tests). Rule: when a req is **device-verified AND uses a secure-con
 the testing path up front — a preview HTTPS deploy (durable fix; a branch → its own HTTPS URL,
 worth a backlog item), a local secure context (tunnel / vite-https / `adb reverse`), or an explicit
 merge-then-verify-live decision. Don't discover the gap at the gate.
+
+## L-004 — the req-15 findings are observations; verify each premise before speccing  (2026-09-10)
+
+Two of the req-15 refactor findings (`reports/req-15-findings.md`) had premises that didn't survive
+contact with the code. **#10** ("`ExerciseTitle` + `ExerciseSetupHeader` always rendered together")
+was false — `WorkoutItemLive` renders them apart, gated on `!resting` — so it was rejected in
+planning (see `work/req-16`). **#6** ("`.ui-sub` almost always = Title then `<p>` subtitle", implying
+a ~50-site sweep to a prop) also missed: CC found most of the ~50 `.ui-sub` uses are **empty-state
+list captions**, not title subtitles, so the `subtitle`-prop migration is only a handful of sites and
+the utility class stays first-class. Neither cost much because the premise was checked before/while
+speccing — but the pattern is clear: a findings doc written "observe, don't do" (DEC-021) records what
+looked true mid-task, not a verified spec. Rule: when turning a finding into a req, re-run its own
+`grep`/read and confirm the premise holds; spec against the code, not the finding's summary. (Also why
+`req-21` capped the demo migration at provably byte-identical sites instead of "convert all 50".)
