@@ -257,3 +257,14 @@ drop. Verified by DOM-equivalence analysis (no layout change — re-renders iden
 + build/tests, not a pixel check. **Correction recorded (L-004):** finding #6's "~50 → prop" framing
 was wrong; the sweep is a handful, the utility class stays. Merge `16ad096` (branch `req-21`,
 `658f498`). `./check` green, 105 tests.
+
+## req-22 — `clearable` prop on `SegmentedControl`  (merged 2026-09-10)
+
+Refactor batch (req-15 findings #7, DEC-021). `SegmentedControl` gains `clearable`, which prepends
+the leading `{value:'', label:'—'}` "none" segment itself — the same idiom three sites hand-rolled —
+through the unchanged map + `String(optValue)===String(value)` selection, so byte-equivalent to the
+old markup. Off by default → non-clearable controls untouched. All three sites converted to
+`clearable` + plain options (History Feel + Effort, Workout Effort); `—`/`''` kept as the fixed
+convention. Verified by construction (identical rendered segments, no other control touched) + the
+idiom grep returning none + build/tests. Merge `81b3692` (branch `req-22`, `4303905`). `./check`
+green, 105 tests.
