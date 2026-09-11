@@ -100,6 +100,7 @@ export function Today() {
         <List>
           <Row to="/routines">Routines</Row>
           <Row to="/schedule">Schedule</Row>
+          <Row to="/history">History</Row>
           <Row to="/settings">Settings</Row>
         </List>
       </Screen>
@@ -168,6 +169,14 @@ export function Today() {
           <NavLink to="/start">Other</NavLink>
         </p>
       )}
+
+      {/* req-14 — Schedule and History are no longer their own tabs (DEC-024
+          folded them under Workouts); keep them reachable from the Today home.
+          Interim until req-32 merges them into one Workouts scroll. */}
+      <List>
+        <Row to="/schedule">Schedule</Row>
+        <Row to="/history">History</Row>
+      </List>
     </Screen>
   )
 }

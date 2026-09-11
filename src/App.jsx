@@ -7,7 +7,6 @@ import { RestEndCue } from './rest-cue'
 import { useHashRoute } from './route'
 import { Today } from './views/Today'
 import {
-  Routines,
   RoutineNew,
   RoutineDetail,
   RoutineEdit,
@@ -21,7 +20,8 @@ import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExerc
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { StartWorkout } from './views/Start'
 import { Settings } from './views/Settings'
-import { NavBar } from './ui/index.jsx'
+import { TabBar } from './ui/index.jsx'
+import { Library } from './views/Library'
 import { Showcase } from './ui/Showcase.jsx'
 
 function SaveFailedBanner() {
@@ -57,7 +57,7 @@ function Screen() {
       />
     )
   }
-  if (route.name === 'routines') return <Routines />
+  if (route.name === 'routines') return <Library tab="routines" />
   if (route.name === 'routine-new') return <RoutineNew />
   if (route.name === 'routine-edit') {
     return <RoutineEdit key={route.routineId} routineId={route.routineId} />
@@ -95,7 +95,7 @@ function Screen() {
   if (route.name === 'routine') {
     return <RoutineDetail key={route.routineId} routineId={route.routineId} />
   }
-  if (route.name === 'exercises') return <Exercises />
+  if (route.name === 'exercises') return <Library tab="exercises" />
   if (route.name === 'exercises-type') {
     return <Exercises key={route.type} type={route.type} />
   }
@@ -176,12 +176,12 @@ export default function App() {
       <WakeLock />
       <RestEndCue />
       <SaveFailedBanner />
-      <NavBar />
-      <main>
+      <main className="ui-main">
         <ErrorBoundary>
           <Screen />
         </ErrorBoundary>
       </main>
+      <TabBar />
     </StoreProvider>
   )
 }

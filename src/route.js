@@ -103,6 +103,23 @@ export function back(fallback = '/') {
   return prev
 }
 
+// req-14 / DEC-024 — the bottom tab bar has three tabs (Workouts / Library /
+// Settings). `activeTab` maps any route name (as returned by parseRoute) to the
+// tab that should be highlighted, so a deep route — editing a routine, opening a
+// schedule slot, mid-workout — still lights the correct tab. Pure and unit-tested
+// (route.test.js). Grouping (DEC-024): routines/* + exercises/* → Library;
+// today, schedule/*, history/*, the in-workout flow + start → Workouts; settings
+// → Settings. 'components' is the dev showcase and belongs to no tab (null).
+export function activeTab(routeName) {
+  const name = String(routeName || '')
+  if (name === 'settings') return 'settings'
+  if (name === 'components') return null
+  if (name.startsWith('routine') || name.startsWith('exercise')) return 'library'
+  // today, schedule*, history*, workout* (in-workout), start — and any future
+  // route that falls through — land on Workouts, the default surface.
+  return 'workouts'
+}
+
 function parseRoutineNested(rest) {
   if (!rest.length) return { screen: 'detail' }
   if (rest[0] === 'plan') return null

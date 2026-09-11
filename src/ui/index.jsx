@@ -1,13 +1,14 @@
 // req-13 / DEC-017 — the minimal, colorless, Apple-inspired component library.
 //
 // First iteration: as little code as possible, grayscale only, every interactive
-// target ≥44px. These are bare primitives. Only the NavBar is wired into the app
-// (the global shell); every other component lives here + in the #/components
+// target ≥44px. These are bare primitives. Only the TabBar is wired into the app
+// (the global shell, req-14); every other component lives here + in the #/components
 // showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
+import { activeTab, useHashRoute } from '../route'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -204,47 +205,89 @@ export function Row({ children, value, action, to }) {
   )
 }
 
-// NavBar — the global shell (Emilio 2026-09-10, supersedes DEC-018). The bar is
-// just a Menu trigger; ALL six nav items live in the menu (nothing shown outside
-// it). The menu closes when an item is clicked (the <ul> onClick) and when the
-// user clicks outside it (a document mousedown outside the <nav>). This is the ONE
+// Tab icons — inline currentColor SVG (inherit the tab's ink, no asset pipeline;
+// req-14 keeps them simple, polish is a later pass). 24px line icons: Workouts a
+// dumbbell, Library a stack of cards, Settings a gear. aria-hidden — the label is
+// the accessible name.
+const iconProps = {
+  width: 24,
+  height: 24,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 2,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+  'aria-hidden': true,
+  className: 'ui-tabbar__icon',
+}
+function IconWorkouts() {
+  // dumbbell
+  return (
+    <svg {...iconProps}>
+      <path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11" />
+    </svg>
+  )
+}
+function IconLibrary() {
+  // stacked cards
+  return (
+    <svg {...iconProps}>
+      <rect x="4" y="4" width="16" height="6" rx="1.5" />
+      <rect x="4" y="14" width="16" height="6" rx="1.5" />
+    </svg>
+  )
+}
+function IconSettings() {
+  // gear (simplified: a ring + cross spokes)
+  return (
+    <svg {...iconProps}>
+      <circle cx="12" cy="12" r="3.5" />
+      <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+    </svg>
+  )
+}
+
+// TabBar — the global shell (req-14 / DEC-024, supersedes the req-13 Menu). A
+// fixed bottom bar of three equal tabs — Workouts / Library / Settings — the
+// app's primary navigation on mobile. Each tab is a NavLink (route nav, not an
+// action); the active tab is derived from the current route via activeTab, so a
+// deep route still lights the right tab. The bar is fixed to the viewport bottom
+// and honours the iOS home-indicator safe area; content clears it via the
+// bottom padding on <main> (ui.css .ui-main). Icons are inline currentColor SVG
+// (no asset pipeline yet — polish is a later pass). This is the ONE navigation
 // component wired into App.jsx.
-const NAV_ITEMS = [
-  { to: '/', label: 'Today' },
-  { to: '/schedule', label: 'Schedule' },
-  { to: '/routines', label: 'Routines' },
-  { to: '/exercises', label: 'Exercises' },
-  { to: '/history', label: 'History' },
-  { to: '/settings', label: 'Settings' },
+//
+// Hidden during the in-workout flow (route names starting with `workout`): the
+// in-gym screens are focused single-task surfaces and a persistent nav bar that
+// could jump you to Library mid-set fights them (DESIGN: in-gym flow flawless).
+// activeTab still maps those routes to Workouts for completeness/tests.
+const TABS = [
+  { id: 'workouts', to: '/', label: 'Workouts', icon: IconWorkouts },
+  { id: 'library', to: '/routines', label: 'Library', icon: IconLibrary },
+  { id: 'settings', to: '/settings', label: 'Settings', icon: IconSettings },
 ]
 
-export function NavBar() {
-  const [open, setOpen] = useState(false)
-  const navRef = useRef(null)
-  useEffect(() => {
-    if (!open) return undefined
-    const onDown = (event) => {
-      if (navRef.current && !navRef.current.contains(event.target)) setOpen(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [open])
+export function TabBar() {
+  const route = useHashRoute()
+  if (String(route.name).startsWith('workout')) return null
+  const current = activeTab(route.name)
   return (
-    <nav ref={navRef}>
-      <div className="ui-navbar">
-        <Button variant="quiet" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-          Menu
-        </Button>
-      </div>
-      {open ? (
-        <ul className="ui-navbar__menu" onClick={() => setOpen(false)}>
-          {NAV_ITEMS.map((item) => (
-            <li key={item.to}>
-              <NavLink to={item.to}>{item.label}</NavLink>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+    <nav className="ui-tabbar" aria-label="Primary">
+      {TABS.map(({ id, to, label, icon: Icon }) => {
+        const selected = current === id
+        return (
+          <BaseNavLink
+            key={id}
+            to={to}
+            className={cx('ui-tabbar__tab', selected && 'is-active')}
+            aria-current={selected ? 'page' : undefined}
+          >
+            <Icon />
+            <span className="ui-tabbar__label">{label}</span>
+          </BaseNavLink>
+        )
+      })}
     </nav>
   )
 }

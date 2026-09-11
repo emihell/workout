@@ -5,7 +5,7 @@
  *   element selectors (button, a, section, input …), so screens that don't use
  *   these classes are visually untouched — the library lives beside the app
  *   until the styling pass migrates screens onto it. The one live consumer is
- *   the NavBar (the global shell) + the #/components showcase.
+ *   the TabBar (the global shell, req-14) + the #/components showcase.
  * TOKENS: grays + an 8px spacing rhythm + radius/size only (DEC-017: "no tokens
  *   beyond spacing/size"). Whitespace, type weight, and 1px hairlines do the work.
  */
@@ -290,23 +290,56 @@ a:active {
   color: var(--ui-ink-3);
 }
 
-/* ---- NavBar (the global shell) ---- */
-.ui-navbar {
-  font-family: var(--ui-font);
+/* ---- TabBar (the global shell, req-14 / DEC-024) ---- */
+/* The main content clears the fixed bar: bar content height + hairline + the iOS
+ * home-indicator safe area. Applied to <main> so every screen scrolls clear of
+ * the bar without each screen knowing about it. */
+.ui-main {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
+.ui-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
   display: flex;
+  background: var(--ui-bg);
+  border-top: 1px solid var(--ui-line);
+  padding-bottom: env(safe-area-inset-bottom); /* sit above the home indicator */
+}
+.ui-tabbar__tab {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--ui-s3);
-  padding: var(--ui-s1) var(--ui-s3);
-  border-bottom: 1px solid var(--ui-line);
+  justify-content: center;
+  gap: var(--ui-s1);
+  min-height: var(--ui-tap);
+  padding: var(--ui-s2) 0;
+  font-family: var(--ui-font);
+  font-size: var(--ui-text-caption);
+  color: var(--ui-ink-3); /* inactive tab: tertiary ink */
+  text-decoration: none;
 }
-.ui-navbar__menu {
-  list-style: none;
-  margin: 0;
-  padding: 0 var(--ui-s3) var(--ui-s2);
-  border-bottom: 1px solid var(--ui-line);
+.ui-tabbar__tab.is-active {
+  color: var(--ui-ink); /* active tab: full ink + weight (grayscale highlight) */
+  font-weight: 600;
 }
-.ui-navbar__menu .ui-navlink {
-  display: flex;
+.ui-tabbar__icon {
+  display: block;
+}
+.ui-tabbar__label {
+  line-height: 1;
+}
+
+/* ---- Library toggle (req-14) — the [Routines|Exercises] segmented control
+ * above the hosted list. Matches the .ui-screen gutter/width so it lines up with
+ * the list below it. */
+.ui-library-toggle {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--ui-s3) var(--ui-s3) 0;
 }
 
 /* ---- Banner ---- */
