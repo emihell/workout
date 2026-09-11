@@ -1,6 +1,6 @@
 # req-28 — show completed workouts on the Today page (note #7)
 
-**Status: READY** (behaviour decided below; ux-feel gate confirms). From Emilio's 2026-09-10 notes:
+**Status: BUILT AND MERGED, 2026-09-11 — branch `req-28` (`e646a1e`…`e646a1e`, 1 commit).** (behaviour decided below; ux-feel gate confirms). From Emilio's 2026-09-10 notes:
 *"To see completed routines on the main page."*
 
 **Gate: gym-flow feel** (DEC-009) — **Emilio uses it before merge.**
