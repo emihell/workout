@@ -176,7 +176,7 @@ function WorkoutItemLive({ routineId, item }) {
   const { needsWu, workCount, currentWorkIndex, plannedDone } = state
   const currentType = needsWu ? 'wu' : 'work'
   const target = needsWu
-    ? String(item.warmup?.reps ?? 12)
+    ? String(item.warmup?.reps ?? '')
     : item.targets?.[currentWorkIndex] ?? item.targets?.[item.targets.length - 1] ?? ''
   const [restore, setRestore] = useState(null)
   const { resting } = useRestCountdown(active)

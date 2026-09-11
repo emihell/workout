@@ -57,7 +57,7 @@ function skippedSet({ item, setType, workIndex }) {
   const key = itemKey(item)
   const target =
     setType === 'wu'
-      ? String(item.warmup?.reps ?? 12)
+      ? String(item.warmup?.reps ?? '')
       : item.targets?.[workIndex] ?? item.targets?.[item.targets?.length - 1] ?? ''
   return {
     routineItemId: key,

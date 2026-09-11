@@ -28,7 +28,7 @@ Correcting meaningful history shows a recalculation preview. Recalculation write
 
 ## Persistence and migration
 
-The seed in `src/db.json` is provenance and first-run data, not the live database. Live state is stored in browser `localStorage` under `workout-mvp-v8`. On load, older v5–v7 keys are migrated to schema version 8: `sessions`/`programs` become `routines`, slot and workout `sessionId` becomes `routineId`, and leftover program wrapping is dropped. Existing opaque ids (`sess-…`, `si-…`) are kept.
+The seed in `src/db.json` is provenance and reference only — it is not loaded at runtime; first run starts from an empty state (`emptyState()` returns empty arrays). Live state is stored in browser `localStorage` under `workout-mvp-v8`. On load, older v5–v7 keys are migrated to schema version 8: `sessions`/`programs` become `routines`, slot and workout `sessionId` becomes `routineId`, and leftover program wrapping is dropped. Existing opaque ids (`sess-…`, `si-…`) are kept.
 
 ## Development
 

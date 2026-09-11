@@ -242,6 +242,12 @@ export function RoutineExercisePick({ routineId, paths }) {
 function ExerciseFields({ item, onChange, onCancel, defaults }) {
   const [role, setRole] = useState(item.role || defaults.role || 'main')
   const [warmup, setWarmup] = useState(Boolean(item.warmup))
+  // req-30 — warmup reps come only from what the user typed (or a saved value when
+  // editing): blank for a new warmup, never a default. See the submit below and DESIGN §1.
+  const [warmupReps, setWarmupReps] = useState(() => {
+    const value = item.warmup?.reps
+    return value == null || value === '' ? '' : String(value)
+  })
   const [sets, setSets] = useState(() => {
     const value = item.sets ?? defaults.sets
     return value == null || value === '' ? '' : String(value)
@@ -275,7 +281,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
         )
         onChange({
           role,
-          warmup: warmup ? item.warmup || { reps: 12 } : null,
+          warmup: warmup ? { reps: warmupReps } : null,
           sets: count,
           targets: parseTargets(targets, count),
           suggestedWeights: weights
@@ -290,6 +296,15 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
     >
       <Select label="Role" options={ROUTINE_ROLES} value={role} onChange={(e) => setRole(e.target.value)} />
       <Checkbox label="WU set" checked={warmup} onChange={setWarmup} />
+      {warmup ? (
+        <Field
+          label="Warmup reps"
+          type="number"
+          min="1"
+          value={warmupReps}
+          onChange={(e) => setWarmupReps(e.target.value)}
+        />
+      ) : null}
       <Field label="Sets" type="number" min="1" value={sets} onChange={(e) => setSets(e.target.value)} />
       <Field label="Reps" value={targets} onChange={(e) => setTargets(e.target.value)} />
       <Field label="Kg" value={weights} onChange={(e) => setWeights(e.target.value)} />

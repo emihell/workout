@@ -158,6 +158,50 @@ describe('workout logging', () => {
     assert.equal(next.sets[2].reps, 'skipped')
     assert.deepEqual(next.completedItemIds, ['si-row'])
   })
+
+  // req-30 — a warmup the user ticked without entering reps must not invent 12;
+  // a skipped such warmup records an empty targetReps (DESIGN §1, no invented data).
+  it('records a skipped warmup with no reps as an empty targetReps (not 12)', () => {
+    const next = withSkippedUnloggedSets({
+      sets: [],
+      completedItemIds: [],
+      snapshot: {
+        items: [
+          {
+            routineItemId: 'si-row',
+            exerciseId: 'ex-rowing',
+            sets: 1,
+            targets: ['10'],
+            warmup: { reps: '' },
+          },
+        ],
+      },
+    })
+    const wu = next.sets.find((set) => set.setType === 'wu')
+    assert.equal(wu.reps, 'skipped')
+    assert.equal(wu.targetReps, '')
+  })
+
+  // req-30 — a user-entered warmup rep count is still honoured on skip (not rewritten).
+  it('keeps a user-entered warmup rep count on a skipped warmup', () => {
+    const next = withSkippedUnloggedSets({
+      sets: [],
+      completedItemIds: [],
+      snapshot: {
+        items: [
+          {
+            routineItemId: 'si-row',
+            exerciseId: 'ex-rowing',
+            sets: 1,
+            targets: ['10'],
+            warmup: { reps: 12 },
+          },
+        ],
+      },
+    })
+    const wu = next.sets.find((set) => set.setType === 'wu')
+    assert.equal(wu.targetReps, '12')
+  })
 })
 
 // req-25 — rest is armed by completion, not suppressed on the last set; only a
