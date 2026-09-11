@@ -329,3 +329,16 @@ set now drops to the overview with the persistent RestBar ticking there (rest-on
 call; refines DEC-013). **Planning browser-verified:** Chest Press restSec 90 last set → rest bar on
 overview, ticked 87→72s; Rowing restSec 0 → no rest (no over-fix). Merge `64fa26e` (branch `req-25`,
 `59dfff9`). `./check` green, 109 tests (4 new + 1 justified update).
+
+## req-26 — declutter the live set-log screen (notes #2 + #3)  (merged 2026-09-11)
+
+Emilio's gym-flow notes #2/#3. (A) The Note field in `SetLogForm` (`ui/index.jsx`) is now hidden
+behind a quiet "Add note" button — tap reveals + focuses it (autoFocus only when opened by tap; a
+pre-existing/seeded note starts expanded and keeps focus off); submitted value unchanged. (B) The
+equipment + cues block under the Complete/Skip buttons (`views/workout/item.jsx`) is removed; cues
+stay reachable via the exercise Title link (decided default). (C) "Previous when paused" was
+**investigated, not assumed** — reproduced the paused state and found Previous already renders when
+paused (gated on `resting`, which stays true while paused), so dropped with nothing to add. Planning
+browser-verified (A) on the Showcase: "Add note" shows by default, tap reveals the focused field. No
+unit test (both changes presentational; flagged rather than adding a hollow one). Merge `e9f3928`
+(branch `req-26`, `fa60892`). `./check` green, 109 tests.

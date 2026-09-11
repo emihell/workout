@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-10. **Shipped: req-01–09, req-11–13, req-15–23, req-25** (all except req-10). Done
+Updated 2026-09-11. **Shipped: req-01–09, req-11–13, req-15–23, req-25–26** (all except req-10). Done
 lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -21,9 +21,9 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 **Now: gym-flow notes** (Emilio 2026-09-10, `work/BACKLOG.md`; refactor-first-notes-after decided).
 All ux-feel → **Emilio feels each before merge** (serial, not self-driving).
-- ~~`req-25` bug #5 (last set no rest)~~ **shipped** — rest-on-overview, verified (DEC-013 refined).
-- `req-26` declutter set-log (#2+#3) ← next · `req-27` upcoming weight during rest (#1, hardest) ·
-  `req-28` completed workouts on Today (#7) · `req-29` button-placement audit, DESIGN §4 (#4)
+- ~~`req-25` bug #5 (last set no rest)~~ · ~~`req-26` declutter set-log (#2+#3)~~ **shipped**.
+- `req-27` upcoming weight during rest (#1, hardest) ← next · `req-28` completed workouts on Today
+  (#7) · `req-29` button-placement audit, DESIGN §4 (#4)
 - #6 timed exercises PARKED (model TBD; a "Duration" field already exists for cardio, e.g. Rowing).
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
