@@ -1,5 +1,5 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
-import { defaultSchedule } from './schedule.js'
+import { dateKey, defaultSchedule } from './schedule.js'
 
 const STORAGE_KEY = 'workout-mvp-v8'
 const LEGACY_KEYS = ['workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -97,6 +97,17 @@ export function routineById(routines, routineId) {
 
 export function findRoutine(routines, routineId) {
   return findRoutineInState(routines, routineId)
+}
+
+// req-28 — the workouts finished on a given calendar day (dateKey(finishedAt) ===
+// dayKey), newest-finished first. The Today page's "Completed today" section reads
+// this. Only genuinely finished workouts count (a `finishedAt` timestamp); a
+// workout re-dated via `performedOn`/`startedAt` is not "completed today", so this
+// filters on `finishedAt` alone rather than the history view's workoutDateKey. Pure.
+export function completedOnDayKey(workouts, dayKey) {
+  return (workouts || [])
+    .filter((workout) => workout.finishedAt && dateKey(workout.finishedAt) === dayKey)
+    .sort((a, b) => new Date(b.finishedAt).getTime() - new Date(a.finishedAt).getTime())
 }
 
 export function groupWorkoutsByRoutine(workouts, routines) {
