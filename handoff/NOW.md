@@ -16,8 +16,11 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY
 
+- **`req-31` rest-end cue** (DEC-023) — sound + vibration when the rest timer hits zero; mirror the
+  wake-lock (req-09) module: null component, feature-detected, fail-silent, unit-tested. No settings
+  toggle, no schema change. **[ux-feel → Emilio's hands, real phone]** Small. **← dispatched.**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
-  the first weight (DEC-012). Larger; expect iteration. **[ux-feel → Emilio's hands before merge]**
+  the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
 
 **Done batches:** refactor (req-16–23, DEC-021; #8 no-op, #10 rejected); gym-flow notes (req-25–29,
 DEC-009-refinement auto-merge). Emilio to gym-test req-25/27 feel. Audit 2026-09-11 (in code

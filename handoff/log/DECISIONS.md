@@ -402,3 +402,29 @@ reviewed and **skipped** (near-zero payoff, slight risk). Gate: ux-feel → Emil
 Built (req-30): a blank warmup stores `{ reps: '' }` (spec left `{}` vs `{ reps: '' }` to CC) —
 keeps the field shape stable so the `?? ''` readers and the editor re-seed stay consistent;
 reps stored as the typed string, matching how `sets`/`targets` are held. No new decision.
+
+## DEC-023 — a rest-end cue: sound + vibration, fired once when rest hits zero  (Emilio, 2026-09-11)
+
+The rest timer (`RestBar`, `useRestCountdown`, `restEndsAt` on `activeWorkout`) only ticks a
+number on screen — no sound, vibration, or notification when rest ends. In a gym you must stare
+at the phone to know rest is up. Wake-lock (req-09) already keeps the screen on, but a lit screen
+in a pocket still tells you nothing. Emilio: cue on rest end = **sound + vibration**.
+
+Decided (Emilio picked sound+vibration; the rest follows to keep it small and buildable):
+- **Fire on the natural 1→0 edge only** — when the live countdown reaches `restEndsAt`. NOT on
+  **Next** (that ends the rest deliberately — `onNext` clears `restEndsAt`), NOT on pause, and
+  **exactly once** per armed rest. Re-arming (+30s, pause→resume) produces a new `restEndsAt` and
+  is allowed to cue again when *that* one lands.
+- **Sound + vibration, both fail-silent, both feature-detected** — mirror the wake-lock (req-09)
+  pattern: a null-rendering component, unsupported API = no-op, any throw swallowed, never
+  disrupts the workout/logging/save. `navigator.vibrate` no-ops on iOS Safari (unsupported) — that
+  is acceptable degradation, sound still plays. A late fire when the tab returns to foreground
+  after rest ended while backgrounded is fine (arguably wanted), not a bug.
+- **Silent mode: not detectable on the web** — no reliable API. We do not try. The OS mute switch
+  silences the sound (as it should); vibration is unaffected. Documented, not engineered around.
+- **No settings toggle in v1** (explicit out-of-scope). The cue fires only during an active
+  workout, and the phone's own mute governs sound. A toggle is a clean follow-up if the cue feels
+  intrusive in use — not built until Emilio asks.
+- **Not persisted-data.** No schema change, no `localStorage` write — pure runtime behaviour, no
+  ask-gate. Drives req-31. Gate: ux-feel → Emilio's hands (a cue is felt, not asserted; needs a
+  real phone in a gym).
