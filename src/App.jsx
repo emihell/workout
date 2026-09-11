@@ -3,6 +3,7 @@ import { StoreProvider } from './store'
 import { getSaveFailed, subscribeSaveFailed } from './storage'
 import { ErrorBoundary } from './error-boundary'
 import { WakeLock } from './wake-lock'
+import { RestEndCue } from './rest-cue'
 import { useHashRoute } from './route'
 import { Today } from './views/Today'
 import {
@@ -173,6 +174,7 @@ export default function App() {
   return (
     <StoreProvider>
       <WakeLock />
+      <RestEndCue />
       <SaveFailedBanner />
       <NavBar />
       <main>
