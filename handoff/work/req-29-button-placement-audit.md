@@ -1,6 +1,6 @@
 # req-29 — button-placement audit: forward=right, back/previous=left (note #4)
 
-**Status: READY.** Applies the spatial rule Emilio set on 2026-09-10, now recorded in
+**Status: BUILT AND MERGED, 2026-09-11 — branch `req-29` (`f84dca5`…`f84dca5`, 1 commit).** Applies the spatial rule Emilio set on 2026-09-10, now recorded in
 `rules/DESIGN.md §4`: *every primary/forward action (Start, Save, Complete, Next, Continue) sits on
 the right; every back/previous/cancel sits on the left.*
 
