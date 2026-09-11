@@ -1,6 +1,6 @@
 # req-26 — declutter the live set-log screen (notes #2 + #3)
 
-**Status: READY** (two small decided-defaults below; ux-feel gate catches any redirect). From
+**Status: BUILT AND MERGED, 2026-09-11 — branch `req-26` (`fa60892`…`fa60892`, 1 commit).** (two small decided-defaults below; ux-feel gate catches any redirect). From
 Emilio's 2026-09-10 gym-flow notes (`work/BACKLOG.md`): *"Remove information under the buttons, add a
 previous button if you pause"* and *"Hide notes, should be a button to click then add."*
 
