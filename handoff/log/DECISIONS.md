@@ -375,3 +375,26 @@ NumberField, SegmentedControl, Checkbox, Textarea, Banner, RestBar, SetLogForm).
 - Migrate **screen-by-screen** (own commit per screen-group) for reviewability. Gate: ux-feel,
   heavy iteration on Emilio's phone. Big diff expected — behaviour unchanged, only the presentation
   moves onto the components.
+
+## DEC-022 — the app never invents warmup reps; the user enters them (audit F1)  (Emilio, 2026-09-11)
+
+The 2026-09-11 audit (F1) found the routine editor stores `{ reps: 12 }` when "WU set" is
+ticked — a rep target the user never entered (`Routine.jsx:278`; bare checkbox, no field),
+surfacing as the warmup target in the live workout (`item.jsx:179`) and on skipped warmups
+(`workout-log.js:60`). This contradicts DESIGN §1 verbatim ("Never invent warmup … 12 reps").
+
+Emilio decided the **rule is right, not the code**: *"it should not invent anything — we do
+not know if 12 is good."* So: add a warmup-reps input to the editor (blank for a new warmup,
+the saved value when editing one), store exactly what's typed, and remove every `?? 12` /
+`|| { reps: 12 }` substitution. A warmup with no reps shows no rep target — absent is absent.
+
+Rejected the two other reconciliations from the audit: keeping 12 as a "structural default"
+and softening the rule (rejected — 12 is not knowable to be good), and dropping warmup reps
+entirely (rejected — the user should be able to prescribe them).
+
+**Not a migration.** Existing routines saved with `{ reps: 12 }` keep it until the user next
+edits that exercise — rewriting stored setup data would be an invisible bulk edit (CLAUDE.md
+ask-gate) and we can't tell which saved 12s were accepted. `warmup` already holds `reps`, so
+no schema bump. Go-forward behaviour only. Drives req-30 (which also carries audit F2, the
+README `db.json` "first-run data" wording fix). Audit F3 (exported-but-internal helpers) was
+reviewed and **skipped** (near-zero payoff, slight risk). Gate: ux-feel → Emilio's hands.

@@ -16,6 +16,16 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY
 
+**Audit 2026-09-11 (first in the series, `audits/2026-09-11.md`):** codebase healthy — no dead
+code, migration tests thorough, perf a non-issue at real scale (13 workouts/327 sets), gate green.
+3 new findings. **F1** (warmup `{reps:12}` invented, vs DESIGN §1) → **req-30 READY** (DEC-022:
+user enters warmup reps, invent nothing; carries F2 too). **F2** README `db.json` "first-run data"
+wording → folded into req-30. **F3** exported-but-internal helpers → reviewed, **skipped**.
+Report file lives in the code worktree (`audits/`), left uncommitted — planning doesn't own it.
+
+- **`req-30` no invented warmup reps** (audit F1/F2, DEC-022) — routine editor gets a warmup-reps
+  field; drop every `?? 12`; no migration (go-forward only). **[ux-feel → Emilio's hands]** Small.
+
 **Refactor batch (req-15 findings, DEC-021): DONE** — all 8 shipped (req-16–23). Findings #8 no-op,
 #10 rejected.
 
