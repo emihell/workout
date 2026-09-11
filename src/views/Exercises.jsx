@@ -162,10 +162,10 @@ export function ExerciseNewManual({ returnBase = null }) {
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <div className="ui-actions">
+          <NavLink to={paths.hub}>Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
-          <NavLink to={paths.hub}>Cancel</NavLink>
         </div>
       </form>
     </Screen>
@@ -282,10 +282,10 @@ export function ExerciseEdit({ exerciseId }) {
         <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
         <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
         <div className="ui-actions">
+          <NavLink to={`/exercises/${ex.id}`}>Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
-          <NavLink to={`/exercises/${ex.id}`}>Cancel</NavLink>
         </div>
       </form>
     </Screen>

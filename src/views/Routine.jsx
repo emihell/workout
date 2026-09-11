@@ -67,10 +67,10 @@ export function RoutineNewForm({ onSave, onCancel, submitLabel = 'Next' }) {
       <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
       <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
       <div className="ui-actions">
+        <Button onClick={onCancel}>Cancel</Button>
         <Button type="submit" variant="primary">
           {submitLabel}
         </Button>
-        <Button onClick={onCancel}>Cancel</Button>
       </div>
     </form>
   )
@@ -186,10 +186,10 @@ export function RoutineEdit({ routineId, paths }) {
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
         <div className="ui-actions">
+          <NavLink to={nav.base}>Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
-          <NavLink to={nav.base}>Cancel</NavLink>
         </div>
       </form>
     </Screen>
@@ -296,10 +296,10 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
       <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
       <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
       <div className="ui-actions">
+        <Button onClick={onCancel}>Cancel</Button>
         <Button type="submit" variant="primary">
           Save
         </Button>
-        <Button onClick={onCancel}>Cancel</Button>
       </div>
     </form>
   )

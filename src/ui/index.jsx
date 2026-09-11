@@ -280,7 +280,8 @@ export function RestBar({ seconds = 0, paused = false, onPauseResume, onAddTime,
 }
 
 // SetLogForm — the single most important gym surface: a kg NumberField, a big reps
-// field, an effort SegmentedControl, a note, and Complete/Skip/Previous Buttons.
+// field, an effort SegmentedControl, a note, and Previous/Skip/Complete Buttons
+// (DESIGN §4 order: retreat left, forward right).
 // Presentational: it owns only the in-progress field values (local state, seeded
 // from the `initial*` props), remounted per-set by the caller with a `key`. All
 // the domain logic — history prefill, carry, restore, targets, the effort→RPE
@@ -359,12 +360,14 @@ export function SetLogForm({
           Add note
         </Button>
       )}
+      {/* DESIGN §4 order: retreat (Previous) left, forward (Complete) right, Skip
+          between (it neither logs nor retreats). */}
       <div className="ui-setlog__actions">
+        {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
+        <Button onClick={onSkip}>Skip</Button>
         <Button type="submit" variant="primary">
           Complete
         </Button>
-        <Button onClick={onSkip}>Skip</Button>
-        {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
       </div>
     </form>
   )

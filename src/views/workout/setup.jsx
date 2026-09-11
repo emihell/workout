@@ -63,15 +63,15 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           rows={3}
         />
         <div className="ui-actions">
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
           <Button
             onClick={() =>
               go(itemCurrentPath(routineId, item, itemLoggingState(active, item).plannedDone))
             }
           >
             Cancel
+          </Button>
+          <Button type="submit" variant="primary">
+            Save
           </Button>
         </div>
       </form>
