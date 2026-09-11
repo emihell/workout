@@ -38,10 +38,10 @@ export function HistoryEdit({ workoutId }) {
         />
         <Textarea label="Note" value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
         <div className="ui-actions">
+          <NavLink to={`/history/${workout.id}`}>Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
-          <NavLink to={`/history/${workout.id}`}>Cancel</NavLink>
         </div>
       </form>
     </Screen>

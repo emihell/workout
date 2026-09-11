@@ -71,10 +71,10 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
       ) : null}
       <Field label="Note" value={note} onChange={(event) => setNote(event.target.value)} />
       <div className="ui-actions">
+        <NavLink to={cancelTo}>Cancel</NavLink>
         <Button type="submit" variant="primary">
           Save
         </Button>
-        <NavLink to={cancelTo}>Cancel</NavLink>
       </div>
     </form>
   )

@@ -80,6 +80,10 @@ a:active {
   margin: 0 0 var(--ui-s2);
 }
 /* a horizontal group of buttons (Save / Cancel, Add set, …). */
+/* Action row. DESIGN §4 spatial rule: order children so the retreat
+   (Cancel/Back/Previous) is left-most and the forward/primary action
+   (Save/Next/Apply) is right-most. Order is set in markup — do not reverse
+   here — so tab order matches the visual left→right order. */
 .ui-actions {
   display: flex;
   flex-wrap: wrap;

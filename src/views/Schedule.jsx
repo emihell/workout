@@ -92,10 +92,10 @@ export function ScheduleLoop() {
           options={LOOP_WEEKS.map((n) => ({ value: n, label: `${n} week${n === 1 ? '' : 's'}` }))}
         />
         <div className="ui-actions">
+          <NavLink to="/schedule">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
-          <NavLink to="/schedule">Cancel</NavLink>
         </div>
       </form>
     </Screen>

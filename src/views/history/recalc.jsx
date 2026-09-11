@@ -25,7 +25,10 @@ export function HistoryRecalculate({ workoutId }) {
           <NavLink to={routinePath}>Routine</NavLink>
         </p>
       ) : null}
+      {/* DESIGN §4: Skip dismisses the recalc (retreat) → left; Apply commits
+          (forward) → right. */}
       <div className="ui-actions">
+        <NavLink to={`/history/${workout.id}`}>Skip</NavLink>
         <Button
           variant="primary"
           onClick={() => {
@@ -35,7 +38,6 @@ export function HistoryRecalculate({ workoutId }) {
         >
           Apply
         </Button>
-        <NavLink to={`/history/${workout.id}`}>Skip</NavLink>
       </div>
     </Screen>
   )
