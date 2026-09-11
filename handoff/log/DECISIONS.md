@@ -398,3 +398,7 @@ ask-gate) and we can't tell which saved 12s were accepted. `warmup` already hold
 no schema bump. Go-forward behaviour only. Drives req-30 (which also carries audit F2, the
 README `db.json` "first-run data" wording fix). Audit F3 (exported-but-internal helpers) was
 reviewed and **skipped** (near-zero payoff, slight risk). Gate: ux-feel → Emilio's hands.
+
+Built (req-30): a blank warmup stores `{ reps: '' }` (spec left `{}` vs `{ reps: '' }` to CC) —
+keeps the field shape stable so the `?? ''` readers and the editor re-seed stay consistent;
+reps stored as the typed string, matching how `sets`/`targets` are held. No new decision.
