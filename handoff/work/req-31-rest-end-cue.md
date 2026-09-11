@@ -1,6 +1,6 @@
 # req-31 — rest-end cue (sound + vibration when the rest timer hits zero)
 
-Status: READY
+**Status: BUILT AND MERGED, 2026-09-11 — branch `req-31` (`dca29c3`…`dca29c3`, 1 commit).**
 Source: Phase-1 backlog item "Rest-end cue + keep the screen awake" — the wake-lock half
 shipped as req-09; this is the remaining cue half. Decision: DEC-023.
 Type: In-gym flow (runtime behaviour, no persisted data). Gate: ux-feel → Emilio's hands

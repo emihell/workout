@@ -403,3 +403,20 @@ no reps shows/records blank, not 12; the set-log Reps field then starts empty (p
 not loaded at runtime (audit F2). Merge `74cd466` (branch `req-30`, `cd26172`). `./check` green,
 125 tests (2 new: blank⇒`targetReps:''`, user-entered 12 still honoured). Gate: Emilio walked the
 routine editor + a live warmup on branch req-30 (ux-feel) and approved the blank target.
+
+## req-31 — rest-end cue (sound + vibration when the rest timer hits zero)  (merged 2026-09-11)
+
+The counterpart to the wake-lock (req-09): the rest timer showed a number but made no sound, so
+you had to watch the phone to know rest was up. New null-rendering `RestEndCue` (`src/rest-cue.js`),
+mounted beside `<WakeLock />`, mirrors the wake-lock module exactly — feature-detected, fail-silent,
+renders nothing. When the live countdown reaches `restEndsAt` on its own it fires a short two-tone
+Web Audio beep (880→1175Hz, ~270ms, no asset file) + `navigator.vibrate([120,60,120])`, exactly once
+per armed rest. The fire decision is a pure `nextCueState(prev, restEndsAt, now)` unit deduped on the
+`restEndsAt` value: **Next** and **pause** null `restEndsAt` → no cue; **+30s** and **pause→resume**
+mint a new `restEndsAt` → cue again when it lands; a reload over an already-expired rest does not beep
+(seeds as already-cued — DEC-023 addendum). AudioContext is unlocked on the set-complete tap
+(`item.jsx`, the iOS gesture requirement). No settings toggle, no silent-mode detection (no reliable
+web API), no rest-state or schema change — diff is only the module + its mount + the unlock hook +
+tests. Merge `<MERGE>` (branch `req-31`, `dca29c3`). `./check` green, 16 new cue tests
+(fire-once / not-on-Next / not-on-pause / re-arm-fires-again / no-op-when-unsupported / never-throws).
+Gate: Emilio ratified the beep + vibration feel on a real phone before merge (ux-feel).

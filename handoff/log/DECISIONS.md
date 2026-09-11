@@ -428,3 +428,11 @@ Decided (Emilio picked sound+vibration; the rest follows to keep it small and bu
 - **Not persisted-data.** No schema change, no `localStorage` write — pure runtime behaviour, no
   ask-gate. Drives req-31. Gate: ux-feel → Emilio's hands (a cue is felt, not asserted; needs a
   real phone in a gym).
+
+Built (req-31): the fire decision **cues only rest-end edges it actually witnesses**. On first
+observation the pure `nextCueState` seeds `lastCued` to the current `restEndsAt` when it's already
+past, so a fresh mount over an already-expired-but-uncleared rest (a reload mid-expired-rest) does
+**not** beep. The spec's allowed "late fire on foreground return" still fires because that's the
+same mounted instance, which witnessed the rest arm (`lastCued` null for it). Tone/vibration are
+tunable defaults (880→1175Hz two-tone ~270ms, vibrate `[120,60,120]`) — Emilio ratified the feel on
+the branch. Merged `<MERGE>` (branch `req-31`, `dca29c3`); `./check` green, 16 cue tests.
