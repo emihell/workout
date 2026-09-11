@@ -388,3 +388,18 @@ already right, DEC-013), lone-button screens (Finish/Abandon/Delete). Two conven
 DESIGN §4 (markup-order-not-reverse; Skip is lateral). Planning browser-verified SetLogForm renders
 Previous · Skip · Complete. Merge `0e5b650` (branch `req-29`, `f84dca5`). `./check` green, 123 tests.
 **This completes Emilio's 2026-09-10 gym-flow notes batch (req-25–29); #6 timed exercises still parked.**
+
+## req-30 — no invented warmup reps (audit F1) + README wording (F2)  (merged 2026-09-11)
+
+Trust fix (DESIGN §1, DEC-022): the routine editor ticked "WU set" and stored an invented
+`{ reps: 12 }` the user never typed, surfacing as the warmup target in the live workout and on
+skipped warmups. Now the editor shows a "Warmup reps" field only when WU is checked — blank for
+a new warmup, the saved value when editing one — and submits `{ reps: <typed> }` with the
+`|| { reps: 12 }` fallback gone; blank stores `{ reps: '' }` (impl note on DEC-022). Dropped the
+`?? 12` in `item.jsx` (live target) and `workout-log.js` (skipped-warmup target) → a warmup with
+no reps shows/records blank, not 12; the set-log Reps field then starts empty (prefill rule).
+**No migration** — routines already saved with `{ reps: 12 }` keep it until next edited
+(go-forward only, no schema bump). README §Persistence reworded: `db.json` is provenance/reference,
+not loaded at runtime (audit F2). Merge `<MERGE>` (branch `req-30`, `cd26172`). `./check` green,
+125 tests (2 new: blank⇒`targetReps:''`, user-entered 12 still honoured). Gate: Emilio walked the
+routine editor + a live warmup on branch req-30 (ux-feel) and approved the blank target.

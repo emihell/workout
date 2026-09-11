@@ -1,6 +1,6 @@
 # req-30 — no invented warmup reps (audit F1) + README wording (audit F2)
 
-Status: READY
+**Status: BUILT AND MERGED, 2026-09-11 — branch `req-30` (`cd26172`…`cd26172`, 1 commit).**
 Source: audit 2026-09-11 (findings F1, F2). Decision: DEC-022.
 Type: Trust-rule fix (setup UI) + doc. Gate: ux-feel → Emilio's hands before merge
 (it changes what a warmup shows in the gym).
