@@ -21,6 +21,7 @@ import { Back, ExercisesLink, Missing } from '../shared'
 import { Button, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
 import { RestBar, useRestCountdown } from './rest'
+import { unlockAudio } from '../../rest-cue'
 
 function usesWeight(ex) {
   return ex && ex.type !== 'bodyweight' && ex.type !== 'cardio'
@@ -203,6 +204,10 @@ function WorkoutItemLive({ routineId, item }) {
       return
     }
     recordButton('complete-set')
+    // req-31 — completing a set is the gesture that arms the rest; use it to
+    // unlock/resume the AudioContext (iOS only lets a gesture start audio) so the
+    // rest-end beep can play when the timer runs out. Fail-silent.
+    unlockAudio()
     const done = finishAfterThisSet()
     setRestore(null)
     store.completeSet(
