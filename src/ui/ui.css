@@ -358,6 +358,33 @@ a:active {
   flex: 1 1 0;
 }
 
+/* ---- Upcoming set during rest (req-27) ---- */
+.ui-upcoming {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-s3);
+  margin-top: var(--ui-s3);
+  padding: var(--ui-s3);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  font-family: var(--ui-font);
+}
+.ui-upcoming__label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ui-upcoming__mark {
+  font-weight: 700;
+}
+.ui-upcoming .ui-field {
+  flex: 1 1 0;
+  margin: 0;
+}
+.ui-upcoming__reps {
+  white-space: nowrap;
+  color: var(--ui-ink-2);
+}
+
 /* ---- Type-scale sampler (showcase only) ---- */
 .ui-typescale {
   list-style: none;

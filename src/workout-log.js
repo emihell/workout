@@ -196,14 +196,32 @@ export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history
 // have); effort and note come from the restore payload only, else the defaults
 // (effort 3 "Moderate", empty note). Same priority order as setLogSeed: restore
 // (un-logging via "Previous") wins. Pure, so the prefill decision is inspectable.
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target }) {
-  const { weight, reps } = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target })
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target, weightOverride = null }) {
+  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target })
+  // req-27 — an explicit upcoming-weight edit made during rest overrides the
+  // computed seed *weight* for this one set: weight only (never reps), never on a
+  // restore, and only when the exercise uses weight. `weightOverride` is a value
+  // the lifter typed (possibly '' — an explicit blank), so the no-invent rule
+  // holds: with no edit (null) the computed blank / history / carry weight stands.
+  const weight = !fromRestore && weighted && weightOverride != null ? weightOverride : seed.weight
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe
       : 3
   const note = fromRestore ? restore.note : ''
-  return { weight, reps, effort, note }
+  return { weight, reps: seed.reps, effort, note }
+}
+
+// req-27 — the pending upcoming-set weight the lifter edited during rest, resolved
+// for the set the form is about to seed. `pending` is activeWorkout.nextSetWeight,
+// scoped to one { itemId, workIndex }: the override applies ONLY to that exact set,
+// so an edit never leaks to another set or a different exercise (whose itemId or
+// workIndex won't match). Returns the override weight (a string, possibly '' — an
+// explicit blank) or null when there is no override for this set. Pure.
+export function pendingWeightFor(pending, { itemId, workIndex }) {
+  if (!pending) return null
+  if (pending.itemId !== itemId || pending.workIndex !== workIndex) return null
+  return pending.weight ?? null
 }
 
 // req-25 — the rest-patch decision, made pure so "when does rest run after a set"

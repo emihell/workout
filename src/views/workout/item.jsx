@@ -12,12 +12,13 @@ import {
   itemLoggingState,
   lastLoggedSetIndex,
   markItemDonePatch,
+  pendingWeightFor,
   reopenItemPatch,
   restPatchAfterSet,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing } from '../shared'
-import { Button, List, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
+import { Button, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
 import { RestBar, useRestCountdown } from './rest'
 
@@ -133,6 +134,39 @@ function restoreFromLoggedSet(set) {
   }
 }
 
+// req-27 — during rest, the upcoming set's prescribed weight is shown and made
+// editable so the lifter can adjust the next load before the set starts. The reps
+// are shown for context (not editable — out of scope). The edit is written to
+// activeWorkout.nextSetWeight (scoped by the caller to this one set) and pre-fills
+// the next set's form via initialSetFields. Local state seeds from the computed
+// upcoming weight and is remounted per set by the caller's `key`, so each set
+// starts from its own seed; the store write + seed wiring live in the caller.
+function RestUpcoming({ weight, reps, changed, direction, onWeightChange }) {
+  const [value, setValue] = useState(weight)
+  return (
+    <div className="ui-upcoming">
+      <span className="ui-upcoming__label">
+        Next
+        {changed ? (
+          <span className="ui-upcoming__mark" aria-label={direction === 'up' ? 'increased' : 'decreased'}>
+            {' '}
+            {direction === 'up' ? '↑' : '↓'}
+          </span>
+        ) : null}
+      </span>
+      <NumberField
+        label="kg"
+        value={value}
+        onChange={(e) => {
+          setValue(e.target.value)
+          onWeightChange(e.target.value)
+        }}
+      />
+      <span className="ui-upcoming__reps">× {reps}</span>
+    </div>
+  )
+}
+
 function WorkoutItemLive({ routineId, item }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -186,7 +220,9 @@ function WorkoutItemLive({ routineId, item }) {
             ? item.suggestedWeights[currentWorkIndex]
             : null,
       },
-      restAfterSet(),
+      // req-27 — clear any upcoming-weight override: this set consumed it (the
+      // form seeded from it), and the next set starts from its own computed seed.
+      { ...restAfterSet(), nextSetWeight: null },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -208,7 +244,7 @@ function WorkoutItemLive({ routineId, item }) {
         targetWeight:
           currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
       },
-      restAfterSet(true),
+      { ...restAfterSet(true), nextSetWeight: null },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -222,6 +258,16 @@ function WorkoutItemLive({ routineId, item }) {
     next.workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
     setRestore(next)
     store.removeActiveSet(index)
+    // req-27 — going back changes which set is upcoming; drop any stale override.
+    store.patchActive({ nextSetWeight: null })
+  }
+
+  // req-27 — an explicit upcoming-weight edit during rest, written scoped to this
+  // exact { itemId, workIndex } so it can only pre-fill this one set.
+  function setUpcomingWeight(value) {
+    store.patchActive({
+      nextSetWeight: { itemId: itemKey(item), workIndex: currentWorkIndex, weight: value },
+    })
   }
 
   const canGoBack = state.logged.length > 0
@@ -236,6 +282,12 @@ function WorkoutItemLive({ routineId, item }) {
     restore &&
     restore.setType === currentType &&
     (currentType === 'wu' || restore.workIndex === currentWorkIndex)
+  // req-27 — a weight the lifter edited on the rest screen for this exact upcoming
+  // set overrides the computed seed; scoped so it never touches another set/exercise.
+  const weightOverride = pendingWeightFor(active.nextSetWeight, {
+    itemId: itemKey(item),
+    workIndex: currentWorkIndex,
+  })
   const seed = initialSetFields({
     weighted,
     fromRestore,
@@ -244,7 +296,21 @@ function WorkoutItemLive({ routineId, item }) {
     history: historyPrefill,
     carry: carryFor(ex, last, currentType, state.workLogged),
     target,
+    weightOverride,
   })
+
+  // req-27 — mark the upcoming weight when it differs from the set just completed
+  // (a progression bump or planned step). Both sides must be real numbers to compare,
+  // so a no-history blank upcoming (or a skipped last set) is never flagged.
+  const lastLoggedWork = state.workLogged.at(-1)
+  const lastLoggedWeight =
+    lastLoggedWork && String(lastLoggedWork.reps || '').toLowerCase() !== 'skipped'
+      ? Number(lastLoggedWork.weight)
+      : null
+  const upcomingWeightNum = seed.weight !== '' && seed.weight != null ? Number(seed.weight) : null
+  const upcomingChanged =
+    weighted && lastLoggedWeight != null && upcomingWeightNum != null && upcomingWeightNum !== lastLoggedWeight
+  const upcomingDirection = upcomingChanged ? (upcomingWeightNum > lastLoggedWeight ? 'up' : 'down') : null
 
   return (
     <Screen>
@@ -261,11 +327,23 @@ function WorkoutItemLive({ routineId, item }) {
         ]}
       />
       {resting ? (
-        canGoBack ? (
-          <Button variant="quiet" onClick={previousSet}>
-            Previous
-          </Button>
-        ) : null
+        <>
+          {weighted && !plannedDone ? (
+            <RestUpcoming
+              key={`up-${itemKey(item)}-${currentType}-${currentWorkIndex}`}
+              weight={seed.weight}
+              reps={target}
+              changed={upcomingChanged}
+              direction={upcomingDirection}
+              onWeightChange={setUpcomingWeight}
+            />
+          ) : null}
+          {canGoBack ? (
+            <Button variant="quiet" onClick={previousSet}>
+              Previous
+            </Button>
+          ) : null}
+        </>
       ) : plannedDone ? null : (
         <SetLogForm
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}

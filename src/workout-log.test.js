@@ -16,6 +16,7 @@ import {
   carriedWorkingSet,
   setLogSeed,
   initialSetFields,
+  pendingWeightFor,
 } from './workout-log.js'
 
 const item = {
@@ -430,5 +431,107 @@ describe('initialSetFields (req-17 seed extraction)', () => {
     for (const input of cases) {
       assert.deepEqual(initialSetFields(input), oldInline(input))
     }
+  })
+
+  // req-27 — an upcoming-weight edit made during rest overrides the seed weight for
+  // that one set only. Weight-only, never on a restore, never inventing on no-history.
+  describe('weightOverride (req-27 upcoming edit)', () => {
+    it('overrides the computed history weight (weighted, not restore)', () => {
+      const fields = initialSetFields({
+        weighted: true,
+        fromRestore: false,
+        restore: null,
+        hasHistory: true,
+        history: { weight: '60', reps: '5' },
+        carry: null,
+        target: '5',
+        weightOverride: '65',
+      })
+      assert.deepEqual(fields, { weight: '65', reps: '5', effort: 3, note: '' })
+    })
+
+    it('an explicit blank override ("") blanks the weight (distinct from null = no edit)', () => {
+      const fields = initialSetFields({
+        weighted: true,
+        fromRestore: false,
+        restore: null,
+        hasHistory: true,
+        history: { weight: '60', reps: '5' },
+        carry: null,
+        target: '5',
+        weightOverride: '',
+      })
+      assert.equal(fields.weight, '')
+    })
+
+    it('no-invent: null override leaves a no-history blank weight blank', () => {
+      const fields = initialSetFields({
+        weighted: true,
+        fromRestore: false,
+        restore: null,
+        hasHistory: false,
+        history: { weight: '', reps: '' },
+        carry: null,
+        target: '10',
+        weightOverride: null,
+      })
+      assert.equal(fields.weight, '')
+    })
+
+    it('ignored on a restore (Previous re-log wins over a stale upcoming edit)', () => {
+      const fields = initialSetFields({
+        weighted: true,
+        fromRestore: true,
+        restore: { weight: '35', reps: '9', rpe: '4', note: '' },
+        hasHistory: true,
+        history: { weight: '60', reps: '5' },
+        carry: null,
+        target: '5',
+        weightOverride: '99',
+      })
+      assert.equal(fields.weight, '35')
+    })
+
+    it('ignored when the exercise is not weighted (weight stays blank)', () => {
+      const fields = initialSetFields({
+        weighted: false,
+        fromRestore: false,
+        restore: null,
+        hasHistory: true,
+        history: { weight: '60', reps: '12' },
+        carry: null,
+        target: '12',
+        weightOverride: '80',
+      })
+      assert.equal(fields.weight, '')
+    })
+  })
+})
+
+// req-27 — the pending upcoming-weight override is scoped to one { itemId, workIndex }
+// so an edit can only ever pre-fill that exact set — never another set or exercise.
+describe('pendingWeightFor (req-27 override scope)', () => {
+  const pending = { itemId: 'si-row', workIndex: 1, weight: '42.5' }
+
+  it('returns the weight when itemId and workIndex both match', () => {
+    assert.equal(pendingWeightFor(pending, { itemId: 'si-row', workIndex: 1 }), '42.5')
+  })
+
+  it('does not leak to another exercise (itemId mismatch → null)', () => {
+    assert.equal(pendingWeightFor(pending, { itemId: 'si-press', workIndex: 1 }), null)
+  })
+
+  it('does not leak to another set of the same exercise (workIndex mismatch → null)', () => {
+    assert.equal(pendingWeightFor(pending, { itemId: 'si-row', workIndex: 2 }), null)
+  })
+
+  it('no pending override → null', () => {
+    assert.equal(pendingWeightFor(null, { itemId: 'si-row', workIndex: 1 }), null)
+    assert.equal(pendingWeightFor(undefined, { itemId: 'si-row', workIndex: 1 }), null)
+  })
+
+  it('an explicit blank override is preserved as "" (not collapsed to null)', () => {
+    const blank = { itemId: 'si-row', workIndex: 1, weight: '' }
+    assert.equal(pendingWeightFor(blank, { itemId: 'si-row', workIndex: 1 }), '')
   })
 })
