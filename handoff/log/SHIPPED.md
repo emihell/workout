@@ -400,6 +400,6 @@ a new warmup, the saved value when editing one — and submits `{ reps: <typed> 
 no reps shows/records blank, not 12; the set-log Reps field then starts empty (prefill rule).
 **No migration** — routines already saved with `{ reps: 12 }` keep it until next edited
 (go-forward only, no schema bump). README §Persistence reworded: `db.json` is provenance/reference,
-not loaded at runtime (audit F2). Merge `<MERGE>` (branch `req-30`, `cd26172`). `./check` green,
+not loaded at runtime (audit F2). Merge `74cd466` (branch `req-30`, `cd26172`). `./check` green,
 125 tests (2 new: blank⇒`targetReps:''`, user-entered 12 still honoured). Gate: Emilio walked the
 routine editor + a live warmup on branch req-30 (ux-feel) and approved the blank target.
