@@ -361,3 +361,16 @@ a blank upcoming. **Planning browser-verified end-to-end** on a fresh seeded rou
 
 **Workflow note (L-006):** req-27 was first committed onto the code worktree's `main`; restructured
 into a proper branch before merge. Code CC always branches; planning is the QA/PO merge gate.
+
+## req-28 — "Completed today" section on the Today page (note #7)  (merged 2026-09-11)
+
+Emilio's gym-flow note #7. Today gains a "Completed today" section listing workouts finished today,
+each row linking to its History detail; renders only when non-empty, below the scheduled/Start area.
+New pure `completedOnDayKey(workouts, dayKey)` in storage.js filters on `finishedAt` **alone**
+(dateKey(finishedAt) === dayKey), newest-first — deliberately not the history view's workoutDateKey,
+so a workout re-dated via performedOn isn't falsely "completed today". Rows reuse History's own
+labelling helpers; no new stored field, no migration. Branched correctly (L-006 held). Planning
+browser-verified: section shows a finished-today workout, links to the correct History detail, hidden
+when empty; unit-tested (today/prev-day/unfinished/empty, timezone-independent). Merge `ab73589`
+(branch `req-28`, `e646a1e`). `./check` green. First req merged under the DEC-009 refinement
+(planning verifies + merges the gym-flow batch; Emilio feels in the gym).

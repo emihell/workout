@@ -157,6 +157,17 @@ used it":
 - **Persisted-data reqs** (schema/migration/bulk write — e.g. req-06, req-07) — **always** wait
   for Emilio's hands before merge, never auto-closed. Ties to CLAUDE.md's migration ask-gate.
 
+**Refinement (Emilio, 2026-09-11) — small gym-flow-polish reqs run automatic.** For the gym-flow
+notes batch (req-25–29 class: small, reversible UI tweaks with no persisted-data touch), the
+"Emilio uses it before merge" step is dropped: **planning browser-verifies and merges itself**, and
+Emilio **feels the batch in the gym** afterward, flagging any that feel wrong for a follow-up. Reason:
+Emilio was already merging on planning's verification and deferring the feel to the gym (gym feel is
+only truly judgeable in the gym), so the present-and-wait round-trip was pure overhead; and these
+reqs are reversible with no data risk. **Still get a pre-merge look:** larger or subjective UX where
+his eyes matter before it ships — req-10 (setup flow), req-14 (nav), req-24 (inline confirms). Planning
+still QAs every one (diff + tests + browser); "automatic" removes the human round-trip, not the QA.
+Emilio can always say "show me first."
+
 **Operating rules that came out of the first runs:**
 - **`/clear` code CC between reqs** (Emilio's ask). Keeps code CC's context clean per build. The
   planning session **cannot** force it (a message named "/clear" arrives as text, not a command),
