@@ -417,6 +417,6 @@ mint a new `restEndsAt` → cue again when it lands; a reload over an already-ex
 (seeds as already-cued — DEC-023 addendum). AudioContext is unlocked on the set-complete tap
 (`item.jsx`, the iOS gesture requirement). No settings toggle, no silent-mode detection (no reliable
 web API), no rest-state or schema change — diff is only the module + its mount + the unlock hook +
-tests. Merge `<MERGE>` (branch `req-31`, `dca29c3`). `./check` green, 16 new cue tests
+tests. Merge `e2aa905` (branch `req-31`, `dca29c3`). `./check` green, 16 new cue tests
 (fire-once / not-on-Next / not-on-pause / re-arm-fires-again / no-op-when-unsupported / never-throws).
 Gate: Emilio ratified the beep + vibration feel on a real phone before merge (ux-feel).
