@@ -436,3 +436,32 @@ past, so a fresh mount over an already-expired-but-uncleared rest (a reload mid-
 same mounted instance, which witnessed the rest arm (`lastCued` null for it). Tone/vibration are
 tunable defaults (880→1175Hz two-tone ~270ms, vibrate `[120,60,120]`) — Emilio ratified the feel on
 the branch. Merged `e2aa905` (branch `req-31`, `dca29c3`); `./check` green, 16 cue tests.
+
+## DEC-024 — new nav: a 3-tab bottom bar (Workouts / Library / Settings)  (Emilio, 2026-09-12)
+
+req-13's top-left **Menu** dropdown of six flat items (Today/Schedule/Routines/Exercises/History/
+Settings) was a functional stopgap Emilio disliked ("not a fan of the menu"). Decided the
+information architecture and the pattern together (Emilio, 2026-09-12, from a previews round):
+
+**Regroup 6 destinations → 3, as a bottom tab bar** (thumb-reachable, DEC-010; the regrouping is
+what makes a tab bar fit — 3 tabs is well under the ~5 HIG cap that blocked it against 6 flat items,
+superseding DEC-018/019's everything-in-one-menu):
+
+1. **Workouts** — Today + Schedule + History merged. *(Emilio rejected "Timeline": "this is where
+   you can start your workout" — the name must read as active, not a passive log.)* Combine them as
+   **one unified scroll**: upcoming above, today anchored in the middle (with the Start action), done
+   below, and **schedule edits inline** on that scroll. This is the boldest/hardest piece — its own
+   req (req-32), built after the shell.
+2. **Library** — Routines + Exercises merged into one screen with a **segmented [Routines | Exercises]
+   toggle**, both first-class, `+ New` per list.
+3. **Settings** — unchanged content, now its own (third, equal) tab.
+
+Rejected: 2-tabs-plus-a-Settings-gear (Emilio chose 3 equal tabs — Settings always one tap, visible);
+a slide-up sheet and a redesigned top dropdown (tabs are more thumb-persistent for daily use); and,
+for Workouts, the segmented-control and Today-home-plus-links layouts (the unified scroll is the goal
+— though "Today + links to Schedule/History" is the **interim** the shell req ships until req-32 lands).
+
+**Split for build:** **req-14** = the shell (bottom tab bar + Library toggle + Settings tab; Workouts
+tab = existing Today with Schedule/History reachable). **req-32** = the unified Workouts scroll
+(depends on req-14). Both ux-feel → Emilio's hands, heavy iteration expected (first "designed" nav
+surface). No persisted-data change — pure routing/UI.

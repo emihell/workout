@@ -16,11 +16,15 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY
 
+- **`req-14` new nav — 3-tab bottom bar** (Workouts/Library/Settings, DEC-024) — the shell: bottom
+  tab bar + Library [Routines|Exercises] segmented toggle + Settings tab; Workouts tab = today +
+  links (interim). **[ux-feel]** Medium. **← dispatched.**
+- `req-32` **unified Workouts scroll** (DEC-024) — merge Today+Schedule+History into one scroll,
+  inline schedule edits. **BLOCKED on req-14**; design iterates with Emilio in-branch. Bold/large.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
 
-**Nothing else is READY** — the remaining Phase-1 items (req-14 nav direction, req-24 inline-confirm
-pattern, history-recalc behaviour, timed exercises #6 model) are all decision-gated on Emilio.
+**Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
 **Done batches:** refactor (req-16–23, DEC-021; #8 no-op, #10 rejected); gym-flow notes (req-25–29,
 DEC-009-refinement auto-merge). Emilio to gym-test req-25/27 feel. Audit 2026-09-11 (in code
