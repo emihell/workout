@@ -2,9 +2,11 @@ import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { greeting, weekdayName } from '../ids'
 import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
+import { completedOnDayKey, findRoutine } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { workoutRoutineId, workoutRoutineName } from './history/helpers'
 import { NavLink } from './shared'
 
 function StartButton({ store, routine, slot, date, label = 'Start' }) {
@@ -24,6 +26,16 @@ function StartButton({ store, routine, slot, date, label = 'Start' }) {
 
 function activeRoutineId(workout) {
   return workout?.routineId || workout?.sessionId
+}
+
+// req-28 — a completed-today workout row, linking to its History detail. Labelled
+// the same way History's list does (program — routine), minus the date (all today).
+function CompletedTodayRow({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const programName = workout.snapshot?.programName
+  const name = workoutRoutineName(workout, routine)
+  const label = programName ? `${programName} — ${name}` : name
+  return <Row to={`/history/${workout.id}`}>{label}</Row>
 }
 
 function WorkoutRow({ store, routine, slot, date, extra }) {
@@ -61,6 +73,7 @@ export function Today() {
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
+  const completedToday = completedOnDayKey(store.workouts, todayKey)
 
   if (!routines.length) {
     return (
@@ -138,6 +151,17 @@ export function Today() {
       ) : (
         <p className="ui-sub">None.</p>
       )}
+
+      {completedToday.length ? (
+        <>
+          <SectionHeader>Completed today</SectionHeader>
+          <List>
+            {completedToday.map((workout) => (
+              <CompletedTodayRow key={workout.id} store={store} workout={workout} />
+            ))}
+          </List>
+        </>
+      ) : null}
 
       {mine ? null : (
         <p>

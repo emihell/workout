@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { emptyState, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
+import { completedOnDayKey, emptyState, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
+import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
 // no-ops (the iOS/Safari Private Mode failure the req-06 read-back defends
@@ -274,5 +275,36 @@ describe('historyPrescription', () => {
     assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 1 }), { weight: '35', reps: '10' })
     assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 2 }), { weight: '', reps: '' })
     assert.deepEqual(historySetPrefill(null, { setType: 'work', workIndex: 0 }), { weight: '', reps: '' })
+  })
+})
+
+// req-28 — the Today page's "Completed today" section reads this. Finished-today
+// only (finishedAt === the given day), newest first; a previous day or an
+// unfinished workout must not appear. Timestamps are built from local Date objects
+// (like the app's `new Date().toISOString()`) and the day key from the same source,
+// so the local↔UTC round-trip in dateKey can't make the test timezone-dependent.
+describe('completedOnDayKey (req-28 completed today)', () => {
+  const day = dateKey(new Date(2026, 8, 11, 12, 0))
+  const morning = { id: 'w-morn', finishedAt: new Date(2026, 8, 11, 8, 0).toISOString() }
+  const evening = { id: 'w-eve', finishedAt: new Date(2026, 8, 11, 18, 30).toISOString() }
+  const yesterday = { id: 'w-yest', finishedAt: new Date(2026, 8, 10, 20, 0).toISOString() }
+  const unfinished = { id: 'w-active', finishedAt: null, startedAt: new Date(2026, 8, 11, 9, 0).toISOString() }
+
+  it("returns today's finished workouts, newest first", () => {
+    const result = completedOnDayKey([morning, yesterday, evening, unfinished], day)
+    assert.deepEqual(result.map((w) => w.id), ['w-eve', 'w-morn'])
+  })
+
+  it('excludes a workout finished on a previous day', () => {
+    assert.deepEqual(completedOnDayKey([yesterday], day), [])
+  })
+
+  it('excludes an unfinished (no finishedAt) workout', () => {
+    assert.deepEqual(completedOnDayKey([unfinished], day), [])
+  })
+
+  it('empty / missing input → empty list', () => {
+    assert.deepEqual(completedOnDayKey([], day), [])
+    assert.deepEqual(completedOnDayKey(null, day), [])
   })
 })
