@@ -1,6 +1,6 @@
 # req-27 — show (and let you change) the upcoming set's weight during rest (note #1)
 
-**Status: READY** (behaviour decided below; ux-feel gate confirms the feel). From Emilio's 2026-09-10
+**Status: BUILT AND MERGED, 2026-09-11 — branch `req-27` (`f99ad52`…`5a09046`, 2 commits).** (behaviour decided below; ux-feel gate confirms the feel). From Emilio's 2026-09-10
 gym-flow notes: *"If weight changes, show 'upcoming' so you can change the weights while resting."*
 
 **Gate: gym-flow feel** (DEC-009) — **Emilio uses it before merge.** The hardest of the note reqs;

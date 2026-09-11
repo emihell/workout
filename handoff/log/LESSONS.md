@@ -74,3 +74,16 @@ old-vs-new **body diff** proving the executable lines are unchanged, plus (2) an
 audit** (every used symbol resolves to an import or a local def; every JSX tag imported), plus (3) a
 **browser walk** of the affected screens — not the `./check` line. CC ran all three here and flagged
 the blind spot; worth building the audit into how we review splits.
+
+## L-006 — code CC must always build on a req branch; planning is the QA/PO merge gate  (Emilio, 2026-09-11)
+
+req-27 was committed **directly onto the code worktree's local `main`** instead of a `req-27` branch —
+a workflow slip (CLAUDE.md already says "implement on a branch named after the requirement"). Emilio
+reinforced the rule: *code CC always makes a branch; planning reads the report, QAs, and merges to
+main* — planning is QA + PO here, and merging is planning's job, never code CC's. Recovery when it
+happens: from the code worktree, `git branch <req>` at the stray commit, `git reset --hard origin/main`,
+`git checkout <req>` — the commit is preserved on the branch and `plan closeout` then works normally
+(done for req-27: main back to e9f3928, branch `req-27` at 5a09046). Prevention: every "build req-NN"
+handoff must say **branch first** (`git checkout main && git pull && git checkout -b req-NN`), and
+planning should sanity-check the branch exists before reviewing. A code-CC pre-push/commit hook that
+refuses commits on `main` would enforce it — worth adding.
