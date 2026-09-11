@@ -374,3 +374,17 @@ browser-verified: section shows a finished-today workout, links to the correct H
 when empty; unit-tested (today/prev-day/unfinished/empty, timezone-independent). Merge `ab73589`
 (branch `req-28`, `e646a1e`). `./check` green. First req merged under the DEC-009 refinement
 (planning verifies + merges the gym-flow batch; Emilio feels in the gym).
+
+## req-29 — button-placement audit: forward=right, back/previous=left (note #4)  (merged 2026-09-11)
+
+Emilio's gym-flow note #4 / DESIGN §4. Turned out to be app-wide, not one screen: **every** `.ui-actions`
+row was primary-left/cancel-right (the inverse of §4). Reordered **11 surfaces** to retreat-left /
+forward-right — SetLogForm (Previous · Skip · Complete), and Cancel · Save across RoutineNew/edit,
+ExerciseFields, Schedule, Exercise new/edit, SetEdit, HistoryEdit, Workout setup; Skip · Apply on
+Recalc. Presentation-only: markup child-order within existing action rows, no behaviour/label/handler/
+style change; `type="submit"` stays the primary (Enter-submit unaffected). Reordered in **markup, not
+`row-reverse`**, so tab/focus order matches the visual order (a11y). Unchanged/compliant: RestBar (Next
+already right, DEC-013), lone-button screens (Finish/Abandon/Delete). Two conventions recorded in
+DESIGN §4 (markup-order-not-reverse; Skip is lateral). Planning browser-verified SetLogForm renders
+Previous · Skip · Complete. Merge `0e5b650` (branch `req-29`, `f84dca5`). `./check` green, 123 tests.
+**This completes Emilio's 2026-09-10 gym-flow notes batch (req-25–29); #6 timed exercises still parked.**

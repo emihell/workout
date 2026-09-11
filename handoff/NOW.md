@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-11. **Shipped: req-01–09, req-11–13, req-15–23, req-25–28** (all except req-10). Done
+Updated 2026-09-11. **Shipped: req-01–09, req-11–13, req-15–23, req-25–29** (all except req-10). Done
 lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -20,10 +20,11 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 #10 rejected.
 
 **Now: gym-flow notes** (Emilio 2026-09-10, `work/BACKLOG.md`; refactor-first-notes-after decided).
-All ux-feel → **Emilio feels each before merge** (serial, not self-driving).
-- ~~req-25 bug #5 · req-26 declutter · req-27 upcoming weight · req-28 completed-on-Today~~ **shipped**.
-  Now **automatic** (DEC-009 refinement): planning verifies + merges; Emilio feels the batch in the gym.
-- `req-29` button-placement audit, DESIGN §4 (#4) ← last, self-driving. Then gym-flow notes done (#6 parked).
+**Gym-flow notes batch (req-25–29): DONE** (Emilio 2026-09-10 notes) — bug #5 rest timer, declutter
+set-log, upcoming weight during rest, completed-on-Today, button-placement audit. All merged automatic
+(DEC-009 refinement: planning verifies + merges; Emilio feels in the gym). **#6 timed exercises PARKED**
+(model decision; a "Duration" field already exists for cardio). Emilio to gym-test req-25/27 feel —
+follow-ups if anything feels off.
 - #6 timed exercises PARKED (model TBD; a "Duration" field already exists for cardio, e.g. Rowing).
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents

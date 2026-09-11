@@ -94,8 +94,16 @@ Every **primary / forward** action — the one that moves you deeper into the fl
 (Start, Save, Complete, Next, Continue) — sits on the **right**. Every **back /
 previous / cancel** action sits on the **left**. This holds on every screen, so the
 thumb learns one map: right advances, left retreats. **The test:** on any screen with
-two actions, is the forward one on the right and the retreat one on the left? (Applies
-retroactively — existing screens must be audited against it, not just new ones.)
+two actions, is the forward one on the right and the retreat one on the left? (Audited
+across the app in req-29, which reordered 11 action rows.)
+
+Two conventions from the req-29 audit:
+- **Set the order in markup, never `row-reverse` in CSS.** `.ui-actions` is normal LTR flex, so DOM
+  child order = visual left→right = tab/focus order. A CSS reverse would desync focus from the visual
+  order (an a11y anti-pattern). New rows put the retreat child first, the primary child last.
+- **A lateral action (e.g. Skip) sits between retreat and forward — never right of the primary.** Skip
+  neither commits nor retreats: in the set-log it's Previous · Skip · Complete; where Skip *dismisses*
+  something (the recalc screen) it reads as a retreat and goes left (Skip · Apply).
 
 ## 5. Feel — a floor, not a budget
 
