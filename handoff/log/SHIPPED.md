@@ -342,3 +342,22 @@ paused (gated on `resting`, which stays true while paused), so dropped with noth
 browser-verified (A) on the Showcase: "Add note" shows by default, tap reveals the focused field. No
 unit test (both changes presentational; flagged rather than adding a hollow one). Merge `e9f3928`
 (branch `req-26`, `fa60892`). `./check` green, 109 tests.
+
+## req-27 — show + edit the upcoming set's weight during rest (note #1)  (merged 2026-09-11)
+
+Emilio's gym-flow note #1. During rest, the next set's prescribed weight is shown in an editable field
+by the RestBar, marked ↑/↓ when it differs from the set just completed; editing it pre-fills the next
+set. Seam: a per-set override `activeWorkout.nextSetWeight = { itemId, workIndex, weight }`, resolved
+by a pure `pendingWeightFor(pending, {itemId, workIndex})` and applied in `initialSetFields` via a new
+`weightOverride` — weight-only, never on a restore, never for non-weighted, and scoped so an edit
+can't leak to another set/exercise (both itemId AND workIndex must match). Cleared on
+complete/skip/previous. Transient on activeWorkout (survives reload via the existing snapshot spread) —
+**no schema bump, no migration, no ask-gate**. History-is-truth intact: the override is only ever a
+typed value (explicit '' honoured, distinct from null), so a no-history weighted exercise still shows
+a blank upcoming. **Planning browser-verified end-to-end** on a fresh seeded routine: set-1 kg blank
+(no-invent); rest showed "Next 40 × 8" editable; edit → 45 → "Next ↑" marker; Next → set 2 pre-filled
+45 (override beat the 40 carry). 43 workout-log tests (no-leak + no-invent pinned). Merge `3911aa9`
+(branch `req-27`, `5a09046`). `./check` green. **Emilio to gym-test the feel later 2026-09-11.**
+
+**Workflow note (L-006):** req-27 was first committed onto the code worktree's `main`; restructured
+into a proper branch before merge. Code CC always branches; planning is the QA/PO merge gate.
