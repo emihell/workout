@@ -45,6 +45,11 @@ cd workout-codebase
 # 2 — activate the git hooks (per-clone, not stored in the repo; guards handoff/)
 git config core.hooksPath .githooks
 
+# 2b — set your commit identity (else git invents user@hostname.local, which
+#      won't link to your GitHub account). Use your real name + GitHub email.
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
 # 3 — install dependencies (node_modules is gitignored)
 npm install
 
