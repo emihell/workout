@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, parseTargets, roleLabel } from '../ids'
 import { go } from '../route'
-import { routineById, historyPrescription } from '../storage'
+import { routineById, historyPrescription, routineDeletionImpact } from '../storage'
 import { useStore } from '../store-context'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing, NavLink } from './shared'
@@ -149,7 +149,19 @@ export function RoutineDetail({ routineId, paths }) {
       {nav.showDelete ? (
         <Button
           onClick={() => {
-            if (!window.confirm(`Delete ${routine.name}?`)) return
+            // req-43 / DEC-031 — name the blast radius (store still archives-vs-
+            // deletes on history; this only describes it). Counts only when > 0.
+            const impact = routineDeletionImpact(store, routine.id)
+            const parts = []
+            if (impact.slots > 0)
+              parts.push(`${impact.slots} schedule slot${impact.slots === 1 ? '' : 's'}`)
+            if (impact.plans > 0)
+              parts.push(`${impact.plans} planned workout${impact.plans === 1 ? '' : 's'}`)
+            const removes = parts.length ? ` This removes ${parts.join(' and ')}.` : ''
+            const head = impact.hasHistory
+              ? `${routine.name} has past workouts and will be archived (kept in your history).`
+              : `Delete ${routine.name}?`
+            if (!window.confirm(head + removes)) return
             store.removeRoutine(routine.id)
             go(nav.done)
           }}

@@ -280,6 +280,35 @@ export function routinesUsingExercise(routines, exerciseId) {
   )
 }
 
+// req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the
+// confirm can name it. removeRoutine (store.jsx) also drops every schedule slot and
+// planned workout that references the routine, and archives-vs-deletes on whether
+// finished history references it. These are pure reads that mirror the store's own
+// reference tests exactly (routineId || sessionId) so the confirm counts match what
+// the delete removes. The logic in the store is unchanged (DEC-031) — this is only
+// how we describe it.
+export function routineDeletionImpact(state, routineId) {
+  const refersTo = (obj) => (obj.routineId || obj.sessionId) === routineId
+  return {
+    slots: (state?.schedule?.slots || []).filter(refersTo).length,
+    plans: (state?.plannedWorkouts || []).filter(refersTo).length,
+    hasHistory: (state?.workouts || []).some(refersTo),
+  }
+}
+
+// req-43 / DEC-031 — the blast radius of deleting an exercise. removeExercise strips
+// it from every routine (and planned-workout item) and archives-vs-deletes on
+// finished history (a set with this exerciseId). Reuses routinesUsingExercise for
+// the routine count; history mirrors the store's set.exerciseId test.
+export function exerciseDeletionImpact(state, exerciseId) {
+  return {
+    routines: routinesUsingExercise(state?.routines, exerciseId).length,
+    hasHistory: (state?.workouts || []).some((workout) =>
+      (workout.sets || []).some((set) => set.exerciseId === exerciseId),
+    ),
+  }
+}
+
 export function exercisesInHistory(workouts, exercises, routines) {
   const ids = []
   const seen = new Set()

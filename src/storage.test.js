@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, saveState } from './storage.js'
+import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, routineDeletionImpact, saveState } from './storage.js'
 import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -399,6 +399,74 @@ describe('req-41 isExternalStateChange (audit F-RISK-3)', () => {
 
   it('is false for an unrelated key', () => {
     assert.equal(isExternalStateChange({ key: 'something-else' }), false)
+  })
+})
+
+describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
+  const state = {
+    routines: [
+      { id: 'r1', exercises: [{ exerciseId: 'e1' }, { exerciseId: 'e2' }] },
+      { id: 'r2', exercises: [{ exerciseId: 'e1' }] },
+      { id: 'r3', exercises: [{ exerciseId: 'e2' }] },
+    ],
+    schedule: {
+      slots: [
+        { routineId: 'r1' },
+        { sessionId: 'r1' }, // legacy field name still counts
+        { routineId: 'r2' },
+      ],
+    },
+    plannedWorkouts: [{ routineId: 'r1' }, { routineId: 'other' }],
+    workouts: [
+      { routineId: 'r2', sets: [{ exerciseId: 'e1' }] },
+      { sessionId: 'r-old', sets: [{ exerciseId: 'e2' }] },
+    ],
+  }
+
+  it('routineDeletionImpact counts slots + plans and flags no history', () => {
+    // r1: two slots (routineId + legacy sessionId), one plan, never finished.
+    assert.deepEqual(routineDeletionImpact(state, 'r1'), {
+      slots: 2,
+      plans: 1,
+      hasHistory: false,
+    })
+  })
+
+  it('routineDeletionImpact flags history via routineId || sessionId', () => {
+    // r2: one slot, no plan, has a finished workout (routineId).
+    assert.deepEqual(routineDeletionImpact(state, 'r2'), {
+      slots: 1,
+      plans: 0,
+      hasHistory: true,
+    })
+    // r-old referenced only by a workout's legacy sessionId still counts as history.
+    assert.equal(routineDeletionImpact(state, 'r-old').hasHistory, true)
+  })
+
+  it('a routine with no references at all is all-zero, no history', () => {
+    assert.deepEqual(routineDeletionImpact(state, 'nope'), {
+      slots: 0,
+      plans: 0,
+      hasHistory: false,
+    })
+  })
+
+  it('exerciseDeletionImpact counts routines and flags history', () => {
+    // e1: in r1 + r2, and a finished set exists.
+    assert.deepEqual(exerciseDeletionImpact(state, 'e1'), {
+      routines: 2,
+      hasHistory: true,
+    })
+    // e2: in r1 + r3, finished set exists (in the sessionId workout).
+    assert.deepEqual(exerciseDeletionImpact(state, 'e2'), {
+      routines: 2,
+      hasHistory: true,
+    })
+  })
+
+  it('exerciseDeletionImpact: an exercise used in a routine but never logged', () => {
+    const s = { routines: [{ id: 'r', exercises: [{ exerciseId: 'e9' }] }], workouts: [] }
+    assert.deepEqual(exerciseDeletionImpact(s, 'e9'), { routines: 1, hasHistory: false })
   })
 })
 
