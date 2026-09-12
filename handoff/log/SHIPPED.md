@@ -616,3 +616,17 @@ malformed cases driven through a faithful throwaway copy (real file never touche
 182 tests. Gate: functional (workflow tooling). Merge `3791bdd` (branch `req-45`, `1aaacfa`, 1 commit).
 Coupling noted (L-008): the canonical grant list now lives in both README §Setup step 5 and `plan` — sync
 comment only, nothing enforces it. **Audit 2026-09-12 closed** with this req.
+
+## req-46 — workflow hardening: save-time drift warning, publish --push, closeout checklist  (merged 2026-09-12)
+
+Post-audit workflow reflection ("fix all"). Three `plan` changes (plan-only diff): (1) `cmd_save` runs
+check_handoff after the commit and echoes drift as a **non-blocking** stderr warning — catches e.g.
+`NOW.md`>50 at save, one step before publish (which stays non-blocking, req-34 stands — DEC-035 area).
+(2) `cmd_publish --push` — opt-in; pushes `origin main planning` only on success, after every refusal
+has already exited; default no-push (DEC-008) intact. (3) `cmd_closeout` **prints** (never edits handoff)
+the DEC-009 step-9 maintenance checklist with req id/title/date filled. `./check` green, 182 tests.
+Gate: infra — planning tested all three live by its own hand (DEC-035): #3 printed the correct checklist
+on this very closeout; #2 pushed both branches on the maintenance publish; #1's non-blocking warning
+exercised on a controlled drift. Merge `7e6070f` (branch `req-46`, `ca12ddc`, 1 commit). Minor (noted,
+left as-is): closeout's internal save fires a transient #1 warning mid-closeout that self-corrects before
+the final clean status.

@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–45** (req-10 pending; req-24
+Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–46** (req-10 pending; req-24
 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
 `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -25,9 +25,9 @@ content-check) all shipped. New: DEC-028..034, L-007/008, `reference/schema.md`.
 (model.js/item.jsx module splits) deferred** — low-value, higher risk; revive if wanted. Non-blocking
 Emilio eyeballs: req-41 two-tab, req-44 gym-flow walk.
 
-**Post-audit reflection → `req-46` (building):** save-time drift warning, `plan publish --push`,
-`plan closeout` checklist. Docs patched: PLANNING.md (idle-notice trails report; pre-spec batches),
-BACKLOG (per-branch preview deploy, L-003).
+**Post-audit reflection → `req-46` SHIPPED:** save-time drift warning, `plan publish --push`,
+`plan closeout` checklist. DEC-035 (planning merges on own testing; runs are batch/single). PLANNING.md +
+BACKLOG (preview deploy) patched. **Nothing building — queue empty.**
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
