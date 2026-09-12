@@ -85,6 +85,22 @@ a.ui-btn--quiet:active {
   padding: var(--ui-s3);
   -webkit-text-size-adjust: 100%;
 }
+/* Full-height variant (req-14 iter 7, the Workout screen): a flex column tall
+ * enough to reach the top of the fixed tab bar, so a child with margin-top:auto
+ * (.ui-pin-bottom) drops to the bottom when content is short — the gap falls above
+ * it — while staying the last in-flow element (not sticky) when content scrolls.
+ * The min-height mirrors <main>'s reserved tab-bar space; border-box so the
+ * screen's own padding is included and nothing over-scrolls. dvh tracks mobile
+ * browser chrome. */
+.ui-screen--fill {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(100dvh - 72px - env(safe-area-inset-bottom));
+}
+.ui-screen--fill .ui-pin-bottom {
+  margin-top: auto;
+}
 .ui-title {
   font-size: var(--ui-text-title);
   font-weight: 700;

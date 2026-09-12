@@ -7,7 +7,6 @@ import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
-import { NavLink } from './shared'
 
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
@@ -172,7 +171,7 @@ export function Today() {
   }
 
   return (
-    <Screen>
+    <Screen className="ui-screen--fill">
       <Title>{greeting()}</Title>
       {loop > 1 ? (
         <p className="ui-sub">
@@ -187,20 +186,19 @@ export function Today() {
         </p>
       ) : null}
 
-      {/* Section order (iter 6): Upcoming› → Today (emphasized) → Completed today
-          → Recent items → View past› → Routines› (bottom). Today and Recent lost
-          their headers — the shared date format, Today's emphasis, and spacing
-          carry the meaning. "Upcoming" is itself the link to the full Schedule;
-          "View past" opens the full History. Interim until req-32's unified scroll. */}
-      <SectionHeader>
-        <NavLink to="/schedule" chevron="forward">Upcoming</NavLink>
-      </SectionHeader>
-      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
+      {/* Section order: Upcoming› (plain link) → items → Today (emphasized) →
+          Completed today → recent items → Previous› (plain link) → gap → Routines›
+          (pinned to the viewport bottom, above the tab bar). Iter 7: "Upcoming" and
+          "Previous" are the SAME style — the first Row of the upcoming list and the
+          last Row of the recent list — so they bookend with identical typography/
+          chevron. Interim peeks of Schedule/History until req-32's unified scroll. */}
       <List>
+        <Row to="/schedule">Upcoming</Row>
         {upcoming.map(({ date, slot, routine }) => (
           <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
         ))}
       </List>
+      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
 
       {todays.length ? (
         todays.map(({ slot, routine }) => (
@@ -226,17 +224,20 @@ export function Today() {
         {recent.map((workout) => (
           <HistoryPeekRow key={workout.id} store={store} workout={workout} />
         ))}
-        <Row to="/history">View past</Row>
+        <Row to="/history">Previous</Row>
       </List>
 
-      {/* Entry to the "choose any workout" picker (/start) — last element, just
-          above the fixed tab bar. Iter 5: a plain nav row (a List Row link, like
-          the "Show all" rows) rather than a styled button, for consistency; label
-          "Routines" (Emilio's call). Hidden mid-workout (!mine). */}
+      {/* Entry to the "choose any workout" picker (/start). Iter 7: pinned to the
+          bottom of the screen — margin-top:auto in the full-height flex column
+          (.ui-screen--fill) drops it just above the fixed tab bar when content is
+          short (the gap falls between Previous and Routines), and it stays the last
+          element (not sticky/fixed) when content scrolls. Hidden mid-workout. */}
       {mine ? null : (
-        <List>
-          <Row to="/start">Routines</Row>
-        </List>
+        <div className="ui-pin-bottom">
+          <List>
+            <Row to="/start">Routines</Row>
+          </List>
+        </div>
       )}
     </Screen>
   )

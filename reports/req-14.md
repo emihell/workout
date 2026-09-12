@@ -190,6 +190,35 @@ header too.
 
 `./check` re-run after iteration 6 — green (145 tests, lint, build).
 
+## Review iteration 7 (Emilio, 2026-09-12)
+
+Three changes on the Workout screen, same branch, not merged. Resulting layout:
+header → **Upcoming›** (plain link) → items → **Today** (emphasized) → Completed
+today → recent items → **Previous›** (plain link) → …gap… → **Routines›** (pinned
+to the viewport bottom, above the tab bar).
+
+1. **"Upcoming" matches "Previous".** Dropped the repurposed section-header styling;
+   "Upcoming" is now the **first `Row` link of the upcoming list** (→ `/schedule`)
+   and "Previous" the **last `Row` link of the recent list** — identical body
+   typography + trailing chevron, bookending their sections.
+2. **"View past" → "Previous"** (target still `/history`).
+3. **"Routines" pinned to the screen bottom.** The Workout `Screen` is now a
+   full-height flex column (`ui-screen--fill`) and the Routines element
+   (`ui-pin-bottom`) has `margin-top:auto`, so on a short screen it drops to just
+   above the fixed tab bar (the empty gap falls between Previous and Routines) and
+   on a long screen it stays the last in-flow element — not sticky/fixed.
+   - CSS: `.ui-screen--fill { display:flex; flex-direction:column; box-sizing:
+     border-box; min-height: calc(100dvh - 72px - env(safe-area-inset-bottom)); }`
+     — the min-height mirrors `<main>`'s reserved tab-bar space so the column
+     reaches the bar's top; `dvh` tracks mobile browser chrome. Scoped to this
+     screen via the modifier class, so other screens are untouched.
+
+Order, Today emphasis, the shared date format, and all actions/status are
+unchanged. **Verified by reasoning, not the browser** (extension still not
+connected): the pin is a standard `margin-top:auto` flex spacer; the risk is the
+`min-height` value vs the real tab-bar height on a device — that's the one thing to
+eyeball. `./check` green.
+
 ## Technical
 
 ### What changed
@@ -317,12 +346,15 @@ list below.
       `+ New`/Add still works.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
-   6. On the Workout tab, top-to-bottom: header → **Upcoming›** (a tappable header
-      → Schedule) + items → **Today** (title-size, spaced, the focal point) →
-      Completed today → Recent items → **View past›** (→ History) → **Routines›**
-      (bottom, → the picker). Every row's info reads the same way — `[when] · [name]
-      — [focus]`, `when` in one format ("Mon, Oct 13"), focus omitted where absent.
-      Today's big primary Start and the Upcoming Start-ahead work.
+   6. On the Workout tab, top-to-bottom: header → **Upcoming›** (plain link →
+      Schedule) + items → **Today** (title-size, spaced, the focal point) →
+      Completed today → Recent items → **Previous›** (plain link → History) →
+      …gap… → **Routines›** (pinned just above the tab bar → the picker). "Upcoming"
+      and "Previous" look identical. On a short screen Routines sits at the bottom
+      with the gap above it; on a long screen it's the last row and the page
+      scrolls. Every row's info reads the same way — `[when] · [name] — [focus]`,
+      `when` in one format ("Mon, Oct 13"), focus omitted where absent. Today's big
+      primary Start and the Upcoming Start-ahead work.
    7. On the Schedule and History pages, Back returns you to Workouts.
    8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.
