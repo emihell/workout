@@ -1,6 +1,6 @@
 # req-39 — reject a malformed backup cleanly instead of a raw TypeError (audit F-RISK-4)
 
-**Status: READY.** From audit 2026-09-12 (F-RISK-4). **Gate: functional** — the
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-39` (`79ccfcc`…`79ccfcc`, 1 commit).** From audit 2026-09-12 (F-RISK-4). **Gate: functional** — the
 fix is input *validation* on the import path; it only rejects bad backups earlier
 and cannot make a good import worse. A round-trip test proves no false-reject; a
 quick real-backup import at merge is welcome (import is a bulk write).
