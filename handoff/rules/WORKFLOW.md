@@ -180,8 +180,8 @@ The planning session and Claude Code work in **different directories on disk**,
 sharing one repository:
 
 ```
-~/projects/workout-app/workout-app-codebase   Claude Code.  main + req-* branches.
-~/projects/workout-app/workout-app-planning    planning session.  branch `planning`.
+~/projects/workout/workout-codebase   Claude Code.  main + req-* branches.
+~/projects/workout/workout-planning    planning session.  branch `planning`.
 ```
 
 A git working tree is per-checkout, not per-branch — one folder means one

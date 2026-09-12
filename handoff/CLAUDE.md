@@ -1,11 +1,11 @@
 # CLAUDE.md
 
 > **Are you the planning session?** If you're working in the
-> `workout-app-planning` worktree (branch `planning`), this file is **not** your
+> `workout-planning` worktree (branch `planning`), this file is **not** your
 > guide — read **`handoff/PLANNING.md`** instead, and note that for you
 > `handoff/` is **yours to write**, not read-only. The "handoff/ is read-only to
 > you" rule below, and everything else in this file, is **Claude Code's**, in the
-> code worktree (`workout-app-codebase`). The two files are counterparts: this
+> code worktree (`workout-codebase`). The two files are counterparts: this
 > one is how to *build*, `PLANNING.md` is how to *plan*.
 
 Instructions for Claude Code working in this repository.

@@ -51,17 +51,17 @@ req-N` (idempotent; it clears the lock and recovers).
 ## Fallback — the manual block (only if `closeout` can't run)
 Paste-safe, no inline comments. This is what `closeout` automates, line for line.
 ```
-rm -f ~/projects/workout-app/workout-app-codebase/.git/index.lock
-cd ~/projects/workout-app/workout-app-codebase
+rm -f ~/projects/workout/workout-codebase/.git/index.lock
+cd ~/projects/workout/workout-codebase
 git checkout main
 git merge --no-ff req-N -m "Merge branch 'req-N'"
-cd ~/projects/workout-app/workout-app-planning
+cd ~/projects/workout/workout-planning
 ./plan save "req-N merged"
 ./plan publish
-cd ~/projects/workout-app/workout-app-codebase
+cd ~/projects/workout/workout-codebase
 git push origin main planning
 git branch -d req-N
-cd ~/projects/workout-app/workout-app-planning && ./plan status
+cd ~/projects/workout/workout-planning && ./plan status
 ```
 Why each line: `rm -f ...index.lock` FIRST — a cloud session may have left a stale lock
 that blocks `checkout`; harmless if absent, the line that always gets forgotten.

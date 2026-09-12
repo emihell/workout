@@ -20,7 +20,7 @@ Emilio writes the code — in Claude Code, not here.
   "here's roughly what it should look like" that turns into the implementation.
   Config or a shell command in a requirement is fine — that *is* the spec.
 - **Write only inside `handoff/`.** Read the whole repository freely.
-- **Work from the planning worktree**, `~/projects/workout-app/workout-app-planning`,
+- **Work from the planning worktree**, `~/projects/workout/workout-planning`,
   on branch `planning`. Never edit `handoff/` in the code worktree — that's Claude
   Code's checkout. `rules/WORKFLOW.md` explains why.
 - **You own the planning worktree's git (DEC-005). The worktrees stay isolated:
@@ -175,7 +175,7 @@ pastes it; he reads them first and sometimes doesn't send them.
 ## The two-agent build loop (DEC-009)
 
 The primary way build work flows now: **you ping code CC directly** (`SendMessage` to its
-session, e.g. `workout-app-codebase-a4`), it builds and reports back, you verify and close.
+session, e.g. `workout-codebase-a4`), it builds and reports back, you verify and close.
 
 **Precondition — only READY, tagged reqs enter the loop.** A req is pingable only when it is
 `READY` (no open decisions) and carries its **Gate** tag (functional / ux-feel / persisted-data /
@@ -246,10 +246,10 @@ All of it is yours (DEC-005/006/008/009) — run it in your own tool calls, neve
 into a fenced block for Emilio:
 
 ```
-../workout-app-codebase/plan save "message"                 # commit handoff/ to planning
+../workout-codebase/plan save "message"                 # commit handoff/ to planning
 git push origin planning                                    # push the planning branch
 cd <code> && ./plan publish && git push origin main planning   # publish docs to main (after the gate)
-../workout-app-codebase/plan closeout req-NN                # merge a built branch (after the merge gate)
+../workout-codebase/plan closeout req-NN                # merge a built branch (after the merge gate)
 ```
 
 Run each as a separate tool call, not one long `&&` chain across a paste boundary. Report

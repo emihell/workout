@@ -81,7 +81,7 @@ planning.** So ownership is drawn at the worktree boundary, not at "git vs no gi
 
 Granted via fixed `Bash` allow-rules in planning's `.claude/settings.json`, scoped to
 planning-only writes (`git add/commit/reset/restore`, `git push origin planning`,
-`../workout-app-codebase/plan save`, `plan status`) — deliberately **not** `plan publish` or a
+`../workout-codebase/plan save`, `plan status`) — deliberately **not** `plan publish` or a
 bare `git push`. The deny on editing the settings files stays. Supersedes the "Don't run git
 commands that write" rule in `PLANNING.md`. **Partly superseded by DEC-006** (the planning
 session now runs the merge/closeout, relaxing the isolation line for that operation).
@@ -99,7 +99,7 @@ not OK'd.
 This is a **deliberate, scoped relaxation of DEC-005's "planning never touches code"**: closeout
 merges the feature branch into `main`, moves `main`, and pushes it — planning touching code, on
 purpose, for the merge only. Everything else in DEC-005 holds (planning still doesn't build, doesn't
-edit code, doesn't drive the code CC). Granted by adding `Bash(../workout-app-codebase/plan
+edit code, doesn't drive the code CC). Granted by adding `Bash(../workout-codebase/plan
 closeout:*)` to `settings.local.json` (gitignored, planning-worktree-local; the classifier blocks
 the planning session from writing its own grant, so Emilio pastes it). Standalone `plan publish`
 of doc-only changes is still not in the grant — those ride the next closeout or are handed over —
