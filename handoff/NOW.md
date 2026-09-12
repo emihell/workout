@@ -24,7 +24,7 @@ Decisions DEC-028..033 taken; planning-side done (`reference/schema.md`, DESIGN 
 **Trust bugs first** (persisted-data → Emilio's hands): corrupt-`v8` (DEC-032), v5 migration test,
 UTC→local date, backup validation, progression unify. **Then:** cross-tab warn (DEC-029), n/a holds
 (DEC-030), archive names slots (DEC-031). **Cleanup:** dead code, dedupe, split `model.js`/`item.jsx`,
-doctor content-check. Reqs specced one at a time from here.
+doctor content-check. Reqs specced one at a time from here. **Building now: `req-36`** (corrupt-`v8` guard).
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
