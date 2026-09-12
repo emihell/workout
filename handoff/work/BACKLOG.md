@@ -169,6 +169,17 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ---
 
+## Workflow / tooling backlog (infra, not product)
+
+- **Per-branch preview deploy (a branch → its own HTTPS URL).** Twice in the 2026-09-12 audit run
+  (req-41 cross-tab, req-44 gym-flow walk) the planning session couldn't browser-verify a UI req
+  itself — serving the branch means running the code worktree, which crosses the planning/code
+  boundary (DEC-005) — so the browser check fell to Emilio. **L-003 already floated this** for
+  secure-context device features (wake-lock/notifications need HTTPS, unreachable on the LAN dev
+  server). A preview deploy per branch would let planning close UX/browser gates without touching the
+  code worktree, and unblock device-API testing. Infra; sizeable (CI/hosting decision). Revisit when
+  UI-heavy reqs (Phase 1 polish, Phase 2 creation flow) make the manual eyeballs a bottleneck.
+
 ## Dependency map (why the order is what it is)
 
 ```

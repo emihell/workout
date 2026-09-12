@@ -218,9 +218,22 @@ them — but only when he has explicitly approved that batch in advance. Absent 
 prompt for the clear at each close. Never skip it on your own initiative, and never assume a
 prior batch approval carries to the next one.
 
+**Pre-spec a known work-list; don't spec one-at-a-time reactively.** When the reqs are already
+known (an audit's findings, a batch of small fixes), write and publish several `READY` req docs
+*up front* — the planning side parallelizes even though builds still run one at a time. In the
+2026-09-12 audit run each req was specced only after the previous merged, which serialized planning
+needlessly. This is separate from build-batching (skipping `/clear`, above) — pre-speccing needs no
+Emilio OK; it's just getting the specs ready ahead of the loop.
+
 **Either side stops** for a question; you stop at a human gate. **Loop-hang recovery:** if the
 idle notice fires but the branch has no ready commit, CC probably stopped to ask Emilio in its own
 session — surface *"CC went idle without a ready branch — did it hit a question?"*, don't wait blind.
+
+**The idle notice trails CC's report — CC's `SendMessage` report is the real completion signal.**
+The `notify_when_idle` echo fires on CC's *prior* turn's idle, so its harness summary names the req
+you already handled (looks "stale"). Don't act on the idle notice as a completion — act on CC's
+report message. Keep `notify_when_idle` only as the **stall backstop** (the req-40 usage-limit case:
+CC went idle *without* reporting). Setting it on every dispatch just adds trailing echoes.
 
 **Report findings during the run and reflect at the end** — patch this file / a `DEC-`/`L-`. The
 loop improves by use.
