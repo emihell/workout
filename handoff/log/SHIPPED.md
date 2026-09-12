@@ -517,3 +517,17 @@ is the local day while the old UTC slice is the prior day (deterministic, real b
 a source-guard test enforcing the grep. Merge `e0c49e0` (branch `req-38`, `c8eebd2`, 1 commit). Merge
 note: existing workouts keep their old (possibly UTC-off-by-one) `performedOn`; only new workouts are
 local; mixed old/new expected.
+
+## req-39 — reject a malformed backup cleanly, not a raw TypeError (audit F-RISK-4)  (merged 2026-09-12)
+
+A backup whose `state.workouts` or `state.schedule.slots` was a non-array threw `"map is not a
+function"` (in `migrateState`'s `.map`) instead of the friendly `"Not a workout database backup."`
+Fix: a `collectionsAreArrays` guard in `unwrapBackup` (`exchange.js`) — a collection field present but
+not an array rejects (→ friendly message); absent stays fine; `schedule?.slots` handled. Applied to
+both the wrapped `{kind,state}` and bare-document paths (the bare path previously checked only
+exercises + a routine-family array, so it had the same hole — now closed). **`migrateState`/`model.js`
+deliberately untouched:** guarding its `.map` sites would make it succeed on corrupt data, defeating
+req-36's load-path corrupt-`v8` guard (silent overwrite) — so validation lives at the import boundary
+only. Diff: `exchange.js` + `exchange.test.js` only. `./check` green, `exchange.test.js` 9 tests. Gate:
+functional (validation-only; tests prove the two repros throw the friendly message AND a real
+`buildBackup` round-trips without false-reject). Merge `a10403a` (branch `req-39`, `79ccfcc`, 1 commit).
