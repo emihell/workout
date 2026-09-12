@@ -4,6 +4,7 @@ import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing, NavLink } from './shared'
+import { exerciseDeletionImpact } from '../storage'
 import { Banner, Button, Field, List, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 
 const TYPE_LABELS = {
@@ -316,7 +317,17 @@ export function ExerciseDetail({ exerciseId }) {
       ) : null}
       <Button
         onClick={() => {
-          if (!window.confirm(`Delete ${ex.name}?`)) return
+          // req-43 / DEC-031 — name the blast radius (store still archives-vs-
+          // deletes on history; this only describes it). Count only when > 0.
+          const impact = exerciseDeletionImpact(store, ex.id)
+          const removes =
+            impact.routines > 0
+              ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'} (and any planned workouts).`
+              : ''
+          const head = impact.hasHistory
+            ? `${ex.name} has past workouts and will be archived (kept in your history).`
+            : `Delete ${ex.name}?`
+          if (!window.confirm(head + removes)) return
           store.removeExercise(ex.id)
           go('/exercises')
         }}
