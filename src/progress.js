@@ -25,7 +25,10 @@ export function validWeights(exercise, max = 250) {
 export function moveToValidWeight(weight, exercise, direction) {
   const current = Number(weight) || 0
   const options = validWeights(exercise, Math.max(250, current + 100))
-  if (!options.length) return Math.max(0, Math.round((current + direction * 0.5) * 2) / 2)
+  // req-42 / DEC-030 — no valid increment (e.g. weightStep:'n/a'): hold, never
+  // invent a step. The recommendation is computed from history using the exercise's
+  // *valid* increments; a 0.5 kg default is a load the config never defines.
+  if (!options.length) return current
   if (direction > 0) return options.find((option) => option > current) ?? options.at(-1)
   return [...options].reverse().find((option) => option < current) ?? options[0]
 }
@@ -54,6 +57,10 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
   const weights = []
   let movedUp = false
   let movedDown = false
+  // req-42 / DEC-030 — computed once (exercise is constant across the sets). With no
+  // valid increment the weighted branch holds instead of moving, so action stays
+  // 'keep' and the reported weight never contradicts the action.
+  const hasIncrements = validWeights(exercise).length > 0
 
   ;(sets || []).forEach((set, index) => {
     const actualWeight = Number(set.weight) || 0
@@ -78,11 +85,19 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
     }
 
     if (missed || rpe >= 5) {
-      weights.push(moveToValidWeight(actualWeight, exercise, -1))
-      movedDown = true
+      if (hasIncrements) {
+        weights.push(moveToValidWeight(actualWeight, exercise, -1))
+        movedDown = true
+      } else {
+        weights.push(actualWeight)
+      }
     } else if (!missed && rpe != null && rpe <= 2) {
-      weights.push(moveToValidWeight(actualWeight, exercise, 1))
-      movedUp = true
+      if (hasIncrements) {
+        weights.push(moveToValidWeight(actualWeight, exercise, 1))
+        movedUp = true
+      } else {
+        weights.push(actualWeight)
+      }
     } else {
       weights.push(actualWeight)
     }

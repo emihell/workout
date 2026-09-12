@@ -24,3 +24,44 @@ describe('dated recommendation loads', () => {
     assert.equal(result.action, 'up')
   })
 })
+
+describe('req-42 / DEC-030 — no valid increment holds (audit F-DIV-1)', () => {
+  const naExercise = { type: 'machine', weightStep: 'n/a' }
+
+  it('moveToValidWeight never invents a step when there are no options', () => {
+    assert.equal(moveToValidWeight(40, naExercise, 1), 40)
+    assert.equal(moveToValidWeight(40, naExercise, -1), 40)
+  })
+
+  it('a would-go-up set (rpe <= 2) holds instead of drifting +0.5', () => {
+    const result = recommendNextPrescription({
+      targets: ['10'],
+      sets: [{ weight: 40, reps: '10', rpe: 2 }],
+      exercise: naExercise,
+    })
+    assert.deepEqual(result.weights, [40])
+    assert.equal(result.action, 'keep')
+    assert.equal(result.reason, 'Same load.')
+  })
+
+  it('a would-go-down set (missed / rpe >= 5) holds instead of drifting -0.5', () => {
+    const result = recommendNextPrescription({
+      targets: ['10'],
+      sets: [{ weight: 40, reps: '8', rpe: 5 }],
+      exercise: naExercise,
+    })
+    assert.deepEqual(result.weights, [40])
+    assert.equal(result.action, 'keep')
+    assert.equal(result.reason, 'Same load.')
+  })
+
+  it('an exercise WITH a valid step still moves down (regression)', () => {
+    const result = recommendNextPrescription({
+      targets: ['10'],
+      sets: [{ weight: 23, reps: '8', rpe: 5 }],
+      exercise: { type: 'machine', weightStep: 'Alt 4/5' },
+    })
+    assert.deepEqual(result.weights, [18])
+    assert.equal(result.action, 'down')
+  })
+})
