@@ -1,6 +1,6 @@
 # req-45 — plan doctor compares grant *contents*, not just existence (DEC-028 follow-up)
 
-**Status: READY.** From the DEC-028 follow-up (surfaced during the F-CONFIG-1 fix).
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-45` (`1aaacfa`…`1aaacfa`, 1 commit).** From the DEC-028 follow-up (surfaced during the F-CONFIG-1 fix).
 **Gate: functional** — workflow tooling (`plan` script); planning verifies by
 running `plan doctor` + merges. No app code, no persisted data.
 
