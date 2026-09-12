@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–43** (req-10 pending; req-24
+Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–44** (req-10 pending; req-24
 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
 `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -24,10 +24,10 @@ Decisions DEC-028..033 taken; planning-side done (`reference/schema.md`, DESIGN 
 **Trust bugs first** (persisted-data → Emilio's hands): corrupt-`v8` (DEC-032), v5 migration test,
 UTC→local date, backup validation, progression unify. **Then:** cross-tab warn (DEC-029), n/a holds
 (DEC-030), archive names slots (DEC-031). **Cleanup:** dead code, dedupe, split `model.js`/`item.jsx`,
-doctor content-check. **req-36–43 shipped** — all trust bugs + behaviour reqs done. **Cleanup left:**
-`req-44` dead code + dedupe predicates + Routine split (building, L-005 gate); `req-45` doctor
-content-check. Module splits (F-STRUCT-4) **deferred** (low-value, higher risk). L-007. req-41 two-tab
-eyeball left to Emilio.
+doctor content-check. **req-36–44 shipped** — trust bugs + behaviour + cleanup dedupe all done.
+**Last: `req-45`** `plan doctor` content-check (building) — the DEC-028 follow-up. Module splits
+(F-STRUCT-4) **deferred** (low-value, higher risk). L-007. req-41 two-tab eyeball left to Emilio.
+Audit 2026-09-12 → essentially closed after req-45.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 

@@ -588,3 +588,18 @@ archived (kept in your history). This removes 2 schedule slots and 1 planned wor
 the diff** - removeRoutine/removeExercise byte-unchanged. `./check` green, 15 test files. Gate: functional
 (wording eyeball welcome; native confirm, inline UI is still req-24). Merge `11b1a70` (branch `req-43`,
 `ecc4aef`, 1 commit).
+
+## req-44 — cleanup: dead export + dedupe drifted predicates (audit F-DEAD-1, F-STRUCT-1/2/3/5)  (merged 2026-09-12)
+
+Pure refactor, no behaviour change except one intended fix. (1) Removed dead `nextScheduled`
+(schedule.js). (2) `isSkippedSet` unified to one export from `workout-log.js` (was 2 defs + inline uses
+in model/item/storage/finish) — `finish.jsx` had dropped the `|| ''` guard (`String(set.reps)`), now
+uses the guarded helper so a null/undefined reps no longer stringifies to "null" (the one edge-case fix).
+(3) `isDurationTarget` exported from `progress.js`, item.jsx's copy removed. (4) New pure
+`isWeightedType(type)` in `ids.js` replaces four spellings (usesWeight/usesLoad/weighted/bodyweight-inverse),
+each caller reading its own field; verified value-equivalent (e.g. `!isWeightedType(t)` ≡
+`t==='bodyweight'||t==='cardio'`). (5) Routine.jsx reuses one `weightParts`. L-005 receipts: import audit
+(every relocated symbol imported at each use; no cycle — ids imports nothing) + browser walk of set-log /
+Finish / Routine / Exercises (Emilio). Pure unit tests for the 3 predicates incl. null/undefined edges.
+`./check` green, 15 test files. Gate: functional + L-005 browser walk. Merge `96d3865` (branch `req-44`,
+`875e1b9`, 1 commit).
