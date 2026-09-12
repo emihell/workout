@@ -104,3 +104,16 @@ unify — the shared helper must land in a pure module, not inline in `finish.js
 (cross-tab warn — the storage-event reconcile logic should be a pure function the store wires up). A
 JSX-capable test runner would remove the constraint but is a real toolchain change — not in scope for
 an audit-fix; flagged here so store-testing limits are planned for, not discovered at the gate.
+
+## L-008 — the canonical grant list now lives in two places, coupled only by a comment  (2026-09-12)
+
+req-45 gave `plan doctor` a content check that compares `settings.local.json`'s `permissions.allow` to a
+canonical grant list — so that list is now hardcoded in **both** README §Setup step 5 (the printf paste a
+new machine runs) **and** `plan`'s `canonical_grants` array, joined only by a "KEEP IN SYNC WITH README
+§Setup step 5" comment. Nothing enforces the sync: change the grants in one place and the other silently
+disagrees — README would hand a new machine a list that `plan doctor` then flags as drift, or vice-versa.
+This was the deliberate trade (reading the list *from* README was ruled fragile/out-of-scope, req-45), so
+it's an accepted coupling, not a mistake — but it's real. Rule: **whenever the planning grants change (a
+new push form, a new `plan` verb), update all three together in the same commit** — README §Setup step 5,
+`plan`'s `canonical_grants`, and the relevant `DEC-` (DEC-005/026 enumerate them) — and re-run `plan
+doctor` to confirm they agree. A future consolidation (single source both read from) would retire this.

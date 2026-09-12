@@ -603,3 +603,16 @@ each caller reading its own field; verified value-equivalent (e.g. `!isWeightedT
 Finish / Routine / Exercises (Emilio). Pure unit tests for the 3 predicates incl. null/undefined edges.
 `./check` green, 15 test files. Gate: functional + L-005 browser walk. Merge `96d3865` (branch `req-44`,
 `875e1b9`, 1 commit).
+
+## req-45 — plan doctor compares grant contents, not just existence (DEC-028 follow-up)  (merged 2026-09-12)
+
+`plan doctor`'s grants check only tested that `settings.local.json` exists — blind to content drift (a
+stale/narrow/over-broad grant list passed). Now it parses `permissions.allow` (python3, order-independent
+set comparison against a hardcoded canonical 10-grant array with a "KEEP IN SYNC WITH README §Setup step
+5" comment) and reports missing AND extra grants; `ok` only on exact match; malformed/non-list → a FIX,
+not a crash; missing-file FIX + DEC-027 exit semantics unchanged. Receipts: real `./plan doctor` → "ok
+grants — matches all 10 canonical grants" (planning independently confirmed post-merge); removed/extra/
+malformed cases driven through a faithful throwaway copy (real file never touched, L-001). `./check` green,
+182 tests. Gate: functional (workflow tooling). Merge `3791bdd` (branch `req-45`, `1aaacfa`, 1 commit).
+Coupling noted (L-008): the canonical grant list now lives in both README §Setup step 5 and `plan` — sync
+comment only, nothing enforces it. **Audit 2026-09-12 closed** with this req.

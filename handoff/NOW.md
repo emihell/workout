@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–44** (req-10 pending; req-24
+Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–45** (req-10 pending; req-24
 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
 `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -18,16 +18,12 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Tooling (SHIPPED 2026-09-12):** req-33/34/35. Grants stay machine-local (DEC-028; tracking
 tried+reverted, F-CONFIG-1) — `plan doctor` green.
 
-## Audit 2026-09-12 → req queue (`audits/2026-09-12.md`, 20 findings)
+## Audit 2026-09-12 — CLOSED (`audits/2026-09-12.md`)
 
-Decisions DEC-028..033 taken; planning-side done (`reference/schema.md`, DESIGN §1 carry, "Correct").
-**Trust bugs first** (persisted-data → Emilio's hands): corrupt-`v8` (DEC-032), v5 migration test,
-UTC→local date, backup validation, progression unify. **Then:** cross-tab warn (DEC-029), n/a holds
-(DEC-030), archive names slots (DEC-031). **Cleanup:** dead code, dedupe, split `model.js`/`item.jsx`,
-doctor content-check. **req-36–44 shipped** — trust bugs + behaviour + cleanup dedupe all done.
-**Last: `req-45`** `plan doctor` content-check (building) — the DEC-028 follow-up. Module splits
-(F-STRUCT-4) **deferred** (low-value, higher risk). L-007. req-41 two-tab eyeball left to Emilio.
-Audit 2026-09-12 → essentially closed after req-45.
+20 findings → 19 resolved: F-CONFIG-1 + req-36–45 (5 trust bugs, 3 behaviour reqs, cleanup dedupe, doctor
+content-check) all shipped. New: DEC-028..034, L-007/008, `reference/schema.md`. **Only F-STRUCT-4
+(model.js/item.jsx module splits) deferred** — low-value, higher risk; revive if wanted. Non-blocking
+Emilio eyeballs: req-41 two-tab, req-44 gym-flow walk.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
