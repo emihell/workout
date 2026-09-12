@@ -36,9 +36,6 @@ DEC-009-refinement auto-merge). Emilio to gym-test req-25/27 feel. Audit 2026-09
 
 - **`req-24` native confirm/alert → inline UI** (from req-15 finding #11) — 10 sites; needs the
   inline-confirm *pattern* decided first (bar/sheet vs two-tap vs undo). **[ux-feel]** Spec: `work/req-24-inline-confirm-alert.md`.
-- **`req-14` nav/menu redesign** — Emilio isn't a fan of req-13's placeholder menu; redesign it, but
-  the *direction* (bottom tab bar / slide-up sheet / drawer / cleaner top menu) needs deciding first.
-  Current menu stays meanwhile. `work/req-14-nav-menu-redesign.md`. **[ux-feel]**
 - **Backend fork** (gates all of Phase 3): browser-only vs a database/server? "Database" and
   "users" are one decision; an AI key can't live in a browser. Decide before any Phase-3 build.
 - **History recalc from a non-latest workout** (Phase 1 behaviour) — see BACKLOG.

@@ -436,7 +436,7 @@ primary Start; empty day → "Nothing scheduled today." + disabled Start) → Co
 picker). All rows share one info format (`date · name — focus`, one formatter `Mon, Oct 13`, focus from
 immutable snapshot, never invented). Schedule/History got Back buttons. Pure routing/UI, **no
 persisted-data change**. Built as the shell only; req-32 (full unified scroll + inline schedule editing)
-is the follow-on. Merge `<MERGE>` (branch `req-14`, `52515fa`…`ba5ccd0`, 9 commits — 1 build + 8 review
+is the follow-on. Merge `49dadc4` (branch `req-14`, `52515fa`…`ba5ccd0`, 9 commits — 1 build + 8 review
 iterations with Emilio). `./check` green, 145 tests. Gate: Emilio drove the whole redesign in-browser
 over 8 passes and approved ("its good, lets merge").
 
