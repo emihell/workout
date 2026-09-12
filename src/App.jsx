@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { StoreProvider } from './store'
-import { getSaveFailed, subscribeSaveFailed } from './storage'
+import { getSaveFailed, subscribeSaveFailed, getLoadUnreadable, subscribeLoadUnreadable } from './storage'
 import { ErrorBoundary } from './error-boundary'
 import { WakeLock } from './wake-lock'
 import { RestEndCue } from './rest-cue'
@@ -30,6 +30,25 @@ function SaveFailedBanner() {
   return (
     <div role="alert">
       Couldn't save your last change. Your data may not persist — export a backup from Settings.
+    </div>
+  )
+}
+
+// req-36 / DEC-032 — distinct from SaveFailedBanner: the stored data was present
+// but unreadable, so the app is showing an empty history and has stopped saving to
+// avoid overwriting the corrupt-but-recoverable value. Persistent until the key is
+// resolved out-of-band (a reload with a readable value clears the signal).
+function LoadUnreadableBanner() {
+  const unreadable = useSyncExternalStore(
+    subscribeLoadUnreadable,
+    getLoadUnreadable,
+    getLoadUnreadable,
+  )
+  if (!unreadable) return null
+  return (
+    <div role="alert">
+      Couldn't read your saved data. It's still on this device but unreadable — don't clear
+      your browser data. Nothing you do now will be saved. Seek recovery before making changes.
     </div>
   )
 }
@@ -176,6 +195,7 @@ export default function App() {
       <WakeLock />
       <RestEndCue />
       <SaveFailedBanner />
+      <LoadUnreadableBanner />
       <main className="ui-main">
         <ErrorBoundary>
           <Screen />
