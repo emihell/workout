@@ -1,6 +1,6 @@
 # req-44 — cleanup: dead export + dedupe drifted predicates (audit F-DEAD-1, F-STRUCT-1/2/3/5)
 
-**Status: READY.** From audit 2026-09-12 (F-DEAD-1, F-STRUCT-1/2/3/5). Pure
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-44` (`875e1b9`…`875e1b9`, 1 commit).** From audit 2026-09-12 (F-DEAD-1, F-STRUCT-1/2/3/5). Pure
 refactor, **no behaviour change**. **Gate: functional, but L-005 applies** — this
 relocates symbols across modules, and oxlint does not flag a missing import, so the
 receipts are an import audit + a browser walk of the affected screens (planning
