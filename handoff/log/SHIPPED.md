@@ -546,3 +546,18 @@ finish matcher missed (would've saved stale `[40]`) now yields `[45]` from both 
 fallback, normal-case regression guard, wu/skipped exclusion. `./check` green, model.test.js 11 tests.
 Interrupted mid-build by a usage-limit reset, resumed cleanly. Gate: persisted-data/behaviour → Emilio
 used it before merge. Merge `078d2c5` (branch `req-40`, `ab4706b`, 1 commit).
+
+## req-41 — warn when another tab changes the data (audit F-RISK-3)  (merged 2026-09-12)
+
+Two open tabs were last-writer-wins over the whole `workout-mvp-v8` key — a stale tab could clobber
+another's finished workout with no warning (no `storage` listener existed). Fix (DEC-029, warn-only):
+a pure `isExternalStateChange(event)` predicate in `storage.js` (`event.key === STORAGE_KEY ||
+event.key === null`) + a signal trio backed by a single lazily-registered, window-guarded `storage`
+listener (so `storage.js` still imports under `node --test`); one-way latch (a reload clears it). A
+distinct `ExternalChangeBanner` in `App.jsx` ("Another tab changed your data — reload…") with a Reload
+button. `saveState`/`loadState` untouched. No merge, no hold-saves (DEC-029 — warn-only doesn't
+*prevent* a determined clobber, just surfaces it). `./check` green, 165 tests (predicate: 4 cases).
+Gate: functional — merged on unit test + line-by-line review; the two-tab end-to-end (open two tabs,
+write in A, banner in B) is a standard-platform eyeball left to Emilio post-merge (warn-only, no data
+write, fully reversible; a clean two-tab test would need the branch served from the code worktree,
+crossing the DEC-005 boundary). Merge `fb2d7f7` (branch `req-41`, `1171e95`, 1 commit).
