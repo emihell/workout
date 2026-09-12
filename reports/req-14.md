@@ -67,6 +67,30 @@ The active-underline strength is unchanged this pass (Emilio will judge it on te
 
 `./check` re-run after iteration 2 — green (145 tests, lint, build).
 
+## Review iteration 3 (Emilio, 2026-09-12)
+
+One CSS fix, same branch, not merged. Emilio: *"primary button text is black."*
+
+**Cause (a specificity bug the iter-2 DEC-016 fix exposed):** making the tabs `<a>`
+put them under the global anchor reset `a, a:visited, a:hover, a:active { color:
+inherit }`. The state selectors there are `(0,1,1)`, which outranks the variant
+class `.ui-btn--primary { color: var(--ui-bg) }` `(0,1,0)`. The active tab links to
+the current page, so the browser treats it as `:visited` → text falls back to
+`inherit` (ink) on the ink-primary background = **black-on-black**. Plain state was
+fine; only the current tab (visited/hover) broke.
+
+**Fix** (`ui.css`, right after the reset): re-assert each variant's color for a
+button-styled anchor across all states —
+`a.ui-btn--primary{,:visited,:hover,:active}` → `var(--ui-bg)`; the secondary/quiet
+selectors → `var(--ui-ink)`. Specificity `(0,2,1)` (class + pseudo) beats the
+reset's `(0,1,1)`. Chose the general `a.ui-btn--*` form over a tab-bar-scoped
+selector so any future anchor wearing `.ui-btn` is covered too.
+
+**Verification is by specificity reasoning, not the browser** (extension still not
+connected): the winning rule is `(0,2,1)` vs the reset's `(0,1,1)` for every state
+(`:visited`/`:hover`/`:active` and the base), so the primary tab's text resolves to
+`--ui-bg` in all states and secondary/quiet stay `--ui-ink`. `./check` green.
+
 ## Technical
 
 ### What changed

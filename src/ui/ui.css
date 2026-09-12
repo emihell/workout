@@ -50,6 +50,31 @@ a:active {
   color: inherit;
 }
 
+/* A button-styled anchor (the TabBar link-tabs, req-14 — an <a> wearing .ui-btn)
+ * must keep its variant text color in EVERY state. The reset above pins
+ * a:visited/:hover/:active to `inherit` at specificity (0,1,1), which beats a bare
+ * variant class (0,1,0); the active tab is a self-link (so :visited) → its text
+ * fell back to ink, i.e. black-on-black on the ink primary. Re-assert each
+ * variant's color for all states at a winning specificity ((0,2,1) via
+ * class+pseudo). DRY + future-proof: any anchor that later wears .ui-btn is
+ * covered, not just the tab bar. */
+a.ui-btn--primary,
+a.ui-btn--primary:visited,
+a.ui-btn--primary:hover,
+a.ui-btn--primary:active {
+  color: var(--ui-bg);
+}
+a.ui-btn--secondary,
+a.ui-btn--secondary:visited,
+a.ui-btn--secondary:hover,
+a.ui-btn--secondary:active,
+a.ui-btn--quiet,
+a.ui-btn--quiet:visited,
+a.ui-btn--quiet:hover,
+a.ui-btn--quiet:active {
+  color: var(--ui-ink);
+}
+
 /* ---- Screen container + type scale ---- */
 .ui-screen {
   font-family: var(--ui-font);
