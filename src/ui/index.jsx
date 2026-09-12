@@ -1,13 +1,14 @@
 // req-13 / DEC-017 — the minimal, colorless, Apple-inspired component library.
 //
 // First iteration: as little code as possible, grayscale only, every interactive
-// target ≥44px. These are bare primitives. Only the NavBar is wired into the app
-// (the global shell); every other component lives here + in the #/components
+// target ≥44px. These are bare primitives. Only the TabBar is wired into the app
+// (the global shell, req-14); every other component lives here + in the #/components
 // showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
+import { activeTab, useHashRoute } from '../route'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -204,47 +205,50 @@ export function Row({ children, value, action, to }) {
   )
 }
 
-// NavBar — the global shell (Emilio 2026-09-10, supersedes DEC-018). The bar is
-// just a Menu trigger; ALL six nav items live in the menu (nothing shown outside
-// it). The menu closes when an item is clicked (the <ul> onClick) and when the
-// user clicks outside it (a document mousedown outside the <nav>). This is the ONE
-// component wired into App.jsx.
-const NAV_ITEMS = [
-  { to: '/', label: 'Today' },
-  { to: '/schedule', label: 'Schedule' },
-  { to: '/routines', label: 'Routines' },
-  { to: '/exercises', label: 'Exercises' },
-  { to: '/history', label: 'History' },
-  { to: '/settings', label: 'Settings' },
+// TabBar — the global shell (req-14 / DEC-024, supersedes the req-13 Menu). A
+// fixed bottom bar of three equal tabs — Workouts / Library / Settings — the
+// app's primary navigation on mobile. Each tab wears the component-library Button
+// LOOK via the `ui-btn ui-btn--{variant}` classes (Emilio's review: no custom
+// icons) but is a NavLink/<a> — pure route nav, honouring DEC-016 (buttons are
+// for actions, links for navigation). The variant is a STATIC emphasis hierarchy
+// — Workouts primary, Library secondary, Settings quiet — that never changes. On
+// TOP of that, the CURRENT tab is marked dynamically from activeTab(route.name):
+// aria-current="page" + an `.is-active` underline that reads on every variant
+// (currentColor, so white on the ink primary, ink on the others). So a tab shows
+// both its fixed emphasis AND whether it's the screen you're on. The bar is fixed
+// to the viewport bottom and honours the iOS home-indicator safe area; content
+// clears it via the bottom padding on <main> (ui.css .ui-main). This is the ONE
+// navigation component wired into App.jsx.
+//
+// Hidden during the in-workout flow (route names starting with `workout`): the
+// in-gym screens are focused single-task surfaces and a persistent nav bar that
+// could jump you to Library mid-set fights them (DESIGN: in-gym flow flawless).
+// activeTab still maps those routes to Workouts for completeness/tests.
+const TABS = [
+  { id: 'workouts', to: '/', label: 'Workout', variant: 'primary' },
+  { id: 'library', to: '/routines', label: 'Library', variant: 'secondary' },
+  { id: 'settings', to: '/settings', label: 'Settings', variant: 'quiet' },
 ]
 
-export function NavBar() {
-  const [open, setOpen] = useState(false)
-  const navRef = useRef(null)
-  useEffect(() => {
-    if (!open) return undefined
-    const onDown = (event) => {
-      if (navRef.current && !navRef.current.contains(event.target)) setOpen(false)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [open])
+export function TabBar() {
+  const route = useHashRoute()
+  if (String(route.name).startsWith('workout')) return null
+  const current = activeTab(route.name)
   return (
-    <nav ref={navRef}>
-      <div className="ui-navbar">
-        <Button variant="quiet" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-          Menu
-        </Button>
-      </div>
-      {open ? (
-        <ul className="ui-navbar__menu" onClick={() => setOpen(false)}>
-          {NAV_ITEMS.map((item) => (
-            <li key={item.to}>
-              <NavLink to={item.to}>{item.label}</NavLink>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+    <nav className="ui-tabbar" aria-label="Primary">
+      {TABS.map(({ id, to, label, variant }) => {
+        const selected = current === id
+        return (
+          <BaseNavLink
+            key={id}
+            to={to}
+            className={cx('ui-btn', `ui-btn--${variant}`, 'ui-tabbar__tab', selected && 'is-active')}
+            aria-current={selected ? 'page' : undefined}
+          >
+            {label}
+          </BaseNavLink>
+        )
+      })}
     </nav>
   )
 }

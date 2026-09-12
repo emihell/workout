@@ -1,17 +1,19 @@
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
-import { greeting, weekdayName } from '../ids'
-import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
+import { greeting } from '../ids'
+import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
 import { completedOnDayKey, findRoutine } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
-import { workoutRoutineId, workoutRoutineName } from './history/helpers'
+import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 import { NavLink } from './shared'
 
-function StartButton({ store, routine, slot, date, label = 'Start' }) {
+function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
     <Button
+      variant={variant}
+      block={block}
       onClick={() =>
         startOrContinue(store, routine.id, {
           scheduledFor: date,
@@ -28,35 +30,110 @@ function activeRoutineId(workout) {
   return workout?.routineId || workout?.sessionId
 }
 
-// req-28 — a completed-today workout row, linking to its History detail. Labelled
-// the same way History's list does (program — routine), minus the date (all today).
-function CompletedTodayRow({ store, workout }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
-  const programName = workout.snapshot?.programName
-  const name = workoutRoutineName(workout, routine)
-  const label = programName ? `${programName} — ${name}` : name
-  return <Row to={`/history/${workout.id}`}>{label}</Row>
+// req-14 (Emilio review iter 5) — the ONE shared row-info format for every workout
+// row on the screen (Upcoming / Today / Recent / Completed today): `[when] ·
+// [name] — [focus]`, rendered the same way everywhere so the three sections show
+// the same information the same way. `focus` degrades gracefully — when a source
+// has none (an older history snapshot without focus, or a deleted routine) the
+// "— focus" is dropped rather than invented (DESIGN §1: never invent absent data).
+// `when` is always supplied and uses the one shared `weekdayDate` format across all
+// rows (iter 6). This is INFO only; each row keeps its own action/status (Start,
+// Done, the history link).
+function WorkoutInfo({ when, name, focus }) {
+  return (
+    <>
+      {when} · {name}
+      {focus ? ` — ${focus}` : ''}
+    </>
+  )
 }
 
-function WorkoutRow({ store, routine, slot, date, extra }) {
+// req-28 — a completed-today workout row, linking to its History detail. Uses the
+// shared info format (iter 5); `when` is "Today" (all completed today), focus from
+// the immutable snapshot. Program name dropped so it matches the other sections.
+function CompletedTodayRow({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  return (
+    <Row to={`/history/${workout.id}`}>
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+    </Row>
+  )
+}
+
+// req-14 (Emilio review) — a recent-history peek row linking to the History detail.
+// Shared info format (iter 5): `when` is the workout's date, focus from the snapshot.
+function HistoryPeekRow({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  return (
+    <Row to={`/history/${workout.id}`}>
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+    </Row>
+  )
+}
+
+// req-14 (Emilio review iter 2) — an upcoming (future) scheduled workout in the
+// peek, with an inline Start so you can start ahead directly from Workouts (the
+// behaviour the old Today "Next" section had; Emilio restored it). Today's big
+// primary Start stays the main CTA — upcoming items get a smaller secondary Start.
+// Guards like the today row: already-covered shows `Done …`, in-progress shows no
+// Start (the top-of-screen Continue owns it). Same startOrContinue path. Info via
+// the shared format (iter 5); `when` is the weekday. The Done status stays in the
+// row's value slot; only the weekday moved into the info line.
+function UpcomingRow({ store, date, slot, routine }) {
+  const dk = dateKey(date)
+  const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
+  const mine = store.activeWorkout
+  const inProgress =
+    activeRoutineId(mine) === routine.id && mine?.scheduleSlotId === slot.id && mine.scheduledFor === dk
+  const startAction =
+    !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
+  return (
+    <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
+      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} />
+    </Row>
+  )
+}
+
+// req-14 (Emilio review) — today's workout is the Workout screen's focal point and
+// main call to action. Iter 8: a two-line stack — the bold date on top, then
+// "name — focus" as a secondary line — then a large, primary, full-width Start.
+// `Done …` shows once logged; a workout already in progress shows nothing here
+// (the top-of-screen Continue owns that), matching the pre-review behaviour.
+function TodayWorkout({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
   const mine = store.activeWorkout
   const inProgress =
     activeRoutineId(mine) === routine.id &&
     mine?.scheduleSlotId === slot.id &&
     mine.scheduledFor === date
-  const bits = [extra, routine.focus].filter(Boolean)
-  // `Done …` is informational (value slot); the Start control is a trailing
-  // action. These are mutually exclusive, and inProgress shows neither.
-  const doneLabel = done ? `Done ${dateKey(done.finishedAt)}` : null
-  const startAction =
-    !done && !inProgress ? (
-      <StartButton store={store} routine={routine} slot={slot} date={date} />
-    ) : null
   return (
-    <Row value={doneLabel} action={startAction}>
-      {routine.name} — {bits.join(' · ')}
-    </Row>
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
+      <p className="ui-today-workout__name">
+        {routine.name}
+        {routine.focus ? ` — ${routine.focus}` : ''}
+      </p>
+      {done ? (
+        <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
+      ) : inProgress ? null : (
+        <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
+      )}
+    </div>
+  )
+}
+
+// req-14 (Emilio review iter 8) — the empty-today state keeps the same emphasized
+// Today block: the bold date on top, "Nothing scheduled today." in the name slot,
+// and the big primary Start rendered disabled (there's nothing to start).
+function TodayEmpty({ date }) {
+  return (
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
+      <p className="ui-today-workout__name">Nothing scheduled today.</p>
+      <Button variant="primary" block disabled>
+        Start
+      </Button>
+    </div>
   )
 }
 
@@ -69,7 +146,11 @@ export function Today() {
   const todays = slotsOn(schedule, now)
     .map((slot) => resolveSlot(routines, slot))
     .filter((x) => x.routine)
-  const upcoming = nextScheduled(routines, schedule, now)
+  // Upcoming schedule peek (tomorrow onward) and recent-history peek — two small
+  // previews that each end in a "Show all" to the full page (req-14 review; the
+  // interim before req-32's unified Workouts scroll).
+  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2)
+  const recent = sortWorkoutsByDate(store.workouts || []).slice(0, 2)
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
@@ -100,6 +181,7 @@ export function Today() {
         <List>
           <Row to="/routines">Routines</Row>
           <Row to="/schedule">Schedule</Row>
+          <Row to="/history">History</Row>
           <Row to="/settings">Settings</Row>
         </List>
       </Screen>
@@ -107,7 +189,7 @@ export function Today() {
   }
 
   return (
-    <Screen>
+    <Screen className={mine ? '' : 'ui-screen--subbar'}>
       <Title>{greeting()}</Title>
       {loop > 1 ? (
         <p className="ui-sub">
@@ -122,34 +204,26 @@ export function Today() {
         </p>
       ) : null}
 
+      {/* Section order: Upcoming› (plain link) → items → Today (emphasized) →
+          Completed today → recent items → Previous› (plain link) → gap → Routines›
+          (pinned to the viewport bottom, above the tab bar). Iter 7: "Upcoming" and
+          "Previous" are the SAME style — the first Row of the upcoming list and the
+          last Row of the recent list — so they bookend with identical typography/
+          chevron. Interim peeks of Schedule/History until req-32's unified scroll. */}
+      <List>
+        <Row to="/schedule">Future workouts</Row>
+        {upcoming.map(({ date, slot, routine }) => (
+          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
+        ))}
+      </List>
+      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
+
       {todays.length ? (
-        <>
-          <SectionHeader>Today</SectionHeader>
-          <List>
-            {todays.map(({ slot, routine }) => (
-              <WorkoutRow key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
-            ))}
-          </List>
-        </>
-      ) : upcoming ? (
-        <>
-          <p className="ui-sub">None today.</p>
-          <SectionHeader>Next</SectionHeader>
-          <List>
-            {upcoming.items.map(({ slot, routine }) => (
-              <WorkoutRow
-                key={slot.id}
-                store={store}
-                routine={routine}
-                slot={slot}
-                date={dateKey(upcoming.date)}
-                extra={weekdayName(upcoming.date.getDay())}
-              />
-            ))}
-          </List>
-        </>
+        todays.map(({ slot, routine }) => (
+          <TodayWorkout key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
+        ))
       ) : (
-        <p className="ui-sub">None.</p>
+        <TodayEmpty date={todayKey} />
       )}
 
       {completedToday.length ? (
@@ -163,10 +237,25 @@ export function Today() {
         </>
       ) : null}
 
+      {recent.length === 0 ? <p className="ui-sub">No history yet.</p> : null}
+      <List>
+        {recent.map((workout) => (
+          <HistoryPeekRow key={workout.id} store={store} workout={workout} />
+        ))}
+        <Row to="/history">Past workouts</Row>
+      </List>
+
+      {/* Entry to the "choose any workout" picker (/start). Iter 8: a fixed strip
+          docked directly above the tab bar (bottom chrome, out of the scroll) — the
+          .ui-screen--subbar padding above keeps content clear of it. Replaces the
+          iter-7 flex-pin, which overflowed by a hair. Hidden mid-workout (!mine). */}
       {mine ? null : (
-        <p>
-          <NavLink to="/start">Other</NavLink>
-        </p>
+        <nav className="ui-subbar" aria-label="Routines">
+          <NavLink to="/start" className="ui-subbar__link">
+            <span>Routines</span>
+            <span className="ui-row__chev" aria-hidden="true">›</span>
+          </NavLink>
+        </nav>
       )}
     </Screen>
   )

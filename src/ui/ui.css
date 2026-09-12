@@ -5,7 +5,7 @@
  *   element selectors (button, a, section, input …), so screens that don't use
  *   these classes are visually untouched — the library lives beside the app
  *   until the styling pass migrates screens onto it. The one live consumer is
- *   the NavBar (the global shell) + the #/components showcase.
+ *   the TabBar (the global shell, req-14) + the #/components showcase.
  * TOKENS: grays + an 8px spacing rhythm + radius/size only (DEC-017: "no tokens
  *   beyond spacing/size"). Whitespace, type weight, and 1px hairlines do the work.
  */
@@ -26,6 +26,12 @@
   --ui-s4: 24px;
 
   --ui-tap: 44px; /* Apple HIG minimum tap target */
+  /* Fixed bottom chrome heights (req-14). The tab bar: border(1) + padding
+   * (s2 top + s2 bottom) + a 44px tab + the iOS safe area. The Workout screen's
+   * Routines strip (req-14 iter 8) docks directly on top of it at this offset;
+   * <main> and that screen reserve these so nothing hides behind them. */
+  --ui-tabbar-h: calc(61px + env(safe-area-inset-bottom));
+  --ui-subbar-h: calc(var(--ui-tap) + 1px); /* Routines strip: a 44px row + hairline */
   --ui-radius: 10px;
   --ui-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
@@ -50,6 +56,31 @@ a:active {
   color: inherit;
 }
 
+/* A button-styled anchor (the TabBar link-tabs, req-14 — an <a> wearing .ui-btn)
+ * must keep its variant text color in EVERY state. The reset above pins
+ * a:visited/:hover/:active to `inherit` at specificity (0,1,1), which beats a bare
+ * variant class (0,1,0); the active tab is a self-link (so :visited) → its text
+ * fell back to ink, i.e. black-on-black on the ink primary. Re-assert each
+ * variant's color for all states at a winning specificity ((0,2,1) via
+ * class+pseudo). DRY + future-proof: any anchor that later wears .ui-btn is
+ * covered, not just the tab bar. */
+a.ui-btn--primary,
+a.ui-btn--primary:visited,
+a.ui-btn--primary:hover,
+a.ui-btn--primary:active {
+  color: var(--ui-bg);
+}
+a.ui-btn--secondary,
+a.ui-btn--secondary:visited,
+a.ui-btn--secondary:hover,
+a.ui-btn--secondary:active,
+a.ui-btn--quiet,
+a.ui-btn--quiet:visited,
+a.ui-btn--quiet:hover,
+a.ui-btn--quiet:active {
+  color: var(--ui-ink);
+}
+
 /* ---- Screen container + type scale ---- */
 .ui-screen {
   font-family: var(--ui-font);
@@ -59,6 +90,12 @@ a:active {
   margin: 0 auto;
   padding: var(--ui-s3);
   -webkit-text-size-adjust: 100%;
+}
+/* The Workout screen (req-14 iter 8) reserves room at the bottom for its fixed
+ * Routines strip, which docks above the tab bar — so nothing hides behind it and
+ * it needs no full-height/overflow trick (that caused the iter-7 hairline scroll). */
+.ui-screen--subbar {
+  padding-bottom: calc(var(--ui-subbar-h) + var(--ui-s3));
 }
 .ui-title {
   font-size: var(--ui-text-title);
@@ -115,6 +152,7 @@ a:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none; /* button-styled anchors (a.ui-btn) must not show the UA underline */
   -webkit-appearance: none;
   appearance: none;
 }
@@ -290,23 +328,94 @@ a:active {
   color: var(--ui-ink-3);
 }
 
-/* ---- NavBar (the global shell) ---- */
-.ui-navbar {
-  font-family: var(--ui-font);
+/* ---- TabBar (the global shell, req-14 / DEC-024) ---- */
+/* The main content clears the fixed bar: bar content height + hairline + the iOS
+ * home-indicator safe area. Applied to <main> so every screen scrolls clear of
+ * the bar without each screen knowing about it. */
+.ui-main {
+  padding-bottom: var(--ui-tabbar-h);
+}
+.ui-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  gap: var(--ui-s2);
+  padding: var(--ui-s2);
+  padding-bottom: calc(var(--ui-s2) + env(safe-area-inset-bottom)); /* clear the home indicator */
+  background: var(--ui-bg);
+  border-top: 1px solid var(--ui-line);
+}
+/* Each tab wears the .ui-btn look but is an <a> (DEC-016); it keeps its variant
+ * styling and just shares the width equally. text-decoration:none kills the UA
+ * anchor underline so the base tab matches a Button; the active tab re-adds a
+ * currentColor underline — visible on the ink primary (white) and the light/quiet
+ * variants (ink) alike. */
+.ui-tabbar__tab {
+  flex: 1 1 0;
+  padding-left: 0;
+  padding-right: 0;
+  text-decoration: none;
+}
+.ui-tabbar__tab.is-active {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+}
+
+/* ---- Routines strip (req-14 iter 8) — the Workout screen's fixed "Routines"
+ * link, docked directly on top of the tab bar (bottom chrome, out of the scrolling
+ * content). Its bottom offset is exactly the tab bar's height so they sit flush. */
+.ui-subbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--ui-tabbar-h);
+  z-index: 9; /* just under the tab bar; they don't overlap */
+  background: var(--ui-bg);
+  border-top: 1px solid var(--ui-line);
+}
+.ui-subbar__link {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--ui-s3);
-  padding: var(--ui-s1) var(--ui-s3);
-  border-bottom: 1px solid var(--ui-line);
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: var(--ui-tap);
+  padding: var(--ui-s2) var(--ui-s3);
+  color: var(--ui-ink);
+  text-decoration: none;
 }
-.ui-navbar__menu {
-  list-style: none;
-  margin: 0;
-  padding: 0 var(--ui-s3) var(--ui-s2);
-  border-bottom: 1px solid var(--ui-line);
+
+/* ---- Library toggle (req-14) — the [Routines|Exercises] segmented control
+ * above the hosted list. Matches the .ui-screen gutter/width so it lines up with
+ * the list below it. */
+.ui-library-toggle {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--ui-s3) var(--ui-s3) 0;
 }
-.ui-navbar__menu .ui-navlink {
-  display: flex;
+
+/* ---- Today's workout (req-14 review) — the screen's focal point, generously
+ * spaced. Iter 8: a two-line stack — the DATE is the bold, title-size top line
+ * (the heaviest text on the screen), then "name — focus" as a secondary line,
+ * then the big primary Start. (Upcoming/Past rows keep their single-line format.) */
+.ui-today-workout {
+  margin: var(--ui-s4) 0;
+}
+.ui-today-workout__date {
+  font-size: var(--ui-text-title);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 var(--ui-s1);
+}
+.ui-today-workout__name {
+  font-size: var(--ui-text-body);
+  color: var(--ui-ink-2);
+  margin: 0 0 var(--ui-s3);
 }
 
 /* ---- Banner ---- */

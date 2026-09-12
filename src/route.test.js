@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { applyBack, applyVisit, hashPath, parseRoute } from './route.js'
+import { activeTab, applyBack, applyVisit, hashPath, parseRoute } from './route.js'
 
 describe('back visits the previous screen', () => {
   it('normalizes hashes to paths', () => {
@@ -178,5 +178,78 @@ describe('stable workflow routes', () => {
       name: 'routine-exercise-create-search',
       routineId: 's',
     })
+  })
+})
+
+describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)', () => {
+  // The full inventory of route names parseRoute can return, each asserted
+  // against the tab DEC-024 groups it under. Deep routes must light the group's
+  // tab, not fall through: editing a routine is still Library, a schedule slot is
+  // still Workouts. If parseRoute grows a route name, add it here.
+  const LIBRARY = [
+    'routines',
+    'routine',
+    'routine-new',
+    'routine-edit',
+    'routine-exercise',
+    'routine-exercise-pick',
+    'routine-exercise-new',
+    'routine-exercise-create',
+    'routine-exercise-create-manual',
+    'routine-exercise-create-search',
+    'exercises',
+    'exercises-type',
+    'exercise',
+    'exercise-edit',
+    'exercise-new',
+    'exercise-new-manual',
+    'exercise-new-search',
+  ]
+  const WORKOUTS = [
+    'today',
+    'schedule',
+    'schedule-loop',
+    'schedule-day',
+    'schedule-day-add',
+    'schedule-slot',
+    'history',
+    'history-month',
+    'history-detail',
+    'history-edit',
+    'history-recalculate',
+    'history-routine',
+    'history-set',
+    'history-set-new',
+    'history-exercises',
+    'history-exercise',
+    'history-workout-exercise',
+    'start',
+    'workout',
+    'workout-preview',
+    'workout-setup',
+    'workout-set',
+    'workout-item',
+    'workout-item-log',
+    'workout-item-done',
+    'workout-item-exercise',
+    'workout-finish',
+  ]
+
+  it('maps routines/* and exercises/* to Library', () => {
+    for (const name of LIBRARY) assert.equal(activeTab(name), 'library', name)
+  })
+
+  it('maps today, schedule/*, history/*, the workout flow + start to Workouts', () => {
+    for (const name of WORKOUTS) assert.equal(activeTab(name), 'workouts', name)
+  })
+
+  it('maps settings to Settings and the dev showcase to no tab', () => {
+    assert.equal(activeTab('settings'), 'settings')
+    assert.equal(activeTab('components'), null)
+  })
+
+  it('defaults an unknown route to Workouts (the fallback surface)', () => {
+    assert.equal(activeTab('some-future-route'), 'workouts')
+    assert.equal(activeTab(undefined), 'workouts')
   })
 })

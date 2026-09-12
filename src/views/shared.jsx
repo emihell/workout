@@ -8,9 +8,11 @@ import { back, toHash } from '../route'
 // req-13 added optional `className` (so the ui library can style it) and
 // `chevron` ('back' → leading ‹, 'forward' → trailing ›). Both default off, so
 // every existing call (`<NavLink to>label</NavLink>`) is unchanged.
-export function NavLink({ to, children, className, chevron }) {
+// req-14 forwards any remaining props (`...rest`) onto the <a> — the TabBar needs
+// `aria-current="page"` on the active tab. Additive: existing callers pass none.
+export function NavLink({ to, children, className, chevron, ...rest }) {
   return (
-    <a href={toHash(to)} className={className || undefined}>
+    <a href={toHash(to)} className={className || undefined} {...rest}>
       {chevron === 'back' ? '‹ ' : null}
       {children}
       {chevron === 'forward' ? ' ›' : null}
