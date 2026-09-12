@@ -102,8 +102,9 @@ purpose, for the merge only. Everything else in DEC-005 holds (planning still do
 edit code, doesn't drive the code CC). Granted by adding `Bash(../workout-codebase/plan
 closeout:*)` to `settings.local.json` (gitignored, planning-worktree-local; the classifier blocks
 the planning session from writing its own grant, so Emilio pastes it). Standalone `plan publish`
-of doc-only changes is still not in the grant — those ride the next closeout or are handed over —
-which can be widened later if the hand-off proves annoying.
+of doc-only changes was initially left out of the grant — those rode the next closeout or were
+handed over — **superseded by DEC-008**, which grants `plan publish` to the planning session
+(the widening this note anticipated).
 
 ## DEC-007 — error-boundary fallback auto-recovers on navigation; react-test-renderer adopted for render-tests  (2026-09-09)
 
