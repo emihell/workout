@@ -16,9 +16,6 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY
 
-- `req-32` **unified Workouts scroll** (DEC-024) — replace req-14's interim Workout screen with the
-  full scroll: merge Today+Schedule+History, inline schedule edits. **READY** (req-14 merged); design
-  iterates with Emilio in-branch (open Qs in the spec). Bold/large. **[ux-feel]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
 

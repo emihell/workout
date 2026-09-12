@@ -1,7 +1,11 @@
 # req-32 — the unified Workouts scroll (merge Today + Schedule + History)
 
-Status: READY (req-14 merged 2026-09-12 — the shell + interim Workout screen exist). Direction
-decided; details to iterate with Emilio during build.
+**Status: DROPPED (Emilio, 2026-09-12).** The req-14 "light peek" (upcoming/today/recent with
+Show-all links out to the full Schedule/History pages) is the right final Workout screen — not an
+interim. The full merged scroll + inline schedule editing "needs a new component and a new idea",
+not a forced merge of the existing screens; not worth building now. Superseded by DEC-025. Kept for
+provenance; do not build. If a genuine unified-scroll concept surfaces later it starts fresh, not
+from this spec.
 Source: DEC-024. Type: Screen redesign (no persisted data). Gate: ux-feel → Emilio's hands, heavy
 iteration expected (this is the boldest UI in the app so far).
 

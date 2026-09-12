@@ -486,3 +486,19 @@ surface). No persisted-data change — pure routing/UI.
   gained a **Back** button (no longer tabs). ("Routines" label → `/start` target is Emilio's pairing.)
 - Pure routing/UI, **no persisted-data change**. `req-32` (the full unified scroll + inline schedule
   editing) supersedes this interim later.
+
+## DEC-025 — the light peek IS the Workout screen; the unified scroll (req-32) is dropped  (Emilio, 2026-09-12)
+
+DEC-024 chose "one unified scroll" (upcoming/today/past merged into a single time axis with inline
+schedule editing) for the Workout group, and req-14 shipped a **light peek** as the interim toward it
+(today + ~2 upcoming + ~2 recent, each section a Show-all link out to the full Schedule/History page).
+
+Having used it, Emilio decided **the light peek is the right final design, not an interim** — *"the
+light peek is the right way to go; showing more needs a new component and a new idea."* So the Workout
+screen stays as req-14 built it (Future workouts› / Today focal block / Past workouts› + the fixed
+Routines strip), and Schedule/History keep their own full pages reached via those links.
+
+**req-32 (the unified scroll + inline schedule editing) is DROPPED** — not built. This overturns the
+"unified scroll" clause of DEC-024 only; the rest of DEC-024 (the 3-tab bottom bar, Library toggle,
+Settings tab, naming) stands. A real merged-timeline concept, if it ever comes, would be a fresh idea
+with its own component — not a merge of the current screens, and not from the req-32 spec.
