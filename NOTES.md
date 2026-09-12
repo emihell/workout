@@ -7,7 +7,8 @@ where recurring build-side conventions live instead.
 ## Running the app
 
 - **Dev** — `npm run dev` → single instance on **http://localhost:5173**.
-- **Tests** — `node --test src/*.test.js` (Node's built-in runner; no framework).
+- **Tests** — `node --test` (Node's built-in runner; no framework) — discovers every
+  `*.test.js` under `src/`, nested folders included (`./check` uses the same recursive set).
 - **Lint** — `npm run lint` (oxlint).
 - **Build** — `npm run build` (vite; this is what Pages deploys).
 - **Full gate** — `./check` runs lint + tests + build and refuses on any red.

@@ -13,6 +13,9 @@ plan sync              both directions of staleness: unpublished planning
                         AND the planning worktree's own code falling behind
 plan closeout req-N    merge a built branch, flip its doc status, publish,
                         push both branches, delete the branch — one command
+plan doctor            verify first-machine setup (layout, hooks, deps, grants,
+                        git identity), then print status. Read-only; exits
+                        non-zero if any check needs a fix.
 EOF
 }
 
@@ -503,6 +506,108 @@ cmd_closeout() {
   "$CODE_DIR/plan" status || true
 }
 
+# req-33: one read-only command that verifies first-machine setup and explains
+# each failure, instead of a dozen manual git probes. Every invariant the README
+# §Setup block establishes gets one line — `ok` or `FIX: … <what to run>` — and
+# any failure makes the whole command exit non-zero. It NEVER mutates: it only
+# reads config and the filesystem, so it's safe to run at any time.
+#
+# It deliberately does NOT reuse find_worktrees (which exit 1s on the first
+# missing worktree): doctor must report ALL failures in one pass, and the
+# missing-worktree case is the specific one it exists to explain (the
+# two-separate-clones trap). So it re-parses `git worktree list` locally.
+cmd_doctor() {
+  local fail=0 pd="" cd="" path="" line
+
+  # 1. Layout — one repo with a planning worktree and a code worktree.
+  while IFS= read -r line; do
+    case "$line" in
+      worktree\ *)               path="${line#worktree }" ;;
+      branch\ refs/heads/planning) pd="$path" ;;
+      branch\ refs/heads/*)       cd="$path" ;;
+    esac
+  done < <(git worktree list --porcelain 2>/dev/null)
+
+  if [ -n "$pd" ] && [ -n "$cd" ]; then
+    echo "ok   layout — planning ($pd) + code ($cd) worktrees in one repo"
+  elif [ -z "$pd" ]; then
+    echo "FIX: layout — no 'planning' worktree in this repo. This usually means two"
+    echo "     SEPARATE clones instead of one repo + two worktrees. Convert it with the"
+    echo "     'Already have two separate clones?' recovery block in README.md §Setup."
+    fail=1
+  else
+    echo "FIX: layout — found the planning worktree but no second (code) worktree."
+    echo "     Re-run README §Setup step 4: git worktree add ../workout-planning planning"
+    fail=1
+  fi
+
+  # 2. hooksPath — the code worktree guards handoff/ via .githooks/pre-commit.
+  if [ -n "$cd" ]; then
+    local hp
+    hp="$(git -C "$cd" config core.hooksPath 2>/dev/null || true)"
+    if [ "$hp" = ".githooks" ]; then
+      echo "ok   hooks — code worktree has core.hooksPath=.githooks"
+    else
+      echo "FIX: hooks — code worktree core.hooksPath is '${hp:-unset}', expected .githooks."
+      echo "     Run: git -C $cd config core.hooksPath .githooks   (README §Setup step 2)"
+      fail=1
+    fi
+  fi
+
+  # 3. Dependencies — node_modules present in the code worktree.
+  if [ -n "$cd" ]; then
+    if [ -d "$cd/node_modules" ]; then
+      echo "ok   deps — node_modules/ present in the code worktree"
+    else
+      echo "FIX: deps — no node_modules/ in $cd. Run: ( cd $cd && npm install )   (§Setup step 3)"
+      fail=1
+    fi
+  fi
+
+  # 4. Grants — the planning session's machine-local permissions file exists.
+  if [ -n "$pd" ]; then
+    if [ -f "$pd/.claude/settings.local.json" ]; then
+      echo "ok   grants — $pd/.claude/settings.local.json exists"
+    else
+      echo "FIX: grants — no .claude/settings.local.json in the planning worktree ($pd)."
+      echo "     Re-paste the grant block from README §Setup step 5."
+      fail=1
+    fi
+  fi
+
+  # 5. Git identity — real name + email, not the auto host-local fallback git
+  # invents at commit time (which won't link to a GitHub account).
+  local gname gemail
+  gname="$(git config user.name || true)"
+  gemail="$(git config user.email || true)"
+  if [ -z "$gname" ] || [ -z "$gemail" ]; then
+    echo "FIX: identity — user.name/user.email not both set (name='${gname}', email='${gemail}')."
+    echo "     git config --global user.name '…'; git config --global user.email '…'  (§Setup step 2b)"
+    fail=1
+  elif [[ "$gemail" == *.local || "$gemail" == *'.(none)' ]]; then
+    echo "FIX: identity — user.email '$gemail' looks auto-generated (host-local), not a real email."
+    echo "     Set it: git config --global user.email 'you@example.com'   (§Setup step 2b)"
+    fail=1
+  else
+    echo "ok   identity — user.name='$gname', user.email='$gemail'"
+  fi
+
+  # 6. End with plan status so layout + drift show in one go. Informational:
+  # its exit (which can flag drift on a correctly set-up machine) does not
+  # change doctor's own exit — doctor reports SETUP health, status reports drift.
+  echo
+  echo "doctor: setup checks done — running plan status:"
+  echo
+  "$0" status || true
+
+  echo
+  if [ "$fail" -ne 0 ]; then
+    echo "doctor: one or more setup checks need attention (see FIX: lines above)." >&2
+    exit 1
+  fi
+  echo "doctor: all setup checks passed."
+}
+
 case "${1:-}" in
   save)
     shift
@@ -519,6 +624,9 @@ case "${1:-}" in
     ;;
   sync)
     cmd_sync
+    ;;
+  doctor)
+    cmd_doctor
     ;;
   closeout)
     shift
