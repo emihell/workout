@@ -19,8 +19,17 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
 
-**Small follow-up:** `./check` globs only top-level `src/*.test.js` — tests under subfolders (e.g.
-`src/views/history/`) silently don't run (found in req-14). Fix the glob or relocate; quick req.
+**Workflow/tooling (READY, functional gate — from the 2026-09-12 review):**
+- `req-33` **`plan doctor`** — one read-only command that verifies the setup (catches the
+  two-separate-clones trap) + runs `plan status`. `work/req-33-plan-doctor.md`.
+- `req-34` **close the gate holes** — CI (`deploy.yml`) runs the full gate before deploy, and fix
+  the `src/*.test.js` glob so nested tests run (folds in the follow-up below). `work/req-34-close-the-gate-holes.md`.
+- `req-35` **narrow the `git push` grant** — drop bare `Bash(git push:*)` for the specific push
+  forms. `work/req-35-narrow-push-grant.md`.
+- Re-scan each against live code before pinging CC.
+
+**Small follow-up (now folded into req-34):** `./check` globs only top-level `src/*.test.js` — tests
+under subfolders (e.g. `src/views/history/`) silently don't run (found in req-14).
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
