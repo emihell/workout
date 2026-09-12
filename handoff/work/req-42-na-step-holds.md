@@ -1,6 +1,6 @@
 # req-42 — a recommendation with no valid increment holds (audit F-DIV-1)
 
-**Status: READY.** Decision made (DEC-030). From audit 2026-09-12 (F-DIV-1).
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-42` (`f548076`…`f548076`, 1 commit).** Decision made (DEC-030). From audit 2026-09-12 (F-DIV-1).
 **Gate: functional** — `progress.js` is pure and unit-tested; the change is exactly
 DEC-030's decided behaviour and deterministic. Planning verifies + merges. (It does
 change the recommendation for `weightStep:'n/a'` exercises — note it at merge.)
