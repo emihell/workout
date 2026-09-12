@@ -561,3 +561,16 @@ Gate: functional — merged on unit test + line-by-line review; the two-tab end-
 write in A, banner in B) is a standard-platform eyeball left to Emilio post-merge (warn-only, no data
 write, fully reversible; a clean two-tab test would need the branch served from the code worktree,
 crossing the DEC-005 boundary). Merge `fb2d7f7` (branch `req-41`, `1171e95`, 1 commit).
+
+## req-42 — a recommendation with no valid increment holds (audit F-DIV-1)  (merged 2026-09-12)
+
+`moveToValidWeight` invented a ±0.5 kg step when the exercise had no valid increments (weightStep
+'n/a', the addExercise default) — a load the config never defines (breaks DESIGN §1/§2). Fix (DEC-030,
+progress.js, pure): (1) `moveToValidWeight` empty-options → `return current` (never invent); (2)
+`recommendNextPrescription` computes `hasIncrements = validWeights(exercise).length > 0` once, and the
+weighted up/down branches only move + set movedUp/movedDown when hasIncrements, else hold (push actual
+weight → action 'keep', so the weight never contradicts the action). Has-increment path (incl.
+at-ceiling/floor) untouched. Tests: n/a holds both directions, `moveToValidWeight(w,{weightStep:'n/a'},±1)===w`,
+Alt 4/5 regression still moves. `./check` green, progress.test.js 6 tests. Gate: functional. Merge
+`d011f02` (branch `req-42`, `f548076`, 1 commit). Note: changes the recommendation for weightStep:'n/a'
+exercises (now hold, not ±0.5 drift); real-weightStep exercises unaffected.

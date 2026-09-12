@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–41** (req-10 pending; req-24
+Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–42** (req-10 pending; req-24
 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
 `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -24,7 +24,7 @@ Decisions DEC-028..033 taken; planning-side done (`reference/schema.md`, DESIGN 
 **Trust bugs first** (persisted-data → Emilio's hands): corrupt-`v8` (DEC-032), v5 migration test,
 UTC→local date, backup validation, progression unify. **Then:** cross-tab warn (DEC-029), n/a holds
 (DEC-030), archive names slots (DEC-031). **Cleanup:** dead code, dedupe, split `model.js`/`item.jsx`,
-doctor content-check. Reqs specced one at a time. **req-36–41 shipped** (5 trust bugs + cross-tab); **building now: `req-42`** (n/a-step holds, DEC-030). Then archive names slots (DEC-031), cleanup. L-007: store.jsx not unit-testable → logic in pure modules. Two-tab eyeball for req-41 left to Emilio (warn-only).
+doctor content-check. Reqs specced one at a time. **req-36–42 shipped** (5 trust bugs, cross-tab, n/a holds); **building now: `req-43`** (delete confirm names slots, DEC-031). Then cleanup (dead nextScheduled, dedupe, split model.js/item.jsx, doctor content-check). L-007. Two-tab eyeball for req-41 left to Emilio.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
