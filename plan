@@ -114,9 +114,36 @@ cmd_save() {
 
   HANDOFF=1 git commit -m "$message" >/dev/null
   echo "plan save: committed ($(git rev-parse --short HEAD)) $message"
+
+  # req-46 #1: surface handoff drift here, one step before publish — publish
+  # already warns (req-34), but by then the drift has landed on main and costs a
+  # trim-and-republish. save runs from the planning worktree on every doc change,
+  # so it's the earliest honest place to catch e.g. NOW.md exceeding its own
+  # ≤50-line rule. NON-BLOCKING: mirrors publish's decision (a stale line number
+  # must not block a save) — the commit above already succeeded. check_handoff
+  # reads git objects at HEAD (the commit just made), never the working tree.
+  local save_drift
+  save_drift="$(python3 "$PLANNING_DIR/scripts/check_handoff.py" --repo "$PLANNING_DIR")" || true
+  if [ -n "$save_drift" ]; then
+    echo "plan save: handoff drift — fix before publish (non-blocking):" >&2
+    printf '%s\n' "$save_drift" | sed 's/^/  /' >&2
+  fi
 }
 
 cmd_publish() {
+  # req-46 #2: opt-in --push. Default stays no-push (DEC-008: standalone publish
+  # and the push to origin are deliberately separate). --push is the convenience
+  # for the doc-only cycle that always ended with a manual `git push origin main
+  # planning`. Parsed before any refusal so a refusal exits without pushing.
+  local do_push=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --push) do_push=1 ;;
+      *) echo "plan publish: unknown argument '$1' (only --push)" >&2; exit 1 ;;
+    esac
+    shift
+  done
+
   find_worktrees
 
   local code_branch
@@ -185,6 +212,13 @@ cmd_publish() {
     echo "plan publish: planning advanced to main"
   else
     echo "plan publish: WARNING — could not fast-forward planning to main (main merge is done; planning left as-is). Investigate: planning is not an ancestor of main." >&2
+  fi
+
+  # req-46 #2: only reached on a successful publish — every refusal above exits
+  # non-zero before here, so --push never fires after a refusal or error.
+  if [ -n "$do_push" ]; then
+    echo "plan publish: --push — pushing main and planning to origin"
+    git -C "$CODE_DIR" push origin main planning
   fi
 }
 
@@ -504,6 +538,22 @@ cmd_closeout() {
   # 6.
   echo
   "$CODE_DIR/plan" status || true
+
+  # 7. req-46 #3: print (never write handoff — too risky, and it can't know the
+  # prose) the DEC-009 step-9 maintenance checklist with the mechanical values
+  # filled in. Removes the "what were the steps again" friction that followed
+  # every closeout, while the SHIPPED/NOW prose stays the author's by hand.
+  # Title from the doc's first `# ` heading, minus the `req-N —` prefix; date is
+  # the closeout date. sed's character class carries an em-dash, so LC_ALL=C is
+  # avoided — the surrounding script already runs UTF-8 (flip_status relies on it).
+  local co_title co_date
+  co_title="$(grep -m1 '^# ' "$doc" | sed -E 's/^# +//; s/^req-[0-9]+ *[—-] *//')"
+  co_date="$(date +%F)"
+  echo
+  echo "plan closeout: done. Now (DEC-009 step 9), before anything else:"
+  echo "  1. SHIPPED.md — append:  ## $reqid — $co_title  (merged $co_date)"
+  echo "  2. NOW.md — bump the shipped range to include $reqid; move the \"building\" marker"
+  echo "  3. ./plan save \"$reqid closeout\"  &&  ./plan publish --push"
 }
 
 # req-33: one read-only command that verifies first-machine setup and explains
@@ -675,7 +725,8 @@ case "${1:-}" in
     cmd_save "$@"
     ;;
   publish)
-    cmd_publish
+    shift
+    cmd_publish "$@"
     ;;
   status)
     cmd_status
