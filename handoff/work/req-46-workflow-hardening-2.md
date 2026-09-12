@@ -1,6 +1,6 @@
 # req-46 — workflow hardening: save-time drift warning, publish --push, closeout checklist
 
-**Status: READY.** From the post-audit workflow reflection (2026-09-12), Emilio's
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-46` (`ca12ddc`…`ca12ddc`, 1 commit).** From the post-audit workflow reflection (2026-09-12), Emilio's
 "fix all". **Gate: infra** (`plan` script + workflow); planning verifies by running
 the commands + merges. No app code, no persisted data. Same class as req-33/34/35.
 
