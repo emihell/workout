@@ -465,3 +465,24 @@ for Workouts, the segmented-control and Today-home-plus-links layouts (the unifi
 tab = existing Today with Schedule/History reachable). **req-32** = the unified Workouts scroll
 (depends on req-14). Both ux-feel → Emilio's hands, heavy iteration expected (first "designed" nav
 surface). No persisted-data change — pure routing/UI.
+
+**Built (req-14), refined over 8 review passes with Emilio:**
+- **Tab bar = three `ui-btn`-styled links** (not `<button>`), honouring DEC-016 (buttons=actions,
+  links=nav) while keeping the Button *look*: Workouts **primary** / Library **secondary** / Settings
+  **quiet** (static hierarchy) + a dynamic active underline (`aria-current`). No custom icons (Emilio:
+  component-library only). `activeTab(routeName)` is a pure fn in `route.js`, unit-tested. The bar is
+  **hidden during the in-workout flow** (route `workout*`) so it can't jump you away mid-set.
+- **First tab is labelled "Workout"** (singular); the group id/route stay `workouts` / `/`.
+- **Library toggle reuses the existing `SegmentedControl`** (no new primitive) — [Routines | Exercises],
+  active segment derived from the route, hosting the unchanged list screens.
+- **Workout screen (interim, until req-32)** — a light version of the unified scroll: header (greeting/
+  week/in-progress) → **"Future workouts›"** (a plain link to `/schedule`) + upcoming rows (each with a
+  Start-ahead) → **Today** (the focal point: **bold date on top**, name — focus below, big **primary**
+  Start; empty day keeps the block with "Nothing scheduled today." + a **disabled** Start) → Completed-
+  today → past rows → **"Past workouts›"** (plain link to `/history`) → **"Routines›"**, a **fixed strip
+  docked above the tab bar** (plain de-styled link to the `/start` picker). All rows share one info
+  format — **`date · name — focus`**, one date formatter (`Mon, Oct 13`, year only when not current),
+  `focus` from immutable `snapshot.focus`, never invented (DESIGN §1/§3). Schedule & History screens
+  gained a **Back** button (no longer tabs). ("Routines" label → `/start` target is Emilio's pairing.)
+- Pure routing/UI, **no persisted-data change**. `req-32` (the full unified scroll + inline schedule
+  editing) supersedes this interim later.

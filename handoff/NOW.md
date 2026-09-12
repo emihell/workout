@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-11. **Shipped: req-01–09, req-11–13, req-15–23, req-25–31** (all except req-10). Done
+Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31** (all except req-10). Done
 lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -16,13 +16,14 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 ## Next — READY
 
-- **`req-14` new nav — 3-tab bottom bar** (Workouts/Library/Settings, DEC-024) — the shell: bottom
-  tab bar + Library [Routines|Exercises] segmented toggle + Settings tab; Workouts tab = today +
-  links (interim). **[ux-feel]** Medium. **← dispatched.**
-- `req-32` **unified Workouts scroll** (DEC-024) — merge Today+Schedule+History into one scroll,
-  inline schedule edits. **BLOCKED on req-14**; design iterates with Emilio in-branch. Bold/large.
+- `req-32` **unified Workouts scroll** (DEC-024) — replace req-14's interim Workout screen with the
+  full scroll: merge Today+Schedule+History, inline schedule edits. **READY** (req-14 merged); design
+  iterates with Emilio in-branch (open Qs in the spec). Bold/large. **[ux-feel]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
+
+**Small follow-up:** `./check` globs only top-level `src/*.test.js` — tests under subfolders (e.g.
+`src/views/history/`) silently don't run (found in req-14). Fix the glob or relocate; quick req.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
