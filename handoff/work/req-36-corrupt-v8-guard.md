@@ -1,6 +1,6 @@
 # req-36 — a corrupt `workout-mvp-v8` key must not be silently overwritten
 
-**Status: READY.** Decision made (DEC-032). Persisted-data / trust req → **Emilio's
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-36` (`65a8023`…`65a8023`, 1 commit).** Decision made (DEC-032). Persisted-data / trust req → **Emilio's
 hands before merge** (DEC-009). From audit 2026-09-12 (F-RISK-2).
 
 ## Why
