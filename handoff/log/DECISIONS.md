@@ -649,3 +649,27 @@ Supersedes DEC-009's per-kind merge gate (functional=planning, ux-feel/persisted
 wherever planning can test the req; DEC-009's "read the diff + failure test, run the gate, never trust
 'done'" discipline is kept and strengthened (planning now *runs* it). The human-use gate survives only
 for what planning cannot reach.
+
+**Carve-out (Emilio, 2026-09-12) — an actual migration or bulk rewrite of existing stored records still
+gets Emilio's eyes before merge.** Autonomous-merge covers guards, go-forward changes, logic, tooling,
+and tests — but NOT a schema-version bump or a mass rewrite of saved history. Reason is
+*irreversibility, not difficulty*: there is no backup, and a unit test proves the code does what the
+test says, not that the test covers your real (messy) `localStorage`. **CLAUDE.md's ask-gate #2**
+(announce what changes + to how many records; add a migration test proving an older key survives) is a
+separate standing rule that such a req triggers regardless of DEC-035. Everything we shipped in the
+2026-09-12 run that was "persisted-data" was a guard or go-forward change (corrupt-v8 guard, backup
+validation, UTC date) — none rewrote existing records; those merged fine under DEC-035. The line is:
+does this req *rewrite records already on disk*? If yes → Emilio's eyes.
+
+**Counterweight to the lost second perspective — spawn an independent reviewer subagent before
+autonomously merging a risky change.** DEC-035 makes planning spec-writer, tester, and merger; the
+second set of eyes is restored not by more of planning's own review but by an on-demand **fresh-context
+subagent that reviews the diff it did not write** — for anything touching **store / model / storage /
+migration** or with wide shared-code blast radius, and for planning's own specs/DECs when subtle. NOT a
+standing role (over-engineering for a one-person app) — a subagent call when stakes justify it; skip it
+for trivial reqs (test-only, dead-code, docs, nits). It's still an AI review: it catches code-correctness,
+not "wrong on your real data" — that's the carve-out's job. The two layers are distinct.
+
+**Dry-run owed:** the throwaway-worktree test method above (`git worktree add` a temp dir, symlink
+`node_modules`, run `node --test`/`vite build` there) is specced but not yet exercised — prove it with
+one dry run before relying on it mid-batch for real app-code, so it doesn't fail at the worst moment.

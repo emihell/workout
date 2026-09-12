@@ -210,6 +210,15 @@ test (real-device gym feel, a two-tab browser check with no preview deploy) is l
 after, and it does **not** block. 'Done' from CC is still a signal — you *run* the tests, never trust
 the receipt.
 
+**Two guards on the autonomy (DEC-035):** (1) **Carve-out** — an actual migration / bulk rewrite of
+*existing stored records* (a schema-version bump, a mass edit of saved history) still gets **Emilio's
+eyes** before merge; irreversible + no backup, and a green test proves the code, not that it covers his
+real data. CLAUDE.md ask-gate #2 fires on such a req regardless. Guards and go-forward changes are not
+this. (2) **Spawn an independent reviewer subagent** (fresh context, reviews a diff it didn't write)
+before autonomously merging anything touching **store / model / storage / migration** or with wide
+shared-code blast radius — and for your own tricky specs/DECs. On-demand, not a standing role; skip it
+for trivial reqs. It catches code-correctness, not "wrong on real data" (that's the carve-out).
+
 **Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
 - **Single** — one req: test all reachable → merge if green → complete → stop.
 - **Batch** — build → test all reachable → merge → complete → continue to the next until the batch is
