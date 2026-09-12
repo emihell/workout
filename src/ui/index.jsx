@@ -225,7 +225,7 @@ export function Row({ children, value, action, to }) {
 // could jump you to Library mid-set fights them (DESIGN: in-gym flow flawless).
 // activeTab still maps those routes to Workouts for completeness/tests.
 const TABS = [
-  { id: 'workouts', to: '/', label: 'Workouts', variant: 'primary' },
+  { id: 'workouts', to: '/', label: 'Workout', variant: 'primary' },
   { id: 'library', to: '/routines', label: 'Library', variant: 'secondary' },
   { id: 'settings', to: '/settings', label: 'Settings', variant: 'quiet' },
 ]

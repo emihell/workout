@@ -170,6 +170,19 @@ export function Today() {
         </p>
       ) : null}
 
+      {/* Section order (iter 4): Upcoming → Today (+ Completed today) → Recent.
+          Upcoming and Recent are light peeks of the Schedule/History pages (no
+          longer tabs, DEC-024), each ending in "Show all"; interim until req-32's
+          unified Workouts scroll. */}
+      <SectionHeader>Upcoming</SectionHeader>
+      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
+      <List>
+        {upcoming.map(({ date, slot, routine }) => (
+          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
+        ))}
+        <Row to="/schedule">Show all</Row>
+      </List>
+
       <SectionHeader>Today</SectionHeader>
       {todays.length ? (
         todays.map(({ slot, routine }) => (
@@ -177,12 +190,6 @@ export function Today() {
         ))
       ) : (
         <p className="ui-sub">Nothing scheduled today.</p>
-      )}
-
-      {mine ? null : (
-        <p>
-          <NavLink to="/start">Choose a workout</NavLink>
-        </p>
       )}
 
       {completedToday.length ? (
@@ -196,18 +203,6 @@ export function Today() {
         </>
       ) : null}
 
-      {/* req-14 review — Schedule and History are no longer tabs (DEC-024 folded
-          them under Workouts). Show a light peek of each with a "Show all" to the
-          full page; interim until req-32's unified Workouts scroll. */}
-      <SectionHeader>Upcoming</SectionHeader>
-      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
-      <List>
-        {upcoming.map(({ date, slot, routine }) => (
-          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
-        ))}
-        <Row to="/schedule">Show all</Row>
-      </List>
-
       <SectionHeader>Recent</SectionHeader>
       {recent.length === 0 ? <p className="ui-sub">No history yet.</p> : null}
       <List>
@@ -216,6 +211,17 @@ export function Today() {
         ))}
         <Row to="/history">Show all</Row>
       </List>
+
+      {/* Big CTA to the "choose any workout" picker — last element, so it sits
+          just above the fixed tab bar. A NavLink wearing the .ui-btn secondary +
+          block LOOK, not a <button>: it's route nav to /start, so DEC-016 keeps it
+          a link (same pattern as the tab bar). Hidden mid-workout (!mine). Label is
+          "Workouts" (plural) — Emilio's call; the tab reads singular "Workout". */}
+      {mine ? null : (
+        <NavLink to="/start" className="ui-btn ui-btn--secondary ui-btn--block">
+          Workouts
+        </NavLink>
+      )}
     </Screen>
   )
 }

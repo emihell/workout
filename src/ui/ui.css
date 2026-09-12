@@ -140,6 +140,7 @@ a.ui-btn--quiet:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none; /* button-styled anchors (a.ui-btn) must not show the UA underline */
   -webkit-appearance: none;
   appearance: none;
 }

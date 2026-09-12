@@ -91,6 +91,34 @@ connected): the winning rule is `(0,2,1)` vs the reset's `(0,1,1)` for every sta
 (`:visited`/`:hover`/`:active` and the base), so the primary tab's text resolves to
 `--ui-bg` in all states and secondary/quiet stay `--ui-ink`. `./check` green.
 
+## Review iteration 4 (Emilio, 2026-09-12)
+
+Three changes on the Workout screen + the tab label, same branch, not merged:
+
+1. **Tab label "Workouts" → "Workout"** (singular) — `TABS` in `ui/index.jsx`. Only
+   the label; `id` (`workouts`), route (`/`) and `activeTab` unchanged.
+2. **Section order → Upcoming → Today → Recent** (`Today.jsx`). Header (greeting /
+   "Week x of y" / "In progress · Continue") stays at the very top; **Upcoming**
+   (with its Show all) moved above **Today**; **Completed today** stays grouped with
+   Today (middle); **Recent** (with its Show all) stays at the bottom.
+3. **"Choose a workout" → a big bottom CTA.** Removed the inline
+   `<NavLink>Choose a workout</NavLink>` from the Today section. Added, as the last
+   element on the screen (after Recent, directly above the fixed tab bar), a large
+   secondary block CTA to `/start`, labelled **"Workouts"** (plural — Emilio's call;
+   the tab is singular "Workout"). Kept the `!mine` visibility guard.
+   - **Implementation note (DEC-016):** rendered as a `NavLink` wearing the
+     `ui-btn ui-btn--secondary ui-btn--block` classes — the big-secondary-block
+     *look* asked for, but a link, since it's pure route nav to `/start`. Same
+     pattern the tab bar now uses; keeps the iter-2/3 DEC-016 fix consistent
+     instead of reintroducing a `<button>`+`go()`. Say if you specifically want a
+     `<button>` here.
+   - Added `text-decoration: none` to the base `.ui-btn` so a button-styled anchor
+     (`a.ui-btn`) shows no UA underline — the CTA and any future `a.ui-btn` read as
+     a button. The tab bar's active-underline still wins (`.is-active`, higher
+     specificity).
+
+`./check` re-run after iteration 4 — green (145 tests, lint, build).
+
 ## Technical
 
 ### What changed
@@ -218,10 +246,12 @@ list below.
       `+ New`/Add still works.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
-   6. On Workouts: today's workout has a big primary Start (works); "Choose a
-      workout" opens the picker; the Upcoming peek's items each have a smaller
-      secondary Start that starts that future workout; the Recent peek shows recent
-      workouts; each "Show all" opens the full Schedule / History page.
+   6. On the Workout tab, sections read top-to-bottom: header → **Upcoming** →
+      **Today** (+ Completed today) → **Recent**. Today's workout has a big primary
+      Start (works); each Upcoming item has a smaller secondary Start that starts
+      that future workout; each "Show all" opens the full Schedule / History page; a
+      big secondary **"Workouts"** button at the very bottom (above the tab bar)
+      opens the workout picker.
    7. On the Schedule and History pages, Back returns you to Workouts.
    8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.
