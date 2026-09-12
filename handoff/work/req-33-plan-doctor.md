@@ -1,6 +1,6 @@
 # req-33 — `plan doctor`: one command that verifies (and explains) the setup
 
-**Status: READY, not built — functional gate.** Re-scan `plan` and the README setup block against
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-33` (`130d30e`…`130d30e`, 1 commit).** Re-scan `plan` and the README setup block against
 live code before sending to CC; the checks below are the intent, not final line numbers.
 
 **Gate: functional** (DEC-009) — planning verifies + merges; no gym-test needed.
