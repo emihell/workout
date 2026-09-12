@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
-import { RPE_OPTIONS, formatSetLine, roleLabel } from '../../ids'
+import { RPE_OPTIONS, formatSetLine, isWeightedType, roleLabel } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
+import { isDurationTarget } from '../../progress'
 import { exerciseById, historySetPrefill, lastSetsForExercise } from '../../storage'
 import { useStore } from '../../store-context'
 import {
   carriedWorkingSet,
   initialSetFields,
+  isSkippedSet,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
@@ -22,15 +24,6 @@ import { Button, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Titl
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
 import { RestBar, useRestCountdown } from './rest'
 import { unlockAudio } from '../../rest-cue'
-
-function usesWeight(ex) {
-  return ex && ex.type !== 'bodyweight' && ex.type !== 'cardio'
-}
-
-function isDurationTarget(target) {
-  const t = String(target || '').toLowerCase()
-  return t.includes('min') || t.includes('sec') || /s$/.test(t.replace(/\s/g, ''))
-}
 
 function liveExercise(store, item) {
   return (
@@ -124,7 +117,7 @@ function carryFor(ex, last, currentType, workLogged) {
 }
 
 function restoreFromLoggedSet(set) {
-  const skipped = String(set?.reps || '').toLowerCase() === 'skipped'
+  const skipped = isSkippedSet(set)
   return {
     setType: set.setType || 'work',
     workIndex: set.setType === 'wu' ? 0 : null,
@@ -215,7 +208,7 @@ function WorkoutItemLive({ routineId, item }) {
         routineItemId: itemKey(item),
         exerciseId: item.exerciseId,
         setType: currentType,
-        weight: usesWeight(ex) ? Number(weight) || 0 : 0,
+        weight: isWeightedType(ex.type) ? Number(weight) || 0 : 0,
         reps: reps || '',
         rpe: rpe ? Number(rpe) : null,
         note,
@@ -276,7 +269,7 @@ function WorkoutItemLive({ routineId, item }) {
   }
 
   const canGoBack = state.logged.length > 0
-  const weighted = usesWeight(ex)
+  const weighted = isWeightedType(ex.type)
   const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
   const showEffort = currentType === 'work' && ex?.type !== 'cardio'
   // Seed the set-log fields from the same sources the app has always used —
@@ -309,7 +302,7 @@ function WorkoutItemLive({ routineId, item }) {
   // so a no-history blank upcoming (or a skipped last set) is never flagged.
   const lastLoggedWork = state.workLogged.at(-1)
   const lastLoggedWeight =
-    lastLoggedWork && String(lastLoggedWork.reps || '').toLowerCase() !== 'skipped'
+    lastLoggedWork && !isSkippedSet(lastLoggedWork)
       ? Number(lastLoggedWork.weight)
       : null
   const upcomingWeightNum = seed.weight !== '' && seed.weight != null ? Number(seed.weight) : null
@@ -442,7 +435,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   const item = workout?.snapshot?.items?.find(
     (candidate) => itemKey(candidate) === (set?.routineItemId || set?.sessionItemId),
   )
-  const usesLoad = item?.exerciseType !== 'cardio' && item?.exerciseType !== 'bodyweight'
+  const usesLoad = isWeightedType(item?.exerciseType)
   const usesRpe = set?.setType !== 'wu' && item?.exerciseType !== 'cardio'
   const itemPath = itemSetsPath(routineId, item, workout)
 

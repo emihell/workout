@@ -296,11 +296,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
           warmup: warmup ? { reps: warmupReps } : null,
           sets: count,
           targets: parseTargets(targets, count),
-          suggestedWeights: weights
-            .split(/[/,]/)
-            .map((value) => Number(value.trim()))
-            .filter(Number.isFinite)
-            .slice(0, count),
+          suggestedWeights: weightParts.slice(0, count),
           restSec: Math.max(0, Number(restSec) || 0),
           notes,
         })

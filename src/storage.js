@@ -1,5 +1,6 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
 import { dateKey, defaultSchedule } from './schedule.js'
+import { isSkippedSet } from './workout-log.js'
 
 const STORAGE_KEY = 'workout-mvp-v8'
 const LEGACY_KEYS = ['workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -338,10 +339,6 @@ export function lastSetsForExercise(workouts, exerciseId) {
     if (sets.length) return { workout: w, sets }
   }
   return null
-}
-
-function isSkippedSet(set) {
-  return String(set?.reps || '').toLowerCase() === 'skipped'
 }
 
 function workingSetsFromHistory(sets) {

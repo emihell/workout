@@ -50,6 +50,15 @@ export function rpeOptionValue(stored) {
 
 export const EXERCISE_TYPES = ['machine', 'free', 'bodyweight', 'cardio']
 
+// req-44 — one pure "does this exercise type carry external load?" predicate,
+// unifying the four drifted spellings (item.jsx usesWeight/usesLoad, model.js
+// weighted, the inverse of progress.js bodyweight). Takes the raw type string; a
+// missing/unknown type reads as weighted (matches every prior spelling, which only
+// excluded the two explicit non-loaded types).
+export function isWeightedType(type) {
+  return type !== 'bodyweight' && type !== 'cardio'
+}
+
 export const ROUTINE_ROLES = [
   { value: 'warmup', label: 'WU routine' },
   { value: 'main', label: 'Main' },

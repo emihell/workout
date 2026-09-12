@@ -1,3 +1,5 @@
+import { isWeightedType } from './ids.js'
+
 export function validWeights(exercise, max = 250) {
   if (Array.isArray(exercise?.weightOptions) && exercise.weightOptions.length) {
     return [...exercise.weightOptions].map(Number).filter(Number.isFinite).sort((a, b) => a - b)
@@ -38,7 +40,7 @@ function parseReps(value) {
   return Number.isFinite(n) ? n : null
 }
 
-function isDurationTarget(value) {
+export function isDurationTarget(value) {
   const t = String(value || '').toLowerCase()
   return t.includes('min') || t.includes('sec') || /s$/.test(t.replace(/\s/g, ''))
 }
@@ -68,7 +70,7 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
     const targetReps = countableReps(targets?.[index] ?? targets?.at(-1))
     const rpe = set.rpe == null ? null : Number(set.rpe)
     const missed = actualReps != null && targetReps != null && actualReps < targetReps
-    const bodyweight = exercise?.type === 'bodyweight' || exercise?.type === 'cardio'
+    const bodyweight = !isWeightedType(exercise?.type)
 
     if (bodyweight || actualWeight <= 0) {
       weights.push(actualWeight)
