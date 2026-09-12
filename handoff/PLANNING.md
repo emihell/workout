@@ -218,6 +218,9 @@ this. (2) **Spawn an independent reviewer subagent** (fresh context, reviews a d
 before autonomously merging anything touching **store / model / storage / migration** or with wide
 shared-code blast radius — and for your own tricky specs/DECs. On-demand, not a standing role; skip it
 for trivial reqs. It catches code-correctness, not "wrong on real data" (that's the carve-out).
+**You spawn it, not code CC** — it gates the merge (yours) and must be independent of the builder; a
+reviewer code CC spawns is the author grading itself. Reads the diff cold (`git diff main..reqN`,
+read-only). Code CC self-reviewing before it reports is a fine habit but is not the independent gate.
 
 **Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
 - **Single** — one req: test all reachable → merge if green → complete → stop.

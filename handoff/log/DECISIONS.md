@@ -670,6 +670,13 @@ standing role (over-engineering for a one-person app) — a subagent call when s
 for trivial reqs (test-only, dead-code, docs, nits). It's still an AI review: it catches code-correctness,
 not "wrong on your real data" — that's the carve-out's job. The two layers are distinct.
 
+**The reviewer is planning-spawned, not code-CC-spawned (Emilio asked, 2026-09-12).** It gates the
+*merge*, which is planning's action, and independence requires it not come from the builder — a reviewer
+code CC spawns inherits code CC's framing (the author grading itself). Planning spawns a fresh subagent
+that reads the committed diff cold (`git diff main..reqN` + files — read-only, within DEC-005). Code CC
+*self-reviewing before it reports* is a welcome build-quality habit but does NOT count as the independent
+gate (it's the author). So: code CC may self-check; planning runs the independent review.
+
 **Dry-run owed:** the throwaway-worktree test method above (`git worktree add` a temp dir, symlink
 `node_modules`, run `node --test`/`vite build` there) is specced but not yet exercised — prove it with
 one dry run before relying on it mid-batch for real app-code, so it doesn't fail at the worst moment.
