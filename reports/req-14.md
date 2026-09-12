@@ -119,6 +119,41 @@ Three changes on the Workout screen + the tab label, same branch, not merged:
 
 `./check` re-run after iteration 4 — green (145 tests, lint, build).
 
+## Review iteration 5 (Emilio, 2026-09-12)
+
+Two changes on the Workout screen, same branch, not merged:
+
+1. **Bottom CTA → "Routines", de-styled.** The `/start` CTA is no longer a
+   big-secondary-block NavLink; it's now a plain nav row — `<List><Row to="/start">
+   Routines</Row></List>` — matching the "Show all" rows for consistency (Emilio:
+   *"should be consistent."*). Kept at the bottom, kept the `!mine` guard, kept the
+   `/start` target. *(Note: the target is still the workout picker `/start`; only
+   the label changed to "Routines" per Emilio.)*
+2. **Unified row info across Upcoming / Today / Recent / Completed-today.** One
+   shared renderer `WorkoutInfo({ when, name, focus })` (`Today.jsx`) now formats
+   every workout row's information the same way: **`[when] · [name] — [focus]`**.
+   - `when`: weekday (Upcoming), date (Recent — via `whenLabel`), "Today" (Today &
+     Completed-today).
+   - `name`: `routine.name` for schedule items; `workoutRoutineName(workout,
+     routine)` for history items.
+   - `focus`: `routine.focus` for schedule items; **`workout.snapshot.focus`** for
+     history items — the immutable snapshot value (DESIGN §3: history is a
+     snapshot), which `planSnapshot` already stores. **Degrades gracefully**: if a
+     snapshot has no focus (older data) or the routine was deleted, the "— focus"
+     is dropped, never invented (DESIGN §1).
+   - **Actions/status untouched**, as instructed: Today's big primary Start, the
+     Upcoming Start-ahead, the Upcoming `Done …` value, in-progress hiding, the
+     history-detail links — all exactly as before. Only the info text/layout was
+     unified.
+   - **Dropped for consistency:** history rows (Recent, Completed-today) previously
+     prefixed the **program name** (`program — routine`). The unified format has no
+     program field — schedule items (Upcoming/Today) have no program to show, so
+     showing it only on history rows would defeat "the same info the same way".
+     Flagging in case Emilio wants program surfaced (it would need resolving a
+     program for schedule items too, or a different shared field).
+
+`./check` re-run after iteration 5 — green (145 tests, lint, build).
+
 ## Technical
 
 ### What changed
@@ -247,11 +282,12 @@ list below.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
    6. On the Workout tab, sections read top-to-bottom: header → **Upcoming** →
-      **Today** (+ Completed today) → **Recent**. Today's workout has a big primary
-      Start (works); each Upcoming item has a smaller secondary Start that starts
-      that future workout; each "Show all" opens the full Schedule / History page; a
-      big secondary **"Workouts"** button at the very bottom (above the tab bar)
-      opens the workout picker.
+      **Today** (+ Completed today) → **Recent**, and every row shows the same info
+      the same way — `[when] · [name] — [focus]` (focus omitted where there's none).
+      Today's workout has a big primary Start (works); each Upcoming item has a
+      smaller secondary Start that starts that future workout; each "Show all" opens
+      the full Schedule / History page; a plain **"Routines"** row at the very
+      bottom (above the tab bar) opens the workout picker.
    7. On the Schedule and History pages, Back returns you to Workouts.
    8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.

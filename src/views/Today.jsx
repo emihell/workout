@@ -6,8 +6,7 @@ import { completedOnDayKey, findRoutine } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
-import { compactDate, sortWorkoutsByDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
-import { NavLink } from './shared'
+import { sortWorkoutsByDate, whenLabel, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
@@ -30,26 +29,42 @@ function activeRoutineId(workout) {
   return workout?.routineId || workout?.sessionId
 }
 
-// req-28 — a completed-today workout row, linking to its History detail. Labelled
-// the same way History's list does (program — routine), minus the date (all today).
-function CompletedTodayRow({ store, workout }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
-  const programName = workout.snapshot?.programName
-  const name = workoutRoutineName(workout, routine)
-  const label = programName ? `${programName} — ${name}` : name
-  return <Row to={`/history/${workout.id}`}>{label}</Row>
+// req-14 (Emilio review iter 5) — the ONE shared row-info format for every workout
+// row on the screen (Upcoming / Today / Recent / Completed today): `[when] ·
+// [name] — [focus]`, rendered the same way everywhere so the three sections show
+// the same information the same way. `focus` degrades gracefully — when a source
+// has none (an older history snapshot without focus, or a deleted routine) the
+// "— focus" is dropped rather than invented (DESIGN §1: never invent absent data).
+// `when` is always supplied (weekday / date / "Today"). This is INFO only; each
+// row keeps its own action/status (Start, Done, the history link).
+function WorkoutInfo({ when, name, focus }) {
+  return (
+    <>
+      {when} · {name}
+      {focus ? ` — ${focus}` : ''}
+    </>
+  )
 }
 
-// req-14 (Emilio review) — a recent-history peek row: same program — routine label
-// as History's list, plus the date, linking to the History detail.
-function HistoryPeekRow({ store, workout }) {
+// req-28 — a completed-today workout row, linking to its History detail. Uses the
+// shared info format (iter 5); `when` is "Today" (all completed today), focus from
+// the immutable snapshot. Program name dropped so it matches the other sections.
+function CompletedTodayRow({ store, workout }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
-  const programName = workout.snapshot?.programName
-  const name = workoutRoutineName(workout, routine)
-  const label = programName ? `${programName} — ${name}` : name
   return (
     <Row to={`/history/${workout.id}`}>
-      {label} — {compactDate(workoutDateKey(workout))}
+      <WorkoutInfo when="Today" name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+    </Row>
+  )
+}
+
+// req-14 (Emilio review) — a recent-history peek row linking to the History detail.
+// Shared info format (iter 5): `when` is the workout's date, focus from the snapshot.
+function HistoryPeekRow({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  return (
+    <Row to={`/history/${workout.id}`}>
+      <WorkoutInfo when={whenLabel(workout)} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
     </Row>
   )
 }
@@ -59,27 +74,29 @@ function HistoryPeekRow({ store, workout }) {
 // behaviour the old Today "Next" section had; Emilio restored it). Today's big
 // primary Start stays the main CTA — upcoming items get a smaller secondary Start.
 // Guards like the today row: already-covered shows `Done …`, in-progress shows no
-// Start (the top-of-screen Continue owns it). Same startOrContinue path.
+// Start (the top-of-screen Continue owns it). Same startOrContinue path. Info via
+// the shared format (iter 5); `when` is the weekday. The Done status stays in the
+// row's value slot; only the weekday moved into the info line.
 function UpcomingRow({ store, date, slot, routine }) {
   const dk = dateKey(date)
   const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
   const mine = store.activeWorkout
   const inProgress =
     activeRoutineId(mine) === routine.id && mine?.scheduleSlotId === slot.id && mine.scheduledFor === dk
-  const value = done ? `Done ${dateKey(done.finishedAt)}` : weekdayName(date.getDay())
   const startAction =
     !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
   return (
-    <Row value={value} action={startAction}>
-      {routine.name}
+    <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
+      <WorkoutInfo when={weekdayName(date.getDay())} name={routine.name} focus={routine.focus} />
     </Row>
   )
 }
 
 // req-14 (Emilio review) — today's workout is the Workouts screen's main call to
-// action: the routine name + a large, primary, full-width Start. `Done …` shows
+// action: the shared info line + a large, primary, full-width Start. `Done …` shows
 // once logged; a workout already in progress shows nothing here (the top-of-screen
-// Continue owns that), matching the pre-review behaviour.
+// Continue owns that), matching the pre-review behaviour. Info format (iter 5) with
+// `when` = "Today".
 function TodayWorkout({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
   const mine = store.activeWorkout
@@ -87,12 +104,10 @@ function TodayWorkout({ store, routine, slot, date }) {
     activeRoutineId(mine) === routine.id &&
     mine?.scheduleSlotId === slot.id &&
     mine.scheduledFor === date
-  const bits = [routine.focus].filter(Boolean)
   return (
     <div className="ui-today-workout">
       <p className="ui-today-workout__name">
-        {routine.name}
-        {bits.length ? ` — ${bits.join(' · ')}` : ''}
+        <WorkoutInfo when="Today" name={routine.name} focus={routine.focus} />
       </p>
       {done ? (
         <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
@@ -212,15 +227,14 @@ export function Today() {
         <Row to="/history">Show all</Row>
       </List>
 
-      {/* Big CTA to the "choose any workout" picker — last element, so it sits
-          just above the fixed tab bar. A NavLink wearing the .ui-btn secondary +
-          block LOOK, not a <button>: it's route nav to /start, so DEC-016 keeps it
-          a link (same pattern as the tab bar). Hidden mid-workout (!mine). Label is
-          "Workouts" (plural) — Emilio's call; the tab reads singular "Workout". */}
+      {/* Entry to the "choose any workout" picker (/start) — last element, just
+          above the fixed tab bar. Iter 5: a plain nav row (a List Row link, like
+          the "Show all" rows) rather than a styled button, for consistency; label
+          "Routines" (Emilio's call). Hidden mid-workout (!mine). */}
       {mine ? null : (
-        <NavLink to="/start" className="ui-btn ui-btn--secondary ui-btn--block">
-          Workouts
-        </NavLink>
+        <List>
+          <Row to="/start">Routines</Row>
+        </List>
       )}
     </Screen>
   )
