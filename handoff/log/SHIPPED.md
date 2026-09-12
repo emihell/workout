@@ -574,3 +574,17 @@ at-ceiling/floor) untouched. Tests: n/a holds both directions, `moveToValidWeigh
 Alt 4/5 regression still moves. `./check` green, progress.test.js 6 tests. Gate: functional. Merge
 `d011f02` (branch `req-42`, `f548076`, 1 commit). Note: changes the recommendation for weightStep:'n/a'
 exercises (now hold, not ±0.5 drift); real-weightStep exercises unaffected.
+
+## req-43 — the delete confirm names what it will remove (audit F-DIV-3)  (merged 2026-09-12)
+
+Deleting a routine silently removed its schedule slots + planned workouts, and deleting an exercise
+silently stripped it from every routine — behind a bare `Delete X?` confirm. DEC-031: the history-only
+archive/delete rule is correct and stays; only the confirm must name its blast radius. Added pure
+`routineDeletionImpact(state, id)` -> {slots, plans, hasHistory} and `exerciseDeletionImpact(state, id)`
+-> {routines, hasHistory} to `storage.js`, mirroring the store's exact reference tests (routineId||sessionId;
+set.exerciseId; reuses `routinesUsingExercise`). `Routine.jsx:152`/`Exercises.jsx:319` confirms now name
+archive-vs-delete + counts (only when >0, singular/plural), e.g. "Upper Body has past workouts and will be
+archived (kept in your history). This removes 2 schedule slots and 1 planned workout." **`store.jsx` NOT in
+the diff** - removeRoutine/removeExercise byte-unchanged. `./check` green, 15 test files. Gate: functional
+(wording eyeball welcome; native confirm, inline UI is still req-24). Merge `11b1a70` (branch `req-43`,
+`ecc4aef`, 1 commit).
