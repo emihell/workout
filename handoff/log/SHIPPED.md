@@ -485,3 +485,21 @@ byte-for-byte unchanged after a mutation. Merge `ce2a4c7` (branch `req-36`, `65a
 `./check` green, 149 tests. Gate: persisted-data → Emilio's hands (used it, DEC-009). **Follow-up
 deferred:** the recovery path out of the held-saves dead-end (explicit discard-and-start-fresh vs.
 auto-quarantine to a `-corrupt-<ts>` side key) is Emilio's pick and becomes its own req.
+
+## req-37 — v5 migration round-trip test (audit F-RISK-1)  (merged 2026-09-12)
+
+`workout-mvp-v5` was a claimed-supported legacy key with no round-trip test (v6/v7 had one; v5 had
+only a delete-assertion). Finding while speccing: there is **no distinct v5 shape in this repo's git
+history** and `migrateState` is uniform/shape-driven (no per-version branch), so "v5" is a version
+number on a program-wrapped shape, not a separate transform. So the test's real value is covering the
+legacy paths v6/v7 tests skip. Added `describe('req-37 v5 migration round-trip')` to
+`storage.test.js` (test-only, one file): seeds a v5 program-wrapped payload with a workout carrying
+`sessionId`/`programName`/a snapshot with `sessionItemId`, and a plan with `sessionId`. Asserts
+routine flatten, `sessionId→routineId` on **slot, workout, AND plan**, `sessionItemId→routineItemId`
+on snapshot-item and set, snapshot's own `sessionId` dropped + `programName` kept, programs/sessions
+dropped, opaque id `sess-1` kept, v8 persisted. Merge `569461b` (branch `req-37`, `517ccee`, 1
+commit); `./check` green, 150 tests. Gate: functional (test-only; planning verified + merged). CC
+finding (→ `reference/schema.md` clarified): `workoutSnapshot` has two branches — only the
+snapshot-**less** branch reads top-level `workout.programName`; the snapshot-present branch keeps
+`programName` from inside the snapshot. Not a bug, but the schema.md ":183" line read more general
+than the code.

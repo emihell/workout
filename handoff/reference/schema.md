@@ -41,7 +41,11 @@ distinct on-disk **shapes**, not distinct code paths. What it does:
 - **Plans:** `sessionId` → `routineId` (`model.js:247-250`).
 - **Workouts:** re-snapshotted + `stripLegacyWorkoutKeys` (`delete sessionId`,
   `model.js:205-208`); `routineId = workout.routineId || workout.sessionId`
-  (`:72`). Legacy `programName` preserved onto the snapshot if present (`:183`).
+  (`:72`). `programName` handling is **branch-specific** (req-37 finding): the
+  snapshot-**less** branch reads `workout.programName || snapshot?.programName ||
+  legacyProgram.programName` (`:183`); the snapshot-**present** branch keeps only
+  what's inside `workout.snapshot` (it does not read top-level `workout.programName`).
+  Real finished workouts carry `programName` in the snapshot, so it round-trips.
 - **Opaque ids kept:** `sess-…`, `si-…` (item id fallback `si-…`, `model.js:14`).
 
 ## Migration test coverage (`storage.test.js`)
