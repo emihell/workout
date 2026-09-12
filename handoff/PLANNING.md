@@ -198,11 +198,23 @@ The full cycle:
 10. stop            do not auto-start the next; wait for Emilio's trigger
 ```
 
-**The merge gate, by kind:**
-- **Functional** (logic/bug fix you can fully browser-verify) → you close it.
-- **UX / feel** (styling, one-handed gym flow) → verify + present; **Emilio uses it**; merge on his OK.
-- **Persisted-data** (schema/migration/bulk write — req-06/07 and kin) → **always** Emilio's hands
-  first, never auto-closed (CLAUDE.md's migration ask-gate).
+**The merge gate (DEC-035, supersedes the old by-kind gate): you merge on your own testing.**
+Test **everything you can reach, by your own hand** — don't trust CC's pasted `./check`. Reachable:
+run `node --test` / `./check`; spin up a **throwaway git worktree of the branch** (`git worktree add`
+a temp dir, symlink the planning worktree's `node_modules`) to run the branch's tests without touching
+the code checkout (stays inside DEC-005 — the temp tree is yours); exercise the acceptance checks;
+browser-test where reachable. **All reachable green → merge and complete** — including persisted-data
+and ux-feel reqs (previously Emilio's hands). For persisted-data, "all you can" means *thoroughly* —
+migration round-trips, anti-clobber/corruption tests, the receipts. Only what you genuinely **cannot**
+test (real-device gym feel, a two-tab browser check with no preview deploy) is left for Emilio to feel
+after, and it does **not** block. 'Done' from CC is still a signal — you *run* the tests, never trust
+the receipt.
+
+**Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
+- **Single** — one req: test all reachable → merge if green → complete → stop.
+- **Batch** — build → test all reachable → merge → complete → continue to the next until the batch is
+  done, no per-req pause. Choosing batch is the approval for continuous building AND for skipping
+  `/clear` between the batch's reqs (supersedes the "batch needs a separate OK" step above).
 
 **`/clear` code CC between reqs — a manual step, confirmed unavoidable.** You can't force it: the
 claude-code-guide confirmed (2026-09-09) there is NO programmatic `/clear` — not via the model,

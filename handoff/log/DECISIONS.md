@@ -615,3 +615,37 @@ finish.jsx's `routineItemId`-only match + unconditional `recommendation.targets`
 user-facing choice — the audit-mandated reconciliation. Common routineItemId-keyed case is unchanged
 (regression-tested); only sessionItemId/item.id-keyed and all-skipped items shift. Gate: persisted-data
 /behaviour → Emilio used it before merge. Merge `078d2c5` (branch `req-40`, `ab4706b`).
+
+## DEC-035 — planning merges on its own testing; every run is explicitly batch or single  (Emilio, 2026-09-12)
+
+Broadens the merge gate after the 2026-09-12 audit run. Emilio: *"if you can then you test — so always
+test all you can — and if all tests pass by your hand then it's ok to merge and complete… it should
+always be run as batch or single."*
+
+**Planning merges on its own verification.** The planning session must **test everything it can reach**,
+by its own hand — not review the diff and trust CC's pasted `./check`. Reachable testing includes: run
+`node --test` / `./check`; spin up a **throwaway git worktree of the branch** (symlink the planning
+worktree's `node_modules`) to run the branch's tests without touching the code worktree (stays within
+DEC-005 — the temp worktree is planning's, not the code checkout); exercise the req's acceptance checks;
+browser-test where reachable. **If everything reachable passes, planning merges and completes** — this
+now includes **persisted-data and ux-feel reqs**, which DEC-009 had reserved for Emilio's hands.
+Rationale: Emilio delegated the merge to planning's testing; a green suite planning *ran itself* is the
+gate. 'Done' from CC stays a signal, not proof — planning re-runs, never trusts the receipt.
+
+**Only the genuinely-untestable is left to Emilio, and it does not block.** Real-device feel (gym,
+one-handed), a two-tab browser check with no preview deploy (BACKLOG) — planning tests all it can, merges,
+and Emilio feels those after and flags regressions (the DEC-009-refinement pattern, now the default).
+For persisted-data especially, "test all you can" means **thoroughly**: migration round-trips, the
+anti-clobber/anti-corruption tests, the acceptance receipts — all run by planning's hand before merge.
+
+**Every run is explicitly batch or single; planning asks which at the start and never assumes.**
+- **Single** — one req: test all reachable → merge if green → complete → stop.
+- **Batch** — build → test all reachable → merge → complete → **continue to the next**, until the whole
+  batch is done, no per-req human pause. Choosing batch IS the approval for continuous building
+  (supersedes PLANNING.md's "batch needs Emilio's OK" as a separate step) and for skipping `/clear`
+  between the batch's reqs. A mode holds for that run only.
+
+Supersedes DEC-009's per-kind merge gate (functional=planning, ux-feel/persisted-data=Emilio's hands)
+wherever planning can test the req; DEC-009's "read the diff + failure test, run the gate, never trust
+'done'" discipline is kept and strengthened (planning now *runs* it). The human-use gate survives only
+for what planning cannot reach.
