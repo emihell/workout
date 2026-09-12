@@ -219,6 +219,40 @@ connected): the pin is a standard `margin-top:auto` flex spacer; the risk is the
 `min-height` value vs the real tab-bar height on a device — that's the one thing to
 eyeball. `./check` green.
 
+## Review iteration 8 (Emilio, 2026-09-12)
+
+Five changes on the Workout screen, same branch, not merged.
+
+1. **Fixed the hairline scroll — "Routines" is now a fixed strip above the tab
+   bar.** Reverted iter-7's `.ui-screen--fill` + `.ui-pin-bottom` (the `min-height`
+   overflowed the viewport by a hair → the scroll). "Routines" is now a fixed
+   `nav.ui-subbar` docked directly on top of the tab bar (`bottom:
+   var(--ui-tabbar-h)`), out of the scrolling content — a plain de-styled link →
+   `/start`. Introduced `--ui-tabbar-h`/`--ui-subbar-h` tokens so `<main>` (clears
+   the tab bar) and the Workout screen (`.ui-screen--subbar`, clears the strip) both
+   reserve the right space and nothing hides behind either bar. No overflow scroll.
+2. **"Upcoming" → "Future workouts"** (still → `/schedule`).
+3. **"Previous" → "Past workouts"** (still → `/history`).
+4. **Today block is a two-line stack.** `TodayWorkout` now renders the **bold,
+   title-size date on top** (`.ui-today-workout__date`) and **"name — focus"** as a
+   secondary line below (`.ui-today-workout__name`, body/secondary ink), then the
+   big primary Start. The iter-6 emphasis moved from the name onto the date — the
+   date is now the heaviest text. Upcoming/Past rows keep their single-line
+   `[when] · [name] — [focus]` format (this stack is Today only).
+5. **Empty-today keeps the Today block with a disabled Start.** New `TodayEmpty`:
+   bold date on top, "Nothing scheduled today." in the name slot, and a big primary
+   Start rendered `disabled` (uses the existing `.ui-btn:disabled` styling).
+   Replaces the plain `ui-sub` empty state.
+
+Order, the other rows' actions/status, and the date format are unchanged.
+
+**Verified by reasoning** (extension still not connected): the strip is a standard
+`position:fixed` element docked at `bottom: var(--ui-tabbar-h)`; no min-height, so
+no overflow (the iter-7 bug is gone). **The one thing to eyeball on device** is the
+same `--ui-tabbar-h` = 61px + safe-area estimate of the tab bar's real height — if
+it's off, the strip could show a hairline gap or a 1px overlap with the bar; both
+are cosmetic and one number to tune. `./check` green.
+
 ## Technical
 
 ### What changed
@@ -346,15 +380,15 @@ list below.
       `+ New`/Add still works.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
-   6. On the Workout tab, top-to-bottom: header → **Upcoming›** (plain link →
-      Schedule) + items → **Today** (title-size, spaced, the focal point) →
-      Completed today → Recent items → **Previous›** (plain link → History) →
-      …gap… → **Routines›** (pinned just above the tab bar → the picker). "Upcoming"
-      and "Previous" look identical. On a short screen Routines sits at the bottom
-      with the gap above it; on a long screen it's the last row and the page
-      scrolls. Every row's info reads the same way — `[when] · [name] — [focus]`,
-      `when` in one format ("Mon, Oct 13"), focus omitted where absent. Today's big
-      primary Start and the Upcoming Start-ahead work.
+   6. On the Workout tab, top-to-bottom: header → **Future workouts›** (plain link →
+      Schedule) + items → **Today** (a two-line stack: bold date on top, "name —
+      focus" below, big primary Start) → Completed today → Recent items → **Past
+      workouts›** (plain link → History). A fixed **Routines›** strip sits directly
+      above the tab bar (→ the picker); content scrolls clear of it, no page
+      overflow/scroll when content is short. When nothing is scheduled today, the
+      Today block still shows (bold date, "Nothing scheduled today.", Start
+      disabled). Row info elsewhere reads `[when] · [name] — [focus]` in one date
+      format ("Mon, Oct 13"). Today's Start and the Future Start-ahead work.
    7. On the Schedule and History pages, Back returns you to Workouts.
    8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.

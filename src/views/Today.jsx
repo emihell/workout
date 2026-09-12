@@ -7,6 +7,7 @@ import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
+import { NavLink } from './shared'
 
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
@@ -93,11 +94,11 @@ function UpcomingRow({ store, date, slot, routine }) {
   )
 }
 
-// req-14 (Emilio review) — today's workout is the Workouts screen's main call to
-// action: the shared info line + a large, primary, full-width Start. `Done …` shows
-// once logged; a workout already in progress shows nothing here (the top-of-screen
-// Continue owns that), matching the pre-review behaviour. Info format (iter 5) with
-// `when` = "Today".
+// req-14 (Emilio review) — today's workout is the Workout screen's focal point and
+// main call to action. Iter 8: a two-line stack — the bold date on top, then
+// "name — focus" as a secondary line — then a large, primary, full-width Start.
+// `Done …` shows once logged; a workout already in progress shows nothing here
+// (the top-of-screen Continue owns that), matching the pre-review behaviour.
 function TodayWorkout({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
   const mine = store.activeWorkout
@@ -107,14 +108,31 @@ function TodayWorkout({ store, routine, slot, date }) {
     mine.scheduledFor === date
   return (
     <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
       <p className="ui-today-workout__name">
-        <WorkoutInfo when={weekdayDate(date)} name={routine.name} focus={routine.focus} />
+        {routine.name}
+        {routine.focus ? ` — ${routine.focus}` : ''}
       </p>
       {done ? (
         <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
       ) : inProgress ? null : (
         <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
       )}
+    </div>
+  )
+}
+
+// req-14 (Emilio review iter 8) — the empty-today state keeps the same emphasized
+// Today block: the bold date on top, "Nothing scheduled today." in the name slot,
+// and the big primary Start rendered disabled (there's nothing to start).
+function TodayEmpty({ date }) {
+  return (
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
+      <p className="ui-today-workout__name">Nothing scheduled today.</p>
+      <Button variant="primary" block disabled>
+        Start
+      </Button>
     </div>
   )
 }
@@ -171,7 +189,7 @@ export function Today() {
   }
 
   return (
-    <Screen className="ui-screen--fill">
+    <Screen className={mine ? '' : 'ui-screen--subbar'}>
       <Title>{greeting()}</Title>
       {loop > 1 ? (
         <p className="ui-sub">
@@ -193,7 +211,7 @@ export function Today() {
           last Row of the recent list — so they bookend with identical typography/
           chevron. Interim peeks of Schedule/History until req-32's unified scroll. */}
       <List>
-        <Row to="/schedule">Upcoming</Row>
+        <Row to="/schedule">Future workouts</Row>
         {upcoming.map(({ date, slot, routine }) => (
           <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
         ))}
@@ -205,7 +223,7 @@ export function Today() {
           <TodayWorkout key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
         ))
       ) : (
-        <p className="ui-sub">Nothing scheduled today.</p>
+        <TodayEmpty date={todayKey} />
       )}
 
       {completedToday.length ? (
@@ -224,20 +242,20 @@ export function Today() {
         {recent.map((workout) => (
           <HistoryPeekRow key={workout.id} store={store} workout={workout} />
         ))}
-        <Row to="/history">Previous</Row>
+        <Row to="/history">Past workouts</Row>
       </List>
 
-      {/* Entry to the "choose any workout" picker (/start). Iter 7: pinned to the
-          bottom of the screen — margin-top:auto in the full-height flex column
-          (.ui-screen--fill) drops it just above the fixed tab bar when content is
-          short (the gap falls between Previous and Routines), and it stays the last
-          element (not sticky/fixed) when content scrolls. Hidden mid-workout. */}
+      {/* Entry to the "choose any workout" picker (/start). Iter 8: a fixed strip
+          docked directly above the tab bar (bottom chrome, out of the scroll) — the
+          .ui-screen--subbar padding above keeps content clear of it. Replaces the
+          iter-7 flex-pin, which overflowed by a hair. Hidden mid-workout (!mine). */}
       {mine ? null : (
-        <div className="ui-pin-bottom">
-          <List>
-            <Row to="/start">Routines</Row>
-          </List>
-        </div>
+        <nav className="ui-subbar" aria-label="Routines">
+          <NavLink to="/start" className="ui-subbar__link">
+            <span>Routines</span>
+            <span className="ui-row__chev" aria-hidden="true">›</span>
+          </NavLink>
+        </nav>
       )}
     </Screen>
   )
