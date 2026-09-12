@@ -1,6 +1,6 @@
 # req-37 — a v5 migration round-trip test (audit F-RISK-1)
 
-**Status: READY.** Test-only, no production code change. From audit 2026-09-12
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-37` (`517ccee`…`517ccee`, 1 commit).** Test-only, no production code change. From audit 2026-09-12
 (F-RISK-1). **Gate: functional** — no schema/data change, so planning verifies
 (`./check`) and merges; no Emilio-hands gate (DEC-009 covers *changes* to
 persisted data; this adds a test that only reads migration behaviour).
