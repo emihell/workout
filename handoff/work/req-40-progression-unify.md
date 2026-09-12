@@ -1,6 +1,6 @@
 # req-40 — one shared progression computation (Finish == recalc) (audit F-CODE-1)
 
-**Status: READY.** From audit 2026-09-12 (F-CODE-1). **Gate: persisted-data /
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-40` (`ab4706b`…`ab4706b`, 1 commit).** From audit 2026-09-12 (F-CODE-1). **Gate: persisted-data /
 behaviour → Emilio's hands before merge** (DEC-009) — it changes what
 recommendation is written onto the routine at Finish.
 
