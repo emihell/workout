@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
-import { recommendNextPrescription } from '../../progress'
-import { exerciseById } from '../../storage'
+import { progressionForItem } from '../../model'
 import { useStore } from '../../store-context'
-import { itemKey } from '../../workout-log'
 import { Back, Missing } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { isActiveFor } from './helpers'
@@ -28,35 +26,25 @@ function FinishScreen() {
   const setCount = (active?.sets || []).length
   const items = active?.snapshot?.items || []
   const progression = items.map((item) => {
-    const exercise =
-      exerciseById(store.exercises, item.exerciseId) ||
-      { type: item.exerciseType, weightStep: item.weightStep }
-    const sets = (active?.sets || []).filter(
-      (set) =>
-        set.setType !== 'wu' &&
-        set.routineItemId === itemKey(item) &&
-        String(set.reps).toLowerCase() !== 'skipped',
-    )
-    const recommendation = recommendNextPrescription({
-      targets: item.targets,
-      sets,
-      exercise,
-    })
+    // req-40 — the saved core ({ routineItemId, sets, recommendation, to, targetsTo })
+    // comes from the ONE shared helper, identical to the History recalc path. Only the
+    // display-only fields below are computed here.
+    const core = progressionForItem(store.exercises, active, item)
     const skippedForItem = (active?.sets || []).some(
       (set) =>
-        set.routineItemId === itemKey(item) &&
+        set.routineItemId === core.routineItemId &&
         String(set.reps).toLowerCase() === 'skipped',
     )
     return {
-      routineItemId: itemKey(item),
+      routineItemId: core.routineItemId,
       exerciseId: item.exerciseId,
       name: item.exerciseName,
       from: item.suggestedWeights || [],
-      to: sets.length ? recommendation.weights : item.suggestedWeights || [],
+      to: core.to,
       targetsFrom: item.targets || [],
-      targetsTo: recommendation.targets,
-      action: recommendation.action,
-      reason: sets.length ? recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
+      targetsTo: core.targetsTo,
+      action: core.recommendation.action,
+      reason: core.sets.length ? core.recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
     }
   })
 

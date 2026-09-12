@@ -294,32 +294,51 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
   })
 }
 
+// req-40 (F-CODE-1) — the single, canonical per-item progression computation shared
+// by BOTH the Finish screen (finish.jsx, what a finished workout SAVES onto the
+// routine) and `progressionFromWorkout` (the History recalc path). It used to be
+// computed twice with divergent set-matching, so the same workout could yield two
+// different saved recommendations (fails DESIGN §2). This reconciles to the fuller
+// model.js semantics (DEC at merge): match a working set by `routineItemId ||
+// sessionItemId` against the item's id-or-fallback OR its raw `item.id` (catches
+// legacy/fallback-keyed sets finish.jsx's `routineItemId`-only match missed), and on
+// no matched working sets keep the item's own `targets`/`suggestedWeights` rather than
+// emitting a from-zero recommendation. Pure (L-007): unit-tested, not inline in a view.
+// Returns the core both callers need; finish.jsx wraps its display-only fields around
+// `sets`/`recommendation`/`to`/`targetsTo`/`routineItemId`.
+export function progressionForItem(exercises, workout, item) {
+  const exercise =
+    (exercises || []).find((candidate) => candidate.id === item.exerciseId) || {
+      type: item.exerciseType,
+      weightStep: item.weightStep,
+    }
+  const itemIdValue = item.routineItemId || item.sessionItemId || item.id
+  const sets = (workout?.sets || []).filter((set) => {
+    const setItemId = set.routineItemId || set.sessionItemId
+    return (
+      set.setType !== 'wu' &&
+      (setItemId === itemIdValue || setItemId === item.id) &&
+      String(set.reps || '').toLowerCase() !== 'skipped'
+    )
+  })
+  const recommendation = recommendNextPrescription({
+    targets: item.targets,
+    sets,
+    exercise,
+  })
+  return {
+    routineItemId: itemIdValue,
+    sets,
+    recommendation,
+    to: sets.length ? recommendation.weights : item.suggestedWeights || [],
+    targetsTo: sets.length ? recommendation.targets : item.targets || [],
+  }
+}
+
 export function progressionFromWorkout(state, workout) {
   return (workout?.snapshot?.items || []).map((item) => {
-    const exercise =
-      (state.exercises || []).find((candidate) => candidate.id === item.exerciseId) || {
-        type: item.exerciseType,
-        weightStep: item.weightStep,
-      }
-    const itemIdValue = item.routineItemId || item.sessionItemId || item.id
-    const sets = (workout.sets || []).filter((set) => {
-      const setItemId = set.routineItemId || set.sessionItemId
-      return (
-        set.setType !== 'wu' &&
-        (setItemId === itemIdValue || setItemId === item.id) &&
-        String(set.reps || '').toLowerCase() !== 'skipped'
-      )
-    })
-    const recommendation = recommendNextPrescription({
-      targets: item.targets,
-      sets,
-      exercise,
-    })
-    return {
-      routineItemId: itemIdValue,
-      to: sets.length ? recommendation.weights : item.suggestedWeights || [],
-      targetsTo: sets.length ? recommendation.targets : item.targets || [],
-    }
+    const { routineItemId, to, targetsTo } = progressionForItem(state.exercises, workout, item)
+    return { routineItemId, to, targetsTo }
   })
 }
 
