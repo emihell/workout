@@ -25,10 +25,9 @@ Decisions DEC-028..033 taken; planning-side done (`reference/schema.md`, DESIGN 
 UTC→local date, backup validation, progression unify. **Then:** cross-tab warn (DEC-029), n/a holds
 (DEC-030), archive names slots (DEC-031). **Cleanup:** dead code, dedupe, split `model.js`/`item.jsx`,
 doctor content-check. **req-36–43 shipped** — all trust bugs + behaviour reqs done. **Cleanup left:**
-`req-44` dead `nextScheduled` + dedupe predicates (isSkippedSet/isDurationTarget/uses-weight) + Routine
-double-split (building); `req-45` `plan doctor` content-check. **Module splits (model.js/item.jsx,
-F-STRUCT-4) — deferred:** low-value nit, higher domino risk; revisit only if Emilio wants. L-007.
-Two-tab eyeball for req-41 left to Emilio.
+`req-44` dead code + dedupe predicates + Routine split (building, L-005 gate); `req-45` doctor
+content-check. Module splits (F-STRUCT-4) **deferred** (low-value, higher risk). L-007. req-41 two-tab
+eyeball left to Emilio.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
