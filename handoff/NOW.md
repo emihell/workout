@@ -25,10 +25,9 @@ content-check) all shipped. New: DEC-028..034, L-007/008, `reference/schema.md`.
 (model.js/item.jsx module splits) deferred** — low-value, higher risk; revive if wanted. Non-blocking
 Emilio eyeballs: req-41 two-tab, req-44 gym-flow walk.
 
-**Post-audit workflow reflection → `req-46` (building):** save-time handoff-drift warning (catch NOW>50
-before publish; publish stays non-blocking per req-34), `plan publish --push`, `plan closeout` prints the
-maintenance checklist. Docs patched: PLANNING.md (idle-notice trails report; pre-spec known batches),
-BACKLOG (per-branch preview deploy, revives L-003).
+**Post-audit reflection → `req-46` (building):** save-time drift warning, `plan publish --push`,
+`plan closeout` checklist. Docs patched: PLANNING.md (idle-notice trails report; pre-spec batches),
+BACKLOG (per-branch preview deploy, L-003).
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
