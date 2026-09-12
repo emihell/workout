@@ -4,9 +4,9 @@ Your cheat sheet. **Two prompts** boot a session — paste one as the first mess
 and put your task where it says `<task>`. Everything after is reference.
 
 ```
-~/projects/workout-app/
-  workout-app-codebase/   code     (branch main)     — Claude Code builds here
-  workout-app-planning/   planning (branch planning) — Cowork writes handoff/ here
+~/projects/workout/
+  workout-codebase/   code     (branch main)     — Claude Code builds here
+  workout-planning/   planning (branch planning) — Cowork writes handoff/ here
 ```
 
 ---
@@ -15,7 +15,7 @@ and put your task where it says `<task>`. Everything after is reference.
 
 ### Cowork (planning)   ← this cold-starts Cowork
 ```
-Planning session for workout-app. Read workout-app-planning/START-HERE.md, then: <task>.
+Planning session for workout-app. Read workout-planning/START-HERE.md, then: <task>.
 ```
 
 ### Claude Code
@@ -59,7 +59,7 @@ planning → CC is `handoff/` (published to `main`). `NOW.md` is the board:
 **Planning read order (do NOT scan the repo):** `handoff/PLANNING.md` (authority)
 → `handoff/NOW.md` (board) → `handoff/rules/CLOSEOUT.md` (before any merge/close-out)
 → on demand: `rules/WORKFLOW.md`, `rules/DESIGN.md` (before any UI/UX), `log/*`,
-`work/req-*`, and `reports/req-N.md` in workout-app-codebase when CC just built.
+`work/req-*`, and `reports/req-N.md` in workout-codebase when CC just built.
 
 **Hard rules:**
 - A req is never marked `BUILT AND MERGED` until git shows it on `main`. No

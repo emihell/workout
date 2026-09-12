@@ -32,15 +32,15 @@ The seed in `src/db.json` is provenance and reference only — it is not loaded 
 
 ## Setup (first time on a machine)
 
-Clone the repo, wire up the git hooks, install deps, and create the planning worktree. The two worktrees **must be siblings** (the planning grants use `../workout-app-codebase` relative paths). Paste the whole block:
+Clone the repo, wire up the git hooks, install deps, and create the planning worktree. The two worktrees **must be siblings** (the planning grants use `../workout-codebase` relative paths). Paste the whole block:
 
 ```sh
 # 0 — a home for the two worktrees (they must be siblings)
-mkdir -p ~/projects/workout-app && cd ~/projects/workout-app
+mkdir -p ~/projects/workout && cd ~/projects/workout
 
 # 1 — clone the code worktree
-git clone https://github.com/emihell/workout.git workout-app-codebase
-cd workout-app-codebase
+git clone https://github.com/emihell/workout.git workout-codebase
+cd workout-codebase
 
 # 2 — activate the git hooks (per-clone, not stored in the repo; guards handoff/)
 git config core.hooksPath .githooks
@@ -49,27 +49,27 @@ git config core.hooksPath .githooks
 npm install
 
 # 4 — add the planning worktree (branch `planning`, sibling directory)
-git worktree add ../workout-app-planning planning
+git worktree add ../workout-planning planning
 
 # 5 — grant the planning session its git + ./plan permissions
 #     (machine-local, gitignored by design — recreate on every machine)
-mkdir -p ../workout-app-planning/.claude
-cat > ../workout-app-planning/.claude/settings.local.json <<'JSON'
+mkdir -p ../workout-planning/.claude
+cat > ../workout-planning/.claude/settings.local.json <<'JSON'
 { "permissions": { "allow": [
   "Bash(git add:*)",
   "Bash(git commit:*)",
   "Bash(git reset:*)",
   "Bash(git restore:*)",
   "Bash(git push:*)",
-  "Bash(../workout-app-codebase/plan save:*)",
-  "Bash(../workout-app-codebase/plan status:*)",
-  "Bash(../workout-app-codebase/plan publish:*)",
-  "Bash(../workout-app-codebase/plan closeout:*)"
+  "Bash(../workout-codebase/plan save:*)",
+  "Bash(../workout-codebase/plan status:*)",
+  "Bash(../workout-codebase/plan publish:*)",
+  "Bash(../workout-codebase/plan closeout:*)"
 ] } }
 JSON
 ```
 
-That gives you the two-worktree layout (`workout-app-codebase/` on `main`, `workout-app-planning/` on `planning`). To boot a session, see **`START-HERE.md`** for the one-line prompts; run the app with `npm run dev` in `workout-app-codebase/`.
+That gives you the two-worktree layout (`workout-codebase/` on `main`, `workout-planning/` on `planning`). To boot a session, see **`START-HERE.md`** for the one-line prompts; run the app with `npm run dev` in `workout-codebase/`.
 
 ## Development
 
