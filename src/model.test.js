@@ -4,6 +4,8 @@ import {
   applyProgressionToRoutines,
   buildPlannedWorkout,
   migrateState,
+  progressionForItem,
+  progressionFromWorkout,
   SCHEMA_VERSION,
 } from './model.js'
 
@@ -221,5 +223,82 @@ describe('routine snapshots', () => {
     assert.deepEqual(next[0].exercises[0].suggestedWeights, [25, 30, 30])
     assert.deepEqual(next[0].exercises[0].targets, ['12', '10', '8'])
     assert.equal(next[0].exercises[0].sets, 3)
+  })
+})
+
+// req-40 (F-CODE-1) — Finish (finish.jsx) and History recalc (progressionFromWorkout)
+// used to compute the per-item progression twice with divergent set-matching, so the
+// same workout could save two different recommendations (fails DESIGN §2). Both now
+// derive their saved core from the one pure helper `progressionForItem`, reconciled to
+// the fuller model.js matcher + the keep-item.targets empty-sets fallback.
+describe('req-40 unified progression (Finish == recalc)', () => {
+  const exercises = [{ id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5' }]
+
+  it('the fuller matcher catches a sessionItemId-keyed set the old finish matcher missed', () => {
+    // The item resolves to key 'ri-1'; the working set is keyed by sessionItemId only
+    // (no routineItemId) — exactly what finish.jsx's `routineItemId`-only filter missed.
+    const item = { exerciseId: 'ex-1', exerciseName: 'Press', routineItemId: 'ri-1', targets: ['8'], suggestedWeights: [40] }
+    const workout = {
+      snapshot: { items: [item] },
+      sets: [{ sessionItemId: 'ri-1', setType: 'work', weight: 40, reps: '8', rpe: 1 }],
+    }
+
+    const core = progressionForItem(exercises, workout, item)
+    assert.equal(core.sets.length, 1, 'the sessionItemId-keyed set is matched')
+    assert.deepEqual(core.to, [45], 'rpe<=2, not missed → up one 5kg step')
+    assert.deepEqual(core.targetsTo, ['8'])
+
+    // The recalc path returns the SAME {to, targetsTo} — the consistency this req buys.
+    const [recalc] = progressionFromWorkout({ exercises }, workout)
+    assert.equal(recalc.routineItemId, 'ri-1')
+    assert.deepEqual({ to: recalc.to, targetsTo: recalc.targetsTo }, { to: core.to, targetsTo: core.targetsTo })
+
+    // Prove it was a real divergence: the OLD finish filter (routineItemId only) saw
+    // zero sets and would have saved the unchanged [40], not the [45] both paths now save.
+    const oldFinishSets = workout.sets.filter(
+      (set) =>
+        set.setType !== 'wu' &&
+        set.routineItemId === 'ri-1' &&
+        String(set.reps).toLowerCase() !== 'skipped',
+    )
+    assert.equal(oldFinishSets.length, 0, 'old finish matcher missed the set')
+    assert.notDeepEqual(core.to, item.suggestedWeights, 'so old finish would have saved a different (stale) recommendation')
+  })
+
+  it('empty matched sets keep item.targets / item.suggestedWeights, not a from-zero recommendation', () => {
+    const item = { exerciseId: 'ex-1', routineItemId: 'ri-1', targets: ['12', '10'], suggestedWeights: [30, 30] }
+    const workout = { snapshot: { items: [item] }, sets: [] }
+    const core = progressionForItem(exercises, workout, item)
+    assert.equal(core.sets.length, 0)
+    assert.deepEqual(core.to, [30, 30])
+    assert.deepEqual(core.targetsTo, ['12', '10'])
+    // recalc agrees
+    const [recalc] = progressionFromWorkout({ exercises }, workout)
+    assert.deepEqual({ to: recalc.to, targetsTo: recalc.targetsTo }, { to: [30, 30], targetsTo: ['12', '10'] })
+  })
+
+  it('a normal routineItemId-keyed workout yields the same recommendation as before (regression guard)', () => {
+    const item = { exerciseId: 'ex-1', routineItemId: 'ri-1', targets: ['8'], suggestedWeights: [40] }
+    const workout = {
+      snapshot: { items: [item] },
+      sets: [{ routineItemId: 'ri-1', setType: 'work', weight: 40, reps: '8', rpe: 1 }],
+    }
+    const [p] = progressionFromWorkout({ exercises }, workout)
+    assert.deepEqual(p, { routineItemId: 'ri-1', to: [45], targetsTo: ['8'] })
+  })
+
+  it('a warm-up and a skipped set never feed the recommendation', () => {
+    const item = { exerciseId: 'ex-1', routineItemId: 'ri-1', targets: ['8'], suggestedWeights: [40] }
+    const workout = {
+      snapshot: { items: [item] },
+      sets: [
+        { routineItemId: 'ri-1', setType: 'wu', weight: 20, reps: '8', rpe: 1 },
+        { routineItemId: 'ri-1', setType: 'work', weight: 40, reps: 'skipped' },
+      ],
+    }
+    const core = progressionForItem(exercises, workout, item)
+    assert.equal(core.sets.length, 0, 'wu + skipped are both excluded')
+    assert.deepEqual(core.to, [40])
+    assert.deepEqual(core.targetsTo, ['8'])
   })
 })
