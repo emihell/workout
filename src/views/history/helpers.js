@@ -46,6 +46,20 @@ export function whenLabel(workout) {
   return compactDate(workoutDateKey(workout))
 }
 
+// req-14 (Emilio review iter 6) — the ONE shared `when` format for the Workout
+// screen's rows (Upcoming / Today / Recent), so all three read the same way:
+// weekday + short date, e.g. "Sun, Oct 13". The year is appended only when it is
+// not the current year, so this year's dates stay compact and older history reads
+// "Sun, Oct 13, 2024". Takes a "YYYY-MM-DD" key; `now` is injectable for testing.
+// Format is the chosen default and is Emilio-tweakable.
+export function weekdayDate(key, now = new Date()) {
+  if (!key || key === 'unknown') return 'Unknown'
+  const [year, month, day] = key.split('-').map(Number)
+  const opts = { weekday: 'short', month: 'short', day: 'numeric' }
+  if (year !== now.getFullYear()) opts.year = 'numeric'
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, opts)
+}
+
 export function sortWorkoutsByDate(workouts) {
   return [...(workouts || [])].sort((a, b) => {
     const left = workoutDateKey(a)

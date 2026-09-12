@@ -363,14 +363,17 @@ a.ui-btn--quiet:active {
 }
 
 /* ---- Today's workout (req-14 review) — the routine name above its large,
- * primary, full-width Start (the Workouts screen's main call to action). */
+ * primary, full-width Start. Iter 6: Today is the screen's focal point — generous
+ * vertical space around it and a title-size, bold name, clearly heavier than the
+ * body-size Upcoming/Recent rows (which have no headers now). */
 .ui-today-workout {
-  margin: var(--ui-s3) 0;
+  margin: var(--ui-s4) 0;
 }
 .ui-today-workout__name {
-  font-size: var(--ui-text-body);
-  font-weight: 600;
-  margin: 0 0 var(--ui-s2);
+  font-size: var(--ui-text-title);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 var(--ui-s3);
 }
 
 /* ---- Banner ---- */

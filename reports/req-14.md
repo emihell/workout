@@ -154,6 +154,42 @@ Two changes on the Workout screen, same branch, not merged:
 
 `./check` re-run after iteration 5 — green (145 tests, lint, build).
 
+## Review iteration 6 (Emilio, 2026-09-12)
+
+Six changes on the Workout screen (the layout Emilio wants), same branch, not
+merged. Resulting order: header → **Upcoming›** (+items) → **Today** (emphasized,
+spaced) → Completed today → Recent items → **View past›** → **Routines›** (bottom).
+
+1. **One shared `when` format on all rows.** New `weekdayDate(key, now?)` in
+   `history/helpers.js` — **weekday + short date, e.g. "Mon, Oct 13"**, appending
+   `, YYYY` only when the year isn't the current year (older history → "Sun, Oct 13,
+   2024"). Upcoming, Today, Recent and Completed-today all render `when` through it.
+   *This is the chosen default and is Emilio-tweakable.* Smoke-checked:
+   `weekdayDate('2025-10-13')` → "Mon, Oct 13"; `'2024-10-13'` → "Sun, Oct 13, 2024".
+   (No unit test: the check gate globs `src/*.test.js` only, and this is a display
+   formatter with an injectable `now`; verified by the smoke run above.)
+2. **Removed the "Today" and "Recent" section headers.** The date format, Today's
+   emphasis (#6), and spacing carry the meaning. The top header (greeting / "Week x
+   of y" / "In progress · Continue") stays.
+3. **"Upcoming" header is now the link to `/schedule`** (a `NavLink` with a forward
+   chevron inside the `SectionHeader`); the separate "Show all" row under Upcoming
+   is gone.
+4. **Recent's link renamed "Show all" → "View past"** (target still `/history`);
+   Recent is now just its items followed by that link (no header).
+5. **"Routines" is the absolute bottom element**, directly above the fixed tab bar
+   (unchanged position, now confirmed as the last thing on the screen).
+6. **Today is the focal point:** `.ui-today-workout` gets `--ui-s4` vertical space
+   and its name is title-size / 700 weight — clearly heavier than the body-size
+   Upcoming/Recent rows. Its big primary Start is unchanged.
+
+Actions/status all unchanged (Start, Start-ahead, Done value, in-progress hide,
+history links). **"Completed today" note:** the peer's stated order didn't mention
+it; I kept it between Today and Recent (where iter 4 put it), with its own header —
+change 2 only removed the Today/Recent headers. Flag if it should move or lose its
+header too.
+
+`./check` re-run after iteration 6 — green (145 tests, lint, build).
+
 ## Technical
 
 ### What changed
@@ -281,13 +317,12 @@ list below.
       `+ New`/Add still works.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
-   6. On the Workout tab, sections read top-to-bottom: header → **Upcoming** →
-      **Today** (+ Completed today) → **Recent**, and every row shows the same info
-      the same way — `[when] · [name] — [focus]` (focus omitted where there's none).
-      Today's workout has a big primary Start (works); each Upcoming item has a
-      smaller secondary Start that starts that future workout; each "Show all" opens
-      the full Schedule / History page; a plain **"Routines"** row at the very
-      bottom (above the tab bar) opens the workout picker.
+   6. On the Workout tab, top-to-bottom: header → **Upcoming›** (a tappable header
+      → Schedule) + items → **Today** (title-size, spaced, the focal point) →
+      Completed today → Recent items → **View past›** (→ History) → **Routines›**
+      (bottom, → the picker). Every row's info reads the same way — `[when] · [name]
+      — [focus]`, `when` in one format ("Mon, Oct 13"), focus omitted where absent.
+      Today's big primary Start and the Upcoming Start-ahead work.
    7. On the Schedule and History pages, Back returns you to Workouts.
    8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.

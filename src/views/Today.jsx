@@ -1,12 +1,13 @@
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
-import { greeting, weekdayName } from '../ids'
+import { greeting } from '../ids'
 import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
 import { completedOnDayKey, findRoutine } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
-import { sortWorkoutsByDate, whenLabel, workoutRoutineId, workoutRoutineName } from './history/helpers'
+import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
+import { NavLink } from './shared'
 
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
@@ -35,8 +36,9 @@ function activeRoutineId(workout) {
 // the same information the same way. `focus` degrades gracefully — when a source
 // has none (an older history snapshot without focus, or a deleted routine) the
 // "— focus" is dropped rather than invented (DESIGN §1: never invent absent data).
-// `when` is always supplied (weekday / date / "Today"). This is INFO only; each
-// row keeps its own action/status (Start, Done, the history link).
+// `when` is always supplied and uses the one shared `weekdayDate` format across all
+// rows (iter 6). This is INFO only; each row keeps its own action/status (Start,
+// Done, the history link).
 function WorkoutInfo({ when, name, focus }) {
   return (
     <>
@@ -53,7 +55,7 @@ function CompletedTodayRow({ store, workout }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   return (
     <Row to={`/history/${workout.id}`}>
-      <WorkoutInfo when="Today" name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
     </Row>
   )
 }
@@ -64,7 +66,7 @@ function HistoryPeekRow({ store, workout }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   return (
     <Row to={`/history/${workout.id}`}>
-      <WorkoutInfo when={whenLabel(workout)} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
     </Row>
   )
 }
@@ -87,7 +89,7 @@ function UpcomingRow({ store, date, slot, routine }) {
     !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
   return (
     <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
-      <WorkoutInfo when={weekdayName(date.getDay())} name={routine.name} focus={routine.focus} />
+      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} />
     </Row>
   )
 }
@@ -107,7 +109,7 @@ function TodayWorkout({ store, routine, slot, date }) {
   return (
     <div className="ui-today-workout">
       <p className="ui-today-workout__name">
-        <WorkoutInfo when="Today" name={routine.name} focus={routine.focus} />
+        <WorkoutInfo when={weekdayDate(date)} name={routine.name} focus={routine.focus} />
       </p>
       {done ? (
         <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
@@ -185,20 +187,21 @@ export function Today() {
         </p>
       ) : null}
 
-      {/* Section order (iter 4): Upcoming → Today (+ Completed today) → Recent.
-          Upcoming and Recent are light peeks of the Schedule/History pages (no
-          longer tabs, DEC-024), each ending in "Show all"; interim until req-32's
-          unified Workouts scroll. */}
-      <SectionHeader>Upcoming</SectionHeader>
+      {/* Section order (iter 6): Upcoming› → Today (emphasized) → Completed today
+          → Recent items → View past› → Routines› (bottom). Today and Recent lost
+          their headers — the shared date format, Today's emphasis, and spacing
+          carry the meaning. "Upcoming" is itself the link to the full Schedule;
+          "View past" opens the full History. Interim until req-32's unified scroll. */}
+      <SectionHeader>
+        <NavLink to="/schedule" chevron="forward">Upcoming</NavLink>
+      </SectionHeader>
       {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
       <List>
         {upcoming.map(({ date, slot, routine }) => (
           <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
         ))}
-        <Row to="/schedule">Show all</Row>
       </List>
 
-      <SectionHeader>Today</SectionHeader>
       {todays.length ? (
         todays.map(({ slot, routine }) => (
           <TodayWorkout key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
@@ -218,13 +221,12 @@ export function Today() {
         </>
       ) : null}
 
-      <SectionHeader>Recent</SectionHeader>
       {recent.length === 0 ? <p className="ui-sub">No history yet.</p> : null}
       <List>
         {recent.map((workout) => (
           <HistoryPeekRow key={workout.id} store={store} workout={workout} />
         ))}
-        <Row to="/history">Show all</Row>
+        <Row to="/history">View past</Row>
       </List>
 
       {/* Entry to the "choose any workout" picker (/start) — last element, just
