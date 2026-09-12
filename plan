@@ -564,14 +564,75 @@ cmd_doctor() {
     fi
   fi
 
-  # 4. Grants — the planning session's machine-local permissions file exists.
+  # 4. Grants — the planning session's machine-local permissions file exists AND
+  #    its permissions.allow matches the canonical grant set exactly (catches
+  #    content drift: a stale, narrowed, or over-broad list — DEC-028 follow-up).
+  #    The canonical list below is the ten grants from README §Setup step 5
+  #    (DEC-005 / DEC-026). KEEP IN SYNC WITH README §Setup step 5 — the one
+  #    coupling: if the grants there change, change them here too.
   if [ -n "$pd" ]; then
-    if [ -f "$pd/.claude/settings.local.json" ]; then
-      echo "ok   grants — $pd/.claude/settings.local.json exists"
-    else
+    local grants_file="$pd/.claude/settings.local.json"
+    if [ ! -f "$grants_file" ]; then
       echo "FIX: grants — no .claude/settings.local.json in the planning worktree ($pd)."
       echo "     Re-paste the grant block from README §Setup step 5."
       fail=1
+    else
+      local canonical_grants=(
+        'Bash(git add:*)'
+        'Bash(git commit:*)'
+        'Bash(git reset:*)'
+        'Bash(git restore:*)'
+        'Bash(git push origin planning:*)'
+        'Bash(git push origin main planning:*)'
+        'Bash(../workout-codebase/plan save:*)'
+        'Bash(../workout-codebase/plan status:*)'
+        'Bash(../workout-codebase/plan publish:*)'
+        'Bash(../workout-codebase/plan closeout:*)'
+      )
+      # python3 is already a dependency (scripts/check_handoff.py). Read
+      # permissions.allow as JSON and diff (order-independent set comparison);
+      # a malformed/unreadable file returns a PARSE line, never a stack trace.
+      local grants_result
+      grants_result="$(CANONICAL="$(printf '%s\n' "${canonical_grants[@]}")" python3 - "$grants_file" <<'PY'
+import json, os, sys
+canonical = set(os.environ["CANONICAL"].splitlines())
+try:
+    with open(sys.argv[1]) as f:
+        data = json.load(f)
+except (ValueError, OSError) as e:
+    print("PARSE\t%s" % e)
+    sys.exit(0)
+allow = (data.get("permissions") or {}).get("allow")
+if not isinstance(allow, list):
+    print("PARSE\tno permissions.allow array")
+    sys.exit(0)
+actual = set(allow)
+missing = sorted(canonical - actual)
+extra = sorted(actual - canonical)
+if not missing and not extra:
+    print("OK\t%d" % len(canonical))
+else:
+    print("DRIFT\tmissing: %s\textra: %s" % (
+        ", ".join(missing) or "(none)",
+        ", ".join(extra) or "(none)"))
+PY
+)"
+      local tag="${grants_result%%$'\t'*}" rest="${grants_result#*$'\t'}"
+      case "$tag" in
+        OK)
+          echo "ok   grants — $grants_file matches all $rest canonical grants"
+          ;;
+        DRIFT)
+          echo "FIX: grants — ${rest//$'\t'/; }"
+          echo "     Re-paste the grant block from README §Setup step 5."
+          fail=1
+          ;;
+        *)
+          echo "FIX: grants — could not read permissions.allow from $grants_file: $rest"
+          echo "     Re-paste the grant block from README §Setup step 5."
+          fail=1
+          ;;
+      esac
     fi
   fi
 
