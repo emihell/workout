@@ -6,42 +6,30 @@ gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `wor
 
 ## Milestone (Emilio, 2026-09-07)
 
-> In-gym flow **flawless** first. Then the **program-creation flow**. Nothing heavy before
-> the flow is flawless.
+> In-gym flow **flawless** first, then **program-creation**. Nothing heavy before the flow is flawless.
 
-```
-Phase 1  in-gym flow flawless    ← now (browser-only)
-Phase 2  program-creation flow   ← next
-Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated on the backend fork)
-```
+Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 backend/users/exercise-DB/AI/styling (gated on the backend fork).
 
 ## Next — READY
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
 
-**Workflow/tooling (SHIPPED 2026-09-12, `8daa8f2`):** `req-33` `plan doctor`, `req-34` gate holes
-(CI runs `./check`; test glob recurses), `req-35` narrow push grant (README slice). DEC-026/027.
-Grants stay machine-local (DEC-028; tracking tried+reverted, F-CONFIG-1) — `settings.local.json`
-recreated, `plan doctor` green.
+**Tooling (SHIPPED 2026-09-12):** req-33/34/35. Grants stay machine-local (DEC-028; tracking
+tried+reverted, F-CONFIG-1) — `plan doctor` green.
 
-## Audit 2026-09-12 → req queue (`audits/2026-09-12.md`)
+## Audit 2026-09-12 → req queue (`audits/2026-09-12.md`, 20 findings)
 
-20 findings; F-CONFIG-1 fixed (DEC-028). Decisions taken: DEC-029..033. **Trust bugs first**
-(persisted-data → Emilio's hands, DEC-009): corrupt-`v8` guard (F-RISK-2/DEC-032), v5 migration
-test + pin shape (F-RISK-1), UTC→local date key (F-CODE-2), backup array-validation (F-RISK-4),
-progression unify Finish==recalc (F-CODE-1). **Then:** cross-tab warn (F-RISK-3/DEC-029), n/a-step
-holds (F-DIV-1/DEC-030), archive confirm names slots (F-DIV-3/DEC-031). **Cleanup:** drop
-`nextScheduled`, dedupe predicates, split `model.js`/`item.jsx`, `plan doctor` content-check.
-**Planning-owned (no code):** populate `reference/`, note DEC-002 carry in DESIGN §1, "Correct" kept
-(DEC-033). Reqs specced one at a time from here.
+Decisions DEC-028..033 taken; planning-side done (`reference/schema.md`, DESIGN §1 carry, "Correct").
+**Trust bugs first** (persisted-data → Emilio's hands): corrupt-`v8` (DEC-032), v5 migration test,
+UTC→local date, backup validation, progression unify. **Then:** cross-tab warn (DEC-029), n/a holds
+(DEC-030), archive names slots (DEC-031). **Cleanup:** dead code, dedupe, split `model.js`/`item.jsx`,
+doctor content-check. Reqs specced one at a time from here.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 
-**Done batches:** refactor (req-16–23, DEC-021; #8 no-op, #10 rejected); gym-flow notes (req-25–29,
-DEC-009-refinement auto-merge). Emilio to gym-test req-25/27 feel. Audit 2026-09-11 (in code
-`audits/`) → req-30 (F1/F2) shipped, F3 skipped. **#6 timed exercises PARKED** (model TBD; a
-"Duration" field already exists for cardio, e.g. Rowing).
+**Done batches:** refactor (req-16–23, DEC-021); gym-flow notes (req-25–29). Emilio to gym-test
+req-25/27 feel. **#6 timed exercises PARKED** (model TBD; cardio "Duration" exists, e.g. Rowing).
 
 ## Needs decisions — parked until their phase
 
