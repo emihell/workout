@@ -25,6 +25,12 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      # req-34: run the same gate the local flow runs (lint + tests + build)
+      # before deploying, so a red suite blocks the Pages deploy. ./check is the
+      # one source of truth — CI can't drift from what `plan publish` enforces.
+      # It builds too (without GITHUB_PAGES), so the deploy build below is the
+      # only Pages-configured build that ships.
+      - run: ./check
       - run: npm run build
         env:
           GITHUB_PAGES: 'true'

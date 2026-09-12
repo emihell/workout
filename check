@@ -33,12 +33,19 @@ fi
 cd "$HERE"
 
 # A gate that runs zero tests and passes is worse than no gate. Refuse if the
-# glob matches nothing rather than letting node --test exit 0 on an empty run.
-shopt -s nullglob
-testfiles=(src/*.test.js)
-shopt -u nullglob
+# search finds nothing rather than letting node --test exit 0 on an empty run.
+#
+# `find` rather than a bash glob (req-34): the gate must run EVERY *.test.js
+# under src/, nested folders included (e.g. src/views/history/). A top-level
+# `src/*.test.js` glob skips those silently, and `src/**/*.test.js` needs
+# globstar — unavailable in the bash 3.2 this runs under on macOS. `find`
+# recurses portably on both macOS and the Ubuntu CI runner.
+testfiles=()
+while IFS= read -r f; do
+  testfiles+=("$f")
+done < <(find src -type f -name '*.test.js' | sort)
 if [ "${#testfiles[@]}" -eq 0 ]; then
-  echo "check: RED — no test files matched src/*.test.js; refusing." >&2
+  echo "check: RED — no test files matched src/**/*.test.js; refusing." >&2
   echo "check: a gate that runs nothing must not pass. Check the path." >&2
   exit 5
 fi

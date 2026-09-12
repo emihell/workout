@@ -61,11 +61,13 @@ git worktree add ../workout-planning planning
 #     Written with printf, not a heredoc: a heredoc's closing word breaks the
 #     moment a paste indents it, and this line survives any indentation.
 mkdir -p ../workout-planning/.claude
-printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git commit:*)", "Bash(git reset:*)", "Bash(git restore:*)", "Bash(git push:*)", "Bash(../workout-codebase/plan save:*)", "Bash(../workout-codebase/plan status:*)", "Bash(../workout-codebase/plan publish:*)", "Bash(../workout-codebase/plan closeout:*)" ] } }' > ../workout-planning/.claude/settings.local.json
+printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git commit:*)", "Bash(git reset:*)", "Bash(git restore:*)", "Bash(git push origin planning:*)", "Bash(git push origin main planning:*)", "Bash(../workout-codebase/plan save:*)", "Bash(../workout-codebase/plan status:*)", "Bash(../workout-codebase/plan publish:*)", "Bash(../workout-codebase/plan closeout:*)" ] } }' > ../workout-planning/.claude/settings.local.json
 
-# 6 — verify the layout: this must print a status, not an error.
-#     "no second (code) worktree" means step 4 didn't take (see the note below).
-../workout-codebase/plan status
+# 6 — verify the whole setup: checks layout, hooks, deps, grants and git
+#     identity, then prints status. Every line should read `ok`; a `FIX:` line
+#     tells you which step to redo. "no 'planning' worktree" means you have two
+#     separate clones, not a worktree — see the note below.
+../workout-codebase/plan doctor
 ```
 
 That gives you the two-worktree layout (`workout-codebase/` on `main`, `workout-planning/` on `planning`). To boot a session, see **`START-HERE.md`** for the one-line prompts; run the app with `npm run dev` in `workout-codebase/`.
@@ -90,7 +92,7 @@ git worktree add ../workout-planning planning
 npm run dev
 npm run lint
 npm run build
-node --test src/*.test.js
+node --test        # runs every *.test.js under src/, nested folders included
 ```
 
 Dev server: a single instance at http://localhost:5173/
