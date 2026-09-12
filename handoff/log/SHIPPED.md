@@ -531,3 +531,18 @@ req-36's load-path corrupt-`v8` guard (silent overwrite) — so validation lives
 only. Diff: `exchange.js` + `exchange.test.js` only. `./check` green, `exchange.test.js` 9 tests. Gate:
 functional (validation-only; tests prove the two repros throw the friendly message AND a real
 `buildBackup` round-trips without false-reject). Merge `a10403a` (branch `req-39`, `79ccfcc`, 1 commit).
+
+## req-40 — one shared progression computation, Finish == recalc (audit F-CODE-1)  (merged 2026-09-12)
+
+The per-item next-time recommendation was computed twice with divergent set-matching — inline in
+`finish.jsx` (what Finish saves onto the routine) vs `progressionFromWorkout` (History recalc) — so the
+same workout could save two different plans (DESIGN §2 fail). Extracted one pure `progressionForItem`
+helper in `model.js` (L-007 — unit-testable, not inline in the view); both `progressionFromWorkout` and
+`finish.jsx` now call it (finish keeps its display-only fields around the shared core). Canonical =
+model.js semantics (DEC-034): match `routineItemId || sessionItemId` (+ `item.id`), keep `item.targets`
+on empty matched sets. `recommendNextPrescription`/`applyProgressionToRoutines`/`progress.js` untouched.
+Consistency test (model.test.js) makes the divergence concrete: a `sessionItemId`-keyed set the old
+finish matcher missed (would've saved stale `[40]`) now yields `[45]` from both paths; + empty-sets
+fallback, normal-case regression guard, wu/skipped exclusion. `./check` green, model.test.js 11 tests.
+Interrupted mid-build by a usage-limit reset, resumed cleanly. Gate: persisted-data/behaviour → Emilio
+used it before merge. Merge `078d2c5` (branch `req-40`, `ab4706b`, 1 commit).

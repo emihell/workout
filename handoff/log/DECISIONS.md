@@ -600,3 +600,18 @@ recommendation section says "*Correcting* meaningful history shows a recalculati
 flow routes edit→recalc-preview — "Correct" names the recalc semantics precisely where a bare "Edit"
 would imply a silent in-place change. Recorded so the vocabulary ledger shows this is chosen, not a
 slip. No code change.
+
+## DEC-034 — one canonical progression computation; finish.jsx's narrower matcher was the bug  (2026-09-12)
+
+req-40 (audit F-CODE-1). The per-item next-time recommendation was computed twice with divergent
+set-matching — inline in `finish.jsx` (what Finish *saves* onto the routine) vs `progressionFromWorkout`
+(the History-recalc path) — so the same workout could yield two different saved plans, failing DESIGN §2.
+Unified into one pure helper `progressionForItem` (`model.js`, per L-007 so it's unit-testable); both
+callers now use it. Where they differed, the **fuller `model.js` semantics win**: match a working set by
+`routineItemId || sessionItemId` against the item id-or-fallback **or** `item.id` (catches
+legacy/fallback-keyed sets the finish `routineItemId`-only filter missed), and on **no matched working
+sets keep `item.targets`/`item.suggestedWeights`** rather than emitting a from-zero recommendation.
+finish.jsx's `routineItemId`-only match + unconditional `recommendation.targets` was the bug. Not a new
+user-facing choice — the audit-mandated reconciliation. Common routineItemId-keyed case is unchanged
+(regression-tested); only sessionItemId/item.id-keyed and all-skipped items shift. Gate: persisted-data
+/behaviour → Emilio used it before merge. Merge `078d2c5` (branch `req-40`, `ab4706b`).
