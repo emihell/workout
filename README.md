@@ -53,23 +53,31 @@ git worktree add ../workout-planning planning
 
 # 5 — grant the planning session its git + ./plan permissions
 #     (machine-local, gitignored by design — recreate on every machine)
+#     Written with printf, not a heredoc: a heredoc's closing word breaks the
+#     moment a paste indents it, and this line survives any indentation.
 mkdir -p ../workout-planning/.claude
-cat > ../workout-planning/.claude/settings.local.json <<'JSON'
-{ "permissions": { "allow": [
-  "Bash(git add:*)",
-  "Bash(git commit:*)",
-  "Bash(git reset:*)",
-  "Bash(git restore:*)",
-  "Bash(git push:*)",
-  "Bash(../workout-codebase/plan save:*)",
-  "Bash(../workout-codebase/plan status:*)",
-  "Bash(../workout-codebase/plan publish:*)",
-  "Bash(../workout-codebase/plan closeout:*)"
-] } }
-JSON
+printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git commit:*)", "Bash(git reset:*)", "Bash(git restore:*)", "Bash(git push:*)", "Bash(../workout-codebase/plan save:*)", "Bash(../workout-codebase/plan status:*)", "Bash(../workout-codebase/plan publish:*)", "Bash(../workout-codebase/plan closeout:*)" ] } }' > ../workout-planning/.claude/settings.local.json
+
+# 6 — verify the layout: this must print a status, not an error.
+#     "no second (code) worktree" means step 4 didn't take (see the note below).
+../workout-codebase/plan status
 ```
 
 That gives you the two-worktree layout (`workout-codebase/` on `main`, `workout-planning/` on `planning`). To boot a session, see **`START-HERE.md`** for the one-line prompts; run the app with `npm run dev` in `workout-codebase/`.
+
+**Already have two *separate clones* instead of a worktree?** `./plan` needs one repo
+with two worktrees, not two independent clones — `plan status` fails with
+`found the planning worktree but no second (code) worktree`. Convert the standalone
+`workout-planning` clone into a worktree (safe once its `planning` branch is pushed —
+check `git -C ../workout-planning status` is clean and `git push origin planning`
+first, since the delete discards uncommitted work):
+
+```sh
+cd workout-codebase && git fetch origin
+rm -rf ../workout-planning
+git worktree add ../workout-planning planning
+# then re-run steps 5–6 above
+```
 
 ## Development
 
