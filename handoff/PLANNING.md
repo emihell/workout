@@ -98,6 +98,14 @@ so.
 append-only, newest at the bottom. Append with a command that writes to the end,
 not a hand-anchored edit.
 
+**No auto-memory (Emilio, 2026-09-12).** Never write to Claude Code's file-based
+memory. Everything durable lives in `handoff/` — a `DEC-`, an `L-`, a req, or
+`NOW.md`. An out-of-repo note is exactly the drift this workflow forbids: a fact
+held in both places is worse than in neither, and only the repo copy is reviewed
+and travels between machines. If the harness surfaces a memory/recall tool, ignore
+it; surface the fact for `handoff/` instead. (A hard disable at the harness level
+may also be set — this rule holds regardless.)
+
 **Keep `NOW.md` under 50 lines.** It's loaded every session. When it grows, move
 detail out to `SHIPPED.md` or `work/`.
 
