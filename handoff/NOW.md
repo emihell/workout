@@ -48,8 +48,3 @@ req-25/27 feel. **#6 timed exercises PARKED** (model TBD; cardio "Duration" exis
 `PLANNING.md` (planning role + the two-agent build loop) → `work/BACKLOG.md` → `rules/DESIGN.md`
 before UI/UX → `rules/WORKFLOW.md` for process → `rules/CLOSEOUT.md` to close a req. `README.md`
 is the product contract.
-
-<!-- req-46 #1 positive test — throwaway drift, removed next commit -->
-<!-- line -->
-<!-- line -->
-<!-- line -->
