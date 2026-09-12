@@ -465,3 +465,23 @@ by planning. Merge `8daa8f2` (branch `req-33-35-workflow-hardening`, `130d30e`, 
 green, 145 tests. Gate: functional (planning verified + merged; no gym-test). Two criteria are
 inherently post-merge: the live CI-gates receipt (the deploy run this push triggers) and the matcher
 check (after Emilio re-pastes the grant).
+
+## req-36 — a corrupt `workout-mvp-v8` key is never silently overwritten (audit F-RISK-2)  (merged 2026-09-12)
+
+First req off the 2026-09-12 audit. `loadState` used one `try` around read+parse+migrate, so a
+corrupt-but-present `v8` value fell to the same `catch` as a blank device — returning `emptyState()`,
+which the next `saveState` then wrote over the corrupt (recoverable) key. Silent total history loss.
+Fix (DEC-032): a `loadUnreadable` signal trio parallel to `saveFailed` (`storage.js`); `loadState`
+now separates reading the raw value (its own try/catch — access-denied → treat as absent) from
+parsing it. Absent/blank → `emptyState()`, byte-for-byte the old path, signal clear. Present but
+parse/migrate throws → latch the signal, return `emptyState()` for render, **no save, no legacy
+removal**. `saveState` returns `false` without `setItem` while the signal is latched, so the raw key
+is preserved untouched. Distinct `LoadUnreadableBanner` in `App.jsx` (own signal + wording, separate
+from the save-failed banner). Implementation calls (CC, no DEC — impl not behaviour): an unreadable
+legacy-only key when no `v8` exists counts as unreadable (only surviving copy); `localStorage.getItem`
+itself throwing = absent (no legible bytes to keep); the signal reflects the current stored value so a
+reload with a readable value clears it. Core anti-regression test asserts the corrupt string is
+byte-for-byte unchanged after a mutation. Merge `ce2a4c7` (branch `req-36`, `65a8023`, 1 commit);
+`./check` green, 149 tests. Gate: persisted-data → Emilio's hands (used it, DEC-009). **Follow-up
+deferred:** the recovery path out of the held-saves dead-end (explicit discard-and-start-fresh vs.
+auto-quarantine to a `-corrupt-<ts>` side key) is Emilio's pick and becomes its own req.

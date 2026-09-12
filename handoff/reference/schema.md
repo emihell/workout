@@ -53,9 +53,13 @@ distinct on-disk **shapes**, not distinct code paths. What it does:
 | v6 | yes | `:107-158` (`schemaVersion: 6`, programs/sessions shape) |
 | **v5** | **NO** | only a delete-assertion `:182`; no seed-and-upgrade |
 
-**F-RISK-1 open:** the v5 on-disk shape must be reconstructed from git history
-(what distinguished v5 from v6) before a v5 round-trip test can be written; pin the
-reconstructed shape here when that req runs.
+**F-RISK-1 → req-37:** there is **no distinct v5 on-disk shape in this repo's git
+history** — the schema-version scheme predates the current history and
+`migrateState` is uniform (no per-version branch). So "v5" is a version number the
+code accepts on a legacy (program-wrapped) shape, not a separate transform. req-37
+adds a v5 round-trip test that (a) proves the `v5` key round-trips and (b) covers
+the legacy paths v6/v7 tests miss — **workout-level `sessionId`/`programName`** and
+**plan `sessionId`**.
 
 ## Recommendation increments (`progress.js`)
 
