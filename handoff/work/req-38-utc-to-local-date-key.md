@@ -1,6 +1,6 @@
 # req-38 — stamp `performedOn`/`plan.date` in local time, not UTC (audit F-CODE-2)
 
-**Status: READY.** From audit 2026-09-12 (F-CODE-2). Small correctness fix.
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-38` (`c8eebd2`…`c8eebd2`, 1 commit).** From audit 2026-09-12 (F-CODE-2). Small correctness fix.
 **Gate: functional** — a bug fix with a clear right answer; planning verifies and
 merges. Note: it changes the stored date **value** for *new* workouts go-forward
 (no migration of existing records) — call this out at merge so Emilio's aware.
