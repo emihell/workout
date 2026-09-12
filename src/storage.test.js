@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
+import { completedOnDayKey, emptyState, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
 import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -224,6 +224,73 @@ describe('req-06 legacy-key cleanup', () => {
         assert.equal(map.get('workout-mvp-v7') ?? null, null) // interrupted cleanup finished
       },
     )
+  })
+})
+
+// req-36 / DEC-032 — a corrupt-but-present `workout-mvp-v8` value must never be
+// silently overwritten. loadState distinguishes "absent" (blank device) from
+// "present but unreadable"; the latter latches getLoadUnreadable() and makes
+// saveState refuse to write, so the raw corrupt bytes stay on disk and recoverable.
+describe('req-36 corrupt v8 guard', () => {
+  const corrupt = '{not valid json, definitely-not-parseable'
+
+  it('(a) preserves a corrupt v8 value byte-for-byte across a mutation', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v8': corrupt } }, (map) => {
+      const state = loadState()
+      // Renders as a blank device rather than throwing...
+      assert.equal(state.routines.length, 0)
+      assert.equal(state.workouts.length, 0)
+      // ...but the "unreadable" signal is latched (distinct from save-failed)...
+      assert.equal(getLoadUnreadable(), true)
+      assert.equal(getSaveFailed(), false)
+      // ...and a subsequent save (what the store's first mutation would do) is a
+      // no-op that returns false and leaves the raw corrupt string untouched.
+      const wrote = saveState({
+        ...emptyState(),
+        routines: [{ id: 'sess-x', name: 'New', focus: 'Machines', exercises: [] }],
+      })
+      assert.equal(wrote, false)
+      assert.equal(map.get('workout-mvp-v8'), corrupt) // byte-for-byte unchanged
+    })
+  })
+
+  it('(b) an absent key is a blank device: signal clear, saves work', () => {
+    withLocalStorage({ seed: {} }, (map) => {
+      const state = loadState()
+      assert.equal(state.routines.length, 0)
+      assert.equal(getLoadUnreadable(), false)
+      assert.equal(saveState(emptyState()), true)
+      assert.ok(map.get('workout-mvp-v8')) // save went through
+    })
+  })
+
+  it('(c) a valid v8 value clears the signal and loads normally', () => {
+    const validV8 = JSON.stringify({
+      ...emptyState(),
+      routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
+    })
+    withLocalStorage({ seed: { 'workout-mvp-v8': validV8 } }, () => {
+      const state = loadState()
+      assert.equal(state.routines[0].name, 'Upper')
+      assert.equal(getLoadUnreadable(), false)
+    })
+  })
+
+  it('an unreadable legacy-only key (no v8) counts as unreadable', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v7': corrupt } }, (map) => {
+      const state = loadState()
+      assert.equal(state.routines.length, 0)
+      assert.equal(getLoadUnreadable(), true)
+      assert.equal(saveState(emptyState()), false)
+      assert.equal(map.get('workout-mvp-v7'), corrupt) // only surviving copy kept
+      assert.equal(map.get('workout-mvp-v8') ?? null, null) // nothing written over it
+    })
+    // Cleanup / assertion: a later readable load clears the latched signal, so it
+    // reflects the *current* stored value and never leaks into other tests.
+    withLocalStorage({ seed: {} }, () => {
+      loadState()
+      assert.equal(getLoadUnreadable(), false)
+    })
   })
 })
 

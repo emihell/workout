@@ -27,6 +27,31 @@ export function subscribeSaveFailed(listener) {
   return () => saveFailedListeners.delete(listener)
 }
 
+// req-36 / DEC-032 — "the stored data is present but unreadable" signal, parallel
+// to saveFailed above. When a corrupt-but-present `workout-mvp-v8` value can't be
+// parsed/migrated (F-RISK-2), loadState latches this instead of silently returning
+// emptyState. While it is set, saveState refuses to write, so the raw corrupt value
+// stays on disk and recoverable — the app must never overwrite the one record it
+// exists to protect. Surfaced by a distinct persistent banner (App.jsx). Absent /
+// blank / valid loads clear it, so the flag reflects the *current* stored value.
+let loadUnreadable = false
+const loadUnreadableListeners = new Set()
+
+function setLoadUnreadable(value) {
+  if (loadUnreadable === value) return
+  loadUnreadable = value
+  for (const listener of loadUnreadableListeners) listener()
+}
+
+export function getLoadUnreadable() {
+  return loadUnreadable
+}
+
+export function subscribeLoadUnreadable(listener) {
+  loadUnreadableListeners.add(listener)
+  return () => loadUnreadableListeners.delete(listener)
+}
+
 export function emptyState() {
   return migrateState({
     schemaVersion: SCHEMA_VERSION,
@@ -61,12 +86,37 @@ function removeLegacyKeysIfV8Persisted() {
 }
 
 export function loadState() {
+  // Reading the raw value is separated from parsing/migrating it (req-36) so we can
+  // tell "no value" (blank device) apart from "value present but unreadable". Only
+  // the second is the corrupt-key case that must NOT be overwritten.
+  let current
+  let raw
   try {
-    const current = localStorage.getItem(STORAGE_KEY)
-    const raw = current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean)
-    if (!raw) return emptyState()
+    current = localStorage.getItem(STORAGE_KEY)
+    raw = current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean)
+  } catch {
+    // localStorage itself is unreadable (access denied). Nothing legible to
+    // preserve, so behave like a blank device rather than latching the signal.
+    setLoadUnreadable(false)
+    return emptyState()
+  }
+
+  // Absent or genuinely empty → blank device. Byte-for-byte the pre-req-36 path:
+  // emptyState(), saves work normally, signal clear.
+  if (!raw) {
+    setLoadUnreadable(false)
+    return emptyState()
+  }
+
+  // A value IS present. If parse or migrate throws it is corrupt-but-present: latch
+  // the unreadable signal (which makes saveState refuse to write, DEC-032) and hand
+  // back emptyState so the UI still renders — under the distinct banner. The raw
+  // value stays on disk untouched and recoverable. A legacy-only key that won't
+  // parse counts too (it is the only surviving copy).
+  try {
     const parsed = JSON.parse(raw)
     const state = migrateState({ ...emptyState(), ...parsed })
+    setLoadUnreadable(false)
     if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION) {
       saveState(state)
     }
@@ -76,11 +126,15 @@ export function loadState() {
     removeLegacyKeysIfV8Persisted()
     return state
   } catch {
+    setLoadUnreadable(true)
     return emptyState()
   }
 }
 
 export function saveState(state) {
+  // req-36 / DEC-032 — the stored value was unreadable; refuse to overwrite it so
+  // the corrupt-but-possibly-recoverable key is preserved untouched. No setItem.
+  if (getLoadUnreadable()) return false
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     setSaveFailed(false)
