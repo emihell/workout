@@ -1,6 +1,6 @@
 # req-43 — the delete confirm names what it will remove (audit F-DIV-3)
 
-**Status: READY.** Decision made (DEC-031). From audit 2026-09-12 (F-DIV-3).
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-43` (`ecc4aef`…`ecc4aef`, 1 commit).** Decision made (DEC-031). From audit 2026-09-12 (F-DIV-3).
 **Gate: functional** (confirm-text + pure helpers) — no store-logic or data change;
 user-facing wording, so an Emilio eyeball is welcome. Planning verifies + merges.
 
