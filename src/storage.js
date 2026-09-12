@@ -52,6 +52,57 @@ export function subscribeLoadUnreadable(listener) {
   return () => loadUnreadableListeners.delete(listener)
 }
 
+// req-41 / DEC-029 (audit F-RISK-3) — warn when *another same-origin tab* changed
+// our data. Each tab holds its own in-memory state and saveState writes the whole
+// key, so two open tabs are last-writer-wins: a stale tab can clobber another's
+// finished workout with no warning. We can't reconcile without a backend, so this
+// is warn-only (no merge, no hold-saves): surface the condition and let the user
+// reload. Pure predicate for the one testable decision — "is this StorageEvent one
+// that changed our persisted state?". A `null` key means localStorage.clear()
+// (also a change); a matching key is our own key being (re)written or removed.
+// The `storage` event fires only in the *other* tabs, never the writer, so the
+// banner lands on the stale tab — exactly the one that needs it.
+export function isExternalStateChange(event) {
+  return event.key === STORAGE_KEY || event.key === null
+}
+
+// Signal trio mirroring saveFailed/loadUnreadable above, backed by a single window
+// `storage` listener. Warn-only and one-way: once another tab changes the data the
+// signal latches true until this tab reloads (a reload re-reads the latest on mount
+// and mounts a fresh module, clearing it) — there is nothing to un-warn about while
+// this tab still holds its stale snapshot. The window listener is registered lazily
+// on first subscribe and removed on last unsubscribe; `typeof window` guards it so
+// storage.js still imports under `node --test` (no window, listener never wired).
+let externalChanged = false
+const externalChangeListeners = new Set()
+let storageEventHandler = null
+
+function handleStorageEvent(event) {
+  if (externalChanged) return
+  if (!isExternalStateChange(event)) return
+  externalChanged = true
+  for (const listener of externalChangeListeners) listener()
+}
+
+export function getExternalChanged() {
+  return externalChanged
+}
+
+export function subscribeExternalChange(listener) {
+  externalChangeListeners.add(listener)
+  if (typeof window !== 'undefined' && !storageEventHandler) {
+    storageEventHandler = handleStorageEvent
+    window.addEventListener('storage', storageEventHandler)
+  }
+  return () => {
+    externalChangeListeners.delete(listener)
+    if (externalChangeListeners.size === 0 && typeof window !== 'undefined' && storageEventHandler) {
+      window.removeEventListener('storage', storageEventHandler)
+      storageEventHandler = null
+    }
+  }
+}
+
 export function emptyState() {
   return migrateState({
     schemaVersion: SCHEMA_VERSION,

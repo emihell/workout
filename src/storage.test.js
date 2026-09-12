@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, loadState, saveState } from './storage.js'
+import { completedOnDayKey, emptyState, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, saveState } from './storage.js'
 import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -381,6 +381,24 @@ describe('req-36 corrupt v8 guard', () => {
       loadState()
       assert.equal(getLoadUnreadable(), false)
     })
+  })
+})
+
+describe('req-41 isExternalStateChange (audit F-RISK-3)', () => {
+  it('is true when another tab wrote our key', () => {
+    assert.equal(isExternalStateChange({ key: 'workout-mvp-v8' }), true)
+  })
+
+  it('is true when another tab cleared storage (key === null)', () => {
+    assert.equal(isExternalStateChange({ key: null }), true)
+  })
+
+  it('is false for a different app key', () => {
+    assert.equal(isExternalStateChange({ key: 'workout-mvp-analytics' }), false)
+  })
+
+  it('is false for an unrelated key', () => {
+    assert.equal(isExternalStateChange({ key: 'something-else' }), false)
   })
 })
 

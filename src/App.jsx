@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { StoreProvider } from './store'
-import { getSaveFailed, subscribeSaveFailed, getLoadUnreadable, subscribeLoadUnreadable } from './storage'
+import { getSaveFailed, subscribeSaveFailed, getLoadUnreadable, subscribeLoadUnreadable, getExternalChanged, subscribeExternalChange } from './storage'
 import { ErrorBoundary } from './error-boundary'
 import { WakeLock } from './wake-lock'
 import { RestEndCue } from './rest-cue'
@@ -49,6 +49,25 @@ function LoadUnreadableBanner() {
     <div role="alert">
       Couldn't read your saved data. It's still on this device but unreadable — don't clear
       your browser data. Nothing you do now will be saved. Seek recovery before making changes.
+    </div>
+  )
+}
+
+// req-41 / DEC-029 (audit F-RISK-3) — another same-origin tab wrote or cleared our
+// storage key, so this tab's in-memory state is now stale and its next save would
+// clobber the other tab's changes. Warn-only (no merge, no hold-saves): reloading
+// re-reads the latest and clears the signal. Distinct from the two banners above.
+function ExternalChangeBanner() {
+  const changed = useSyncExternalStore(
+    subscribeExternalChange,
+    getExternalChanged,
+    getExternalChanged,
+  )
+  if (!changed) return null
+  return (
+    <div role="alert">
+      Another tab changed your data — reload to see the latest.{' '}
+      <button type="button" onClick={() => window.location.reload()}>Reload</button>
     </div>
   )
 }
@@ -196,6 +215,7 @@ export default function App() {
       <RestEndCue />
       <SaveFailedBanner />
       <LoadUnreadableBanner />
+      <ExternalChangeBanner />
       <main className="ui-main">
         <ErrorBoundary>
           <Screen />
