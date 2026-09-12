@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { uid } from './ids'
 import { applyBackup as applyBackupFn } from './exchange.js'
 import { applyProgressionToRoutines, buildPlannedWorkout, planSnapshot, progressionFromWorkout } from './model'
-import { clampLoopWeeks } from './schedule'
+import { clampLoopWeeks, dateKey } from './schedule'
 import { loadState, saveState } from './storage'
 import { StoreContext } from './store-context'
 import { addWorkingSetToState, withSkippedUnloggedSets } from './workout-log'
@@ -211,7 +211,7 @@ export function StoreProvider({ children }) {
             suppliedPlan ||
             buildPlannedWorkout(s, {
               routineId,
-              date: scheduledFor || new Date().toISOString().slice(0, 10),
+              date: scheduledFor || dateKey(new Date()),
               scheduleSlotId,
             })
           if (!plan) return s
@@ -230,7 +230,7 @@ export function StoreProvider({ children }) {
               id: uid('wo'),
               routineId,
               scheduledFor: plan.scheduleSlotId ? plan.date : null,
-              performedOn: new Date().toISOString().slice(0, 10),
+              performedOn: dateKey(new Date()),
               scheduleSlotId: plan.scheduleSlotId || null,
               occurrenceId: plan.occurrenceId,
               snapshot: planSnapshot(plan),
