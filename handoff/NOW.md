@@ -1,7 +1,8 @@
 # Now
 
-Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31** (all except req-10). Done
-lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-12. **Shipped: req-01–09, req-11–23, req-25–31, req-33–35** (req-10 pending; req-24
+gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
+`work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -19,10 +20,10 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design back-and-forth first. **[ux-feel]**
 
-**Workflow/tooling (READY, functional — 2026-09-12 review; re-scan vs live code before CC):**
-`req-33` `plan doctor` (verify setup, catch the two-clones trap) · `req-34` close gate holes (CI
-runs the full gate before deploy + fix the `src/*.test.js` glob so nested tests run) · `req-35`
-narrow the `git push` grant. Specs: `work/req-33..35-*.md`.
+**Workflow/tooling (SHIPPED 2026-09-12, `8daa8f2`):** `req-33` `plan doctor`, `req-34` gate holes
+(CI runs `./check`; test glob recurses), `req-35` narrow push grant (README slice). DEC-026/027.
+**ACTION (Emilio):** re-paste planning `.claude/settings.local.json` with the two narrow push rules,
+then confirm the matcher accepts them / re-prompts on a bare push.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 

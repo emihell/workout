@@ -1,8 +1,6 @@
 # req-35 — narrow the planning session's `git push` grant to its intended forms
 
-**Status: READY, not built — functional gate.** Verify the permission-matcher accepts the narrowed
-rules on the real machine before finalizing (a too-narrow rule just re-prompts — annoying, not
-dangerous).
+**Status: README slice BUILT AND MERGED, 2026-09-12 — branch `req-33-35-workflow-hardening` (`130d30e`), merge `8daa8f2` (batch with req-33/34).** README printf block now grants the two narrow forms only; no bare `Bash(git push:*)` left in README or `handoff/`. Handoff prose was already narrow (DEC-005). See DEC-026. **REMAINING (Emilio):** re-paste machine-local `settings.local.json` with the narrowed grant, then verify the matcher accepts `git push origin main planning:*` as one rule and re-prompts on a bare/force push — record the working form if it needs the per-branch split.
 
 **Gate: functional** (DEC-009) — planning verifies + merges.
 

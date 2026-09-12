@@ -442,4 +442,26 @@ over 8 passes and approved ("its good, lets merge").
 
 **Follow-up noted:** `./check` runs only top-level `src/*.test.js`, so tests under subfolders (e.g.
 `src/views/history/`) silently don't run — surfaced when `weekdayDate` couldn't be gated there. Worth a
-small cleanup req (fix the glob or relocate) so nested tests actually execute.
+small cleanup req (fix the glob or relocate) so nested tests actually execute. *(Closed by req-34.)*
+
+## req-33 / req-34 / req-35 — workflow hardening (one branch)  (merged 2026-09-12)
+
+Three small workflow/tooling reqs, batched on one branch. **req-33** adds `plan doctor` — a read-only
+subcommand that verifies first-machine setup (layout, hooks, deps, grants, git identity) then runs
+`plan status`, printing `ok`/`FIX: <exact command>` per line and exiting non-zero on any FIX. It
+deliberately does **not** reuse `find_worktrees` (which exits on the first miss) so all failures show in
+one pass, and it owns the explained FIX for the two-separate-clones trap; its exit reflects setup only,
+not drift (DEC-027). README §Setup step 6 now ends with `plan doctor`. **req-34** closes two gate holes:
+`deploy.yml` now runs `./check` before the Pages build (one source of truth — CI can't drift from
+`plan publish`), so a red suite blocks deploy; and `check`'s test discovery moved from a top-level
+`src/*.test.js` glob to `find src -type f -name '*.test.js'` (not globstar — bash 3.2 on macOS lacks
+it, and CI is Ubuntu). The glob hole was **latent** — all 14 tests were top-level at build time, so the
+fix is preventive, proven with a throwaway nested fixture (14→15 files). **req-35** narrows the
+planning push grant from a bare `Bash(git push:*)` to the two forms the workflow uses
+(`git push origin planning`, `git push origin main planning`) in the README block (DEC-026); the
+machine-local `settings.local.json` re-paste is Emilio's, and the matcher-accepts / re-prompts-on-bare
+verification waits on that. Handoff prose (`CLAUDE.md` test line, DEC-005 grant enumeration) reconciled
+by planning. Merge `8daa8f2` (branch `req-33-35-workflow-hardening`, `130d30e`, 1 commit). `./check`
+green, 145 tests. Gate: functional (planning verified + merged; no gym-test). Two criteria are
+inherently post-merge: the live CI-gates receipt (the deploy run this push triggers) and the matcher
+check (after Emilio re-pastes the grant).

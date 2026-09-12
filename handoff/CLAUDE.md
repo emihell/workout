@@ -31,7 +31,7 @@ is the live example.
 ```bash
 npm run dev        # http://localhost:5173  — single dev instance
 npm run lint       # oxlint
-node --test src/*.test.js   # the unit tests
+node --test        # unit tests — every *.test.js under src/ (nested included)
 npm run build      # production build (what GitHub Pages deploys)
 ./check            # the full gate: lint + tests + build
 ```

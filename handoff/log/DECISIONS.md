@@ -79,12 +79,13 @@ planning.** So ownership is drawn at the worktree boundary, not at "git vs no gi
 - **Build prompts for the code-worktree CC are handed to Emilio to paste** — planning does not
   drive that session.
 
-Granted via fixed `Bash` allow-rules in planning's `.claude/settings.json`, scoped to
-planning-only writes (`git add/commit/reset/restore`, `git push origin planning`,
-`../workout-codebase/plan save`, `plan status`) — deliberately **not** `plan publish` or a
-bare `git push`. The deny on editing the settings files stays. Supersedes the "Don't run git
-commands that write" rule in `PLANNING.md`. **Partly superseded by DEC-006** (the planning
-session now runs the merge/closeout, relaxing the isolation line for that operation).
+Granted via fixed `Bash` allow-rules in planning's machine-local `.claude/settings.local.json`,
+scoped to planning writes (`git add/commit/reset/restore`, the narrow push forms
+`git push origin planning` and `git push origin main planning`, and the `../workout-codebase/plan`
+verbs `save/status/publish/closeout`). The deny on editing the settings files stays. Supersedes the
+"Don't run git commands that write" rule in `PLANNING.md`. **Partly superseded by DEC-006/DEC-008**
+(planning now runs merge/closeout and publish, which need the `origin main planning` push) and
+**DEC-026** (the push grant is scoped to those two forms, not a bare `git push:*`).
 
 ## DEC-006 — the planning session runs the merge (`plan closeout`) after Emilio's use-it OK  (2026-09-08)
 
@@ -503,3 +504,28 @@ Routines strip), and Schedule/History keep their own full pages reached via thos
 "unified scroll" clause of DEC-024 only; the rest of DEC-024 (the 3-tab bottom bar, Library toggle,
 Settings tab, naming) stands. A real merged-timeline concept, if it ever comes, would be a fresh idea
 with its own component — not a merge of the current screens, and not from the req-32 spec.
+
+## DEC-026 — the planning session's `git push` grant is scoped to two forms, not a bare push  (2026-09-12)
+
+req-35. The grant in README §Setup and the planning worktree's `.claude/settings.local.json` carried
+a bare `Bash(git push:*)` — authorizing *any* push to *any* branch/remote, `--force` included. That is
+wider than the trust model DEC-005 states in prose ("deliberately not... a bare `git push`"). Narrowed
+to exactly the forms the workflow uses:
+
+    "Bash(git push origin planning:*)",
+    "Bash(git push origin main planning:*)",
+
+(`origin planning` for `plan save`; `origin main planning` for `plan publish`/`closeout`, per DEC-008.)
+A wrong-branch or force push is no longer pre-authorized — it re-prompts. Applied to README (merged in
+the req-33-35 batch, `8daa8f2`); the machine-local `settings.local.json` is Emilio's to re-paste (the
+classifier blocks the session from writing its own grant). If the matcher won't accept
+`origin main planning:*` as one rule, split per-branch and record the working form.
+
+## DEC-027 — `plan doctor`'s exit reflects setup invariants only; drift is reported, not failed on  (2026-09-12)
+
+req-33. `plan doctor` ends by running `plan status`, which can exit non-zero on *handoff drift*
+(unpublished planning, code behind). Open choice from the build: should doctor's own exit inherit that?
+Decided **no** — doctor runs `plan status` with `|| true`, so its exit reflects only the five setup
+invariants (layout, hooks, deps, grants, identity). Doctor answers "is this machine set up correctly?",
+a stable yes/no; drift is a normal transient working state, not a broken setup. The status output is
+still shown, so drift stays visible — just not conflated with a setup failure. Accepted as-built.

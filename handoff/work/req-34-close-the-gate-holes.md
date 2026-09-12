@@ -1,7 +1,6 @@
 # req-34 — close the gate holes: run the full gate in CI, and fix the test glob
 
-**Status: READY, not built — functional gate.** Re-scan `deploy.yml`, `check`, and the test-file
-layout against live code before sending to CC.
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-33-35-workflow-hardening` (`130d30e`), merge `8daa8f2` (batch with req-33/35).** `deploy.yml` now runs `./check` before the Pages build; `check` uses `find src -type f -name '*.test.js'` (not globstar — bash 3.2 on macOS). Glob-hole was **latent** at build time (no nested tests existed; all 14 top-level), so the fix is preventive — proven with a throwaway nested fixture (14→15). Report: `reports/req-33-35.md`.
 
 **Gate: functional** (DEC-009) — planning verifies + merges; no gym-test needed.
 
