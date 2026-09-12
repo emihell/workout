@@ -3,6 +3,46 @@
 Branch `req-14`. Nav shell only (req-32 timeline merge is out of scope). No
 persisted-data / schema change — routing + UI only.
 
+## Review iteration 1 (Emilio, 2026-09-12)
+
+Five changes after the first look, same branch, still not merged:
+
+1. **Tabs are component-library `Button`s, no custom icons.** Dropped the inline
+   SVG icons. TABS now carry a static variant — Workouts `primary`, Library
+   `secondary`, Settings `quiet` — rendered as `<Button variant … onClick=go(to)>`.
+   The active tab is still dynamic on top: `aria-current="page"` + an `.is-active`
+   currentColor underline that reads on every variant (white on the ink primary,
+   ink on the light/quiet ones). So a tab shows both its fixed emphasis and
+   whether it's the current screen. (`ui/index.jsx`, `ui/ui.css`.)
+   - *Note (DEC-016 tension):* these tabs navigate via a `Button`+`go()`, not an
+     `<a>`. DEC-016 reserves `<button>` for actions and uses `NavLink`/`<a>` for
+     pure route nav. Emilio's review explicitly asked for the Button primitive on
+     this surface, so I followed it — flagging for the DEC-024 writeup. If the
+     link semantics matter more than the Button look, the alternative is a
+     `NavLink` carrying the `ui-btn` classes.
+2. **"Other" → "Choose a workout"** on Today (`Today.jsx`).
+3. **Today's Start is a large primary block button.** `StartButton` gained
+   `variant`/`block`; today's workout renders as `TodayWorkout` (routine name +
+   full-width `variant="primary" block` Start) instead of a small trailing row
+   action. `Done …` shows once logged; an in-progress workout shows nothing here
+   (the top-of-screen Continue owns that, as before).
+4. **Workouts shows a peek of Schedule + History, each with "Show all".**
+   Replaced the bare Schedule/History links with two preview sections: up to 2
+   upcoming schedule occurrences (`remainingInLoop`, tomorrow onward) and the 2
+   most-recent history workouts (`sortWorkoutsByDate`), each ending in a
+   `Show all` row → `/schedule` / `/history`.
+5. **`Back` on the Schedule and History top-level screens** (`Schedule.jsx`,
+   `history/list.jsx`) so you can return to Workouts now that they aren't tabs.
+
+Behaviour changes worth a DEC/L note:
+- The old Today **"Next"** section let you Start a *future* scheduled workout
+  inline. That inline Start is gone (upcoming is now a read-only peek). Starting
+  ahead is still possible via "Choose a workout" (`/start`) and via Schedule → day.
+- `nextScheduled` is no longer used by Today (swapped for `remainingInLoop`); it
+  remains exported/used elsewhere.
+
+`./check` re-run after the iteration — green (145 tests, lint, build).
+
 ## Technical
 
 ### What changed
@@ -113,19 +153,30 @@ list below.
 ## Merge-gate — ready to look at (branch `req-14`, `npm run dev`)
 
 1. **What it does:** Replaces the top-left Menu dropdown with a fixed 3-tab bottom
-   bar — **Workouts** (Today + Schedule/History links) · **Library** (a
-   Routines/Exercises toggle over the existing lists) · **Settings**. Schedule and
-   History are no longer tabs; they're reachable from the Workouts (Today) screen.
+   bar of three **Button**s — **Workouts** (primary) · **Library** (secondary) ·
+   **Settings** (quiet); the current screen's tab is underlined. Workouts (Today)
+   is now the main workout surface: a big primary **Start** for today's workout, a
+   peek of upcoming Schedule and recent History (each with **Show all**). Library
+   is a Routines/Exercises toggle over the existing lists. Schedule and History
+   aren't tabs — reached from Workouts, with a **Back** to return.
 2. **What to test:**
-   1. Bottom bar shows three tabs; no top Menu button anywhere.
-   2. Tapping each tab lands on that group; the active tab is visibly highlighted.
+   1. Bottom bar shows three Button tabs (Workouts filled, Library light, Settings
+      outlined); no top Menu anywhere.
+   2. Tapping each tab lands on that group; the current tab is underlined (and the
+      underline moves as you switch screens, independent of the fixed variants).
    3. Content isn't hidden behind the bar; the bar clears the iOS home indicator.
    4. Library shows [Routines | Exercises]; switching swaps the list; each list's
       `+ New`/Add still works.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
-   6. From Today, Schedule and History both open; Start still works.
-   7. Start a workout — the tab bar disappears for the in-gym screens, and comes
+   6. On Workouts: today's workout has a big Start (works); "Choose a workout" opens
+      the picker; the Upcoming and Recent peeks show items, and each "Show all"
+      opens the full Schedule / History page.
+   7. On the Schedule and History pages, Back returns you to Workouts.
+   8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.
-3. **What I couldn't verify:** everything in the "Could not verify" note above —
-   all of it is visual/device/feel and needs your hands.
+3. **What I couldn't verify:** everything visual/feel — the Chrome extension is
+   not connected this session, so I could not drive the browser. Tab-bar Button
+   look and the active underline's contrast on each variant, the big-Start layout
+   when there are multiple workouts on one day, safe-area on a real device, and
+   the peek/Show-all feel all need your hands.

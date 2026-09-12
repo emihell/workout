@@ -8,7 +8,7 @@
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
 import { useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
-import { activeTab, useHashRoute } from '../route'
+import { activeTab, go, useHashRoute } from '../route'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -205,67 +205,28 @@ export function Row({ children, value, action, to }) {
   )
 }
 
-// Tab icons — inline currentColor SVG (inherit the tab's ink, no asset pipeline;
-// req-14 keeps them simple, polish is a later pass). 24px line icons: Workouts a
-// dumbbell, Library a stack of cards, Settings a gear. aria-hidden — the label is
-// the accessible name.
-const iconProps = {
-  width: 24,
-  height: 24,
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-  'aria-hidden': true,
-  className: 'ui-tabbar__icon',
-}
-function IconWorkouts() {
-  // dumbbell
-  return (
-    <svg {...iconProps}>
-      <path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11" />
-    </svg>
-  )
-}
-function IconLibrary() {
-  // stacked cards
-  return (
-    <svg {...iconProps}>
-      <rect x="4" y="4" width="16" height="6" rx="1.5" />
-      <rect x="4" y="14" width="16" height="6" rx="1.5" />
-    </svg>
-  )
-}
-function IconSettings() {
-  // gear (simplified: a ring + cross spokes)
-  return (
-    <svg {...iconProps}>
-      <circle cx="12" cy="12" r="3.5" />
-      <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" />
-    </svg>
-  )
-}
-
 // TabBar — the global shell (req-14 / DEC-024, supersedes the req-13 Menu). A
 // fixed bottom bar of three equal tabs — Workouts / Library / Settings — the
-// app's primary navigation on mobile. Each tab is a NavLink (route nav, not an
-// action); the active tab is derived from the current route via activeTab, so a
-// deep route still lights the right tab. The bar is fixed to the viewport bottom
-// and honours the iOS home-indicator safe area; content clears it via the
-// bottom padding on <main> (ui.css .ui-main). Icons are inline currentColor SVG
-// (no asset pipeline yet — polish is a later pass). This is the ONE navigation
-// component wired into App.jsx.
+// app's primary navigation on mobile. Each tab is a component-library Button
+// (Emilio's review: no custom icons) with a STATIC emphasis hierarchy —
+// Workouts primary, Library secondary, Settings quiet — that never changes. On
+// TOP of that, the CURRENT tab is marked dynamically from activeTab(route.name):
+// aria-current="page" + an `.is-active` underline that reads on every variant
+// (currentColor, so white on the ink primary, ink on the others). So a tab shows
+// both its fixed emphasis AND whether it's the screen you're on. Tabs navigate
+// (a Button + go(); the bar is chrome, not content links). The bar is fixed to
+// the viewport bottom and honours the iOS home-indicator safe area; content
+// clears it via the bottom padding on <main> (ui.css .ui-main). This is the ONE
+// navigation component wired into App.jsx.
 //
 // Hidden during the in-workout flow (route names starting with `workout`): the
 // in-gym screens are focused single-task surfaces and a persistent nav bar that
 // could jump you to Library mid-set fights them (DESIGN: in-gym flow flawless).
 // activeTab still maps those routes to Workouts for completeness/tests.
 const TABS = [
-  { id: 'workouts', to: '/', label: 'Workouts', icon: IconWorkouts },
-  { id: 'library', to: '/routines', label: 'Library', icon: IconLibrary },
-  { id: 'settings', to: '/settings', label: 'Settings', icon: IconSettings },
+  { id: 'workouts', to: '/', label: 'Workouts', variant: 'primary' },
+  { id: 'library', to: '/routines', label: 'Library', variant: 'secondary' },
+  { id: 'settings', to: '/settings', label: 'Settings', variant: 'quiet' },
 ]
 
 export function TabBar() {
@@ -274,18 +235,18 @@ export function TabBar() {
   const current = activeTab(route.name)
   return (
     <nav className="ui-tabbar" aria-label="Primary">
-      {TABS.map(({ id, to, label, icon: Icon }) => {
+      {TABS.map(({ id, to, label, variant }) => {
         const selected = current === id
         return (
-          <BaseNavLink
+          <Button
             key={id}
-            to={to}
+            variant={variant}
             className={cx('ui-tabbar__tab', selected && 'is-active')}
             aria-current={selected ? 'page' : undefined}
+            onClick={() => go(to)}
           >
-            <Icon />
-            <span className="ui-tabbar__label">{label}</span>
-          </BaseNavLink>
+            {label}
+          </Button>
         )
       })}
     </nav>

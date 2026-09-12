@@ -33,6 +33,7 @@ export function Schedule() {
 
   return (
     <Screen>
+      <Back />
       <Title>Schedule</Title>
       <p>
         <NavLink to="/schedule/loop">

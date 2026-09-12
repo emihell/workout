@@ -1,17 +1,19 @@
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { greeting, weekdayName } from '../ids'
-import { coveringWorkout, dateKey, loopWeekIndex, nextScheduled, resolveSlot, slotsOn } from '../schedule'
+import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
 import { completedOnDayKey, findRoutine } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
-import { workoutRoutineId, workoutRoutineName } from './history/helpers'
+import { compactDate, sortWorkoutsByDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 import { NavLink } from './shared'
 
-function StartButton({ store, routine, slot, date, label = 'Start' }) {
+function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
     <Button
+      variant={variant}
+      block={block}
       onClick={() =>
         startOrContinue(store, routine.id, {
           scheduledFor: date,
@@ -38,25 +40,44 @@ function CompletedTodayRow({ store, workout }) {
   return <Row to={`/history/${workout.id}`}>{label}</Row>
 }
 
-function WorkoutRow({ store, routine, slot, date, extra }) {
+// req-14 (Emilio review) — a recent-history peek row: same program — routine label
+// as History's list, plus the date, linking to the History detail.
+function HistoryPeekRow({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const programName = workout.snapshot?.programName
+  const name = workoutRoutineName(workout, routine)
+  const label = programName ? `${programName} — ${name}` : name
+  return (
+    <Row to={`/history/${workout.id}`}>
+      {label} — {compactDate(workoutDateKey(workout))}
+    </Row>
+  )
+}
+
+// req-14 (Emilio review) — today's workout is the Workouts screen's main call to
+// action: the routine name + a large, primary, full-width Start. `Done …` shows
+// once logged; a workout already in progress shows nothing here (the top-of-screen
+// Continue owns that), matching the pre-review behaviour.
+function TodayWorkout({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
   const mine = store.activeWorkout
   const inProgress =
     activeRoutineId(mine) === routine.id &&
     mine?.scheduleSlotId === slot.id &&
     mine.scheduledFor === date
-  const bits = [extra, routine.focus].filter(Boolean)
-  // `Done …` is informational (value slot); the Start control is a trailing
-  // action. These are mutually exclusive, and inProgress shows neither.
-  const doneLabel = done ? `Done ${dateKey(done.finishedAt)}` : null
-  const startAction =
-    !done && !inProgress ? (
-      <StartButton store={store} routine={routine} slot={slot} date={date} />
-    ) : null
+  const bits = [routine.focus].filter(Boolean)
   return (
-    <Row value={doneLabel} action={startAction}>
-      {routine.name} — {bits.join(' · ')}
-    </Row>
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__name">
+        {routine.name}
+        {bits.length ? ` — ${bits.join(' · ')}` : ''}
+      </p>
+      {done ? (
+        <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
+      ) : inProgress ? null : (
+        <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
+      )}
+    </div>
   )
 }
 
@@ -69,7 +90,11 @@ export function Today() {
   const todays = slotsOn(schedule, now)
     .map((slot) => resolveSlot(routines, slot))
     .filter((x) => x.routine)
-  const upcoming = nextScheduled(routines, schedule, now)
+  // Upcoming schedule peek (tomorrow onward) and recent-history peek — two small
+  // previews that each end in a "Show all" to the full page (req-14 review; the
+  // interim before req-32's unified Workouts scroll).
+  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2)
+  const recent = sortWorkoutsByDate(store.workouts || []).slice(0, 2)
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
@@ -123,34 +148,19 @@ export function Today() {
         </p>
       ) : null}
 
+      <SectionHeader>Today</SectionHeader>
       {todays.length ? (
-        <>
-          <SectionHeader>Today</SectionHeader>
-          <List>
-            {todays.map(({ slot, routine }) => (
-              <WorkoutRow key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
-            ))}
-          </List>
-        </>
-      ) : upcoming ? (
-        <>
-          <p className="ui-sub">None today.</p>
-          <SectionHeader>Next</SectionHeader>
-          <List>
-            {upcoming.items.map(({ slot, routine }) => (
-              <WorkoutRow
-                key={slot.id}
-                store={store}
-                routine={routine}
-                slot={slot}
-                date={dateKey(upcoming.date)}
-                extra={weekdayName(upcoming.date.getDay())}
-              />
-            ))}
-          </List>
-        </>
+        todays.map(({ slot, routine }) => (
+          <TodayWorkout key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
+        ))
       ) : (
-        <p className="ui-sub">None.</p>
+        <p className="ui-sub">Nothing scheduled today.</p>
+      )}
+
+      {mine ? null : (
+        <p>
+          <NavLink to="/start">Choose a workout</NavLink>
+        </p>
       )}
 
       {completedToday.length ? (
@@ -164,18 +174,27 @@ export function Today() {
         </>
       ) : null}
 
-      {mine ? null : (
-        <p>
-          <NavLink to="/start">Other</NavLink>
-        </p>
-      )}
-
-      {/* req-14 — Schedule and History are no longer their own tabs (DEC-024
-          folded them under Workouts); keep them reachable from the Today home.
-          Interim until req-32 merges them into one Workouts scroll. */}
+      {/* req-14 review — Schedule and History are no longer tabs (DEC-024 folded
+          them under Workouts). Show a light peek of each with a "Show all" to the
+          full page; interim until req-32's unified Workouts scroll. */}
+      <SectionHeader>Upcoming</SectionHeader>
+      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
       <List>
-        <Row to="/schedule">Schedule</Row>
-        <Row to="/history">History</Row>
+        {upcoming.map(({ date, slot, routine }) => (
+          <Row key={`${dateKey(date)}-${slot.id}`} value={weekdayName(date.getDay())}>
+            {routine.name}
+          </Row>
+        ))}
+        <Row to="/schedule">Show all</Row>
+      </List>
+
+      <SectionHeader>Recent</SectionHeader>
+      {recent.length === 0 ? <p className="ui-sub">No history yet.</p> : null}
+      <List>
+        {recent.map((workout) => (
+          <HistoryPeekRow key={workout.id} store={store} workout={workout} />
+        ))}
+        <Row to="/history">Show all</Row>
       </List>
     </Screen>
   )

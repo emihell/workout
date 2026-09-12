@@ -52,6 +52,7 @@ export function History({ month = null }) {
 
   return (
     <Screen>
+      <Back />
       <Title>History</Title>
       <p>
         <NavLink to="/history/exercises">By exercise</NavLink>
