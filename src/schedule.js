@@ -143,17 +143,3 @@ export function remainingInLoop(routines, schedule, fromDate = new Date()) {
   }
   return items
 }
-
-export function nextScheduled(routines, schedule, fromDate = new Date()) {
-  const start = new Date(fromDate)
-  start.setHours(0, 0, 0, 0)
-  const loop = clampLoopWeeks(schedule?.loopWeeks)
-  for (let i = 1; i <= loop * 7; i++) {
-    const d = addDays(start, i)
-    const found = slotsOn(schedule, d)
-      .map((slot) => resolveSlot(routines, slot))
-      .filter((x) => x.routine)
-    if (found.length) return { date: d, items: found }
-  }
-  return null
-}

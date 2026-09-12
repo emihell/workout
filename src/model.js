@@ -1,4 +1,6 @@
+import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
+import { isSkippedSet } from './workout-log.js'
 
 export const SCHEMA_VERSION = 8
 
@@ -85,7 +87,7 @@ function workoutSnapshot(state, workout, origin = state) {
         return (
           (setItemId === itemIdValue || set.exerciseId === item.exerciseId) &&
           set.setType !== 'wu' &&
-          String(set.reps || '').toLowerCase() !== 'skipped'
+          !isSkippedSet(set)
         )
       })
       const baseline = templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
@@ -149,7 +151,7 @@ function workoutSnapshot(state, workout, origin = state) {
       (candidate) =>
         candidate.exerciseId === set.exerciseId &&
         candidate.setType !== 'wu' &&
-        String(candidate.reps || '').toLowerCase() !== 'skipped',
+        !isSkippedSet(candidate),
     )
     items.push({
       routineItemId: templateItem?.id || `history-${workout.id}-${set.exerciseId}`,
@@ -318,7 +320,7 @@ export function progressionForItem(exercises, workout, item) {
     return (
       set.setType !== 'wu' &&
       (setItemId === itemIdValue || setItemId === item.id) &&
-      String(set.reps || '').toLowerCase() !== 'skipped'
+      !isSkippedSet(set)
     )
   })
   const recommendation = recommendNextPrescription({
@@ -350,7 +352,7 @@ export function buildPlannedWorkout(state, { routineId, date, scheduleSlotId = n
     const targets = [...(item.targets || [])]
     const suggestedWeights = [...(item.suggestedWeights || [])]
     const sets = Number(item.sets) || targets.length || 1
-    const weighted = exercise && exercise.type !== 'bodyweight' && exercise.type !== 'cardio'
+    const weighted = exercise && isWeightedType(exercise.type)
     return {
       id: `pi-${item.id}`,
       routineItemId: item.id,

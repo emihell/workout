@@ -1,6 +1,22 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatSetLine, rpeLabel, rpeOptionValue } from './ids.js'
+import { formatSetLine, isWeightedType, rpeLabel, rpeOptionValue } from './ids.js'
+
+describe('req-44 isWeightedType (unifies usesWeight/usesLoad/weighted/bodyweight)', () => {
+  it('machine and free carry load', () => {
+    assert.equal(isWeightedType('machine'), true)
+    assert.equal(isWeightedType('free'), true)
+  })
+  it('bodyweight and cardio do not', () => {
+    assert.equal(isWeightedType('bodyweight'), false)
+    assert.equal(isWeightedType('cardio'), false)
+  })
+  it('a missing/unknown type reads as weighted (matches every prior spelling)', () => {
+    assert.equal(isWeightedType(undefined), true)
+    assert.equal(isWeightedType(null), true)
+    assert.equal(isWeightedType('anything-else'), true)
+  })
+})
 
 describe('effort labels', () => {
   it('maps stored numbers to Easy Moderate Hard Failure', () => {

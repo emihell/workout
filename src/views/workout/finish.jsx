@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { progressionForItem } from '../../model'
+import { isSkippedSet } from '../../workout-log'
 import { useStore } from '../../store-context'
 import { Back, Missing } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
@@ -31,9 +32,7 @@ function FinishScreen() {
     // display-only fields below are computed here.
     const core = progressionForItem(store.exercises, active, item)
     const skippedForItem = (active?.sets || []).some(
-      (set) =>
-        set.routineItemId === core.routineItemId &&
-        String(set.reps).toLowerCase() === 'skipped',
+      (set) => set.routineItemId === core.routineItemId && isSkippedSet(set),
     )
     return {
       routineItemId: core.routineItemId,

@@ -1,6 +1,20 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { moveToValidWeight, recommendNextPrescription, validWeights } from './progress.js'
+import { isDurationTarget, moveToValidWeight, recommendNextPrescription, validWeights } from './progress.js'
+
+describe('req-44 isDurationTarget (was duplicated in item.jsx)', () => {
+  it('recognises min/sec durations', () => {
+    assert.equal(isDurationTarget('30 sec'), true)
+    assert.equal(isDurationTarget('5 min'), true)
+    assert.equal(isDurationTarget('45s'), true)
+  })
+  it('is false for a plain rep count and blanks', () => {
+    assert.equal(isDurationTarget('10'), false)
+    assert.equal(isDurationTarget(''), false)
+    assert.equal(isDurationTarget(null), false)
+    assert.equal(isDurationTarget(undefined), false)
+  })
+})
 
 describe('dated recommendation loads', () => {
   it('uses true alternating 4/5 kg machine loads', () => {

@@ -155,7 +155,10 @@ export function lastLoggedSetIndex(workout, item) {
   return (workout.sets || []).lastIndexOf(lastSet)
 }
 
-function isSkippedSet(set) {
+// req-44 — the one shared skipped-set predicate (was duplicated in storage.js and
+// inlined in model.js/item.jsx/finish.jsx). Guards a null/undefined `reps` via
+// `|| ''` — the finish.jsx site previously dropped that guard.
+export function isSkippedSet(set) {
   return String(set?.reps || '').toLowerCase() === 'skipped'
 }
 
