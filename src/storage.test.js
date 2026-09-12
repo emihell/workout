@@ -227,6 +227,96 @@ describe('req-06 legacy-key cleanup', () => {
   })
 })
 
+// req-37 (audit F-RISK-1) — `workout-mvp-v5` is a claimed-supported legacy key but
+// had no round-trip test (v6 :107-158, v7 :175-227 do; v5 had only a delete
+// assertion :182). There is no distinct v5 on-disk shape in git history and
+// migrateState is uniform/shape-driven (model.js:219), so this seeds a v5
+// (program-wrapped) shape and — the real prize — covers the legacy paths the v6/v7
+// tests skip: workout-level `sessionId`/`programName` (workoutSnapshot +
+// stripLegacyWorkoutKeys) and plan `sessionId` → routineId. Test-only; no
+// production change.
+describe('req-37 v5 migration round-trip', () => {
+  const v5 = JSON.stringify({
+    schemaVersion: 5,
+    exercises: [{ id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5' }],
+    programs: [
+      {
+        id: 'prog-1',
+        name: 'Gym',
+        sessions: [
+          {
+            id: 'sess-1',
+            name: 'Upper',
+            focus: 'Machines',
+            exercises: [{ exerciseId: 'ex-1', sets: 1, targets: ['8'], suggestedWeights: [40] }],
+          },
+        ],
+      },
+    ],
+    schedule: { loopWeeks: 1, slots: [{ week: 0, weekday: 1, programId: 'prog-1', sessionId: 'sess-1' }] },
+    // Legacy workout shape the v6/v7 tests skip: sessionId + programName on the
+    // workout, a snapshot to migrate, and logged sets.
+    workouts: [
+      {
+        id: 'wo-1',
+        sessionId: 'sess-1',
+        programName: 'Gym',
+        finishedAt: '2026-08-20T10:00:00.000Z',
+        snapshot: { sessionId: 'sess-1', sessionName: 'Upper', programName: 'Gym', items: [{ exerciseId: 'ex-1', sessionItemId: 'si-old-1' }] },
+        sets: [{ exerciseId: 'ex-1', sessionItemId: 'si-old-1', setType: 'work', weight: 40, reps: '8' }],
+      },
+    ],
+    // Legacy plan shape: plan-level sessionId → routineId.
+    plannedWorkouts: [{ id: 'pw-1', sessionId: 'sess-1', date: '2026-08-27', items: [{ exerciseId: 'ex-1', sessionItemId: 'si-old-1' }] }],
+  })
+
+  it('reads the v5 key, flattens programs, maps every sessionId→routineId, writes v8', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v5': v5 } }, (map) => {
+      const state = loadState()
+
+      // Routine flatten + opaque id + fields preserved; program wrapper dropped.
+      assert.equal(state.routines.length, 1)
+      assert.equal(state.routines[0].id, 'sess-1')
+      assert.equal(state.routines[0].name, 'Upper')
+      assert.equal(state.routines[0].focus, 'Machines')
+      assert.equal(state.programs, undefined)
+      assert.equal(state.sessions, undefined)
+
+      // Schedule slot: sessionId → routineId, no leftover sessionId.
+      assert.equal(state.schedule.slots.length, 1)
+      assert.equal(state.schedule.slots[0].routineId, 'sess-1')
+      assert.equal(state.schedule.slots[0].sessionId, undefined)
+
+      // Workout: routineId from sessionId, sessionId stripped off the workout,
+      // snapshot migrated (its own sessionId dropped) and programName preserved.
+      assert.equal(state.workouts.length, 1)
+      assert.equal(state.workouts[0].routineId, 'sess-1')
+      assert.equal(state.workouts[0].sessionId, undefined)
+      assert.equal(state.workouts[0].snapshot.routineId, 'sess-1')
+      assert.equal(state.workouts[0].snapshot.sessionId, undefined)
+      assert.equal(state.workouts[0].snapshot.programName, 'Gym')
+      // Snapshot item: legacy sessionItemId → routineItemId, sessionItemId dropped.
+      assert.equal(state.workouts[0].snapshot.items[0].exerciseId, 'ex-1')
+      assert.equal(state.workouts[0].snapshot.items[0].routineItemId, 'si-old-1')
+      assert.equal(state.workouts[0].snapshot.items[0].sessionItemId, undefined)
+      // Set: legacy sessionItemId → routineItemId too.
+      assert.equal(state.workouts[0].sets[0].routineItemId, 'si-old-1')
+      assert.equal(state.workouts[0].sets[0].sessionItemId, undefined)
+
+      // Plan: sessionId → routineId.
+      assert.equal(state.plannedWorkouts.length, 1)
+      assert.equal(state.plannedWorkouts[0].routineId, 'sess-1')
+      assert.equal(state.plannedWorkouts[0].sessionId, undefined)
+
+      // Persisted as v8, program wrapper gone from disk too.
+      const stored = JSON.parse(map.get('workout-mvp-v8'))
+      assert.equal(stored.schemaVersion, 8)
+      assert.equal(stored.routines[0].id, 'sess-1')
+      assert.equal(stored.programs, undefined)
+    })
+  })
+})
+
 // req-36 / DEC-032 — a corrupt-but-present `workout-mvp-v8` value must never be
 // silently overwritten. loadState distinguishes "absent" (blank device) from
 // "present but unreadable"; the latter latches getLoadUnreadable() and makes
