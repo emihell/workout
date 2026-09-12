@@ -33,10 +33,14 @@ This is the one that decides the hard cases.
 - **A weighted exercise with no history has no invented starting weight.** Its dated
   plan explains calibration (start light, do the program reps, adjust by valid
   increments). It does not guess a number and present it as a plan.
-- **Prefills come only from finished-workout history for that same field.** The one
-  exception is the live set-log screen: Reps prefills from that set's target, and
-  effort prefills Moderate (`.cursor/rules/history-prefill.mdc`). Nowhere else does a
-  plan, a library cue, a recommendation, or a type default become a prefilled value.
+- **Prefills come only from finished-workout history for that same field.** Two
+  sanctioned exceptions, both the user's own input rather than invented data: (1) the
+  live set-log screen prefills Reps from that set's target and effort Moderate
+  (`.cursor/rules/history-prefill.mdc`); (2) for a **no-history** exercise, the next
+  working set carries the kg+reps of the most recent set logged **this session**
+  (DEC-002) — it's the value the user just entered, filling what would otherwise be
+  blank, and stays an editable prefill. Nowhere else does a plan, a library cue, a
+  recommendation, or a type default become a prefilled value.
 - **Never invent warmup (e.g. 50% / 12 reps), rest (e.g. 90s), or notes (a copy of
   cues).** Absent is absent. Editing an existing record may show that record's saved
   values — that's history, not invention.

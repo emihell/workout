@@ -22,8 +22,19 @@ Phase 3  database+users, own exercise DB, animations, AI, full styling  (gated o
 
 **Workflow/tooling (SHIPPED 2026-09-12, `8daa8f2`):** `req-33` `plan doctor`, `req-34` gate holes
 (CI runs `./check`; test glob recurses), `req-35` narrow push grant (README slice). DEC-026/027.
-**ACTION (Emilio):** re-paste planning `.claude/settings.local.json` with the two narrow push rules,
-then confirm the matcher accepts them / re-prompts on a bare push.
+Grants stay machine-local (DEC-028; tracking tried+reverted, F-CONFIG-1) — `settings.local.json`
+recreated, `plan doctor` green.
+
+## Audit 2026-09-12 → req queue (`audits/2026-09-12.md`)
+
+20 findings; F-CONFIG-1 fixed (DEC-028). Decisions taken: DEC-029..033. **Trust bugs first**
+(persisted-data → Emilio's hands, DEC-009): corrupt-`v8` guard (F-RISK-2/DEC-032), v5 migration
+test + pin shape (F-RISK-1), UTC→local date key (F-CODE-2), backup array-validation (F-RISK-4),
+progression unify Finish==recalc (F-CODE-1). **Then:** cross-tab warn (F-RISK-3/DEC-029), n/a-step
+holds (F-DIV-1/DEC-030), archive confirm names slots (F-DIV-3/DEC-031). **Cleanup:** drop
+`nextScheduled`, dedupe predicates, split `model.js`/`item.jsx`, `plan doctor` content-check.
+**Planning-owned (no code):** populate `reference/`, note DEC-002 carry in DESIGN §1, "Correct" kept
+(DEC-033). Reqs specced one at a time from here.
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
 

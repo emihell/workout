@@ -529,3 +529,74 @@ Decided **no** — doctor runs `plan status` with `|| true`, so its exit reflect
 invariants (layout, hooks, deps, grants, identity). Doctor answers "is this machine set up correctly?",
 a stable yes/no; drift is a normal transient working state, not a broken setup. The status output is
 still shown, so drift stays visible — just not conflated with a setup failure. Accepted as-built.
+
+## DEC-028 — the planning grants stay machine-local; tracking them was tried and reverted  (Emilio, 2026-09-12)
+
+The planning grants (`git add/commit/reset/restore`, the two narrow push forms, the four
+`../workout-codebase/plan` verbs) live in the **gitignored, machine-local**
+`.claude/settings.local.json` — not the tracked `.claude/settings.json`. Tried the reverse this
+session (move them into the tracked file so they sync across machines, avoiding the per-machine
+paste), commit `25d7db2`; the 2026-09-12 audit (F-CONFIG-1) caught two costs and Emilio reverted
+(`1f609b5`):
+- `plan doctor` checks grants by the **existence** of `settings.local.json` (`plan:569-572`), so
+  tracking + deleting the local file made doctor report a false `FIX: grants` failure.
+- `main`'s `settings.json` is deny-only; the next `plan publish` would merge the `allow` grants into
+  `main`, handing the **code worktree** the planning-only grants — the isolation regression DEC-005
+  exists to prevent. (A grant only suppresses a prompt, but it removes the guardrail.)
+
+Rejected keeping-tracked because the drift it avoids is already handled: `plan doctor` flags a
+missing file and points at README §Setup step 5 to re-paste, and the grants are effectively static.
+Reaffirms DEC-005/026 and the README §Setup model unchanged. Follow-up (backlog): harden
+`plan doctor` to compare the grant *contents* to the canonical block, not just check existence — the
+one drift kind (content drift on one machine) it can't currently catch.
+
+## DEC-029 — a cross-tab write conflict warns and asks for reload; it does not merge  (Emilio, 2026-09-12)
+
+Audit F-RISK-3: two open tabs each hold their own in-memory state and `saveState` writes the whole
+key, so the second tab to finish a workout clobbers the first — silently, no `storage` listener.
+Decided: add a `storage`-event listener that, when another tab writes `workout-mvp-v8`, shows a
+banner ("another tab changed your data — reload") — **warn only, no auto-merge**. Rejected merging
+(reconciling two histories is error-prone without a backend and touches the record directly —
+backend/Phase-3 territory) and leave-for-backend (the silent clobber is a real data-loss path worth
+closing now). Drives a small req.
+
+## DEC-030 — a recommendation with no valid increment holds; it never invents a 0.5 kg step  (Emilio, 2026-09-12)
+
+Audit F-DIV-1: `moveToValidWeight` (`progress.js:28`) falls back to a hardcoded ±0.5 kg when the
+exercise has no valid increments — reachable for a `machine`/`free` exercise left at the
+`weightStep:'n/a'` default (`store.jsx:172`). That recommends a load the exercise config never
+defines, breaking DESIGN §1/§2 ("never invent … recommendation traceable to a valid increment").
+Decided: with no valid increment, the recommendation **holds** (action `keep`, no move); the user can
+still adjust manually. Rejected requiring a `weightStep` before recommending (adds a setup gate) and
+keeping the 0.5 kg default (it's an invented value). Drives a req.
+
+## DEC-031 — "referenced" means referenced by finished history; delete confirm must name the slots it removes  (Emilio, 2026-09-12)
+
+Audit F-DIV-3: `removeRoutine`/`removeExercise` (`store.jsx:44-67,185-204`) test "referenced"
+against finished `workouts` only, so a routine referenced solely by a schedule slot or a
+not-yet-performed planned workout is hard-deleted and its slots/plans silently removed. Decided:
+the history-only reading is **correct** (DESIGN §3 — "history keeps pointing at what it recorded";
+setup objects with no history are not part of the immutable record) — but the delete confirm
+(`Routine.jsx:150-158`) must **name the schedule slots / planned workouts it will remove** so the
+deletion is not silent. Rejected broadening "referenced" to archive-on-slot (a larger behaviour
+change for objects that aren't yet history). Drives a req.
+
+## DEC-032 — an unreadable `workout-mvp-v8` key is never overwritten; a distinct banner surfaces it  (Emilio, 2026-09-12)
+
+Audit F-RISK-2: if the `v8` key is present but not valid JSON, `loadState` (`storage.js:64-80`)
+returns `emptyState()` — indistinguishable from a blank device — and the first mutation's
+`saveState` overwrites the corrupt (but possibly recoverable) key with empty state, silently. Decided
+(mirrors DEC-001's trust stance): on an **unreadable** `v8` value, the app must **not overwrite it** —
+hold saves and surface a distinct, persistent banner ("couldn't read your saved data — don't clear
+anything, export/seek recovery") separate from the save-failed banner, so the raw value stays on disk
+and recoverable. Absent key = empty is unchanged; only corrupt-but-present is the new path. Persisted-
+data / trust req → Emilio's hands before merge (DEC-009). Drives a req.
+
+## DEC-033 — history detail keeps "Correct" (not "Edit") as a deliberate vocabulary exception  (Emilio, 2026-09-12)
+
+Audit F-DIV-4: the history detail page labels its edit action **"Correct"** (`history/detail.jsx:53`),
+not the "Edit" the action-vocabulary contract names for object-detail pages. Kept as-is: README's own
+recommendation section says "*Correcting* meaningful history shows a recalculation preview," and the
+flow routes edit→recalc-preview — "Correct" names the recalc semantics precisely where a bare "Edit"
+would imply a silent in-place change. Recorded so the vocabulary ledger shows this is chosen, not a
+slip. No code change.
