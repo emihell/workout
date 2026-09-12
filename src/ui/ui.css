@@ -310,13 +310,16 @@ a:active {
   background: var(--ui-bg);
   border-top: 1px solid var(--ui-line);
 }
-/* Each tab is a Button (.ui-btn); it keeps its variant styling and just shares
- * the width equally. The active tab adds a currentColor underline — visible on
- * the ink primary (white) and the light/quiet variants (ink) alike. */
+/* Each tab wears the .ui-btn look but is an <a> (DEC-016); it keeps its variant
+ * styling and just shares the width equally. text-decoration:none kills the UA
+ * anchor underline so the base tab matches a Button; the active tab re-adds a
+ * currentColor underline — visible on the ink primary (white) and the light/quiet
+ * variants (ink) alike. */
 .ui-tabbar__tab {
   flex: 1 1 0;
   padding-left: 0;
   padding-right: 0;
+  text-decoration: none;
 }
 .ui-tabbar__tab.is-active {
   text-decoration: underline;

@@ -43,6 +43,30 @@ Behaviour changes worth a DEC/L note:
 
 `./check` re-run after the iteration — green (145 tests, lint, build).
 
+## Review iteration 2 (Emilio, 2026-09-12)
+
+Two decided changes, same branch, not merged:
+
+1. **Inline Start-ahead restored on the upcoming peek.** Emilio reversed the iter-1
+   behaviour change: you can again Start a *future* scheduled workout straight from
+   Workouts. New `UpcomingRow` (`Today.jsx`) gives each upcoming item a smaller
+   **secondary** Start via the same `startOrContinue(store, routine.id, {
+   scheduledFor, scheduleSlotId })` path, with the same guards as the today row
+   (already-covered → `Done …`; in-progress → no Start). Today's big **primary**
+   Start stays the main CTA.
+2. **DEC-016 fix on the tab bar (look identical, semantics corrected).** Tabs were
+   `Button` (`<button>`) + `go()`; now they are `NavLink`/`<a>` carrying the
+   `ui-btn ui-btn--{variant}` classes — same look (primary/secondary/quiet), but
+   correct link-nav per DEC-016 (buttons for actions, links for navigation). Active
+   state kept (`aria-current="page"` + the underline). Added `text-decoration:none`
+   to the base tab so the anchor doesn't show a UA underline; `.is-active` re-adds
+   it. **For DEC-024:** the tab bar uses the Button *look* through link semantics —
+   the DEC-016 tension from iter 1 is resolved, not carried.
+
+The active-underline strength is unchanged this pass (Emilio will judge it on test).
+
+`./check` re-run after iteration 2 — green (145 tests, lint, build).
+
 ## Technical
 
 ### What changed
@@ -153,8 +177,9 @@ list below.
 ## Merge-gate — ready to look at (branch `req-14`, `npm run dev`)
 
 1. **What it does:** Replaces the top-left Menu dropdown with a fixed 3-tab bottom
-   bar of three **Button**s — **Workouts** (primary) · **Library** (secondary) ·
-   **Settings** (quiet); the current screen's tab is underlined. Workouts (Today)
+   bar — three link-tabs wearing the Button look, **Workouts** (primary) ·
+   **Library** (secondary) · **Settings** (quiet); the current screen's tab is
+   underlined. Workouts (Today)
    is now the main workout surface: a big primary **Start** for today's workout, a
    peek of upcoming Schedule and recent History (each with **Show all**). Library
    is a Routines/Exercises toggle over the existing lists. Schedule and History
@@ -169,9 +194,10 @@ list below.
       `+ New`/Add still works.
    5. Open a routine, then Back — the toggle still shows Routines (deep route keeps
       the right tab/segment). Same for an exercise.
-   6. On Workouts: today's workout has a big Start (works); "Choose a workout" opens
-      the picker; the Upcoming and Recent peeks show items, and each "Show all"
-      opens the full Schedule / History page.
+   6. On Workouts: today's workout has a big primary Start (works); "Choose a
+      workout" opens the picker; the Upcoming peek's items each have a smaller
+      secondary Start that starts that future workout; the Recent peek shows recent
+      workouts; each "Show all" opens the full Schedule / History page.
    7. On the Schedule and History pages, Back returns you to Workouts.
    8. Start a workout — the tab bar disappears for the in-gym screens, and comes
       back when you leave.

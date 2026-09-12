@@ -8,7 +8,7 @@
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
 import { useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
-import { activeTab, go, useHashRoute } from '../route'
+import { activeTab, useHashRoute } from '../route'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -207,15 +207,16 @@ export function Row({ children, value, action, to }) {
 
 // TabBar — the global shell (req-14 / DEC-024, supersedes the req-13 Menu). A
 // fixed bottom bar of three equal tabs — Workouts / Library / Settings — the
-// app's primary navigation on mobile. Each tab is a component-library Button
-// (Emilio's review: no custom icons) with a STATIC emphasis hierarchy —
-// Workouts primary, Library secondary, Settings quiet — that never changes. On
+// app's primary navigation on mobile. Each tab wears the component-library Button
+// LOOK via the `ui-btn ui-btn--{variant}` classes (Emilio's review: no custom
+// icons) but is a NavLink/<a> — pure route nav, honouring DEC-016 (buttons are
+// for actions, links for navigation). The variant is a STATIC emphasis hierarchy
+// — Workouts primary, Library secondary, Settings quiet — that never changes. On
 // TOP of that, the CURRENT tab is marked dynamically from activeTab(route.name):
 // aria-current="page" + an `.is-active` underline that reads on every variant
 // (currentColor, so white on the ink primary, ink on the others). So a tab shows
-// both its fixed emphasis AND whether it's the screen you're on. Tabs navigate
-// (a Button + go(); the bar is chrome, not content links). The bar is fixed to
-// the viewport bottom and honours the iOS home-indicator safe area; content
+// both its fixed emphasis AND whether it's the screen you're on. The bar is fixed
+// to the viewport bottom and honours the iOS home-indicator safe area; content
 // clears it via the bottom padding on <main> (ui.css .ui-main). This is the ONE
 // navigation component wired into App.jsx.
 //
@@ -238,15 +239,14 @@ export function TabBar() {
       {TABS.map(({ id, to, label, variant }) => {
         const selected = current === id
         return (
-          <Button
+          <BaseNavLink
             key={id}
-            variant={variant}
-            className={cx('ui-tabbar__tab', selected && 'is-active')}
+            to={to}
+            className={cx('ui-btn', `ui-btn--${variant}`, 'ui-tabbar__tab', selected && 'is-active')}
             aria-current={selected ? 'page' : undefined}
-            onClick={() => go(to)}
           >
             {label}
-          </Button>
+          </BaseNavLink>
         )
       })}
     </nav>

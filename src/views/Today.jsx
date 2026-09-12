@@ -54,6 +54,28 @@ function HistoryPeekRow({ store, workout }) {
   )
 }
 
+// req-14 (Emilio review iter 2) — an upcoming (future) scheduled workout in the
+// peek, with an inline Start so you can start ahead directly from Workouts (the
+// behaviour the old Today "Next" section had; Emilio restored it). Today's big
+// primary Start stays the main CTA — upcoming items get a smaller secondary Start.
+// Guards like the today row: already-covered shows `Done …`, in-progress shows no
+// Start (the top-of-screen Continue owns it). Same startOrContinue path.
+function UpcomingRow({ store, date, slot, routine }) {
+  const dk = dateKey(date)
+  const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
+  const mine = store.activeWorkout
+  const inProgress =
+    activeRoutineId(mine) === routine.id && mine?.scheduleSlotId === slot.id && mine.scheduledFor === dk
+  const value = done ? `Done ${dateKey(done.finishedAt)}` : weekdayName(date.getDay())
+  const startAction =
+    !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
+  return (
+    <Row value={value} action={startAction}>
+      {routine.name}
+    </Row>
+  )
+}
+
 // req-14 (Emilio review) — today's workout is the Workouts screen's main call to
 // action: the routine name + a large, primary, full-width Start. `Done …` shows
 // once logged; a workout already in progress shows nothing here (the top-of-screen
@@ -181,9 +203,7 @@ export function Today() {
       {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
       <List>
         {upcoming.map(({ date, slot, routine }) => (
-          <Row key={`${dateKey(date)}-${slot.id}`} value={weekdayName(date.getDay())}>
-            {routine.name}
-          </Row>
+          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
         ))}
         <Row to="/schedule">Show all</Row>
       </List>
