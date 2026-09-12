@@ -420,3 +420,26 @@ web API), no rest-state or schema change — diff is only the module + its mount
 tests. Merge `e2aa905` (branch `req-31`, `dca29c3`). `./check` green, 16 new cue tests
 (fire-once / not-on-Next / not-on-pause / re-arm-fires-again / no-op-when-unsupported / never-throws).
 Gate: Emilio ratified the beep + vibration feel on a real phone before merge (ux-feel).
+
+## req-14 — new nav: 3-tab bottom bar (Workout / Library / Settings)  (merged 2026-09-12)
+
+Replaced req-13's top-left Menu dropdown of six flat items with a **fixed bottom tab bar of three
+groups** (DEC-024): **Workout** (Today+Schedule+History), **Library** (Routines+Exercises), **Settings**.
+Tabs are `ui-btn`-styled links (Workout primary / Library secondary / Settings quiet + active underline;
+no custom icons — component-library only; honours DEC-016 by using links not `<button>` for nav), driven
+by a pure unit-tested `activeTab(routeName)`; the bar hides during the in-workout flow. Library is the
+existing `SegmentedControl` toggling the unchanged Routines/Exercises screens. The Workout screen is an
+**interim** light version of req-32's unified scroll: header → "Future workouts›" (link to Schedule) +
+upcoming rows with Start-ahead → **Today** as the focal point (bold date on top, name — focus below, big
+primary Start; empty day → "Nothing scheduled today." + disabled Start) → Completed-today → past rows →
+"Past workouts›" (link to History) → a **fixed "Routines›" strip docked above the tab bar** (→ /start
+picker). All rows share one info format (`date · name — focus`, one formatter `Mon, Oct 13`, focus from
+immutable snapshot, never invented). Schedule/History got Back buttons. Pure routing/UI, **no
+persisted-data change**. Built as the shell only; req-32 (full unified scroll + inline schedule editing)
+is the follow-on. Merge `<MERGE>` (branch `req-14`, `52515fa`…`ba5ccd0`, 9 commits — 1 build + 8 review
+iterations with Emilio). `./check` green, 145 tests. Gate: Emilio drove the whole redesign in-browser
+over 8 passes and approved ("its good, lets merge").
+
+**Follow-up noted:** `./check` runs only top-level `src/*.test.js`, so tests under subfolders (e.g.
+`src/views/history/`) silently don't run — surfaced when `weekdayDate` couldn't be gated there. Worth a
+small cleanup req (fix the glob or relocate) so nested tests actually execute.

@@ -1,7 +1,7 @@
 # req-32 — the unified Workouts scroll (merge Today + Schedule + History)
 
-Status: BLOCKED on req-14 (needs the Workouts tab shell first). Direction decided; details to
-iterate with Emilio during build.
+Status: READY (req-14 merged 2026-09-12 — the shell + interim Workout screen exist). Direction
+decided; details to iterate with Emilio during build.
 Source: DEC-024. Type: Screen redesign (no persisted data). Gate: ux-feel → Emilio's hands, heavy
 iteration expected (this is the boldest UI in the app so far).
 

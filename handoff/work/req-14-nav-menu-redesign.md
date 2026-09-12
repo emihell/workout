@@ -1,6 +1,6 @@
 # req-14 — new nav: 3-tab bottom bar (Workouts / Library / Settings)
 
-Status: READY
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-14` (`52515fa`…`ba5ccd0`, 9 commits).**
 Source: Emilio disliked req-13's Menu dropdown; direction decided 2026-09-12. Decision: DEC-024.
 Type: Navigation / UI shell (no persisted data). Gate: ux-feel → Emilio's hands before merge
 (this is the app's primary navigation on mobile; expect iteration — first "designed" nav surface).
