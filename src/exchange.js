@@ -138,16 +138,44 @@ export function buildBackup(state, { includeAssistant = false } = {}) {
   return pack
 }
 
+// req-39 (F-RISK-4) — a backup may legitimately OMIT any collection (migrateState
+// defaults them), but a field that is PRESENT must be an array. Otherwise
+// migrateState's `.map()` throws a raw "map is not a function" TypeError instead of
+// the friendly reject below. Validated here, at the import boundary, and NEVER by
+// array-guarding migrateState: the load path relies on migrateState throwing on a
+// corrupt value so req-36/DEC-032's corrupt-v8 guard fires instead of silently
+// overwriting it.
+const COLLECTION_FIELDS = [
+  'exercises',
+  'routines',
+  'sessions',
+  'programs',
+  'workouts',
+  'plannedWorkouts',
+  'draftWorkouts',
+]
+
+function collectionsAreArrays(root) {
+  for (const field of COLLECTION_FIELDS) {
+    if (root[field] !== undefined && !Array.isArray(root[field])) return false
+  }
+  // `?.` keeps a non-object/absent schedule safe; only a present, non-array `slots`
+  // (the migrateState `.map` site) is a reject.
+  if (root.schedule?.slots !== undefined && !Array.isArray(root.schedule.slots)) return false
+  return true
+}
+
 export function unwrapBackup(payload) {
   if (!payload || typeof payload !== 'object') return null
   if (payload.kind === BACKUP_KIND) {
-    return payload.state && typeof payload.state === 'object' ? payload : null
+    if (!payload.state || typeof payload.state !== 'object') return null
+    return collectionsAreArrays(payload.state) ? payload : null
   }
   if (
     Array.isArray(payload.exercises) &&
     (Array.isArray(payload.routines) || Array.isArray(payload.sessions) || Array.isArray(payload.programs))
   ) {
-    return payload
+    return collectionsAreArrays(payload) ? payload : null
   }
   return null
 }
