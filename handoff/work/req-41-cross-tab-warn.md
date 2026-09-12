@@ -1,6 +1,6 @@
 # req-41 — warn when another tab changes the data (audit F-RISK-3)
 
-**Status: READY.** Decision made (DEC-029). From audit 2026-09-12 (F-RISK-3).
+**Status: BUILT AND MERGED, 2026-09-12 — branch `req-41` (`1171e95`…`1171e95`, 1 commit).** Decision made (DEC-029). From audit 2026-09-12 (F-RISK-3).
 **Gate: functional** — warn-only, writes no data; the real check is a two-tab
 browser test (planning attempts it; else Emilio). Not a persisted-data *change*.
 
