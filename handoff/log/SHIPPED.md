@@ -503,3 +503,17 @@ finding (→ `reference/schema.md` clarified): `workoutSnapshot` has two branche
 snapshot-**less** branch reads top-level `workout.programName`; the snapshot-present branch keeps
 `programName` from inside the snapshot. Not a bug, but the schema.md ":183" line read more general
 than the code.
+
+## req-38 — stamp the day key in local time, not UTC (audit F-CODE-2)  (merged 2026-09-12)
+
+Two sites in `store.jsx` built the day key as UTC `new Date().toISOString().slice(0,10)` — `:214`
+(plan.date default) and `:233` (`performedOn`) — while the whole rest of the app uses the local-time
+`dateKey` (`schedule.js`). Near midnight for an off-UTC user a workout landed a calendar day off.
+Fix: import `dateKey`, swap both sites to `dateKey(new Date())` (3 lines, go-forward only, no
+migration). Grep acceptance empty. `./check` green, 15 test files. Gate: functional (planning merged).
+Test: `store.jsx` can't be imported under plain `node --test` (no JSX transform → **L-007**), so
+`store.test.js` proves it two reachable ways — a TZ+14 boundary instant showing `dateKey(new Date())`
+is the local day while the old UTC slice is the prior day (deterministic, real behaviour change), plus
+a source-guard test enforcing the grep. Merge `e0c49e0` (branch `req-38`, `c8eebd2`, 1 commit). Merge
+note: existing workouts keep their old (possibly UTC-off-by-one) `performedOn`; only new workouts are
+local; mixed old/new expected.

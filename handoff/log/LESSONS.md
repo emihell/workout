@@ -87,3 +87,20 @@ happens: from the code worktree, `git branch <req>` at the stray commit, `git re
 handoff must say **branch first** (`git checkout main && git pull && git checkout -b req-NN`), and
 planning should sanity-check the branch exists before reviewing. A code-CC pre-push/commit hook that
 refuses commits on `main` would enforce it — worth adding.
+
+## L-007 — `store.jsx` behaviour is unreachable by the `node --test` gate (no JSX transform)  (2026-09-12)
+
+Found building req-38 (F-CODE-2, a fix inside `store.jsx`). The gate runs plain `node --test`, which
+has **no JSX transform**, so any module that is `.jsx` — `store.jsx` above all — **cannot be imported
+by a test.** That is why no existing test imports the store; the tested logic all lives in pure `.js`
+(`model.js`, `workout-log.js`, `storage.js`, `progress.js`, `schedule.js`). Consequence: you cannot
+drive `startWorkout`/store mutations directly in a unit test. req-38 worked around it by pinning a
+boundary `new Date()` to prove the *substituted expression* (`dateKey(new Date())`) is local-not-UTC,
+plus a source-guard test that reads `store.jsx` as text — deterministic, but not a real store-behaviour
+test. Rule: **when a req's logic must be unit-tested, put that logic in a pure `.js` module** (a helper
+in `model.js`/`workout-log.js`), not inline in `store.jsx`/a view `.jsx`; the store/view then just
+calls it. Directly relevant to the queued audit reqs that touch `store.jsx`: **req-40** (progression
+unify — the shared helper must land in a pure module, not inline in `finish.jsx`) and **req-41**
+(cross-tab warn — the storage-event reconcile logic should be a pure function the store wires up). A
+JSX-capable test runner would remove the constraint but is a real toolchain change — not in scope for
+an audit-fix; flagged here so store-testing limits are planned for, not discovered at the gate.
