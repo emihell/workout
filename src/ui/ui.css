@@ -332,7 +332,16 @@ a.ui-btn--quiet:active {
 /* The main content clears the fixed bar: bar content height + hairline + the iOS
  * home-indicator safe area. Applied to <main> so every screen scrolls clear of
  * the bar without each screen knowing about it. */
+/* req-51 — with viewport-fit=cover (index.html) the app draws under the status
+ * bar / notch / Dynamic Island and rounded corners, so reserve the top and side
+ * insets here. These are env()-driven: on a device with no inset each resolves to
+ * 0 (fallback), so no extra dead space is added — the spacing only appears where
+ * the hardware needs it. The bottom inset is handled by --ui-tabbar-h / the fixed
+ * chrome below. */
 .ui-main {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: var(--ui-tabbar-h);
 }
 .ui-tabbar {
@@ -344,7 +353,11 @@ a.ui-btn--quiet:active {
   display: flex;
   gap: var(--ui-s2);
   padding: var(--ui-s2);
-  padding-bottom: calc(var(--ui-s2) + env(safe-area-inset-bottom)); /* clear the home indicator */
+  padding-bottom: calc(var(--ui-s2) + env(safe-area-inset-bottom, 0px)); /* clear the home indicator */
+  /* req-51 — in landscape the notch/rounded corner eats one side; keep the tabs
+   * out of it. env()-driven → 0 (no extra space) when there's no side inset. */
+  padding-left: calc(var(--ui-s2) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--ui-s2) + env(safe-area-inset-right, 0px));
   background: var(--ui-bg);
   border-top: 1px solid var(--ui-line);
 }
@@ -385,7 +398,10 @@ a.ui-btn--quiet:active {
   max-width: 560px;
   margin: 0 auto;
   min-height: var(--ui-tap);
-  padding: var(--ui-s2) var(--ui-s3);
+  /* req-51 — keep the strip's content clear of a landscape side inset; env()-driven
+   * so no extra space where there's no inset. */
+  padding: var(--ui-s2) calc(var(--ui-s3) + env(safe-area-inset-right, 0px)) var(--ui-s2)
+    calc(var(--ui-s3) + env(safe-area-inset-left, 0px));
   color: var(--ui-ink);
   text-decoration: none;
 }
@@ -426,7 +442,11 @@ a.ui-btn--quiet:active {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--ui-ink-3);
+  /* req-51 a11y — this is meaningful 13px status text, so it must meet WCAG AA
+   * for normal text (4.5:1). ink-3 (#8e8e8e) is only 3.28:1 on white and fails;
+   * ink-2 (#6b6b6b) is 5.33:1 and passes. ink-3 stays for disabled controls
+   * (exempt from 1.4.3) and the chevron glyph (a graphic, needs only 3:1). */
+  color: var(--ui-ink-2);
 }
 
 /* ---- Workout peek-row info (req-47) — the stacked date-above-info format shared
