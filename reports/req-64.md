@@ -1,100 +1,110 @@
-# req-64 — Trim START-HERE to cold-start-only; kill the workflow-doc duplication drift
+# req-64 — Remove START-HERE.md; fold the boot prompts into README
 
-Branch `req-64` (off `main`). Gate: **infra/docs** — planning verifies by reading the
-diff and merges on its own read (DEC-035); low blast radius (root docs only, no `src/`).
-Built, **NOT merged**.
+Branch `req-64` (off `main`), built on top of the earlier trim commit `451d61a`. Gate:
+**infra/docs** — planning verifies by reading the diff and merges on its own read (DEC-035);
+low blast radius (root docs only, no `src/`). Built, **NOT merged**.
+
+**Re-scoped mid-req** from "trim START-HERE to cold-start-only" to "delete START-HERE
+entirely" on Emilio's reframe (DEC-044 updated): after the trim, START-HERE's only job was
+to hold two boot prompts + a worktree-layout line — a redundant second front door, since the
+root `CLAUDE.md` banner auto-routes each worktree and README is the conventional entry.
 
 ## Technical
 
 ### What changed (2 files, root docs only)
 
-**`START-HERE.md`** — trimmed from 74 → 44 lines. Now cold-start-only:
-- Kept: the worktree-layout snippet, the two boot prompts, the one-line "your task is
-  usually…", and a single pointer to `handoff/PLANNING.md` (planning) / `CLAUDE.md`
-  (build) under a new **WHERE EVERYTHING ELSE IS** heading.
-- **Removed** the "HOW WE WORK — the loop" three-stage section and the "FOR THE
-  ASSISTANT" read-order + hard-rules block. Both restated `handoff/` docs (coverage
-  table below).
+**`START-HERE.md`** — **deleted** (`git rm`). It previously held the two boot prompts, a
+worktree-layout diagram, and (before `451d61a`) the loop/hard-rules prose. The loop prose was
+already removed in the trim; its remaining content (the prompts) is now in README.
 
-**`README.md`** — the "Planning workflow" paragraph only (~line 106). Retired "Cowork"
-→ "a Claude Code \"planning\" session", and corrected a cross-reference my trim would
-otherwise have made stale: it said START-HERE "has the boot prompts and the loop" — the
-loop no longer lives there, so it now reads "the boot prompts and the worktree layout;
-the loop itself lives in `handoff/`." Rest of README (product contract, Setup block)
-untouched.
+**`README.md`** — three edits:
+1. **New `## Boot a session` subsection** (after the Setup block, before Development, §89–101)
+   carrying both boot prompts and the "your `<task>` is usually…" hint. The worktree layout
+   was *not* re-stated — README's Setup already asserts it ("That gives you the two-worktree
+   layout …"), so restating it would recreate the duplication this req kills.
+2. **`:73`** (in Setup) — *"To boot a session, see `START-HERE.md` for the one-line prompts"*
+   → now links to `[Boot a session](#boot-a-session)` below.
+3. **`:108`** (Planning workflow) — *"Start at `START-HERE.md` — it has the boot prompts and
+   the worktree layout"* → reworded to point at the Boot-a-session subsection above (prompts)
+   and Setup (layout); the loop still lives in `handoff/`.
 
-### Coverage check — every removed line has a canonical home in `handoff/`
+The `451d61a` trim had already touched `:106/:108` and retired "Cowork" from that paragraph;
+this reconciles it so no `START-HERE` reference remains anywhere.
 
-The spec required confirming removed content genuinely lives in `handoff/` (failure
-case: deleting something unique to START-HERE). It does; nothing was unique:
+### The new README subsection (quoted — acceptance: prompts preserved + discoverable)
 
-| Removed from START-HERE | Canonical source |
-| --- | --- |
-| Three-stage loop (Plan / Build / Record & close) | `PLANNING.md` "The two-agent build loop (DEC-009)" §175–277 (full 10-step cycle) + `CLAUDE.md` "How work arrives" |
-| "Hand-offs are files, never pastes"; the `NOW.md` board line | `PLANNING.md` "Reports come back in `reports/`, not in `handoff/`" §362–371; board in `NOW.md` |
-| Planning read order (`PLANNING.md`→`NOW.md`→`CLOSEOUT.md`→on-demand) | `PLANNING.md` §3–5 ("Read this first… then `NOW.md`") + its "Owns" block deferring to `rules/WORKFLOW.md`/`CLOSEOUT.md` |
-| "never mark BUILT AND MERGED until git shows it on main; no optimistic pre-flip" | `CLOSEOUT.md` §20–21 ("stays 'NOT merged' right up until close-out. Do not pre-flip") |
-| index-lock caution / "never run index-touching git" | `CLOSEOUT.md:66` (stale-lock wording) + `PLANNING.md` (`--no-optional-locks` for read-only, §30/§118) |
-| "everything durable is a committed file / no session memory" | `PLANNING.md` "No auto-memory" §101–107 + `CLAUDE.md` "Memory is for you, not for the project" |
-| "close-out is one fixed, lock-guarded procedure; never retype freehand" | `CLOSEOUT.md` itself (§3–4, §52) |
+```
+## Boot a session
 
-### Decisions I made (spec left implementation wording to the code session)
+Paste one of these as a session's first message, with your task where it says `<task>`:
 
-1. **Planning boot prompt re-targeted `workout-planning/START-HERE.md` → `handoff/PLANNING.md`.**
-   Rationale: after the trim, START-HERE carries no planning workflow, so the real
-   planning guide is `PLANNING.md`. This makes the two boot prompts symmetric (code
-   already reads `CLAUDE.md` directly, not via START-HERE) and matches the spec's own
-   framing ("everything else … is in `handoff/PLANNING.md` for planning and `CLAUDE.md`
-   for building"). Functionally equivalent to the old indirection (old prompt → START-HERE
-   → pointer → PLANNING.md), one hop shorter. **Flag for the reviewer:** if you'd rather
-   the planning boot still land on START-HERE first, this is the one line to revert.
-2. **Path made path-agnostic** ("two sibling worktrees, wherever you cloned them"), per
-   the spec's unconfirmed-default. No machine path hardcoded in START-HERE. README's
-   Setup block `mkdir -p ~/projects/workout` was left as-is (out of scope; it reads as a
-   suggested location, not an assertion of where the repo is).
-3. **"cloud session" wording:** step 3 said soften *if the hard-rules block survives*. It
-   did **not** survive the trim — the whole "FOR THE ASSISTANT" block was removed — so the
-   cloud framing is gone wholesale rather than reworded. Index-lock caution is preserved
-   in its canonical home (`CLOSEOUT.md:66`).
+- **Planning:** `Planning session for workout-app. Read handoff/PLANNING.md, then: <task>.`
+- **Build (Claude Code):** `Claude Code session for workout-app. Read CLAUDE.md, then: <task>.`
+
+Your `<task>` is usually one of:
+
+- Planning — *"what's next?"*  ·  *"spec a req for <idea>"*  ·  *"process and close req-N"*
+- Build — *"build req-N"*
+
+These prompts are the fast way in, not the mechanism: the root `CLAUDE.md` banner
+auto-loads every turn and routes each worktree on its own (planning → `handoff/PLANNING.md`,
+build → `CLAUDE.md`), so a session cold-started in either worktree finds its way without one.
+```
+
+Both prompts match DEC-044: planning → `handoff/PLANNING.md`, build → `CLAUDE.md`.
+
+### Routing intact — the load-bearing piece (acceptance: CLAUDE.md banner unchanged)
+
+The root `CLAUDE.md` banner is what makes cold-start work without START-HERE. **It was not
+touched** (`git status --porcelain CLAUDE.md` → empty). Read to confirm both worktree branches
+still route correctly:
+- planning worktree → *"read `handoff/PLANNING.md` instead … `handoff/` is yours to write"*
+- code worktree → the CLAUDE.md build guide (the rest of the file)
 
 ### Verification (receipts)
 
-Acceptance criteria run as commands:
-
 ```
-$ grep -rn "Cowork" README.md START-HERE.md ; echo exit=$?
-exit=1                    # no matches
+$ git ls-files START-HERE.md ; echo exit=$?
+exit=0                    # no output → file no longer tracked
 
-$ grep -rn "cloud session" START-HERE.md ; echo exit=$?
+$ ls START-HERE.md
+ls: START-HERE.md: No such file or directory   # gone from disk too
+
+$ grep -rn "START-HERE" README.md CLAUDE.md src/ .githooks/ plan ; echo exit=$?
+exit=1                    # no matches (handoff/ history out of scope)
+
+$ grep -rn "Cowork" README.md ; echo exit=$?
 exit=1                    # none
 
-$ grep -rn "projects/workout" START-HERE.md ; echo exit=$?
-exit=1                    # path-agnostic, no asserted path
+$ git status --porcelain CLAUDE.md
+                         # empty — banner unchanged
 
 $ git status --porcelain
  M README.md
- M START-HERE.md          # root docs only — NO handoff/ file touched
+D  START-HERE.md          # root docs only — NO handoff/ file touched
 ```
 
 `./check`:
 ```
 check: green — lint, 19 test file(s), and the build all passed.
 ```
-(Docs don't affect the gate; run to confirm it stays green. 218 tests pass.)
+(218 tests pass. Docs don't affect the gate; run to confirm it stays green.)
 
 ## Workflow
 
-- **Scope:** matched the spec exactly. One in-scope-adjacent fix rode along: the README
-  "Planning workflow" paragraph asserted START-HERE "has … the loop", which my trim
-  falsified — corrected in the same paragraph I was already editing for terminology, so
-  as not to create a fresh stale cross-reference (the exact drift this req kills). Called
-  out above.
-- **One decision worth a second look (→ possible `DEC-`):** the planning boot prompt now
-  points at `handoff/PLANNING.md` instead of `START-HERE.md`. It's an implementation
-  choice the spec delegated, but it changes the documented cold-start entry for planning,
-  so it's the reviewer's call to keep.
-- **Nothing in `handoff/` was touched** — this was root-doc-only by design (DEC-043 /
-  DEC-005 isolation: `plan save` refuses non-`handoff/` files, which is why it came to the
-  code session). No `handoff/` edits attempted, so the pre-commit guard was never exercised.
-- **No new `DEC-`/`L-` proposed from build friction** — the work was mechanical once the
-  coverage check confirmed nothing unique was being dropped.
+- **Scope:** matched the re-scoped spec exactly — deleted START-HERE, added the Boot-a-session
+  subsection, fixed both dangling refs (`:73`, `:108`), left the `CLAUDE.md` banner and
+  README's product/Setup content untouched.
+- **Reconciled with the earlier trim (`451d61a`):** that commit had already reworded the
+  Planning-workflow paragraph (killing "Cowork" and the "loop lives here" claim). This req's
+  `:108` edit builds on that so the paragraph now carries no START-HERE reference at all.
+- **One implementation choice (spec delegated placement/wording):** put `## Boot a session`
+  between Setup and Development — the prompts sit next to first-machine setup, where a new
+  reader already is. Did **not** re-state the worktree layout there (README already asserts it
+  in Setup); a bare pointer avoids reintroducing the duplication DEC-043/DEC-044 target.
+- **Nothing in `handoff/` was touched** — root-doc-only by design (DEC-005 isolation; `plan
+  save` refuses non-`handoff/` files, which is why this comes to the code session). The
+  pre-commit guard was never exercised.
+- **No new `DEC-`/`L-` from build friction** — mechanical once the trim had already confirmed
+  nothing unique was being dropped. The content decision (delete vs. keep) is Emilio's,
+  recorded as DEC-044.
