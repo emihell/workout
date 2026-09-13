@@ -713,3 +713,35 @@ the code worktree, tested via a **detached** worktree at the branch SHA
 (`git worktree add --detach <sha>`, 182 tests). Both stayed inside DEC-005 (temp trees
 are planning's, code checkout untouched). The detached-SHA variant is the move when the
 branch is already checked out elsewhere.
+
+## DEC-037 — Build workflow by lane; batches use fresh ephemeral agents (no /clear)
+
+Decided 2026-09-13 (Emilio). Refines the two-agent loop (DEC-009). **The lane is chosen
+by whether the DESIGN is settled — not by the req tag, not by "batch vs single".**
+
+- **Settled + mechanical** (functional fixes, or UI whose design is already decided) →
+  **autonomous ephemeral build agents**, for BATCH work. Planning spawns a fresh
+  general-purpose agent **per req in its own isolated git worktree**; it reads
+  `handoff/work/req-N`, builds on branch `req-N` off `main`, runs `./check`, writes
+  `reports/req-N.md`, and reports to planning. Planning tests (its own hand), runs the
+  independent reviewer for shared code, and closes out. Fresh context per req by
+  construction → **no `/clear` ever**. Emilio gets **one consolidated test list at the
+  end of the batch** (his after-look; ux-feel merges on planning's testing per DEC-035).
+- **Unsettled design/feel** → **Emilio + code CC, live.** Code CC reports to *Emilio*,
+  they iterate on screen; the result flows to planning to fold in (the "work happens
+  outside the loop" path). This is the hands-on lane Emilio had been losing.
+- **Functional single reqs** needing coordination but not taste → the planning-driven
+  code-CC loop (DEC-009 as-is), Emilio at the gates.
+
+**Why:** making planning the hub for *every* build cut Emilio out of the work where his
+taste is the driver. Ephemeral agents also **free code CC** so Emilio can run a design
+req on it in PARALLEL with a mechanical batch. "ux-feel" ≠ "Emilio hands-on" — once the
+design is settled the build is mechanical and the test list is the gate.
+
+**No programmatic `/clear` (re-confirmed 2026-09-13, claude-code-guide):** unchanged —
+a "/clear" cross-session message arrives as plain text (never executed), hooks/settings/
+MCP can't trigger it, no self-clear. The fix is not reusing a session, hence ephemeral
+agents. **Ephemeral-agent gotchas:** the fresh worktree has no `node_modules` (symlink
+the planning worktree's in the agent's setup); the branch persists in the shared `.git`
+after the temp worktree is pruned (closeout finds it); the agent must NOT merge/push —
+planning closes out.

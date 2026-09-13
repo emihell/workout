@@ -177,6 +177,19 @@ pastes it; he reads them first and sometimes doesn't send them.
 The primary way build work flows now: **you ping code CC directly** (`SendMessage` to its
 session, e.g. `workout-codebase-a4`), it builds and reports back, you verify and close.
 
+**Choose the lane by whether the DESIGN is settled (DEC-037), not by tag or batch/single:**
+- **Settled + mechanical → autonomous ephemeral agents (batches).** Spawn a fresh
+  general-purpose build agent **per req in its own isolated worktree** (no `/clear` — there
+  is none; the fix is not reusing a session). It builds branch `req-N` off `main`, runs
+  `./check`, writes `reports/req-N.md`, reports to you; you test by your own hand, run the
+  independent reviewer for shared code, close out, and give Emilio **one test list at the
+  end**. Agent setup gotcha: symlink the planning worktree's `node_modules`; agent must not
+  merge/push.
+- **Unsettled design/feel → Emilio + code CC live.** Code CC reports to *Emilio*; they
+  iterate on screen; fold the result in when it lands. Ephemeral batches free code CC for
+  this to run in parallel.
+- **Functional single reqs → the planning-driven loop below**, Emilio at the gates.
+
 **Precondition — only READY, tagged reqs enter the loop.** A req is pingable only when it is
 `READY` (no open decisions) and carries its **Gate** tag (functional / ux-feel / persisted-data /
 infra — set in the req header at spec time). A `NEEDS DECISION` req is resolved with Emilio
