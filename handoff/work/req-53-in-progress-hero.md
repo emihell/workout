@@ -1,6 +1,6 @@
 # req-53 — In-progress workout becomes the main-page hero (drop the "in progress" row)
 
-**Status: READY.** From Emilio 2026-09-13: *"If workout is in progress - remove the
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-53` (`f08a023`…`f08a023`, 1 commit).** From Emilio 2026-09-13: *"If workout is in progress - remove the
 'in progress row' instead - the today start button should be the continue button and
 it should say in progress next to the routine info."* Open case (active workout that
 isn't today's slot) decided by Emilio 2026-09-13: **the in-progress workout is always
