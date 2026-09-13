@@ -216,7 +216,7 @@ export function Today() {
           last Row of the recent list — so they bookend with identical typography/
           chevron. Interim peeks of Schedule/History until req-32's unified scroll. */}
       <List>
-        <Row to="/schedule">Future workouts</Row>
+        <Row to="/schedule">Schedule</Row>
         {upcoming.map(({ date, slot, routine }) => (
           <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} todayKey={todayKey} />
         ))}
@@ -247,7 +247,7 @@ export function Today() {
         {recent.map((workout) => (
           <HistoryPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
         ))}
-        <Row to="/history">Past workouts</Row>
+        <Row to="/history">History</Row>
       </List>
 
       {/* Entry to the "choose any workout" picker (/start). Iter 8: a fixed strip
