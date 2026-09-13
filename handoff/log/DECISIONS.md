@@ -680,3 +680,36 @@ gate (it's the author). So: code CC may self-check; planning runs the independen
 **Dry-run owed:** the throwaway-worktree test method above (`git worktree add` a temp dir, symlink
 `node_modules`, run `node --test`/`vite build` there) is specced but not yet exercised — prove it with
 one dry run before relying on it mid-batch for real app-code, so it doesn't fail at the worst moment.
+
+## DEC-036 — Bottom menu redesign: floating Workout-oval + icon-only circles (solid)
+
+Decided 2026-09-13 (Emilio, from the `/design` mockups). Replaces the req-14/DEC-024
+three-text-tab `TabBar`. Form inspired by Apple's "Liquid Glass" (floating capsule
+controls) but **solid — no translucency, no shadow** (Emilio trimmed both). Three
+controls, left→right **Library · Workout · Settings**:
+- **Workout** = wide oval/capsule, **text only, no icon**, `flex:1` so it takes all
+  remaining width — the deliberate focus.
+- **Library / Settings** = **icon-only circles** (~56px; grid + sliders icons). This
+  reverses the prior no-icons stance (req-14) for these two.
+- **Selection model A (Emilio):** the **current screen's** control is **ink-filled**
+  (`--ui-ink`); the others carry a **faint hairline border** (`--ui-line`, white fill).
+  The fill moves with the active tab — reuse `activeTab` (`route.js:113`). (Rejected
+  model B: Workout always ink-filled.)
+- Same three tab groups/targets as today (Library=`/routines`, Workout=`/`,
+  Settings=`/settings`); hidden during the in-workout flow (route starts `workout`).
+- **Floating** (inset from the edges), so content clears it via bottom padding +
+  `env(safe-area-inset-bottom)` — depends on `viewport-fit=cover` (req-51).
+- Extracted into **its own component** in the library (Emilio: "its own component").
+Spec: req-52. Rejected en route (the `/design` exploration): icon+label tabs, a
+center-Start FAB, a 4-tab IA (Schedule/History top-level), a dark-glass tray, and the
+translucent/shadowed glass finishes.
+
+## DEC-035 follow-up (2026-09-13): throwaway-worktree dry-run exercised
+
+DEC-035 left the throwaway-worktree test method "owed" (unexercised). Now proven on
+real app-code: req-47 tested in a `git worktree add` branch checkout with symlinked
+`node_modules` (lint 0, build ✓, 182 tests); req-48, whose branch was checked out in
+the code worktree, tested via a **detached** worktree at the branch SHA
+(`git worktree add --detach <sha>`, 182 tests). Both stayed inside DEC-005 (temp trees
+are planning's, code checkout untouched). The detached-SHA variant is the move when the
+branch is already checked out elsewhere.

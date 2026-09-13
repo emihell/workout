@@ -22,7 +22,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 - `req-50` **Components sweep** — no bare text links; nav→NavLink, action→Button. Order after req-49. **[ux-feel]**
 - `req-51` **iPhone safe-area + a11y** — menu clips in full-screen; root cause [measured]: no
   `viewport-fit=cover` → `env(safe-area-*)`=0. Real-device look is Emilio's after-check. **[ux-feel]**
-- `req-52` **Bottom menu redesign** — **NEEDS DECISIONS**: mock variants first, then spec. **[ux-feel]**
+- `req-52` **Bottom menu redesign** — READY (DEC-036): floating solid Workout-oval + icon-only
+  Library/Settings circles, selection fill follows the active tab. Build after req-51 (safe-area). **[ux-feel]**
 
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
