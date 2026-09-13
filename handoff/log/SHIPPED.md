@@ -760,3 +760,12 @@ to="/schedule">Schedule</Row>` link + the `UpcomingRow` items + the "Nothing sch
 now-dead `UpcomingRow` / `upcoming` / `remainingInLoop` import. Merge `4a476f0` (branch `req-57`,
 `558135d`, 1 commit). **Over-removed (L-013):** Emilio meant only the Schedule *nav link*, not the whole
 preview — **req-59 restores the upcoming items, keeping just the link removed.**
+
+## req-59 — Restored the front-page upcoming preview; kept only the Schedule link removed  (merged 2026-09-13)
+
+Corrects req-57's over-removal (L-013). Restored the upcoming preview from the pre-req-57 source — the
+`UpcomingRow` component, `upcoming = remainingInLoop(...).slice(0,2)`, the `remainingInLoop` import, and
+the headerless upcoming `<List>` + "Nothing scheduled." — minus the `<Row to="/schedule">Schedule</Row>`
+nav link (Emilio wanted only the link gone, not the whole preview). Today hero + recent/History
+untouched; `remainingInLoop` is imported again so its export is no longer orphaned. Planning verified by
+its own hand (213 tests). Merge `58a59eb` (branch `req-59`, `2c7c11d`, 1 commit).
