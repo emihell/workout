@@ -71,7 +71,7 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
       ) : null}
       <Field label="Note" value={note} onChange={(event) => setNote(event.target.value)} />
       <div className="ui-actions">
-        <NavLink to={cancelTo}>Cancel</NavLink>
+        <NavLink to={cancelTo} className="ui-btn ui-btn--quiet">Cancel</NavLink>
         <Button type="submit" variant="primary">
           Save
         </Button>

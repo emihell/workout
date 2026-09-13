@@ -39,7 +39,7 @@ export function Schedule() {
     <Screen>
       <Title>Schedule</Title>
       <p>
-        <NavLink to="/schedule/loop">
+        <NavLink to="/schedule/loop" className="ui-navlink">
           Loop · {loop} week{loop === 1 ? '' : 's'}
         </NavLink>
       </p>
@@ -97,7 +97,7 @@ export function ScheduleLoop() {
           options={LOOP_WEEKS.map((n) => ({ value: n, label: `${n} week${n === 1 ? '' : 's'}` }))}
         />
         <div className="ui-actions">
-          <NavLink to="/schedule">Cancel</NavLink>
+          <NavLink to="/schedule" className="ui-btn ui-btn--quiet">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
@@ -136,15 +136,15 @@ export function ScheduleDay({ week, weekday }) {
               </Button>
             }
           >
-            <NavLink to={dayPathOf(week, weekday, `/${slot.id}`)}>{slotLabel(routines, slot)}</NavLink>
+            <NavLink to={dayPathOf(week, weekday, `/${slot.id}`)} className="ui-navlink">{slotLabel(routines, slot)}</NavLink>
           </Row>
         ))}
       </List>
       <p>
-        <NavLink to={dayPathOf(week, weekday, '/add')}>Add routine</NavLink>
+        <NavLink to={dayPathOf(week, weekday, '/add')} className="ui-navlink">Add routine</NavLink>
       </p>
       <p>
-        <NavLink to="/schedule">Done</NavLink>
+        <NavLink to="/schedule" className="ui-navlink">Done</NavLink>
       </p>
     </Screen>
   )

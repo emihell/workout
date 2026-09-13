@@ -50,7 +50,7 @@ export function HistoryDetail({ workoutId }) {
       </p>
       <p className="ui-sub">
         {workout.overallFeel ? `${workout.overallFeel} · ` : ''}
-        <NavLink to={`/history/${workout.id}/edit`}>Correct</NavLink>
+        <NavLink to={`/history/${workout.id}/edit`} className="ui-navlink">Correct</NavLink>
       </p>
       {workout.overallNote ? <p className="ui-sub">{workout.overallNote}</p> : null}
 
@@ -72,7 +72,7 @@ export function HistoryDetail({ workoutId }) {
         })}
       </List>
       <p>
-        <NavLink to={`/history/${workout.id}/set/new`}>Add set</NavLink>
+        <NavLink to={`/history/${workout.id}/set/new`} className="ui-navlink">Add set</NavLink>
       </p>
 
       {workout.progression?.length ? (

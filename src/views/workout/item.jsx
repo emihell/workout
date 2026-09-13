@@ -19,7 +19,7 @@ import {
   restPatchAfterSet,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
-import { Back, ExercisesLink, Missing } from '../shared'
+import { Back, ExercisesLink, Missing, NavLink } from '../shared'
 import { Button, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
 import { RestBar, useRestCountdown } from './rest'
@@ -56,7 +56,7 @@ function ExerciseTitle({ routineId, item, ex, bits }) {
     <>
       <Title>
         {inLibrary ? (
-          <a href={`#${exerciseEditorPath(routineId, item)}`}>{name}</a>
+          <NavLink to={exerciseEditorPath(routineId, item)}>{name}</NavLink>
         ) : (
           name
         )}

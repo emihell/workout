@@ -87,7 +87,7 @@ export function Exercises({ type = null }) {
     <Screen>
       <Title>Exercises</Title>
       <p>
-        <NavLink to="/exercises/new">Add exercise</NavLink>
+        <NavLink to="/exercises/new" className="ui-navlink">Add exercise</NavLink>
       </p>
       <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
       {q ? (
@@ -163,7 +163,7 @@ export function ExerciseNewManual({ returnBase = null }) {
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <div className="ui-actions">
-          <NavLink to={paths.hub}>Cancel</NavLink>
+          <NavLink to={paths.hub} className="ui-btn ui-btn--quiet">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
@@ -216,7 +216,10 @@ export function ExerciseNewSearch({ returnBase = null }) {
             {hits.map((item) => {
               const existing = libraryNames.get(String(item.name || '').trim().toLowerCase())
               const action = existing ? (
-                <NavLink to={returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}>
+                <NavLink
+                  to={returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}
+                  className="ui-btn ui-btn--secondary"
+                >
                   {returnBase ? 'Add to routine' : 'Already added'}
                 </NavLink>
               ) : (
@@ -283,7 +286,7 @@ export function ExerciseEdit({ exerciseId }) {
         <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
         <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
         <div className="ui-actions">
-          <NavLink to={`/exercises/${ex.id}`}>Cancel</NavLink>
+          <NavLink to={`/exercises/${ex.id}`} className="ui-btn ui-btn--quiet">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
@@ -305,7 +308,7 @@ export function ExerciseDetail({ exerciseId }) {
       <Back to="/exercises" />
       <Title>{ex.name}</Title>
       <p>
-        <NavLink to={`/exercises/${ex.id}/edit`}>Edit</NavLink>
+        <NavLink to={`/exercises/${ex.id}/edit`} className="ui-navlink">Edit</NavLink>
       </p>
       <p className="ui-sub">{[ex.equipment, typeLabel(ex.type), ex.weightStep].filter(Boolean).join(' · ')}</p>
       {ex.muscles ? <p className="ui-sub">{ex.muscles}</p> : null}

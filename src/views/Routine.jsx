@@ -40,7 +40,7 @@ export function Routines() {
     <Screen>
       <Title>Routines</Title>
       <p>
-        <NavLink to="/routines/new">Add routine</NavLink>
+        <NavLink to="/routines/new" className="ui-navlink">Add routine</NavLink>
       </p>
       {routines.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -130,11 +130,11 @@ export function RoutineDetail({ routineId, paths }) {
       <p className="ui-sub">
         {meta}
         {meta ? ' · ' : ''}
-        <NavLink to={nav.edit}>Edit</NavLink>
+        <NavLink to={nav.edit} className="ui-navlink">Edit</NavLink>
       </p>
       <SectionHeader>Exercises</SectionHeader>
       <p>
-        <NavLink to={nav.pick}>Add exercise</NavLink>
+        <NavLink to={nav.pick} className="ui-navlink">Add exercise</NavLink>
       </p>
       {routine.exercises.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -156,13 +156,13 @@ export function RoutineDetail({ routineId, paths }) {
                 </>
               }
             >
-              <NavLink to={nav.item(item.id)}>{ex?.name || item.exerciseId}</NavLink> — {itemMeta}
+              <NavLink to={nav.item(item.id)} className="ui-navlink">{ex?.name || item.exerciseId}</NavLink> — {itemMeta}
             </Row>
           )
         })}
       </List>
       <p>
-        <NavLink to={nav.done}>Done</NavLink>
+        <NavLink to={nav.done} className="ui-navlink">Done</NavLink>
       </p>
       {nav.showDelete ? (
         <Button
@@ -216,7 +216,7 @@ export function RoutineEdit({ routineId, paths }) {
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
         <div className="ui-actions">
-          <NavLink to={nav.base}>Cancel</NavLink>
+          <NavLink to={nav.base} className="ui-btn ui-btn--quiet">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
@@ -248,7 +248,7 @@ export function RoutineExercisePick({ routineId, paths }) {
       <Back to={nav.base} />
       <Title>Add exercise</Title>
       <p>
-        <NavLink to={nav.create}>Create exercise</NavLink>
+        <NavLink to={nav.create} className="ui-navlink">Create exercise</NavLink>
       </p>
       {store.exercises.length === 0 ? (
         <p className="ui-sub">None.</p>
