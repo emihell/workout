@@ -106,9 +106,10 @@ No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, soc
 ## Planning workflow
 
 This repo uses a two-worktree planning/build loop. Start at **`START-HERE.md`** — it
-has the boot prompts and the loop. In short: a Cowork "planning" session writes specs
-into `handoff/` (read-only to the builder, enforced by a pre-commit hook), Claude Code
-builds each `req-N` on its own branch, and `./plan` publishes/merges/closes.
+has the boot prompts and the worktree layout; the loop itself lives in `handoff/`. In
+short: a Claude Code "planning" session writes specs into `handoff/` (read-only to the
+builder, enforced by a pre-commit hook), Claude Code builds each `req-N` on its own
+branch, and `./plan` publishes/merges/closes.
 
 ```
 ./check          the gate: lint + tests + build (must pass before code reaches main)
