@@ -377,6 +377,7 @@ a.ui-btn--quiet:active {
   align-items: center;
   justify-content: center;
   min-height: var(--ui-dock-h);
+  font-family: var(--ui-font);
   font-size: var(--ui-text-body);
   font-weight: 600;
   text-decoration: none;
