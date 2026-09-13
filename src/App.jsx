@@ -20,7 +20,7 @@ import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExerc
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { StartWorkout } from './views/Start'
 import { Settings } from './views/Settings'
-import { TabBar } from './ui/index.jsx'
+import { BottomMenu } from './ui/BottomMenu.jsx'
 import { Library } from './views/Library'
 import { Showcase } from './ui/Showcase.jsx'
 
@@ -221,7 +221,7 @@ export default function App() {
           <Screen />
         </ErrorBoundary>
       </main>
-      <TabBar />
+      <BottomMenu />
     </StoreProvider>
   )
 }
