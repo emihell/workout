@@ -1,6 +1,6 @@
 # req-55 — One in-progress workout: hero-replacement, stale lifecycle, abandon-on-new
 
-**Status: READY.** Model decided with Emilio 2026-09-13 (DEC-038). Supersedes req-53's
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-55` (`a382217`…`488a50e`, 2 commits).** Model decided with Emilio 2026-09-13 (DEC-038). Supersedes req-53's
 *display* (the standalone second hero) and removes the multi-draft feature.
 
 **Gate: ux-feel + persisted-data.** Touches the store/model (`store.jsx`) and several
