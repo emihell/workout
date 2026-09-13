@@ -1,6 +1,6 @@
 # req-61 — gitignore `.claude/worktrees/` so parallel agent builds don't block closeout
 
-**Status: READY.** From Emilio 2026-09-13 (workflow feedback). Fixes L-011.
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-61` (`82aee03`…`82aee03`, 1 commit).** From Emilio 2026-09-13 (workflow feedback). Fixes L-011.
 
 **Gate: infra.** One line in `.gitignore`; planning builds + tests + merges on its own
 testing.
