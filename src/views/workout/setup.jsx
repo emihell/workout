@@ -22,10 +22,14 @@ export function WorkoutItemExercise({ routineId, itemId }) {
     return <Missing>Not found.</Missing>
   }
 
+  // req-49 — this "edit exercise details" screen is reached from the item's log/done
+  // screen, so Back returns there (the same target as the form's Cancel below).
+  const backTo = itemCurrentPath(routineId, item, itemLoggingState(active, item).plannedDone)
+
   if (!ex) {
     return (
       <Screen>
-        <Back />
+        <Back to={backTo} />
         <Title>{exerciseName(item)}</Title>
         <p className="ui-sub">Not found.</p>
       </Screen>
@@ -34,7 +38,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={backTo} />
       <RestBar />
       <Title>{exerciseName(item)}</Title>
       <p className="ui-sub">{ex.equipment}</p>

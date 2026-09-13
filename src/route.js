@@ -25,12 +25,6 @@ export function applyVisit(stack, path, { replace = false } = {}) {
   return stack
 }
 
-export function applyBack(stack, currentHash, fallback = '/') {
-  const current = hashPath(currentHash)
-  if (stack[stack.length - 1] === current) stack.pop()
-  return stack[stack.length - 1] || fallback
-}
-
 function loadVisits() {
   if (typeof sessionStorage === 'undefined') return []
   try {
@@ -91,16 +85,6 @@ export function go(path, { replace = false } = {}) {
   if (typeof window !== 'undefined' && hashPath(window.location.hash) !== next) {
     window.location.hash = toHash(next)
   }
-}
-
-export function back(fallback = '/') {
-  const current = typeof window === 'undefined' ? fallback : window.location.hash
-  const prev = applyBack(visits, current, fallback)
-  persistVisits()
-  if (typeof window !== 'undefined') {
-    window.location.hash = toHash(prev)
-  }
-  return prev
 }
 
 // req-14 / DEC-024 — the bottom tab bar has three tabs (Workouts / Library /

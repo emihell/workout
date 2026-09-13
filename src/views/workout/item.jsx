@@ -445,7 +445,7 @@ export function WorkoutSetEdit({ routineId, index }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={itemPath} />
       <RestBar />
       <p className="ui-sub">{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
       <Title>Set</Title>

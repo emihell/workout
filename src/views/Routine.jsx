@@ -99,7 +99,7 @@ export function RoutineNew() {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/routines" />
       <Title>Add routine</Title>
       <RoutineNewForm
         onSave={({ name, focus }) => {
@@ -125,7 +125,7 @@ export function RoutineDetail({ routineId, paths }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={nav.done} />
       <Title>{routine.name}</Title>
       <p className="ui-sub">
         {meta}
@@ -204,7 +204,7 @@ export function RoutineEdit({ routineId, paths }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={nav.base} />
       <Title>Name</Title>
       <form
         onSubmit={(e) => {
@@ -245,7 +245,7 @@ export function RoutineExercisePick({ routineId, paths }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={nav.base} />
       <Title>Add exercise</Title>
       <p>
         <NavLink to={nav.create}>Create exercise</NavLink>
@@ -366,7 +366,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={nav.pick} />
       <p className="ui-sub">{routine.name}</p>
       <Title>{ex.name}</Title>
       <ExerciseFields
@@ -413,7 +413,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={parent} />
       <p className="ui-sub">{routine.name}</p>
       <Title>{ex?.name || item.exerciseId}</Title>
       <ExerciseFields

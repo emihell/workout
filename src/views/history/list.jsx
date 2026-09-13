@@ -69,7 +69,7 @@ export function History({ month = null }) {
     const workouts = group?.workouts || []
     return (
       <Screen>
-        <Back />
+        <Back to="/history" />
         <Title>{monthLabel(month)}</Title>
         {workouts.length === 0 ? (
           <p className="ui-sub">None.</p>
@@ -86,7 +86,7 @@ export function History({ month = null }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/" />
       <Title>History</Title>
       <p>
         <NavLink to="/history/exercises">By exercise</NavLink>
@@ -119,7 +119,7 @@ export function HistoryExercises() {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/history" />
       <Title>By exercise</Title>
       {list.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -142,7 +142,7 @@ export function HistoryExercise({ exerciseId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/history/exercises" />
       <Title>{ex?.name || exerciseId}</Title>
       {groups.length === 0 ? <p className="ui-sub">None.</p> : null}
       {groups.map((group) => (

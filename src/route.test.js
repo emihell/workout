@@ -1,24 +1,35 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { activeTab, applyBack, applyVisit, hashPath, parseRoute } from './route.js'
+import * as route from './route.js'
+import { activeTab, applyVisit, hashPath, parseRoute } from './route.js'
 
-describe('back visits the previous screen', () => {
-  it('normalizes hashes to paths', () => {
+// req-49 — Back returns to a screen's logical PARENT (a `to` prop passed at each
+// call site), never the last-visited screen. The visit-stack "go back" primitive
+// (back()/applyBack) that popped NAV_KEY has been removed: nothing derives Back
+// from visit order any more, so parent resolution is independent of how you
+// arrived. The visit stack itself stays, but only to feed screen-view analytics
+// (recordScreen), which is why applyVisit remains.
+describe('req-49 — the visit-stack back primitive is gone', () => {
+  it('normalizes hashes to paths (hashPath stays — Back builds targets from it)', () => {
     assert.equal(hashPath('#/routines'), '/routines')
     assert.equal(hashPath('/schedule'), '/schedule')
     assert.equal(hashPath(''), '/')
   })
 
-  it('records every new screen, including returning to an earlier one via a link', () => {
+  it('no longer exports back() or applyBack() — Back no longer pops the visit stack', () => {
+    assert.equal(route.back, undefined, 'back() must be removed: Back navigates to a fixed parent, not a stack pop')
+    assert.equal(route.applyBack, undefined, 'applyBack() must be removed with its only caller')
+  })
+
+  it('still records every screen for analytics, independent of any back logic', () => {
+    // applyVisit feeds recordScreen (screen-view counting) — a separate concern that
+    // stays. It records visit order but nothing reads it to resolve a Back target.
     const stack = []
     applyVisit(stack, '/')
     applyVisit(stack, '/exercises')
     applyVisit(stack, '/')
     applyVisit(stack, '/workout/sess-upper')
     assert.deepEqual(stack, ['/', '/exercises', '/', '/workout/sess-upper'])
-    assert.equal(applyBack(stack, '/workout/sess-upper'), '/')
-    assert.deepEqual(stack, ['/', '/exercises', '/'])
-    assert.equal(applyBack(stack, '/'), '/exercises')
   })
 
   it('replaces the current screen when a preview becomes the live workout', () => {
@@ -28,7 +39,6 @@ describe('back visits the previous screen', () => {
     applyVisit(stack, '/workout/sess-upper/slot-a/2026-08-31')
     applyVisit(stack, '/workout/sess-upper', { replace: true })
     assert.deepEqual(stack, ['/', '/schedule', '/workout/sess-upper'])
-    assert.equal(applyBack(stack, '/workout/sess-upper'), '/schedule')
   })
 })
 

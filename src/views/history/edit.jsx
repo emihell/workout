@@ -19,7 +19,7 @@ export function HistoryEdit({ workoutId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={`/history/${workout.id}`} />
       <Title>Correct</Title>
       <form
         onSubmit={(e) => {
@@ -97,7 +97,7 @@ export function HistorySetNew({ workoutId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={`/history/${workout.id}`} />
       <Title>Add set</Title>
       {choices.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -124,7 +124,9 @@ export function HistorySet({ workoutId, index }) {
 
   return (
     <Screen>
-      <Back />
+      {/* req-49 — a set is opened from its exercise screen, so Back returns there
+          (the same target as the form's Cancel), not two levels up to the workout. */}
+      <Back to={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`} />
       <p className="ui-sub">{workoutRoutineName(workout, null)}</p>
       <Title>Set</Title>
       <SetEditForm

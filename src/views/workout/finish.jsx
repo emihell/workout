@@ -14,10 +14,10 @@ export function WorkoutFinish({ routineId }) {
   if (!isActiveFor(store.activeWorkout, routineId)) {
     return <Missing>Not found.</Missing>
   }
-  return <FinishScreen />
+  return <FinishScreen routineId={routineId} />
 }
 
-function FinishScreen() {
+function FinishScreen({ routineId }) {
   const store = useStore()
   const [overallNote, setOverallNote] = useState('')
   const [overallFeel, setOverallFeel] = useState('')
@@ -51,7 +51,7 @@ function FinishScreen() {
 
   return (
     <Screen>
-      <Back />
+      <Back to={`/workout/${routineId}`} />
       <RestBar />
       <Title>Finish</Title>
       <p className="ui-sub">

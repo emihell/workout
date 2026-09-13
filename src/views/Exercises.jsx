@@ -70,7 +70,7 @@ export function Exercises({ type = null }) {
     const items = (group?.items || []).filter((ex) => matchesQuery(ex, q))
     return (
       <Screen>
-        <Back />
+        <Back to="/exercises" />
         <Title>{typeLabel(type)}</Title>
         <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
         {items.length === 0 ? <p className="ui-sub">{q ? 'No matches.' : 'None.'}</p> : null}
@@ -133,7 +133,7 @@ export function ExerciseNew({ returnBase = null }) {
   const paths = createPaths(returnBase)
   return (
     <Screen>
-      <Back />
+      <Back to={paths.pick} />
       <Title>Add exercise</Title>
       <List>
         <Row to={paths.manual}>Add manually</Row>
@@ -151,7 +151,7 @@ export function ExerciseNewManual({ returnBase = null }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={paths.hub} />
       <Title>Add exercise</Title>
       <form
         onSubmit={(e) => {
@@ -204,7 +204,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={paths.hub} />
       <Title>Search</Title>
       {error ? <Banner role="alert">{error}</Banner> : null}
       {catalog === null && !error ? <p className="ui-sub">Loading…</p> : null}
@@ -260,7 +260,7 @@ export function ExerciseEdit({ exerciseId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={`/exercises/${ex.id}`} />
       <Title>Details</Title>
       <form
         onSubmit={(e) => {
@@ -302,7 +302,7 @@ export function ExerciseDetail({ exerciseId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/exercises" />
       <Title>{ex.name}</Title>
       <p>
         <NavLink to={`/exercises/${ex.id}/edit`}>Edit</NavLink>

@@ -42,7 +42,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     const previewMeta = [plan.focus, plan.date].filter(Boolean).join(' · ')
     return (
       <Screen>
-        <Back />
+        <Back to="/" />
         <Title subtitle={previewMeta}>{plan.routineName}</Title>
         <List>
           {plan.items.map((item) => (
@@ -83,7 +83,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   if (items.length === 0) {
     return (
       <Screen>
-        <Back />
+        <Back to="/" />
         <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || 'Workout'}</Title>
         <p className="ui-sub">No exercises.</p>
         <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
@@ -95,7 +95,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
 
   return (
     <Screen>
-      <Back />
+      {/* req-49 — Back steps out of the in-workout hub to Today; the workout stays
+          active (resume via Continue). Abandon (below) is the explicit discard. */}
+      <Back to="/" />
       <RestBar />
       <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</Title>
       <List>

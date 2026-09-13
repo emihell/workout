@@ -76,7 +76,7 @@ export function ScheduleLoop() {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/schedule" />
       <Title>Loop</Title>
       <form
         onSubmit={(e) => {
@@ -115,7 +115,7 @@ export function ScheduleDay({ week, weekday }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/schedule" />
       <Title>
         {weekdayName(weekday)}
         {loop > 1 ? ` · week ${week + 1}` : ''}
@@ -157,7 +157,7 @@ export function ScheduleDayAdd({ week, weekday }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={dayPath} />
       <Title>Add routine</Title>
       {routines.length === 0 ? (
         <RoutineNewForm

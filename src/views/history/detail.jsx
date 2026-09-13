@@ -30,7 +30,7 @@ export function HistoryDetail({ workoutId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to="/history" />
       <Title>
         {snapshot
           ? snapshot.programName
@@ -131,7 +131,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={`/history/${workout.id}`} />
       <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
       <p className="ui-sub">
         {[roleLabel(snapshotItem?.role), snapshotItem?.warmup ? 'WU set' : null, whenLabel(workout)]

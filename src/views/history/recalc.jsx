@@ -15,7 +15,7 @@ export function HistoryRecalculate({ workoutId }) {
 
   return (
     <Screen>
-      <Back />
+      <Back to={`/history/${workout.id}`} />
       <Title>Update?</Title>
       <p className="ui-sub">
         {workoutRoutineName(workout, null)} — {whenLabel(workout)}
