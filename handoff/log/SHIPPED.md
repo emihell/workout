@@ -745,3 +745,18 @@ screen. Built via an ephemeral agent (DEC-037); independent reviewer cleared it 
 dangling refs, no test weakened — the visit-stack test swapped `/start`→`/schedule` preserving intent).
 Planning verified by its own hand (213 tests) and merged (DEC-035); Emilio's phone look is the
 non-blocking after-check. Merge `0e88642` (branch `req-56`, `39d4dc5`, 1 commit).
+
+## req-58 — Routine-row Start is secondary  (merged 2026-09-13)
+
+Emilio: starting from the Routines page is the off-schedule fallback, so its Start shouldn't carry the
+primary ink emphasis. One line — the routine-row Start `<Button>` variant `primary`→`secondary`
+(onClick/position unchanged; the today-hero Start stays primary). Built via ephemeral agent; planning
+verified by its own hand (213 tests). Merge `5861aed` (branch `req-58`, `8b4772b`, 1 commit).
+
+## req-57 — Front-page schedule preview removed  (merged 2026-09-13; scope corrected by req-59)
+
+Emilio "remove schedule from front page." Removed the front-page upcoming preview (the `<Row
+to="/schedule">Schedule</Row>` link + the `UpcomingRow` items + the "Nothing scheduled." line) and the
+now-dead `UpcomingRow` / `upcoming` / `remainingInLoop` import. Merge `4a476f0` (branch `req-57`,
+`558135d`, 1 commit). **Over-removed (L-013):** Emilio meant only the Schedule *nav link*, not the whole
+preview — **req-59 restores the upcoming items, keeping just the link removed.**

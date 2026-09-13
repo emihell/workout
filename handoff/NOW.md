@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48, req-51–56** (req-10 pending;
+Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48, req-51–58** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025; req-49/50 READY, held). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -17,8 +17,8 @@ menu) + req-53→**req-55** (in-progress: one-at-a-time, abandon-on-new, hero-re
 Abandon; DEC-038, req-55 supersedes req-53's display) + req-54 (dock font). Emilio device/feel after-look
 owed (non-blocking); req-55 he eyed pre-merge (persisted-data).
 
-**In flight (Emilio 2026-09-13 phone testing):** `req-57` remove the front-page schedule preview (it's
-in Library now); `req-58` routine-row Start → secondary (off-schedule is unusual). Both single-view. **[ux-feel]**
+**In flight:** `req-59` — **corrects req-57** (which over-removed the whole front-page upcoming preview):
+restore the upcoming items, keep only the `Schedule` nav link removed (Emilio meant just the link). L-013. **[ux-feel]**
 
 **READY, held (the back-nav pair):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root

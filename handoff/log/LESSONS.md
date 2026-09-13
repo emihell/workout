@@ -158,3 +158,15 @@ req-55. `workout-actions.js` imported `./route` / `./schedule` (extensionless); 
 uncovered. Fixed by using `./route.js` / `./schedule.js`. **Lesson:** any module you intend to cover with
 `node --test` (the project gate) must use explicit `.js` extensions on its relative imports — extensionless
 specifiers pass lint/build but silently block node from loading the module under test.
+
+## L-013 — don't merge a flagged behaviour fork on your own reading — confirm it first
+
+req-57. Emilio's "remove schedule from front page" had two visibly-different readings — remove just the
+Schedule **nav link**, or remove the **whole upcoming preview**. Planning picked the broad one, flagged
+it "reversible / decided on his behalf," and **merged** — he meant the narrow one, so it shipped wrong
+and needed req-59 to correct (a wasted build + a correction). DEC-035 lets planning merge ux-feel on its
+own testing, but that covers *implementation/quality*, NOT a genuine **behaviour fork** where two
+outcomes are both plausible and a user notices the difference — that is Emilio's call (CLAUDE.md "when to
+ask" #1). **Lesson:** when a UX instruction forks into materially-different visible outcomes, CONFIRM the
+fork before building/merging; "flag it reversible and merge anyway" is not a substitute for the one-line
+ask. Prefer the narrower/less-destructive reading when unsure.
