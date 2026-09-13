@@ -29,6 +29,10 @@ export function Schedule() {
   const schedule = store.schedule || { loopWeeks: 1, slots: [] }
   const loop = clampLoopWeeks(schedule.loopWeeks)
   const currentWeek = loopWeekIndex(schedule)
+  // req-48 — mark today's row: the single (week, weekday) that is the current loop
+  // week AND today's weekday. `getDay()` (0=Sun..6=Sat) is the same weekday
+  // convention `slotsOn`/`WEEKDAY_ORDER` use, so it lines up with the rows below.
+  const todayWeekday = new Date().getDay()
   const routines = activeRoutines(store)
 
   return (
@@ -52,8 +56,9 @@ export function Schedule() {
             {WEEKDAY_ORDER.map((weekday) => {
               const slots = slotsForWeekDay(schedule, week, weekday)
               const names = slots.map((slot) => slotLabel(routines, slot)).join(', ')
+              const isToday = week === currentWeek && weekday === todayWeekday
               return (
-                <Row key={weekday} to={dayPathOf(week, weekday)}>
+                <Row key={weekday} to={dayPathOf(week, weekday)} value={isToday ? 'Today' : null}>
                   {weekdayName(weekday)} — {names || 'Rest'}
                 </Row>
               )
