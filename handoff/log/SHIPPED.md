@@ -657,3 +657,48 @@ Row value slot, no new CSS. Requires BOTH conditions, so a non-current loop week
 worktree; weekday convention checked against `schedule.js`) and merged (DEC-035). Merge `0c62ff6`
 (branch `req-48`, `f61d52a`, 1 commit). CC's open feel-choice for Emilio's after-look: marker is a
 "Today" text tag (vs a dot or bold weekday).
+
+## req-53 — In-progress workout becomes the main-page hero (drop the "in progress" row)  (merged 2026-09-13)
+
+Emilio 2026-09-13, ux-feel. First of the 2026-09-13 batch, and the first build via a **fresh
+ephemeral agent** (DEC-037 — no `/clear`). `src/views/Today.jsx`: removed the top "In progress.
+[Continue]" row; `TodayWorkout`'s `inProgress` branch now renders a primary full-width **Continue**
+(`startOrContinue(store, activeRoutineId(mine))`) + an inline "in progress" marker instead of `null`;
+new `InProgressHero` for an active workout that matches no today slot (name/focus/date from the
+workout's own record via `findRoutine`+`workoutRoutineName`+`snapshot?.focus`+`workoutDateKey`, so a
+deleted routine still shows the snapshot name — DESIGN §1); `activeIsTodaySlot` guarantees the active
+workout renders exactly once; `TodayEmpty` suppressed while a workout is in progress. New
+`.ui-inprogress` eyebrow marker (existing tokens). Open case decided by Emilio: the in-progress
+workout is always the hero. Planning verified by its own hand (isolated worktree, 182 tests) and
+merged (DEC-035). Merge `a65bb21` (branch `req-53`, `f08a023`, 1 commit). No reviewer (single view).
+
+## req-51 — iPhone safe areas + accessibility: the menu clips in full-screen  (merged 2026-09-13)
+
+Emilio 2026-09-12, ux-feel. Root cause [measured]: `index.html` viewport meta lacked
+`viewport-fit=cover`, so iOS resolved every `env(safe-area-inset-*)` to 0 and the existing bottom
+safe-area math was inert → the bar clipped the home indicator in standalone (L-009). Fix: added
+`viewport-fit=cover`; `.ui-main` reserves top + left/right insets; `.ui-tabbar`/`.ui-subbar__link`
+add landscape side insets; all `env()`-driven with `0px` fallback (no dead gap on no-notch — locked
+by `src/ui/safe-area.test.js`, incl. the failure-case "no hardcoded px" assertion). A11y: measured
+grayscale contrast on white — `--ui-ink-2` 5.33:1 (AA pass), `--ui-ink-3` 3.28:1 (fails normal;
+stays only on disabled text [1.4.3-exempt] + the chevron glyph [graphic]); moved the meaningful
+`.ui-inprogress` status text ink-3→ink-2. Flagged + deferred (not fixed): error banners render
+outside the top-inset padding. Planning verified by its own hand (187 tests) and merged. Merge
+`308a045` (branch `req-51`, `8693618`, 1 commit). Real-device look owed (Emilio, non-blocking).
+
+## req-52 — Bottom menu: floating Workout-oval + icon-only circles  (merged 2026-09-13)
+
+Emilio, ux-feel, design co-decided via the `/design` mockups (DEC-036). Replaced the three-text-tab
+`TabBar` with a floating bottom menu **extracted to its own component** `src/ui/BottomMenu.jsx`
+(wired in `App.jsx`; `TabBar`/`TABS`/`.ui-tabbar*`/`--ui-tabbar-h` removed — no stale code). Three
+controls L→R: **Library** (icon-only circle, grid SVG) · **Workout** (wide text-only oval, `flex:1`)
+· **Settings** (icon-only circle, sliders SVG). Solid — no translucency, no shadow; floats inset from
+the edges. Selection model A: the current screen's control is ink-filled (`.is-current`, currentColor
+flips the icon/text), others carry a faint hairline border — driven by `activeTab(route.name)` (shared,
+unit-tested; targets unchanged; hidden on `workout*`). Content clears the dock via `--ui-dock-clear`
+(`env(safe-area-inset-bottom)`-driven); `.ui-subbar` re-anchored above it. a11y: `aria-label` on the
+icon circles, `aria-current` on the selected. Test note (L-010): `node --test` has no JSX transform,
+so render criteria are locked by a static-source test + behavioural `activeTab` coverage. Planning
+verified by its own hand (194 tests) AND an **independent reviewer** (shared shell, DEC-035 — no
+issues) before merge. Merge `18327e5` (branch `req-52`, `57c84f2`, 1 commit). On-device feel owed
+(Emilio, non-blocking).

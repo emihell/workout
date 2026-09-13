@@ -1,8 +1,8 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48** (req-10 pending; req-24
-gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
-`work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48, req-51–53** (req-10 pending;
+req-24 gated; req-32 dropped, DEC-025; req-49/50 READY, held). Done lives in `log/SHIPPED.md`. Full
+reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -10,22 +10,16 @@ gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `wor
 
 Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 backend/users/exercise-DB/AI/styling (gated on the backend fork).
 
-## Next — UI/UX batch (Emilio 2026-09-13). Quick pair SHIPPED; heavy ones held for Emilio's go.
+## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**Quick pair SHIPPED (2026-09-13):** req-47 (date-above-info, today black/other gray) + req-48 (renames
-+ Schedule today-marker). Emilio after-look owed: (47) whole-stack vs body-only; (48) "Today" tag vs dot.
+**2026-09-13 batch SHIPPED:** req-47/48 (row hierarchy, renames+today-marker) + req-53 (in-progress
+hero) + req-51 (iPhone safe-area) + req-52 (bottom menu). Emilio device/feel after-look owed
+(non-blocking) — see the test list handed over at close.
 
-**Also READY:** `req-53` in-progress workout is always the main-page hero — drop the "in progress" row, big button → Continue, "in progress" by the info (Emilio 2026-09-13). Single view. **[ux-feel]**
-
-**Heavy (held — need Emilio's go to build):**
+**READY, held (the back-nav pair):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
   cause: `route.js` visit-stack). Touches shared route/helper → reviewer subagent before merge. **[functional]**
 - `req-50` **Components sweep** — no bare text links; nav→NavLink, action→Button. Order after req-49. **[ux-feel]**
-- `req-51` **iPhone safe-area + a11y** — menu clips in full-screen; root cause [measured]: no
-  `viewport-fit=cover` → `env(safe-area-*)`=0. Real-device look is Emilio's after-check. **[ux-feel]**
-- `req-52` **Bottom menu redesign** — READY (DEC-036): floating solid Workout-oval + icon-only
-  Library/Settings circles, selection fill follows the active tab. Build after req-51 (safe-area). **[ux-feel]**
-
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

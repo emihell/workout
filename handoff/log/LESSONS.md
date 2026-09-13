@@ -117,3 +117,36 @@ it's an accepted coupling, not a mistake — but it's real. Rule: **whenever the
 new push form, a new `plan` verb), update all three together in the same commit** — README §Setup step 5,
 `plan`'s `canonical_grants`, and the relevant `DEC-` (DEC-005/026 enumerate them) — and re-run `plan
 doctor` to confirm they agree. A future consolidation (single source both read from) would retire this.
+
+## L-009 — `viewport-fit=cover` is the precondition for any `env(safe-area-inset-*)`
+
+req-51. The app had safe-area CSS (`--ui-tabbar-h: calc(61px + env(safe-area-inset-bottom))`)
+since req-14, but the bottom bar still clipped the home indicator in standalone. Root cause
+[measured]: `index.html` viewport meta lacked `viewport-fit=cover`, so iOS resolves EVERY
+`env(safe-area-inset-*)` to `0` — the safe-area math was silently inert the whole time.
+**Lesson:** safe-area CSS written before `viewport-fit=cover` does nothing and reads as
+"handled" in review. When adding `env(safe-area-inset-*)`, confirm `viewport-fit=cover` is in
+the viewport meta, and keep every inset `env()`-driven with a `0px` fallback so no-notch
+devices get no dead gap.
+
+## L-010 — `node --test` has no JSX transform; components can't be render-tested here
+
+req-52. The `./check` gate runs `node --test` with no JSX/Babel transform, so a `.jsx`
+component cannot be imported and rendered in a unit test. Two working substitutes are already
+in the tree: **behavioural coverage via the pure helper** the component reads (`activeTab` in
+`route.test.js`), and **static-source assertions** that read the component file as text
+(`safe-area.test.js`, `BottomMenu.test.js` — assert the aria-labels, the null-on-`workout*`
+guard, the targets). **Lesson:** don't spec "render-level" asserts for a UI req under this
+gate; ask for the pure-logic test + a static-source lock, and treat the true render check as
+the browser after-look. If render-level asserts become common, adding a jsdom/transform test
+lane is the real fix.
+
+## L-011 — an isolation:worktree agent leaves its branch checked out; remove it before closeout
+
+DEC-037 batches. A build agent spawned with `isolation: worktree` does `git checkout -b req-N`
+inside a worktree under `<code>/.claude/worktrees/agent-<id>`, which is NOT auto-cleaned once it
+has commits — so branch `req-N` stays checked out there, and `plan closeout`'s `git branch -d`
+would fail ("checked out at ..."). **Lesson:** after the agent reports and before closeout, run
+`git -C <code> worktree remove --force .claude/worktrees/agent-<id>` then `git worktree prune`.
+The branch's commits persist in the shared `.git` after removal, so closeout still finds and
+merges `req-N`. (Verify branch is free: `git branch` shows no leading `+`.)
