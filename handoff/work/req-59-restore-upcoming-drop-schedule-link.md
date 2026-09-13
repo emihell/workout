@@ -1,6 +1,6 @@
 # req-59 — Restore the front-page upcoming preview; remove ONLY the "Schedule" link (corrects req-57)
 
-**Status: READY.** From Emilio 2026-09-13: *"i didn't mean to remove the whole preview,
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-59` (`2c7c11d`…`2c7c11d`, 1 commit).** From Emilio 2026-09-13: *"i didn't mean to remove the whole preview,
 just the schedule option."* Corrects req-57's over-removal.
 
 **Gate: ux-feel.** Single view (`Today.jsx`), no shared code, no persisted data.
