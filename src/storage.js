@@ -216,6 +216,21 @@ export function completedOnDayKey(workouts, dayKey) {
     .sort((a, b) => new Date(b.finishedAt).getTime() - new Date(a.finishedAt).getTime())
 }
 
+// req-55 / DEC-038 — the unfinished in-progress workouts to surface for resolution
+// (Continue / Abandon). Exactly one workout can be actively in progress; it is only
+// "stale" here once it was STARTED on a prior day (dateKey(startedAt) !== todayKey) —
+// an active workout started today is the today-page hero, not a stale row. Legacy
+// `draftWorkouts` (the removed multi-draft feature) are always surfaced so old data
+// can be resolved through the normal UI, then the field drains empty. These are
+// NEVER finished history: they live outside `workouts` and never feed progress.js.
+export function staleInProgressWorkouts(state, todayKey) {
+  const items = []
+  const active = state?.activeWorkout
+  if (active && dateKey(active.startedAt) !== todayKey) items.push(active)
+  for (const draft of state?.draftWorkouts || []) items.push(draft)
+  return items
+}
+
 export function groupWorkoutsByRoutine(workouts, routines) {
   const groups = []
   const indexByRoutine = new Map()

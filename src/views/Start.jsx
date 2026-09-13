@@ -4,7 +4,7 @@ import { clampLoopWeeks, coveringWorkout, dateKey, remainingInLoop } from '../sc
 import { useStore } from '../store-context'
 import { RoutineNewForm } from './Routine'
 import { Back } from './shared'
-import { Button, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 
 export function StartWorkout() {
   const store = useStore()
@@ -16,31 +16,6 @@ export function StartWorkout() {
     <Screen>
       <Back />
       <Title>Start</Title>
-
-      {(store.draftWorkouts || []).length ? (
-        <>
-          <SectionHeader>Drafts</SectionHeader>
-          <List>
-            {store.draftWorkouts.map((draft) => (
-              <Row
-                key={draft.id}
-                action={
-                  <Button
-                    onClick={() => {
-                      store.resumeDraft(draft.id)
-                      go(`/workout/${draft.routineId || draft.sessionId}`)
-                    }}
-                  >
-                    Resume
-                  </Button>
-                }
-              >
-                {draft.snapshot?.routineName || draft.snapshot?.sessionName || 'Workout'} — {(draft.sets || []).length} sets
-              </Row>
-            ))}
-          </List>
-        </>
-      ) : null}
 
       <SectionHeader>Scheduled</SectionHeader>
       {upcoming.length === 0 ? <p className="ui-sub">None.</p> : null}

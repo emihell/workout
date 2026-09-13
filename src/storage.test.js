@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, routineDeletionImpact, saveState } from './storage.js'
+import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, routineDeletionImpact, saveState, staleInProgressWorkouts } from './storage.js'
 import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -518,6 +518,107 @@ describe('historyPrescription', () => {
     assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 1 }), { weight: '35', reps: '10' })
     assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 2 }), { weight: '', reps: '' })
     assert.deepEqual(historySetPrefill(null, { setType: 'work', workIndex: 0 }), { weight: '', reps: '' })
+  })
+})
+
+// req-55 / DEC-038 — exactly one in-progress workout; the multi-draft feature is
+// removed but any LEGACY stored draft must be surfaced (Continue/Abandon), never
+// silently dropped, and an unfinished workout is NEVER finished history.
+describe('req-55 staleInProgressWorkouts (surface, don\'t drop)', () => {
+  const todayKey = dateKey(new Date())
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  const priorKey = dateKey(yesterday)
+
+  it('an active workout started TODAY is the hero, not a stale row', () => {
+    const state = { activeWorkout: { id: 'a1', startedAt: new Date().toISOString() }, draftWorkouts: [] }
+    assert.deepEqual(staleInProgressWorkouts(state, todayKey), [])
+  })
+
+  it('an active workout started a PRIOR day is surfaced as stale', () => {
+    const active = { id: 'a1', startedAt: yesterday.toISOString() }
+    const state = { activeWorkout: active, draftWorkouts: [] }
+    // Sanity: the two keys really differ (guards a same-day flake at midnight).
+    assert.notEqual(priorKey, todayKey)
+    assert.deepEqual(staleInProgressWorkouts(state, todayKey), [active])
+  })
+
+  it('legacy drafts are always surfaced, alongside a stale active', () => {
+    const active = { id: 'a1', startedAt: yesterday.toISOString() }
+    const draft = { id: 'd1', startedAt: '2026-01-01T10:00:00.000Z' }
+    const state = { activeWorkout: active, draftWorkouts: [draft] }
+    assert.deepEqual(staleInProgressWorkouts(state, todayKey), [active, draft])
+  })
+
+  it('no active, no drafts → nothing to resolve', () => {
+    assert.deepEqual(staleInProgressWorkouts({ activeWorkout: null, draftWorkouts: [] }, todayKey), [])
+    assert.deepEqual(staleInProgressWorkouts({}, todayKey), [])
+  })
+})
+
+// The persisted-data proof: a stored key carrying a `draftWorkouts` entry still
+// loads, the draft survives to disk (v8), it is SURFACED for resolution, and it is
+// NOT promoted into finished history — so it can never feed a recommendation.
+describe('req-55 legacy-draft migration is non-destructive', () => {
+  // A v7 key (routine-based) carrying one in-progress draft + one finished workout.
+  const seeded = JSON.stringify({
+    schemaVersion: 7,
+    exercises: [{ id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5' }],
+    routines: [{ id: 'rtn-1', name: 'Upper', focus: 'Machines', exercises: [] }],
+    schedule: { loopWeeks: 1, slots: [] },
+    workouts: [
+      {
+        id: 'wo-done',
+        routineId: 'rtn-1',
+        finishedAt: '2026-08-20T10:00:00.000Z',
+        snapshot: { routineId: 'rtn-1', routineName: 'Upper', items: [{ exerciseId: 'ex-1', routineItemId: 'si-1' }] },
+        sets: [{ exerciseId: 'ex-1', routineItemId: 'si-1', setType: 'work', weight: 40, reps: '8' }],
+      },
+    ],
+    plannedWorkouts: [],
+    // The legacy draft — an UNFINISHED workout with logged sets for the same exercise.
+    draftWorkouts: [
+      {
+        id: 'draft-1',
+        routineId: 'rtn-1',
+        startedAt: '2026-08-25T09:00:00.000Z',
+        finishedAt: null,
+        snapshot: { routineId: 'rtn-1', routineName: 'Upper', items: [{ exerciseId: 'ex-1', routineItemId: 'si-1' }] },
+        sets: [{ exerciseId: 'ex-1', routineItemId: 'si-1', setType: 'work', weight: 999, reps: '5' }],
+      },
+    ],
+    activeWorkout: null,
+  })
+
+  it('loads the draft, surfaces it, keeps it out of finished history + recommendations, persists v8', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v7': seeded } }, (map) => {
+      const state = loadState()
+
+      // (1) The draft is NOT dropped — it survives the load and migration.
+      assert.equal(state.draftWorkouts.length, 1)
+      assert.equal(state.draftWorkouts[0].id, 'draft-1')
+
+      // (2) It is SURFACED for resolution (Continue/Abandon UI reads this).
+      const surfaced = staleInProgressWorkouts(state, dateKey(new Date()))
+      assert.ok(surfaced.some((w) => w.id === 'draft-1'), 'legacy draft must be surfaced')
+
+      // (3) It is NOT finished history — only the genuinely finished workout is.
+      assert.equal(state.workouts.length, 1)
+      assert.equal(state.workouts[0].id, 'wo-done')
+      assert.ok(!state.workouts.some((w) => w.id === 'draft-1'))
+
+      // (4) It never feeds a recommendation: historyPrescription reads `workouts`
+      // only, so the draft's 999kg set is invisible — the prescription comes from
+      // the finished 40kg workout, never the unfinished one.
+      const rx = historyPrescription(state.workouts, 'ex-1')
+      assert.deepEqual(rx.suggestedWeights, [40])
+      assert.ok(!rx.suggestedWeights.includes(999))
+
+      // (5) Persisted to v8 with the draft intact (non-destructive on disk too).
+      const stored = JSON.parse(map.get('workout-mvp-v8'))
+      assert.equal(stored.schemaVersion, 8)
+      assert.equal(stored.draftWorkouts.length, 1)
+      assert.equal(stored.draftWorkouts[0].id, 'draft-1')
+    })
   })
 })
 
