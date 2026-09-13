@@ -143,9 +143,6 @@ export function ScheduleDay({ week, weekday }) {
       <p>
         <NavLink to={dayPathOf(week, weekday, '/add')} className="ui-navlink" chevron="forward">Add routine</NavLink>
       </p>
-      <p>
-        <NavLink to="/schedule" className="ui-navlink" chevron="forward">Done</NavLink>
-      </p>
     </Screen>
   )
 }

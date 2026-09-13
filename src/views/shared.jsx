@@ -1,4 +1,4 @@
-import { go, toHash } from '../route'
+import { toHash } from '../route'
 
 // req-12 / DEC-016 — the one nav-link primitive. Pure route navigation ("go to
 // another screen", no state change) is an <a href>, not a <button>; <button> is
@@ -20,22 +20,19 @@ export function NavLink({ to, children, className, chevron, ...rest }) {
   )
 }
 
-// req-15 — styled as a quiet library button. Uses the ui-btn classes directly
-// (not the Button component) because ui/index.jsx imports NavLink from this file;
-// keeping shared.jsx free of ui/ imports keeps that dependency one-way.
-//
 // req-49 — Back returns to the screen's logical PARENT (the `to` prop), never the
 // last-visited screen. Each call site passes its parent per the route hierarchy;
-// navigation is a fixed route move via `go`, not a visit-stack pop, so Back is
-// independent of how you arrived. `to` defaults to Today ('/') for the one caller
-// that can't know a parent (`Missing`). (req-50 folds Back into the shared
-// component/link treatment per DEC-016 — it must keep this `to`.)
+// `to` defaults to Today ('/') for the one caller that can't know a parent
+// (`Missing`).
+//
+// req-62 — Back IS navigation, so per DEC-016 it's the NavLink primitive (an
+// <a href>), not a button — the same `‹`-chevron link treatment as `ExercisesLink`
+// and the counterpart of the forward `›` nav links. One component, so every Back
+// site reads as navigation consistently.
 export function Back({ to = '/' }) {
   return (
     <p>
-      <button type="button" className="ui-btn ui-btn--quiet" onClick={() => go(to)}>
-        Back
-      </button>
+      <NavLink to={to} className="ui-navlink" chevron="back">Back</NavLink>
     </p>
   )
 }
