@@ -70,7 +70,7 @@ printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git commit
 ../workout-codebase/plan doctor
 ```
 
-That gives you the two-worktree layout (`workout-codebase/` on `main`, `workout-planning/` on `planning`). To boot a session, see **`START-HERE.md`** for the one-line prompts; run the app with `npm run dev` in `workout-codebase/`.
+That gives you the two-worktree layout (`workout-codebase/` on `main`, `workout-planning/` on `planning`). To boot a session, see **[Boot a session](#boot-a-session)** below for the one-line prompts; run the app with `npm run dev` in `workout-codebase/`.
 
 **Already have two *separate clones* instead of a worktree?** `./plan` needs one repo
 with two worktrees, not two independent clones — `plan status` fails with
@@ -85,6 +85,22 @@ rm -rf ../workout-planning
 git worktree add ../workout-planning planning
 # then re-run steps 5–6 above
 ```
+
+## Boot a session
+
+Paste one of these as a session's first message, with your task where it says `<task>`:
+
+- **Planning:** `Planning session for workout-app. Read handoff/PLANNING.md, then: <task>.`
+- **Build (Claude Code):** `Claude Code session for workout-app. Read CLAUDE.md, then: <task>.`
+
+Your `<task>` is usually one of:
+
+- Planning — *"what's next?"*  ·  *"spec a req for <idea>"*  ·  *"process and close req-N"*
+- Build — *"build req-N"*
+
+These prompts are the fast way in, not the mechanism: the root `CLAUDE.md` banner
+auto-loads every turn and routes each worktree on its own (planning → `handoff/PLANNING.md`,
+build → `CLAUDE.md`), so a session cold-started in either worktree finds its way without one.
 
 ## Development
 
@@ -105,10 +121,12 @@ No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, soc
 
 ## Planning workflow
 
-This repo uses a two-worktree planning/build loop. Start at **`START-HERE.md`** — it
-has the boot prompts and the loop. In short: a Cowork "planning" session writes specs
-into `handoff/` (read-only to the builder, enforced by a pre-commit hook), Claude Code
-builds each `req-N` on its own branch, and `./plan` publishes/merges/closes.
+This repo uses a two-worktree planning/build loop. The boot prompts are in
+**[Boot a session](#boot-a-session)** above (the worktree layout is in **Setup**); the
+loop itself lives in `handoff/`. In
+short: a Claude Code "planning" session writes specs into `handoff/` (read-only to the
+builder, enforced by a pre-commit hook), Claude Code builds each `req-N` on its own
+branch, and `./plan` publishes/merges/closes.
 
 ```
 ./check          the gate: lint + tests + build (must pass before code reaches main)
