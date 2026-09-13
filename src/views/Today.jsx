@@ -1,7 +1,7 @@
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
-import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
+import { coveringWorkout, dateKey, loopWeekIndex, resolveSlot, slotsOn } from '../schedule'
 import { completedOnDayKey, findRoutine, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
@@ -83,29 +83,6 @@ function HistoryPeekRow({ store, workout, todayKey }) {
   )
 }
 
-// req-14 (Emilio review iter 2) — an upcoming (future) scheduled workout in the
-// peek, with an inline Start so you can start ahead directly from Workouts (the
-// behaviour the old Today "Next" section had; Emilio restored it). Today's big
-// primary Start stays the main CTA — upcoming items get a smaller secondary Start.
-// Guards like the today row: already-covered shows `Done …`, in-progress shows no
-// Start (the top-of-screen Continue owns it). Same startOrContinue path. Info via
-// the shared format (iter 5); `when` is the weekday. The Done status stays in the
-// row's value slot; only the weekday moved into the info line.
-function UpcomingRow({ store, date, slot, routine, todayKey }) {
-  const dk = dateKey(date)
-  const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
-  const mine = store.activeWorkout
-  const inProgress =
-    activeRoutineId(mine) === routine.id && mine?.scheduleSlotId === slot.id && mine.scheduledFor === dk
-  const startAction =
-    !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
-  return (
-    <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
-      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} today={dk === todayKey} />
-    </Row>
-  )
-}
-
 // req-14 (Emilio review) — today's workout is the Workout screen's focal point and
 // main call to action. Iter 8: a two-line stack — the bold date on top, then
 // "name — focus" as a secondary line — then a large, primary, full-width Start.
@@ -158,9 +135,9 @@ function TodayHero({ store, workout }) {
 }
 
 // req-55 — a stale/unfinished in-progress workout (started a prior day, or a legacy
-// draft) surfaced in the recent peek as a row with a secondary **Continue**,
-// mirroring UpcomingRow's inline Start. Marked "in progress"; never a finished-
-// history link. Continue resumes it (abandoning any current active via the warning).
+// draft) surfaced in the recent peek as a row with a secondary **Continue**.
+// Marked "in progress"; never a finished-history link. Continue resumes it
+// (abandoning any current active via the warning).
 function InProgressPeekRow({ store, workout, todayKey }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   return (
@@ -204,10 +181,6 @@ export function Today() {
   const todays = slotsOn(schedule, now)
     .map((slot) => resolveSlot(routines, slot))
     .filter((x) => x.routine)
-  // Upcoming schedule peek (tomorrow onward) and recent-history peek — two small
-  // previews that each end in a "Show all" to the full page (req-14 review; the
-  // interim before req-32's unified Workouts scroll).
-  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2)
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
@@ -266,19 +239,11 @@ export function Today() {
         </p>
       ) : null}
 
-      {/* Section order: Upcoming› (plain link) → items → Today (emphasized) →
-          Completed today → recent items → Previous› (plain link) → gap → Routines›
-          (pinned to the viewport bottom, above the tab bar). Iter 7: "Upcoming" and
-          "Previous" are the SAME style — the first Row of the upcoming list and the
-          last Row of the recent list — so they bookend with identical typography/
-          chevron. Interim peeks of Schedule/History until req-32's unified scroll. */}
-      <List>
-        <Row to="/schedule">Schedule</Row>
-        {upcoming.map(({ date, slot, routine }) => (
-          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} todayKey={todayKey} />
-        ))}
-      </List>
-      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
+      {/* Section order: Today (emphasized) → Completed today → recent items →
+          Previous› (plain link, the last Row of the recent list) → gap → Routines›
+          (pinned to the viewport bottom, above the tab bar). req-57 removed the
+          front-page schedule preview — Schedule now lives in the Library segment
+          (req-56). Recent-history peek stays until req-32's unified scroll. */}
 
       {/* req-55 / DEC-038 — an in-progress workout started today IS the single hero,
           replacing today's scheduled block(s). No second hero. On finish/abandon it
