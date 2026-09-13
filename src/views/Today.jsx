@@ -7,7 +7,6 @@ import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
-import { NavLink } from './shared'
 
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
@@ -259,7 +258,7 @@ export function Today() {
   }
 
   return (
-    <Screen className={activeStartedToday ? '' : 'ui-screen--subbar'}>
+    <Screen>
       <Title>{greeting()}</Title>
       {loop > 1 ? (
         <p className="ui-sub">
@@ -318,20 +317,6 @@ export function Today() {
         )}
         <Row to="/history">History</Row>
       </List>
-
-      {/* Entry to the "choose any workout" picker (/start). Iter 8: a fixed strip
-          docked directly above the tab bar (bottom chrome, out of the scroll) — the
-          .ui-screen--subbar padding above keeps content clear of it. Replaces the
-          iter-7 flex-pin, which overflowed by a hair. Hidden while the in-progress
-          hero leads the screen (req-55); a stale in-progress keeps the picker. */}
-      {activeStartedToday ? null : (
-        <nav className="ui-subbar" aria-label="Routines">
-          <NavLink to="/start" className="ui-subbar__link">
-            <span>Routines</span>
-            <span className="ui-row__chev" aria-hidden="true">›</span>
-          </NavLink>
-        </nav>
-      )}
     </Screen>
   )
 }

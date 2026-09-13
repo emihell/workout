@@ -3,6 +3,7 @@ import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, parseTargets, roleLabel } 
 import { go } from '../route'
 import { routineById, historyPrescription, routineDeletionImpact } from '../storage'
 import { useStore } from '../store-context'
+import { startOrContinue } from '../workout-actions'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing, NavLink } from './shared'
 import { Button, Checkbox, Field, List, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
@@ -44,7 +45,24 @@ export function Routines() {
       {routines.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {routines.map((routine) => (
-          <Row key={routine.id} to={routinePath(routine.id)}>
+          // req-56 — each row carries two actions. Edit is navigation to the
+          // routine detail/manage screen, so per DEC-016 it's a link (styled as a
+          // button, like the tab-bar links / Back); Start is a state change, so a
+          // <Button>. DESIGN §4: retreat/secondary (Edit) left, primary (Start)
+          // right. Start reuses the req-55 one-in-progress / abandon-on-new path.
+          <Row
+            key={routine.id}
+            action={
+              <>
+                <NavLink to={routinePath(routine.id)} className="ui-btn ui-btn--secondary">
+                  Edit
+                </NavLink>
+                <Button variant="primary" onClick={() => startOrContinue(store, routine.id)}>
+                  Start
+                </Button>
+              </>
+            }
+          >
             {routine.name} — {routine.focus}
           </Row>
         ))}

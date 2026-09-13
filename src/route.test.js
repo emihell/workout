@@ -24,11 +24,11 @@ describe('back visits the previous screen', () => {
   it('replaces the current screen when a preview becomes the live workout', () => {
     const stack = []
     applyVisit(stack, '/')
-    applyVisit(stack, '/start')
+    applyVisit(stack, '/schedule')
     applyVisit(stack, '/workout/sess-upper/slot-a/2026-08-31')
     applyVisit(stack, '/workout/sess-upper', { replace: true })
-    assert.deepEqual(stack, ['/', '/start', '/workout/sess-upper'])
-    assert.equal(applyBack(stack, '/workout/sess-upper'), '/start')
+    assert.deepEqual(stack, ['/', '/schedule', '/workout/sess-upper'])
+    assert.equal(applyBack(stack, '/workout/sess-upper'), '/schedule')
   })
 })
 
@@ -186,6 +186,8 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
   // against the tab DEC-024 groups it under. Deep routes must light the group's
   // tab, not fall through: editing a routine is still Library, a schedule slot is
   // still Workouts. If parseRoute grows a route name, add it here.
+  // req-56: schedule/* moved from Workouts to Library — Schedule is now the first
+  // Library segment, so every schedule screen lights the Library circle.
   const LIBRARY = [
     'routines',
     'routine',
@@ -204,14 +206,14 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
     'exercise-new',
     'exercise-new-manual',
     'exercise-new-search',
-  ]
-  const WORKOUTS = [
-    'today',
     'schedule',
     'schedule-loop',
     'schedule-day',
     'schedule-day-add',
     'schedule-slot',
+  ]
+  const WORKOUTS = [
+    'today',
     'history',
     'history-month',
     'history-detail',
@@ -223,7 +225,6 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
     'history-exercises',
     'history-exercise',
     'history-workout-exercise',
-    'start',
     'workout',
     'workout-preview',
     'workout-setup',
@@ -235,11 +236,15 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
     'workout-finish',
   ]
 
-  it('maps routines/* and exercises/* to Library', () => {
+  it('maps routines/*, exercises/* and schedule/* to Library', () => {
     for (const name of LIBRARY) assert.equal(activeTab(name), 'library', name)
+    // req-56 — the schedule screens specifically light Library, not Workouts.
+    assert.equal(activeTab('schedule'), 'library')
+    assert.equal(activeTab('schedule-day'), 'library')
+    assert.equal(activeTab('schedule-slot'), 'library')
   })
 
-  it('maps today, schedule/*, history/*, the workout flow + start to Workouts', () => {
+  it('maps today, history/* and the workout flow to Workouts', () => {
     for (const name of WORKOUTS) assert.equal(activeTab(name), 'workouts', name)
   })
 
