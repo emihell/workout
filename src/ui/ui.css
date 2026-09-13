@@ -4,8 +4,8 @@
  * ADDITIVE: every selector is scoped to a `.ui-` class. There are NO bare
  *   element selectors (button, a, section, input …), so screens that don't use
  *   these classes are visually untouched — the library lives beside the app
- *   until the styling pass migrates screens onto it. The one live consumer is
- *   the TabBar (the global shell, req-14) + the #/components showcase.
+ *   until the styling pass migrates screens onto it. The live consumers are
+ *   the bottom menu (the global shell, req-52 — .ui-dock) + the #/components showcase.
  * TOKENS: grays + an 8px spacing rhythm + radius/size only (DEC-017: "no tokens
  *   beyond spacing/size"). Whitespace, type weight, and 1px hairlines do the work.
  */
@@ -26,11 +26,18 @@
   --ui-s4: 24px;
 
   --ui-tap: 44px; /* Apple HIG minimum tap target */
-  /* Fixed bottom chrome heights (req-14). The tab bar: border(1) + padding
-   * (s2 top + s2 bottom) + a 44px tab + the iOS safe area. The Workout screen's
-   * Routines strip (req-14 iter 8) docks directly on top of it at this offset;
-   * <main> and that screen reserve these so nothing hides behind them. */
-  --ui-tabbar-h: calc(61px + env(safe-area-inset-bottom));
+  /* Floating bottom dock (req-52 / DEC-036 — replaces the old flush --ui-tabbar-h
+   * bar). The dock is a control-height row (--ui-dock-h) inset from the viewport
+   * bottom by --ui-dock-bottom, PLUS the iOS home-indicator safe area. Content
+   * clears it via --ui-dock-clear (the dock's total footprint from the bottom of
+   * the viewport); the Workout screen's Routines strip docks just above that.
+   * env()-driven → on a no-notch device the safe-area term is 0, so no dead gap. */
+  --ui-dock-inset: 14px; /* left/right inset — the dock floats, not full-width */
+  --ui-dock-bottom: 22px; /* gap from the viewport bottom (above the safe area) */
+  --ui-dock-h: 56px; /* circle diameter / oval min-height */
+  --ui-dock-clear: calc(
+    var(--ui-dock-h) + var(--ui-dock-bottom) + env(safe-area-inset-bottom, 0px)
+  );
   --ui-subbar-h: calc(var(--ui-tap) + 1px); /* Routines strip: a 44px row + hairline */
   --ui-radius: 10px;
   --ui-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -56,14 +63,15 @@ a:active {
   color: inherit;
 }
 
-/* A button-styled anchor (the TabBar link-tabs, req-14 — an <a> wearing .ui-btn)
- * must keep its variant text color in EVERY state. The reset above pins
- * a:visited/:hover/:active to `inherit` at specificity (0,1,1), which beats a bare
- * variant class (0,1,0); the active tab is a self-link (so :visited) → its text
- * fell back to ink, i.e. black-on-black on the ink primary. Re-assert each
- * variant's color for all states at a winning specificity ((0,2,1) via
- * class+pseudo). DRY + future-proof: any anchor that later wears .ui-btn is
- * covered, not just the tab bar. */
+/* A button-styled anchor (an <a> wearing .ui-btn) must keep its variant text color
+ * in EVERY state. The reset above pins a:visited/:hover/:active to `inherit` at
+ * specificity (0,1,1), which beats a bare variant class (0,1,0); a self-link (so
+ * :visited) would otherwise fall back to ink, i.e. black-on-black on the ink
+ * primary. Re-assert each variant's color for all states at a winning specificity
+ * ((0,2,1) via class+pseudo). Future-proof: any anchor that wears .ui-btn is
+ * covered. (The req-14 tab bar was the original consumer; req-52's bottom menu
+ * uses its own .ui-dock classes, but this general reset is kept for any .ui-btn
+ * anchor.) */
 a.ui-btn--primary,
 a.ui-btn--primary:visited,
 a.ui-btn--primary:hover,
@@ -328,65 +336,85 @@ a.ui-btn--quiet:active {
   color: var(--ui-ink-3);
 }
 
-/* ---- TabBar (the global shell, req-14 / DEC-024) ---- */
-/* The main content clears the fixed bar: bar content height + hairline + the iOS
- * home-indicator safe area. Applied to <main> so every screen scrolls clear of
- * the bar without each screen knowing about it. */
+/* ---- Bottom menu (the global shell, req-52 / DEC-036) ---- */
+/* The main content clears the FLOATING dock: dock height + its bottom inset + the
+ * iOS home-indicator safe area (--ui-dock-clear), plus one spacing step so content
+ * never butts against the dock. Applied to <main> so every screen scrolls clear of
+ * the dock without each screen knowing about it. */
 /* req-51 — with viewport-fit=cover (index.html) the app draws under the status
  * bar / notch / Dynamic Island and rounded corners, so reserve the top and side
  * insets here. These are env()-driven: on a device with no inset each resolves to
  * 0 (fallback), so no extra dead space is added — the spacing only appears where
- * the hardware needs it. The bottom inset is handled by --ui-tabbar-h / the fixed
- * chrome below. */
+ * the hardware needs it. The bottom clearance (--ui-dock-clear) carries its own
+ * env(safe-area-inset-bottom) term the same way. */
 .ui-main {
   padding-top: env(safe-area-inset-top, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
-  padding-bottom: var(--ui-tabbar-h);
+  padding-bottom: calc(var(--ui-dock-clear) + var(--ui-s3));
 }
-.ui-tabbar {
+/* The dock: a solid floating row of three controls, inset from all edges (NOT a
+ * flush full-width bar). Solid — no backdrop-filter, no shadow (DEC-036). */
+.ui-dock {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: calc(var(--ui-dock-inset) + env(safe-area-inset-left, 0px));
+  right: calc(var(--ui-dock-inset) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--ui-dock-bottom) + env(safe-area-inset-bottom, 0px));
   z-index: 10;
   display: flex;
+  align-items: center;
   gap: var(--ui-s2);
-  padding: var(--ui-s2);
-  padding-bottom: calc(var(--ui-s2) + env(safe-area-inset-bottom, 0px)); /* clear the home indicator */
-  /* req-51 — in landscape the notch/rounded corner eats one side; keep the tabs
-   * out of it. env()-driven → 0 (no extra space) when there's no side inset. */
-  padding-left: calc(var(--ui-s2) + env(safe-area-inset-left, 0px));
-  padding-right: calc(var(--ui-s2) + env(safe-area-inset-right, 0px));
-  background: var(--ui-bg);
-  border-top: 1px solid var(--ui-line);
+  /* keep the row centered and readable on wide viewports (tablet / desktop) */
+  max-width: 560px;
+  margin: 0 auto;
 }
-/* Each tab wears the .ui-btn look but is an <a> (DEC-016); it keeps its variant
- * styling and just shares the width equally. text-decoration:none kills the UA
- * anchor underline so the base tab matches a Button; the active tab re-adds a
- * currentColor underline — visible on the ink primary (white) and the light/quiet
- * variants (ink) alike. */
-.ui-tabbar__tab {
-  flex: 1 1 0;
-  padding-left: 0;
-  padding-right: 0;
+/* Shared control base — an <a> (DEC-016), not a <button>: these navigate. The
+ * unselected state carries a faint hairline border on a --ui-bg fill; the current
+ * screen's control is ink-filled (.is-current below). The fill moves with the
+ * active tab. */
+.ui-dock__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ui-dock-h);
+  font-size: var(--ui-text-body);
+  font-weight: 600;
   text-decoration: none;
+  background: var(--ui-bg);
+  color: var(--ui-ink);
+  border: 1px solid var(--ui-line);
 }
-.ui-tabbar__tab.is-active {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 2px;
+.ui-dock__circle {
+  flex: 0 0 var(--ui-dock-h);
+  width: var(--ui-dock-h);
+  height: var(--ui-dock-h);
+  border-radius: 50%;
+}
+.ui-dock__oval {
+  flex: 1 1 0; /* the wide Workout capsule takes the remaining width */
+  border-radius: calc(var(--ui-dock-h) / 2);
+}
+/* Selection model A: the current screen's control is ink-filled; currentColor
+ * carries the flip to --ui-bg, so the icon strokes / the "Workout" text invert
+ * with it. */
+.ui-dock__btn.is-current {
+  background: var(--ui-ink);
+  color: var(--ui-bg);
+  border-color: var(--ui-ink);
+}
+.ui-dock__icon {
+  display: block;
 }
 
 /* ---- Routines strip (req-14 iter 8) — the Workout screen's fixed "Routines"
- * link, docked directly on top of the tab bar (bottom chrome, out of the scrolling
- * content). Its bottom offset is exactly the tab bar's height so they sit flush. */
+ * link. It docks just above the floating dock's footprint (--ui-dock-clear), out
+ * of the scrolling content. Full-width strip (unlike the inset dock). */
 .ui-subbar {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: var(--ui-tabbar-h);
-  z-index: 9; /* just under the tab bar; they don't overlap */
+  bottom: var(--ui-dock-clear);
+  z-index: 9; /* under the dock; they don't overlap */
   background: var(--ui-bg);
   border-top: 1px solid var(--ui-line);
 }
