@@ -418,6 +418,27 @@ a.ui-btn--quiet:active {
   margin: 0 0 var(--ui-s3);
 }
 
+/* ---- Workout peek-row info (req-47) — the stacked date-above-info format shared
+ * by the Upcoming / Recent / Completed-today rows on the Workout screen. The date
+ * is a caption-size line on top; the body ("name — focus") reads black for today's
+ * row (--today) and gray for every other date, so the eye lands on today. (The
+ * emphasized Today block above uses its own .ui-today-workout__* rules.) */
+.ui-workout-info {
+  display: block;
+}
+.ui-workout-info__date {
+  display: block;
+  font-size: var(--ui-text-caption);
+  color: var(--ui-ink-2);
+}
+.ui-workout-info__body {
+  display: block;
+  color: var(--ui-ink-2);
+}
+.ui-workout-info--today .ui-workout-info__body {
+  color: var(--ui-ink);
+}
+
 /* ---- Banner ---- */
 .ui-banner {
   font-family: var(--ui-font);

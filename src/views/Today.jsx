@@ -31,42 +31,47 @@ function activeRoutineId(workout) {
 }
 
 // req-14 (Emilio review iter 5) — the ONE shared row-info format for every workout
-// row on the screen (Upcoming / Today / Recent / Completed today): `[when] ·
-// [name] — [focus]`, rendered the same way everywhere so the three sections show
-// the same information the same way. `focus` degrades gracefully — when a source
-// has none (an older history snapshot without focus, or a deleted routine) the
-// "— focus" is dropped rather than invented (DESIGN §1: never invent absent data).
-// `when` is always supplied and uses the one shared `weekdayDate` format across all
-// rows (iter 6). This is INFO only; each row keeps its own action/status (Start,
-// Done, the history link).
-function WorkoutInfo({ when, name, focus }) {
+// row on the screen (Upcoming / Today / Recent / Completed today). req-47: a
+// two-line stack echoing the Today block — the date (`when`) on its own line in
+// caption size, then `name — focus` below (the old ` · ` separator is gone). `focus`
+// degrades gracefully — when a source has none (an older history snapshot without
+// focus, or a deleted routine) the "— focus" is dropped rather than invented
+// (DESIGN §1: never invent absent data). `when` uses the one shared `weekdayDate`
+// format across all rows (iter 6). `today` colors the body black (`--ui-ink`) when
+// the row's date is today, gray (`--ui-ink-2`) otherwise, so the eye lands on today;
+// it is keyed off the row's date-vs-today, not the component. This is INFO only;
+// each row keeps its own action/status (Start, Done, the history link).
+function WorkoutInfo({ when, name, focus, today }) {
   return (
-    <>
-      {when} · {name}
-      {focus ? ` — ${focus}` : ''}
-    </>
+    <span className={`ui-workout-info${today ? ' ui-workout-info--today' : ''}`}>
+      <span className="ui-workout-info__date">{when}</span>
+      <span className="ui-workout-info__body">
+        {name}
+        {focus ? ` — ${focus}` : ''}
+      </span>
+    </span>
   )
 }
 
 // req-28 — a completed-today workout row, linking to its History detail. Uses the
 // shared info format (iter 5); `when` is "Today" (all completed today), focus from
 // the immutable snapshot. Program name dropped so it matches the other sections.
-function CompletedTodayRow({ store, workout }) {
+function CompletedTodayRow({ store, workout, todayKey }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   return (
     <Row to={`/history/${workout.id}`}>
-      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
     </Row>
   )
 }
 
 // req-14 (Emilio review) — a recent-history peek row linking to the History detail.
 // Shared info format (iter 5): `when` is the workout's date, focus from the snapshot.
-function HistoryPeekRow({ store, workout }) {
+function HistoryPeekRow({ store, workout, todayKey }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   return (
     <Row to={`/history/${workout.id}`}>
-      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} />
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
     </Row>
   )
 }
@@ -79,7 +84,7 @@ function HistoryPeekRow({ store, workout }) {
 // Start (the top-of-screen Continue owns it). Same startOrContinue path. Info via
 // the shared format (iter 5); `when` is the weekday. The Done status stays in the
 // row's value slot; only the weekday moved into the info line.
-function UpcomingRow({ store, date, slot, routine }) {
+function UpcomingRow({ store, date, slot, routine, todayKey }) {
   const dk = dateKey(date)
   const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
   const mine = store.activeWorkout
@@ -89,7 +94,7 @@ function UpcomingRow({ store, date, slot, routine }) {
     !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
   return (
     <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
-      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} />
+      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} today={dk === todayKey} />
     </Row>
   )
 }
@@ -213,7 +218,7 @@ export function Today() {
       <List>
         <Row to="/schedule">Future workouts</Row>
         {upcoming.map(({ date, slot, routine }) => (
-          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} />
+          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} todayKey={todayKey} />
         ))}
       </List>
       {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
@@ -231,7 +236,7 @@ export function Today() {
           <SectionHeader>Completed today</SectionHeader>
           <List>
             {completedToday.map((workout) => (
-              <CompletedTodayRow key={workout.id} store={store} workout={workout} />
+              <CompletedTodayRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
             ))}
           </List>
         </>
@@ -240,7 +245,7 @@ export function Today() {
       {recent.length === 0 ? <p className="ui-sub">No history yet.</p> : null}
       <List>
         {recent.map((workout) => (
-          <HistoryPeekRow key={workout.id} store={store} workout={workout} />
+          <HistoryPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
         ))}
         <Row to="/history">Past workouts</Row>
       </List>
