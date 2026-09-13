@@ -1,6 +1,6 @@
 # req-51 — iPhone safe areas + accessibility: the menu clips in full-screen
 
-**Status: READY** (root cause measured; final on-device tuning iterated per WORKFLOW
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-51` (`8693618`…`8693618`, 1 commit).** (root cause measured; final on-device tuning iterated per WORKFLOW
 "a UI requirement is not finished when written"). From Emilio 2026-09-12: *"Menu needs
 to go up a bit, when I use the app in full screen the menu is too far down on the
 phone, it clips a bit, check standard iPhone margin rules - make sure our application
