@@ -745,3 +745,27 @@ agents. **Ephemeral-agent gotchas:** the fresh worktree has no `node_modules` (s
 the planning worktree's in the agent's setup); the branch persists in the shared `.git`
 after the temp worktree is pruned (closeout finds it); the agent must NOT merge/push —
 planning closes out.
+
+## DEC-038 — One in-progress workout (abandon on new); supersedes the multi-draft feature
+
+Decided 2026-09-13 (Emilio, from the req-53 after-look). The app currently keeps
+**multiple** unfinished workouts as `draftWorkouts` (`store.jsx:221-261`), resumable from
+the Start screen; starting a new workout while one is active saves the current as a draft
+("Save draft?", `workout-actions.js:10`). Emilio wants **exactly one in-progress workout**:
+
+- Starting a new workout while one is active **abandons** the current, after a warning
+  ("Starting a new workout will abandon the workout in progress"). No draft stacking.
+- **Abandon = discard entirely** — no finished-history record (unfinished ≠ real history,
+  DESIGN §1). *(Reversible; decided on his behalf.)*
+- **Display (supersedes req-53's standalone second hero):** the in-progress workout, while
+  started *today*, **replaces** today's Start hero; finishing/abandoning returns today's
+  scheduled block. Once it ages to a **prior day** it drops out of the hero and shows as a
+  **Continue** row in the main-page recent peek, and as a **Continue + Abandon** row in the
+  full History view — never counted as completed history.
+- **Legacy stored drafts:** surfaced once in that same UI (Continue/Abandon) so they resolve
+  through the normal path, then the mechanism is gone — **non-destructive**, no bulk delete;
+  a migration test proves a stored draft is surfaced, not dropped.
+
+Spec: req-55. Persisted-data touch → Emilio's eyes before merge (DEC-035 carve-out) +
+independent reviewer (store change). Rejected: keep-drafts-but-surface-them (B), and
+one-in-progress-with-no-auto-discard (C).
