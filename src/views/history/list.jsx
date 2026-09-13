@@ -1,7 +1,9 @@
-import { exerciseById, exercisesInHistory, findRoutine, groupWorkoutsByRoutine } from '../../storage'
+import { dateKey } from '../../schedule'
+import { exerciseById, exercisesInHistory, findRoutine, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
+import { abandonInProgress, continueInProgress } from '../../workout-actions'
 import { Back, NavLink } from '../shared'
-import { List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
+import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import {
   compactDate,
   groupWorkoutsByMonth,
@@ -26,9 +28,41 @@ function WorkoutHistoryRow({ store, workout }) {
   )
 }
 
+// req-55 / DEC-038 — an unfinished in-progress workout (the single stale
+// activeWorkout, started a prior day, or a legacy draft) shown in History so it can
+// be resolved: **Continue** resumes it (abandoning any current active via the
+// warning), **Abandon** discards it entirely — it is NEVER a finished-history record
+// and never feeds progress.js. No link to a detail page (there is no finished record
+// to open); the row's action buttons are the only affordances.
+function InProgressHistoryRow({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const name = workoutRoutineName(workout, routine)
+  return (
+    <Row
+      action={
+        <>
+          <Button onClick={() => continueInProgress(store, workout)}>Continue</Button>
+          <Button variant="quiet" onClick={() => abandonInProgress(store, workout)}>
+            Abandon
+          </Button>
+        </>
+      }
+    >
+      <span className="ui-workout-info">
+        <span className="ui-workout-info__date">{compactDate(workoutDateKey(workout))}</span>
+        <span className="ui-workout-info__body">
+          {name}
+          <span className="ui-inprogress">in progress</span>
+        </span>
+      </span>
+    </Row>
+  )
+}
+
 export function History({ month = null }) {
   const store = useStore()
   const months = groupWorkoutsByMonth(store.workouts || [])
+  const inProgress = staleInProgressWorkouts(store, dateKey(new Date()))
 
   if (month) {
     const group = months.find((candidate) => candidate.key === month)
@@ -57,6 +91,16 @@ export function History({ month = null }) {
       <p>
         <NavLink to="/history/exercises">By exercise</NavLink>
       </p>
+      {inProgress.length ? (
+        <>
+          <SectionHeader>In progress</SectionHeader>
+          <List>
+            {inProgress.map((workout) => (
+              <InProgressHistoryRow key={workout.id} store={store} workout={workout} />
+            ))}
+          </List>
+        </>
+      ) : null}
       {months.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {months.map((group) => (

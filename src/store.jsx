@@ -216,16 +216,12 @@ export function StoreProvider({ children }) {
             })
           if (!plan) return s
           if (s.activeWorkout?.occurrenceId === plan.occurrenceId) return s
+          // DEC-038 / req-55 — exactly one in-progress workout. Starting a new one
+          // discards whatever was active (the caller warns first, workout-actions.js);
+          // no draft stacking. The `draftWorkouts` field is kept (legacy data) but is
+          // never written to again.
           return {
             ...s,
-            draftWorkouts: s.activeWorkout
-              ? [
-                  ...(s.draftWorkouts || []).filter(
-                    (draft) => draft.occurrenceId !== s.activeWorkout.occurrenceId,
-                  ),
-                  s.activeWorkout,
-                ]
-              : s.draftWorkouts || [],
             activeWorkout: {
               id: uid('wo'),
               routineId,
@@ -247,19 +243,29 @@ export function StoreProvider({ children }) {
           }
         })
       },
-      resumeDraft(workoutId) {
+      // req-55 — resolve a LEGACY stored draft (the removed multi-draft feature).
+      // Continue promotes the draft to the single active workout, discarding any
+      // current active entirely (one-in-progress invariant; the caller warns first).
+      // No new drafts are ever written — this only drains what old data left behind.
+      continueDraft(workoutId) {
         setState((s) => {
           const draft = (s.draftWorkouts || []).find((candidate) => candidate.id === workoutId)
           if (!draft) return s
           return {
             ...s,
-            draftWorkouts: [
-              ...(s.draftWorkouts || []).filter((candidate) => candidate.id !== workoutId),
-              ...(s.activeWorkout ? [s.activeWorkout] : []),
-            ],
+            draftWorkouts: (s.draftWorkouts || []).filter((candidate) => candidate.id !== workoutId),
             activeWorkout: draft,
           }
         })
+      },
+      // req-55 — discard a legacy stored draft. No finished-history record (an
+      // unfinished workout is not completed history, DESIGN §1); it is simply removed
+      // from draftWorkouts.
+      abandonDraft(workoutId) {
+        setState((s) => ({
+          ...s,
+          draftWorkouts: (s.draftWorkouts || []).filter((candidate) => candidate.id !== workoutId),
+        }))
       },
       abandonWorkout() {
         setState((s) => ({ ...s, activeWorkout: null }))
