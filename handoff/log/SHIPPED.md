@@ -780,3 +780,12 @@ descending (most-recent below today, oldest at the bottom), so the whole column 
 future → today (hero) → past. Shared helpers (`remainingInLoop` / `sortWorkoutsByDate`) untouched — only
 `Today.jsx`. Planning verified by its own hand (213 tests). Merge `f8567f7` (branch `req-60`, `d5bff03`,
 1 commit).
+
+## req-61 — gitignore `.claude/worktrees/` (fixes L-011)  (merged 2026-09-13)
+
+From the 2026-09-13 workflow feedback. Added `.claude/worktrees/` to the code repo's `.gitignore`, scoped
+so the tracked `.claude/settings.json` + `.claude/skills/` stay tracked. Ephemeral build-agent worktrees
+(isolation: worktree, DEC-037) no longer show as untracked in `git status`, so a parallel agent build no
+longer blocks `plan closeout` on a sibling req (the L-011 snag, previously worked around by serializing).
+Verified: `git check-ignore` hits `.claude/worktrees/agent-*`; `git ls-files .claude/` still lists the
+tracked config. `./check` green, 213 tests. Merge `9e0dc77` (branch `req-61`, `82aee03`, 1 commit).
