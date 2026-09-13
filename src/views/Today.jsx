@@ -30,6 +30,14 @@ function activeRoutineId(workout) {
   return workout?.routineId || workout?.sessionId
 }
 
+// req-53 — the "in progress" marker that sits next to the routine info in the
+// emphasized hero block (today's slot or the standalone hero). Reuses the
+// grayscale eyebrow look; inline so it reads as a status beside the name, not a
+// second line.
+function InProgressMark() {
+  return <span className="ui-inprogress">in progress</span>
+}
+
 // req-14 (Emilio review iter 5) — the ONE shared row-info format for every workout
 // row on the screen (Upcoming / Today / Recent / Completed today). req-47: a
 // two-line stack echoing the Today block — the date (`when`) on its own line in
@@ -102,8 +110,11 @@ function UpcomingRow({ store, date, slot, routine, todayKey }) {
 // req-14 (Emilio review) — today's workout is the Workout screen's focal point and
 // main call to action. Iter 8: a two-line stack — the bold date on top, then
 // "name — focus" as a secondary line — then a large, primary, full-width Start.
-// `Done …` shows once logged; a workout already in progress shows nothing here
-// (the top-of-screen Continue owns that), matching the pre-review behaviour.
+// `Done …` shows once logged. req-53: when this slot IS the active workout
+// (`inProgress`), the block itself becomes the hero — an "in progress" marker
+// beside the name and a big primary **Continue** in the button slot (the old
+// top-of-screen "In progress" row is gone), rendered once. Same resume call the
+// old row used (`startOrContinue(store, activeRoutineId(mine))`).
 function TodayWorkout({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
   const mine = store.activeWorkout
@@ -117,12 +128,41 @@ function TodayWorkout({ store, routine, slot, date }) {
       <p className="ui-today-workout__name">
         {routine.name}
         {routine.focus ? ` — ${routine.focus}` : ''}
+        {inProgress ? <InProgressMark /> : null}
       </p>
       {done ? (
         <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
-      ) : inProgress ? null : (
+      ) : inProgress ? (
+        <Button variant="primary" block onClick={() => startOrContinue(store, activeRoutineId(mine))}>
+          Continue
+        </Button>
+      ) : (
         <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
       )}
+    </div>
+  )
+}
+
+// req-53 — an active workout that matches no today slot (started ahead from
+// Upcoming, ad-hoc from /start, or nothing scheduled today) still becomes the
+// emphasized hero, rendered above today's block(s). Reuses the Today block's look
+// (`.ui-today-workout`). Name/focus/date resolve from the workout's OWN record
+// the way the peek rows do (`findRoutine` + `workoutRoutineName` +
+// `workout.snapshot?.focus`, `workoutDateKey`) — the snapshot name survives a
+// deleted/archived routine (DESIGN §1), never invented. Same resume call.
+function InProgressHero({ store, workout }) {
+  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  return (
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(workoutDateKey(workout))}</p>
+      <p className="ui-today-workout__name">
+        {workoutRoutineName(workout, routine)}
+        {workout.snapshot?.focus ? ` — ${workout.snapshot.focus}` : ''}
+        <InProgressMark />
+      </p>
+      <Button variant="primary" block onClick={() => startOrContinue(store, activeRoutineId(workout))}>
+        Continue
+      </Button>
     </div>
   )
 }
@@ -160,6 +200,16 @@ export function Today() {
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
   const completedToday = completedOnDayKey(store.workouts, todayKey)
+  // req-53 — does the active workout exactly match one of today's slots? If so its
+  // own TodayWorkout block carries the hero (Continue + marker); if not, a
+  // standalone InProgressHero renders above the today block(s). Either way the
+  // active workout appears exactly once.
+  const activeIsTodaySlot =
+    !!mine &&
+    todays.some(
+      ({ slot, routine }) =>
+        activeRoutineId(mine) === routine.id && mine.scheduleSlotId === slot.id && mine.scheduledFor === todayKey,
+    )
 
   if (!routines.length) {
     return (
@@ -202,13 +252,6 @@ export function Today() {
         </p>
       ) : null}
 
-      {mine ? (
-        <p className="ui-sub">
-          In progress.{' '}
-          <Button onClick={() => startOrContinue(store, activeRoutineId(mine))}>Continue</Button>
-        </p>
-      ) : null}
-
       {/* Section order: Upcoming› (plain link) → items → Today (emphasized) →
           Completed today → recent items → Previous› (plain link) → gap → Routines›
           (pinned to the viewport bottom, above the tab bar). Iter 7: "Upcoming" and
@@ -223,11 +266,17 @@ export function Today() {
       </List>
       {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
 
+      {/* req-53 — an active workout that isn't one of today's slots leads as a
+          standalone hero above today's block(s). */}
+      {mine && !activeIsTodaySlot ? <InProgressHero store={store} workout={mine} /> : null}
+
       {todays.length ? (
         todays.map(({ slot, routine }) => (
           <TodayWorkout key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
         ))
-      ) : (
+      ) : mine ? null : (
+        // req-53 — suppress "Nothing scheduled" while a workout is in progress; the
+        // standalone hero above already leads the screen.
         <TodayEmpty date={todayKey} />
       )}
 
