@@ -101,6 +101,18 @@ thumb learns one map: right advances, left retreats. **The test:** on any screen
 two actions, is the forward one on the right and the retreat one on the left? (Audited
 across the app in req-29, which reordered 11 action rows.)
 
+**Navigation vs. action treatment (Emilio, 2026-09-13; req-62 / DEC-042).** The vocabulary has
+two treatments, and a control must wear the one that matches what it does:
+- **Navigation** (changes screen, commits nothing) wears the **link** treatment — the `NavLink`
+  primitive with a chevron: `‹` for back, `›` for forward. It reads as a *place*, and uses only the
+  §4 verbs. `Back` is a `‹ Back` link, not a button (DEC-016).
+- **Action** (commits/changes state) wears the **Button**, with only the §4 verbs.
+- **No off-vocabulary verb.** "Done" (reads like it commits when nothing does) and "Correct"
+  (an action-y one-off for what is really *Edit*) are the caught examples — removed in req-62.
+- A navigate-only control may take the *button look* where it sits beside a real Button (DEC-040),
+  but it stays a link (no `go()` handler). **The test:** is every screen-change a chevron link and
+  every state-change a Button, and does each use a §4 verb — no "Done", no "Correct"?
+
 Two conventions from the req-29 audit:
 - **Set the order in markup, never `row-reverse` in CSS.** `.ui-actions` is normal LTR flex, so DOM
   child order = visual left→right = tab/focus order. A CSS reverse would desync focus from the visual

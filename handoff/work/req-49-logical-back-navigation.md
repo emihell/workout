@@ -1,6 +1,6 @@
 # req-49 — Back goes to the logical parent, not the last-visited page
 
-**Status: READY.** From Emilio 2026-09-12: *"There are still some back buttons that
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-49` (`41ab51c`, 1 commit).** From Emilio 2026-09-12: *"There are still some back buttons that
 send you literally back to last visited page, it should send you back to its logical
 previous page - Scan the app for similar issues."*
 

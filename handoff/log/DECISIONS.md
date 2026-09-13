@@ -769,3 +769,63 @@ the Start screen; starting a new workout while one is active saves the current a
 Spec: req-55. Persisted-data touch → Emilio's eyes before merge (DEC-035 carve-out) +
 independent reviewer (store change). Rejected: keep-drafts-but-surface-them (B), and
 one-in-progress-with-no-auto-discard (C).
+
+## DEC-039 — Back's logical parent for the two screens req-49 left to CC's call
+
+Decided 2026-09-13 (CC's call in req-49, recorded on merge). req-49 made every `Back` go to
+its logical parent; two parents weren't fixed by the spec table and CC chose, defensibly:
+
+- **`history-set` Back → the workout-exercise screen** (the screen that lists the sets), **not**
+  `/history/:id` (the workout detail). A set is opened *from* its exercise screen, so that is its
+  true parent, and it matches the set form's existing `cancelTo`. Going two levels up would skip
+  the screen you came from.
+- **In-workout `Back` (overview/preview/empty-active) → `/` (Today), workout left ACTIVE.** The
+  preview route has no in-app link constructing it (Today starts via `startOrContinue`), so its
+  launch surface is genuinely ambiguous; Today is the tab landing and the safe single parent.
+  Back steps out **without discarding** — the workout stays resumable via Continue; **Abandon is
+  the explicit discard** (consistent with DEC-038: unfinished ≠ discarded-by-navigation).
+
+Both reversible. Not in a spec/DEC/rule when built → recorded here per WORKFLOW.
+
+## DEC-040 — Navigate-only controls are links (NavLink), even when they wear the button look
+
+Decided 2026-09-13 (CC's call in req-50, recorded on merge; governed by DEC-016). The req-50
+spec bullet had lumped "Cancel-as-dismiss / Add / Done" under *Action → Button*, but DEC-016 says
+**navigation without a state change is a link**. Cancel/Skip/row-label links navigate and commit
+nothing, so they stayed the `NavLink` primitive — given the **button look** (`ui-btn ui-btn--quiet`
+retreat / `ui-btn ui-btn--secondary` in a Row action slot) where they sit beside a real `<Button>`,
+so they read as the button they pair with **without** gaining an imperative `go()` handler (which
+would be a behaviour change, out of req-50's presentation-only scope). Matches the precedent at
+`Routine.jsx:57` (a nav "Edit" already rendered `a.ui-btn--secondary`) and the `a.ui-btn` CSS at
+`ui.css:74-87`. The genuine state-changers (Save/Start/Remove/Delete/Add-that-writes) were already
+`<Button>` and untouched. Reversible to true `<Button>`s in ~6 one-line edits if the a11y/semantics
+call is ever preferred over presentation-only.
+
+## DEC-041 — Pre-merge phone-test gate = local `vite preview` over Tailscale (not a cloud preview deploy)
+
+Decided 2026-09-13 (Emilio; built as the `demo-staging` tooling, recorded as req-63). The way to
+test a built branch on the phone **before merging to main** is: `npm run demo` (`vite build && vite
+preview --port 4173 --strictPort`, base `/` since `GITHUB_PAGES` is unset) exposed over the tailnet
+via `tailscale serve --bg 4173`. `tailscale serve` gives the local app a real **HTTPS** URL, which
+unblocks secure-context features (**wake-lock / notifications / add-to-home-screen**) — the L-003
+blocker a plain-LAN host had. `serve` (private, tailnet-only), never `funnel` (public). Runbook:
+`DEMO.md`. `vite.config.js` gained `allowedHosts: ['.ts.net']` on server + preview.
+
+**Supersedes** the backlog's "per-branch preview deploy (cloud)" tooling item **for Emilio's own
+testing**. Caveat: it runs on Emilio's Mac, so the **planning session cannot use it** to browser-test
+a branch — planning still tests via `node --test` / a throwaway worktree (DEC-035). Merging touched
+`package.json`, so the `main`-push triggers one harmless Pages redeploy of the same site.
+
+## DEC-042 — Navigation wears link treatment + §4 verbs; actions wear Button; no off-vocabulary verbs
+
+Decided 2026-09-13 (Emilio, from the demo — "is *Done* really done?"; built as req-62, rule added to
+`rules/DESIGN.md` §4). One vocabulary, two treatments: **navigation** wears the **link** treatment
+(chevron `‹` back / `›` forward, reads as a place) and uses only the DESIGN §4 verbs; **actions**
+wear the **Button** and use only §4 verbs. No off-vocabulary verb, no navigation dressed as a button.
+Applied in req-62: (1) `Back` became the `NavLink` primitive (`‹ Back`, a real `<a href>`) everywhere,
+completing the "fold Back into the component treatment" req-50 deferred — same req-49 targets, no
+behaviour change; (2) removed "**Done**" from RoutineDetail/ScheduleDay — off-vocabulary, read like it
+commits, and made 100% redundant by req-49 (Back now goes to that same list); (3) "**Correct**" →
+"**Edit**" (link + the `history/edit.jsx` screen title) — a workout detail is an object detail, which
+§4 says owns *Edit*. Deferred (Emilio's optional, not done): "Create exercise"→"New exercise", the
+"Already added" status-link. Presentation/label only; no route or data change.

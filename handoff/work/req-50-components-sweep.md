@@ -1,7 +1,6 @@
 # req-50 — Everything clickable uses a library component (no bare text links)
 
-**Status: READY** (intent + constraints settled; a UI sweep, iterated on the feel
-gate per WORKFLOW "a UI requirement is not finished when written"). From Emilio
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-50` (`e95685c` + `8cb9980` chevron follow-up, 2 commits).** From Emilio
 2026-09-12: *"These are some 'buttons' that are still just link text - these should
 also use components - everything should use components - Scan the app for similar."*
 
