@@ -17,6 +17,9 @@ menu) + req-53→**req-55** (in-progress: one-at-a-time, abandon-on-new, hero-re
 Abandon; DEC-038, req-55 supersedes req-53's display) + req-54 (dock font). Emilio device/feel after-look
 owed (non-blocking); req-55 he eyed pre-merge (persisted-data).
 
+**In flight (Emilio 2026-09-13 phone testing):** `req-57` remove the front-page schedule preview (it's
+in Library now); `req-58` routine-row Start → secondary (off-schedule is unusual). Both single-view. **[ux-feel]**
+
 **READY, held (the back-nav pair):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
   cause: `route.js` visit-stack). Touches shared route/helper → reviewer subagent before merge. **[functional]**
