@@ -57,7 +57,7 @@ export function Routines() {
                 <NavLink to={routinePath(routine.id)} className="ui-btn ui-btn--secondary">
                   Edit
                 </NavLink>
-                <Button variant="primary" onClick={() => startOrContinue(store, routine.id)}>
+                <Button variant="secondary" onClick={() => startOrContinue(store, routine.id)}>
                   Start
                 </Button>
               </>
