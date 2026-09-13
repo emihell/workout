@@ -1,6 +1,6 @@
 # req-56 — Start/Edit on routine rows; Schedule into the Library segmented; drop the first-page Routines strip
 
-**Status: READY.** From Emilio 2026-09-13 (phone testing): *"remove routines from the
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-56` (`39d4dc5`…`39d4dc5`, 1 commit).** From Emilio 2026-09-13 (phone testing): *"remove routines from the
 first page — instead add 'start' 'edit' buttons on the routines in the routines page.
 move schedule into the library page as a third option on the top segmented — so it's:
 schedule routines exercises."* "Write a req, execute directly."
