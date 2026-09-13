@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–64** (req-10 pending;
+Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–63** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -20,6 +20,9 @@ DEC-039) + **req-50** (components sweep, DEC-040) + **req-63** (demo phone-test 
 pre-merge (persisted-data); req-62 he approved on the demo.
 
 **READY, held:**
+- `req-64` **Remove START-HERE.md** — delete the file, fold the two boot prompts into README's
+  Setup, fix README's dangling refs; rely on the `CLAUDE.md` banner for worktree routing (DEC-044).
+  Re-scoped from trim → delete; code session continues branch `req-64`. **[infra/docs]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
