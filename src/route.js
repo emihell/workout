@@ -114,9 +114,13 @@ export function activeTab(routeName) {
   const name = String(routeName || '')
   if (name === 'settings') return 'settings'
   if (name === 'components') return null
-  if (name.startsWith('routine') || name.startsWith('exercise')) return 'library'
-  // today, schedule*, history*, workout* (in-workout), start — and any future
-  // route that falls through — land on Workouts, the default surface.
+  // req-56: schedule* moved to Library — Schedule is now the first Library
+  // segment, so every schedule screen lights the Library circle (was Workouts).
+  if (name.startsWith('routine') || name.startsWith('exercise') || name.startsWith('schedule')) {
+    return 'library'
+  }
+  // today, history*, workout* (in-workout) — and any future route that falls
+  // through — land on Workouts, the default surface.
   return 'workouts'
 }
 
@@ -271,7 +275,6 @@ export function parseRoute(path) {
     }
   }
   if (parts[0] === 'workout' && parts[1]) return { name: 'workout', routineId: parts[1] }
-  if (parts[0] === 'start') return { name: 'start' }
 
   if (parts[0] === 'history' && parts[1] === 'exercises') return { name: 'history-exercises' }
   if (parts[0] === 'history' && parts[1] === 'exercise' && parts[2]) {

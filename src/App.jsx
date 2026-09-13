@@ -14,11 +14,10 @@ import {
   RoutineExerciseNew,
   RoutineExerciseEdit,
 } from './views/Routine'
-import { Schedule, ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
+import { ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
 import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
-import { StartWorkout } from './views/Start'
 import { Settings } from './views/Settings'
 import { BottomMenu } from './ui/BottomMenu.jsx'
 import { Library } from './views/Library'
@@ -74,7 +73,7 @@ function ExternalChangeBanner() {
 
 function Screen() {
   const route = useHashRoute()
-  if (route.name === 'schedule') return <Schedule />
+  if (route.name === 'schedule') return <Library tab="schedule" />
   if (route.name === 'schedule-loop') return <ScheduleLoop />
   if (route.name === 'schedule-day') {
     return <ScheduleDay key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} />
@@ -173,7 +172,6 @@ function Screen() {
     return <Workout key={`${route.routineId}-${route.scheduleSlotId}-${route.date}`} routineId={route.routineId} scheduleSlotId={route.scheduleSlotId} date={route.date} />
   }
   if (route.name === 'workout') return <Workout routineId={route.routineId} />
-  if (route.name === 'start') return <StartWorkout />
   if (route.name === 'history') return <History />
   if (route.name === 'history-month') return <History key={route.month} month={route.month} />
   if (route.name === 'history-exercises') return <HistoryExercises />
