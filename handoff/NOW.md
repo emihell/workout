@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–46** (req-10 pending; req-24
+Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48** (req-10 pending; req-24
 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased:
 `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -10,14 +10,13 @@ gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full reqs: `wor
 
 Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 backend/users/exercise-DB/AI/styling (gated on the backend fork).
 
-## Next — UI/UX batch (Emilio 2026-09-13). Spec all → push → build the quick ones → hold the heavy.
+## Next — UI/UX batch (Emilio 2026-09-13). Quick pair SHIPPED; heavy ones held for Emilio's go.
 
-**Quick (batch-build now, low-impact):**
-- `req-47` **Workout-page row hierarchy** — date stacked above info (caption font); today black,
-  other dates gray; today block untouched. **[ux-feel]**
-- `req-48` **Rename Future→Schedule / Past→History + Schedule today-marker.** **[ux-feel]**
+**Quick pair SHIPPED (2026-09-13):** req-47 (row hierarchy: date-above-info, today black/other gray)
++ req-48 (renames Future→Schedule/Past→History, Schedule today-marker). Emilio after-look owed
+(non-blocking): (47) whole-stack darken vs body-only; (48) "Today" tag vs dot/bold.
 
-**Heavy (hold — Emilio waits for these):**
+**Heavy (held — need Emilio's go to build):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
   cause: `route.js` visit-stack). Touches shared route/helper → reviewer subagent before merge. **[functional]**
 - `req-50` **Components sweep** — no bare text links; nav→NavLink, action→Button. Order after req-49. **[ux-feel]**

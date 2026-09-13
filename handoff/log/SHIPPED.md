@@ -630,3 +630,30 @@ on this very closeout; #2 pushed both branches on the maintenance publish; #1's 
 exercised on a controlled drift. Merge `7e6070f` (branch `req-46`, `ca12ddc`, 1 commit). Minor (noted,
 left as-is): closeout's internal save fires a transient #1 warning mid-closeout that self-corrects before
 the final clean status.
+
+## req-47 — Workout page: date above the info, today black / other dates gray  (merged 2026-09-13)
+
+First of the 2026-09-13 UI/UX batch (Emilio, ux-feel, batch-built). `Today.jsx` `WorkoutInfo` now
+renders a two-line stack echoing the Today block — the date (`when`) on its own caption-size line
+(`--ui-text-caption`), then `name — focus` below (the old ` · ` separator gone). The body reads
+`--ui-ink` (black) for today's row and `--ui-ink-2` (gray) otherwise, keyed off the row's
+`dateKey === todayKey` (not the component), so it stays correct if a row is reused for another date;
+`todayKey` threaded into UpcomingRow/HistoryPeekRow/CompletedTodayRow. `focus` still degrades
+gracefully (guard unchanged, DESIGN §1). New CSS `.ui-workout-info/__date/__body/--today`, no new
+tokens. The emphasized TodayWorkout/TodayEmpty block is byte-unchanged (Emilio: the today row is
+special). Gate: ux-feel — planning verified by its own hand in an isolated worktree (lint 0, build ✓,
+182 tests) and merged (DEC-035). Merge `55c20e8` (branch `req-47`, `7b3883d`, 1 commit). CC's one open
+feel-choice left for Emilio's after-look: only the body darkens for today; the date line stays gray.
+
+## req-48 — Rename Future→Schedule / Past→History, mark today on the Schedule  (merged 2026-09-13)
+
+Second of the 2026-09-13 UI/UX batch (Emilio, ux-feel, batch-built). `Today.jsx`: two section-link
+labels swapped — "Future workouts"→"Schedule", "Past workouts"→"History" (targets `/schedule`,
+`/history` unchanged). `Schedule.jsx`: `todayWeekday = new Date().getDay()` (0=Sun; the same convention
+`slotsOn`/`WEEKDAY_ORDER` use — verified), each day row computes `isToday = week === currentWeek &&
+weekday === todayWeekday` and passes `value={isToday ? 'Today' : null}` — a "Today" tag in the existing
+Row value slot, no new CSS. Requires BOTH conditions, so a non-current loop week is never marked
+(failure-case criterion). Gate: ux-feel — planning verified by its own hand (182 tests, detached
+worktree; weekday convention checked against `schedule.js`) and merged (DEC-035). Merge `0c62ff6`
+(branch `req-48`, `f61d52a`, 1 commit). CC's open feel-choice for Emilio's after-look: marker is a
+"Today" text tag (vs a dot or bold weekday).
