@@ -829,3 +829,27 @@ commits, and made 100% redundant by req-49 (Back now goes to that same list); (3
 "**Edit**" (link + the `history/edit.jsx` screen title) — a workout detail is an object detail, which
 §4 says owns *Edit*. Deferred (Emilio's optional, not done): "Create exercise"→"New exercise", the
 "Already added" status-link. Presentation/label only; no route or data change.
+
+## DEC-043 — Root workflow docs stay the code session's; START-HERE is cold-start-only, workflow single-sourced in handoff/
+
+Decided 2026-09-13 (Emilio). Trigger: a "Cowork → Claude Code" terminology fix for
+`README.md` + `START-HERE.md`. Planning first handed it back as "the code session's",
+stating an ownership nothing actually documents, then over-corrected by committing the
+root-doc edits on the planning branch. Both were wrong-shaped. The decision:
+
+- **Do NOT relax the `plan save` guard / the "planning writes only `handoff/`" rule.** The
+  guard is not arbitrary: it gives the two worktrees **zero shared write surface**, which is
+  what makes `plan publish`'s planning→main merge conflict-free and automatic. A carve-out
+  for "workflow docs" reintroduces exactly that merge-conflict class (and `README.md` is the
+  product contract — code/Emilio territory, edited during builds). Line-level ownership
+  inside one file is unenforceable by git anyway.
+- **Root docs (`README.md`, `START-HERE.md`) are the code session's / Emilio's to edit.**
+  Planning specs the change as a req; the code session commits it. (The reverted attempt was
+  `97c637b`, undone by `ce80df3` — net-zero.)
+- **The real drift was duplication, not ownership.** `START-HERE.md` restated the loop +
+  stages that already live in `handoff/PLANNING.md`/`WORKFLOW.md`; a fact in two files is the
+  drift engine (the "Cowork" rot and the stale `~/projects/workout/` path were symptoms). Fix:
+  **single-source the workflow in `handoff/`** and shrink `START-HERE.md` to cold-start-only
+  (boot prompts + a pointer). Spec'd as **req-64**.
+- **Behaviour lesson:** don't state an inferred ownership/rule as fact, and when a rule blocks
+  a user-asked change, surface the drift and do the low-risk part — don't invent an owner.
