@@ -1,6 +1,6 @@
 # req-60 — Front page reads chronologically (future at top, today middle, oldest at bottom)
 
-**Status: READY.** From Emilio 2026-09-13: *"dates should be chronological — starting
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-60` (`d5bff03`…`d5bff03`, 1 commit).** From Emilio 2026-09-13: *"dates should be chronological — starting
 at the bottom with the oldest, going up to the top where the date most in the future
 is, with today in the middle."*
 
