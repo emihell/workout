@@ -206,7 +206,11 @@ export function Today() {
     .filter((x) => x.routine)
   // Upcoming schedule peek (tomorrow onward) — a small preview of what's next, each
   // with an inline Start (req-14 review; the interim before req-32's unified scroll).
-  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2)
+  // req-60 — the shown list is REVERSED so the column reads chronologically top→bottom
+  // (dates decreasing): the furthest of the two soonest workouts sits at the top and
+  // the nearest just above the today hero. `remainingInLoop` is ascending (nearest
+  // first) and stays that way for its other callers — the flip is render-time only.
+  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2).reverse()
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
