@@ -1,6 +1,6 @@
 # req-62 — Kill the action/navigation label ambiguity
 
-**Status: BUILT, NOT merged — branch `req-62-nav-vocabulary` (`e5737f8`, 1 commit). Human-verified on the demo (ux-feel gate met, Emilio).**
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-62` (`e5737f8`…`e5737f8`, 1 commit).**
 
 **Gate: ux-feel.** Built from an in-session scan + Emilio's direction on the demo (no
 pre-written READY spec); planning assigned the number and recorded it on close-out.
