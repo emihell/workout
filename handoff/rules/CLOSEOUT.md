@@ -63,8 +63,8 @@ git push origin main planning
 git branch -d req-N
 cd ~/projects/workout/workout-planning && ./plan status
 ```
-Why each line: `rm -f ...index.lock` FIRST — a cloud session may have left a stale lock
-that blocks `checkout`; harmless if absent, the line that always gets forgotten.
+Why each line: `rm -f ...index.lock` FIRST — an interrupted session may have left a
+stale lock that blocks `checkout`; harmless if absent, the line that always gets forgotten.
 `--no-ff` forces a "Merge branch 'req-N'" commit the drift check reads as evidence.
 Order: merge BEFORE `./plan publish`, or publish refuses ("code worktree not on main").
 `./plan publish` runs `./check` and merges planning→main; it does NOT push — the push

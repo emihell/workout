@@ -1,7 +1,7 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48, req-51–61** (req-10 pending;
-req-24 gated; req-32 dropped, DEC-025; req-49/50 READY, held). Done lives in `log/SHIPPED.md`. Full
+Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–63** (req-10 pending;
+req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -14,13 +14,12 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 **2026-09-13 SHIPPED:** req-47/48 (row hierarchy, renames+marker) + req-51 (safe-area) + req-52 (bottom
 menu) + req-53→**req-55** (in-progress: one-at-a-time, abandon-on-new, hero-replacement, stale→Continue/
-Abandon; DEC-038, req-55 supersedes req-53's display) + req-54 (dock font). Emilio device/feel after-look
-owed (non-blocking); req-55 he eyed pre-merge (persisted-data).
+Abandon; DEC-038, req-55 supersedes req-53's display) + req-54 (dock font) + **req-49** (logical back nav,
+DEC-039) + **req-50** (components sweep, DEC-040) + **req-63** (demo phone-test gate, DEC-041) + **req-62**
+(nav/action vocabulary, DEC-042). Emilio device/feel after-look owed (non-blocking); req-55 he eyed
+pre-merge (persisted-data); req-62 he approved on the demo.
 
-**READY, held (the back-nav pair):**
-- `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
-  cause: `route.js` visit-stack). Touches shared route/helper → reviewer subagent before merge. **[functional]**
-- `req-50` **Components sweep** — no bare text links; nav→NavLink, action→Button. Order after req-49. **[ux-feel]**
+**READY, held:**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

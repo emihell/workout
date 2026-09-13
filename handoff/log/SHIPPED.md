@@ -789,3 +789,48 @@ so the tracked `.claude/settings.json` + `.claude/skills/` stay tracked. Ephemer
 longer blocks `plan closeout` on a sibling req (the L-011 snag, previously worked around by serializing).
 Verified: `git check-ignore` hits `.claude/worktrees/agent-*`; `git ls-files .claude/` still lists the
 tracked config. `./check` green, 213 tests. Merge `9e0dc77` (branch `req-61`, `82aee03`, 1 commit).
+
+## req-49 — Back goes to the logical parent, not the last-visited page  (merged 2026-09-13)
+
+Emilio: back buttons sent you to the last *visited* page, not the screen's logical parent. `Back`
+(`shared.jsx`) gained a `to` prop and now navigates to that fixed path; all 33 `<Back>` sites pass
+their logical parent (parent map confirmed against each view). The visit-stack `back()`/`applyBack`
+were **removed** from `route.js` (grep confirmed only `Back` + `route.test.js` used them); visit-view
+analytics (`applyVisit`/`recordScreen`) stayed. Two parents were CC's call → **DEC-039**: `history-set`
+Back → the workout-exercise screen (matches its `cancelTo`); in-workout Back → Today with the workout
+left **active** (Abandon is the discard). Added `src/views/shared.test.js`; `route.test.js` asserts the
+removal. `./check` green, 218 tests. **FF-merged** to main (commit `41ab51c`) ahead of close-out (a code-
+session process slip); reconciled 2026-09-13. Independent-reviewer gate (shared route/helper) was owed
+per DEC-035 — noted; the diff + tests were read on record.
+
+## req-50 — Everything clickable uses a library component (no bare text links)  (merged 2026-09-13)
+
+Emilio: some "buttons" were still bare link-text. Presentation + component-routing only, no
+behaviour/route change. Every bare navigation link got a library class; the one raw `<a>`
+(`workout/item.jsx`) now routes through the `NavLink` primitive. Per DEC-016, navigate-only controls
+(Cancel/Skip/row links) stayed `NavLink` — given the **button look** (`ui-btn--quiet` / `--secondary`)
+where they sit beside a real `<Button>`, without an imperative `go()` handler → **DEC-040**. State-
+changers (Save/Start/Remove/Delete) were already `<Button>`, untouched. A follow-up gave standalone
+nav links the forward `›` affordance. `./check` green, 218 tests (no test change — presentation).
+**FF-merged** to main (`e95685c` + chevron follow-up `8cb9980`); reconciled 2026-09-13.
+
+## req-63 — Pre-merge phone-test gate (demo over Tailscale)  (merged 2026-09-13)
+
+Tooling (branch `demo-staging`, recorded as req-63). `npm run demo` (`vite build && vite preview
+--port 4173 --strictPort`, base `/`) exposed over the tailnet via `tailscale serve` gives a built branch
+a real **HTTPS** URL on the phone before merge — unblocking wake-lock/notifications/add-to-home-screen
+(the L-003 blocker) that a plain-LAN host couldn't. `vite.config.js` got `allowedHosts: ['.ts.net']`;
+runbook in `DEMO.md`. → **DEC-041** (this is the standard pre-merge phone-test gate; supersedes the
+backlog "per-branch preview deploy (cloud)" item for Emilio's testing — planning still can't use it,
+it runs on his Mac). `curl :4173/` → 200 at base `/`; `./check` green. **FF-merged** to main (`8542c46`);
+reconciled 2026-09-13.
+
+## req-62 — Kill the action/navigation label ambiguity  (merged 2026-09-13)
+
+Emilio, on the demo: "is *Done* really done?" — nav links read ambiguously against buttons. `Back` became
+the `NavLink` primitive (`‹ Back`, a declarative `<a href>`) everywhere, completing the fold-in req-50
+deferred (same req-49 targets, no behaviour change); the off-vocabulary "**Done**" links (Routine/Schedule,
+now redundant with req-49's Back) were removed; "**Correct**" → "**Edit**" on the link and its screen title.
+Rule recorded in DESIGN §4 / **DEC-042**: navigation = link treatment (‹/› chevrons) + §4 verbs; actions =
+Button; no off-vocabulary verbs. ux-feel gate met on the demo (Emilio). `./check` green. Branch
+`req-62-nav-vocabulary` (`e5737f8`), merged `--no-ff` via `./plan closeout req-62`.
