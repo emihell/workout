@@ -1,6 +1,6 @@
 # req-52 — Bottom menu: floating Workout-oval + icon-only circles
 
-**Status: READY.** Design decided with Emilio via the `/design` mockups (DEC-036).
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-52` (`57c84f2`…`57c84f2`, 1 commit).** Design decided with Emilio via the `/design` mockups (DEC-036).
 From Emilio 2026-09-12: *"Bottom menu should be its own component in the library -
 design it together with me"*; direction chosen 2026-09-13: *"use 1 — but not
 translucent, no icon on workout button, no shadow, give non-selected a faint border
