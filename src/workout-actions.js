@@ -17,11 +17,14 @@ export function startOrContinue(store, routineId, options = {}) {
   const scheduleSlotId = config.scheduleSlotId || null
   const active = store.activeWorkout
   const activeId = workoutRoutineId(active)
-  // "Continuing the same in-progress workout" — same routine, and (when an
-  // occurrence is named) the same occurrence. Anything else is a genuinely
-  // different workout.
+  // "Continuing the same in-progress workout" — same routine, (when an
+  // occurrence is named) the same occurrence, AND started today. A stale active
+  // started on a prior day is a genuinely different workout: tapping today's
+  // Start must abandon-on-new, not silently resume yesterday's sets under
+  // yesterday's occurrence/date (DEC-038). Anything else is different too.
   const sameOccurrence = !config.occurrenceId || active?.occurrenceId === config.occurrenceId
-  const continuingSame = !!active && activeId === routineId && sameOccurrence
+  const startedToday = !!active && dateKey(active.startedAt) === dateKey(new Date())
+  const continuingSame = !!active && activeId === routineId && sameOccurrence && startedToday
   // req-55 / DEC-038 — start-while-active abandons the current, with a warning
   // (replaces the old "Save draft?" path). Cancel: do nothing, keep the active one.
   if (active && !continuingSame) {

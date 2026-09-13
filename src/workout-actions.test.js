@@ -8,6 +8,7 @@ import {
   continueInProgress,
   startOrContinue,
 } from './workout-actions.js'
+import { dateKey } from './schedule.js'
 
 // req-55 / DEC-038 — start-while-active abandons the one in-progress workout after a
 // warning (no draft stacking); Continue/Abandon resolve a stale in-progress or a
@@ -82,11 +83,46 @@ describe('startOrContinue — abandon-on-new (DEC-038)', () => {
     assert.equal(store.draftWorkouts.length, 0)
   })
 
-  it('continuing the SAME active workout → no confirm, no restart, just navigates', () => {
-    const store = fakeStore({ activeWorkout: { id: 'a1', routineId: 'rtn-x' } })
+  it('continuing the SAME active workout (started today) → no confirm, no restart, just navigates', () => {
+    const store = fakeStore({
+      activeWorkout: { id: 'a1', routineId: 'rtn-x', startedAt: new Date().toISOString() },
+    })
     startOrContinue(store, 'rtn-x')
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), []) // neither abandonWorkout nor startWorkout
+  })
+
+  // req-55 fix (post-review) — an inline Today/Upcoming Start passes no occurrenceId.
+  // When the active workout for the same routine is STALE (started a prior day), that
+  // is a genuinely new workout, not a continuation: it must abandon-on-new, never
+  // silently resume yesterday's in-progress sets under yesterday's occurrence/date.
+  it('STALE active (same routine, started a prior day) + no occurrenceId → warns, abandons, starts fresh', () => {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const store = fakeStore({
+      activeWorkout: { id: 'a1', routineId: 'rtn-x', startedAt: yesterday.toISOString() },
+    })
+    confirmReturn = true
+    startOrContinue(store, 'rtn-x', {
+      scheduledFor: dateKey(new Date()),
+      scheduleSlotId: 'slot-today',
+    })
+    assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
+    // Does NOT silently continue: it discards the stale one then starts a fresh workout.
+    assert.deepEqual(names(store), ['abandonWorkout', 'startWorkout'])
+    assert.equal(store.draftWorkouts.length, 0)
+  })
+
+  it('resuming TODAY\'s active (same routine, started today) + no occurrenceId → no warning, no new startWorkout', () => {
+    const store = fakeStore({
+      activeWorkout: { id: 'a1', routineId: 'rtn-x', startedAt: new Date().toISOString() },
+    })
+    startOrContinue(store, 'rtn-x', {
+      scheduledFor: dateKey(new Date()),
+      scheduleSlotId: 'slot-today',
+    })
+    assert.deepEqual(confirmMessages, [])
+    assert.deepEqual(names(store), []) // neither abandonWorkout nor startWorkout — just navigates
   })
 })
 

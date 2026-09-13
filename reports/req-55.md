@@ -162,3 +162,34 @@ surfaced there too so you can resolve them.
 tests cover the store/action logic and the migration, but the actual hero replacement, the
 warning dialogs, and the History/peek rendering need your eyes in the browser. Also the exact
 placement/feel of the "in progress" marker on the peek and History rows is a judgement call.
+
+---
+
+## Fix (post-review)
+
+**Bug (independent review).** `startOrContinue` (`src/workout-actions.js`) treated the active
+workout as "continuing the same" whenever it matched the routine and occurrence. The
+inline Today/Upcoming **Start** buttons pass no `occurrenceId`, so `sameOccurrence` was
+unconditionally true. If a STALE `activeWorkout` for routine R (started a prior day, still
+unfinished) existed and R was also scheduled today, tapping today's "Start" hit
+`continuingSame === true` — so it neither warned/abandoned nor started fresh, silently
+navigating into yesterday's in-progress sets. On finish it filed under yesterday and today's
+slot was never marked done. The label said "Start" but resumed a stale workout.
+
+**Fix.** `continuingSame` now additionally requires the active workout was started today:
+`dateKey(active.startedAt) === dateKey(new Date())`. `active.startedAt` is the ISO string set
+by `store.jsx` `startWorkout`; `dateKey` is `./schedule.js`, matching the rest of the file.
+When the active workout is stale, `continuingSame` is false, so the existing active-and-different
+path runs: warn `ABANDON_ON_NEW_WARNING` → `store.abandonWorkout()` → `store.startWorkout(...)`.
+Resuming TODAY's in-progress (same routine, started today) is unchanged — no warning, no restart.
+The stale row's own `continueInProgress`/`abandonInProgress` paths are untouched.
+
+**Tests** (`src/workout-actions.test.js`). Added two cases and hardened one existing fixture:
+- STALE active (same routine, started a prior day) + Start with no `occurrenceId` → asserts
+  `[ABANDON_ON_NEW_WARNING]` and calls `['abandonWorkout', 'startWorkout']` (does NOT silently continue).
+- Resuming TODAY's active (same routine, started today) + no `occurrenceId` → asserts no warning
+  and no store calls (just navigates) — the no-regression guard.
+- The existing "continuing the SAME active workout" fixture now carries `startedAt: today`, since
+  under the corrected model "same" requires started-today (fixture correction, not a weakening).
+
+`./check` → `check: green — lint, 18 test file(s), and the build all passed.` (213 tests, 0 fail).
