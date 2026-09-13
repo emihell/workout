@@ -1,6 +1,6 @@
 # req-48 — Rename Future→Schedule / Past→History, and mark today on the Schedule
 
-**Status: READY.** From Emilio 2026-09-12: *"Future workout can be exchange for
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-48` (`f61d52a`…`f61d52a`, 1 commit).** From Emilio 2026-09-12: *"Future workout can be exchange for
 Schedule … Schedule should have a mark on the todays day … Past workout can just be
 history."*
 
