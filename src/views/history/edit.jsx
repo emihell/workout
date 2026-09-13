@@ -20,7 +20,7 @@ export function HistoryEdit({ workoutId }) {
   return (
     <Screen>
       <Back to={`/history/${workout.id}`} />
-      <Title>Correct</Title>
+      <Title>Edit</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()

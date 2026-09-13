@@ -161,9 +161,6 @@ export function RoutineDetail({ routineId, paths }) {
           )
         })}
       </List>
-      <p>
-        <NavLink to={nav.done} className="ui-navlink" chevron="forward">Done</NavLink>
-      </p>
       {nav.showDelete ? (
         <Button
           onClick={() => {
