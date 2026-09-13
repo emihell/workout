@@ -834,3 +834,18 @@ now redundant with req-49's Back) were removed; "**Correct**" → "**Edit**" on 
 Rule recorded in DESIGN §4 / **DEC-042**: navigation = link treatment (‹/› chevrons) + §4 verbs; actions =
 Button; no off-vocabulary verbs. ux-feel gate met on the demo (Emilio). `./check` green. Branch
 `req-62-nav-vocabulary` (`e5737f8`), merged `--no-ff` via `./plan closeout req-62`.
+
+## req-64 — Trim START-HERE to cold-start-only (kill workflow-doc duplication)  (merged 2026-09-13)
+
+DEC-043 follow-through. `START-HERE.md` re-stated the build loop + hard-rules that live canonically
+in `handoff/PLANNING.md` + `rules/WORKFLOW.md`/`CLOSEOUT.md` — a fact in two files, the drift engine
+(the "Cowork" rot and the stale `~/projects/workout/` path were the symptoms). Trimmed 74→44 lines to
+cold-start-only: worktree layout, the two boot prompts, the task hint, and a pointer to PLANNING.md
+(planning) / CLAUDE.md (build). Removed the three-stage loop and the "FOR THE ASSISTANT" read-order/
+hard-rules block (coverage table in reports/req-64.md maps every removed line to its home in handoff/;
+planning verified nothing unique was dropped). Retired "Cowork" in START-HERE + README's Planning-
+workflow paragraph (rest of README — product contract, Setup — untouched); made the worktree path
+path-agnostic; dropped the "cloud session" framing (caution stays in CLOSEOUT.md:66). Planning boot
+prompt now reads handoff/PLANNING.md directly → **DEC-044**. Root-doc-only (no handoff/ touched —
+it's the code session's territory, DEC-043/DEC-005); built by the code session. `grep Cowork` → none;
+`./check` green (218 tests). Branch `req-64` (`451d61a`), merged `--no-ff` via `./plan closeout req-64`.

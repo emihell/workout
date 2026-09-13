@@ -1,7 +1,6 @@
 # req-64 — Trim START-HERE to cold-start-only; kill the workflow-doc duplication drift
 
-**Status: READY** (one default made on Emilio's behalf — the worktree path, marked
-unconfirmed below).
+**Status: BUILT, NOT merged — branch `req-64` (`451d61a`, 1 commit). Verified by planning (diff + coverage table).** (Path default confirmed path-agnostic; boot-prompt re-target → DEC-044.)
 
 **Gate: infra/docs.** Built by the **code session** — it edits repo-root files
 (`START-HERE.md`, `README.md`) that planning cannot commit (DEC-005 isolation; `plan

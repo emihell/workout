@@ -853,3 +853,15 @@ root-doc edits on the planning branch. Both were wrong-shaped. The decision:
   (boot prompts + a pointer). Spec'd as **req-64**.
 - **Behaviour lesson:** don't state an inferred ownership/rule as fact, and when a rule blocks
   a user-asked change, surface the drift and do the low-risk part — don't invent an owner.
+
+## DEC-044 — Planning boots by reading handoff/PLANNING.md directly; START-HERE is a cold-start cheat-sheet only
+
+Decided 2026-09-13 (code session's implementation call in req-64, accepted by planning on
+review). After req-64 trimmed `START-HERE.md` to cold-start-only (DEC-043), the planning
+**boot prompt** was re-targeted: `Read workout-planning/START-HERE.md` → `Read
+handoff/PLANNING.md`. Symmetric with the code prompt (`Read CLAUDE.md`), one hop shorter,
+and it matches PLANNING.md's own "read this first on a fresh start." `START-HERE.md` stays
+as the doc Emilio reads to pick which prompt to paste + the worktree layout — not a session
+read-order doc anymore. Both the old and new prompts still work (the trimmed START-HERE
+routes onward to PLANNING.md/CLAUDE.md), so nothing breaks if the old prompt is pasted from
+memory. Reversible in one line if Emilio prefers the planning boot to land on START-HERE first.
