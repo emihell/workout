@@ -1,6 +1,6 @@
 # req-58 — Routine-row Start is secondary, not primary (off-schedule is unusual)
 
-**Status: READY.** From Emilio 2026-09-13: *"start in routines can also be secondary —
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-58` (`8b4772b`…`8b4772b`, 1 commit).** From Emilio 2026-09-13: *"start in routines can also be secondary —
 it's unusual to start from here — it's when you didn't follow the schedule."* Tweak to
 req-56.
 
