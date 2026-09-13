@@ -16,6 +16,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 + req-48 (renames Future→Schedule/Past→History, Schedule today-marker). Emilio after-look owed
 (non-blocking): (47) whole-stack darken vs body-only; (48) "Today" tag vs dot/bold.
 
+**Also READY (Emilio 2026-09-13):** `req-53` in-progress workout becomes the main-page hero — drop the
+"in progress" row, big button → Continue, "in progress" by the info; always the hero (DEC in req). Single view. **[ux-feel]**
+
 **Heavy (held — need Emilio's go to build):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
   cause: `route.js` visit-stack). Touches shared route/helper → reviewer subagent before merge. **[functional]**
@@ -32,9 +35,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## History (detail in SHIPPED / audits/2026-09-12.md)
 
-Audit 2026-09-12 CLOSED 19/20 (req-36–45 + F-CONFIG-1; only F-STRUCT-4 deferred) → req-46 (DEC-035).
-Tooling req-33/34/35 (DEC-028). Refactor req-16–23 (DEC-021); gym-flow req-25–29. **#6 timed PARKED.**
-Emilio eyeballs owed (non-blocking): req-41 two-tab, req-44/25/27 gym feel.
+Audit 2026-09-12 CLOSED 19/20 → req-46 (DEC-035). Tooling req-33/34/35. Refactor req-16–23; gym-flow
+req-25–29. **#6 timed PARKED.** Emilio eyeballs owed (non-blocking): req-41 two-tab, req-44/25/27 gym feel.
 
 ## Needs decisions — parked until their phase
 
