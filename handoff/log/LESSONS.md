@@ -150,3 +150,11 @@ would fail ("checked out at ..."). **Lesson:** after the agent reports and befor
 `git -C <code> worktree remove --force .claude/worktrees/agent-<id>` then `git worktree prune`.
 The branch's commits persist in the shared `.git` after removal, so closeout still finds and
 merges `req-N`. (Verify branch is free: `git branch` shows no leading `+`.)
+
+## L-012 — modules needing `node --test` coverage must use explicit `.js` import specifiers
+
+req-55. `workout-actions.js` imported `./route` / `./schedule` (extensionless); Vite resolves those, but
+`node --test` (no bundler resolution) could not load the module to unit-test it, so the logic was
+uncovered. Fixed by using `./route.js` / `./schedule.js`. **Lesson:** any module you intend to cover with
+`node --test` (the project gate) must use explicit `.js` extensions on its relative imports — extensionless
+specifiers pass lint/build but silently block node from loading the module under test.

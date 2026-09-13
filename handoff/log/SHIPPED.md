@@ -712,3 +712,21 @@ req-52 after-look (Emilio: "workout has a different font"). One-line fix: `.ui-d
 merged. Merge `a537a82` (branch `req-54`, `885dff6`, 1 commit). (Closeout emitted the known transient
 `check_handoff` "commit not in HEAD" warning mid-run — verified reconciled: `885dff6` is an ancestor
 of main, both worktrees clean.)
+
+## req-55 — One in-progress workout: hero-replacement, stale lifecycle, abandon-on-new  (merged 2026-09-13)
+
+Emilio / DEC-038, ux-feel + persisted-data. Supersedes req-53's standalone second hero and removes the
+multi-draft feature. Model: exactly one in-progress workout (`store.activeWorkout`). Starting a different
+one warns "Starting a new workout will abandon the workout in progress" and discards the current (no draft
+stacking); `startWorkout` stops writing `draftWorkouts`. An in-progress workout **started today** replaces
+today's Start block as the single hero (finish/abandon → today's Start returns); once **started a prior
+day** it drops to a Continue row in the recent peek and Continue + Abandon in the History view, never
+counted as finished history or fed to `progress.js`. Abandon = discard, no record. **Non-destructive
+migration:** `draftWorkouts` kept and only drained through the UI (`continueDraft`/`abandonDraft`); a
+migration test (real `loadState`, seeded `workout-mvp-v7` draft) proves the draft survives, is surfaced,
+stays out of finished history + recommendations, and persists to v8. Built via an ephemeral agent
+(DEC-037); an **independent reviewer** caught one bug — today's Start silently resumed a stale prior-day
+workout of the same routine — **fixed on-branch** (`488a50e`: "continuing same" now also requires the
+active was started today, with tests). Emilio's eyes-before-merge (persisted-data carve-out) given.
+Files: `store.jsx`, `storage.js`, `workout-actions.js`, `Today.jsx`, `history/list.jsx`, `Start.jsx` +
+tests. `./check` green, 213 tests. Merge `127ea54` (branch `req-55`, `a382217`…`488a50e`, 2 commits).
