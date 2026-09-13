@@ -769,3 +769,14 @@ the headerless upcoming `<List>` + "Nothing scheduled." — minus the `<Row to="
 nav link (Emilio wanted only the link gone, not the whole preview). Today hero + recent/History
 untouched; `remainingInLoop` is imported again so its export is no longer orphaned. Planning verified by
 its own hand (213 tests). Merge `58a59eb` (branch `req-59`, `2c7c11d`, 1 commit).
+
+## req-60 — Front page reads chronologically (future top, today middle, oldest bottom)  (merged 2026-09-13)
+
+Emilio: "dates should be chronological — oldest at the bottom, most future at the top, today in the
+middle." The upcoming preview was rendered ascending (nearest-future at top, reading backwards);
+reversed it at render time (`remainingInLoop(...).slice(0,2).reverse()`) so the furthest of the two
+soonest workouts sits at the top and the nearest just above the today hero. The recent peek was already
+descending (most-recent below today, oldest at the bottom), so the whole column now decreases top→bottom:
+future → today (hero) → past. Shared helpers (`remainingInLoop` / `sortWorkoutsByDate`) untouched — only
+`Today.jsx`. Planning verified by its own hand (213 tests). Merge `f8567f7` (branch `req-60`, `d5bff03`,
+1 commit).
