@@ -1,7 +1,7 @@
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
-import { coveringWorkout, dateKey, loopWeekIndex, resolveSlot, slotsOn } from '../schedule'
+import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
 import { completedOnDayKey, findRoutine, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
@@ -79,6 +79,29 @@ function HistoryPeekRow({ store, workout, todayKey }) {
   return (
     <Row to={`/history/${workout.id}`}>
       <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
+    </Row>
+  )
+}
+
+// req-14 (Emilio review iter 2) — an upcoming (future) scheduled workout in the
+// peek, with an inline Start so you can start ahead directly from Workouts (the
+// behaviour the old Today "Next" section had; Emilio restored it). Today's big
+// primary Start stays the main CTA — upcoming items get a smaller secondary Start.
+// Guards like the today row: already-covered shows `Done …`, in-progress shows no
+// Start (the top-of-screen Continue owns it). Same startOrContinue path. Info via
+// the shared format (iter 5); `when` is the weekday. The Done status stays in the
+// row's value slot; only the weekday moved into the info line.
+function UpcomingRow({ store, date, slot, routine, todayKey }) {
+  const dk = dateKey(date)
+  const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
+  const mine = store.activeWorkout
+  const inProgress =
+    activeRoutineId(mine) === routine.id && mine?.scheduleSlotId === slot.id && mine.scheduledFor === dk
+  const startAction =
+    !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
+  return (
+    <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
+      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} today={dk === todayKey} />
     </Row>
   )
 }
@@ -181,6 +204,9 @@ export function Today() {
   const todays = slotsOn(schedule, now)
     .map((slot) => resolveSlot(routines, slot))
     .filter((x) => x.routine)
+  // Upcoming schedule peek (tomorrow onward) — a small preview of what's next, each
+  // with an inline Start (req-14 review; the interim before req-32's unified scroll).
+  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2)
   const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
@@ -239,11 +265,19 @@ export function Today() {
         </p>
       ) : null}
 
-      {/* Section order: Today (emphasized) → Completed today → recent items →
-          Previous› (plain link, the last Row of the recent list) → gap → Routines›
-          (pinned to the viewport bottom, above the tab bar). req-57 removed the
-          front-page schedule preview — Schedule now lives in the Library segment
-          (req-56). Recent-history peek stays until req-32's unified scroll. */}
+      {/* Section order: upcoming items → Today (emphasized) → Completed today →
+          recent items → Previous› (plain link, the last Row of the recent list) →
+          gap → Routines› (pinned to the viewport bottom, above the tab bar). req-59
+          restored the upcoming preview (the "what's next" items with inline Start);
+          req-57's Schedule nav link stays gone — Schedule lives in the Library
+          segment (req-56). The upcoming list is headerless. Interim peeks until
+          req-32's unified scroll. */}
+      <List>
+        {upcoming.map(({ date, slot, routine }) => (
+          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} todayKey={todayKey} />
+        ))}
+      </List>
+      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
 
       {/* req-55 / DEC-038 — an in-progress workout started today IS the single hero,
           replacing today's scheduled block(s). No second hero. On finish/abandon it
