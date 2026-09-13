@@ -1,6 +1,6 @@
 # req-57 — Remove the schedule preview from the front page (it lives in Library now)
 
-**Status: READY.** From Emilio 2026-09-13: *"remove schedule from front page — as we
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-57` (`558135d`…`558135d`, 1 commit).** From Emilio 2026-09-13: *"remove schedule from front page — as we
 now have it in the library."* Follows req-56 (Schedule became a Library segment).
 
 **Gate: ux-feel.** Single view (`Today.jsx`) — no shared code, no persisted data.
