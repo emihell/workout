@@ -25,3 +25,5 @@ dist-ssr
 
 # local, per-machine Claude settings
 .claude/settings.local.json
+# ephemeral build-agent git worktrees (isolation: worktree)
+.claude/worktrees/
