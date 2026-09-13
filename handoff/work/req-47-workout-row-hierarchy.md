@@ -1,6 +1,6 @@
 # req-47 — Workout page: date above the info, today black / other dates gray
 
-**Status: READY.** From Emilio 2026-09-12: *"Similar to the today row - put the date
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-47` (`7b3883d`…`7b3883d`, 1 commit).** From Emilio 2026-09-12: *"Similar to the today row - put the date
 above the workout info … use the smaller [font] we have for the dates … Today rows
 workout info should be black, other dates should be gray."* Emilio-directed polish
 (DESIGN §5 feel is normally deferred; this is explicitly requested).
