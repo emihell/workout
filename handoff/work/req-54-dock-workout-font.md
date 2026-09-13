@@ -1,6 +1,6 @@
 # req-54 — Bottom menu: the "Workout" oval uses the wrong font
 
-**Status: READY.** From Emilio 2026-09-13 (req-52 after-look): *"workout has a
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-54` (`885dff6`…`885dff6`, 1 commit).** From Emilio 2026-09-13 (req-52 after-look): *"workout has a
 different font than rest of the system?"*
 
 **Gate: ux-feel** — trivial CSS; planning builds + tests + merges on its own testing.
