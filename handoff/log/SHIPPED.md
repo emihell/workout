@@ -730,3 +730,18 @@ workout of the same routine — **fixed on-branch** (`488a50e`: "continuing same
 active was started today, with tests). Emilio's eyes-before-merge (persisted-data carve-out) given.
 Files: `store.jsx`, `storage.js`, `workout-actions.js`, `Today.jsx`, `history/list.jsx`, `Start.jsx` +
 tests. `./check` green, 213 tests. Merge `127ea54` (branch `req-55`, `a382217`…`488a50e`, 2 commits).
+
+## req-56 — Start/Edit on routine rows; Schedule into the Library segmented; drop the first-page Routines strip  (merged 2026-09-13)
+
+Emilio 2026-09-13 (phone testing), ux-feel + functional. The Library toggle is now **Schedule ·
+Routines · Exercises** (Schedule hosted inside the toggle via `Library tab="schedule"`; its list view
+drops `<Back/>`, drill-downs keep theirs). Each routine row (`Routines()`) gains **Edit** (a NavLink →
+the routine detail/manage screen, left) + **Start** (primary Button → `startOrContinue(store,
+routine.id)`, right — reuses the req-55 one-in-progress / abandon-on-new path), DESIGN §4 order.
+Removed the first-page `.ui-subbar` "Routines" strip and the now-orphaned `/start` picker
+(`StartWorkout` deleted; route, `ui-screen--subbar`/`.ui-subbar*`/`--ui-subbar-h` CSS removed).
+`activeTab`: `schedule*` → **library**, so the bottom-menu Library circle lights on every Schedule
+screen. Built via an ephemeral agent (DEC-037); independent reviewer cleared it (routing correct, no
+dangling refs, no test weakened — the visit-stack test swapped `/start`→`/schedule` preserving intent).
+Planning verified by its own hand (213 tests) and merged (DEC-035); Emilio's phone look is the
+non-blocking after-check. Merge `0e88642` (branch `req-56`, `39d4dc5`, 1 commit).
