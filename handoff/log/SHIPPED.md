@@ -702,3 +702,13 @@ so render criteria are locked by a static-source test + behavioural `activeTab` 
 verified by its own hand (194 tests) AND an **independent reviewer** (shared shell, DEC-035 — no
 issues) before merge. Merge `18327e5` (branch `req-52`, `57c84f2`, 1 commit). On-device feel owed
 (Emilio, non-blocking).
+
+## req-54 — Bottom menu: the "Workout" oval uses the app font  (merged 2026-09-13)
+
+req-52 after-look (Emilio: "workout has a different font"). One-line fix: `.ui-dock__btn` set
+`font-size`/`font-weight` but no `font-family`, and the dock renders outside `.ui-screen`, so the
+"Workout" text fell back to the browser default serif (the SVG icons were unaffected). Added
+`font-family: var(--ui-font)`. Planning verified by its own hand (194 tests, isolated worktree) and
+merged. Merge `a537a82` (branch `req-54`, `885dff6`, 1 commit). (Closeout emitted the known transient
+`check_handoff` "commit not in HEAD" warning mid-run — verified reconciled: `885dff6` is an ancestor
+of main, both worktrees clean.)

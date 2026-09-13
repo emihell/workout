@@ -1,8 +1,8 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48, req-51–53** (req-10 pending;
-req-24 gated; req-32 dropped, DEC-025; req-49/50 READY, held). Done lives in `log/SHIPPED.md`. Full
-reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–48, req-51–54** (req-10 pending;
+req-24 gated; req-32 dropped, DEC-025; req-49/50 READY held; req-55 READY, awaiting Emilio model-confirm
++ build). Done lives in `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -12,9 +12,13 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**2026-09-13 batch SHIPPED:** req-47/48 (row hierarchy, renames+today-marker) + req-53 (in-progress
-hero) + req-51 (iPhone safe-area) + req-52 (bottom menu). Emilio device/feel after-look owed
-(non-blocking) — see the test list handed over at close.
+**2026-09-13 SHIPPED:** req-47/48 (row hierarchy, renames+marker) + req-53 (in-progress hero) + req-51
+(safe-area) + req-52 (bottom menu) + req-54 (dock font). Emilio device/feel after-look owed (non-blocking).
+
+**In flight:**
+- `req-55` **One in-progress workout (DEC-038)** — abandon-on-new, hero-replacement (supersedes req-53
+  display), stale→recent/History Continue+Abandon, removes drafts. **READY; awaiting Emilio model-confirm,
+  then build. Persisted-data → his eyes before merge + reviewer.** **[ux-feel + persisted-data]**
 
 **READY, held (the back-nav pair):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
