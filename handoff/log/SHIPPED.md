@@ -834,3 +834,20 @@ now redundant with req-49's Back) were removed; "**Correct**" → "**Edit**" on 
 Rule recorded in DESIGN §4 / **DEC-042**: navigation = link treatment (‹/› chevrons) + §4 verbs; actions =
 Button; no off-vocabulary verbs. ux-feel gate met on the demo (Emilio). `./check` green. Branch
 `req-62-nav-vocabulary` (`e5737f8`), merged `--no-ff` via `./plan closeout req-62`.
+
+## req-64 — Remove START-HERE.md; boot prompts fold into README  (merged 2026-09-13)
+
+The conclusion of DEC-043/DEC-044's duplication cleanup. req-64 first *trimmed* START-HERE to
+cold-start-only; on review Emilio asked whether the file was needed at all — it wasn't. The root
+`CLAUDE.md` banner auto-loads every turn and already self-routes each worktree (planning →
+handoff/PLANNING.md, build → the CLAUDE.md guide), so a cold-started session loads its context
+without START-HERE (proven live). README is the conventional entry, so a second START-HERE doc was
+a redundant front door holding prompts CLAUDE.md had made optional. Deleted `START-HERE.md`; moved
+the two boot prompts + the task hint into a new README **"Boot a session"** subsection (planning →
+handoff/PLANNING.md, build → CLAUDE.md, per DEC-044), with a note that the prompts are the fast way
+in, not the mechanism. Fixed README's two dangling START-HERE refs (:73 link, the Planning-workflow
+paragraph). The `CLAUDE.md` banner — the actual routing — was left untouched (verified). Root-doc-
+only (no handoff/), built by the code session. Verified by planning: `git ls-files START-HERE.md`
+empty, `grep -rn START-HERE README.md CLAUDE.md src/ .githooks/ plan` → none, `grep Cowork README.md`
+→ none, CLAUDE.md unchanged; `./check` green (218 tests). Branch `req-64` (`451d61a` trim + `42c3adf`
+delete, 2 commits), merged `--no-ff` via `./plan closeout req-64`.
