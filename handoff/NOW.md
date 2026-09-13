@@ -12,12 +12,10 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — UI/UX batch (Emilio 2026-09-13). Quick pair SHIPPED; heavy ones held for Emilio's go.
 
-**Quick pair SHIPPED (2026-09-13):** req-47 (row hierarchy: date-above-info, today black/other gray)
-+ req-48 (renames Future→Schedule/Past→History, Schedule today-marker). Emilio after-look owed
-(non-blocking): (47) whole-stack darken vs body-only; (48) "Today" tag vs dot/bold.
+**Quick pair SHIPPED (2026-09-13):** req-47 (date-above-info, today black/other gray) + req-48 (renames
++ Schedule today-marker). Emilio after-look owed: (47) whole-stack vs body-only; (48) "Today" tag vs dot.
 
-**Also READY (Emilio 2026-09-13):** `req-53` in-progress workout becomes the main-page hero — drop the
-"in progress" row, big button → Continue, "in progress" by the info; always the hero (DEC in req). Single view. **[ux-feel]**
+**Also READY:** `req-53` in-progress workout is always the main-page hero — drop the "in progress" row, big button → Continue, "in progress" by the info (Emilio 2026-09-13). Single view. **[ux-feel]**
 
 **Heavy (held — need Emilio's go to build):**
 - `req-49` **Logical back nav** — Back→logical parent, not last-visit (one `Back`, ~35 sites; root
