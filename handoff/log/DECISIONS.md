@@ -853,3 +853,17 @@ root-doc edits on the planning branch. Both were wrong-shaped. The decision:
   (boot prompts + a pointer). Spec'd as **req-64**.
 - **Behaviour lesson:** don't state an inferred ownership/rule as fact, and when a rule blocks
   a user-asked change, surface the drift and do the low-risk part — don't invent an owner.
+
+## DEC-044 — Planning boots by reading handoff/PLANNING.md directly; START-HERE.md removed (prompts move to README)
+
+Decided 2026-09-13 (Emilio). **Supersedes DEC-043's "shrink START-HERE to cold-start-only":**
+on review Emilio asked whether the file was needed at all — it isn't. The root `CLAUDE.md`
+auto-loads every turn and its banner already self-routes each worktree (planning →
+`handoff/PLANNING.md`, build → the CLAUDE.md guide), so a cold-started session loads its
+context without START-HERE — proven live (the planning session that decided this got no boot
+prompt and read `PLANNING.md` first, via that banner). README is the conventional entry; a
+second `START-HERE` doc was a competing front door holding prompts `CLAUDE.md` had made
+optional — the residue of the duplication DEC-043 targets. So: **delete `START-HERE.md`, move
+the two boot prompts into README's Setup**; the planning prompt reads `handoff/PLANNING.md`
+(symmetric with build → `CLAUDE.md`). Load-bearing piece kept untouched: the `CLAUDE.md`
+banner. Spec: req-64 (re-scoped trim → delete). Reversible (restore the file) if ever wanted.
