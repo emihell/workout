@@ -1,6 +1,6 @@
 # req-64 — Remove START-HERE.md; fold the boot prompts into README
 
-**Status: BUILT, NOT merged — branch `req-64` (`451d61a` trim + `42c3adf` delete, 2 commits). Verified by planning (diff + greps).** (Re-scoped trim → delete on Emilio's reframe; see Why.)
+**Status: BUILT AND MERGED, 2026-09-13 — branch `req-64` (`451d61a`…`42c3adf`, 2 commits).** (Re-scoped trim → delete on Emilio's reframe; see Why.)
 
 **Gate: infra/docs.** Built by the **code session** — it edits repo-root files
 (`START-HERE.md`, `README.md`) that planning cannot commit (DEC-005 isolation; `plan save`
