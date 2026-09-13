@@ -89,7 +89,7 @@ export function History({ month = null }) {
       <Back to="/" />
       <Title>History</Title>
       <p>
-        <NavLink to="/history/exercises" className="ui-navlink">By exercise</NavLink>
+        <NavLink to="/history/exercises" className="ui-navlink" chevron="forward">By exercise</NavLink>
       </p>
       {inProgress.length ? (
         <>

@@ -39,7 +39,7 @@ export function Schedule() {
     <Screen>
       <Title>Schedule</Title>
       <p>
-        <NavLink to="/schedule/loop" className="ui-navlink">
+        <NavLink to="/schedule/loop" className="ui-navlink" chevron="forward">
           Loop · {loop} week{loop === 1 ? '' : 's'}
         </NavLink>
       </p>
@@ -141,10 +141,10 @@ export function ScheduleDay({ week, weekday }) {
         ))}
       </List>
       <p>
-        <NavLink to={dayPathOf(week, weekday, '/add')} className="ui-navlink">Add routine</NavLink>
+        <NavLink to={dayPathOf(week, weekday, '/add')} className="ui-navlink" chevron="forward">Add routine</NavLink>
       </p>
       <p>
-        <NavLink to="/schedule" className="ui-navlink">Done</NavLink>
+        <NavLink to="/schedule" className="ui-navlink" chevron="forward">Done</NavLink>
       </p>
     </Screen>
   )

@@ -69,7 +69,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           </Button>
         ) : (
           <p>
-            <NavLink to={scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`} className="ui-navlink">
+            <NavLink to={scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`} className="ui-navlink" chevron="forward">
               Add exercises
             </NavLink>
           </p>

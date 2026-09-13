@@ -87,7 +87,7 @@ export function Exercises({ type = null }) {
     <Screen>
       <Title>Exercises</Title>
       <p>
-        <NavLink to="/exercises/new" className="ui-navlink">Add exercise</NavLink>
+        <NavLink to="/exercises/new" className="ui-navlink" chevron="forward">Add exercise</NavLink>
       </p>
       <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
       {q ? (
@@ -308,7 +308,7 @@ export function ExerciseDetail({ exerciseId }) {
       <Back to="/exercises" />
       <Title>{ex.name}</Title>
       <p>
-        <NavLink to={`/exercises/${ex.id}/edit`} className="ui-navlink">Edit</NavLink>
+        <NavLink to={`/exercises/${ex.id}/edit`} className="ui-navlink" chevron="forward">Edit</NavLink>
       </p>
       <p className="ui-sub">{[ex.equipment, typeLabel(ex.type), ex.weightStep].filter(Boolean).join(' · ')}</p>
       {ex.muscles ? <p className="ui-sub">{ex.muscles}</p> : null}

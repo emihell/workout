@@ -22,7 +22,7 @@ export function HistoryRecalculate({ workoutId }) {
       </p>
       {routinePath ? (
         <p>
-          <NavLink to={routinePath} className="ui-navlink">Routine</NavLink>
+          <NavLink to={routinePath} className="ui-navlink" chevron="forward">Routine</NavLink>
         </p>
       ) : null}
       {/* DESIGN §4: Skip dismisses the recalc (retreat) → left; Apply commits
