@@ -4,6 +4,12 @@ The recurring read-only sanity check. Run it between milestones with `/audit`, n
 mid-build. It reads `handoff/` and the whole codebase and writes one dated findings
 report. It changes no code.
 
+**Companion: the workflow-fit audit.** This audit checks the *code*. Between milestones
+also re-fit the *machinery* to the project — a workflow-fit audit (first run
+`audits/workflow-2026-09-14.md`): diagnose drift, redundancy, and what no longer fits a
+solo browser-only app, same diagnose-don't-treat discipline, findings → Emilio's call.
+The workflow should stay agile as the project grows, not ossify.
+
 ## The one rule: diagnose, don't treat
 
 The audit **finds and records; it never fixes.** Not a rename, not a one-line tidy,

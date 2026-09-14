@@ -4,6 +4,11 @@ Append-only, newest at the bottom. One entry per decision that a user could noti
 that constrains future work. Supersede rather than edit — a later entry can overturn an
 earlier one, but the earlier one stays.
 
+**The "Current rules digest" below is the read path** — start there for what's live; the
+entries are the archive. Append-only means this grows unbounded: if it becomes unwieldy
+(~1000+ lines), superseded entries may be split to a `DECISIONS-archive.md` (digest stays
+the entry point) — a move, never a rewrite.
+
 Format:
 
 ```

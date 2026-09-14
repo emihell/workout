@@ -170,7 +170,9 @@ session, e.g. `workout-codebase-a4`), it builds and reports back, you verify and
   merge/push.
 - **Unsettled design/feel → Emilio + code CC live.** Code CC reports to *Emilio*; they
   iterate on screen; fold the result in when it lands. Ephemeral batches free code CC for
-  this to run in parallel.
+  this to run in parallel. **It closes like any other req:** once the design settles, you
+  write the result up as a req doc (+ any `DEC-` for what was decided), then run the normal
+  gate + `closeout` — the live iteration is the build, not a bypass of the record.
 - **Functional single reqs → the planning-driven loop below**, Emilio at the gates.
 
 **Precondition — only READY, tagged reqs enter the loop.** A req is pingable only when it is
@@ -205,6 +207,11 @@ Two guards before an autonomous merge (DEC-035): a real migration / bulk rewrite
 → **Emilio's eyes** (CLAUDE.md ask-gate #2 fires regardless); anything touching store / model /
 storage / migration or wide blast radius → an **independent reviewer subagent you (not code CC)
 spawn**, reading the committed diff cold — skip it for trivial reqs.
+
+**Back up before you touch his data (unconfirmed, pending Emilio's ratification).** The store has no
+undo and no automatic backup. Before merging any persisted-data / migration req, remind Emilio to
+**export a fresh backup first** (Settings → Export); and periodically remind him to keep one. This is
+a conservative default — confirm with Emilio and record it as a `DEC-` if he wants it standing.
 
 **Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
 - **Single** — one req: test all reachable → merge if green → complete → stop.

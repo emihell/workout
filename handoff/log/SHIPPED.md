@@ -972,3 +972,16 @@ done: CLAUDE.md now says to size the report to the req — trivial/mechanical ch
 (both Technical+Workflow sections kept, but a line or two each; never pad, never drop a real deviation).
 Verified: `check_handoff`'s "sections" check targets BACKLOG's index not report structure (safe); check
 green via publish. Planning-owned, published to `main`.
+
+## req-73 — Fill the workflow gaps the audit found  (published 2026-09-14)
+
+Audit §4: filled 4 of 5 gaps (the 5th, `reference/migration.md`, deferred to req-75 — it must be derived
+carefully from `storage.js`). (1) **Backup discipline** (marked *unconfirmed* — Emilio's policy call): the
+store has no undo/backup, so PLANNING.md now says remind Emilio to export a fresh backup before merging any
+persisted-data/migration req, plus periodically; ratify → DEC- later. (2) **Live-lane "done"**: DEC-037's
+Emilio+CC-live lane now states it closes like any other req — Planner writes the settled result up as a req
+doc (+ DEC) and runs the normal gate + closeout. (3) **Workflow-refit cadence**: AUDIT.md names a companion
+workflow-fit audit between milestones (the machinery should stay agile, not ossify). (4) **Log entry-path**:
+DECISIONS.md header names the digest as the read path + an archive-split option (~1000+ lines, superseded
+first) — a move never a rewrite, append-only preserved. No new DEC (backup rule stays unconfirmed guidance).
+`check` green via publish. Planning-owned, published to `main`.
