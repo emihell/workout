@@ -4,12 +4,8 @@ Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–7
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
-## ✅ Blocking batch CLEARED (2026-09-13 workflow review → shipped 2026-09-14)
-
-Serial batch, each closed before the next (DEC-035 batch mode). All merged:
-req-65 (CLAUDE.md merge model → DEC-035) · req-66 (pre-push `--no-ff` guard; approach A,
-DEC-045) · req-67 (DECISIONS.md digest + superseded markers) · req-68 (Planner/Builder names
-+ tags, now live) · req-69 (follow-ups: WORKFLOW.md stale gate + `plan doctor` false hooks-FIX).
+**Cleared 2026-09-14 (serial batch, DEC-035):** req-65–69 — CLAUDE.md merge model, pre-push
+`--no-ff` guard (DEC-045), DECISIONS digest, Planner/Builder tags, `plan doctor` fix. Detail in SHIPPED.
 
 ## Workflow audit follow-up (Emilio: "deal with workflow/planning first", 2026-09-14)
 
