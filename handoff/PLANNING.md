@@ -41,11 +41,13 @@ Emilio writes the code — in Claude Code, not here.
   ./plan status                where things stand (read-only)
   ```
 
-  **The merge is yours, after Emilio's use-it OK (DEC-006).** `./plan closeout req-N`
-  merges a built branch into `main` and is now yours to run — but only once Emilio
-  has used that branch in a real browser and given the go for it. Never merge on
-  green tests alone; never merge a branch he hasn't OK'd. The use-it gate is his;
-  the mechanical closeout is yours.
+  **The merge is yours, on your own testing (DEC-035).** `./plan closeout req-N`
+  merges a built branch into `main` and is yours to run — you test everything you can
+  reach by your own hand and merge on that, ux-feel and persisted-data included. Only
+  two gates go to a human/reviewer before merge: a real migration or bulk rewrite of
+  stored records → Emilio's eyes first, and a shared-code change → an independent
+  reviewer subagent. Genuinely-untestable feel (real-device gym) he feels *after* and
+  flags — it does not block. See DEC-035 for the full model.
 
   **`plan publish` is yours too (DEC-008).** Doc-only changes to `main` — a `NOW.md`
   pointer, a new/updated req, a `DEC-`/`L-` — you publish yourself so code CC always
@@ -255,11 +257,10 @@ fresh `claude` session per req (which changes the messaging address each time). 
 `/clear`. So at each close tell Emilio: *"req-NN closed — `/clear` code CC, then say build the
 next."* Don't re-investigate automating it.
 
-**Default is `/clear` between every req. A batch is the exception and needs Emilio's OK first.**
-For a run of smaller reqs he may choose to build several back-to-back *without* a clear between
-them — but only when he has explicitly approved that batch in advance. Absent that OK, always
-prompt for the clear at each close. Never skip it on your own initiative, and never assume a
-prior batch approval carries to the next one.
+**Absent a batch, `/clear` between every req.** In single mode, prompt Emilio to `/clear` code CC
+at each close. A batch skips the clears — its fresh-agent-per-req construction (DEC-037) gives the
+clean context a `/clear` would — and **choosing batch is itself the approval** (DEC-035); do not
+ask for a separate per-batch OK, and do not assume one batch's approval carries to the next run.
 
 **Pre-spec a known work-list; don't spec one-at-a-time reactively.** When the reqs are already
 known (an audit's findings, a batch of small fixes), write and publish several `READY` req docs
@@ -316,8 +317,9 @@ prompt (the two-agent loop). A ping **must be self-contained** (see the CC-knows
 and **name its branch** — the code worktree may not be on the requirement's branch when a
 test is due.
 
-**The only things you hand Emilio now:** the `/clear` reminder at each close, a use-it
-gate for UX/persisted-data reqs, a genuine decision, or a command your own grant blocks.
+**The only things you hand Emilio now:** the `/clear` reminder at each close, the migration
+carve-out (a real migration or bulk rewrite → his eyes before merge, DEC-035), a genuine
+decision, or a command your own grant blocks.
 Fenced blocks are for those and for code; comparisons and tables go in prose, never in a
 fence used to align columns.
 
@@ -356,13 +358,13 @@ and *what now*; the file says *why*.
 1. the answer                     1-3 sentences
 2. detail, only if it changes     optional
    his decision
-3. what's next, if anything       a `/clear` reminder, a use-it gate, or a
-                                  decision he owns — else nothing
+3. what's next, if anything       a `/clear` reminder, the migration carve-out,
+                                  or a decision he owns — else nothing
 ```
 
 You run the git and drive the loop yourself, so most turns end with a one-line note of
 what you saved/published/merged — not a command block. Emilio has to act only for a
-`/clear`, a use-it gate (UX/persisted-data), or a decision. The test before sending:
+`/clear`, the migration carve-out, or a decision. The test before sending:
 **does this sentence change what Emilio does next?** If no, it belongs in a file.
 
 ## Reports come back in `reports/`, not in `handoff/`
@@ -435,8 +437,9 @@ Split a CC report by kind:
   the report says? These get the second set of eyes, because they are exactly what
   CC has been wrong about. Judgment is **reading the diff and the real data
   yourself**, never re-executing.
-- **Feel / UX** — Emilio's "use it" gate before merge. Not automatable, not the
-  planning session's to close.
+- **Feel / UX** — genuinely-untestable real-device feel (gym, one-handed). You test all
+  you *can* reach and merge on that (DEC-035); Emilio feels the rest *after* and flags
+  regressions — it does not block the merge.
 
 The test before re-running anything CC reported: *would running it give an answer
 different from what CC already showed?* If no, read the report.

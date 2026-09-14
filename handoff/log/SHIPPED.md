@@ -928,3 +928,19 @@ cwd). Now `plan doctor` exits 0 (`ok hooks`). **Left as an optional future Build
 DEC-005 isolation):** hardening doctor to accept an absolute path that resolves to the worktree's
 `.githooks`, so config drift can't false-fail again. Verified: WORKFLOW.md stale phrasing gone; no other
 guide asserts the old gate; doctor exit 0; hooksPath `.githooks`. Planning-owned, published to `main`.
+
+## req-70 — Reconcile the remaining merge-gate drift to DEC-035  (published 2026-09-14)
+
+First follow-up from the workflow-machinery audit (`audits/workflow-2026-09-14.md`). req-65/69 fixed the
+pre-DEC-035 merge-gate language in CLAUDE.md + WORKFLOW.md-Branching, but the audit found 9 stale spots +
+2 self-contradictions still teaching the DEC-009 "Emilio uses it before merge" gate, concentrated in the
+3 docs the reconciliation pass missed — worst being `PLANNING.md:44` ("Never merge on green tests alone",
+the direct opposite of DEC-035 and of how Planner just operated). Fixed each to DEC-035 (planning tests
+what it can reach + merges on that, ux-feel + persisted-data included; the two carve-outs — migration/
+bulk-rewrite → Emilio, shared-code → independent reviewer — are the only pre-merge gates; untestable feel
+is felt after, non-blocking): PLANNING.md (merge-is-yours block, the stale batch paragraph contradicting
+its own DEC-035 batch rule, the 3 "use-it gate for UX/persisted-data" residues, the Feel/UX line),
+WORKFLOW.md (Reviewing checklist item 5, which also contradicted its own Branching section), CLOSEOUT.md
+(the DEC-009 per-kind preamble → DEC-035). Marked the BACKLOG per-branch-preview-deploy item superseded-
+in-part by DEC-041. Correctness in place; single-homing is req-71. Verified: stale-gate grep clean across
+all three docs; `./check`/check_handoff green via publish. Planning-owned, published to `main`.

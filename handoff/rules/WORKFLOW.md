@@ -156,8 +156,11 @@ printed.
 3. Confirm no test was weakened or deleted to go green — a test edit must be
    justified in the diff.
 4. Check the failure-case criterion actually fails when it should.
-5. **Emilio uses it.** The human "use it" gate is the merge gate — not automatable,
-   and it does not close until he has.
+5. **Merge on your own testing (DEC-035).** A green suite you ran yourself is the
+   gate — ux-feel and persisted-data included. The only human/reviewer gates before
+   merge are the two carve-outs: a real migration/bulk-rewrite → Emilio's eyes, a
+   shared-code change → an independent reviewer. Genuinely-untestable feel he judges
+   *after*; it does not block.
 
 Then, and only then, close out (`rules/CLOSEOUT.md`).
 

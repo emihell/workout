@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–69** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–70** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -11,9 +11,17 @@ req-65 (CLAUDE.md merge model → DEC-035) · req-66 (pre-push `--no-ff` guard; 
 DEC-045) · req-67 (DECISIONS.md digest + superseded markers) · req-68 (Planner/Builder names
 + tags, now live) · req-69 (follow-ups: WORKFLOW.md stale gate + `plan doctor` false hooks-FIX).
 
-**Open decision for Emilio (not a req — a direction):** the process weight. ~2,600 lines of
-workflow machinery for a solo browser-only app, and this session shipped zero product (all meta).
-Worth deciding whether to prune/consolidate the process, or accept it. Not spec'd — your call.
+## Workflow audit follow-up (Emilio: "deal with workflow/planning first", 2026-09-14)
+
+Audited on facts (`audits/workflow-2026-09-14.md`): verdict = **drift + volume, not cruft**;
+machinery mostly fits. Emilio said "do it" — being worked as a serial batch:
+- ✅ `req-70` **Reconcile merge-gate drift** — SHIPPED. 9 stale spots + 2 self-contradictions → DEC-035.
+- `req-71` **Consolidate to one-home-per-rule** — NEXT. ~15 multi-homed rules → single home +
+  cross-refs; est. −250–350 restatement lines. Shared-doc blast radius → independent reviewer pre-merge.
+- `req-72` **Fit adaptations** — trim reviewer *doctrine* (keep tool), slim readiness taxonomy, lighten
+  per-req paperwork. Some judgment calls for Emilio.
+- `req-73` **Gaps** — backup-discipline standing rule (open policy Q for Emilio), log-pruning cadence,
+  periodic workflow-refit step, `reference/migration.md`.
 
 ## Milestone (Emilio, 2026-09-07)
 

@@ -171,7 +171,9 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
-- **Per-branch preview deploy (a branch → its own HTTPS URL).** Twice in the 2026-09-12 audit run
+- **Per-branch preview deploy (a branch → its own HTTPS URL).** *(Superseded in part by DEC-041:
+  the cloud preview was replaced by Tailscale `vite preview` for Emilio's own testing; only the
+  planning-can't-browser-verify motivation below partly survives.)* Twice in the 2026-09-12 audit run
   (req-41 cross-tab, req-44 gym-flow walk) the planning session couldn't browser-verify a UI req
   itself — serving the branch means running the code worktree, which crosses the planning/code
   boundary (DEC-005) — so the browser check fell to Emilio. **L-003 already floated this** for

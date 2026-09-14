@@ -1,11 +1,12 @@
 # Closing out a requirement
 
 The ONE process for merging a built branch and recording it. Identical every time.
-The **planning session runs closeout**, after the merge gate (DEC-009): it closes
-**functional** reqs itself once it has browser-verified them; **UX-feel** and
-**persisted-data** reqs wait for Emilio's use-it OK first, then the planning session
-runs closeout. The planning session records the req and runs the command. No freehand
-variants.
+The **planning session runs closeout**, on its own testing (**DEC-035**): it tests
+everything it can reach by its own hand and merges on that — ux-feel and persisted-data
+included. The only gates before merge are the two carve-outs: a real migration or bulk
+rewrite of stored records → Emilio's eyes first; a shared-code change → an independent
+reviewer subagent. The planning session records the req and runs the command. No
+freehand variants.
 
 This whole sequence is one command — `./plan closeout req-N`. The manual block below
 is the fallback if `closeout` can't run.
