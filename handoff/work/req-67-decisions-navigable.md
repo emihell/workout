@@ -1,7 +1,7 @@
 # req-67 — Make DECISIONS.md a reference, not just an archive
 
-**Status: READY.** **BLOCKING** (workflow-review finding #4, 2026-09-13) — lower urgency than
-req-65/66 (hygiene, not a live trap); do it in the same blocking batch.
+**Status: SHIPPED 2026-09-14** — planning-owned, published to `main` (no code branch).
+Was BLOCKING (workflow-review finding #4, 2026-09-13) — hygiene; done in the blocking batch.
 
 **Gate: infra/docs.** Builder: **planning** — edits `handoff/log/DECISIONS.md` (planning's).
 No code-session dispatch. Merges on planning's own read.

@@ -12,8 +12,7 @@ Being worked as a serial batch (2026-09-14): each closed before the next, per DE
 - ✅ `req-65` **Reconcile CLAUDE.md's merge model with DEC-035** — SHIPPED 2026-09-14.
 - `req-66` **Enforce/tolerate --no-ff merges to main** — the closeout status machinery assumes
   `--no-ff`; the FF slip this session broke it. Guard it or make closeout tolerate FF. **[code]**
-- `req-67` **Make DECISIONS.md navigable** — mark superseded DECs + a current-rules digest (46
-  entries, 14 supersessions). Lower urgency, same batch. **[planning]**
+- ✅ `req-67` **Make DECISIONS.md navigable** — SHIPPED 2026-09-14 (digest + 6 superseded markers).
 - `req-68` **Name the two sessions Planner/Builder + [PLANNER]/[BUILDER] tags** — added by
   Emilio 2026-09-14; the two sessions got confused once. **[planning]**
 

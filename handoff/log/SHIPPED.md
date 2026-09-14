@@ -866,3 +866,19 @@ independent reviewer). References DEC-035 by name. Verified: `grep "used it\|not
 first" handoff/CLAUDE.md` → empty; DEC-035 now cited 3×. **Noted, not fixed (out of scope):** the same
 stale claim survives at `rules/WORKFLOW.md:217` — follow-up req recommended. Planning-owned, published to
 `main` (no code branch).
+
+## req-67 — Make DECISIONS.md navigable (superseded markers + digest)  (published 2026-09-14)
+
+Workflow-review finding #4: 46 DEC entries, 14 supersession mentions, no way to find the *current*
+rule without reading all and applying the supersession chain by hand. Added a **"Current rules digest"**
+at the top (12 bullets, each live operational rule → its current DEC: merge gate DEC-035, build lanes
+DEC-037/009, isolation DEC-005/008/026, persisted-data DEC-032, history-is-truth DEC-002/022/030, one
+in-progress DEC-038, nav vocab DEC-042/040/039, nav structure DEC-036, platform DEC-010, phone-test
+DEC-041, styling DEC-017/020, boot DEC-044). Marked the 6 DEC entries a later DEC supersedes with a
+non-destructive `> SUPERSEDED` blockquote at their top: DEC-006 (gate→DEC-035, publish→DEC-008, partial),
+DEC-009 (gate→DEC-035, loop→DEC-037, partial), DEC-018 (→019/024/036), DEC-019 (→024/036), DEC-024
+(→036), DEC-043 (→044). DEC-005 left as-is (already carries an accurate inline "partly superseded by
+DEC-006/008/026" note; still the live isolation rule). Verified: `git diff --numstat` = 48 added / 0
+deleted (append-only preserved), 6 markers, digest present. Supersession mentions that target a non-DEC
+(a req, a backlog item, a PLANNING.md rule, a feature) were left unmarked, correctly. Planning-owned,
+published to `main` (no code branch).

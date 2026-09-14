@@ -15,6 +15,38 @@ what was rejected. Cross-ref the req if there is one.
 
 ---
 
+## Current rules digest
+
+The live operational rules, each pointing at its current DEC. The entries below are the
+append-only **archive**; this digest is where to find what is *currently* true. Any entry a
+later DEC replaced carries a `> SUPERSEDED` marker at its top.
+
+- **Merge gate** — planning tests everything it can reach by its own hand and merges on that,
+  incl. ux-feel + persisted-data; the only carve-outs are a real migration/bulk-rewrite (Emilio's
+  eyes) and shared-code (independent reviewer subagent). → **DEC-035**
+- **Build lanes** — settled/mechanical → ephemeral build agents in a batch; unsettled design/feel →
+  Emilio + code CC live; functional-coordination → the planning-driven code-CC loop. No `/clear`.
+  → **DEC-037** (refines **DEC-009**)
+- **Isolation boundary** — planning never touches code, code never touches planning; planning owns
+  planning-worktree git, `closeout`, and `publish`; push scoped to two forms. → **DEC-005**, **DEC-008**, **DEC-026**
+- **Persisted-data safety** — never overwrite an unreadable `workout-mvp-v8` key; announce a migration
+  + record count and add a survives-upgrade test. → **DEC-032** + CLAUDE.md ask-gate
+- **History is the source of truth** — the app never invents data: carry entered kg+reps for a
+  no-history exercise, never invent warmup reps, hold a recommendation with no valid increment.
+  → **DEC-002**, **DEC-022**, **DEC-030**
+- **One in-progress workout** — starting a new one abandons the old; it replaces today's Start hero.
+  → **DEC-038**
+- **Nav vocabulary** — navigation wears link treatment + §4 verbs, actions wear Button; navigate-only
+  controls are links even when button-styled; Back = logical parent. → **DEC-042**, **DEC-040**, **DEC-039**
+- **Nav structure** — floating bottom menu (Workout oval + icon-only circles). → **DEC-036**
+- **Platform** — mobile is primary; the live workout is mobile-only. → **DEC-010**
+- **Phone-test gate** — local `vite preview` over Tailscale, not a cloud preview deploy. → **DEC-041**
+- **Styling foundation** — minimal, colorless, Apple-inspired component library + a fixed named type
+  scale. → **DEC-017**, **DEC-020**
+- **Session boot** — planning reads `handoff/PLANNING.md` directly; no START-HERE. → **DEC-044**
+
+---
+
 ## DEC-001 — a failed save shows a persistent banner  (2026-09-07)
 
 When `saveState` can't write to `localStorage` (quota exceeded, Safari private mode), the
@@ -89,6 +121,10 @@ verbs `save/status/publish/closeout`). The deny on editing the settings files st
 
 ## DEC-006 — the planning session runs the merge (`plan closeout`) after Emilio's use-it OK  (2026-09-08)
 
+> **SUPERSEDED in part** — the human-use merge gate here is replaced by **DEC-035** (planning
+> merges on its own testing); the standalone-`publish` handover clause by **DEC-008**. That
+> planning *runs* the mechanical closeout stays live.
+
 Emilio: *"you can from now on merge."* DEC-005 kept `plan closeout` (merging a built feature
 branch to `main`) as Emilio's, because it touches the code worktree. That is now the planning
 session's to run — **but the human-use merge gate is unchanged**: Emilio still uses the branch
@@ -143,6 +179,9 @@ the next `NOW.md`/req state, and Emilio's trigger to code CC collapses to "build
 human-use merge gate (DEC-006) is unchanged; this is only about getting docs to `main`.
 
 ## DEC-009 — the two-agent build loop, and the merge gate by req kind  (2026-09-09)
+
+> **SUPERSEDED in part** — the merge-gate-by-kind is replaced by **DEC-035**; the two-agent loop
+> is refined/extended by **DEC-037** (lanes). The diff + failure-test review discipline stays live.
 
 The build loop is now: planning session pings code CC (`SendMessage`) to build the next req →
 code CC builds on a branch and reports back → planning reviews the diff + tests, loops it back to
@@ -333,6 +372,9 @@ inspiration from Apple apps"):
 
 ## DEC-018 — primary mobile nav is Today + Schedule; the rest go in a menu  (Emilio, 2026-09-10)
 
+> **SUPERSEDED by DEC-019** (everything in the menu), then **DEC-024** (3-tab bar) and **DEC-036**
+> (floating bottom menu). Dead.
+
 Six flat nav items is too many for mobile. **Primary / always-visible: Today** (now) **+ Schedule**
 (this week) — the daily-use pairing. **Behind a simple menu** (a "Menu"/"More" affordance):
 **Routines, Exercises, History, Settings**. History is review-not-daily, so it moves into the menu
@@ -341,6 +383,8 @@ Routines/Exercises as a "Plan" area) is refinable later, and analytics (req-08) 
 items actually get used. Shapes req-13's `NavBar`.
 
 ## DEC-019 — nav: everything goes in the menu; menu closes on item-click or outside-click  (Emilio, 2026-09-10) — supersedes DEC-018's primary items
+
+> **SUPERSEDED by DEC-024** (3-tab bottom bar), later **DEC-036** (floating bottom menu). Dead.
 
 Two visible items (Today + Schedule) + a Menu felt unbalanced. Revised: the **NavBar is just a Menu
 trigger**; **all** nav items (Today, Schedule, Routines, Exercises, History, Settings) live inside
@@ -440,6 +484,8 @@ tunable defaults (880→1175Hz two-tone ~270ms, vibrate `[120,60,120]`) — Emil
 the branch. Merged `e2aa905` (branch `req-31`, `dca29c3`); `./check` green, 16 cue tests.
 
 ## DEC-024 — new nav: a 3-tab bottom bar (Workouts / Library / Settings)  (Emilio, 2026-09-12)
+
+> **SUPERSEDED by DEC-036** — the bottom menu redesign replaced this 3-text-tab `TabBar`.
 
 req-13's top-left **Menu** dropdown of six flat items (Today/Schedule/Routines/Exercises/History/
 Settings) was a functional stopgap Emilio disliked ("not a fan of the menu"). Decided the
@@ -831,6 +877,8 @@ commits, and made 100% redundant by req-49 (Back now goes to that same list); (3
 "Already added" status-link. Presentation/label only; no route or data change.
 
 ## DEC-043 — Root workflow docs stay the code session's; START-HERE is cold-start-only, workflow single-sourced in handoff/
+
+> **SUPERSEDED by DEC-044** — START-HERE.md was removed entirely; boot prompts moved to README.
 
 Decided 2026-09-13 (Emilio). Trigger: a "Cowork → Claude Code" terminology fix for
 `README.md` + `START-HERE.md`. Planning first handed it back as "the code session's",
