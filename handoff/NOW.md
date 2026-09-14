@@ -1,8 +1,23 @@
 # Now
 
-Updated 2026-09-13. **Shipped: req-01–09, req-11–23, req-25–31, req-33–64** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–64** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
+
+## ⛔ BLOCKING — do these first (Emilio, 2026-09-13 workflow review)
+
+**MUST before any other work.** All READY. req-65/67 are planning's own (handoff/ edits, quick);
+req-66 dispatches to the code session. Publish + build these before resuming product/other reqs.
+- `req-65` **Reconcile CLAUDE.md's merge model with DEC-035** — the builder's guide still asserts
+  a human use-gate blocks every merge; DEC-035 made planning the merger. Live trap. **[planning]**
+- `req-66` **Enforce/tolerate --no-ff merges to main** — the closeout status machinery assumes
+  `--no-ff`; the FF slip this session broke it. Guard it or make closeout tolerate FF. **[code]**
+- `req-67` **Make DECISIONS.md navigable** — mark superseded DECs + a current-rules digest (46
+  entries, 14 supersessions). Lower urgency, same batch. **[planning]**
+
+**Open decision for Emilio (not a req — a direction):** the process weight. ~2,600 lines of
+workflow machinery for a solo browser-only app, and this session shipped zero product (all meta).
+Worth deciding whether to prune/consolidate the process, or accept it. Not spec'd — your call.
 
 ## Milestone (Emilio, 2026-09-07)
 
