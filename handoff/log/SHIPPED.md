@@ -944,3 +944,18 @@ WORKFLOW.md (Reviewing checklist item 5, which also contradicted its own Branchi
 (the DEC-009 per-kind preamble → DEC-035). Marked the BACKLOG per-branch-preview-deploy item superseded-
 in-part by DEC-041. Correctness in place; single-homing is req-71. Verified: stale-gate grep clean across
 all three docs; `./check`/check_handoff green via publish. Planning-owned, published to `main`.
+
+## req-71 — Consolidate the workflow docs to one-home-per-rule  (published 2026-09-14)
+
+Workflow-audit follow-up #2: ~15 operational rules were stated in full in 2–5 docs, so a change to one
+rotted the copies (the merge-gate drift, req-65/69/70, proved it). Single-homed each rule + replaced the
+restatements with cross-refs, keeping CLAUDE.md self-contained (Builder loads it every turn → one-liner +
+pointer, never gutted). Homes: merge-gate + two carve-outs → DEC-035 (the real anti-drift win — it can't
+rot again); migration ask-gate → CLAUDE.md; /clear finding → DEC-037; loop diagram → WORKFLOW.md;
+isolation → DEC-005. PLANNING.md's two *internal* duplicates (git-command list, re-check-CC-by-kind)
+collapsed to one each (most of its −41). Net −51 lines (PLANNING −41, CLAUDE −2, WORKFLOW −4, CLOSEOUT
+−4); DECISIONS.md archive trim deferred by design. Built by a consolidation agent, gated by an
+**independent reviewer (PASS)** per DEC-035 shared-doc blast radius — it traced every deleted fact to a
+surviving home, confirmed no new contradiction and CLAUDE.md still stands alone; found one dropped nuance
+(the /clear→fresh-session SendMessage-address rationale) which was restored in PLANNING.md. Emilio eyed
+the before/after before publish. No rule's meaning changed. Planning-owned, published to `main`.

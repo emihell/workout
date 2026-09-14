@@ -30,35 +30,16 @@ Emilio writes the code — in Claude Code, not here.
   on branch `planning`. Never edit `handoff/` in the code worktree — that's Claude
   Code's checkout. `rules/WORKFLOW.md` explains why.
 - **You own the planning worktree's git (DEC-005). The worktrees stay isolated:
-  planning never touches code, code never touches planning.** Yours to run:
-  `commit`, `./plan save`, and `git push origin planning` — all planning-branch
-  only. Git writes work from the planning worktree (proven 2026-09-08); use
-  `--no-optional-locks` for read-only queries.
-
-  ```
-  ./plan save "message"        commit handoff/ to the planning branch (planning tree only)
-  git push origin planning     publish the planning branch to the remote
-  ./plan status                where things stand (read-only)
-  ```
-
-  **The merge is yours, on your own testing (DEC-035).** `./plan closeout req-N`
-  merges a built branch into `main` and is yours to run — you test everything you can
-  reach by your own hand and merge on that, ux-feel and persisted-data included. Only
-  two gates go to a human/reviewer before merge: a real migration or bulk rewrite of
-  stored records → Emilio's eyes first, and a shared-code change → an independent
-  reviewer subagent. Genuinely-untestable feel (real-device gym) he feels *after* and
-  flags — it does not block. See DEC-035 for the full model.
-
-  **`plan publish` is yours too (DEC-008).** Doc-only changes to `main` — a `NOW.md`
-  pointer, a new/updated req, a `DEC-`/`L-` — you publish yourself so code CC always
-  reads a current `handoff/`. Same gate as closeout (code worktree on `main` first;
-  `plan publish` also refuses a dirty code tree). `plan publish` does not push, so
-  follow it with `git push origin main planning`. This is the deliberate relaxation
-  of DEC-005's isolation line: publish and closeout both move `main` in the code
-  worktree, on purpose. **Keep handoff current between builds** — after each closeout,
-  publish the next `NOW.md`/req state so "build req-NN" is all Emilio has to say.
-
-  **Read-only looking at the code worktree is fine** — `git -C <code>
+  planning never touches code, code never touches planning.** Yours to run — all
+  planning-branch only: `commit`, `./plan save`, `git push origin planning`. Git
+  writes work from the planning worktree (proven 2026-09-08); use `--no-optional-locks`
+  for read-only queries.
+- **`plan publish` (DEC-008) and `plan closeout` (DEC-035) are yours too** — the
+  deliberate relaxation of DEC-005's isolation line: both move `main` in the code
+  worktree, on purpose. The full command reference is "You run the git yourself" below;
+  the merge model is DEC-035; **keep `handoff/` current between builds** — after each
+  closeout publish the next `NOW.md`/req state so "build req-NN" is all Emilio has to say.
+- **Read-only looking at the code worktree is fine** — `git -C <code>
   --no-optional-locks log main..<branch>` to confirm a build landed is reading, not
   touching. You drive the code-worktree CC by **pinging it directly** (`SendMessage`)
   in the two-agent build loop (see the loop section and `DEC-009`) — not by handing
@@ -66,16 +47,12 @@ Emilio writes the code — in Claude Code, not here.
 
 ## The loop
 
-```
-talk  →  references  →  idea  →  bare-bones test  →  rescan the code
-      →  write requirement  →  Claude Code builds  →  verify independently
-      →  findings to log/  →  back to talk
-```
-
-Full version in `rules/WORKFLOW.md`. This is the planning-craft micro-loop; the
-cross-session plan → build → close stages are the two-agent build loop below (and `DEC-009`).
-The two steps that get skipped are testing the riskiest assumption *before*
-speccing, and rescanning the code immediately before writing.
+The planning-craft micro-loop (`talk → references → idea → bare-bones test → rescan →
+write requirement → CC builds → verify → findings to log/ → back to talk`) lives in
+full at `rules/WORKFLOW.md §The loop`, including the two steps that get skipped —
+testing the riskiest assumption *before* speccing, and rescanning the code immediately
+before writing. Distinct from it: the cross-session plan → build → close stages are the
+two-agent build loop below (and `DEC-009`).
 
 ## How to work
 
@@ -84,11 +61,10 @@ schema shape, or "that isn't possible" is a claim to be tested. In a browser-onl
 app the cheap test is a unit test, a console line against the real model, or
 reading the actual `src/` — not reasoning harder.
 
-**Check Claude Code's reports rather than relaying them.** It is careful and
-mostly right, and it can still report a helper as "removed" that never existed, or
-ship a guard that fails open. Re-run its acceptance criteria where running gives a
-different answer than reading; read the diff and the real data where judgement is
-what's in question. (Split by kind — see the last section.)
+**Check Claude Code's reports rather than relaying them.** It is careful and mostly
+right, and can still report a helper as "removed" that never existed or ship a guard
+that fails open. Split the report by kind and check each accordingly — see "Re-check
+CC's judgment, read CC's mechanics" below.
 
 **Ask what happens when it fails.** A green happy path is the weakest evidence
 available. Every requirement needs at least one failure-case criterion — see
@@ -106,13 +82,12 @@ so.
 append-only, newest at the bottom. Append with a command that writes to the end,
 not a hand-anchored edit.
 
-**No auto-memory (Emilio, 2026-09-12).** Never write to Claude Code's file-based
-memory. Everything durable lives in `handoff/` — a `DEC-`, an `L-`, a req, or
-`NOW.md`. An out-of-repo note is exactly the drift this workflow forbids: a fact
-held in both places is worse than in neither, and only the repo copy is reviewed
-and travels between machines. If the harness surfaces a memory/recall tool, ignore
-it; surface the fact for `handoff/` instead. (A hard disable at the harness level
-may also be set — this rule holds regardless.)
+**No auto-memory (Emilio, 2026-09-12).** Never write anything durable to file-based
+memory — everything durable lives in `handoff/` (a `DEC-`, `L-`, req, or `NOW.md`). If
+the harness surfaces a memory/recall tool, ignore it and surface the fact for `handoff/`
+instead; a hard harness disable may also be set — the rule holds regardless. The reasoning
+(a fact held in both places is worse than in neither; only the repo copy is reviewed and
+travels between machines) is CLAUDE.md §"Memory is for you, not for the project" — see it.
 
 **Keep `NOW.md` under 50 lines.** It's loaded every session. When it grows, move
 detail out to `SHIPPED.md` or `work/`.
@@ -213,35 +188,23 @@ The full cycle:
 4. review           read the diff + the failure-case test yourself — "done" is a signal, not proof
 5. loop back        gaps → SendMessage CC to fix (still its branch); not a new decision, just the spec
 6. verify           run the gate; browser-test where behaviour only shows in the running app
-7. merge gate       by kind (below)
+7. merge gate       your own testing (DEC-035, below)
 8. closeout         plan closeout req-NN  (yours, after the gate)
 9. maintain         immediately: prune NOW.md, write SHIPPED, publish — before anything else
 10. stop            do not auto-start the next; wait for Emilio's trigger
 ```
 
-**The merge gate (DEC-035, supersedes the old by-kind gate): you merge on your own testing.**
-Test **everything you can reach, by your own hand** — don't trust CC's pasted `./check`. Reachable:
-run `node --test` / `./check`; spin up a **throwaway git worktree of the branch** (`git worktree add`
-a temp dir, symlink the planning worktree's `node_modules`) to run the branch's tests without touching
-the code checkout (stays inside DEC-005 — the temp tree is yours); exercise the acceptance checks;
-browser-test where reachable. **All reachable green → merge and complete** — including persisted-data
-and ux-feel reqs (previously Emilio's hands). For persisted-data, "all you can" means *thoroughly* —
-migration round-trips, anti-clobber/corruption tests, the receipts. Only what you genuinely **cannot**
-test (real-device gym feel, a two-tab browser check with no preview deploy) is left for Emilio to feel
-after, and it does **not** block. 'Done' from CC is still a signal — you *run* the tests, never trust
-the receipt.
-
-**Two guards on the autonomy (DEC-035):** (1) **Carve-out** — an actual migration / bulk rewrite of
-*existing stored records* (a schema-version bump, a mass edit of saved history) still gets **Emilio's
-eyes** before merge; irreversible + no backup, and a green test proves the code, not that it covers his
-real data. CLAUDE.md ask-gate #2 fires on such a req regardless. Guards and go-forward changes are not
-this. (2) **Spawn an independent reviewer subagent** (fresh context, reviews a diff it didn't write)
-before autonomously merging anything touching **store / model / storage / migration** or with wide
-shared-code blast radius — and for your own tricky specs/DECs. On-demand, not a standing role; skip it
-for trivial reqs. It catches code-correctness, not "wrong on real data" (that's the carve-out).
-**You spawn it, not code CC** — it gates the merge (yours) and must be independent of the builder; a
-reviewer code CC spawns is the author grading itself. Reads the diff cold (`git diff main..reqN`,
-read-only). Code CC self-reviewing before it reports is a fine habit but is not the independent gate.
+**The merge gate — you merge on your own testing (DEC-035; see it for the full model, both
+carve-outs, and the throwaway-worktree method).** Operationally: test everything reachable by your
+own hand — `node --test` / `./check`, a **throwaway git worktree of the branch** (symlink the
+planning worktree's `node_modules`, stays inside DEC-005), the acceptance checks, browser where
+reachable — don't trust CC's pasted `./check`. All green → merge, persisted-data and ux-feel
+included (persisted-data *thoroughly* — migration round-trips, anti-clobber/corruption tests). Only
+the genuinely-untestable (real-device gym feel) is left for Emilio after, and it does not block.
+Two guards before an autonomous merge (DEC-035): a real migration / bulk rewrite of stored records
+→ **Emilio's eyes** (CLAUDE.md ask-gate #2 fires regardless); anything touching store / model /
+storage / migration or wide blast radius → an **independent reviewer subagent you (not code CC)
+spawn**, reading the committed diff cold — skip it for trivial reqs.
 
 **Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
 - **Single** — one req: test all reachable → merge if green → complete → stop.
@@ -249,18 +212,13 @@ read-only). Code CC self-reviewing before it reports is a fine habit but is not 
   done, no per-req pause. Choosing batch is the approval for continuous building AND for skipping
   `/clear` between the batch's reqs (supersedes the "batch needs a separate OK" step above).
 
-**`/clear` code CC between reqs — a manual step, confirmed unavoidable.** You can't force it: the
-claude-code-guide confirmed (2026-09-09) there is NO programmatic `/clear` — not via the model,
-hooks (shell only), settings, custom commands, or cross-session messages (a "/clear" message
-arrives as plain text, never executed). The only alternatives are Emilio typing `/clear`, or a
-fresh `claude` session per req (which changes the messaging address each time). We keep the manual
-`/clear`. So at each close tell Emilio: *"req-NN closed — `/clear` code CC, then say build the
-next."* Don't re-investigate automating it.
-
-**Absent a batch, `/clear` between every req.** In single mode, prompt Emilio to `/clear` code CC
-at each close. A batch skips the clears — its fresh-agent-per-req construction (DEC-037) gives the
-clean context a `/clear` would — and **choosing batch is itself the approval** (DEC-035); do not
-ask for a separate per-batch OK, and do not assume one batch's approval carries to the next run.
+**`/clear` code CC between reqs — a manual step (no programmatic `/clear` exists; the
+claude-code-guide finding is recorded in DEC-037).** In single mode, at each close tell
+Emilio: *"req-NN closed — `/clear` code CC, then say build the next."* Don't re-investigate
+automating it (the only alternative, a fresh `claude` session per req, changes its `SendMessage`
+address each time). A batch skips the clears — its fresh-agent-per-req construction (DEC-037) gives
+the clean context a `/clear` would — and **choosing batch is itself the approval** (DEC-035);
+don't ask a separate per-batch OK, and don't assume one batch's approval carries to the next run.
 
 **Pre-spec a known work-list; don't spec one-at-a-time reactively.** When the reqs are already
 known (an audit's findings, a batch of small fixes), write and publish several `READY` req docs
@@ -307,6 +265,7 @@ into a fenced block for Emilio:
 git push origin planning                                    # push the planning branch
 cd <code> && ./plan publish && git push origin main planning   # publish docs to main (after the gate)
 ../workout-codebase/plan closeout req-NN                # merge a built branch (after the merge gate)
+./plan status                                              # where things stand (read-only)
 ```
 
 Run each as a separate tool call, not one long `&&` chain across a paste boundary. Report

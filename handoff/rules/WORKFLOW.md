@@ -156,11 +156,9 @@ printed.
 3. Confirm no test was weakened or deleted to go green — a test edit must be
    justified in the diff.
 4. Check the failure-case criterion actually fails when it should.
-5. **Merge on your own testing (DEC-035).** A green suite you ran yourself is the
-   gate — ux-feel and persisted-data included. The only human/reviewer gates before
-   merge are the two carve-outs: a real migration/bulk-rewrite → Emilio's eyes, a
-   shared-code change → an independent reviewer. Genuinely-untestable feel he judges
-   *after*; it does not block.
+5. **Merge on your own testing (DEC-035)** — a green suite you ran yourself is the
+   gate. See DEC-035 for the model and its two carve-outs (real migration/bulk-rewrite
+   → Emilio's eyes; shared-code change → an independent reviewer).
 
 Then, and only then, close out (`rules/CLOSEOUT.md`).
 
@@ -168,14 +166,14 @@ Then, and only then, close out (`rules/CLOSEOUT.md`).
 
 The user's real state is their workout history in `localStorage` (`workout-mvp-v8`).
 There is no server copy and no undo. `src/db.json` is seed/provenance, not the live
-store.
+store; the existing **v5→v8 migration** is the pattern to preserve, not break — a test
+must prove an older v5–v7 key survives the upgrade.
 
-**Before any change to the schema version or any bulk rewrite of stored records:**
-state what will change and to how many records, and add a migration test that proves
-an older key (v5–v7) survives the upgrade — the existing v5→v8 path is the pattern
-to preserve, not break. A read, a single edit through the normal UI, or work against
-a throwaway/mocked store needs none of this. This is CC's ask-gate #2 in `CLAUDE.md`;
-it exists because a bad migration silently destroys data the user can't get back.
+The rule that governs any schema-version change or bulk rewrite of stored records —
+state what changes and to how many records, add the survives-upgrade test — is **CC's
+ask-gate #2 in `CLAUDE.md`; see it.** (A read, a single edit through the normal UI, or
+work against a throwaway/mocked store needs none of it.) It exists because a bad
+migration silently destroys data the user can't get back.
 
 ## Two worktrees
 
@@ -216,11 +214,9 @@ work/req-NN-name.md      the requirement
 git branch req-NN-name   the work
 ```
 
-Claude Code implements on the branch; the planning session tests everything it can reach
-by its own hand and merges on that (**DEC-035**) — including UX-feel and persisted-data
-reqs. The only human/reviewer gates are the two carve-outs: a real migration or bulk
-rewrite of stored records goes to Emilio first, and a shared-code change gets an
-independent reviewer before merge. Git is the ticket system.
+Claude Code implements on the branch; the planning session tests what it can reach by
+its own hand and merges on that (**DEC-035**, including its two carve-outs). Git is the
+ticket system.
 
 ## After each requirement lands
 
