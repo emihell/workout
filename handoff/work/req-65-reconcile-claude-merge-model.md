@@ -1,7 +1,7 @@
 # req-65 — Reconcile CLAUDE.md's merge model with DEC-035
 
-**Status: READY.** **BLOCKING** (workflow-review finding #1, 2026-09-13). Highest priority:
-a live trap for the build session.
+**Status: SHIPPED 2026-09-14** — planning-owned, published to `main` (no code branch).
+Was BLOCKING (workflow-review finding #1, 2026-09-13): a live trap for the build session.
 
 **Gate: infra/docs.** Builder: **planning** — this edits `handoff/CLAUDE.md` (the root
 `CLAUDE.md` is a symlink to it), which is planning's to write. No code-session dispatch.

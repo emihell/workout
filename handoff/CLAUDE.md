@@ -107,8 +107,11 @@ the usual path now) or by Emilio directly. Either way: implement on a branch nam
 after the requirement, run `./check`, write `reports/req-NN.md`, and **report back to
 whoever asked** (reply to the planning session's message if it pinged you). **Do not
 merge, and do not start the next requirement.** Review and merge are handled for you:
-the planning session reviews the diff and closes out, merging by req type — Emilio
-uses UX and persisted-data reqs himself first.
+the planning session tests everything it can reach by its own hand and merges on that
+(**DEC-035**) — including UX-feel and persisted-data reqs. Two carve-outs are the only
+human/reviewer gates: an actual migration or bulk rewrite of already-stored records
+gets Emilio's eyes first, and a change touching shared code (store / model / storage /
+migration, or wide blast radius) gets an independent reviewer before merge.
 
 `./plan` at the repository root is the **planning session's** tool.
 **Don't run `plan save`, `plan publish`, or `plan closeout`** — those are the planning
@@ -188,10 +191,9 @@ before doing it, and add a migration test that proves an older key survives the
 upgrade. A read, a single edit through the normal UI path, or work against a
 throwaway/mocked store needs no ask.
 
-## Nothing merges until Emilio has used it
+## You report it ready; you never merge it
 
-**A human using the app is a merge gate, not a formality.** Automated checks are
-worth writing; they do not close the gate. When a branch is done, do not report
+**The build session does not merge — ever.** When a branch is done, do not report
 that it is finished — report that it is **ready to look at**, in this shape:
 
 ```
@@ -202,11 +204,15 @@ that it is finished — report that it is **ready to look at**, in this shape:
    verify yourself         judgement about how it feels
 ```
 
-Tell him to open the app (say which branch). Keep the list short enough to work
-through in one sitting — if it needs fifteen items, the branch is too big.
+Tell whoever asked which branch, and keep the list short enough to work through in
+one sitting — if it needs fifteen items, the branch is too big. The planning session
+then tests everything it can reach by its own hand and merges on that (**DEC-035**);
+Emilio feels the untestable parts (real-device gym feel) after, and flags
+regressions — that does not block the merge.
 
-**Then wait.** Do not merge on your own initiative, ever, even when every test
-passes and every criterion is met.
+**Then hand off.** Do not merge on your own initiative, ever, even when every test
+passes and every criterion is met — merging is the planning session's, per DEC-035,
+with Emilio's eyes required only on the migration/bulk-rewrite carve-out above.
 
 ## Finishing
 

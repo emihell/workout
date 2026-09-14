@@ -851,3 +851,18 @@ only (no handoff/), built by the code session. Verified by planning: `git ls-fil
 empty, `grep -rn START-HERE README.md CLAUDE.md src/ .githooks/ plan` → none, `grep Cowork README.md`
 → none, CLAUDE.md unchanged; `./check` green (218 tests). Branch `req-64` (`451d61a` trim + `42c3adf`
 delete, 2 commits), merged `--no-ff` via `./plan closeout req-64`.
+
+## req-65 — Reconcile CLAUDE.md's merge model with DEC-035  (published 2026-09-14)
+
+Workflow-review finding #1: `handoff/CLAUDE.md` (auto-loaded into the build session every turn) still
+asserted the pre-DEC-035 merge model — "a human using the app is a merge gate… do not merge on your own
+initiative, ever" and "Emilio uses UX and persisted-data reqs himself first" — a live "fact in two
+places, follow the one you never read" trap. Rewrote the two passages ("How work arrives" + the former
+"Nothing merges until Emilio has used it" section, now "You report it ready; you never merge it") to the
+DEC-035 model: the build session reports built + unmerged and never merges (unchanged); planning tests
+everything it can reach by its own hand and merges on that, incl. ux-feel + persisted-data; the only
+human/reviewer gates are the two carve-outs (migration/bulk-rewrite → Emilio's eyes; shared-code →
+independent reviewer). References DEC-035 by name. Verified: `grep "used it\|not a formality\|himself
+first" handoff/CLAUDE.md` → empty; DEC-035 now cited 3×. **Noted, not fixed (out of scope):** the same
+stale claim survives at `rules/WORKFLOW.md:217` — follow-up req recommended. Planning-owned, published to
+`main` (no code branch).
