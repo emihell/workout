@@ -896,3 +896,20 @@ sessions" map naming both against their worktrees). Ephemeral/spawned build agen
 Emilio's terminal, and are explicitly excluded from tagging. No worktree/branch/dir renames — handles in
 text + tags only. Verified: `[PLANNER]`/`[BUILDER]` instructions present in PLANNING.md/CLAUDE.md,
 README names both. Planning-owned, published to `main` (no code branch).
+
+## req-66 — Enforce the --no-ff-merge-to-main invariant  (merged 2026-09-14)
+
+Workflow-review finding #2: the closeout/status machinery reads a `Merge branch 'req-N'` commit's two
+parents to compute a req's status line; four FF-merges this session left no merge commit, so `plan
+closeout` couldn't flip status and needed hand-recovery. Builder chose **approach A (guard)** over the
+spec's suggested B (tolerate), because **B is impossible** — after a pure FF the branch tip becomes the
+merge-base, so the recompute range is empty (measured vs the real FF'd req-49); tolerating would mean
+inventing a range (DEC-045). One new file `.githooks/pre-push` (executable), nothing in `plan` touched:
+on a push to `main` it refuses if a local `req-*` branch tip sits on main's first-parent spine (= a FF);
+`--no-ff` puts the tip off-spine (2nd parent) → allowed. Legit paths unblocked — closeout (`--no-ff`,
+branch present), publish (doc-commit FF), non-main pushes. Escape hatch `WORKOUT_ALLOW_FF=1` (never
+silent). Planner verified independently in a scratch repo (bare origin + clone on the real hook): FF
+refused w/ fix printed, `--no-ff` allowed + real `Merge branch` commit, override/doc-FF/non-main all
+allowed; `./check` green (218). Built by Builder on branch `req-66`, closed out by Planner.
+**Follow-up flagged (not in scope):** `plan doctor` (`plan:598`) checks the literal string `.githooks`
+while this worktree's `core.hooksPath` reads absolute — a possible false `FIX: hooks`; hook still runs.
