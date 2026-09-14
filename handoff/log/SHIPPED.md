@@ -882,3 +882,17 @@ DEC-006/008/026" note; still the live isolation rule). Verified: `git diff --num
 deleted (append-only preserved), 6 markers, digest present. Supersession mentions that target a non-DEC
 (a req, a backlog item, a PLANNING.md rule, a feature) were left unmarked, correctly. Planning-owned,
 published to `main` (no code branch).
+
+## req-68 — Name the two sessions Planner / Builder + message tags  (published 2026-09-14)
+
+Emilio: the two persistent Claude Code sessions (planning + code, separate terminals) had been
+confused for each other once, with consequences. Standardized role handles matching a sibling project:
+**Planner** = planning session (`workout-planning`), **Builder** = code session (`workout-codebase`).
+Every message each writes now starts with its tag on the first line — `[PLANNER]` / `[BUILDER]` — so
+Emilio tells the terminals apart at a glance. Recorded durably in the three guides: PLANNING.md ("## The
+role" — Planner identity + `[PLANNER]`), CLAUDE.md (top, loads every turn — Builder identity +
+`[BUILDER]`; so Builder picks its tag up on its next turn), and handoff/README.md (new "## The two
+sessions" map naming both against their worktrees). Ephemeral/spawned build agents report to Planner, not
+Emilio's terminal, and are explicitly excluded from tagging. No worktree/branch/dir renames — handles in
+text + tags only. Verified: `[PLANNER]`/`[BUILDER]` instructions present in PLANNING.md/CLAUDE.md,
+README names both. Planning-owned, published to `main` (no code branch).

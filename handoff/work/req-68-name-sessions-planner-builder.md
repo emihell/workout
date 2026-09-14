@@ -1,9 +1,8 @@
 # req-68 — Name the two sessions Planner / Builder + message tags
 
-**Status: READY.** **BLOCKING** (Emilio, 2026-09-14). High priority: the two
-persistent sessions have been confused for each other once already, with
-consequences. Standardize the naming (matching a sibling project) so Emilio can
-tell them apart at a glance.
+**Status: SHIPPED 2026-09-14** — planning-owned, published to `main` (no code branch).
+Was BLOCKING (Emilio, 2026-09-14): the two persistent sessions had been confused for each
+other once, with consequences. Standardized the naming (matching a sibling project).
 
 **Gate: infra/docs.** Builder for this req: **planning (Planner)** — it edits
 `handoff/` files only (`PLANNING.md`, `CLAUDE.md`, `README.md`). No code-session

@@ -9,10 +9,22 @@ that task actually needs. Don't load the rest by default.
 If you *are* the planning session and this is a fresh start, read
 **`PLANNING.md`** first — it's the role and the rules for working here.
 
+## The two sessions
+
+Two persistent Claude Code sessions run in separate terminals against sibling worktrees:
+
+- **Planner** — the planning session, `workout-planning` worktree (branch `planning`).
+  Writes `handoff/`, touches no code. Starts every message with `[PLANNER]`.
+- **Builder** — the code session, `workout-codebase` worktree (per-req branches).
+  Writes code, treats `handoff/` as read-only input. Starts every message with `[BUILDER]`.
+
+The tags are how Emilio tells the two terminals apart at a glance. Ephemeral build agents
+Builder spawns report back to Planner, not to Emilio's terminal, and do not tag.
+
 ## Ownership
 
-- Only the planning session writes here. It touches no code.
-- Claude Code treats everything here as **read-only input**.
+- Only the planning session (Planner) writes here. It touches no code.
+- Claude Code (Builder) treats everything here as **read-only input**.
 - **Enforced, not merely stated:** a permission deny rule blocks the Edit tool,
   and a pre-commit hook rejects commits that touch `handoff/` without `HANDOFF=1`.
   Reads are deliberately unrestricted.

@@ -13,6 +13,12 @@ Instructions for Claude Code working in this repository.
 This file is loaded on every turn, so it stays short. Everything else is loaded
 on demand from `handoff/`.
 
+**You are Builder** — the code session, in the `workout-codebase` worktree. **Start
+every message you write with `[BUILDER]` on the first line**, so Emilio can tell you
+apart from Planner (the planning session) at a glance — both are local Claude Code in
+separate terminals. Ephemeral build agents you spawn report back to Planner, not to
+Emilio's terminal, and do **not** tag.
+
 ## The project
 
 A browser-only workout app. React + Vite, no server. One trustworthy loop: set up

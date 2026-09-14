@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–65** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–65, req-67–68** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -13,8 +13,8 @@ Being worked as a serial batch (2026-09-14): each closed before the next, per DE
 - `req-66` **Enforce/tolerate --no-ff merges to main** — the closeout status machinery assumes
   `--no-ff`; the FF slip this session broke it. Guard it or make closeout tolerate FF. **[code]**
 - ✅ `req-67` **Make DECISIONS.md navigable** — SHIPPED 2026-09-14 (digest + 6 superseded markers).
-- `req-68` **Name the two sessions Planner/Builder + [PLANNER]/[BUILDER] tags** — added by
-  Emilio 2026-09-14; the two sessions got confused once. **[planning]**
+- ✅ `req-68` **Name the two sessions Planner/Builder + [PLANNER]/[BUILDER] tags** — SHIPPED
+  2026-09-14. Builder picks up `[BUILDER]` on its next turn (CLAUDE.md loads every turn).
 
 **Open decision for Emilio (not a req — a direction):** the process weight. ~2,600 lines of
 workflow machinery for a solo browser-only app, and this session shipped zero product (all meta).
