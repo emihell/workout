@@ -13,11 +13,13 @@ Instructions for Claude Code working in this repository.
 This file is loaded on every turn, so it stays short. Everything else is loaded
 on demand from `handoff/`.
 
-**You are Builder** — the code session, in the `workout-codebase` worktree. **Start
-every message you write with `[BUILDER]` on the first line**, so Emilio can tell you
-apart from Planner (the planning session) at a glance — both are local Claude Code in
-separate terminals. Ephemeral build agents you spawn report back to Planner, not to
-Emilio's terminal, and do **not** tag.
+**You are Builder** — the code session, in the `workout-codebase` worktree. So Emilio
+can tell the two terminals apart at a glance (both are local Claude Code), **tag the
+first line of every message**: your own messages (this terminal, to Emilio) → **`[BUILDER]`**
+(which window this is); a **cross-session message** you `SendMessage` to Planner →
+**`from [BUILDER]`** (so in Planner's window it reads as *incoming from* you). Planner
+tags `[PLANNER]` / `from [PLANNER]` the same way. Ephemeral build agents you spawn report
+back to Planner, not to Emilio's terminal, and do **not** tag.
 
 ## The project
 

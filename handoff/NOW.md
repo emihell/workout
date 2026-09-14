@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–73** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–74** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -9,17 +9,11 @@ reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 ## Workflow audit follow-up (Emilio: "deal with workflow/planning first", 2026-09-14)
 
-Audited on facts (`audits/workflow-2026-09-14.md`): verdict = **drift + volume, not cruft**;
-machinery mostly fits. Emilio said "do it" — being worked as a serial batch:
-- ✅ `req-70` **Reconcile merge-gate drift** — SHIPPED. 9 stale spots + 2 self-contradictions → DEC-035.
-- ✅ `req-71` **Consolidate to one-home-per-rule** — SHIPPED. Merge gate single-homed to DEC-035
-  (drift can't recur); −51 lines; independent-reviewer PASS.
-- ✅ `req-72` **Fit adaptations** — SHIPPED. Report sized-to-req (CLAUDE.md); reviewer-doctrine already
-  done (req-71); taxonomy-slim deferred (Builder/check_handoff coupling).
-- ✅ `req-73` **Gaps** — SHIPPED. Backup discipline (unconfirmed), live-lane close, workflow-refit
-  cadence, log entry-path. 5th gap `reference/migration.md` → req-75.
-- `req-74` **Tag fix** — NEXT. Cross-session messages prefix `from [PLANNER]`/`from [BUILDER]` (own-window
-  messages stay `[PLANNER]`/`[BUILDER]`); req-68 refinement (Emilio, 2026-09-14).
+Audited on facts (`audits/workflow-2026-09-14.md`): verdict = **drift + volume, not cruft**. Serial batch:
+- ✅ `req-70–73` SHIPPED — merge-gate drift reconciled, docs consolidated (one-home-per-rule, reviewer
+  PASS), report sized-to-req, gaps filled (backup unconfirmed, live-lane close, refit cadence). Detail: SHIPPED.
+- ✅ `req-74` **Tag fix** — SHIPPED. Cross-session messages prefix `from [PLANNER]`/`from [BUILDER]`
+  (own-window stays bare); now live.
 - `req-75` **`reference/migration.md`** — authoritative migration reference derived from `storage.js`
   (v5–v8 chain + invariants); the one gap that needs code-reading. Held for Emilio's go.
 

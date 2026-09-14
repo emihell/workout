@@ -985,3 +985,12 @@ workflow-fit audit between milestones (the machinery should stay agile, not ossi
 DECISIONS.md header names the digest as the read path + an archive-split option (~1000+ lines, superseded
 first) — a move never a rewrite, append-only preserved. No new DEC (backup rule stays unconfirmed guidance).
 `check` green via publish. Planning-owned, published to `main`.
+
+## req-74 — Cross-session messages tag `from [PLANNER]` / `from [BUILDER]`  (published 2026-09-14)
+
+req-68 refinement (Emilio): an incoming cross-session message showed the sender's bare tag (Builder's
+window displaying `[PLANNER]`), reading as if that window *were* Planner. Split the convention in the
+three req-68 docs (PLANNING.md, CLAUDE.md, handoff/README.md): a session's OWN messages keep the bare tag
+`[PLANNER]`/`[BUILDER]` (which window this is); a cross-session `SendMessage` to the other session prefixes
+`from [PLANNER]`/`from [BUILDER]` (incoming from the sender, not a relabel of the receiving window).
+Planner adopted the behaviour immediately. Planning-owned, published to `main`.

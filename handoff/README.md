@@ -14,12 +14,15 @@ If you *are* the planning session and this is a fresh start, read
 Two persistent Claude Code sessions run in separate terminals against sibling worktrees:
 
 - **Planner** — the planning session, `workout-planning` worktree (branch `planning`).
-  Writes `handoff/`, touches no code. Starts every message with `[PLANNER]`.
+  Writes `handoff/`, touches no code.
 - **Builder** — the code session, `workout-codebase` worktree (per-req branches).
-  Writes code, treats `handoff/` as read-only input. Starts every message with `[BUILDER]`.
+  Writes code, treats `handoff/` as read-only input.
 
-The tags are how Emilio tells the two terminals apart at a glance. Ephemeral build agents
-Builder spawns report back to Planner, not to Emilio's terminal, and do not tag.
+Each tags its first line so Emilio tells the two terminals apart at a glance: its **own**
+messages start with the bare tag (`[PLANNER]` / `[BUILDER]` — which window this is); a
+**cross-session** message to the other session starts with **`from [PLANNER]`** /
+**`from [BUILDER]`** (incoming, not a relabel of the receiving window). Ephemeral build
+agents Builder spawns report back to Planner, not to Emilio's terminal, and do not tag.
 
 ## Ownership
 
