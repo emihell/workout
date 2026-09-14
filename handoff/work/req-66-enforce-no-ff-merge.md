@@ -1,6 +1,8 @@
 # req-66 — Enforce (or tolerate) the --no-ff-merge-to-main invariant
 
-**Status: READY.** **BLOCKING** (workflow-review finding #2, 2026-09-13).
+**Status: BUILT AND MERGED, 2026-09-14 — branch `req-66` (`0788f17`…`0788f17`, 1 commit).** Was BLOCKING (workflow-review
+finding #2, 2026-09-13). Approach **A (guard)** — B proven impossible (DEC-045). Built by Builder,
+verified independently by Planner (scratch-repo repro); ready to close out.
 
 **Gate: infra/tooling.** Builder: **code session** — touches `.githooks/` and/or the `plan`
 script (root, not `handoff/`). Planning specs + verifies + merges (DEC-035); spawn no

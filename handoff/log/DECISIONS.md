@@ -44,6 +44,8 @@ later DEC replaced carries a `> SUPERSEDED` marker at its top.
 - **Styling foundation** — minimal, colorless, Apple-inspired component library + a fixed named type
   scale. → **DEC-017**, **DEC-020**
 - **Session boot** — planning reads `handoff/PLANNING.md` directly; no START-HERE. → **DEC-044**
+- **Merge shape** — every req reaches `main` via `--no-ff` (a `.githooks/pre-push` guard refuses a
+  fast-forward of a `req-*` branch; override `WORKOUT_ALLOW_FF=1`). → **DEC-045**
 
 ---
 
@@ -915,3 +917,21 @@ optional — the residue of the duplication DEC-043 targets. So: **delete `START
 the two boot prompts into README's Setup**; the planning prompt reads `handoff/PLANNING.md`
 (symmetric with build → `CLAUDE.md`). Load-bearing piece kept untouched: the `CLAUDE.md`
 banner. Spec: req-64 (re-scoped trim → delete). Reversible (restore the file) if ever wanted.
+
+## DEC-045 — every req reaches main via `--no-ff`; a pre-push guard enforces it (approach A, not B)  (2026-09-14)
+
+req-66. The closeout/status machinery reads a `Merge branch 'req-N'` commit's two parents to compute a
+req's status line; a fast-forward merge leaves no merge commit, and the range is **unrecoverable from refs**
+afterward — after a pure FF the branch tip *becomes* the merge-base, so `merge-base main <branch>..<branch>`
+is empty (measured against the real FF'd req-49, `41ab51c`). So the spec's proposed **B (tolerate — recompute
+the range from the branch)** cannot work: it would have to invent a range, against the project's core rule
+(never invent data you don't have). Chose **A (guard):** a new `.githooks/pre-push` that refuses a push
+landing a `req-*` branch tip on main's **first-parent spine** (the topological signature of a FF); a
+`--no-ff` merge puts the tip on the merge's 2nd parent, off-spine, allowed. Does **not** block the legit
+paths — `plan closeout` (`--no-ff`, branch still present at push), `plan publish` (doc-commit FF, never a
+`req-*` tip), or non-main pushes. Escape hatch `WORKOUT_ALLOW_FF=1`, never silent. Touches nothing in the
+`plan` script. Verified independently by Planner in a scratch repo (bare origin + clone wired to the real
+hook): FF refused with the fix printed; `--no-ff` push allowed and lands a real `Merge branch` commit;
+override + doc-FF + non-main-push all allowed. Known limit (accepted): the guard matches on the local
+`req-*` branch still existing — FF-and-delete-before-push leaves no ref, but by then the range is already
+lost, which is the thing A refuses earlier to prevent.
