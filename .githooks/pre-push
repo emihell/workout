@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# req-66: guard the --no-ff-merge-to-main invariant.
+#
+# The closeout/status machinery (`plan closeout`, scripts/check_handoff.py) reads
+# a `Merge branch 'req-N'` commit's two parents to compute a requirement's status
+# line. A plain fast-forward merge of a req-* branch produces NO merge commit, so
+# the range is lost — `merge-base main <branch>..<branch>` is EMPTY once the FF
+# lands (the branch tip becomes the merge base). The information cannot be
+# recovered from refs afterward, so we prevent the FF instead of tolerating it.
+#
+# The signal is topological and exact: a req-* branch merged with --no-ff has its
+# tip as the merge commit's SECOND parent — off main's first-parent spine. A
+# fast-forwarded req-* branch has its tip ON that spine. So: if a local `req-*`
+# branch tip appears on the first-parent commits this push newly adds to `main`,
+# it was fast-forwarded — refuse.
+#
+# This does NOT block the legitimate paths:
+#   - `plan closeout` merges with --no-ff (tip stays off-spine) and pushes while
+#     the branch still exists, then deletes it — the tip is never on the spine.
+#   - `plan publish` fast-forwards `planning`'s doc commits onto main; those are
+#     not the tip of any `req-*` branch, so nothing matches.
+#
+# Escape hatch (never silent): WORKOUT_ALLOW_FF=1 git push ...
+set -euo pipefail
+
+zero='0000000000000000000000000000000000000000'
+
+violations=()
+
+while read -r _local_ref local_sha remote_ref remote_sha; do
+  # Only the invariant on `main` matters here.
+  [ "$remote_ref" = "refs/heads/main" ] || continue
+  # Deleting main (local sha all-zero): nothing to guard.
+  [ "$local_sha" = "$zero" ] && continue
+
+  # The first-parent commits this push newly adds to main's spine. On a brand-new
+  # remote main (remote sha all-zero) there is no delta to diff against, so take
+  # the whole spine — strictly safer (it can only catch more).
+  if [ "$remote_sha" = "$zero" ]; then
+    spine="$(git rev-list --first-parent "$local_sha")"
+  else
+    spine="$(git rev-list --first-parent "$remote_sha..$local_sha")"
+  fi
+  [ -n "$spine" ] || continue
+
+  # Any local req-* branch whose tip sits on that spine was fast-forwarded in.
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue
+    local_tip="$(git rev-parse --verify "$ref^{commit}" 2>/dev/null)" || continue
+    if grep -qxF "$local_tip" <<<"$spine"; then
+      violations+=("${ref#refs/heads/}  ($(git rev-parse --short "$local_tip"))")
+    fi
+  done < <(git for-each-ref --format='%(refname)' 'refs/heads/req-*')
+done
+
+[ "${#violations[@]}" -eq 0 ] && exit 0
+
+{
+  echo "Refusing: this push lands a req-* branch on main by fast-forward (no merge commit)."
+  echo "The closeout/status machinery reads the 'Merge branch' commit to compute the"
+  echo "requirement's status line; a fast-forward leaves none, and the commit range"
+  echo "cannot be recovered afterward. Fast-forwarded onto main's first-parent spine:"
+  printf '  %s\n' "${violations[@]}"
+  echo
+  echo "Fix — re-do the merge with --no-ff so a merge commit exists:"
+  echo "  git checkout main"
+  echo "  git reset --hard @{u}        # drop the fast-forwarded commits (they're on the branch)"
+  echo "  git merge --no-ff <branch>   # or let the planning session run: ./plan closeout req-N"
+  echo
+  echo "Override (never silent):  WORKOUT_ALLOW_FF=1 git push ..."
+} >&2
+
+if [ -n "${WORKOUT_ALLOW_FF:-}" ]; then
+  echo "pre-push: WORKOUT_ALLOW_FF=1 set — allowing the fast-forward anyway." >&2
+  exit 0
+fi
+exit 1
