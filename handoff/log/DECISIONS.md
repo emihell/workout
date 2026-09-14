@@ -35,7 +35,8 @@ later DEC replaced carries a `> SUPERSEDED` marker at its top.
 - **Isolation boundary** — planning never touches code, code never touches planning; planning owns
   planning-worktree git, `closeout`, and `publish`; push scoped to two forms. → **DEC-005**, **DEC-008**, **DEC-026**
 - **Persisted-data safety** — never overwrite an unreadable `workout-mvp-v8` key; announce a migration
-  + record count and add a survives-upgrade test. → **DEC-032** + CLAUDE.md ask-gate
+  + record count and add a survives-upgrade test; back up (Export) before a persisted-data merge. →
+  **DEC-032**, **DEC-046** + CLAUDE.md ask-gate
 - **History is the source of truth** — the app never invents data: carry entered kg+reps for a
   no-history exercise, never invent warmup reps, hold a recommendation with no valid increment.
   → **DEC-002**, **DEC-022**, **DEC-030**
@@ -940,3 +941,15 @@ hook): FF refused with the fix printed; `--no-ff` push allowed and lands a real 
 override + doc-FF + non-main-push all allowed. Known limit (accepted): the guard matches on the local
 `req-*` branch still existing — FF-and-delete-before-push leaves no ref, but by then the range is already
 lost, which is the thing A refuses earlier to prevent.
+
+## DEC-046 — back up before touching stored data; Planner prompts the export  (Emilio delegated, 2026-09-14)
+
+Ratifies the req-73 "unconfirmed" backup rule (Emilio: "do what you think is best"). The store
+(`localStorage['workout-mvp-v8']`) is the user's real, irreplaceable history — no server, no automatic
+backup, no undo. The workflow already gates a real migration/bulk-rewrite on Emilio's eyes (DEC-035
+carve-out) and CLAUDE.md ask-gate #2, but nothing prompted the one cheap safety net the app already has:
+**Export**. So: **before merging any persisted-data / migration req, Planner reminds Emilio to export a
+fresh backup first** (Settings → Export → `workout-mvp-backup` JSON, DEC-004/req-01), and periodically
+otherwise. It's a reminder, not an automated backup (browser-only, no infra to schedule one) — the point
+is that the process names the safety net at the exact moment risk is highest. Reversible: supersede this
+DEC to change the cadence or drop it. Home for the operational rule: PLANNING.md (Planner's reminders).

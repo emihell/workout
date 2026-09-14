@@ -211,10 +211,9 @@ Two guards before an autonomous merge (DEC-035): a real migration / bulk rewrite
 storage / migration or wide blast radius → an **independent reviewer subagent you (not code CC)
 spawn**, reading the committed diff cold — skip it for trivial reqs.
 
-**Back up before you touch his data (unconfirmed, pending Emilio's ratification).** The store has no
-undo and no automatic backup. Before merging any persisted-data / migration req, remind Emilio to
-**export a fresh backup first** (Settings → Export); and periodically remind him to keep one. This is
-a conservative default — confirm with Emilio and record it as a `DEC-` if he wants it standing.
+**Back up before you touch his data (DEC-046).** The store has no undo and no automatic backup.
+Before merging any persisted-data / migration req, remind Emilio to **export a fresh backup first**
+(Settings → Export); and periodically remind him to keep one.
 
 **Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
 - **Single** — one req: test all reachable → merge if green → complete → stop.

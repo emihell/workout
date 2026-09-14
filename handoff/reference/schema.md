@@ -1,7 +1,7 @@
 # Persistence: schema, migration, recommendation increments
 
-Measured from the code on 2026-09-12 (`src/storage.js`, `src/model.js`,
-`src/progress.js`). Durable facts a requirement can lean on without re-deriving.
+Measured from the code on 2026-09-12, re-verified 2026-09-14 (`src/storage.js`,
+`src/model.js`, `src/progress.js`). Durable facts a requirement can lean on without re-deriving.
 If the code changes, update this — a `DEC-` or req that moves the schema updates
 here in the same pass.
 
@@ -17,18 +17,21 @@ here in the same pass.
 - `src/db.json` is **provenance/reference only**, not imported at runtime; first
   run starts from `emptyState()` (empty arrays, `storage.js:30-42`).
 
-## Load + migrate flow (`storage.js:loadState`, 64-80)
+## Load + migrate flow (`storage.js:loadState`, 140-184)
 
 1. Read `workout-mvp-v8`; else the first non-null legacy key (`.find(Boolean)`).
 2. No value → `emptyState()`.
 3. `JSON.parse(raw)` → `migrateState({ ...emptyState(), ...parsed })`.
 4. Re-`saveState` if there was no current v8 value or `parsed.schemaVersion !== 8`.
 5. `removeLegacyKeysIfV8Persisted()` (read-back gated).
-6. Any throw in the whole block → `emptyState()`. **Caveat (F-RISK-2/DEC-032):** a
-   *corrupt but present* v8 value currently also falls here and is then overwritten
-   — the open req changes this to preserve + banner.
+6. A throw in **parse/migrate** is the corrupt-but-present case (**DEC-032 / req-36,
+   shipped**): latch `loadUnreadable`, return `emptyState()` under a distinct banner,
+   and **`saveState` then refuses to write** — the raw value is preserved on disk and
+   recoverable, never overwritten (`storage.js:163-183`, `186-189`; test
+   `storage.test.js:320-340`). A throw reading `localStorage` *itself* (access denied)
+   is treated as a blank device instead — `emptyState()`, signal clear (`storage.js:149-154`).
 
-## migrateState is uniform, not version-branched (`model.js:219`)
+## migrateState is uniform, not version-branched (`model.js:221`)
 
 The same transform runs regardless of the source `schemaVersion` — v5/v6/v7 are
 distinct on-disk **shapes**, not distinct code paths. What it does:
@@ -55,13 +58,13 @@ distinct on-disk **shapes**, not distinct code paths. What it does:
 | v8 | yes | `:206-227` |
 | v7 | yes | `:164-204` (`schemaVersion: 7`, routines shape) |
 | v6 | yes | `:107-158` (`schemaVersion: 6`, programs/sessions shape) |
-| **v5** | **NO** | only a delete-assertion `:182`; no seed-and-upgrade |
+| v5 | yes | `:238-274` (`schemaVersion: 5`, programs shape; req-37, shipped) |
 
-**F-RISK-1 → req-37:** there is **no distinct v5 on-disk shape in this repo's git
-history** — the schema-version scheme predates the current history and
+**F-RISK-1 (req-37, shipped):** there is **no distinct v5 on-disk shape in this repo's
+git history** — the schema-version scheme predates the current history and
 `migrateState` is uniform (no per-version branch). So "v5" is a version number the
 code accepts on a legacy (program-wrapped) shape, not a separate transform. req-37
-adds a v5 round-trip test that (a) proves the `v5` key round-trips and (b) covers
+added the v5 round-trip test that (a) proves the `v5` key round-trips and (b) covers
 the legacy paths v6/v7 tests miss — **workout-level `sessionId`/`programName`** and
 **plan `sessionId`**.
 

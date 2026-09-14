@@ -1,21 +1,18 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–74** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–75** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 **Cleared 2026-09-14 (serial batch, DEC-035):** req-65–69 — CLAUDE.md merge model, pre-push
 `--no-ff` guard (DEC-045), DECISIONS digest, Planner/Builder tags, `plan doctor` fix. Detail in SHIPPED.
 
-## Workflow audit follow-up (Emilio: "deal with workflow/planning first", 2026-09-14)
+## ✅ Workflow audit follow-up CLEARED (Emilio: "deal with workflow first" → shipped 2026-09-14)
 
-Audited on facts (`audits/workflow-2026-09-14.md`): verdict = **drift + volume, not cruft**. Serial batch:
-- ✅ `req-70–73` SHIPPED — merge-gate drift reconciled, docs consolidated (one-home-per-rule, reviewer
-  PASS), report sized-to-req, gaps filled (backup unconfirmed, live-lane close, refit cadence). Detail: SHIPPED.
-- ✅ `req-74` **Tag fix** — SHIPPED. Cross-session messages prefix `from [PLANNER]`/`from [BUILDER]`
-  (own-window stays bare); now live.
-- `req-75` **`reference/migration.md`** — authoritative migration reference derived from `storage.js`
-  (v5–v8 chain + invariants); the one gap that needs code-reading. Held for Emilio's go.
+Audited on facts (`handoff/audits/workflow-2026-09-14.md`): verdict = **drift + volume, not cruft**. All merged
+(reqs 70–75): merge-gate drift reconciled, docs consolidated to one-home-per-rule (reviewer PASS, merge gate
+can't drift again), report sized-to-req, gaps filled, `from [PLANNER]`/`from [BUILDER]` tags live, migration
+reference (schema.md) refreshed. **DEC-045** (`--no-ff` guard), **DEC-046** (backup-before-migration). Detail: SHIPPED.
 
 ## Milestone (Emilio, 2026-09-07)
 

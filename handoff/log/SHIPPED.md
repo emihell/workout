@@ -994,3 +994,17 @@ three req-68 docs (PLANNING.md, CLAUDE.md, handoff/README.md): a session's OWN m
 `[PLANNER]`/`[BUILDER]` (which window this is); a cross-session `SendMessage` to the other session prefixes
 `from [PLANNER]`/`from [BUILDER]` (incoming from the sender, not a relabel of the receiving window).
 Planner adopted the behaviour immediately. Planning-owned, published to `main`.
+
+## req-75 — Refresh the migration reference (schema.md); + DEC-046 backup ratified  (published 2026-09-14)
+
+Workflow-audit follow-up #5. The audit's gap-5 ("no authoritative migration reference, create migration.md")
+was **inaccurate on inspection**: `handoff/reference/schema.md` already IS that reference — so creating
+`migration.md` would re-introduce the duplication reqs 70–71 removed. Correct action = refresh the existing
+reference, which had drifted (measured 2026-09-12): fixed the corrupt-key caveat (it described an "open req"
+though req-36/DEC-032 shipped — now preserve + loadUnreadable + saveState-refuses + banner), flipped v5 to
+tested (req-37 shipped its round-trip, storage.test.js:238), refreshed stale line cites (loadState 64-80→
+140-184, migrateState 219→221), added a re-verified-2026-09-14 date — all checked against current
+storage.js/model.js. Persisted the workflow audit durably at `handoff/audits/workflow-2026-09-14.md` and
+recorded in AUDIT.md that workflow audits live in `handoff/audits/` (product audits stay in root `audits/`).
+**DEC-046** rode this publish: ratified the req-73 backup rule (Emilio delegated) — Planner reminds Emilio
+to Export before any persisted-data/migration merge; digest + PLANNING.md updated. Planning-owned, published.
