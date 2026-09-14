@@ -213,9 +213,11 @@ work/req-NN-name.md      the requirement
 git branch req-NN-name   the work
 ```
 
-Claude Code implements on the branch; the planning session reviews the diff and closes
-out, merging by req type (DEC-009) — Emilio uses UX and persisted-data reqs himself
-first. Git is the ticket system.
+Claude Code implements on the branch; the planning session tests everything it can reach
+by its own hand and merges on that (**DEC-035**) — including UX-feel and persisted-data
+reqs. The only human/reviewer gates are the two carve-outs: a real migration or bulk
+rewrite of stored records goes to Emilio first, and a shared-code change gets an
+independent reviewer before merge. Git is the ticket system.
 
 ## After each requirement lands
 

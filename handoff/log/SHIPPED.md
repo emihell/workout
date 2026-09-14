@@ -913,3 +913,18 @@ refused w/ fix printed, `--no-ff` allowed + real `Merge branch` commit, override
 allowed; `./check` green (218). Built by Builder on branch `req-66`, closed out by Planner.
 **Follow-up flagged (not in scope):** `plan doctor` (`plan:598`) checks the literal string `.githooks`
 while this worktree's `core.hooksPath` reads absolute — a possible false `FIX: hooks`; hook still runs.
+
+## req-69 — Two follow-ups from the 65–68 blocking batch  (published 2026-09-14)
+
+Cleanup of two trivia surfaced while shipping the batch. (1) **`rules/WORKFLOW.md:217`** carried the same
+pre-DEC-035 merge claim req-65 fixed in CLAUDE.md ("closes out, merging by req type (DEC-009) — Emilio
+uses UX and persisted-data reqs himself first"); rewrote it to the DEC-035 model (planning tests what it
+can reach + merges on that; carve-outs = migration/bulk-rewrite → Emilio, shared-code → independent
+reviewer). (2) **`plan doctor` false `FIX: hooks`** (exit 1): the code worktree's `core.hooksPath` was
+absolute while doctor checks the documented relative `.githooks`; the hook ran fine either way. Reset it
+(`git -C …workout-codebase config core.hooksPath .githooks`) — verified in a scratch repo that a relative
+hooksPath still fires the req-66 guard, incl. from a subdir (git resolves it against the worktree top, not
+cwd). Now `plan doctor` exits 0 (`ok hooks`). **Left as an optional future Builder req (out of scope,
+DEC-005 isolation):** hardening doctor to accept an absolute path that resolves to the worktree's
+`.githooks`, so config drift can't false-fail again. Verified: WORKFLOW.md stale phrasing gone; no other
+guide asserts the old gate; doctor exit 0; hooksPath `.githooks`. Planning-owned, published to `main`.

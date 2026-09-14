@@ -1,20 +1,15 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–68** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–69** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
-## ⛔ BLOCKING — do these first (Emilio, 2026-09-13 workflow review)
+## ✅ Blocking batch CLEARED (2026-09-13 workflow review → shipped 2026-09-14)
 
-**MUST before any other work.** req-67/68 are planning's own (handoff/ edits, quick);
-req-66 dispatches to the code session. Publish + build these before resuming product/other reqs.
-Being worked as a serial batch (2026-09-14): each closed before the next, per DEC-035 batch mode.
-- ✅ `req-65` **Reconcile CLAUDE.md's merge model with DEC-035** — SHIPPED 2026-09-14.
-- ✅ `req-66` **Enforce --no-ff merges to main** — SHIPPED 2026-09-14. Approach A (pre-push guard);
-  B proven impossible (DEC-045). Blocking batch complete.
-- ✅ `req-67` **Make DECISIONS.md navigable** — SHIPPED 2026-09-14 (digest + 6 superseded markers).
-- ✅ `req-68` **Name the two sessions Planner/Builder + [PLANNER]/[BUILDER] tags** — SHIPPED
-  2026-09-14. Builder picks up `[BUILDER]` on its next turn (CLAUDE.md loads every turn).
+Serial batch, each closed before the next (DEC-035 batch mode). All merged:
+req-65 (CLAUDE.md merge model → DEC-035) · req-66 (pre-push `--no-ff` guard; approach A,
+DEC-045) · req-67 (DECISIONS.md digest + superseded markers) · req-68 (Planner/Builder names
++ tags, now live) · req-69 (follow-ups: WORKFLOW.md stale gate + `plan doctor` false hooks-FIX).
 
 **Open decision for Emilio (not a req — a direction):** the process weight. ~2,600 lines of
 workflow machinery for a solo browser-only app, and this session shipped zero product (all meta).
