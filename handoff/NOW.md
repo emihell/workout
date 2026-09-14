@@ -27,23 +27,11 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**2026-09-13 SHIPPED:** req-47/48 (row hierarchy, renames+marker) + req-51 (safe-area) + req-52 (bottom
-menu) + req-53→**req-55** (in-progress: one-at-a-time, abandon-on-new, hero-replacement, stale→Continue/
-Abandon; DEC-038, req-55 supersedes req-53's display) + req-54 (dock font) + **req-49** (logical back nav,
-DEC-039) + **req-50** (components sweep, DEC-040) + **req-63** (demo phone-test gate, DEC-041) + **req-62**
-(nav/action vocabulary, DEC-042). Emilio device/feel after-look owed (non-blocking); req-55 he eyed
-pre-merge (persisted-data); req-62 he approved on the demo.
-
 **READY, held:**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
 **Still decision-gated:** req-24 inline-confirm pattern, history-recalc behaviour, timed exercises #6 model.
-
-## History (detail in SHIPPED / audits/2026-09-12.md)
-
-Audit 2026-09-12 CLOSED 19/20 → req-46 (DEC-035). Tooling req-33/34/35. Refactor req-16–23; gym-flow
-req-25–29. **#6 timed PARKED.** Emilio eyeballs owed (non-blocking): req-41 two-tab, req-44/25/27 gym feel.
 
 ## Needs decisions — parked until their phase
 
