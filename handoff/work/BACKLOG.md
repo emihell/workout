@@ -171,6 +171,11 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
+- **[optional, Builder] Slim the readiness taxonomy.** The 6-state tag set (READY / NEEDS DECISIONS /
+  BLOCKED / SHELVED / WITHDRAWN / BUILT-MERGED) is more than a solo backlog needs (workflow audit
+  2026-09-14 §3). Slimming it means editing `scripts/check_handoff.py:220-248`, which validates the exact
+  tags — a Builder/code change for marginal benefit. Do only if the taxonomy actually gets in the way.
+
 - **Per-branch preview deploy (a branch → its own HTTPS URL).** *(Superseded in part by DEC-041:
   the cloud preview was replaced by Tailscale `vite preview` for Emilio's own testing; only the
   planning-can't-browser-verify motivation below partly survives.)* Twice in the 2026-09-12 audit run

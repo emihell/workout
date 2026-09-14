@@ -139,6 +139,10 @@ that rode along, decisions taken with Emilio mid-build, and anything that should
 become a `DEC-`/`L-` or change how we work. The Workflow section is how the
 planning session learns what happened instead of guessing from the diff.
 
+**Size the report to the req.** A trivial or mechanical change gets a brief
+report — both sections stay, but each can be a line or two. The point is signal,
+not volume: don't pad, and never drop a real deviation from the Workflow section.
+
 **A claim of yours labelled `[inferred]` has not been run** — check it before
 building on it. `[measured]` means a query or a test produced it, and the command
 is quoted.

@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–71** (req-10 pending;
+Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–72** (req-10 pending;
 req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
@@ -14,8 +14,8 @@ machinery mostly fits. Emilio said "do it" — being worked as a serial batch:
 - ✅ `req-70` **Reconcile merge-gate drift** — SHIPPED. 9 stale spots + 2 self-contradictions → DEC-035.
 - ✅ `req-71` **Consolidate to one-home-per-rule** — SHIPPED. Merge gate single-homed to DEC-035
   (drift can't recur); −51 lines; independent-reviewer PASS.
-- `req-72` **Fit adaptations** — trim reviewer *doctrine* (keep tool), slim readiness taxonomy, lighten
-  per-req paperwork. Some judgment calls for Emilio.
+- ✅ `req-72` **Fit adaptations** — SHIPPED. Report sized-to-req (CLAUDE.md); reviewer-doctrine already
+  done (req-71); taxonomy-slim deferred (Builder/check_handoff coupling).
 - `req-73` **Gaps** — backup-discipline standing rule (unconfirmed default for Emilio), log-pruning
   cadence, periodic workflow-refit step, `reference/migration.md`.
 - `req-74` **Tag fix** — cross-session messages prefix `from [PLANNER]`/`from [BUILDER]` (own-window

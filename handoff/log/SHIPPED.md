@@ -959,3 +959,16 @@ collapsed to one each (most of its −41). Net −51 lines (PLANNING −41, CLAU
 surviving home, confirmed no new contradiction and CLAUDE.md still stands alone; found one dropped nuance
 (the /clear→fresh-session SendMessage-address rationale) which was restored in PLANNING.md. Emilio eyed
 the before/after before publish. No rule's meaning changed. Planning-owned, published to `main`.
+
+## req-72 — Fit adaptations from the workflow audit  (published 2026-09-14)
+
+Audit §3 (NEEDS-ADAPTATION) had three items; on inspection two were already-handled or cross-domain, so
+this delivered the one safe planning-domain change and recorded the others honestly (the audit rated the
+machinery "mostly EARNS-KEEP" — no churn for its own sake). (1) Reviewer *doctrine* → already trimmed by
+req-71 (operational trigger in PLANNING.md, full doctrine in append-only DEC-035). (2) 6-state readiness
+taxonomy slim → deferred: `scripts/check_handoff.py:220-248` validates the exact tags, so it's a Builder/
+code change for marginal benefit; logged as an optional Builder backlog item. (3) Per-req paperwork →
+done: CLAUDE.md now says to size the report to the req — trivial/mechanical changes get a brief report
+(both Technical+Workflow sections kept, but a line or two each; never pad, never drop a real deviation).
+Verified: `check_handoff`'s "sections" check targets BACKLOG's index not report structure (safe); check
+green via publish. Planning-owned, published to `main`.
