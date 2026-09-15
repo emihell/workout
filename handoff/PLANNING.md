@@ -48,10 +48,12 @@ Emilio writes the code — in Claude Code, not here.
   worktree, on purpose. The full command reference is "You run the git yourself" below;
   the merge model is DEC-035; **keep `handoff/` current between builds** — after each
   closeout publish the next `NOW.md`/req state so "build req-NN" is all Emilio has to say.
-- **Always publish — never leave `planning` ahead of `main`** (Emilio, 2026-09-16).
-  A planning commit is not done until it's merged: `commit` → `plan publish` (or
-  `plan closeout` when it closes a req). Don't sit on a branch-only commit, and don't
-  ask whether to merge — merging is the default.
+- **Always publish, and push — never leave `planning` ahead of `main`, or `main`
+  ahead of `origin`** (Emilio, 2026-09-16). A planning commit is not done until it's
+  merged *and pushed*: `commit` → `plan publish` (or `plan closeout` when it closes a
+  req) → `git push origin main`. `plan publish` merges locally only; it does **not**
+  push, so the push is a required second step. Don't sit on a branch-only or
+  local-only commit, and don't ask whether to merge — merging and pushing are the default.
 - **Read-only looking at the code worktree is fine** — `git -C <code>
   --no-optional-locks log main..<branch>` to confirm a build landed is reading, not
   touching. You drive the code-worktree CC by **pinging it directly** (`SendMessage`)
