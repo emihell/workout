@@ -29,9 +29,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Gym-flow batch 2 (Emilio 2026-09-14, in-gym) — SAVED as req-76..86, NOT scheduled (tokens).**
 Raw notes: BACKLOG N1–N11. READY (spec settled): req-76 Continue→current-exercise, req-79
 done/not-done contrast, req-80 nav-to-bottom+inline-note, req-81 Today "Completed" dedupe. One-pick:
-req-77 active-workout affordance (badge vs floating), req-78 rest-pill-into-next-set (confirm remove
-rest view). NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default (brushes core
-rule), req-84 auto-complete routine, req-85 timed exercises (model shape), req-86 dev note-capture.
+req-78 rest-pill-into-next-set (confirm remove rest view). PAUSED (Emilio 2026-09-16): req-77
+active-workout affordance. NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default
+(brushes core rule), req-84 auto-complete routine, req-85 timed exercises (model shape), req-86 dev note-capture.
 
 **Still decision-gated:** req-24 inline-confirm pattern; history-recalc behaviour; req-82/83/84/85/86 (above).
 

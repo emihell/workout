@@ -1,6 +1,7 @@
 # req-77 — active-workout affordance across the app (N4, gym-flow batch 2)
 
-**Status: NEEDS DECISION (one pick) — saved 2026-09-14, not scheduled.** From Emilio's
+**Status: PAUSED (Emilio, 2026-09-16) — do not schedule or re-raise the badge/floating pick
+until Emilio revives it.** Was NEEDS DECISION (one pick), saved 2026-09-14. From Emilio's
 2026-09-14 notes: *"There should maybe be a floating button for active workout? Or a signal
 in the workout button in menu?"*
 
