@@ -27,13 +27,10 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
-**Gym-flow batch 2 (Emilio 2026-09-14, in-gym) — SAVED as req-76..86, NOT scheduled (tokens).**
-Raw notes: BACKLOG N1–N11. READY (spec settled): req-76 Continue→current-exercise, req-79
-done/not-done contrast, req-80 nav-to-bottom+inline-note, req-81 Today "Completed" dedupe, req-78
-rest-pill-into-next-set (decided 2026-09-16: remove rest view, self-paced — **build LAST**, domino
-risk on req-25/27). PAUSED (Emilio 2026-09-16): req-77 active-workout affordance.
-NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default
-(brushes core rule), req-84 auto-complete routine, req-85 timed exercises (model shape), req-86 dev note-capture.
+**Gym-flow batch 2 (Emilio 2026-09-14) — req-76..86** (raw: BACKLOG N1–N11). In flight this session
+(order at top); req-78 decided 2026-09-16 (remove rest view, self-paced, build last). PAUSED: req-77
+affordance. NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default (brushes core
+rule), req-84 auto-complete, req-85 timed (model shape), req-86 dev note-capture.
 
 **Still decision-gated:** req-24 inline-confirm pattern; history-recalc behaviour; req-82/83/84/85/86 (above).
 
