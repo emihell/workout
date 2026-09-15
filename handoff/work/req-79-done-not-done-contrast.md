@@ -1,6 +1,6 @@
 # req-79 — done/not-done contrast in the active exercise list (N6, gym-flow batch 2)
 
-**Status: READY — saved 2026-09-14, not scheduled.** From Emilio's 2026-09-14 notes:
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-79` (`45b402c`…`45b402c`, 1 commit).** From Emilio's 2026-09-14 notes:
 *"In the exercise list for an active workout, make a bigger visual difference between exercises
 that are done and those that are not, so your eye focuses on the ones not done."*
 
