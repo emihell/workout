@@ -1050,3 +1050,21 @@ derivation — skipped counts as done and is passed over); all-done → overview
 can share them) and re-exported from `helpers.jsx` — callers unchanged. +6 tests (218→**224**): resumeTarget
 selection incl. skipped + all-done→overview, and a startOrContinue hash-assertion integration test.
 `--no-ff`. Browser lands-on-current is Emilio's ux-feel check.
+
+## req-78 — rest timer as a floating pill, folded into the next set (N5, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 2, req 5/5 (last). D1+D2 (Emilio 2026-09-16): `RestBar`→**`RestPill`** (small `position:fixed`
+pill, time + tap-to-skip), the req-27 `RestUpcoming` panel deleted, and the next set's log form now
+renders **during rest** (no intermediate panel/tap, Complete never locked — self-paced). req-27's
+nextSetWeight override folded away; the form's own weight field is the editable surface (no-invent
+preserved: seed from restore/carry/history). Pill swapped in on all 5 in-workout screens; form `key`
+stable across rest-end so edits survive. **req-25 bug protected:** `restPatchAfterSet` (arming) and
+`store.removeActiveSet` (clearing) diffs are EMPTY — logic untouched; `previousSet` still clears via
+`removeActiveSet`; added a **source-guard test** (store.test.js) that fails if the rest-clear is ever
+stripped. Test edits called out: removed the `weightOverride`/`pendingWeightFor` cases (tested deleted
+code), kept restPatch/restRemaining/rest-cue. `./check` green (**216** tests), `--no-ff`.
+**Two behaviour removals flagged for Emilio (consequences of D1/D2, not signed off individually):**
+(a) the pill has no **Pause/+30s** (were on the old blocking bar); (b) the req-27 progression **↑/↓
+marker** dropped with RestUpcoming. Builder's candidate DEC: "rest is informational, not a control
+surface; next set always live during rest." **Emilio still owes the req-25 Previous-then-forward check
+in a real browser** (Planner has no browser; verified by logic + source guard only).

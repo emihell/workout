@@ -1,8 +1,9 @@
 # Now
 
-Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–75, req-76, req-79, req-80, req-81**
-(req-10 pending; req-24 gated; req-32 dropped, DEC-025). **Batch 2 in flight (DEC-047):** req-76/79/80/81 ✓;
-req-78 building (last). Done lives in `log/SHIPPED.md`. Full
+Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–76, req-78–81** (req-10 pending;
+req-24 gated; req-32 dropped, DEC-025; req-77 PAUSED). **Batch 2 DONE (DEC-047): req-76/78/79/80/81 merged.**
+Emilio's after-batch pass owed: ux-feel + the req-78 req-25 Previous-then-forward browser check + 2
+req-78 behaviour removals to confirm (Pause/+30s; progression ↑/↓ marker). Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 **Cleared 2026-09-14 (serial batch, DEC-035):** req-65–69 — CLAUDE.md merge model, pre-push
