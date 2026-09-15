@@ -244,13 +244,18 @@ export function RestBar({ seconds = 0, paused = false, onPauseResume, onAddTime,
 }
 
 // SetLogForm — the single most important gym surface: a kg NumberField, a big reps
-// field, an effort SegmentedControl, a note, and Previous/Skip/Complete Buttons
-// (DESIGN §4 order: retreat left, forward right).
+// field, an effort SegmentedControl, and Previous/Skip/Complete Buttons pinned to
+// the absolute bottom of the screen (req-80; DESIGN §4 order: retreat left, forward
+// right, the lateral Skip between).
 // Presentational: it owns only the in-progress field values (local state, seeded
 // from the `initial*` props), remounted per-set by the caller with a `key`. All
 // the domain logic — history prefill, carry, restore, targets, the effort→RPE
 // mapping — lives in the caller (the workout screen), which passes the seeds in
-// and reads {weight, reps, effort, note} back out of onComplete.
+// and reads {weight, reps, effort} back out of onComplete.
+//
+// The note affordance is NOT here (req-80): "Add note" is a small control beside
+// the exercise title (item.jsx), and the note value is owned by the caller and
+// passed to completeSet directly — so it sits by the title, not in this field group.
 //
 // Props: `weighted` shows the kg field; `showEffort` shows the effort control
 // (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
@@ -269,7 +274,6 @@ export function SetLogForm({
   initialWeight = '',
   initialReps = '',
   initialEffort = 3,
-  initialNote = '',
   canGoBack = true,
   onComplete,
   onSkip,
@@ -278,18 +282,12 @@ export function SetLogForm({
   const [weight, setWeight] = useState(initialWeight)
   const [reps, setReps] = useState(initialReps)
   const [effort, setEffort] = useState(initialEffort)
-  const [note, setNote] = useState(initialNote)
-  // req-26 — the note is hidden behind an "Add note" affordance to declutter the
-  // mid-set screen. Start expanded only when a note already exists (a restored /
-  // seeded note), so it is never lost; otherwise show the button. The submitted
-  // value is unchanged — `note` stays '' until the field is opened and typed in.
-  const [showNote, setShowNote] = useState(Boolean(initialNote))
   return (
     <form
       className="ui-setlog"
       onSubmit={(e) => {
         e.preventDefault()
-        onComplete?.({ weight, reps, effort, note })
+        onComplete?.({ weight, reps, effort })
       }}
     >
       <div className="ui-setlog__nums">
@@ -310,22 +308,9 @@ export function SetLogForm({
           <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
         </>
       ) : null}
-      {showNote ? (
-        // autoFocus only when revealed by tapping (initialNote empty at mount);
-        // a pre-existing note starts expanded but does not grab focus / the keyboard.
-        <Field
-          label="Note"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          autoFocus={!initialNote}
-        />
-      ) : (
-        <Button variant="quiet" onClick={() => setShowNote(true)}>
-          Add note
-        </Button>
-      )}
-      {/* DESIGN §4 order: retreat (Previous) left, forward (Complete) right, Skip
-          between (it neither logs nor retreats). */}
+      {/* req-80 — pinned to the absolute bottom (thumb reach) via .ui-setlog__actions.
+          DESIGN §4 order: retreat (Previous) left, forward (Complete) right, Skip
+          between (it neither logs nor retreats). Markup order = visual/focus order. */}
       <div className="ui-setlog__actions">
         {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
         <Button onClick={onSkip}>Skip</Button>
