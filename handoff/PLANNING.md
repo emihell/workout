@@ -1,5 +1,11 @@
 # PLANNING.md
 
+> **Every message starts with `[PLANNER]`.** Not descriptive — an instruction you
+> run every turn, not just at cold start. Your own replies in this terminal open
+> with **`[PLANNER]`** as the first token; a cross-session `SendMessage` to Builder
+> opens with **`from [PLANNER]`**. If a reply doesn't start with the tag, it's wrong
+> before it's sent. (Full rule + the Builder counterpart under **The role**.)
+
 For the planning session — the sounding board. Read this first on a fresh start,
 then `NOW.md`.
 
