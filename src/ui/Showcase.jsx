@@ -11,7 +11,7 @@ import {
   List,
   NavLink,
   NumberField,
-  RestBar,
+  RestPill,
   Row,
   Screen,
   SegmentedControl,
@@ -48,7 +48,6 @@ const SCALE = [
   { token: '--ui-text-section', name: 'section' },
   { token: '--ui-text-title', name: 'title' },
   { token: '--ui-text-display', name: 'display' },
-  { token: '--ui-text-rest', name: 'rest' },
 ]
 
 function TypeScale() {
@@ -165,8 +164,8 @@ export function Showcase() {
         <Banner role="alert">Couldn't save your last change — export a backup from Settings.</Banner>
       </Block>
 
-      <Block heading="Rest bar">
-        <RestBar seconds={72} paused={false} onPauseResume={() => {}} onAddTime={() => {}} onNext={() => {}} />
+      <Block heading="Rest pill">
+        <RestPill seconds={72} onSkip={() => {}} />
       </Block>
 
       <Block heading="Set-log form">

@@ -23,7 +23,7 @@ import { NavLink } from './shared'
 //     two paths' exact, differing save behaviour.
 //   - cancelTo — the Cancel link's route.
 //
-// Everything around the form (Screen / Back / RestBar / header / History's
+// Everything around the form (Screen / Back / RestPill / header / History's
 // Remove button) stays in the caller.
 export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave, cancelTo }) {
   const [weight, setWeight] = useState(set?.weight ?? '')
