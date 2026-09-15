@@ -183,10 +183,14 @@ export function List({ children }) {
   return <ul className="ui-list">{children}</ul>
 }
 
-export function Row({ children, value, action, to }) {
+// `className` is an optional modifier appended to the row's own class (e.g.
+// req-79's `ui-row--done` to mute a completed exercise). Default '' leaves every
+// existing caller's `ui-row` untouched.
+export function Row({ children, value, action, to, className = '' }) {
+  const rowClass = `ui-row${className ? ` ${className}` : ''}`
   if (to) {
     return (
-      <li className="ui-row">
+      <li className={rowClass}>
         <NavLink to={to} className="ui-row__link">
           <span className="ui-row__label">{children}</span>
           {value != null ? <span className="ui-row__value">{value}</span> : null}
@@ -196,7 +200,7 @@ export function Row({ children, value, action, to }) {
     )
   }
   return (
-    <li className="ui-row">
+    <li className={rowClass}>
       <span>{children}</span>
       {value != null ? <span className="ui-row__value">{value}</span> : null}
       {action != null ? <span className="ui-row__action">{action}</span> : null}

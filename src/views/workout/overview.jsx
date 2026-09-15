@@ -105,7 +105,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone
           const path = itemCurrentPath(routineId, item, completed)
           return (
-            <Row key={itemKey(item) || item.id} to={path}>
+            // req-79 — completed exercises read muted (ui-row--done) so the eye lands
+            // on what's left; not-done rows stay full emphasis. Order/meaning unchanged.
+            <Row key={itemKey(item) || item.id} to={path} className={completed ? 'ui-row--done' : ''}>
               {exerciseName(item)} — {roleLabel(item.role)}
               {completed ? ' · done' : ''}
             </Row>
