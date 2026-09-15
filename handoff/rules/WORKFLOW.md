@@ -27,6 +27,14 @@ real model, or reading the actual code.
 the codebase between conversations. A requirement written from memory has told a
 builder to add something that already existed.
 
+**Check it doesn't already exist — before creating anything, not just code.** Before
+writing a req, a file, an inbox, a "recovered" note, or any mechanism: `git ls-files`,
+`git log --all`, and check `origin` (a `git fetch` first) for it. This is the rescan
+rule extended to *reqs and captures*, and it is not optional — 2026-09-16, a whole
+session was spent re-deriving `req-76..86`, which already existed on `origin/planning`,
+because the local branch was stale and never fetched. A grep of your local branch can
+never prove something is missing; `git log --all`/origin is the only search that can.
+
 ## Readiness — a requirement is not handed over until it's decided
 
 Every requirement carries one tag on its first line. **Only `READY` reaches Claude
@@ -217,6 +225,25 @@ git branch req-NN-name   the work
 Claude Code implements on the branch; the planning session tests what it can reach by
 its own hand and merges on that (**DEC-035**, including its two carve-outs). Git is the
 ticket system.
+
+## Batch mode (DEC-047) — the opt-in exception, not the norm
+
+**The default stays: one req at a time, human-gate testing per req (DEC-035).** Do not
+loosen it. **Batch mode** is a distinct exception, entered **only** by Emilio's explicit
+approval **with planning up front** (which reqs, what order) before any of them starts.
+Inside an approved batch:
+
+- **Serial-but-continuous.** One req/branch at a time (DEC-035 still: Builder builds,
+  Planner merges), but **don't stop between them** — build → `./check` → merge →
+  dispatch the next — and give **one summary at the end**, not per-req.
+- **Relaxed per-req testing.** Merge on `./check` green **without** holding for Emilio
+  to feel each `ux-feel` req; he trains with the app and iterates **after** the batch.
+- **Don't clear sessions mid-batch.** Builder's and Planner's both stay alive for
+  continuity — Emilio is intentionally out of the loop and context must carry across.
+- **The behaviour-decision gate still applies.** A gated req still needs Emilio's call,
+  resolved in the pre-batch planning. Only *testing* is relaxed, never *decisions*.
+
+Outside an explicitly approved batch, none of the above is in effect.
 
 ## After each requirement lands
 

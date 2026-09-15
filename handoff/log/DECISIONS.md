@@ -953,3 +953,20 @@ fresh backup first** (Settings → Export → `workout-mvp-backup` JSON, DEC-004
 otherwise. It's a reminder, not an automated backup (browser-only, no infra to schedule one) — the point
 is that the process names the safety net at the exact moment risk is highest. Reversible: supersede this
 DEC to change the cadence or drop it. Home for the operational rule: PLANNING.md (Planner's reminders).
+
+## DEC-047 — batch mode: an opt-in exception to one-req-at-a-time + human-gate testing  (Emilio, 2026-09-16)
+
+The **default workflow is unchanged and stays the norm**: one req at a time, human-gate testing per req
+(DEC-035). Emilio was explicit — "i dont wanna loosen up all rules." **Batch mode** is a distinct, opt-in
+exception, entered **only** by Emilio's explicit approval **with planning up front** (which reqs, what
+order) before a single one starts. Inside an approved batch: **(1) serial-but-continuous** — one req/branch
+at a time (DEC-035 still: Builder builds, Planner merges), but Planner does **not** stop between them
+(build → `./check` → merge → dispatch the next), with **one summary at the batch end**, not per-req; **(2)
+relaxed per-req testing** — this app is not production and Emilio is the only user, so Planner merges on
+`./check` green **without** holding for Emilio to feel each `ux-feel` req; he trains with the app and
+iterates **after** the batch (extends DEC-035's "feels the untestable parts after" from per-req to
+per-batch); **(3) sessions are not cleared during a batch** — Builder's and Planner's both stay alive for
+continuity, because Emilio is intentionally out of the loop and context must carry across the reqs. **The
+behaviour-decision gate still applies** even in a batch — a gated req still needs Emilio's call, resolved
+during the pre-batch planning; only *testing* is relaxed, never *decisions*. Reversible. Home for the
+operational rule: WORKFLOW.md §"Batch mode".
