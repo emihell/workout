@@ -1026,3 +1026,15 @@ suffix kept. **Shared-component touch:** `ui/index.jsx` `Row` gained an optional
 (additive; `rowClass` reduces to `ui-row` for all ~40 existing callers — Planner verified every caller
 unaffected, DEC-035 shared-code carve-out). `./check` green (218 tests), `--no-ff`. Feel judgement (the
 0.45 value) left for Emilio's after-batch pass — one value to tune.
+
+## req-80 — during-exercise: nav to the bottom, inline "Add note" by the title (N7, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 2, req 3/5. Previous/Skip/Complete now pinned to the absolute bottom (`.ui-setlog__actions`
+`position:fixed`, DESIGN §4 order, still inside the form so submit/Enter unchanged); "Add note" is a
+small quiet control beside the exercise title (`ExerciseTitle` gained an optional `aside` slot) that
+reveals the note field under the title. **Note state lifted out of `SetLogForm` into `WorkoutItemLive`**
+(passed straight to `completeSet`; per-set reset via an effect keyed on the current set incl.
+Previous/restore) — Planner verified the note→completeSet→store path is intact and `store.jsx`/
+`workout-log.js` are untouched (note saves exactly as before). Shared touches additive (`ExerciseTitle`
+aside; both callers checked). `./check` green (218). ux-feel (bar placement, aside look, Showcase's
+cosmetic fixed-bar dev-only side effect) → Emilio's after-batch pass.
