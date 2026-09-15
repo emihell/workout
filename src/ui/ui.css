@@ -515,13 +515,51 @@ a.ui-btn--quiet:active {
 .ui-setlog__nums .ui-field {
   flex: 1 1 0;
 }
+/* req-80 — the Previous/Skip/Complete row is pinned to the absolute bottom of the
+ * viewport (thumb reach) instead of sitting mid-form. It is still inside the <form>,
+ * so Complete (type=submit) and Enter-to-submit are unchanged. Aligned to the screen
+ * column (max-width + centered + the screen gutter) and given a solid background +
+ * hairline so scrolled content never bleeds through. Sits at the same bottom offset
+ * the global dock uses; the dock is hidden on workout routes, and .ui-main already
+ * reserves --ui-dock-clear of bottom padding so the fields above clear this bar. */
 .ui-setlog__actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--ui-dock-bottom) + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  max-width: 560px;
+  margin: 0 auto;
+  box-sizing: border-box;
   display: flex;
   gap: var(--ui-s2);
-  margin-top: var(--ui-s3);
+  padding: var(--ui-s2) var(--ui-s3) 0;
 }
 .ui-setlog__actions .ui-btn {
   flex: 1 1 0;
+}
+
+/* req-80 — the exercise title row: the name takes the space, a small control (the
+ * "Add note" toggle) sits beside it on the right. */
+.ui-exercise-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-s2);
+}
+.ui-exercise-head .ui-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.ui-exercise-head__aside {
+  flex: 0 0 auto;
+}
+/* A deliberately small, quiet button — smaller than a full tap-height Button so it
+ * reads as a secondary affordance beside the title, not a primary action. */
+.ui-addnote {
+  min-height: auto;
+  padding: var(--ui-s1) var(--ui-s2);
+  font-size: var(--ui-text-caption);
 }
 
 /* ---- Upcoming set during rest (req-27) ---- */

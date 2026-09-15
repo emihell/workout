@@ -20,7 +20,7 @@ import {
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing, NavLink } from '../shared'
-import { Button, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
+import { Button, Field, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
 import { RestBar, useRestCountdown } from './rest'
 import { unlockAudio } from '../../rest-cue'
@@ -48,19 +48,25 @@ function setProgressLabel(item, state, currentType, currentWorkIndex) {
   return `${current}/${total}`
 }
 
-function ExerciseTitle({ routineId, item, ex, bits }) {
+// `aside` (req-80) renders a small control beside the title — the live log screen
+// passes the "Add note" toggle here so it sits next to the exercise name. Callers
+// that omit it (the done view) render exactly as before.
+function ExerciseTitle({ routineId, item, ex, bits, aside }) {
   const inLibrary = Boolean(item?.exerciseId && ex?.id === item.exerciseId)
   const name = exerciseName(item)
   const meta = (bits || []).filter(Boolean).join(' · ')
   return (
     <>
-      <Title>
-        {inLibrary ? (
-          <NavLink to={exerciseEditorPath(routineId, item)}>{name}</NavLink>
-        ) : (
-          name
-        )}
-      </Title>
+      <div className="ui-exercise-head">
+        <Title>
+          {inLibrary ? (
+            <NavLink to={exerciseEditorPath(routineId, item)}>{name}</NavLink>
+          ) : (
+            name
+          )}
+        </Title>
+        {aside ? <div className="ui-exercise-head__aside">{aside}</div> : null}
+      </div>
       {meta ? <p className="ui-sub">{meta}</p> : null}
     </>
   )
@@ -310,6 +316,23 @@ function WorkoutItemLive({ routineId, item }) {
     weighted && lastLoggedWeight != null && upcomingWeightNum != null && upcomingWeightNum !== lastLoggedWeight
   const upcomingDirection = upcomingChanged ? (upcomingWeightNum > lastLoggedWeight ? 'up' : 'down') : null
 
+  // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
+  // title. The value lives here (passed straight to completeSet), and the reveal
+  // (req-26 pattern) starts open only when a note is already seeded (restore/history),
+  // so it is never lost. Both reset per set: SetLogForm remounts by `key`, but this
+  // state lives above it, so the effect re-seeds it whenever the current set changes.
+  const noteSeed = seed.note
+  const setSeedKey = `${itemKey(item)}-${currentType}-${currentWorkIndex}`
+  const [note, setNote] = useState(noteSeed)
+  const [showNote, setShowNote] = useState(Boolean(noteSeed))
+  useEffect(() => {
+    setNote(noteSeed)
+    setShowNote(Boolean(noteSeed))
+  }, [setSeedKey, noteSeed])
+  // The note only makes sense while a set is being logged (not during rest, not once
+  // the exercise is planned-done) — that's the same branch that renders SetLogForm.
+  const logging = !resting && !plannedDone
+
   return (
     <Screen>
       <ExercisesLink routineId={routineId} />
@@ -323,7 +346,20 @@ function WorkoutItemLive({ routineId, item }) {
           currentType === 'wu' ? 'WU set' : null,
           setProgressLabel(item, state, currentType, currentWorkIndex),
         ]}
+        aside={
+          logging && !showNote ? (
+            <Button variant="quiet" className="ui-addnote" onClick={() => setShowNote(true)}>
+              Add note
+            </Button>
+          ) : null
+        }
       />
+      {/* req-80 — the note field the "Add note" control reveals, rendered by the
+          title (not inside SetLogForm). autoFocus only when opened by tapping (no
+          seeded note); an empty field submits no note (unchanged behaviour). */}
+      {logging && showNote ? (
+        <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} autoFocus={!noteSeed} />
+      ) : null}
       {resting ? (
         <>
           {weighted && !plannedDone ? (
@@ -352,9 +388,8 @@ function WorkoutItemLive({ routineId, item }) {
           initialWeight={seed.weight}
           initialReps={seed.reps}
           initialEffort={seed.effort}
-          initialNote={seed.note}
           canGoBack={canGoBack}
-          onComplete={({ weight, reps, effort, note }) => completeSet({ weight, reps, rpe: effort, note })}
+          onComplete={({ weight, reps, effort }) => completeSet({ weight, reps, rpe: effort, note })}
           onSkip={skipSet}
           onPrevious={previousSet}
         />
