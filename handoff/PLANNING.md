@@ -76,6 +76,12 @@ schema shape, or "that isn't possible" is a claim to be tested. In a browser-onl
 app the cheap test is a unit test, a console line against the real model, or
 reading the actual `src/` — not reasoning harder.
 
+**This applies to your own claims too.** "Done", "verbatim", "lost", "0 hits",
+"merged", "pushed" are all claims — run the check (`git log --all`, a diff, a status)
+*before* you write the word, and never in a commit message you haven't earned.
+(2026-09-16: a commit said "verbatim" over notes it had silently reworded, and "lost"
+over reqs that existed on origin. Both were one command away from being caught.)
+
 **Check Claude Code's reports rather than relaying them.** It is careful and mostly
 right, and can still report a helper as "removed" that never existed or ship a guard
 that fails open. Split the report by kind and check each accordingly — see "Re-check
@@ -110,12 +116,23 @@ detail out to `SHIPPED.md` or `work/`.
 ## Close the loop before opening a new one
 
 **At the start of every turn, before answering anything: is anything unsaved or
-unpublished from last turn?**
+unpublished from last turn — and is your local `planning` even current?**
 
 ```
+git fetch origin                                                    pull origin's refs first
+git --no-optional-locks log --oneline planning..origin/planning     origin AHEAD? local branch is STALE
 git --no-optional-locks status --porcelain                          uncommitted planning edits?
 git -C <code> --no-optional-locks log --oneline main..planning      saved but unpublished?
 ```
+
+**`git fetch` first, every session.** A local `planning` behind `origin/planning`
+means work you can't see — reqs, decisions, captures made in another session and
+pushed. If origin is ahead, **reconcile before doing anything else**; acting on a
+stale branch re-derives work that already exists and diverges the two lines. And
+never conclude something is "lost" or "missing" from a grep of your local branch —
+`git log --all` / `origin` is the only search that can say that. (2026-09-16: a
+whole session was spent "recovering" notes already specced as `req-76..86` on
+`origin/planning`, because the branch was stale and never fetched.)
 
 Save, push, and publish are all yours (DEC-008). So: if `handoff/` edits are
 uncommitted, **save and push them before answering**. If work is saved but unpublished
