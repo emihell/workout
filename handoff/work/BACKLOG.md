@@ -129,6 +129,69 @@ verified; see SHIPPED / DEC-013 refinement). The rest specced and queued (all ux
 PARKED on Emilio's model decision — note: Rowing already uses a "Duration" field (cardio), so a
 duration concept partly exists; may inform #6.
 
+### Gym-flow notes — batch 2, Emilio 2026-09-14 (in-gym, on the shipped req-25..31 flow)
+
+Raw notes captured after using the flow that batch-1 (req-25..29) built. All Phase 1. Grounded
+against the code; disposition + open questions noted. **Not yet specced as reqs.** Several need a
+behaviour call first. Numbered N1..N11 in Emilio's order.
+
+- **N1 — empty-today Start → "Start new workout" (ad-hoc).** When nothing is scheduled, the Start
+  should start a workout, not sit dead. [measured] `TodayEmpty` renders Start **disabled**
+  (`Today.jsx:191`); `startOrContinue` requires a `routineId` (`workout-actions.js:14`) — no
+  ad-hoc/blank-workout path exists. *Disp:* needs a decision. *Q:* start a **blank** ad-hoc workout
+  (new model capability) or open a **routine picker**?
+- **N2 — timed exercises.** *Already captured* as batch-1 **#6**, PARKED on the model-shape decision
+  (Emilio 2026-09-10; above). Not a new item and not yet a req — still waiting on his call
+  (orthogonal weight/duration flag vs a new `EXERCISE_TYPES` value). Persisted-data ask-gate applies.
+- **N3 — Continue lands straight in the current exercise, not the overview.** [measured]
+  `startOrContinue` resumes onto the Workout **overview** (`/workout/:routineId`, `overview.jsx`
+  lists items); the current item is already computable (`itemCurrentPath`/`completed`,
+  `overview.jsx:105,136`). *Disp:* READY-able, small. *Q:* define "current" = first not-done item?
+- **N4 — active-workout affordance from elsewhere in the app** — a floating button, or a signal on
+  the Workout tab. *Disp:* ux-feel, READY-able. *Q:* floating persistent Continue vs a badge/dot on
+  the tab (recommend the tab badge — a floating button competes with the log UI).
+- **N5 — rest timer as a small floating pill, folded into the next-set page.** Shrink the rest UI to
+  a pill/button (absolute), and on completing a set move **straight to the next set** carrying the
+  rest pill — removing the dedicated timer screen and one button press. [measured] rest is the
+  persistent `RestBar`/rest view (`workout/rest.jsx`; req-25 rest-on-overview + req-27 upcoming
+  weight shipped here). *Disp:* ux-feel, **medium — reworks the surface req-25/27 built.** *Q:*
+  confirm removing the dedicated rest view entirely.
+- **N6 — bigger done/not-done contrast in the active exercise list.** De-emphasize done exercises so
+  the eye lands on the not-done ones. [measured] `overview.jsx:110` shows only a `· done` text
+  suffix; no visual de-emphasis. *Disp:* ux-feel, small, READY-able.
+- **N7 — during an exercise: Previous/Skip/Next to the absolute bottom; "Add note" a small control
+  beside the exercise title.** [measured] pairs with DESIGN §4 button placement (req-29 shipped) and
+  req-26 (note behind a button). *Disp:* ux-feel, small–medium.
+- **N8 — dev-only "note on this page" button** (very small/unimposing) — jots a note tied to the
+  current page/route so a req can be made from it (an in-app backlog-capture pipe). *Disp:*
+  **meta/dev-tooling, not product** — unusual scope. *Q:* build it (where do notes persist —
+  localStorage? exported how?), or keep capturing verbally? Recommend a dev-flag-gated localStorage
+  jotpad with export-to-clipboard, never shipped to the live build.
+- **N9 — a set-setting changed mid-workout becomes the future default.** e.g. bump 4kg→5kg in warm-up
+  → 5kg is the default next time. [measured] prefills already come from the **last finished workout's**
+  per-field value (history-prefill rule / DESIGN §1; req-17 `initialSetFields`) — so after *this*
+  workout finishes, the next prefill is already 5kg. What is genuinely new/unclear: does he also want
+  the change to (a) update the **routine template's** prescribed value immediately, and/or (b) apply
+  live to the **remaining sets of this same workout**? *Disp:* **needs a behaviour decision — brushes
+  the core prefill rule.** *Q for Emilio.*
+- **N10 — auto-complete a finished routine.** When every exercise is done, a ~10s "great job" summary
+  (stats/improvement vs last time), then auto-finish with an option to edit — minimize taps vs the
+  current "all done → press Finish". [measured] Finish is a manual Row (`overview.jsx:116`) →
+  `WorkoutFinish`. *Disp:* ux-feel + behaviour; auto-writing a finish touches data-trust. *Q:*
+  auto-finish on expiry vs countdown-then-confirm (recommend countdown with a visible Cancel/Edit,
+  auto-commit on expiry).
+- **N11 — Today page: drop the duplicate "Completed today", and maybe unify the list model.**
+  [measured] a workout finished today renders in **both** "Completed today" (`Today.jsx:301`) **and**
+  the recent peek (`:314`) — a genuine duplicate. The Today screen is one file with ~8 sub-components
+  and overlapping state flags (`activeStartedToday`/stale/done/`completedToday`); a prior unification
+  attempt, **req-32**, was **dropped** (DEC-025). *Disp:* dedup is READY-able-small; the broader
+  refactor is dropped-req-32 territory — decide whether to revive it. His "several components → weird
+  states" read is half-right: one file, many blocks, real state overlap.
+
+**Sequencing insight:** N3/N4/N5/N6/N7 are ux-feel refinements on the shipped in-gym flow and can be
+specced fresh against the current code (batch-1's "refactor first" collision is past — that flow is
+merged). N1/N9/N10 carry behaviour decisions; N2/N8 are their own decisions. Order once decided.
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 Emilio's "we should start creating programs." Today the app has **routines** (reusable
