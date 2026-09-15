@@ -1,7 +1,8 @@
 # Now
 
-Updated 2026-09-14. **Shipped: req-01–09, req-11–23, req-25–31, req-33–75** (req-10 pending;
-req-24 gated; req-32 dropped, DEC-025). Done lives in `log/SHIPPED.md`. Full
+Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–75, req-81** (req-10 pending;
+req-24 gated; req-32 dropped, DEC-025). **Batch 2 in flight (DEC-047 batch mode):** req-81 ✓ merged;
+req-79 building; then req-80 → req-76 → req-78. Done lives in `log/SHIPPED.md`. Full
 reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
 **Cleared 2026-09-14 (serial batch, DEC-035):** req-65–69 — CLAUDE.md merge model, pre-push
@@ -26,13 +27,10 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
-**Gym-flow batch 2 (Emilio 2026-09-14, in-gym) — SAVED as req-76..86, NOT scheduled (tokens).**
-Raw notes: BACKLOG N1–N11. READY (spec settled): req-76 Continue→current-exercise, req-79
-done/not-done contrast, req-80 nav-to-bottom+inline-note, req-81 Today "Completed" dedupe, req-78
-rest-pill-into-next-set (decided 2026-09-16: remove rest view, self-paced — **build LAST**, domino
-risk on req-25/27). PAUSED (Emilio 2026-09-16): req-77 active-workout affordance.
-NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default
-(brushes core rule), req-84 auto-complete routine, req-85 timed exercises (model shape), req-86 dev note-capture.
+**Gym-flow batch 2 (Emilio 2026-09-14) — req-76..86** (raw: BACKLOG N1–N11). In flight this session
+(order at top); req-78 decided 2026-09-16 (remove rest view, self-paced, build last). PAUSED: req-77
+affordance. NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default (brushes core
+rule), req-84 auto-complete, req-85 timed (model shape), req-86 dev note-capture.
 
 **Still decision-gated:** req-24 inline-confirm pattern; history-recalc behaviour; req-82/83/84/85/86 (above).
 

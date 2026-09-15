@@ -1008,3 +1008,12 @@ storage.js/model.js. Persisted the workflow audit durably at `handoff/audits/wor
 recorded in AUDIT.md that workflow audits live in `handoff/audits/` (product audits stay in root `audits/`).
 **DEC-046** rode this publish: ratified the req-73 backup rule (Emilio delegated) — Planner reminds Emilio
 to Export before any persisted-data/migration merge; digest + PLANNING.md updated. Planning-owned, published.
+
+## req-81 — remove the duplicate "Completed today" on Today (N11, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 2, req 1/5 (DEC-047 batch mode). A workout finished today rendered twice on Today (the labeled
+"Completed today" section + the recent peek). Builder's dedupe direction: the "Completed today" section
+owns today's finished sessions; the recent peek excludes exactly that set (filtered by workout id) and reads
+as prior-day history. Also guarded the "No history yet." line from printing beneath a Completed-today
+section. Today.jsx composition only — no data change. `./check` green (218 tests), `--no-ff`. ux-feel gate:
+per batch mode (DEC-047) merged on green without a per-req gym-test hold; Emilio feels it after the batch.
