@@ -1038,3 +1038,15 @@ Previous/restore) — Planner verified the note→completeSet→store path is in
 `workout-log.js` are untouched (note saves exactly as before). Shared touches additive (`ExerciseTitle`
 aside; both callers checked). `./check` green (218). ux-feel (bar placement, aside look, Showcase's
 cosmetic fixed-bar dev-only side effect) → Emilio's after-batch pass.
+
+## req-76 — Continue resumes into the current exercise (N2, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 2, req 4/5. Continue/resume of an in-progress workout now routes straight into the first not-done
+exercise's log page (`resumeTarget`, reusing the overview's exact `itemIsMarkedDone || plannedDone`
+derivation — skipped counts as done and is passed over); all-done → overview with Finish. Wired into
+`startOrContinue` (continuing-same only; start-new still lands on overview) and `continueInProgress`.
+**Refactor:** the pure path builders (`itemLogPath`/`itemDonePath`/`itemCurrentPath`) moved from
+`helpers.jsx` to a new JSX-free `src/workout-paths.js` (so `workout-actions.js`, loaded by `node --test`,
+can share them) and re-exported from `helpers.jsx` — callers unchanged. +6 tests (218→**224**): resumeTarget
+selection incl. skipped + all-done→overview, and a startOrContinue hash-assertion integration test.
+`--no-ff`. Browser lands-on-current is Emilio's ux-feel check.

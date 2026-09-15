@@ -1,7 +1,6 @@
 # req-78 — rest timer as a floating pill, folded into the next set (N5, gym-flow batch 2)
 
-**Status: READY — decisions made 2026-09-16 (below); not yet scheduled. Build LAST of the batch
-(domino risk: reworks the req-25/27 rest surface, must not regress the req-25 rest-timer bug).**
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-78` (`dee674d`…`dee674d`, 1 commit).**
 From Emilio's 2026-09-14 notes: *"When I finish last set I see the rest timer in the exercise menu
 — make it much much smaller, a little pill/button floating in absolute. Maybe remove the timer
 screen and move it into each following page … when I complete a set, move to next set but have the
