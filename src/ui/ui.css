@@ -328,6 +328,13 @@ a.ui-btn--quiet:active {
 .ui-row__chev {
   color: var(--ui-ink-3);
 }
+/* req-79 — a completed exercise in the active-workout overview reads muted so the
+ * eye lands on the not-done rows. Opacity dims the whole row uniformly (label,
+ * value, chevron) and works in both themes without per-token overrides. Row order
+ * and the "done" meaning are unchanged; this is emphasis only. */
+.ui-row--done {
+  opacity: 0.45;
+}
 
 /* ---- Bottom menu (the global shell, req-52 / DEC-036) ---- */
 /* The main content clears the FLOATING dock: dock height + its bottom inset + the
