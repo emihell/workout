@@ -1,6 +1,6 @@
 # req-81 — remove the duplicate "Completed today" on Today (N11, gym-flow batch 2)
 
-**Status: READY — saved 2026-09-14, not scheduled.** From Emilio's 2026-09-14 notes:
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-81` (`d6626d1`…`d6626d1`, 1 commit).** From Emilio's 2026-09-14 notes:
 *"On the main page, remove the 'complete today' — it becomes a duplicate."* (The broader "make
 the Today list one component" idea is captured separately — see Decisions.)
 
