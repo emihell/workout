@@ -215,6 +215,11 @@ export function Today() {
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
   const completedToday = completedOnDayKey(store.workouts, todayKey)
+  // req-81 — dedupe: a workout finished today used to appear twice on Today — in the
+  // "Completed today" section AND in the recent peek. "Completed today" (with its
+  // header) owns today's finished sessions; the recent peek excludes exactly that set
+  // (by id, so it tracks whatever the section renders) and reads as prior-day history.
+  const completedTodayIds = new Set(completedToday.map((workout) => workout.id))
   // req-55 / DEC-038 — the single in-progress workout is the today hero only while it
   // was STARTED today; then it replaces today's scheduled Start block. Once it ages to
   // a prior day it is "stale": no longer the hero (today's Start shows normally), and
@@ -223,9 +228,11 @@ export function Today() {
   // req-55 — the recent peek shows finished history AND any stale/unfinished
   // in-progress workout (started a prior day, or a legacy draft) as a Continue row,
   // merged by date so a stale one appears only when it falls in the recent window.
+  // req-81 — today's finished workouts are excluded here; they live in "Completed
+  // today" above (stale in-progress are never finished, so none are in that set).
   const recent = sortWorkoutsByDate([
     ...staleInProgressWorkouts(store, todayKey),
-    ...(store.workouts || []),
+    ...(store.workouts || []).filter((workout) => !completedTodayIds.has(workout.id)),
   ]).slice(0, 2)
 
   if (!routines.length) {
@@ -309,7 +316,9 @@ export function Today() {
         </>
       ) : null}
 
-      {recent.length === 0 ? <p className="ui-sub">No history yet.</p> : null}
+      {recent.length === 0 && completedToday.length === 0 ? (
+        <p className="ui-sub">No history yet.</p>
+      ) : null}
       <List>
         {recent.map((workout) =>
           workout.finishedAt ? (
