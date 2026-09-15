@@ -6,9 +6,11 @@ import {
   ABANDON_ON_NEW_WARNING,
   abandonInProgress,
   continueInProgress,
+  resumeTarget,
   startOrContinue,
 } from './workout-actions.js'
 import { dateKey } from './schedule.js'
+import { hashPath } from './route.js'
 
 // req-55 / DEC-038 — start-while-active abandons the one in-progress workout after a
 // warning (no draft stacking); Continue/Abandon resolve a stale in-progress or a
@@ -158,6 +160,70 @@ describe('continueInProgress — resolve a stale/draft workout', () => {
     confirmReturn = false
     continueInProgress(store, { id: 'd1', routineId: 'rtn-d' })
     assert.deepEqual(names(store), [])
+  })
+})
+
+describe('resumeTarget (req-76) — Continue lands on the current exercise', () => {
+  // Real snapshot items carry a distinct `id` as well as the routineItemId; include
+  // it so setsForItem's id-fallback clauses don't false-match a set to the wrong item.
+  const items = [
+    { id: 'x1', routineItemId: 'i1', sets: 2 },
+    { id: 'x2', routineItemId: 'i2', sets: 2 },
+    { id: 'x3', routineItemId: 'i3', sets: 2 },
+  ]
+  const workout = (sets = [], completedItemIds = []) => ({
+    routineId: 'rtn-x',
+    snapshot: { items },
+    sets,
+    completedItemIds,
+  })
+
+  it('nothing done → first item log page', () => {
+    assert.equal(resumeTarget(workout()), '/workout/rtn-x/item/i1/log')
+  })
+
+  it('first item marked done → next not-done item', () => {
+    assert.equal(resumeTarget(workout([], ['i1'])), '/workout/rtn-x/item/i2/log')
+  })
+
+  it('first item planned-done (all work sets logged) → next not-done item', () => {
+    const sets = [
+      { routineItemId: 'i1', setType: 'work' },
+      { routineItemId: 'i1', setType: 'work' },
+    ]
+    assert.equal(resumeTarget(workout(sets)), '/workout/rtn-x/item/i2/log')
+  })
+
+  it('a fully-skipped exercise counts as done and is passed over', () => {
+    const sets = [
+      { routineItemId: 'i1', setType: 'work', reps: 'skipped' },
+      { routineItemId: 'i1', setType: 'work', reps: 'skipped' },
+    ]
+    assert.equal(resumeTarget(workout(sets)), '/workout/rtn-x/item/i2/log')
+  })
+
+  it('every exercise done → overview (Finish visible), not a broken item page', () => {
+    assert.equal(resumeTarget(workout([], ['i1', 'i2', 'i3'])), '/workout/rtn-x')
+  })
+
+  it('no items / no snapshot → overview', () => {
+    assert.equal(resumeTarget({ routineId: 'rtn-x', snapshot: { items: [] } }), '/workout/rtn-x')
+    assert.equal(resumeTarget({ routineId: 'rtn-x' }), '/workout/rtn-x')
+  })
+
+  it('resuming the same active workout navigates into the current exercise (no restart)', () => {
+    const active = {
+      id: 'a1',
+      routineId: 'rtn-x',
+      startedAt: new Date().toISOString(),
+      snapshot: { items: [{ id: 'x1', routineItemId: 'i1', sets: 1 }, { id: 'x2', routineItemId: 'i2', sets: 1 }] },
+      sets: [{ routineItemId: 'i1', setType: 'work' }], // i1 planned-done
+      completedItemIds: [],
+    }
+    const store = fakeStore({ activeWorkout: active })
+    startOrContinue(store, 'rtn-x')
+    assert.deepEqual(names(store), []) // neither abandon nor restart
+    assert.equal(hashPath(globalThis.window.location.hash), '/workout/rtn-x/item/i2/log')
   })
 })
 

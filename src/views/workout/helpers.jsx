@@ -1,5 +1,11 @@
 import { itemKey, itemLoggingState } from '../../workout-log'
+import { itemCurrentPath, itemDonePath, itemLogPath } from '../../workout-paths'
 import { Missing } from '../shared'
+
+// req-76 — the item log/done path builders now live in the JSX-free workout-paths
+// module (so workout-actions.js can share them); re-exported here so the workout
+// screens' `import { itemCurrentPath, … } from './helpers'` keep working unchanged.
+export { itemCurrentPath, itemDonePath, itemLogPath }
 
 // Shared helpers for the in-workout screens (req-19 split of Workout.jsx). These
 // are the only symbols used by more than one of the workout/ screen modules;
@@ -19,21 +25,6 @@ export function isActiveFor(active, routineId) {
 
 export function MissingItem() {
   return <Missing>Not found.</Missing>
-}
-
-export function itemLogPath(routineId, item) {
-  return `/workout/${routineId}/item/${itemKey(item)}/log`
-}
-
-export function itemDonePath(routineId, item) {
-  return `/workout/${routineId}/item/${itemKey(item)}/done`
-}
-
-// One branch, written once: a done exercise goes to its done screen, otherwise
-// its log screen. The `done` boolean varies by caller (marked-done+plannedDone
-// on the overview, plannedDone alone on the setup form), so it stays an argument.
-export function itemCurrentPath(routineId, item, done) {
-  return done ? itemDonePath(routineId, item) : itemLogPath(routineId, item)
 }
 
 export function itemSetsPath(routineId, item, workout) {

@@ -1,5 +1,7 @@
 import { go, hashPath } from './route.js'
 import { dateKey } from './schedule.js'
+import { itemIsMarkedDone, itemLoggingState } from './workout-log.js'
+import { itemCurrentPath } from './workout-paths.js'
 
 // req-55 / DEC-038 — the one warning shown before an in-progress workout is
 // discarded. There is exactly one in-progress workout; starting a different one, or
@@ -9,6 +11,22 @@ export const ABANDON_ON_NEW_WARNING =
 
 function workoutRoutineId(workout) {
   return workout?.routineId || workout?.sessionId
+}
+
+// req-76 — where a Continue/resume lands. Route straight into the "current" exercise:
+// the first item that is NOT done — neither marked-done nor planned-done. A skipped
+// exercise ends up planned-done (its skipped sets still fill its set count), so it
+// counts as done and is passed over, matching the decision that completed AND skipped
+// are both "not-current". If every exercise is done, land on the overview (with Finish
+// visible) rather than a broken/empty exercise page.
+export function resumeTarget(workout) {
+  const routineId = workoutRoutineId(workout)
+  const overview = `/workout/${routineId}`
+  const items = workout?.snapshot?.items || []
+  const current = items.find(
+    (item) => !(itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone),
+  )
+  return current ? itemCurrentPath(routineId, current, false) : overview
 }
 
 export function startOrContinue(store, routineId, options = {}) {
@@ -34,9 +52,14 @@ export function startOrContinue(store, routineId, options = {}) {
   if (!continuingSame) {
     store.startWorkout(routineId, scheduledFor, scheduleSlotId, config.plan || null)
   }
-  const target = `/workout/${routineId}`
+  const base = `/workout/${routineId}`
+  // req-76 — resuming the same in-progress workout lands on its current exercise;
+  // starting new keeps the overview as the landing (start-new is out of scope). The
+  // replace decision stays tied to the workout base: if we're already anywhere in
+  // this workout, replace rather than stacking history.
+  const target = continuingSame ? resumeTarget(active) : base
   const here = hashPath(typeof window === 'undefined' ? '/' : window.location.hash)
-  const replace = here === target || here.startsWith(`${target}/`)
+  const replace = here === base || here.startsWith(`${base}/`)
   go(target, { replace })
 }
 
@@ -48,14 +71,15 @@ export function continueInProgress(store, workout) {
   const routineId = workoutRoutineId(workout)
   const active = store.activeWorkout
   if (active && active.id === workout.id) {
-    go(`/workout/${routineId}`)
+    // req-76 — resume straight into the current exercise (or the overview if all done).
+    go(resumeTarget(active))
     return
   }
   if (active) {
     if (!window.confirm(ABANDON_ON_NEW_WARNING)) return
   }
   store.continueDraft(workout.id)
-  go(`/workout/${routineId}`)
+  go(resumeTarget(workout))
 }
 
 // req-55 — Abandon an unfinished in-progress workout from History. Discards
