@@ -224,22 +224,23 @@ export function Banner({ children, role = 'status' }) {
 
 // ---- Molecules (compose the atoms) ----
 
-// RestBar — the rest countdown (Emilio 2026-09-10): a big remaining-time number on
-// its own full-width line, then a row of exactly three equal-width buttons —
-// [Pause/Resume] [+30s] [Next] — with Next the primary button, rightmost.
-// Presentational: the real screen wires the handlers; the showcase passes stubs.
-export function RestBar({ seconds = 0, paused = false, onPauseResume, onAddTime, onNext }) {
+// RestPill (req-78) — the rest countdown as a small floating pill, replacing the
+// full-width RestBar. Since the next set's form is always live during rest (D2), rest
+// never blocks input, so the pill is purely informational + dismissable: it shows the
+// remaining seconds and the whole pill is a tap-target that skips the rest. No
+// pause/+30s/next controls — those belonged to the blocking rest surface that's gone.
+// Presentational: the real screen wires onSkip; the showcase passes a stub.
+export function RestPill({ seconds = 0, onSkip }) {
   return (
-    <div className="ui-restbar" role="status">
-      <div className="ui-restbar__time">{seconds}s</div>
-      <div className="ui-restbar__actions">
-        <Button onClick={onPauseResume}>{paused ? 'Resume' : 'Pause'}</Button>
-        <Button onClick={onAddTime}>+30s</Button>
-        <Button variant="primary" onClick={onNext}>
-          Next
-        </Button>
-      </div>
-    </div>
+    <button
+      type="button"
+      className="ui-restpill"
+      onClick={onSkip}
+      aria-label={`Rest ${seconds} seconds — tap to skip`}
+    >
+      <span className="ui-restpill__time">{seconds}s</span>
+      <span className="ui-restpill__skip">rest · skip</span>
+    </button>
   )
 }
 

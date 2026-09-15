@@ -48,7 +48,6 @@
   --ui-text-section: 22px; /* SectionHeader / h2 */
   --ui-text-title: 32px; /* Title / h1 screen titles */
   --ui-text-display: 40px; /* big data numbers (e.g. kg NumberField) */
-  --ui-text-rest: 112px; /* rest countdown — one step above display */
 }
 
 /* Base link treatment (req-15): the app is fully migrated onto the library, so
@@ -483,28 +482,40 @@ a.ui-btn--quiet:active {
   margin: var(--ui-s2) 0;
 }
 
-/* ---- RestBar (molecule) ---- */
-.ui-restbar {
-  padding: var(--ui-s3);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius);
+/* ---- RestPill (molecule, req-78) ---- */
+/* The rest countdown as a small floating pill (replaces the full-width RestBar).
+ * position: fixed so it floats over whichever in-workout screen is showing and the
+ * countdown persists across navigation. Top-centre keeps it clear of the top-left
+ * Exercises link, the top-right "Add note" control, and the bottom set-log action bar.
+ * Solid, no shadow (matches the dock, DEC-036). The whole pill is a tap-target that
+ * skips the rest. */
+.ui-restpill {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + var(--ui-s2));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--ui-s2);
+  min-height: auto;
+  padding: var(--ui-s1) var(--ui-s3);
+  border: 1px solid var(--ui-ink);
+  border-radius: 999px;
+  background: var(--ui-ink);
+  color: var(--ui-bg);
   font-family: var(--ui-font);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.ui-restbar__time {
-  display: block;
-  text-align: center;
-  font-size: var(--ui-text-rest);
+.ui-restpill__time {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1;
-  margin-bottom: var(--ui-s3);
 }
-.ui-restbar__actions {
-  display: flex;
-  gap: var(--ui-s2);
-}
-.ui-restbar__actions .ui-btn {
-  flex: 1 1 0; /* exactly three equal-width thirds */
+.ui-restpill__skip {
+  font-size: var(--ui-text-caption);
+  opacity: 0.75;
 }
 
 /* ---- SetLogForm (molecule) ---- */
@@ -562,32 +573,8 @@ a.ui-btn--quiet:active {
   font-size: var(--ui-text-caption);
 }
 
-/* ---- Upcoming set during rest (req-27) ---- */
-.ui-upcoming {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-s3);
-  margin-top: var(--ui-s3);
-  padding: var(--ui-s3);
-  border: 1px solid var(--ui-line);
-  border-radius: var(--ui-radius);
-  font-family: var(--ui-font);
-}
-.ui-upcoming__label {
-  font-weight: 600;
-  white-space: nowrap;
-}
-.ui-upcoming__mark {
-  font-weight: 700;
-}
-.ui-upcoming .ui-field {
-  flex: 1 1 0;
-  margin: 0;
-}
-.ui-upcoming__reps {
-  white-space: nowrap;
-  color: var(--ui-ink-2);
-}
+/* req-78 — the req-27 ".ui-upcoming" rest panel was removed with its RestUpcoming
+ * component (the upcoming-weight edit folded into the always-present next-set form). */
 
 /* ---- Type-scale sampler (showcase only) ---- */
 .ui-typescale {

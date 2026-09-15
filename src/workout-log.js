@@ -124,7 +124,7 @@ export function itemIsMarkedDone(workout, item) {
 // completedItemIds. It deliberately does NOT touch restEndsAt/restPausedRemaining:
 // req-25 arms a rest on the last set too (rest-on-overview), and this patch runs
 // right after the rest patch — clearing rest here would wipe the armed countdown
-// before the overview's RestBar renders. Suppression of rest belongs to the skip
+// before the overview's rest pill renders. Suppression of rest belongs to the skip
 // path (restPatchAfterSet), not to marking done.
 export function markItemDonePatch(workout, item) {
   const key = itemKey(item)
@@ -199,32 +199,17 @@ export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history
 // have); effort and note come from the restore payload only, else the defaults
 // (effort 3 "Moderate", empty note). Same priority order as setLogSeed: restore
 // (un-logging via "Previous") wins. Pure, so the prefill decision is inspectable.
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target, weightOverride = null }) {
+// req-78 — the req-27 upcoming-weight override was removed: the next set's form is now
+// the editable surface during rest, so the weight seed comes from restore/carry/history
+// alone. (The pure pendingWeightFor helper went with it.)
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target }) {
   const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target })
-  // req-27 — an explicit upcoming-weight edit made during rest overrides the
-  // computed seed *weight* for this one set: weight only (never reps), never on a
-  // restore, and only when the exercise uses weight. `weightOverride` is a value
-  // the lifter typed (possibly '' — an explicit blank), so the no-invent rule
-  // holds: with no edit (null) the computed blank / history / carry weight stands.
-  const weight = !fromRestore && weighted && weightOverride != null ? weightOverride : seed.weight
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe
       : 3
   const note = fromRestore ? restore.note : ''
-  return { weight, reps: seed.reps, effort, note }
-}
-
-// req-27 — the pending upcoming-set weight the lifter edited during rest, resolved
-// for the set the form is about to seed. `pending` is activeWorkout.nextSetWeight,
-// scoped to one { itemId, workIndex }: the override applies ONLY to that exact set,
-// so an edit never leaks to another set or a different exercise (whose itemId or
-// workIndex won't match). Returns the override weight (a string, possibly '' — an
-// explicit blank) or null when there is no override for this set. Pure.
-export function pendingWeightFor(pending, { itemId, workIndex }) {
-  if (!pending) return null
-  if (pending.itemId !== itemId || pending.workIndex !== workIndex) return null
-  return pending.weight ?? null
+  return { weight: seed.weight, reps: seed.reps, effort, note }
 }
 
 // req-25 — the rest-patch decision, made pure so "when does rest run after a set"

@@ -65,3 +65,19 @@ describe('req-38 day key is stamped in local time, not UTC', () => {
     assert.match(src, /import\s*\{[^}]*\bdateKey\b[^}]*\}\s*from\s*'\.\/schedule'/)
   })
 })
+
+// req-25 / req-78 — the rest-timer bug (a stale timer double-counting after Previous)
+// is prevented by removeActiveSet clearing the armed rest when a logged set is undone:
+// going back drops restEndsAt/restPausedRemaining, so re-completing arms a fresh timer
+// rather than double-counting. req-78 reworks the rest surface but must NOT touch this,
+// so lock it as a source guard (store.jsx can't be imported under `node --test`).
+describe('req-25 store.removeActiveSet clears the armed rest (no double timer)', () => {
+  const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
+
+  it('removeActiveSet resets restEndsAt and restPausedRemaining to null', () => {
+    const body = src.match(/removeActiveSet\(index\)\s*\{[\s\S]*?\n {6}\},/)
+    assert.ok(body, 'removeActiveSet method not found in store.jsx')
+    assert.match(body[0], /restEndsAt:\s*null/, 'removeActiveSet must clear restEndsAt')
+    assert.match(body[0], /restPausedRemaining:\s*null/, 'removeActiveSet must clear restPausedRemaining')
+  })
+})

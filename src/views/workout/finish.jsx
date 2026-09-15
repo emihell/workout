@@ -7,7 +7,7 @@ import { useStore } from '../../store-context'
 import { Back, Missing } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { isActiveFor } from './helpers'
-import { RestBar } from './rest'
+import { RestPill } from './rest'
 
 export function WorkoutFinish({ routineId }) {
   const store = useStore()
@@ -52,7 +52,7 @@ function FinishScreen({ routineId }) {
   return (
     <Screen>
       <Back to={`/workout/${routineId}`} />
-      <RestBar />
+      <RestPill />
       <Title>Finish</Title>
       <p className="ui-sub">
         {name} — {minutes} min · {setCount} sets

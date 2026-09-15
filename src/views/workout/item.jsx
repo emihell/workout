@@ -14,15 +14,14 @@ import {
   itemLoggingState,
   lastLoggedSetIndex,
   markItemDonePatch,
-  pendingWeightFor,
   reopenItemPatch,
   restPatchAfterSet,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing, NavLink } from '../shared'
-import { Button, Field, List, NumberField, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
+import { Button, Field, List, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
-import { RestBar, useRestCountdown } from './rest'
+import { RestPill, useRestCountdown } from './rest'
 import { unlockAudio } from '../../rest-cue'
 
 function liveExercise(store, item) {
@@ -134,38 +133,11 @@ function restoreFromLoggedSet(set) {
   }
 }
 
-// req-27 — during rest, the upcoming set's prescribed weight is shown and made
-// editable so the lifter can adjust the next load before the set starts. The reps
-// are shown for context (not editable — out of scope). The edit is written to
-// activeWorkout.nextSetWeight (scoped by the caller to this one set) and pre-fills
-// the next set's form via initialSetFields. Local state seeds from the computed
-// upcoming weight and is remounted per set by the caller's `key`, so each set
-// starts from its own seed; the store write + seed wiring live in the caller.
-function RestUpcoming({ weight, reps, changed, direction, onWeightChange }) {
-  const [value, setValue] = useState(weight)
-  return (
-    <div className="ui-upcoming">
-      <span className="ui-upcoming__label">
-        Next
-        {changed ? (
-          <span className="ui-upcoming__mark" aria-label={direction === 'up' ? 'increased' : 'decreased'}>
-            {' '}
-            {direction === 'up' ? '↑' : '↓'}
-          </span>
-        ) : null}
-      </span>
-      <NumberField
-        label="kg"
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value)
-          onWeightChange(e.target.value)
-        }}
-      />
-      <span className="ui-upcoming__reps">× {reps}</span>
-    </div>
-  )
-}
+// req-78 — the req-27 RestUpcoming panel (an editable "next weight" shown during a
+// blocking rest) is gone. Rest no longer blocks: the next set's own log form is shown
+// immediately on completing a set, and its weight field IS the editable surface, so the
+// separate panel and its nextSetWeight override folded away. The rest itself now shows
+// only as the floating RestPill.
 
 function WorkoutItemLive({ routineId, item }) {
   const store = useStore()
@@ -224,9 +196,7 @@ function WorkoutItemLive({ routineId, item }) {
             ? item.suggestedWeights[currentWorkIndex]
             : null,
       },
-      // req-27 — clear any upcoming-weight override: this set consumed it (the
-      // form seeded from it), and the next set starts from its own computed seed.
-      { ...restAfterSet(), nextSetWeight: null },
+      restAfterSet(),
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -248,7 +218,7 @@ function WorkoutItemLive({ routineId, item }) {
         targetWeight:
           currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
       },
-      { ...restAfterSet(true), nextSetWeight: null },
+      restAfterSet(true),
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -261,17 +231,9 @@ function WorkoutItemLive({ routineId, item }) {
     const next = restoreFromLoggedSet(lastLogged)
     next.workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
     setRestore(next)
+    // req-25 — removeActiveSet clears the armed rest (restEndsAt/restPausedRemaining)
+    // so going back then forward re-arms a fresh timer rather than double-counting.
     store.removeActiveSet(index)
-    // req-27 — going back changes which set is upcoming; drop any stale override.
-    store.patchActive({ nextSetWeight: null })
-  }
-
-  // req-27 — an explicit upcoming-weight edit during rest, written scoped to this
-  // exact { itemId, workIndex } so it can only pre-fill this one set.
-  function setUpcomingWeight(value) {
-    store.patchActive({
-      nextSetWeight: { itemId: itemKey(item), workIndex: currentWorkIndex, weight: value },
-    })
   }
 
   const canGoBack = state.logged.length > 0
@@ -286,12 +248,8 @@ function WorkoutItemLive({ routineId, item }) {
     restore &&
     restore.setType === currentType &&
     (currentType === 'wu' || restore.workIndex === currentWorkIndex)
-  // req-27 — a weight the lifter edited on the rest screen for this exact upcoming
-  // set overrides the computed seed; scoped so it never touches another set/exercise.
-  const weightOverride = pendingWeightFor(active.nextSetWeight, {
-    itemId: itemKey(item),
-    workIndex: currentWorkIndex,
-  })
+  // req-78 — the weight seed comes from restore/carry/history only; the req-27
+  // upcoming-weight override is gone (the next set's form is now the editable surface).
   const seed = initialSetFields({
     weighted,
     fromRestore,
@@ -300,21 +258,7 @@ function WorkoutItemLive({ routineId, item }) {
     history: historyPrefill,
     carry: carryFor(ex, last, currentType, state.workLogged),
     target,
-    weightOverride,
   })
-
-  // req-27 — mark the upcoming weight when it differs from the set just completed
-  // (a progression bump or planned step). Both sides must be real numbers to compare,
-  // so a no-history blank upcoming (or a skipped last set) is never flagged.
-  const lastLoggedWork = state.workLogged.at(-1)
-  const lastLoggedWeight =
-    lastLoggedWork && !isSkippedSet(lastLoggedWork)
-      ? Number(lastLoggedWork.weight)
-      : null
-  const upcomingWeightNum = seed.weight !== '' && seed.weight != null ? Number(seed.weight) : null
-  const upcomingChanged =
-    weighted && lastLoggedWeight != null && upcomingWeightNum != null && upcomingWeightNum !== lastLoggedWeight
-  const upcomingDirection = upcomingChanged ? (upcomingWeightNum > lastLoggedWeight ? 'up' : 'down') : null
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
   // title. The value lives here (passed straight to completeSet), and the reveal
@@ -329,14 +273,16 @@ function WorkoutItemLive({ routineId, item }) {
     setNote(noteSeed)
     setShowNote(Boolean(noteSeed))
   }, [setSeedKey, noteSeed])
-  // The note only makes sense while a set is being logged (not during rest, not once
-  // the exercise is planned-done) — that's the same branch that renders SetLogForm.
-  const logging = !resting && !plannedDone
+  // req-78 — the next set's log form is now shown throughout rest (rest doesn't block
+  // input), so the note affordance shows whenever the form does: any time the exercise
+  // isn't planned-done. (`resting` no longer gates the form.)
+  const logging = !plannedDone
 
   return (
     <Screen>
       <ExercisesLink routineId={routineId} />
-      <RestBar />
+      {/* req-78 — the running rest is a small floating pill (self-hides when no rest). */}
+      <RestPill />
       <ExerciseTitle
         routineId={routineId}
         item={item}
@@ -360,25 +306,12 @@ function WorkoutItemLive({ routineId, item }) {
       {logging && showNote ? (
         <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} autoFocus={!noteSeed} />
       ) : null}
-      {resting ? (
-        <>
-          {weighted && !plannedDone ? (
-            <RestUpcoming
-              key={`up-${itemKey(item)}-${currentType}-${currentWorkIndex}`}
-              weight={seed.weight}
-              reps={target}
-              changed={upcomingChanged}
-              direction={upcomingDirection}
-              onWeightChange={setUpcomingWeight}
-            />
-          ) : null}
-          {canGoBack ? (
-            <Button variant="quiet" onClick={previousSet}>
-              Previous
-            </Button>
-          ) : null}
-        </>
-      ) : plannedDone ? null : (
+      {/* req-78 — the next set's log form shows immediately on completing a set, during
+          rest included (no intermediate rest panel, no extra tap). Its Complete is live
+          while the pill counts down (D2, self-paced). The form remounts per set by
+          `key`; rest ending doesn't change the key, so in-progress edits survive. Once
+          the exercise is planned-done, completeSet has already advanced to the overview. */}
+      {plannedDone ? null : (
         <SetLogForm
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
           weighted={weighted}
@@ -415,7 +348,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
   return (
     <Screen>
       <ExercisesLink routineId={routineId} />
-      <RestBar />
+      <RestPill />
       <SectionHeader>Today</SectionHeader>
       {today.length ? (
         <List>
@@ -481,7 +414,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   return (
     <Screen>
       <Back to={itemPath} />
-      <RestBar />
+      <RestPill />
       <p className="ui-sub">{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
       <Title>Set</Title>
       <SetEditForm

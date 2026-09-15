@@ -7,7 +7,7 @@ import { navForBase, RoutineScreens } from '../Routine'
 import { Back, Missing } from '../shared'
 import { Button, Field, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './helpers'
-import { RestBar } from './rest'
+import { RestPill } from './rest'
 
 export function WorkoutItemExercise({ routineId, itemId }) {
   const store = useStore()
@@ -39,7 +39,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   return (
     <Screen>
       <Back to={backTo} />
-      <RestBar />
+      <RestPill />
       <Title>{exerciseName(item)}</Title>
       <p className="ui-sub">{ex.equipment}</p>
       <form

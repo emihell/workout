@@ -9,7 +9,7 @@ import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
-import { RestBar } from './rest'
+import { RestPill } from './rest'
 
 function abandonWorkout(store) {
   if (!window.confirm('Abandon?')) return
@@ -98,7 +98,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
       {/* req-49 — Back steps out of the in-workout hub to Today; the workout stays
           active (resume via Continue). Abandon (below) is the explicit discard. */}
       <Back to="/" />
-      <RestBar />
+      <RestPill />
       <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</Title>
       <List>
         {items.map((item) => {
