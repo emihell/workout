@@ -1,6 +1,6 @@
 # req-76 — Continue resumes into the current exercise (N2, gym-flow batch 2)
 
-**Status: READY — saved 2026-09-14, not scheduled.** From Emilio's 2026-09-14 notes:
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-76` (`b3337a6`…`b3337a6`, 1 commit).** From Emilio's 2026-09-14 notes:
 *"If I start an exercise in a workout, go elsewhere, then press continue on the active
 workout — I should go straight into the exercise."*
 
