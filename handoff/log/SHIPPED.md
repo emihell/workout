@@ -1017,3 +1017,12 @@ owns today's finished sessions; the recent peek excludes exactly that set (filte
 as prior-day history. Also guarded the "No history yet." line from printing beneath a Completed-today
 section. Today.jsx composition only — no data change. `./check` green (218 tests), `--no-ff`. ux-feel gate:
 per batch mode (DEC-047) merged on green without a per-req gym-test hold; Emilio feels it after the batch.
+
+## req-79 — done/not-done contrast in the active exercise list (N6, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 2, req 2/5. Completed exercises in the active-workout overview read muted (`.ui-row--done`,
+opacity 0.45 — whole row) so the eye lands on not-done rows; order + "done" meaning unchanged, `· done`
+suffix kept. **Shared-component touch:** `ui/index.jsx` `Row` gained an optional `className=''` prop
+(additive; `rowClass` reduces to `ui-row` for all ~40 existing callers — Planner verified every caller
+unaffected, DEC-035 shared-code carve-out). `./check` green (218 tests), `--no-ff`. Feel judgement (the
+0.45 value) left for Emilio's after-batch pass — one value to tune.
