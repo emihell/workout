@@ -1,6 +1,6 @@
 # req-80 — during-exercise: nav to the bottom, inline "Add note" by the title (N7, gym-flow batch 2)
 
-**Status: READY — saved 2026-09-14, not scheduled.** From Emilio's 2026-09-14 notes:
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-80` (`0d2b159`…`0d2b159`, 1 commit).** From Emilio's 2026-09-14 notes:
 *"Previous/Skip/Next should be at the absolute bottom of the page, and Add note should be
 something small beside the exercise title."*
 
