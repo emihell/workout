@@ -1,6 +1,6 @@
 # req-84 — auto-complete a finished routine (N10, gym-flow batch 2)
 
-**Status: READY — decisions + full spec settled with Emilio 2026-09-16.** No persisted-data change
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-84` (`7dfea1a`…`7dfea1a`, 1 commit).** No persisted-data change
 (read-only stats + the existing finish path). From Emilio's 2026-09-14 notes:
 *"When all exercises in a routine are done, auto-complete? A 'great job' in 10 sec showing
 stats/improvements from last time, then auto-complete the whole routine but with an option to
