@@ -184,3 +184,11 @@ ground truth (origin). **Fixed:** git-fetch-at-session-start (PLANNING.md), chec
 and "lost"/"missing"/"verbatim"/"done"/"merged" are claims that need the command output **beside** them
 before the word is written — the honesty *rule* alone did not hold (it broke again the same session), so
 the discipline is receipts, not intentions.
+
+## L-015 — brace a `$var` immediately followed by a non-ASCII byte in bash  (2026-09-16)
+
+req-91. A `$PREVIEW_PORT` written directly before a multibyte `…` in the `plan` script was parsed as one
+undefined variable name (bash reads the following bytes as part of the name), which under `set -u` aborted
+the build. Fixed by `${PREVIEW_PORT}`. **Lesson:** in the `plan` script especially — it's full of `…`,
+`–` (en-dash) and other non-ASCII — **always brace `${var}` when the next character is non-ASCII**, or the
+var name silently swallows it. Cheap to prevent, annoying to diagnose.

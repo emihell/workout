@@ -2,9 +2,9 @@
 
 Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–91** (req-10 pending; req-24
 gated; req-32 dropped; req-77 PAUSED). Session retro shipped: L-014, receipt discipline, DEC-047
-visibility gate, req-89 (UI screenshot tool), req-90 (closeout auto-ledger). **Nothing building.**
-**NEEDS DECISION: req-91** per-branch preview deploy — Emilio's infra-approach call (the durable UI-blind fix). Owed by Emilio (after-deploy
-checks): the timed-exercise browser flow (req-85) + the req-78 req-25 Previous-then-forward check.
+visibility gate, req-89 (UI screenshot tool), req-90 (closeout auto-ledger), req-91 (`./plan preview`).
+**Nothing building.** Owed by Emilio: **one live `./plan preview` run** (tailscaled up) to confirm the
+`.ts.net` URL; the timed-exercise browser flow (req-85); the req-78 req-25 Previous-then-forward check.
 Loose follow-ups (deferred): req-85 v1 gaps (timed-set duration not editable in set-edit; timed
 bodyweight still asks effort); req-78 add-backs (+30s/pause, ↑↓ marker — DEC-048 "nice to have").
 Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.

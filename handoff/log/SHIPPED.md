@@ -1181,4 +1181,14 @@ pre-merge `plan`, so this entry is the last hand-written one; step 4b applies fr
 
 ## req-91 — `./plan preview` : one command to open a branch on your phone before merge  (merged 2026-09-16)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+From the session retro (approach (c), Emilio). New `preview` verb in `plan`, wrapping DEC-041's Tailscale
+flow: `./plan preview [req-NN]` builds the branch (vite base `/`) → backgrounds `vite preview :4173` →
+`tailscale serve --bg 4173` → prints the `*.ts.net` HTTPS URL; `req-NN` checks out first (clean tree
+only); `./plan preview stop` tears it all down. **Entirely additive** (356 insertions, 0 deletions — no
+touch to closeout/publish/save); `serve` never `funnel`; code-worktree-only (DEC-041 caveat). DEMO.md
+points at it. Verified by Builder: guards refuse+exit1, build+serve curl 200, clean single-server replace,
+stop frees the port, `./check` green (261). **Needs Emilio's one live run** (tailscaled was down in
+Builder's session): the real `.ts.net` URL over HTTPS on the phone, and the surgical `--https=443 off`
+teardown live. `--no-ff`. With req-89 (Planner's screenshot gate), the UI-blindness gap is closed both
+ends. **This was the first live firing of req-90's step-4b auto-ledger — it worked** (stub + range
+auto-written).
