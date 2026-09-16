@@ -156,6 +156,10 @@ behaviour call first. Numbered N1..N11 in Emilio's order.
   persistent `RestBar`/rest view (`workout/rest.jsx`; req-25 rest-on-overview + req-27 upcoming
   weight shipped here). *Disp:* ux-feel, **medium — reworks the surface req-25/27 built.** *Q:*
   confirm removing the dedicated rest view entirely.
+  **SHIPPED as req-78 (2026-09-16), DEC-048.** Two consequences Emilio judged "nice to have" —
+  **deferred, not scheduled:** (a) re-add **+30s / Pause** to the pill *if* real gym use wants to
+  extend a rest (DEC-048 allows an optional nudge without contradiction); (b) **re-surface the req-27
+  progression ↑/↓ marker** somewhere on the next-set form (it was dropped with the RestUpcoming panel).
 - **N6 — bigger done/not-done contrast in the active exercise list.** De-emphasize done exercises so
   the eye lands on the not-done ones. [measured] `overview.jsx:110` shows only a `· done` text
   suffix; no visual de-emphasis. *Disp:* ux-feel, small, READY-able.

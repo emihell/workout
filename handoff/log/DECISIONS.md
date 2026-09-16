@@ -970,3 +970,17 @@ continuity, because Emilio is intentionally out of the loop and context must car
 behaviour-decision gate still applies** even in a batch — a gated req still needs Emilio's call, resolved
 during the pre-batch planning; only *testing* is relaxed, never *decisions*. Reversible. Home for the
 operational rule: WORKFLOW.md §"Batch mode".
+
+## DEC-048 — rest is informational, not a control surface; the next set is always live during rest  (Emilio, 2026-09-16)
+
+Ratifies the consequences of req-78's D1/D2 (rest-pill rework). Rest is now a small floating pill that
+shows the remaining time and skips on tap — nothing else. Two controls the old blocking `RestBar` carried
+are **intentionally gone**: **Pause / +30s** (self-pacing removes their purpose — you can log the next set
+whenever, so extending/pausing a countdown that no longer blocks is moot) and the **req-27 progression
+↑/↓ marker** (it lived on the deleted `RestUpcoming` panel; the next set's own weight field now shows the
+load). Emilio, shown both removals, judged them **"nice to have"** — acceptable to lose now, worth a
+possible add-back later (captured as deferred backlog items, not scheduled). So the governing rule going
+forward: **rest does not block input and is not a control surface; the next set's form is the live surface
+during rest.** Reversible — a future req can re-add +30s or re-surface the marker without contradicting
+this (the DEC is about rest not *blocking*, not about forbidding an optional timer nudge). Home for the
+operational behaviour: the code (`rest.jsx` RestPill, `item.jsx` form-during-rest) + req-78 in SHIPPED.
