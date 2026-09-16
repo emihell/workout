@@ -1,6 +1,6 @@
 # req-82 — empty-day Start = start a workout (N1, gym-flow batch 2)
 
-**Status: READY — Emilio picked (a) routine picker, 2026-09-16. No model change.**
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-82` (`29c9741`…`29c9741`, 1 commit).**
 From Emilio's 2026-09-14 notes: *"If nothing is scheduled today, make the start button 'start new workout'."*
 
 **Gate: functional.**

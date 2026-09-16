@@ -1068,3 +1068,14 @@ code), kept restPatch/restRemaining/rest-cue. `./check` green (**216** tests), `
 marker** dropped with RestUpcoming. Builder's candidate DEC: "rest is informational, not a control
 surface; next set always live during rest." **Emilio still owes the req-25 Previous-then-forward check
 in a real browser** (Planner has no browser; verified by logic + source guard only).
+
+## req-86 — dev-only "note on this page" capture button (N8, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 3, req 1/3. Dev-only on-page feedback capture (Emilio: "add feedback directly on a page, fast").
+Small "✎" button bottom-left on every screen **in dev builds only** → panel showing the current route,
+a note field, Save/Copy-JSON/Clear. Notes go to a **separate** `localStorage` key `workout-dev-notes-v1`
+(never `workout-mvp-v8`), capturing `{route, timestamp, text, context}` (context = routeName, id params,
+hash, app git-sha). **Fail-closed gating verified:** single render site `{import.meta.env.DEV ? <DevNotes/>
+: null}` (App.jsx) → Vite DCE removes it + tree-shakes `src/dev/*` in prod; Builder's `GITHUB_PAGES=true
+npm run build` + `dist/` grep = 0 matches (14 in src). Touches no product code (App.jsx 1 line, `src/dev/*`,
+a version define). +9 tests (**225**). `./check` green, `--no-ff`. Live render/clipboard is Emilio's check.
