@@ -1,9 +1,10 @@
 # req-86 — dev-only "note on this page" capture button (N8, gym-flow batch 2)
 
-**Status: NEEDS DECISION — saved 2026-09-14, not scheduled. Dev tooling, not product.** From
-Emilio's 2026-09-14 notes: *"A new button only for development — a little, very unimposing button
-where, while doing an exercise and seeing a flaw or improvement, I can add a note saved connected
-to that page, so you can see what it's connected to and create a req from it."*
+**Status: READY — Emilio said build it, 2026-09-16.** Purpose (Emilio's words, 2026-09-16):
+*"so I can add feedback directly on a page, fast, and you can add anything you need to be able to
+create a req on that feedback."* From the 2026-09-14 notes: *"A new button only for development — a
+little, very unimposing button where, while doing an exercise and seeing a flaw or improvement, I can
+add a note saved connected to that page, so you can see what it's connected to and create a req from it."*
 
 **Gate: infra / dev-only** — must **never** ship to the live GitHub Pages build.
 
@@ -13,15 +14,24 @@ Emilio wants an in-app pipe into this backlog: a tiny, unimposing button that jo
 the current page/route while using the app, so a req can be made from it later — instead of
 capturing verbally after the fact.
 
-## Open decision (Emilio)
+## The behaviour (decided: build it, Emilio 2026-09-16)
 
-Build it? And if so:
-- **persistence** — a separate `localStorage` key (recommended: **never** touch `workout-mvp-v8`);
-- **retrieval** — a dev screen listing notes, and/or **export-to-clipboard / JSON**;
-- **gating** — a dev flag / env so it is absent from the production build.
+A small, unimposing button present on every screen **in dev only**. Tapping it opens a minimal text
+input; on save it stores a feedback note tied to the current page. The store is a **separate
+`localStorage` key** (never `workout-mvp-v8`). Notes are **exportable** (copy-to-clipboard as JSON)
+so they can be handed to the planning session to become reqs.
 
-*Recommended:* dev-flag-gated, a separate localStorage key, capture `{route, timestamp, text}`,
-export-to-clipboard as JSON. No dev screen needed at first if export suffices.
+**Capture enough context to make a req from it** (Emilio's ask — "add anything you need"):
+- `route` — the current hash route (so the note is tied to the exact screen).
+- `timestamp` — when it was captured (local time; the app already has `dateKey`).
+- `text` — Emilio's feedback.
+- and any cheap, useful context CC judges helps req-creation: e.g. the active route params /
+  exercise or workout id if on a workout screen, and the app version/build. **Never** copy the
+  user's real history wholesale — just the small identifying context.
+
+**Gating (hard requirement):** a dev flag (e.g. `import.meta.env.DEV` / a build-time flag) so the
+button and its store are **entirely absent** from the production GitHub Pages build — no render, no
+key written. This is the acceptance failure case.
 
 ## Data-trust guard
 
@@ -40,4 +50,7 @@ Written once approved. Provisional acceptance:
 
 ## Decisions
 
-- Build vs keep capturing verbally; persistence/retrieval/gating shape (Emilio) — blocks READY.
+- Build it (Emilio, 2026-09-16). Shape: dev-flag-gated, separate localStorage key, capture
+  `{route, timestamp, text}` + cheap req-useful context, export-to-clipboard as JSON. No dev listing
+  screen at first if export suffices (CC may add a trivial one if cheaper than clipboard).
+- Exact dev-flag mechanism + which context fields — implementation (CC), within the guards above.

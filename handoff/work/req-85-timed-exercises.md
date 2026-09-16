@@ -1,7 +1,8 @@
 # req-85 — timed exercises (duration sets) (N2 / batch-1 #6, gym-flow)
 
-**Status: NEEDS DECISION — PARKED on model shape (Emilio, 2026-09-10; re-raised 2026-09-14).**
-Emilio 2026-09-14: *"Time for timed exercises."* Same feature as the 2026-09-10 note #6.
+**Status: MODEL DECIDED 2026-09-16 — (a) orthogonal weight/duration flag (below); FULL SPEC + PERSISTED-
+DATA CEREMONY PENDING before a batch — not yet buildable.** Emilio 2026-09-14: *"Time for timed
+exercises."* Same feature as the 2026-09-10 note #6; unparked 2026-09-16.
 
 **Gate: persisted-data + model + UI** (schema-version bump; ask-gate applies).
 
@@ -13,13 +14,22 @@ have `restSec` already (`model.js:41`) but **no per-set work duration**; `EXERCI
 ['machine','free','bodyweight','cardio']` (`ids.js:51`) has no "timed" concept. Rowing already
 uses a "Duration" field (cardio) — a duration concept **partly exists** and may inform the shape.
 
-## Open decision (Emilio) — the model shape
+## Model decided (Emilio, 2026-09-16): (a) orthogonal weight/duration flag
 
-- **(a) an orthogonal weight/duration flag** on any exercise (weight and/or duration), vs
-- **(b) a new `EXERCISE_TYPES` value** (`'timed'`).
+Any exercise can carry a **weight and/or a duration** — a flag on the exercise, **not** a new type,
+so an exercise can be weighted, timed, or both (matches Emilio's framing; Rowing's existing "Duration"
+shows a duration concept can coexist with type). (b) new `'timed'` `EXERCISE_TYPES` value **rejected**
+(rigid: timed OR weighted, never both).
 
-Nothing is specced until this is picked. The "sound at zero" reuses the still-open rest-end-cue
-backlog item.
+**In scope (Emilio, 2026-09-16):** a timed exercise needs a real **in-set countdown timer** — you
+start it, it counts down during the set, with a **sound at zero** (reuses the rest-end-cue work).
+
+**Full spec + persisted-data ceremony still to be written before this enters a batch:**
+- **What changes and to how many records** — the store schema-version bump for the new duration
+  field; state it before touching the store (ask-gate #2 / DEC-035 carve-out → Emilio's eyes).
+- **A migration round-trip test** proving older `localStorage` keys survive the bump.
+- **Back up first** (Settings → Export) before merge (DEC-046) — Planner reminds Emilio at that point.
+- The countdown UI + the start/stop/complete interaction with the existing set-log flow.
 
 ## Persisted-data ask-gate (when this revives)
 

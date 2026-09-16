@@ -1,6 +1,7 @@
 # req-84 — auto-complete a finished routine (N10, gym-flow batch 2)
 
-**Status: NEEDS DECISION — saved 2026-09-14, not scheduled.** From Emilio's 2026-09-14 notes:
+**Status: DECISION MADE 2026-09-16 (countdown-then-confirm, below); FULL SPEC PENDING before a batch
+— not yet buildable (needs the net-new vs-last-time stats specced).** From Emilio's 2026-09-14 notes:
 *"When all exercises in a routine are done, auto-complete? A 'great job' in 10 sec showing
 stats/improvements from last time, then auto-complete the whole routine but with an option to
 edit … goal should be that everything is automated and user interaction is minimal — instead of
@@ -14,11 +15,13 @@ a list all done and press Done."*
 `WorkoutFinish`. Emilio wants the finish to feel automatic: a short celebratory summary, then the
 workout completes on its own with a chance to intervene.
 
-## Open decision (Emilio)
+## Decision (Emilio, 2026-09-16): countdown-then-confirm, auto-commit on expiry
 
-- auto-finish **on timer expiry**, vs a **countdown-then-confirm**. *Recommended:* a ~10s
-  countdown with a visible **Cancel/Edit** that **auto-commits on expiry** — minimal taps, still
-  reversible before it commits.
+A ~10s countdown with a visible **Cancel/Edit** that **auto-commits the finish on expiry** — minimal
+taps, still reversible before it commits. **Full spec still to be written before this enters a batch**
+— chiefly the **"vs last time" stats** (which stats, computed from what; note this comparison does
+**not** exist today — it's net-new) and the exact countdown UI. Heavier than the other batch-2 reqs;
+sequence it deliberately.
 
 ## Data-trust note
 
