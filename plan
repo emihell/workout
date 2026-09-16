@@ -13,6 +13,10 @@ plan sync              both directions of staleness: unpublished planning
                         AND the planning worktree's own code falling behind
 plan closeout req-N    merge a built branch, flip its doc status, publish,
                         push both branches, delete the branch — one command
+plan preview [req-N]   build the checked-out (or a named req-N) branch and
+                        serve it over Tailscale (HTTPS) to test on the phone
+                        before merge; run in the CODE worktree (DEC-041)
+plan preview stop      tear down that preview server + tailscale serve
 plan doctor            verify first-machine setup (layout, hooks, deps, grants,
                         git identity), then print status. Read-only; exits
                         non-zero if any check needs a fix.
@@ -44,6 +48,12 @@ claude_code_running() {
     *) return 0 ;;  # pgrep itself errored — unknown, not safe
   esac
 }
+
+# req-91: `plan preview` state. Machine-local temp — one preview at a time on
+# this Mac (the fixed demo port, DEC-041), so a single pidfile/log is enough.
+PREVIEW_PORT=4173
+PREVIEW_PIDFILE="${TMPDIR:-/tmp}/workout-plan-preview.pid"
+PREVIEW_LOG="${TMPDIR:-/tmp}/workout-plan-preview.log"
 
 # Sets PLANNING_DIR / CODE_DIR from `git worktree list`, keyed on branch name
 # rather than a hardcoded path — req-02 may move things, Emilio may rename
@@ -813,6 +823,228 @@ PY
   echo "doctor: all setup checks passed."
 }
 
+# req-91: `plan preview` — DEC-041's phone-test gate as one verb. Builds the
+# checked-out (or a named req-N) branch exactly as `npm run demo` does (vite
+# build, base '/' with GITHUB_PAGES unset -> vite preview on :4173), then exposes
+# it over the tailnet with `tailscale serve` (private, NEVER funnel — DEC-041),
+# and prints the HTTPS *.ts.net URL to open on the phone. `plan preview stop`
+# tears the whole thing down.
+#
+# Runs in the CODE worktree — it builds and serves a code branch, so it is not a
+# planning-session command (the DEC-041 caveat). All git/build/serve work targets
+# CODE_DIR. `npm run demo` is one foreground `vite build && vite preview`; this
+# splits the two so the preview can be backgrounded (survives the command),
+# tracked by pid, and torn down cleanly — same vite flags, same DEC-041 wiring.
+
+# Resolve the branch a `req-N` arg names: the bare `req-N` if it exists, else the
+# single `req-N-<slug>`. Zero or many matches is refused (never guess which to
+# serve) — same shape as closeout's branch resolution.
+preview_resolve_branch() {
+  local n="$1" reqid="req-$1"
+  local -a branches=()
+  local b
+  while IFS= read -r b; do
+    [ -n "$b" ] && branches+=("$b")
+  done < <(git -C "$CODE_DIR" for-each-ref --format='%(refname:short)' \
+             "refs/heads/$reqid" "refs/heads/$reqid-*")
+  if [ "${#branches[@]}" -eq 0 ]; then
+    echo "plan preview: no branch '$reqid' (or '$reqid-*') to preview." >&2
+    return 1
+  fi
+  if [ "${#branches[@]}" -gt 1 ]; then
+    echo "plan preview: more than one branch matches '$reqid'; name one exactly:" >&2
+    printf '  %s\n' "${branches[@]}" >&2
+    return 1
+  fi
+  printf '%s\n' "${branches[0]}"
+}
+
+# Poll until vite preview accepts connections, or the process dies (a port clash
+# under --strictPort exits it). Bounded so a stuck start never hangs the command.
+preview_wait_ready() {
+  local i pid
+  for i in $(seq 1 30); do
+    pid="$(cat "$PREVIEW_PIDFILE" 2>/dev/null || true)"
+    if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
+      return 1
+    fi
+    if curl -sf -o /dev/null "http://127.0.0.1:$PREVIEW_PORT/" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  return 1
+}
+
+# The HTTPS URL `tailscale serve` publishes for this node = https://<MagicDNS
+# name>. Read it from `tailscale status --json` (.Self.DNSName). Empty output if
+# tailscale is down or the field is missing — the caller falls back to `serve
+# status`.
+preview_url() {
+  command -v tailscale >/dev/null 2>&1 || return 0
+  tailscale status --json 2>/dev/null | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    name = ((d.get("Self") or {}).get("DNSName") or "").rstrip(".")
+    if name:
+        print("https://" + name)
+except Exception:
+    pass
+' 2>/dev/null || true
+}
+
+# Turn off the tailnet serve for our port. DEC-041/DEMO.md form first (surgical:
+# just the :443 handler); fall back to a full reset if that form fails (e.g. a
+# tailscale build without `--https=… off`). Both are no-ops when the daemon is
+# down — nothing is serving in that case anyway.
+preview_tailscale_off() {
+  command -v tailscale >/dev/null 2>&1 || return 0
+  if tailscale serve --https=443 off >/dev/null 2>&1; then
+    echo "plan preview: tailscale serve on :443 turned off"
+  elif tailscale serve reset >/dev/null 2>&1; then
+    echo "plan preview: tailscale serve reset"
+  else
+    echo "plan preview: note — 'tailscale serve' teardown did not run (daemon down?); nothing serving if so." >&2
+  fi
+}
+
+# Tear down everything a start put up: the tracked preview server, any straggler
+# on the fixed port (so a lost pidfile never leaves :4173 occupied and a re-run
+# never stacks two), and the tailnet serve. Idempotent — safe to call before a
+# start and on its own via `plan preview stop`.
+preview_stop() {
+  local stopped=""
+  if [ -f "$PREVIEW_PIDFILE" ]; then
+    local pid
+    pid="$(cat "$PREVIEW_PIDFILE" 2>/dev/null || true)"
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null || true
+      echo "plan preview: stopped preview server (pid $pid)"
+      stopped=1
+    fi
+    rm -f "$PREVIEW_PIDFILE"
+  fi
+  if command -v lsof >/dev/null 2>&1; then
+    local port_pids
+    port_pids="$(lsof -ti "tcp:$PREVIEW_PORT" 2>/dev/null || true)"
+    if [ -n "$port_pids" ]; then
+      echo "$port_pids" | xargs kill 2>/dev/null || true
+      echo "plan preview: freed port $PREVIEW_PORT"
+      stopped=1
+    fi
+  fi
+  preview_tailscale_off
+  [ -n "$stopped" ] || echo "plan preview: no local preview server was running"
+  rm -f "$PREVIEW_LOG"
+}
+
+cmd_preview() {
+  local arg="${1:-}"
+
+  # stop needs neither a worktree nor tailscale-up; handle it first so it always
+  # works, from anywhere.
+  if [ "$arg" = "stop" ]; then
+    preview_stop
+    return 0
+  fi
+
+  find_worktrees
+  local here
+  here="$(git rev-parse --show-toplevel)"
+  if [ "$here" != "$CODE_DIR" ]; then
+    echo "plan preview: run this from the code worktree ($CODE_DIR), not $here." >&2
+    echo "  it builds and serves a code branch; the planning worktree is the wrong place (DEC-041)." >&2
+    exit 1
+  fi
+
+  if ! command -v tailscale >/dev/null 2>&1; then
+    echo "plan preview: tailscale not found on PATH — the phone-test gate needs it (DEC-041/DEMO.md)." >&2
+    exit 1
+  fi
+
+  # Optional branch checkout, only on a clean tree (never clobber in-progress
+  # work). No arg -> preview whatever is checked out.
+  case "$arg" in
+    "")
+      ;;
+    req-*|[0-9]*)
+      local n="${arg#req-}"
+      if ! [[ "$n" =~ ^[0-9]+$ ]]; then
+        echo "plan preview: '$arg' is not a requirement id (expected req-N or N)" >&2
+        exit 1
+      fi
+      if [ -n "$(git -C "$CODE_DIR" status --porcelain)" ]; then
+        echo "plan preview: refusing — code worktree ($CODE_DIR) has uncommitted changes." >&2
+        echo "  won't check out req-$n over in-progress work. Commit or stash first, e.g.:" >&2
+        echo "    git -C \"$CODE_DIR\" stash    # re-run, then: git -C \"$CODE_DIR\" stash pop" >&2
+        exit 1
+      fi
+      local branch
+      branch="$(preview_resolve_branch "$n")" || exit 1
+      if ! git -C "$CODE_DIR" checkout "$branch" >/dev/null 2>&1; then
+        echo "plan preview: could not check out '$branch'." >&2
+        exit 1
+      fi
+      echo "plan preview: checked out $branch"
+      ;;
+    *)
+      echo "plan preview: unknown argument '$arg' (expected nothing, req-N, or stop)" >&2
+      exit 1
+      ;;
+  esac
+
+  local branch_now
+  branch_now="$(git -C "$CODE_DIR" rev-parse --abbrev-ref HEAD)"
+
+  # Replace cleanly: clear any previous preview before starting a new one, so two
+  # servers never stack on :4173 (--strictPort would otherwise error).
+  preview_stop >/dev/null 2>&1 || true
+
+  echo "plan preview: building $branch_now (vite build, base '/', GITHUB_PAGES unset)…"
+  if ! ( cd "$CODE_DIR" && env -u GITHUB_PAGES npm run build ) >/dev/null 2>&1; then
+    echo "plan preview: build failed — run 'npm run build' in $CODE_DIR to see the error." >&2
+    exit 1
+  fi
+
+  echo "plan preview: starting vite preview on :$PREVIEW_PORT…"
+  # exec so the tracked pid IS vite (not an npm wrapper), for a clean single-kill
+  # teardown. Backgrounded and log-redirected, so it outlives this command.
+  ( cd "$CODE_DIR" && exec ./node_modules/.bin/vite preview \
+      --port "$PREVIEW_PORT" --strictPort --host 127.0.0.1 ) >"$PREVIEW_LOG" 2>&1 &
+  echo "$!" > "$PREVIEW_PIDFILE"
+
+  if ! preview_wait_ready; then
+    echo "plan preview: preview server didn't come up — last lines of its log:" >&2
+    tail -n 15 "$PREVIEW_LOG" >&2 2>/dev/null || true
+    preview_stop >/dev/null 2>&1 || true
+    exit 1
+  fi
+
+  # Expose over the tailnet — serve (private), NEVER funnel (DEC-041).
+  if ! tailscale serve --bg "$PREVIEW_PORT" >/dev/null 2>&1; then
+    echo >&2
+    echo "plan preview: the build is serving locally on http://127.0.0.1:$PREVIEW_PORT," >&2
+    echo "  but 'tailscale serve' failed — is tailscaled up and logged in? (check: tailscale status)" >&2
+    echo "  once it is:   tailscale serve --bg $PREVIEW_PORT" >&2
+    echo "  when done:    ./plan preview stop" >&2
+    exit 1
+  fi
+
+  local url
+  url="$(preview_url)"
+  echo
+  if [ -n "$url" ]; then
+    echo "plan preview: $branch_now is live for the phone (open on the tailnet):"
+    echo "    $url"
+  else
+    echo "plan preview: $branch_now is serving; open the HTTPS host shown by:"
+    tailscale serve status 2>&1 | sed 's/^/    /' || true
+  fi
+  echo
+  echo "  stop when done:  ./plan preview stop"
+}
+
 # req-90: `_PLAN_NO_MAIN=1 source ./plan` loads the functions without dispatching,
 # so the ledger helpers (append_shipped_stub / bump_now_range) can be exercised
 # against fixtures by scripts/plan-ledger.test.sh. No effect on normal invocation.
@@ -856,6 +1088,22 @@ case "${1:-}" in
     fi
     trap 'rm -f "${_PLAN_SELF:-}"' EXIT
     cmd_closeout "$@"
+    ;;
+  preview)
+    shift
+    # Like closeout: `preview req-N` checks out a branch mid-run, which can
+    # rewrite this very `plan` file on disk (req-91 itself does). Bash reads a
+    # script incrementally, so re-exec once from a stable temp copy before the
+    # checkout; the copy cleans itself up. The backgrounded preview server is a
+    # child of the re-exec'd shell and outlives it (no huponexit in scripts).
+    if [ "${_PLAN_REEXEC:-}" != "1" ]; then
+      _PLAN_SELF="$(mktemp "${TMPDIR:-/tmp}/plan-preview.XXXXXX")"
+      cat "$0" > "$_PLAN_SELF"
+      export _PLAN_REEXEC=1 _PLAN_SELF
+      exec bash "$_PLAN_SELF" preview "$@"
+    fi
+    trap 'rm -f "${_PLAN_SELF:-}"' EXIT
+    cmd_preview "$@"
     ;;
   *)
     usage

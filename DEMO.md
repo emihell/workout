@@ -11,6 +11,26 @@ build the branch  →  npm run demo  →  Tailscale HTTPS URL  →  test on the 
                                                        merge to main → GitHub Pages (production)
 ```
 
+## One step: `./plan preview` (req-91)
+
+`./plan preview` wraps the whole flow below into one command — run it **in the code
+worktree** (it builds a code branch):
+
+```bash
+./plan preview            # build + serve the checked-out branch, print the HTTPS URL
+./plan preview req-91     # check out req-91 first (clean tree only), then the same
+./plan preview stop       # tear it all down — preview server + tailscale serve
+```
+
+It does exactly what the manual sections below do — `vite build` (base `/`), `vite
+preview` on 4173, `tailscale serve --bg 4173` — and prints the `*.ts.net` URL to open
+on the phone. A re-run replaces cleanly (never two servers on 4173); `stop` leaves
+nothing listening. It refuses a `req-NN` checkout on a dirty tree (never clobbers
+in-progress work), and uses `serve`, never `funnel` (private to the tailnet).
+
+The manual steps below still work and document *why* each piece is needed — reach for
+them when something in `./plan preview` needs debugging.
+
 ## Serve the checked-out branch
 
 From this repo, on the Mac:
