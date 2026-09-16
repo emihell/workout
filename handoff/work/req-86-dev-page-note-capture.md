@@ -1,6 +1,6 @@
 # req-86 — dev-only "note on this page" capture button (N8, gym-flow batch 2)
 
-**Status: READY — Emilio said build it, 2026-09-16.** Purpose (Emilio's words, 2026-09-16):
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-86` (`4bb704f`…`4bb704f`, 1 commit).** Purpose (Emilio's words, 2026-09-16):
 *"so I can add feedback directly on a page, fast, and you can add anything you need to be able to
 create a req on that feedback."* From the 2026-09-14 notes: *"A new button only for development — a
 little, very unimposing button where, while doing an exercise and seeing a flaw or improvement, I can
