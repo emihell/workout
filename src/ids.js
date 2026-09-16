@@ -104,6 +104,8 @@ export function formatSetLine(set) {
   if (set.weight != null && set.weight !== '' && Number(set.weight) !== 0) {
     bits.push(`${set.weight} kg`)
   }
+  // req-85 — a timed set logs seconds in place of reps; show it as e.g. "30s".
+  if (set.durationSec != null && set.durationSec !== '') bits.push(`${set.durationSec}s`)
   if (set.reps != null && set.reps !== '') bits.push(`${set.reps}`)
   if (set.rpe) bits.push(rpeLabel(set.rpe) || 'logged')
   return bits.join(' · ') || 'logged'

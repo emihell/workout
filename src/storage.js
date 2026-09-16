@@ -2,8 +2,8 @@ import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
 import { dateKey, defaultSchedule } from './schedule.js'
 import { isSkippedSet } from './workout-log.js'
 
-const STORAGE_KEY = 'workout-mvp-v8'
-const LEGACY_KEYS = ['workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
+const STORAGE_KEY = 'workout-mvp-v9'
+const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
 
 // "Last save failed" signal. saveState writes are unguarded against a throwing
 // localStorage.setItem (quota exceeded, Safari/iOS private mode), and the write
@@ -29,7 +29,7 @@ export function subscribeSaveFailed(listener) {
 }
 
 // req-36 / DEC-032 — "the stored data is present but unreadable" signal, parallel
-// to saveFailed above. When a corrupt-but-present `workout-mvp-v8` value can't be
+// to saveFailed above. When a corrupt-but-present `workout-mvp-v9` value can't be
 // parsed/migrated (F-RISK-2), loadState latches this instead of silently returning
 // emptyState. While it is set, saveState refuses to write, so the raw corrupt value
 // stays on disk and recoverable — the app must never overwrite the one record it
@@ -118,15 +118,15 @@ export function emptyState() {
   })
 }
 
-// req-06 — remove the superseded legacy keys, but ONLY after the v8 value is
-// confirmed persisted by reading it back. A save that fails *silently* (iOS/Safari
-// Private Mode has historically accepted the write and stored nothing) must never
-// trigger a delete — that is the one path that could destroy the only surviving
-// copy of the user's history. "saveState didn't throw" is NOT confirmation; the
-// read-back is the entire safety mechanism. Best-effort and self-contained: a
-// throwing removeItem/getItem is swallowed here so a cleanup failure degrades to
-// "legacy stays", never to loadState returning emptyState and orphaning the data.
-function removeLegacyKeysIfV8Persisted() {
+// req-06 — remove the superseded legacy keys (now including v8, req-85), but ONLY
+// after the current value is confirmed persisted by reading it back. A save that
+// fails *silently* (iOS/Safari Private Mode has historically accepted the write and
+// stored nothing) must never trigger a delete — that is the one path that could
+// destroy the only surviving copy of the user's history. "saveState didn't throw" is
+// NOT confirmation; the read-back is the entire safety mechanism. Best-effort and
+// self-contained: a throwing removeItem/getItem is swallowed here so a cleanup failure
+// degrades to "legacy stays", never to loadState returning emptyState and orphaning it.
+function removeLegacyKeysIfCurrentPersisted() {
   try {
     if (localStorage.getItem(STORAGE_KEY) == null) return
     for (const key of LEGACY_KEYS) {
@@ -172,10 +172,10 @@ export function loadState() {
     if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION) {
       saveState(state)
     }
-    // Only reached when this device had data (fresh migration, or already v8 with
-    // a legacy copy left over from an interrupted cleanup). The read-back gate
+    // Only reached when this device had data (fresh migration, or already current
+    // with a legacy copy left over from an interrupted cleanup). The read-back gate
     // decides whether any legacy key is actually removed.
-    removeLegacyKeysIfV8Persisted()
+    removeLegacyKeysIfCurrentPersisted()
     return state
   } catch {
     setLoadUnreadable(true)

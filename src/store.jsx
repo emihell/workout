@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { uid } from './ids'
 import { applyBackup as applyBackupFn } from './exchange.js'
-import { applyProgressionToRoutines, buildPlannedWorkout, planSnapshot, progressionFromWorkout } from './model'
+import { applyProgressionToRoutines, buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, progressionFromWorkout } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
 import { loadState, saveState } from './storage'
 import { StoreContext } from './store-context'
@@ -80,6 +80,8 @@ export function StoreProvider({ children }) {
               sets: Math.max(1, Number(item.sets) || (item.targets || []).length || 1),
               targets: Array.isArray(item.targets) ? item.targets : [],
               suggestedWeights: Array.isArray(item.suggestedWeights) ? item.suggestedWeights : [],
+              // req-85 — per-set target seconds (parallel to targets/suggestedWeights).
+              durations: Array.isArray(item.durations) ? item.durations : [],
             },
           ],
         }))
@@ -99,6 +101,7 @@ export function StoreProvider({ children }) {
                   targets: patch.targets !== undefined ? patch.targets : item.targets,
                   suggestedWeights:
                     patch.suggestedWeights !== undefined ? patch.suggestedWeights : item.suggestedWeights,
+                  durations: patch.durations !== undefined ? patch.durations : item.durations,
                 }
               : item,
           ),
@@ -172,6 +175,9 @@ export function StoreProvider({ children }) {
           muscles: (data.muscles || '').trim(),
           cues: (data.cues || '').trim(),
           type: data.type || 'free',
+          // req-85 — orthogonal timer flag + default target seconds.
+          hasDuration: Boolean(data.hasDuration),
+          durationSec: data.durationSec != null ? Number(data.durationSec) : DEFAULT_DURATION_SEC,
         }
         setState((s) => ({ ...s, exercises: [...s.exercises, exercise] }))
         return exercise.id

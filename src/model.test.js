@@ -333,3 +333,61 @@ describe('req-40 unified progression (Finish == recalc)', () => {
     assert.deepEqual(core.targetsTo, ['8'])
   })
 })
+
+// req-85 (v9) — the timed-exercise schema fields. Migration defaults them on every
+// exercise/routine item; buildPlannedWorkout + the legacy workoutSnapshot rebuild
+// thread the per-set durations through. All shape-driven and behaviour-neutral for
+// non-timed data.
+describe('req-85 timed-exercise schema (v9)', () => {
+  it('defaults hasDuration:false + a durationSec on every migrated exercise', () => {
+    const migrated = migrateState(stateFixture())
+    const ex = migrated.exercises[0]
+    assert.equal(ex.hasDuration, false)
+    assert.equal(typeof ex.durationSec, 'number')
+    assert.equal(ex.durationSec, 30) // DEFAULT_DURATION_SEC
+    assert.equal(migrated.schemaVersion, 9)
+  })
+
+  it('preserves an exercise that already carries hasDuration + durationSec', () => {
+    const source = stateFixture()
+    source.exercises[0] = { ...source.exercises[0], hasDuration: true, durationSec: 45 }
+    const ex = migrateState(source).exercises[0]
+    assert.equal(ex.hasDuration, true)
+    assert.equal(ex.durationSec, 45)
+  })
+
+  it('defaults durations:[] on every migrated routine item, and preserves a set one', () => {
+    const migrated = migrateState(stateFixture())
+    assert.deepEqual(migrated.routines[0].exercises[0].durations, [])
+
+    const source = stateFixture()
+    source.programs[0].sessions[0].exercises[0].durations = [30, 40, 50]
+    const item = migrateState(source).routines[0].exercises[0]
+    assert.deepEqual(item.durations, [30, 40, 50])
+  })
+
+  it('buildPlannedWorkout threads the routine item durations into the plan item', () => {
+    const source = stateFixture()
+    source.programs[0].sessions[0].exercises[0].durations = [30, 30, 30]
+    const state = migrateState(source)
+    const plan = buildPlannedWorkout(state, { routineId: 's-1', date: '2026-08-31' })
+    assert.deepEqual(plan.items[0].durations, [30, 30, 30])
+  })
+
+  it('legacy workoutSnapshot rebuild includes durations from the template item', () => {
+    const source = stateFixture()
+    source.programs[0].sessions[0].exercises[0].durations = [25]
+    // A legacy workout with no stored snapshot → the rebuild branch runs and must
+    // carry the template item's durations onto the snapshot item.
+    source.workouts = [
+      {
+        id: 'w-1',
+        sessionId: 's-1',
+        finishedAt: '2026-08-20T10:00:00.000Z',
+        sets: [{ exerciseId: 'ex-1', weight: 20, reps: '12', rpe: 3 }],
+      },
+    ]
+    const migrated = migrateState(source)
+    assert.deepEqual(migrated.workouts[0].snapshot.items[0].durations, [25])
+  })
+})

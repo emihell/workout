@@ -3,6 +3,7 @@ import { RPE_OPTIONS, formatSetLine, isWeightedType, roleLabel } from '../../ids
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
+import { DEFAULT_DURATION_SEC } from '../../model'
 import { exerciseById, historySetPrefill, lastSetsForExercise } from '../../storage'
 import { useStore } from '../../store-context'
 import {
@@ -171,7 +172,7 @@ function WorkoutItemLive({ routineId, item }) {
     return restPatchAfterSet({ restSec: item.restSec, skipped })
   }
 
-  function completeSet({ weight, reps, rpe, note }) {
+  function completeSet({ weight, reps, rpe, note, durationSec }) {
     if (currentType === 'work' && ex?.type !== 'cardio' && !rpe) {
       window.alert('Pick effort.')
       return
@@ -201,6 +202,8 @@ function WorkoutItemLive({ routineId, item }) {
         setType: currentType,
         weight: isWeightedType(ex.type) ? Number(weight) || 0 : 0,
         reps: reps || '',
+        // req-85 — a timed work set logs seconds in place of reps; only set when present.
+        ...(durationSec != null ? { durationSec: Number(durationSec) || 0 } : {}),
         rpe: rpe ? Number(rpe) : null,
         note,
         targetReps: target || '',
@@ -253,6 +256,16 @@ function WorkoutItemLive({ routineId, item }) {
   const weighted = isWeightedType(ex.type)
   const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
   const showEffort = currentType === 'work' && ex?.type !== 'cardio'
+  // req-85 — a timed exercise counts down a duration on its WORK sets (a warmup set
+  // stays reps-based). Target seconds: this set's routine duration, else the last one
+  // in the list, else the exercise default, else the app default. Never invents beyond
+  // that default target (the value is editable and logged as the target, v1).
+  const timedSet = Boolean(ex?.hasDuration) && currentType === 'work'
+  const durationTarget =
+    item.durations?.[currentWorkIndex] ??
+    item.durations?.[item.durations.length - 1] ??
+    ex?.durationSec ??
+    DEFAULT_DURATION_SEC
   // Seed the set-log fields from the same sources the app has always used —
   // restore (Previous), then carry (no-history working set), then history /
   // target. Domain logic stays here; the ui/ SetLogForm only holds the values.
@@ -334,14 +347,18 @@ function WorkoutItemLive({ routineId, item }) {
         <SetLogForm
           key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
           weighted={weighted}
+          timed={timedSet}
           showEffort={showEffort}
           repsLabel={repsLabel}
           effortOptions={RPE_OPTIONS}
           initialWeight={seed.weight}
           initialReps={seed.reps}
+          initialDuration={durationTarget}
           initialEffort={seed.effort}
           canGoBack={canGoBack}
-          onComplete={({ weight, reps, effort }) => completeSet({ weight, reps, rpe: effort, note })}
+          onComplete={({ weight, reps, effort, durationSec }) =>
+            completeSet({ weight, reps, rpe: effort, note, durationSec })
+          }
           onSkip={skipSet}
           onPrevious={previousSet}
         />

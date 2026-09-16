@@ -6,8 +6,9 @@
 // the #/components showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
+import { defaultBeep, unlockAudio } from '../rest-cue.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -262,8 +263,63 @@ export function RestPill({ seconds = 0, onSkip }) {
 // (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
 // "Duration"; `effortOptions` overrides the segments. The reps field is a full
 // keyboard (not decimal-only) so durations like "30 min" can be typed.
+// req-85 — the in-set count-down for a timed exercise. A SECOND, concurrent timer
+// with its OWN local state (a deadline + a 250ms tick) — deliberately NOT the
+// persisted restEndsAt, so starting it never touches the rest pill/cue and the two
+// countdowns run independently. Start counts down from the (editable) target seconds
+// and beeps once at zero (defaultBeep, fail-silent); the logged value is the target,
+// not a stopwatch actual (v1). Local state resets per set because SetLogForm remounts
+// by `key`.
+function DurationTimer({ seconds, onSecondsChange }) {
+  const [deadline, setDeadline] = useState(null)
+  const [now, setNow] = useState(() => 0)
+  const firedRef = useRef(false)
+
+  useEffect(() => {
+    if (deadline == null) return undefined
+    const tick = () => {
+      const t = Date.now()
+      setNow(t)
+      if (t >= deadline && !firedRef.current) {
+        firedRef.current = true
+        defaultBeep()
+      }
+    }
+    tick()
+    const id = setInterval(tick, 250)
+    return () => clearInterval(id)
+  }, [deadline])
+
+  const running = deadline != null
+  const remaining = running ? Math.max(0, Math.ceil((deadline - now) / 1000)) : Number(seconds) || 0
+  const start = () => {
+    unlockAudio()
+    firedRef.current = false
+    const secs = Math.max(1, Number(seconds) || 0)
+    setNow(Date.now())
+    setDeadline(Date.now() + secs * 1000)
+  }
+  return (
+    <div className="ui-setlog__timer">
+      <NumberField
+        label="Duration (s)"
+        min="1"
+        value={seconds}
+        onChange={(e) => onSecondsChange(e.target.value)}
+      />
+      <div className="ui-timer__count" aria-live="polite">
+        {remaining}s
+      </div>
+      <Button variant="secondary" onClick={start}>
+        {running ? 'Restart' : 'Start'}
+      </Button>
+    </div>
+  )
+}
+
 export function SetLogForm({
   weighted = true,
+  timed = false,
   showEffort = true,
   repsLabel = 'Reps',
   effortOptions = [
@@ -274,6 +330,7 @@ export function SetLogForm({
   ],
   initialWeight = '',
   initialReps = '',
+  initialDuration = 0,
   initialEffort = 3,
   canGoBack = true,
   onComplete,
@@ -282,26 +339,36 @@ export function SetLogForm({
 }) {
   const [weight, setWeight] = useState(initialWeight)
   const [reps, setReps] = useState(initialReps)
+  const [duration, setDuration] = useState(String(initialDuration || ''))
   const [effort, setEffort] = useState(initialEffort)
   return (
     <form
       className="ui-setlog"
       onSubmit={(e) => {
         e.preventDefault()
-        onComplete?.({ weight, reps, effort })
+        onComplete?.({
+          weight,
+          reps: timed ? '' : reps,
+          effort,
+          durationSec: timed ? Math.max(0, Number(duration) || 0) : undefined,
+        })
       }}
     >
       <div className="ui-setlog__nums">
         {weighted ? (
           <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
         ) : null}
-        <Field
-          label={repsLabel}
-          className="ui-input--num"
-          value={reps}
-          onChange={(e) => setReps(e.target.value)}
-          required
-        />
+        {timed ? (
+          <DurationTimer seconds={duration} onSecondsChange={setDuration} />
+        ) : (
+          <Field
+            label={repsLabel}
+            className="ui-input--num"
+            value={reps}
+            onChange={(e) => setReps(e.target.value)}
+            required
+          />
+        )}
       </div>
       {showEffort ? (
         <>
