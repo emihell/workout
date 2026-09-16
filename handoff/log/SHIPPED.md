@@ -1079,3 +1079,12 @@ hash, app git-sha). **Fail-closed gating verified:** single render site `{import
 : null}` (App.jsx) → Vite DCE removes it + tree-shakes `src/dev/*` in prod; Builder's `GITHUB_PAGES=true
 npm run build` + `dist/` grep = 0 matches (14 in src). Touches no product code (App.jsx 1 line, `src/dev/*`,
 a version define). +9 tests (**225**). `./check` green, `--no-ff`. Live render/clipboard is Emilio's check.
+
+## req-82 — empty-day Start = start a workout (N1, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 3, req 2/3. DEC-047(a) routine-picker. The empty-day (`TodayEmpty`) disabled "Start" is now an
+enabled **"Start new workout"** that navigates to the existing `/routines` list (whose per-row Start
+already calls `startOrContinue` off-schedule) — reuses that surface, no new UI, no ad-hoc workout, no
+data change. Zero-routines is safe by construction (TodayEmpty only renders with ≥1 routine; even so
+`/routines` shows the Add path, never a dead picker). `./check` green (225), `--no-ff`. Builder's flagged
+trade-off for Emilio: two-tap (Start → pick a routine) vs a one-tap inline picker — inline can come later.

@@ -1,6 +1,6 @@
 # req-83 — a set value changed mid-workout becomes the future default (N9, gym-flow batch 2)
 
-**Status: READY — Emilio picked (c) apply live to the same session's remaining sets, 2026-09-16.**
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-83` (`78b2910`…`78b2910`, 1 commit).**
 Note: the "future default" half is **already handled** — history prefills the last *finished* workout's
 per-field value ([measured] `historySetPrefill`/`lastSetsForExercise`, warm-up matched to warm-up), so
 (a) needs nothing. This req is only the **immediate/live** half: propagate a mid-workout change to the
