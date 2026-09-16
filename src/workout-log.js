@@ -176,21 +176,84 @@ export function carriedWorkingSet(workLogged) {
 }
 
 // kg + reps to prefill the set-log form, in priority order (req-02 / DEC-002):
-//   restore (un-logging via "Previous")  →  carried last live set (NO-history
-//   exercise only)  →  history prefill weight + target reps (has-history, and
-//   the first set of a no-history exercise). `weighted` gates kg — bodyweight /
-//   cardio never seed a weight. `carry` is expected to be null whenever the
-//   exercise has history, so the with-history path never carries; the explicit
-//   `!hasHistory` guard keeps that scope rule visible and testable. Pure so the
-//   prefill decision is inspectable, the way the history-prefill rule is.
-export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target }) {
+//   restore (un-logging via "Previous")  →  session seed override (req-83)  →
+//   carried last live set (NO-history exercise only)  →  history prefill weight +
+//   target reps (has-history, and the first set of a no-history exercise).
+//   `weighted` gates kg — bodyweight / cardio never seed a weight. `carry` is
+//   expected to be null whenever the exercise has history, so the with-history path
+//   never carries; the explicit `!hasHistory` guard keeps that scope rule visible
+//   and testable. Pure so the prefill decision is inspectable, the way the
+//   history-prefill rule is.
+//
+// req-83 (N9) — `override` is the session-scoped, per-field seed override for THIS
+// exercise+setType (see nextSeedOverrides): once the user enters a value that
+// differs from the presented seed, that field seeds from the override for the
+// remaining sets this session, until changed again. Only a field the user actually
+// changed is present on `override`, so an untouched field falls straight through to
+// carry/history/target — never invented (DESIGN §1). It sits BELOW restore (a
+// Previous re-edit shows the set's own logged values) and ABOVE carry/history.
+// `weighted` still gates kg, so a weight override never lands on a bodyweight set.
+export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target, override }) {
   if (fromRestore) {
     return { weight: weighted ? restore.weight : '', reps: restore.reps }
   }
-  if (!hasHistory && carry) {
-    return { weight: weighted ? carry.weight : '', reps: carry.reps }
+  const ov = override || {}
+  const baseWeight = !hasHistory && carry ? carry.weight : history.weight
+  const baseReps = !hasHistory && carry ? carry.reps : target || ''
+  return {
+    weight: weighted ? (ov.weight != null ? ov.weight : baseWeight) : '',
+    reps: ov.reps != null ? ov.reps : baseReps,
   }
-  return { weight: weighted ? history.weight : '', reps: target || '' }
+}
+
+// req-83 (N9) — the key a seed override is stored under on `activeWorkout.seedOverrides`.
+// Per exercise AND per set kind: warm-up ('wu') and working ('work') sets seed
+// independently (the separation the seed already uses), so a warm-up change carries
+// only to later warm-up sets and NOT to the first working set (decided default: NO).
+export function seedOverrideKey(exerciseId, setType) {
+  return `${exerciseId}::${setType === 'wu' ? 'wu' : 'work'}`
+}
+
+// A weight/reps normalized the same way the seed sources stringify them, so a value
+// re-entered unchanged compares equal (no spurious override). Weight compares
+// numerically ('5' === '5.0' === 5); reps compares as trimmed strings (targets can be
+// non-numeric, e.g. a duration).
+function weightSeedString(weight) {
+  return weight != null && weight !== '' && Number(weight) !== 0 ? String(weight) : ''
+}
+function repsSeedString(reps) {
+  return reps != null && reps !== '' ? String(reps) : ''
+}
+function sameWeight(a, b) {
+  return (Number(a) || 0) === (Number(b) || 0)
+}
+function sameReps(a, b) {
+  return repsSeedString(a) === repsSeedString(b)
+}
+
+// req-83 (N9) — the next seed-override map after a set is logged. For the current
+// exercise+setType, compare each logged field against the seed the form PRESENTED
+// (`seed`, which already reflects any earlier override): a field that differs is
+// the user changing it, so it becomes the override for the remaining sets; a field
+// left at its seed is not "changed" and its prior override (if any) is untouched —
+// so changing only weight never alters reps' seed, and vice-versa (field isolation,
+// DESIGN §1). `weighted` gates weight, so a bodyweight set never records a weight
+// override. Returns the SAME map (by identity) when nothing changed, so the caller
+// can skip a needless write. Pure: keyed by exerciseId, it can never leak across
+// exercises, and this is unit-tested rather than reasoned about.
+export function nextSeedOverrides(overrides, { exerciseId, setType, weighted, seed, logged }) {
+  const map = overrides || {}
+  const key = seedOverrideKey(exerciseId, setType)
+  const prev = map[key] || {}
+  const next = { ...prev }
+  if (weighted && !sameWeight(logged.weight, seed.weight)) {
+    next.weight = weightSeedString(logged.weight)
+  }
+  if (!sameReps(logged.reps, seed.reps)) {
+    next.reps = repsSeedString(logged.reps)
+  }
+  if (next.weight === prev.weight && next.reps === prev.reps) return map
+  return { ...map, [key]: next }
 }
 
 // Everything the live set-log form starts from, decided from inputs alone — the
@@ -202,8 +265,8 @@ export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history
 // req-78 — the req-27 upcoming-weight override was removed: the next set's form is now
 // the editable surface during rest, so the weight seed comes from restore/carry/history
 // alone. (The pure pendingWeightFor helper went with it.)
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target }) {
-  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target })
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target, override }) {
+  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target, override })
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe

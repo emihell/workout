@@ -17,6 +17,8 @@ import {
   setLogSeed,
   initialSetFields,
   isSkippedSet,
+  seedOverrideKey,
+  nextSeedOverrides,
 } from './workout-log.js'
 
 describe('req-44 isSkippedSet (one shared guarded predicate)', () => {
@@ -501,4 +503,149 @@ describe('initialSetFields (req-17 seed extraction)', () => {
   // Their test blocks (weightOverride cases + the pendingWeightFor describe) are
   // removed with them; the remaining initialSetFields cases above still lock the
   // restore/carry/history seed (the no-invent rule) that survives the fold.
+})
+
+// req-83 (N9) — a value changed mid-workout seeds this exercise's remaining sets
+// this session (live/session only; never the routine template, never history).
+describe('req-83 seedOverrideKey (per exercise + set kind)', () => {
+  it('separates warm-up from working and one exercise from another', () => {
+    assert.equal(seedOverrideKey('ex1', 'wu'), 'ex1::wu')
+    assert.equal(seedOverrideKey('ex1', 'work'), 'ex1::work')
+    assert.notEqual(seedOverrideKey('ex1', 'work'), seedOverrideKey('ex2', 'work'))
+    // any non-'wu' setType folds to 'work'
+    assert.equal(seedOverrideKey('ex1', undefined), 'ex1::work')
+  })
+})
+
+describe('req-83 setLogSeed override (live carry of a changed field)', () => {
+  const history = { weight: '4', reps: '8' }
+
+  it('weight override replaces the history/target weight; reps untouched', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history,
+      carry: null,
+      target: '8',
+      override: { weight: '5' },
+    })
+    assert.deepEqual(seed, { weight: '5', reps: '8' })
+  })
+
+  it('reps override replaces the target; weight untouched (field isolation)', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history,
+      carry: null,
+      target: '8',
+      override: { reps: '6' },
+    })
+    assert.deepEqual(seed, { weight: '4', reps: '6' })
+  })
+
+  it('no override → identical to the pre-req-83 seed', () => {
+    const base = { weighted: true, fromRestore: false, restore: null, hasHistory: true, history, carry: null, target: '8' }
+    assert.deepEqual(setLogSeed(base), setLogSeed({ ...base, override: undefined }))
+    assert.deepEqual(setLogSeed(base), { weight: '4', reps: '8' })
+  })
+
+  it('restore (Previous) still wins over an override', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: true,
+      restore: { weight: '99', reps: '99' },
+      hasHistory: true,
+      history,
+      carry: null,
+      target: '8',
+      override: { weight: '5', reps: '6' },
+    })
+    assert.deepEqual(seed, { weight: '99', reps: '99' })
+  })
+
+  it('a weight override never lands on a bodyweight (not weighted) set', () => {
+    const seed = setLogSeed({
+      weighted: false,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history,
+      carry: null,
+      target: '8',
+      override: { weight: '5', reps: '6' },
+    })
+    assert.deepEqual(seed, { weight: '', reps: '6' })
+  })
+})
+
+describe('req-83 nextSeedOverrides (only a changed field propagates)', () => {
+  const at = (exerciseId, setType, weighted, seed, logged) =>
+    nextSeedOverrides({}, { exerciseId, setType, weighted, seed, logged })
+
+  it('changing only weight records weight, not reps', () => {
+    const next = at('ex1', 'work', true, { weight: '4', reps: '8' }, { weight: '5', reps: '8' })
+    assert.deepEqual(next, { 'ex1::work': { weight: '5' } })
+  })
+
+  it('changing only reps records reps, not weight (field isolation)', () => {
+    const next = at('ex1', 'work', true, { weight: '4', reps: '8' }, { weight: '4', reps: '6' })
+    assert.deepEqual(next, { 'ex1::work': { reps: '6' } })
+  })
+
+  it('logging the seed unchanged records nothing and returns the SAME map', () => {
+    const map = { 'ex1::work': { weight: '5' } }
+    const next = nextSeedOverrides(map, {
+      exerciseId: 'ex1', setType: 'work', weighted: true,
+      seed: { weight: '5', reps: '8' }, logged: { weight: '5', reps: '8' },
+    })
+    assert.equal(next, map) // identity — no needless write
+  })
+
+  it('numeric equality: 5 vs "5.0" is not a change', () => {
+    const next = at('ex1', 'work', true, { weight: '5', reps: '8' }, { weight: '5.0', reps: '8' })
+    assert.deepEqual(next, {})
+  })
+
+  it('a weight change on a bodyweight (not weighted) set is ignored', () => {
+    const next = at('ex1', 'work', false, { weight: '', reps: '8' }, { weight: '5', reps: '8' })
+    assert.deepEqual(next, {})
+  })
+
+  it('a warm-up change and a working change live under separate keys (no wu→work leak)', () => {
+    let map = nextSeedOverrides({}, {
+      exerciseId: 'ex1', setType: 'wu', weighted: true,
+      seed: { weight: '4', reps: '10' }, logged: { weight: '5', reps: '10' },
+    })
+    assert.deepEqual(map, { 'ex1::wu': { weight: '5' } })
+    map = nextSeedOverrides(map, {
+      exerciseId: 'ex1', setType: 'work', weighted: true,
+      seed: { weight: '20', reps: '8' }, logged: { weight: '22.5', reps: '8' },
+    })
+    assert.deepEqual(map, { 'ex1::wu': { weight: '5' }, 'ex1::work': { weight: '22.5' } })
+  })
+
+  it('never crosses to another exercise', () => {
+    const map = { 'ex1::work': { weight: '5' } }
+    const next = nextSeedOverrides(map, {
+      exerciseId: 'ex2', setType: 'work', weighted: true,
+      seed: { weight: '10', reps: '8' }, logged: { weight: '12', reps: '8' },
+    })
+    assert.deepEqual(next['ex1::work'], { weight: '5' }) // ex1 untouched
+    assert.deepEqual(next['ex2::work'], { weight: '12' })
+  })
+
+  it('changing a field again overrides the prior override ("until changed again")', () => {
+    const map = { 'ex1::work': { weight: '5' } }
+    // the form now presents weight 5 (the override); the user changes it to 6
+    const next = nextSeedOverrides(map, {
+      exerciseId: 'ex1', setType: 'work', weighted: true,
+      seed: { weight: '5', reps: '8' }, logged: { weight: '6', reps: '8' },
+    })
+    assert.deepEqual(next, { 'ex1::work': { weight: '6' } })
+  })
 })

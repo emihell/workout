@@ -239,6 +239,10 @@ export function StoreProvider({ children }) {
               restPausedRemaining: null,
               sets: [],
               progression: null,
+              // req-83 (N9) — live, session-scoped per-field seed overrides
+              // (exerciseId::setType → {weight?, reps?}). Transient: never a schema
+              // field, cleared when the workout finishes (activeWorkout → null).
+              seedOverrides: {},
             },
           }
         })
@@ -349,8 +353,12 @@ export function StoreProvider({ children }) {
       finishWorkout({ overallNote, overallFeel, progression = [] }) {
         setState((s) => {
           if (!s.activeWorkout) return s
+          // req-83 (N9) — the live seed-override map is transient session state; it is
+          // dropped at finish so it never lands on the finished-history record (which
+          // feeds history-prefill from `sets` alone).
+          const { seedOverrides, ...activeToFinish } = s.activeWorkout
           const finished = withSkippedUnloggedSets({
-            ...s.activeWorkout,
+            ...activeToFinish,
             finishedAt: new Date().toISOString(),
             overallNote: overallNote || '',
             overallFeel: overallFeel || '',

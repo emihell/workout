@@ -81,3 +81,23 @@ describe('req-25 store.removeActiveSet clears the armed rest (no double timer)',
     assert.match(body[0], /restPausedRemaining:\s*null/, 'removeActiveSet must clear restPausedRemaining')
   })
 })
+
+describe('req-83 store wiring for live seed overrides', () => {
+  const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
+
+  it('startWorkout seeds an empty seedOverrides map on the new active workout', () => {
+    const body = src.match(/startWorkout\([\s\S]*?\n {6}\},/)
+    assert.ok(body, 'startWorkout method not found in store.jsx')
+    assert.match(body[0], /seedOverrides:\s*\{\}/, 'startWorkout must init seedOverrides: {}')
+  })
+
+  it('finishWorkout drops seedOverrides so it never lands on finished history', () => {
+    const body = src.match(/finishWorkout\(\{[\s\S]*?\n {6}\},/)
+    assert.ok(body, 'finishWorkout method not found in store.jsx')
+    assert.match(
+      body[0],
+      /const \{ seedOverrides, \.\.\.\w+ \} = s\.activeWorkout/,
+      'finishWorkout must strip seedOverrides off the finished record',
+    )
+  })
+})

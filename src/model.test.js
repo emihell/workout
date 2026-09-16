@@ -102,6 +102,37 @@ describe('state migration', () => {
     assert.deepEqual(migrated.workouts[0].snapshot.items[0].suggestedWeights, [20])
     assert.equal(migrated.workouts[0].sets[0].routineItemId, 'si-s-1-0-ex-1')
   })
+
+  // req-83 (N9) — the live seed-override map is an optional transient field on
+  // activeWorkout (no schema-version bump). migrateState must carry it through
+  // untouched, AND an older active-workout key that predates it must still load.
+  it('preserves activeWorkout.seedOverrides through migration', () => {
+    const source = stateFixture()
+    source.activeWorkout = {
+      id: 'wo-1',
+      sessionId: 's-1',
+      startedAt: '2026-09-16T09:00:00.000Z',
+      finishedAt: null,
+      sets: [],
+      seedOverrides: { 'ex-1::work': { weight: '5' } },
+    }
+    const migrated = migrateState(source)
+    assert.deepEqual(migrated.activeWorkout.seedOverrides, { 'ex-1::work': { weight: '5' } })
+  })
+
+  it('loads an older activeWorkout that has no seedOverrides (field simply absent)', () => {
+    const source = stateFixture()
+    source.activeWorkout = {
+      id: 'wo-1',
+      sessionId: 's-1',
+      startedAt: '2026-09-16T09:00:00.000Z',
+      finishedAt: null,
+      sets: [],
+    }
+    const migrated = migrateState(source)
+    assert.equal(migrated.activeWorkout.seedOverrides, undefined)
+    assert.equal(migrated.activeWorkout.routineId, 's-1')
+  })
 })
 
 describe('routine snapshots', () => {
