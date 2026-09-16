@@ -1,4 +1,5 @@
 import { recordButton } from '../analytics'
+import { go } from '../route'
 import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
 import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
@@ -181,15 +182,23 @@ function InProgressPeekRow({ store, workout, todayKey }) {
 }
 
 // req-14 (Emilio review iter 8) — the empty-today state keeps the same emphasized
-// Today block: the bold date on top, "Nothing scheduled today." in the name slot,
-// and the big primary Start rendered disabled (there's nothing to start).
+// Today block: the bold date on top, "Nothing scheduled today." in the name slot.
+// req-82 (N1) — the Start is no longer a dead disabled control. With nothing
+// scheduled you can still start off-schedule: it becomes an enabled "Start new
+// workout" that opens the routine picker (the existing Routines list at
+// `/routines`, whose per-row Start already calls startOrContinue off-schedule —
+// DEC-047 (a): reuse that surface, don't invent one, and no ad-hoc/blank workout).
+// TodayEmpty only ever renders when at least one routine exists — Today()'s
+// `!routines.length` early return handles the zero-routines case with the no-data
+// screen (which itself links to /routines → Add routine), so the picker is never
+// empty from here.
 function TodayEmpty({ date }) {
   return (
     <div className="ui-today-workout">
       <p className="ui-today-workout__date">{weekdayDate(date)}</p>
       <p className="ui-today-workout__name">Nothing scheduled today.</p>
-      <Button variant="primary" block disabled>
-        Start
+      <Button variant="primary" block onClick={() => go('/routines')}>
+        Start new workout
       </Button>
     </div>
   )
