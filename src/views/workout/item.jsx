@@ -14,8 +14,10 @@ import {
   itemLoggingState,
   lastLoggedSetIndex,
   markItemDonePatch,
+  nextSeedOverrides,
   reopenItemPatch,
   restPatchAfterSet,
+  seedOverrideKey,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing, NavLink } from '../shared'
@@ -181,6 +183,17 @@ function WorkoutItemLive({ routineId, item }) {
     unlockAudio()
     const done = finishAfterThisSet()
     setRestore(null)
+    // req-83 (N9) — a field entered differently from the seed becomes the seed for
+    // this exercise's remaining sets this session. Compared against `seed` (what the
+    // form presented, incl. any earlier override); only a changed field propagates.
+    // Merged into the same activeWorkout patch as the rest timer.
+    const seedOverrides = nextSeedOverrides(active.seedOverrides, {
+      exerciseId: item.exerciseId,
+      setType: currentType,
+      weighted,
+      seed,
+      logged: { weight, reps },
+    })
     store.completeSet(
       {
         routineItemId: itemKey(item),
@@ -196,7 +209,7 @@ function WorkoutItemLive({ routineId, item }) {
             ? item.suggestedWeights[currentWorkIndex]
             : null,
       },
-      restAfterSet(),
+      { ...restAfterSet(), seedOverrides },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -248,6 +261,11 @@ function WorkoutItemLive({ routineId, item }) {
     restore &&
     restore.setType === currentType &&
     (currentType === 'wu' || restore.workIndex === currentWorkIndex)
+  // req-83 (N9) — the live, session-scoped seed override for this exercise+setType:
+  // once a value entered this session differs from the presented seed, it seeds the
+  // remaining sets (see nextSeedOverrides, applied on completeSet below). Absent for
+  // an untouched field, so the normal carry/history/target seed shows through.
+  const override = (active.seedOverrides || {})[seedOverrideKey(item.exerciseId, currentType)]
   // req-78 — the weight seed comes from restore/carry/history only; the req-27
   // upcoming-weight override is gone (the next set's form is now the editable surface).
   const seed = initialSetFields({
@@ -258,6 +276,7 @@ function WorkoutItemLive({ routineId, item }) {
     history: historyPrefill,
     carry: carryFor(ex, last, currentType, state.workLogged),
     target,
+    override,
   })
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
