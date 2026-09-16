@@ -1,48 +1,76 @@
-# req-91 — a preview deploy per branch (an HTTPS URL to see a change before merge)
+# req-91 — `./plan preview` : one command to open a branch on your phone before merge
 
-**Status: NEEDS DECISION (infra approach) — from the 2026-09-16 session retro; "the last one" (Emilio).**
-The durable fix for the session's biggest systemic risk: shipping UI blind. req-89 (a headless
-screenshot) is the cheap interim; this is the structural version — a real URL a human can open.
+**Status: READY — Emilio picked approach (c), 2026-09-16.** Formalize DEC-041's Tailscale `vite preview`
+into a single `plan` verb, so a UI change can be opened on a real device over HTTPS **before** merge.
 
-**Gate: infra** (CI/hosting decision; no app runtime or persisted-data change).
+**Gate: tooling** (the `plan` script + DEMO.md; no app runtime or persisted-data change). Builder req
+(edits `plan`, like req-90).
 
 ## Why
 
-[measured] neither Builder nor Planner can drive a browser (Chrome extension unconnected in both
-sessions), so ~12 UI reqs shipped this session with no browser check; req-88 shipped an invisible button.
-The app already deploys to GitHub Pages on push to `main` (`.github/workflows/deploy.yml`) — but only
-*after* merge. A **per-branch (or per-PR) preview URL** would let a UI change be seen **before** it lands,
-on a real device, over HTTPS — which also unblocks the secure-context device features (wake-lock,
-notifications) that the LAN dev server can't serve (**L-003**, and the BACKLOG "per-branch preview
-deploy" item, partly superseded by DEC-041's Tailscale `vite preview` but not for the pre-merge-review
-motivation).
+[measured] DEC-041 (req-63) already set up the pre-merge phone test: `npm run demo` (`vite build && vite
+preview --port 4173 --strictPort`, base `/`) exposed via `tailscale serve --bg 4173` → a real HTTPS
+`.ts.net` URL that unblocks secure-context features (wake-lock / notifications / add-to-home-screen);
+runbook `DEMO.md`; `vite.config.js` has `allowedHosts: ['.ts.net']`. But it's manual and previews
+**whatever is checked out**, not a named branch — to preview `req-NN` you must hand-checkout the branch
+first. Emilio picked (c): wrap it into `./plan preview` so it's one step. (req-89's headless screenshot
+already covers Planner's automated pre-merge visibility check; this is the human, on-device, interactive
+half — and the only path to HTTPS-only device features.)
 
-## Open decision (Emilio) — the approach
+## The behaviour (approach (c), Emilio 2026-09-16)
 
-- **(a) GitHub Pages preview per branch** — extend the existing Pages workflow to publish `req-*`
-  branches to a preview path/subdomain. Cheapest to reason about (same infra as prod), but Pages
-  multi-target/preview is awkward.
-- **(b) A preview host (Netlify / Cloudflare Pages / GitHub Actions artifact + a static host)** — first
-  such dependency for a deliberately infra-light, browser-only project; a real add to the stack.
-- **(c) Formalize the existing Tailscale `vite preview` (DEC-041)** into a one-command "serve this branch
-  for me to open on my phone" — least new infra, but it's Emilio's device serving, not a shareable/CI URL.
+`./plan preview [req-NN]` (run **in the code worktree** — it builds code; Emilio or the code session runs
+it, NOT the planning session, per the DEC-041 caveat):
+- **No arg** → preview the branch currently checked out (the common case: right after Builder reports a
+  UI req, the code worktree is already on it).
+- **`req-NN` arg** → check that branch out first, but **only if the code tree is clean** (refuse on a
+  dirty tree with the recovery, so it never clobbers in-progress work).
+- Then: `vite build` (base `/`, `GITHUB_PAGES` unset, as `demo`) → `vite preview --port 4173
+  --strictPort` → `tailscale serve --bg 4173` → **print the `.ts.net` HTTPS URL** to open on the phone.
+- **Stop:** a clear way to end it — `./plan preview stop` (or print the `tailscale serve --bg off` +
+  kill-preview lines) so the tailnet serve and the preview server are torn down, never left running.
 
-Nothing is specced until the approach is picked. Note this **crosses the planning/code worktree boundary**
-if Planning is to serve/verify branches itself (DEC-005) — part of the decision is *who* opens the URL
-(Emilio, or Planning gaining a browser path).
+Reuse the existing `demo` script / DEC-041 wiring under the hood rather than reinventing the build+serve.
 
-## Scope / acceptance (written once the approach is picked)
+## Scope
 
-Must include:
-- A URL produced for a `req-*` branch (or PR) without merging to `main`.
-- The prod deploy path (push→Pages) unchanged.
-- No secret/token committed; no app runtime change.
-- A note on how it plugs into the DEC-047 visibility gate (does it *replace* req-89's screenshot for UI
-  reqs, or complement it?).
+- A `preview` verb in the `plan` script (build + serve + print URL + stop), wrapping DEC-041's demo/
+  tailscale flow and adding the branch-checkout convenience.
+- Update `DEMO.md` to point at `./plan preview` as the one-step path.
+
+## Out of scope
+
+- The production deploy (push→Pages) — unchanged.
+- Any app runtime / persisted-data change.
+- A cloud/shareable/CI URL — (c) is explicitly the local-machine-over-Tailscale path; the planning
+  session still can't use it to browser-verify (DEC-041 caveat stands; req-89's screenshot is Planner's
+  path).
+
+## Watch-outs (CC)
+
+- **Boundary:** this runs in the code worktree and builds a code branch; it must not be a planning-only
+  command. A dirty-tree guard before any checkout is mandatory (never disrupt Builder mid-task).
+- **No secrets:** `tailscale serve` is `serve` (tailnet-only), **never `funnel`** (public) — per DEC-041.
+- **Port reuse / re-run:** a second `plan preview` while one is serving should replace cleanly, not
+  stack two servers on :4173 (`--strictPort` will otherwise error).
+
+## Acceptance criteria
+
+- **One command serves a branch (device):** `./plan preview req-NN` on the Mac builds that branch and
+  prints an HTTPS `.ts.net` URL that opens the branch's build on the phone.
+- **Current-branch default:** `./plan preview` with no arg previews the checked-out branch.
+- **Dirty-tree guard (failure case):** `./plan preview req-NN` on a dirty code tree refuses and prints
+  the recovery, changing nothing.
+- **Stop tears down:** the stop path ends the preview server and `tailscale serve`, leaving nothing
+  listening.
+- **Prod untouched / no secret:** production deploy path unchanged; `funnel` never used; no token committed.
+- **No app regression:** `./check` green.
 
 ## Decisions
 
-- Approach (a)/(b)/(c) (Emilio) — blocks READY. This is a stack/infra decision for an intentionally
-  infra-light project, so it's Emilio's call, not an implementation choice.
-- Relationship to req-89: interim screenshot now, this as the durable version — retire or keep req-89's
-  tool once this lands (decide when specced).
+- Approach (c) — local `vite preview` over Tailscale, wrapped in `./plan preview` (Emilio, 2026-09-16).
+  Not (a) Pages-preview, not (b) an external host.
+- Current-branch default + `req-NN` checkout with a dirty-tree guard; stop path — implementation (CC),
+  within the watch-outs.
+- Relationship to req-89: req-89 = Planner's automated screenshot gate; req-91 = Emilio's on-device
+  interactive preview. Both kept; they cover different halves.
