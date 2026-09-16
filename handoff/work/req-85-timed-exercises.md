@@ -1,6 +1,6 @@
 # req-85 — timed exercises (duration sets) (N2 / batch-1 #6, gym-flow)
 
-**Status: READY — model + schema shape signed off by Emilio 2026-09-16 (v8→v9 bump, below).**
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-85` (`0e5ae4b`…`0e5ae4b`, 1 commit).**
 Emilio 2026-09-14: *"Time for timed exercises."* Same feature as the 2026-09-10 note #6; unparked and
 specced 2026-09-16. **Merge gate remains:** this is a real schema-version bump, so it fires CLAUDE.md
 ask-gate #2 / DEC-035's migration carve-out — **Emilio's eyes on the migration test + a fresh Export
