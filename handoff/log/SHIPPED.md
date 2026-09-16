@@ -1127,3 +1127,21 @@ persisted-data change** — verified: `store.jsx` untouched, `storage.js` only a
 map (finish.jsx output + persisted progression unchanged). Countdown is UI-only (not `restEndsAt`),
 double-commit guarded. New `auto-complete.jsx`; `defaultBeep` exported. +6 tests → **254**. `./check`
 green, `--no-ff`. ux-feel (10s length, beep, re-arm on revisit) → Emilio.
+
+## req-85 — timed exercises (duration sets)  (merged 2026-09-16, v8→v9 SCHEMA BUMP)
+
+The one schema bump of the session; **merge gated on Emilio's Export backup + eyes on the migration
+(DEC-046 / ask-gate #2 — both done before merge).** Orthogonal model (a): exercise `+ hasDuration`
+(default false) `+ durationSec` (default 30); routine item `+ durations: []` (per-set seconds). A timed
+set logs **duration in place of reps** (weight orthogonal); in-set **Start → count-down → beep at zero
+→ Complete** (own timer state, NOT `restEndsAt` — no rest collision); logs the target (editable, v1); no
+duration progression v1. **Migration verified safe by Planner:** `STORAGE_KEY→v9`, `v8` prepended to
+LEGACY_KEYS, the **read-back-before-delete gate unchanged** (v8 removed only after v9 write confirmed);
+`migrateState`/`migrateRoutine` add **defaults only, rewrite nothing**, idempotent; **finished history
+untouched** (test asserts logged sets gain nothing); threaded through `buildPlannedWorkout` +
+`workoutSnapshot` legacy branch. Re-pointed ~a dozen `v8`→`v9` test/comment refs — mechanical, intent
+kept (verified, no weakening). Receipt: `ok - loads a v8(+v5) device into v9, nothing lost, only
+defaults`; `ok - throwing write leaves v8 intact`. +7 tests → **261**. `./check` green, `--no-ff`.
+**v1 gaps flagged for Emilio:** (a) set-edit can't yet change an existing timed set's duration (preserved,
+not editable there); (b) a timed bodyweight set still asks for effort. Both easy follow-ups. All timed-UI
+browser behaviour is Emilio's check on the deployed site.
