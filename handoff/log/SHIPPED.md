@@ -1154,3 +1154,14 @@ opacity:0.45; 34×34` — a holdover from its dev-only "unimposing" origin). Mov
 top-right with a `maxHeight` so it stays on-screen (was bottom-left). **`DevNotes.jsx` inline styles
 only** — gating (req-87 toggle), the `workout-dev-notes-v1` store, and capture shape untouched. `./check`
 green (261), `--no-ff`. Real-device notch/placement feel is Emilio's check.
+
+## req-89 — a headless screenshot script for pre-merge UI visibility checks  (merged 2026-09-16)
+
+From the session retro — enacts the DEC-047 visibility gate. `scripts/screenshot.mjs` + `npm run shot --
+<route>` boots the built app behind a tiny static server and captures a PNG with headless Chrome
+(Puppeteer, **devDependency** — prod-clean verified, `grep dist/ puppeteer` = 0), phone viewport (390×844)
+so bottom-dock/notch occlusion shows. **Seed convention** (reuse for future UI reqs): `--seed <file.json>`
+writes a raw state doc to `localStorage['workout-mvp-v9']`, migrated on load — `src/db.json` works as a
+fixture. No `src/` runtime change. `./check` green (261), `--no-ff`. Puppeteer-over-Playwright + the seed
+convention are tooling impl choices (not a DEC). **Workflow use:** a UI req's report includes the
+screenshot of the changed screen; Planner Reads it before merge (WORKFLOW §Batch mode).
