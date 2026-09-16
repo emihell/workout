@@ -1165,3 +1165,16 @@ writes a raw state doc to `localStorage['workout-mvp-v9']`, migrated on load —
 fixture. No `src/` runtime change. `./check` green (261), `--no-ff`. Puppeteer-over-Playwright + the seed
 convention are tooling impl choices (not a DEC). **Workflow use:** a UI req's report includes the
 screenshot of the changed screen; Planner Reads it before merge (WORKFLOW §Batch mode).
+
+## req-90 — `plan closeout` auto-writes the SHIPPED stub + bumps NOW's shipped range  (merged 2026-09-16)
+
+From the session retro — kills the manual ledger step that tripped twice (NOW hit 51 once, a doubled
+req-84/85 block once). New **step 4b** in `plan closeout req-N`, run after the status-flip and before the
+existing save/publish/push (rides the same publish): (a) appends a `## req-N — <title> (merged <date>)`
+heading + a visible `_Stub — Planner: …_` one-liner to SHIPPED.md, and (b) bumps NOW's `**Shipped:**`
+range to include req-N (extends `…–N-1`→`…–N` when contiguous, else `, req-N`). Both **idempotent**
+(guard on an existing entry / already-covered range) and **non-fatal** (warn, never abort post-merge); the
+NOW bump edits only the one-line span (+ a >50-line warning). The SHIPPED *substance* and the "Building:"
+marker stay the Planner's (printed as reminders). 18-check `scripts/plan-ledger.test.sh` (not wired into
+`./check` — app gate only). `./check` green (261), `--no-ff`. **Note:** req-90's own closeout ran the
+pre-merge `plan`, so this entry is the last hand-written one; step 4b applies from the next closeout.
