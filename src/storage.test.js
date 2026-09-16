@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, routineDeletionImpact, saveState, staleInProgressWorkouts } from './storage.js'
+import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, previousSameRoutineWorkout, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
 import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -650,5 +650,68 @@ describe('completedOnDayKey (req-28 completed today)', () => {
   it('empty / missing input → empty list', () => {
     assert.deepEqual(completedOnDayKey([], day), [])
     assert.deepEqual(completedOnDayKey(null, day), [])
+  })
+})
+
+// req-84 — the "vs last time" summary. Pure helpers: stats + delta, and the
+// selection of the prior same-routine workout. The no-prior case (no invented
+// comparison) is the DESIGN §1 no-invent rule made testable.
+describe('req-84 workoutSummaryStats', () => {
+  const START = Date.parse('2026-09-16T10:00:00Z')
+  const workSet = (weight, reps) => ({ setType: 'work', weight, reps })
+  const active = {
+    startedAt: new Date(START).toISOString(),
+    sets: [{ setType: 'wu', weight: 40, reps: 5 }, workSet(100, 5), workSet(100, 5)],
+  }
+  const now = START + 30 * 60000 // 30 min in
+
+  it('no prior workout → stats with no delta (no-invent)', () => {
+    const s = workoutSummaryStats(active, null, now)
+    assert.deepEqual(s, { volume: 1000, duration: 30, sets: 3, deltas: null })
+  })
+
+  it('with a prior → per-number deltas', () => {
+    const prior = {
+      startedAt: new Date(START - 60 * 60000).toISOString(),
+      finishedAt: new Date(START - 40 * 60000).toISOString(), // 20 min
+      sets: [workSet(100, 5)], // vol 500, 1 set
+    }
+    const s = workoutSummaryStats(active, prior, now)
+    assert.equal(s.volume, 1000)
+    assert.equal(s.duration, 30)
+    assert.equal(s.sets, 3)
+    assert.deepEqual(s.deltas, { volume: 500, duration: 10, sets: 2 })
+  })
+
+  it('warmup sets excluded from volume, counted in set total', () => {
+    const s = workoutSummaryStats(active, null, now)
+    assert.equal(s.volume, 1000) // wu 40x5 not counted
+    assert.equal(s.sets, 3) // wu counted
+  })
+})
+
+describe('req-84 previousSameRoutineWorkout', () => {
+  const wk = (id, routineId, name, extra = {}) => ({
+    id,
+    routineId,
+    snapshot: { routineId, routineName: name },
+    ...extra,
+  })
+  const active = wk('active', 'r1', 'Push')
+
+  it('returns the most recent finished workout of the same routine', () => {
+    const workouts = [wk('w2', 'r1', 'Push'), wk('w1', 'r1', 'Push'), wk('x', 'r2', 'Pull')]
+    const prior = previousSameRoutineWorkout(active, workouts, [])
+    assert.equal(prior.id, 'w2')
+  })
+
+  it('no same-routine workout → null (first time)', () => {
+    const workouts = [wk('x', 'r2', 'Pull')]
+    assert.equal(previousSameRoutineWorkout(active, workouts, []), null)
+  })
+
+  it('empty history → null', () => {
+    assert.equal(previousSameRoutineWorkout(active, [], []), null)
+    assert.equal(previousSameRoutineWorkout(active, null, []), null)
   })
 })

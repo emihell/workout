@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { roleLabel } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
@@ -9,6 +9,7 @@ import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
+import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
 
 function abandonWorkout(store) {
@@ -20,6 +21,10 @@ function abandonWorkout(store) {
 
 export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   const store = useStore()
+  // req-84 — once the auto-complete summary is cancelled, keep it dismissed for this
+  // mount (all items are still done, so it would otherwise re-show immediately). A
+  // fresh visit to the overview remounts and re-arms it — the intended "all done" cue.
+  const [autoDismissed, setAutoDismissed] = useState(false)
   const { routine } = findRoutine(store.routines, routineId)
   const active = store.activeWorkout
   const mine = isActiveFor(active, routineId)
@@ -90,6 +95,22 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           Abandon
         </Button>
       </Screen>
+    )
+  }
+
+  // req-84 — every exercise done (same per-item test the list rows use). When true the
+  // overview shows the auto-complete summary instead of the list; NOT before then.
+  const allDone = items.every(
+    (item) => itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone,
+  )
+  if (allDone && !autoDismissed) {
+    return (
+      <AutoCompleteSummary
+        routineId={routineId}
+        active={active}
+        store={store}
+        onCancel={() => setAutoDismissed(true)}
+      />
     )
   }
 
