@@ -1114,3 +1114,16 @@ notes still in `workout-dev-notes-v1`; **neither touches `workout-mvp-v8`** (uni
 storage.js change). Ships-to-prod-inert verified (`GITHUB_PAGES=true` build grep = 7 matches, the inverse
 of req-86). +5 tests → **248**. `./check` green, `--no-ff`. Live toggle flow is Emilio's check (on the
 deployed site). `src/dev/*` kept unrenamed (renaming would strand the existing `-dev-` notes key).
+
+## req-84 — auto-complete a finished routine (N10, gym-flow batch 2)  (merged 2026-09-16)
+
+When every exercise is done, the overview shows a "great job" summary (volume/duration/sets, each with a
+delta vs the **previous same-routine** finished workout — no prior → **no delta**, no-invent) + a **10s
+countdown** that auto-commits via the existing `store.finishWorkout` (empty Feel/Note). **Cancel** →
+overview, nothing finished (`autoDismissed` guards re-show); **Edit** → the manual Finish screen. **No
+persisted-data change** — verified: `store.jsx` untouched, `storage.js` only adds pure helpers
+(`workoutSummaryStats`, `previousSameRoutineWorkout` — prepends `active` to reuse the exact
+`groupWorkoutsByRoutine` key), and `buildFinishProgression` is a byte-identical extraction of finish.jsx's
+map (finish.jsx output + persisted progression unchanged). Countdown is UI-only (not `restEndsAt`),
+double-commit guarded. New `auto-complete.jsx`; `defaultBeep` exported. +6 tests → **254**. `./check`
+green, `--no-ff`. ux-feel (10s length, beep, re-arm on revisit) → Emilio.

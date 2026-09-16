@@ -1,9 +1,9 @@
 # Now
 
-Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–76, req-78–83, req-86–87** (req-10
-pending; req-24 gated; req-32 dropped; req-77 PAUSED). **Next: req-84** auto-complete (+vs-last stats) **+
-req-85** timed exercises (schema bump — Emilio's eyes + backup-first) — both DECIDED, spec-pending
-(Planner owes the specs). **Batch 2 after-batch pass still owed by Emilio:** the req-78 req-25
+Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–84, req-86–87** (req-10 pending;
+req-24 gated; req-32 dropped; req-77 PAUSED). **Building: req-85** timed exercises — **v8→v9 SCHEMA BUMP**;
+merge gated on Emilio's Export backup + eyes on the migration test (DEC-046 / ask-gate #2), NOT a
+fire-and-forget merge. **Batch 2 after-batch pass still owed by Emilio:** the req-78 req-25
 Previous-then-forward browser check (the 2 req-78 removals are settled — DEC-048, "nice to have").
 Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
 
