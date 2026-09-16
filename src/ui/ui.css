@@ -526,6 +526,25 @@ a.ui-btn--quiet:active {
 .ui-setlog__nums .ui-field {
   flex: 1 1 0;
 }
+/* req-85 — the in-set duration count-down: the editable seconds field, the live
+ * remaining readout, and Start/Restart, laid out in a row that flexes to fill. */
+.ui-setlog__timer {
+  flex: 2 1 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ui-s3);
+}
+.ui-setlog__timer .ui-field {
+  flex: 1 1 0;
+}
+.ui-timer__count {
+  min-width: 3.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ui-fs-lg, 1.25rem);
+  font-weight: 600;
+  padding-bottom: var(--ui-s2);
+}
 /* req-80 — the Previous/Skip/Complete row is pinned to the absolute bottom of the
  * viewport (thumb reach) instead of sitting mid-form. It is still inside the <form>,
  * so Complete (type=submit) and Enter-to-submit are unchanged. Aligned to the screen

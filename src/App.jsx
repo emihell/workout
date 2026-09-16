@@ -78,7 +78,7 @@ function ExternalChangeBanner() {
 }
 
 // req-87 — the runtime gate for the feedback-capture button. Subscribes to the
-// feedback-enabled flag (its own localStorage key, never workout-mvp-v8) the same
+// feedback-enabled flag (its own localStorage key, never workout-mvp-v9) the same
 // way as the banners above; renders the button/panel only when ON. Default OFF, so
 // on a fresh/production visit nothing renders and no key is written until the
 // Settings toggle is turned on.

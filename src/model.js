@@ -2,7 +2,12 @@ import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
 import { isSkippedSet } from './workout-log.js'
 
-export const SCHEMA_VERSION = 8
+export const SCHEMA_VERSION = 9
+
+// req-85 — default target seconds for a timed exercise that has no per-set
+// duration set yet. Used as the exercise-level default and the fallback when a
+// routine item's `durations` array is empty.
+export const DEFAULT_DURATION_SEC = 30
 
 function inferRole(item, exercise, index) {
   if (item.role) return item.role
@@ -46,6 +51,9 @@ function migrateRoutine(routine, exercises, legacyRecommendations) {
         sets: Number(item.sets) || Number(baseline?.sets) || targets.length || 1,
         targets,
         suggestedWeights,
+        // req-85 (v9) — per-set target seconds, parallel to targets/suggestedWeights.
+        // Defaulted to [] on every routine item; only timed exercises populate it.
+        durations: Array.isArray(item.durations) ? [...item.durations] : [],
       }
     }),
   }
@@ -168,6 +176,9 @@ function workoutSnapshot(state, workout, origin = state) {
       restSec: templateItem?.restSec || 0,
       notes: templateItem?.notes || '',
       warmup: templateItem?.warmup || null,
+      // req-85 (v9) — thread per-set durations into the legacy-rebuilt snapshot item
+      // (the already-snapshotted branch above preserves it via `...rest`).
+      durations: templateItem?.durations ? [...templateItem.durations] : [],
     })
   }
   const itemByExercise = new Map(items.map((item) => [item.exerciseId, item]))
@@ -227,7 +238,14 @@ export function migrateState(input) {
   const interim = {
     ...source,
     schemaVersion: SCHEMA_VERSION,
-    exercises: exercises.map((exercise) => ({ ...exercise, archivedAt: exercise.archivedAt || null })),
+    exercises: exercises.map((exercise) => ({
+      ...exercise,
+      archivedAt: exercise.archivedAt || null,
+      // req-85 (v9) — orthogonal timer flag + default target seconds, defaulted on
+      // every exercise. hasDuration false keeps a non-timed exercise behaviour-neutral.
+      hasDuration: Boolean(exercise.hasDuration),
+      durationSec: exercise.durationSec != null ? Number(exercise.durationSec) : DEFAULT_DURATION_SEC,
+    })),
     routines,
     schedule: {
       ...(source.schedule || {}),
@@ -392,6 +410,9 @@ export function buildPlannedWorkout(state, { routineId, date, scheduleSlotId = n
       sets,
       targets,
       suggestedWeights,
+      // req-85 (v9) — carry per-set durations from the routine item into the plan item
+      // so the started-workout snapshot knows each timed set's target seconds.
+      durations: [...(item.durations || [])],
       restSec: item.restSec || 0,
       notes: item.notes || '',
       warmup: item.warmup || null,

@@ -266,7 +266,7 @@ export function RoutineExercisePick({ routineId, paths }) {
   )
 }
 
-function ExerciseFields({ item, onChange, onCancel, defaults }) {
+function ExerciseFields({ item, onChange, onCancel, defaults, timed = false }) {
   const [role, setRole] = useState(item.role || defaults.role || 'main')
   const [warmup, setWarmup] = useState(Boolean(item.warmup))
   // req-30 — warmup reps come only from what the user typed (or a saved value when
@@ -286,6 +286,9 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
     return value == null || value === '' ? '' : String(value)
   })
   const [notes, setNotes] = useState(item.notes || '')
+  // req-85 — per-set target seconds for a timed exercise, entered like Kg (slash/comma
+  // separated) and stored parallel to targets. Only shown when the exercise is timed.
+  const [durations, setDurations] = useState((item.durations || []).join('/'))
 
   return (
     <form
@@ -300,10 +303,15 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
           .split(/[/,]/)
           .map((value) => Number(value.trim()))
           .filter(Number.isFinite)
+        const durationParts = String(durations || '')
+          .split(/[/,]/)
+          .map((value) => Number(value.trim()))
+          .filter(Number.isFinite)
         const count = Math.max(
           Number.isFinite(enteredSets) && enteredSets > 0 ? enteredSets : 0,
           targetParts.length,
           weightParts.length,
+          timed ? durationParts.length : 0,
           1,
         )
         onChange({
@@ -312,6 +320,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
           sets: count,
           targets: parseTargets(targets, count),
           suggestedWeights: weightParts.slice(0, count),
+          durations: timed ? durationParts.slice(0, count) : item.durations || [],
           restSec: Math.max(0, Number(restSec) || 0),
           notes,
         })
@@ -331,6 +340,9 @@ function ExerciseFields({ item, onChange, onCancel, defaults }) {
       <Field label="Sets" type="number" min="1" value={sets} onChange={(e) => setSets(e.target.value)} />
       <Field label="Reps" value={targets} onChange={(e) => setTargets(e.target.value)} />
       <Field label="Kg" value={weights} onChange={(e) => setWeights(e.target.value)} />
+      {timed ? (
+        <Field label="Duration (s)" value={durations} onChange={(e) => setDurations(e.target.value)} />
+      ) : null}
       <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
       <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
       <div className="ui-actions">
@@ -377,6 +389,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
           suggestedWeights: defaults.suggestedWeights,
         }}
         defaults={defaults}
+        timed={Boolean(ex?.hasDuration)}
         onCancel={() => go(nav.pick)}
         onChange={(patch) => {
           store.addRoutineExercise(routine.id, { exerciseId: ex.id, ...patch })
@@ -417,6 +430,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
         key={`${routine.id}-${index}`}
         item={item}
         defaults={defaults}
+        timed={Boolean(ex?.hasDuration)}
         onCancel={() => go(parent)}
         onChange={(patch) => {
           store.updateRoutineExercise(routine.id, index, patch)

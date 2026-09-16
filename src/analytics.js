@@ -1,7 +1,7 @@
 // req-08 / DEC-011 — local usage analytics.
 //
 // Bounded aggregate counts in a SEPARATE localStorage key, deliberately isolated
-// from the workout state (`workout-mvp-v8`): never in the workout backup, no
+// from the workout state (`workout-mvp-v9`): never in the workout backup, no
 // migration, and a corrupt/oversized analytics blob can't touch workout history.
 //
 // Writes are best-effort and MUST fail silently. This is the opposite of the

@@ -149,7 +149,7 @@ describe('blank device storage', () => {
       assert.equal(state.routines[0].exercises[0].sets, 1)
       assert.equal(state.programs, undefined)
       assert.equal(state.sessions, undefined)
-      const stored = JSON.parse(map.get('workout-mvp-v8'))
+      const stored = JSON.parse(map.get('workout-mvp-v9'))
       assert.equal(stored.routines[0].id, 'sess-1')
       assert.equal(stored.programs, undefined)
     } finally {
@@ -158,26 +158,28 @@ describe('blank device storage', () => {
   })
 })
 
-// req-06 — legacy keys are removed only after v8 is confirmed persisted by a
-// read-back. The failure-case tests are the point: a failed or silent upgrade
+// req-06 — legacy keys are removed only after the current key is confirmed persisted
+// by a read-back. The failure-case tests are the point: a failed or silent upgrade
 // must leave the legacy copy intact, because it is the only surviving history.
+// (req-85 bumped the current key v8→v9, so v8 is now one of the legacy keys.)
 describe('req-06 legacy-key cleanup', () => {
   const legacyV7 = JSON.stringify({
     schemaVersion: 7,
     exercises: [{ id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5' }],
     routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
   })
-  const validV8 = JSON.stringify({
+  const validCurrent = JSON.stringify({
     ...emptyState(),
     routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
   })
 
-  it('happy path: migrates v7, writes v8, and removes every legacy key', () => {
+  it('happy path: migrates v7, writes v9, and removes every legacy key', () => {
     withLocalStorage({ seed: { 'workout-mvp-v7': legacyV7 } }, (map) => {
       const state = loadState()
       assert.equal(state.routines[0].name, 'Upper')
-      assert.ok(map.get('workout-mvp-v8')) // v8 was written
-      assert.equal(map.get('workout-mvp-v7') ?? null, null) // legacy gone
+      assert.ok(map.get('workout-mvp-v9')) // v9 was written
+      assert.equal(map.get('workout-mvp-v8') ?? null, null) // legacy gone
+      assert.equal(map.get('workout-mvp-v7') ?? null, null)
       assert.equal(map.get('workout-mvp-v6') ?? null, null)
       assert.equal(map.get('workout-mvp-v5') ?? null, null)
     })
@@ -187,41 +189,41 @@ describe('req-06 legacy-key cleanup', () => {
     withLocalStorage({ throwOnSet: true, seed: { 'workout-mvp-v7': legacyV7 } }, (map) => {
       const state = loadState()
       assert.equal(state.routines[0].name, 'Upper') // load still returns usable state
-      assert.equal(map.get('workout-mvp-v8') ?? null, null) // nothing persisted
+      assert.equal(map.get('workout-mvp-v9') ?? null, null) // nothing persisted
       assert.ok(map.get('workout-mvp-v7')) // legacy copy is still here
     })
   })
 
   it('failure — silent no-op write: v7 survives (the read-back is the whole point)', () => {
-    // setItem does nothing and does NOT throw, so getItem('...v8') stays null.
+    // setItem does nothing and does NOT throw, so getItem('...v9') stays null.
     // A cleanup keyed on "saveState didn't throw" would wrongly delete v7 here.
     withLocalStorage({ silentSet: true, seed: { 'workout-mvp-v7': legacyV7 } }, (map) => {
       const state = loadState()
       assert.equal(state.routines[0].name, 'Upper')
-      assert.equal(map.get('workout-mvp-v8') ?? null, null) // silently stored nothing
+      assert.equal(map.get('workout-mvp-v9') ?? null, null) // silently stored nothing
       assert.ok(map.get('workout-mvp-v7')) // legacy copy still present — not deleted
     })
   })
 
-  it('already on v8, no legacy: unchanged, nothing removed, no throw', () => {
-    withLocalStorage({ seed: { 'workout-mvp-v8': validV8 } }, (map) => {
-      const before = map.get('workout-mvp-v8')
+  it('already on v9, no legacy: unchanged, nothing removed, no throw', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v9': validCurrent } }, (map) => {
+      const before = map.get('workout-mvp-v9')
       let state
       assert.doesNotThrow(() => {
         state = loadState()
       })
       assert.equal(state.routines[0].name, 'Upper')
-      assert.equal(map.get('workout-mvp-v8'), before) // v8 write path untouched
+      assert.equal(map.get('workout-mvp-v9'), before) // v9 write path untouched
     })
   })
 
-  it('already on v8 with a leftover legacy key: reclaims the legacy copy', () => {
+  it('already on v9 with a leftover legacy key: reclaims the legacy copy', () => {
     withLocalStorage(
-      { seed: { 'workout-mvp-v8': validV8, 'workout-mvp-v7': legacyV7 } },
+      { seed: { 'workout-mvp-v9': validCurrent, 'workout-mvp-v8': legacyV7 } },
       (map) => {
         loadState()
-        assert.ok(map.get('workout-mvp-v8')) // v8 intact
-        assert.equal(map.get('workout-mvp-v7') ?? null, null) // interrupted cleanup finished
+        assert.ok(map.get('workout-mvp-v9')) // v9 intact
+        assert.equal(map.get('workout-mvp-v8') ?? null, null) // interrupted cleanup finished
       },
     )
   })
@@ -270,7 +272,7 @@ describe('req-37 v5 migration round-trip', () => {
     plannedWorkouts: [{ id: 'pw-1', sessionId: 'sess-1', date: '2026-08-27', items: [{ exerciseId: 'ex-1', sessionItemId: 'si-old-1' }] }],
   })
 
-  it('reads the v5 key, flattens programs, maps every sessionId→routineId, writes v8', () => {
+  it('reads the v5 key, flattens programs, maps every sessionId→routineId, writes v9', () => {
     withLocalStorage({ seed: { 'workout-mvp-v5': v5 } }, (map) => {
       const state = loadState()
 
@@ -308,24 +310,24 @@ describe('req-37 v5 migration round-trip', () => {
       assert.equal(state.plannedWorkouts[0].routineId, 'sess-1')
       assert.equal(state.plannedWorkouts[0].sessionId, undefined)
 
-      // Persisted as v8, program wrapper gone from disk too.
-      const stored = JSON.parse(map.get('workout-mvp-v8'))
-      assert.equal(stored.schemaVersion, 8)
+      // Persisted as v9, program wrapper gone from disk too.
+      const stored = JSON.parse(map.get('workout-mvp-v9'))
+      assert.equal(stored.schemaVersion, 9)
       assert.equal(stored.routines[0].id, 'sess-1')
       assert.equal(stored.programs, undefined)
     })
   })
 })
 
-// req-36 / DEC-032 — a corrupt-but-present `workout-mvp-v8` value must never be
+// req-36 / DEC-032 — a corrupt-but-present `workout-mvp-v9` value must never be
 // silently overwritten. loadState distinguishes "absent" (blank device) from
 // "present but unreadable"; the latter latches getLoadUnreadable() and makes
 // saveState refuse to write, so the raw corrupt bytes stay on disk and recoverable.
-describe('req-36 corrupt v8 guard', () => {
+describe('req-36 corrupt v9 guard', () => {
   const corrupt = '{not valid json, definitely-not-parseable'
 
-  it('(a) preserves a corrupt v8 value byte-for-byte across a mutation', () => {
-    withLocalStorage({ seed: { 'workout-mvp-v8': corrupt } }, (map) => {
+  it('(a) preserves a corrupt v9 value byte-for-byte across a mutation', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v9': corrupt } }, (map) => {
       const state = loadState()
       // Renders as a blank device rather than throwing...
       assert.equal(state.routines.length, 0)
@@ -340,7 +342,7 @@ describe('req-36 corrupt v8 guard', () => {
         routines: [{ id: 'sess-x', name: 'New', focus: 'Machines', exercises: [] }],
       })
       assert.equal(wrote, false)
-      assert.equal(map.get('workout-mvp-v8'), corrupt) // byte-for-byte unchanged
+      assert.equal(map.get('workout-mvp-v9'), corrupt) // byte-for-byte unchanged
     })
   })
 
@@ -350,30 +352,30 @@ describe('req-36 corrupt v8 guard', () => {
       assert.equal(state.routines.length, 0)
       assert.equal(getLoadUnreadable(), false)
       assert.equal(saveState(emptyState()), true)
-      assert.ok(map.get('workout-mvp-v8')) // save went through
+      assert.ok(map.get('workout-mvp-v9')) // save went through
     })
   })
 
-  it('(c) a valid v8 value clears the signal and loads normally', () => {
-    const validV8 = JSON.stringify({
+  it('(c) a valid v9 value clears the signal and loads normally', () => {
+    const validCurrent = JSON.stringify({
       ...emptyState(),
       routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
     })
-    withLocalStorage({ seed: { 'workout-mvp-v8': validV8 } }, () => {
+    withLocalStorage({ seed: { 'workout-mvp-v9': validCurrent } }, () => {
       const state = loadState()
       assert.equal(state.routines[0].name, 'Upper')
       assert.equal(getLoadUnreadable(), false)
     })
   })
 
-  it('an unreadable legacy-only key (no v8) counts as unreadable', () => {
+  it('an unreadable legacy-only key (no v9) counts as unreadable', () => {
     withLocalStorage({ seed: { 'workout-mvp-v7': corrupt } }, (map) => {
       const state = loadState()
       assert.equal(state.routines.length, 0)
       assert.equal(getLoadUnreadable(), true)
       assert.equal(saveState(emptyState()), false)
       assert.equal(map.get('workout-mvp-v7'), corrupt) // only surviving copy kept
-      assert.equal(map.get('workout-mvp-v8') ?? null, null) // nothing written over it
+      assert.equal(map.get('workout-mvp-v9') ?? null, null) // nothing written over it
     })
     // Cleanup / assertion: a later readable load clears the latched signal, so it
     // reflects the *current* stored value and never leaks into other tests.
@@ -386,7 +388,7 @@ describe('req-36 corrupt v8 guard', () => {
 
 describe('req-41 isExternalStateChange (audit F-RISK-3)', () => {
   it('is true when another tab wrote our key', () => {
-    assert.equal(isExternalStateChange({ key: 'workout-mvp-v8' }), true)
+    assert.equal(isExternalStateChange({ key: 'workout-mvp-v9' }), true)
   })
 
   it('is true when another tab cleared storage (key === null)', () => {
@@ -556,7 +558,7 @@ describe('req-55 staleInProgressWorkouts (surface, don\'t drop)', () => {
 })
 
 // The persisted-data proof: a stored key carrying a `draftWorkouts` entry still
-// loads, the draft survives to disk (v8), it is SURFACED for resolution, and it is
+// loads, the draft survives to disk (v9), it is SURFACED for resolution, and it is
 // NOT promoted into finished history — so it can never feed a recommendation.
 describe('req-55 legacy-draft migration is non-destructive', () => {
   // A v7 key (routine-based) carrying one in-progress draft + one finished workout.
@@ -613,9 +615,9 @@ describe('req-55 legacy-draft migration is non-destructive', () => {
       assert.deepEqual(rx.suggestedWeights, [40])
       assert.ok(!rx.suggestedWeights.includes(999))
 
-      // (5) Persisted to v8 with the draft intact (non-destructive on disk too).
-      const stored = JSON.parse(map.get('workout-mvp-v8'))
-      assert.equal(stored.schemaVersion, 8)
+      // (5) Persisted to v9 with the draft intact (non-destructive on disk too).
+      const stored = JSON.parse(map.get('workout-mvp-v9'))
+      assert.equal(stored.schemaVersion, 9)
       assert.equal(stored.draftWorkouts.length, 1)
       assert.equal(stored.draftWorkouts[0].id, 'draft-1')
     })
@@ -713,5 +715,101 @@ describe('req-84 previousSameRoutineWorkout', () => {
   it('empty history → null', () => {
     assert.equal(previousSameRoutineWorkout(active, [], []), null)
     assert.equal(previousSameRoutineWorkout(active, null, []), null)
+  })
+})
+
+// req-85 (v9) — the schema-version bump v8→v9 adds the timed-exercise fields. This is
+// the migration round-trip the merge gate hangs on: a real v8 key (plus an older v5)
+// must load into v9 with NOTHING lost, only the new fields defaulted, and the legacy
+// keys removed ONLY after the v9 write is confirmed by read-back (the req-06 rule).
+describe('req-85 v9 migration round-trip', () => {
+  const v8 = JSON.stringify({
+    schemaVersion: 8,
+    exercises: [
+      { id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5', archivedAt: null },
+    ],
+    routines: [
+      {
+        id: 'rtn-1',
+        name: 'Upper',
+        focus: 'Machines',
+        archivedAt: null,
+        exercises: [
+          {
+            id: 'si-1',
+            exerciseId: 'ex-1',
+            role: 'main',
+            restSec: 90,
+            notes: '',
+            warmup: null,
+            sets: 3,
+            targets: ['12', '10', '8'],
+            suggestedWeights: [20, 25, 25],
+          },
+        ],
+      },
+    ],
+    schedule: { loopWeeks: 1, slots: [] },
+    workouts: [
+      {
+        id: 'wo-1',
+        routineId: 'rtn-1',
+        startedAt: '2026-09-01T09:00:00.000Z',
+        finishedAt: '2026-09-01T10:00:00.000Z',
+        snapshot: {
+          routineId: 'rtn-1',
+          routineName: 'Upper',
+          items: [
+            { routineItemId: 'si-1', exerciseId: 'ex-1', exerciseName: 'Press', targets: ['12'], suggestedWeights: [20] },
+          ],
+        },
+        sets: [{ routineItemId: 'si-1', exerciseId: 'ex-1', setType: 'work', weight: 20, reps: '12', rpe: 3 }],
+      },
+    ],
+    plannedWorkouts: [],
+    draftWorkouts: [],
+    activeWorkout: null,
+    legacyRecommendations: {},
+  })
+  const v5 = JSON.stringify({ schemaVersion: 5, exercises: [], programs: [] })
+
+  it('loads a v8 (+v5) device into v9 with nothing lost and only defaults added', () => {
+    withLocalStorage({ seed: { 'workout-mvp-v8': v8, 'workout-mvp-v5': v5 } }, (map) => {
+      const state = loadState()
+
+      // Exercise: original fields intact, gains ONLY the two defaulted timer fields.
+      const ex = state.exercises[0]
+      assert.equal(ex.name, 'Press')
+      assert.equal(ex.hasDuration, false)
+      assert.equal(ex.durationSec, 30)
+
+      // Routine item: prescription intact, gains durations:[] (defaulted).
+      const item = state.routines[0].exercises[0]
+      assert.deepEqual(item.targets, ['12', '10', '8'])
+      assert.deepEqual(item.suggestedWeights, [20, 25, 25])
+      assert.deepEqual(item.durations, [])
+
+      // Finished history untouched: the logged set keeps weight/reps, no duration added.
+      const set = state.workouts[0].sets[0]
+      assert.equal(set.weight, 20)
+      assert.equal(set.reps, '12')
+      assert.equal(set.durationSec, undefined)
+      assert.equal(state.workouts[0].snapshot.items[0].exerciseName, 'Press')
+
+      // Persisted as v9, and the legacy keys are reclaimed after the read-back.
+      const stored = JSON.parse(map.get('workout-mvp-v9'))
+      assert.equal(stored.schemaVersion, 9)
+      assert.equal(map.get('workout-mvp-v8') ?? null, null)
+      assert.equal(map.get('workout-mvp-v5') ?? null, null)
+    })
+  })
+
+  it('a throwing write leaves the v8 copy intact (no premature delete)', () => {
+    withLocalStorage({ throwOnSet: true, seed: { 'workout-mvp-v8': v8 } }, (map) => {
+      const state = loadState()
+      assert.equal(state.routines[0].name, 'Upper') // still usable in memory
+      assert.equal(map.get('workout-mvp-v9') ?? null, null) // nothing persisted
+      assert.ok(map.get('workout-mvp-v8')) // the only surviving copy is kept
+    })
   })
 })

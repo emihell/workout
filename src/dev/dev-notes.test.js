@@ -58,7 +58,7 @@ test('append/read round-trips through the dev key only', () => {
   const note = buildNote({ route: '/', text: 'hi' }, 't1')
   appendNote(storage, note)
   assert.deepEqual(readNotes(storage), [note])
-  // The one and only key written is the dev key — never workout-mvp-v8.
+  // The one and only key written is the dev key — never workout-mvp-v9.
   assert.deepEqual([...storage._map.keys()], [DEV_NOTES_KEY])
 })
 
@@ -126,8 +126,8 @@ test('writeEnabled(true) stores "true"; writeEnabled(false) REMOVES the key (off
 })
 
 // Acceptance: the only localStorage keys this feature ever touches are the flag key
-// and the notes key — NEVER workout-mvp-v8 (the user's real history).
-test('the feature touches only the feedback flag + notes keys, never workout-mvp-v8', () => {
+// and the notes key — NEVER workout-mvp-v9 (the user's real history).
+test('the feature touches only the feedback flag + notes keys, never workout-mvp-v9', () => {
   const storage = fakeStorage()
   writeEnabled(storage, true)
   appendNote(storage, buildNote({ route: '/', text: 'x' }, 't1'))
@@ -136,10 +136,10 @@ test('the feature touches only the feedback flag + notes keys, never workout-mvp
   // 'false' removed its key, so only the notes key remains written after the run,
   // and at no point was any key other than these two set.
   assert.deepEqual(touched, [DEV_NOTES_KEY])
-  assert.ok(!touched.includes('workout-mvp-v8'))
+  assert.ok(!touched.includes('workout-mvp-v9'))
   // Both allowed keys are distinct from the workout data key.
-  assert.notEqual(DEV_NOTES_KEY, 'workout-mvp-v8')
-  assert.notEqual(FEEDBACK_ENABLED_KEY, 'workout-mvp-v8')
+  assert.notEqual(DEV_NOTES_KEY, 'workout-mvp-v9')
+  assert.notEqual(FEEDBACK_ENABLED_KEY, 'workout-mvp-v9')
 })
 
 test('storage failures on the flag degrade to OFF, never throw', () => {

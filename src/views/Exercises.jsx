@@ -5,7 +5,8 @@ import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing, NavLink } from './shared'
 import { exerciseDeletionImpact } from '../storage'
-import { Banner, Button, Field, List, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
+import { Banner, Button, Checkbox, Field, List, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
+import { DEFAULT_DURATION_SEC } from '../model'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -256,6 +257,11 @@ export function ExerciseEdit({ exerciseId }) {
   const [weightStep, setWeightStep] = useState(ex?.weightStep || '2.5')
   const [muscles, setMuscles] = useState(ex?.muscles || '')
   const [cues, setCues] = useState(ex?.cues || '')
+  // req-85 — orthogonal timer flag + default target seconds (any type can be timed).
+  const [hasDuration, setHasDuration] = useState(Boolean(ex?.hasDuration))
+  const [durationSec, setDurationSec] = useState(
+    ex?.durationSec != null ? String(ex.durationSec) : String(DEFAULT_DURATION_SEC),
+  )
 
   if (!ex) {
     return <Missing>Not found.</Missing>
@@ -275,6 +281,10 @@ export function ExerciseEdit({ exerciseId }) {
             weightStep: weightStep.trim() || 'n/a',
             muscles: muscles.trim(),
             cues: cues.trim(),
+            hasDuration,
+            durationSec: hasDuration
+              ? Math.max(1, Number(durationSec) || DEFAULT_DURATION_SEC)
+              : ex.durationSec ?? DEFAULT_DURATION_SEC,
           })
           go(`/exercises/${ex.id}`)
         }}
@@ -283,6 +293,15 @@ export function ExerciseEdit({ exerciseId }) {
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
         <Field label="Weight step" value={weightStep} onChange={(e) => setWeightStep(e.target.value)} />
+        <Checkbox label="Timed (count down a duration)" checked={hasDuration} onChange={setHasDuration} />
+        {hasDuration ? (
+          <NumberField
+            label="Default duration (s)"
+            min="1"
+            value={durationSec}
+            onChange={(e) => setDurationSec(e.target.value)}
+          />
+        ) : null}
         <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
         <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
         <div className="ui-actions">
@@ -310,7 +329,11 @@ export function ExerciseDetail({ exerciseId }) {
       <p>
         <NavLink to={`/exercises/${ex.id}/edit`} className="ui-navlink" chevron="forward">Edit</NavLink>
       </p>
-      <p className="ui-sub">{[ex.equipment, typeLabel(ex.type), ex.weightStep].filter(Boolean).join(' · ')}</p>
+      <p className="ui-sub">
+        {[ex.equipment, typeLabel(ex.type), ex.weightStep, ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
+          .filter(Boolean)
+          .join(' · ')}
+      </p>
       {ex.muscles ? <p className="ui-sub">{ex.muscles}</p> : null}
       {ex.cues ? (
         <>

@@ -12,7 +12,7 @@
 //
 // Hard data-trust guard (req-86/87): BOTH keys here — the notes store and the
 // enabled flag — live under their OWN localStorage keys and NEVER read or write
-// `workout-mvp-v8`. The user's real workout history is untouchable by this feature.
+// `workout-mvp-v9`. The user's real workout history is untouchable by this feature.
 //
 // The core is pure and storage-injected so it is unit-testable under `node --test`
 // (which has no localStorage / window). The browser wrappers at the bottom bind it

@@ -17,7 +17,7 @@ export function Settings() {
   const [error, setError] = useState('')
   const [includeAssistant, setIncludeAssistant] = useState(false)
   // req-87 — the feedback-notes toggle. Its own localStorage key (never
-  // workout-mvp-v8); default OFF. Flipping it shows/hides the ✎ capture button
+  // workout-mvp-v9); default OFF. Flipping it shows/hides the ✎ capture button
   // app-wide immediately (App.jsx's gate subscribes to the same store).
   const feedbackEnabled = useSyncExternalStore(
     subscribeFeedbackEnabled,

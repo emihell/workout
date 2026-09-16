@@ -98,7 +98,7 @@ describe('export and isolation from workout history', () => {
 
   it('analytics uses a separate key and never rides in the workout backup', () => {
     assert.equal(ANALYTICS_KEY, 'workout-mvp-analytics')
-    assert.notEqual(ANALYTICS_KEY, 'workout-mvp-v8')
+    assert.notEqual(ANALYTICS_KEY, 'workout-mvp-v9')
 
     // The workout backup is built only from store state, which has no analytics
     // fields — recording analytics can never change it.
