@@ -1,6 +1,6 @@
 # req-91 — `./plan preview` : one command to open a branch on your phone before merge
 
-**Status: READY — Emilio picked approach (c), 2026-09-16.** Formalize DEC-041's Tailscale `vite preview`
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-91` (`5a23104`…`eaa49b5`, 3 commits).** Formalize DEC-041's Tailscale `vite preview`
 into a single `plan` verb, so a UI change can be opened on a real device over HTTPS **before** merge.
 
 **Gate: tooling** (the `plan` script + DEMO.md; no app runtime or persisted-data change). Builder req

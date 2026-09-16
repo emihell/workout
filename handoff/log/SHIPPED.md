@@ -1178,3 +1178,7 @@ NOW bump edits only the one-line span (+ a >50-line warning). The SHIPPED *subst
 marker stay the Planner's (printed as reminders). 18-check `scripts/plan-ledger.test.sh` (not wired into
 `./check` — app gate only). `./check` green (261), `--no-ff`. **Note:** req-90's own closeout ran the
 pre-merge `plan`, so this entry is the last hand-written one; step 4b applies from the next closeout.
+
+## req-91 — `./plan preview` : one command to open a branch on your phone before merge  (merged 2026-09-16)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
