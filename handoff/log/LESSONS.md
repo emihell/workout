@@ -170,3 +170,17 @@ outcomes are both plausible and a user notices the difference — that is Emilio
 ask" #1). **Lesson:** when a UX instruction forks into materially-different visible outcomes, CONFIRM the
 fork before building/merging; "flag it reversible and merge anyway" is not a substitute for the one-line
 ask. Prefer the narrower/less-destructive reading when unsure.
+
+## L-014 — a whole session lost to a stale local branch never fetched  (2026-09-16)
+
+Planning opened a session, never ran `git fetch`, and concluded from a grep of the **local** branch that
+Emilio's gym-flow notes were "lost" — then spent a large part of the session re-running a grounding sweep,
+re-creating an INBOX, and "restoring notes to TRUE verbatim." All of it duplicated `req-76..86`, which
+already existed on `origin/planning` (`2719ba8`/`c81fd6e`, made a prior session). `git log --all` would
+have found them in one command. It also produced three false claims ("verbatim" over notes it had reworded,
+"lost"/"0 hits" over reqs that existed). **Root:** asserting from memory / local state instead of checking
+ground truth (origin). **Fixed:** git-fetch-at-session-start (PLANNING.md), check-it-exists-before-creating
+(WORKFLOW.md §Rescan). **Lesson:** the fetch/`--all` check is mechanical and mandatory at session start;
+and "lost"/"missing"/"verbatim"/"done"/"merged" are claims that need the command output **beside** them
+before the word is written — the honesty *rule* alone did not hold (it broke again the same session), so
+the discipline is receipts, not intentions.

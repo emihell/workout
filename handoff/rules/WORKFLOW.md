@@ -236,8 +236,16 @@ Inside an approved batch:
 - **Serial-but-continuous.** One req/branch at a time (DEC-035 still: Builder builds,
   Planner merges), but **don't stop between them** — build → `./check` → merge →
   dispatch the next — and give **one summary at the end**, not per-req.
-- **Relaxed per-req testing.** Merge on `./check` green **without** holding for Emilio
-  to feel each `ux-feel` req; he trains with the app and iterates **after** the batch.
+- **Relaxed per-req testing — but "feel" is deferrable, "does it render / is it visible"
+  is NOT.** Merge on `./check` green without holding for Emilio to *feel* each `ux-feel`
+  req (spacing, wording, gym-flow) — he iterates after the batch. But whether a UI control
+  **renders, is on-screen, and is not occluded** is an objective, binary fact, not a feel
+  judgement, and it must be confirmed **before merge** by whoever merges — never swept into
+  the deferred-feel bucket. (2026-09-16: req-88 shipped an invisible feedback button because
+  batch mode let visibility ride as "feel"; nobody saw it until Emilio hunted for it.) With
+  no browser in either session, the pre-merge visibility check is a scripted screenshot of
+  the changed screen (see the UI-visibility check tool) or, until that exists, Emilio's
+  fast eyeball on the deployed change — but it is a gate, not an after-thought.
 - **Don't clear sessions mid-batch.** Builder's and Planner's both stay alive for
   continuity — Emilio is intentionally out of the loop and context must carry across.
 - **The behaviour-decision gate still applies.** A gated req still needs Emilio's call,

@@ -971,6 +971,11 @@ behaviour-decision gate still applies** even in a batch — a gated req still ne
 during the pre-batch planning; only *testing* is relaxed, never *decisions*. Reversible. Home for the
 operational rule: WORKFLOW.md §"Batch mode".
 
+**Refinement (2026-09-16, session retro):** "relaxed testing" defers *feel*, not *visibility*. Whether a
+UI control **renders / is on-screen / is not occluded** is objective and must be confirmed before merge —
+never deferred like feel. req-88 shipped an invisible feedback button precisely because batch mode let
+visibility ride as feel. See WORKFLOW.md §"Batch mode".
+
 ## DEC-048 — rest is informational, not a control surface; the next set is always live during rest  (Emilio, 2026-09-16)
 
 Ratifies the consequences of req-78's D1/D2 (rest-pill rework). Rest is now a small floating pill that

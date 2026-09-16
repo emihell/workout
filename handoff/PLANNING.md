@@ -76,11 +76,14 @@ schema shape, or "that isn't possible" is a claim to be tested. In a browser-onl
 app the cheap test is a unit test, a console line against the real model, or
 reading the actual `src/` — not reasoning harder.
 
-**This applies to your own claims too.** "Done", "verbatim", "lost", "0 hits",
-"merged", "pushed" are all claims — run the check (`git log --all`, a diff, a status)
-*before* you write the word, and never in a commit message you haven't earned.
-(2026-09-16: a commit said "verbatim" over notes it had silently reworded, and "lost"
-over reqs that existed on origin. Both were one command away from being caught.)
+**Your own completion-claims need a receipt beside them, not just care.** "Done",
+"verified", "verbatim", "lost", "0 hits", "merged", "pushed" are claims — the command
+output that proves each sits **beside** the word (a `git log --all`, a diff, a `./check`
+line), the same discipline CLAUDE.md puts on Builder (`[measured]` vs `[inferred]`). This
+is mechanical on purpose: the honesty *intent* is not enough — on 2026-09-16 it was written
+as a rule and **broken the same session** ("verbatim" over reworded notes; "lost" / "caught
+the notes we lost" over reqs that existed on origin — see L-014). A claim with no receipt
+beside it is `[inferred]`: do not state it as done, and never in a commit message.
 
 **Check Claude Code's reports rather than relaying them.** It is careful and mostly
 right, and can still report a helper as "removed" that never existed or ship a guard
