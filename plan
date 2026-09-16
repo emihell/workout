@@ -394,6 +394,72 @@ with open(path, "w", encoding="utf-8") as fh:
 PY
 }
 
+# req-90: the two mechanical ledger edits that followed every closeout by hand
+# (and went wrong twice this session — NOW hit 51 lines once, a doubled req-84/85
+# block once). STUB + RANGE ONLY: the SHIPPED substance and the "Building:" marker
+# stay the author's (printed as reminders in step 7). Both edits are idempotent —
+# a re-run, or an entry the author has since filled, is left untouched, never
+# doubled — so a closeout re-run is safe.
+
+# Append a "## req-N — <title>  (merged <date>)" heading + a one-line placeholder
+# to SHIPPED.md, UNLESS an entry for req-N is already there. The guard both makes
+# re-runs idempotent and refuses to clobber prose the author has since written
+# under that heading (the append is the boilerplate; the paragraph is the signal).
+append_shipped_stub() {
+  local path="$1" reqid="$2" title="$3" adate="$4"
+  if grep -Eq "^## ${reqid} " "$path"; then
+    echo "plan closeout: SHIPPED.md — a ${reqid} entry already exists; left untouched."
+    return 0
+  fi
+  # Two spaces before "(merged …)" to match the existing entries' heading style.
+  printf '\n## %s — %s  (merged %s)\n\n_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._\n' \
+    "$reqid" "$title" "$adate" >> "$path"
+  echo "plan closeout: SHIPPED.md — appended a ${reqid} stub (fill in the substance)."
+}
+
+# Bump NOW.md's first "**Shipped: … **" span to include req-N: extend the final
+# range in place (…–(N-1) -> …–N, or a bare req-(N-1) -> req-(N-1)–N) when N abuts
+# it, else append ", req-N". Idempotent: if N is already covered by any span, the
+# file is untouched. Prints one word (extended|appended|unchanged) on success; the
+# span is a single line, so this never adds a line (the ≤50 rule is enforced by the
+# caller's line-count warning).
+bump_now_range() {
+  python3 - "$1" "$2" <<'PY'
+import re, sys
+path, n = sys.argv[1], int(sys.argv[2])
+with open(path, encoding="utf-8") as fh:
+    text = fh.read()
+
+m = re.search(r"\*\*Shipped:(.*?)\*\*", text, flags=re.S)
+if not m:
+    sys.stderr.write("plan closeout: NOW.md — no '**Shipped: …**' span found.\n")
+    sys.exit(2)
+
+body = m.group(1)
+DASH = "–"  # en-dash, as the ranges are written (req-33–89)
+tok = re.compile(r"req-0*(\d+)(?:" + DASH + r"0*(\d+))?")
+matches = list(tok.finditer(body))
+spans = [(int(a.group(1)), int(a.group(2)) if a.group(2) else int(a.group(1))) for a in matches]
+
+if any(lo <= n <= hi for lo, hi in spans):
+    print("unchanged")  # already covered — leave the span alone
+    sys.exit(0)
+
+last = matches[-1]
+lo, hi = spans[-1]
+if n == hi + 1:
+    new_body = body[:last.start()] + "req-%d%s%d" % (lo, DASH, n) + body[last.end():]
+    result = "extended"
+else:
+    new_body = body + ", req-%d" % n
+    result = "appended"
+
+with open(path, "w", encoding="utf-8") as fh:
+    fh.write(text[:m.start(1)] + new_body + text[m.end(1):])
+print(result)
+PY
+}
+
 cmd_closeout() {
   local arg="${1:-}"
   if [ -z "$arg" ]; then
@@ -525,6 +591,38 @@ cmd_closeout() {
     echo "plan closeout: WARNING — could not compute the commit range; leaving the doc Status unchanged." >&2
   fi
 
+  # 4b. req-90: the two mechanical ledger edits, done BEFORE the save below so they
+  # ride the same publish. Title from the doc's first `# ` heading (minus the
+  # `req-N —` prefix); date is the closeout date. Both writes are idempotent and
+  # non-fatal — a failure warns and leaves the closeout to publish what it has,
+  # never aborting after the merge already landed.
+  local co_title co_date shipped now now_lines bump_out
+  co_title="$(grep -m1 '^# ' "$doc" | sed -E 's/^# +//; s/^req-[0-9]+ *[—-] *//')"
+  co_date="$(date +%F)"
+  shipped="$PLANNING_DIR/handoff/log/SHIPPED.md"
+  now="$PLANNING_DIR/handoff/NOW.md"
+
+  if [ -f "$shipped" ]; then
+    append_shipped_stub "$shipped" "$reqid" "$co_title" "$co_date" \
+      || echo "plan closeout: WARNING — could not append the SHIPPED stub; add it by hand." >&2
+  else
+    echo "plan closeout: WARNING — $shipped not found; SHIPPED stub not appended." >&2
+  fi
+
+  if [ -f "$now" ]; then
+    if bump_out="$(bump_now_range "$now" "$n")"; then
+      echo "plan closeout: NOW.md — shipped range ${bump_out} to include ${reqid}."
+    else
+      echo "plan closeout: WARNING — NOW.md shipped range not bumped; do it by hand." >&2
+    fi
+    now_lines="$(wc -l < "$now" | tr -d ' ')"
+    if [ "$now_lines" -gt 50 ]; then
+      echo "plan closeout: WARNING — NOW.md is ${now_lines} lines (> 50); trim it (the range bump adds no line, but NOW is already over)." >&2
+    fi
+  else
+    echo "plan closeout: WARNING — $now not found; shipped range not bumped." >&2
+  fi
+
   # 5. Save the flip on planning, publish planning->main (runs ./check), push
   # both branches, drop the branch. ./plan save must run from the planning
   # worktree, so it is invoked there in a subshell.
@@ -539,21 +637,17 @@ cmd_closeout() {
   echo
   "$CODE_DIR/plan" status || true
 
-  # 7. req-46 #3: print (never write handoff — too risky, and it can't know the
-  # prose) the DEC-009 step-9 maintenance checklist with the mechanical values
-  # filled in. Removes the "what were the steps again" friction that followed
-  # every closeout, while the SHIPPED/NOW prose stays the author's by hand.
-  # Title from the doc's first `# ` heading, minus the `req-N —` prefix; date is
-  # the closeout date. sed's character class carries an em-dash, so LC_ALL=C is
-  # avoided — the surrounding script already runs UTF-8 (flip_status relies on it).
-  local co_title co_date
-  co_title="$(grep -m1 '^# ' "$doc" | sed -E 's/^# +//; s/^req-[0-9]+ *[—-] *//')"
-  co_date="$(date +%F)"
+  # 7. req-90: the SHIPPED heading + NOW range are now written and published by
+  # steps 4b/5 above, so the "what were the steps again" copy-paste is gone. What
+  # remains is the author's prose — which the tool can't know and must never
+  # invent — so print only that. It is a fresh save/publish because step 5 already
+  # ran (the stub is on main now; the substance replaces it next pass).
   echo
-  echo "plan closeout: done. Now (DEC-009 step 9), before anything else:"
-  echo "  1. SHIPPED.md — append:  ## $reqid — $co_title  (merged $co_date)"
-  echo "  2. NOW.md — bump the shipped range to include $reqid; move the \"building\" marker"
-  echo "  3. ./plan save \"$reqid closeout\"  &&  ./plan publish --push"
+  echo "plan closeout: done — ${reqid} merged; SHIPPED stub + NOW shipped-range written and published."
+  echo "Still yours (prose — a fresh save/publish, DEC-009 step 9):"
+  echo "  1. SHIPPED.md — replace the ${reqid} stub line with the real entry (what changed / verified)."
+  echo "  2. NOW.md — move the \"Building:\" marker off ${reqid}; add any DEC-/L- from the build."
+  echo "  3. ./plan save \"$reqid ledger\"  &&  ./plan publish --push"
 }
 
 # req-33: one read-only command that verifies first-machine setup and explains
@@ -718,6 +812,13 @@ PY
   fi
   echo "doctor: all setup checks passed."
 }
+
+# req-90: `_PLAN_NO_MAIN=1 source ./plan` loads the functions without dispatching,
+# so the ledger helpers (append_shipped_stub / bump_now_range) can be exercised
+# against fixtures by scripts/plan-ledger.test.sh. No effect on normal invocation.
+if [ "${_PLAN_NO_MAIN:-}" = "1" ]; then
+  return 0 2>/dev/null || exit 0
+fi
 
 case "${1:-}" in
   save)
