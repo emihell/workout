@@ -1,6 +1,6 @@
 # req-90 — `plan closeout` auto-writes the SHIPPED stub + bumps NOW's shipped range
 
-**Status: READY — from the 2026-09-16 session retro.** Kills the repetitive, error-prone ledger step that
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-90` (`6cb0e0b`…`6cb0e0b`, 1 commit).** Kills the repetitive, error-prone ledger step that
 follows every closeout.
 
 **Gate: tooling** (the `plan` script; no app change).
