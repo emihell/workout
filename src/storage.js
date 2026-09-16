@@ -411,3 +411,47 @@ export function durationLabel(startedAt, finishedAt) {
   const min = Math.max(1, Math.round(ms / 60000))
   return `${min} min`
 }
+
+// Minutes elapsed for a workout, matching finish.jsx:26 / durationLabel — at least
+// 1, rounded. `end` lets the caller pass a live clock for the still-active workout
+// (which has no finishedAt yet) or a stored finishedAt for a finished one.
+function workoutMinutes(startedAt, end) {
+  const started = startedAt ? new Date(startedAt).getTime() : end
+  return Math.max(1, Math.round((end - started) / 60000))
+}
+
+// req-84 — the "vs last time" summary shown when a routine auto-completes. Pure and
+// inspectable: given the just-finished (still-active) workout, the previous
+// same-routine finished workout (or null), and a `now` clock for duration, it returns
+// the three numbers plus a per-number delta. No prior → deltas is null: the summary
+// shows the stats but INVENTS no comparison (DESIGN §1, the no-invent rule). Selection
+// of `prior` (previousSameRoutineWorkout) is separate and equally testable.
+export function workoutSummaryStats(active, prior, now) {
+  const volume = workoutVolume(active)
+  const duration = workoutMinutes(active?.startedAt, now)
+  const sets = (active?.sets || []).length
+  if (!prior) return { volume, duration, sets, deltas: null }
+  return {
+    volume,
+    duration,
+    sets,
+    deltas: {
+      volume: volume - workoutVolume(prior),
+      duration: duration - workoutMinutes(prior.startedAt, new Date(prior.finishedAt).getTime()),
+      sets: sets - (prior.sets || []).length,
+    },
+  }
+}
+
+// The most recent FINISHED workout of the same routine as `active`, or null if this is
+// the first. Reuses the exact grouping key that groupWorkoutsByRoutine already applies
+// (routineId + program + name) by grouping [active, ...workouts] together: `active` is
+// prepended so it heads its own group, and its immediate neighbour (index 1) is the
+// prior same-routine workout. `workouts` is newest-first (store.finishWorkout prepends),
+// so index 1 is the most recent prior. No duplicated key logic.
+export function previousSameRoutineWorkout(active, workouts, routines) {
+  if (!active) return null
+  const groups = groupWorkoutsByRoutine([active, ...(workouts || [])], routines)
+  const group = groups.find((g) => g.workouts[0] === active)
+  return group?.workouts[1] ?? null
+}

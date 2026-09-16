@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
-import { progressionForItem } from '../../model'
-import { isSkippedSet } from '../../workout-log'
+import { buildFinishProgression } from '../../model'
 import { useStore } from '../../store-context'
 import { Back, Missing } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
@@ -25,27 +24,10 @@ function FinishScreen({ routineId }) {
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
   const [minutes] = useState(() => Math.max(1, Math.round((Date.now() - started.getTime()) / 60000)))
   const setCount = (active?.sets || []).length
-  const items = active?.snapshot?.items || []
-  const progression = items.map((item) => {
-    // req-40 — the saved core ({ routineItemId, sets, recommendation, to, targetsTo })
-    // comes from the ONE shared helper, identical to the History recalc path. Only the
-    // display-only fields below are computed here.
-    const core = progressionForItem(store.exercises, active, item)
-    const skippedForItem = (active?.sets || []).some(
-      (set) => set.routineItemId === core.routineItemId && isSkippedSet(set),
-    )
-    return {
-      routineItemId: core.routineItemId,
-      exerciseId: item.exerciseId,
-      name: item.exerciseName,
-      from: item.suggestedWeights || [],
-      to: core.to,
-      targetsFrom: item.targets || [],
-      targetsTo: core.targetsTo,
-      action: core.recommendation.action,
-      reason: core.sets.length ? core.recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
-    }
-  })
+  // req-40 — the saved core comes from the ONE shared progressionForItem helper
+  // (identical to the History recalc path); req-84 — the same builder now feeds the
+  // auto-complete path, so both persist byte-identical progression.
+  const progression = buildFinishProgression(store.exercises, active)
 
   const name = active?.snapshot?.routineName || active?.snapshot?.sessionName
 

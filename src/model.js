@@ -337,6 +337,33 @@ export function progressionForItem(exercises, workout, item) {
   }
 }
 
+// The finish-time progression array, exactly as the Finish screen builds it. The
+// saved core ({ routineItemId, sets, recommendation, to, targetsTo }) comes from
+// the ONE shared progressionForItem helper (identical to the History recalc path);
+// the extra fields here are display-only. Extracted so the manual Finish screen
+// (finish.jsx) and the req-84 auto-complete path pass byte-identical progression to
+// store.finishWorkout — no second, drifting copy of this shape.
+export function buildFinishProgression(exercises, active) {
+  const items = active?.snapshot?.items || []
+  return items.map((item) => {
+    const core = progressionForItem(exercises, active, item)
+    const skippedForItem = (active?.sets || []).some(
+      (set) => set.routineItemId === core.routineItemId && isSkippedSet(set),
+    )
+    return {
+      routineItemId: core.routineItemId,
+      exerciseId: item.exerciseId,
+      name: item.exerciseName,
+      from: item.suggestedWeights || [],
+      to: core.to,
+      targetsFrom: item.targets || [],
+      targetsTo: core.targetsTo,
+      action: core.recommendation.action,
+      reason: core.sets.length ? core.recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
+    }
+  })
+}
+
 export function progressionFromWorkout(state, workout) {
   return (workout?.snapshot?.items || []).map((item) => {
     const { routineItemId, to, targetsTo } = progressionForItem(state.exercises, workout, item)

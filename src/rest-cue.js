@@ -60,7 +60,7 @@ export function unlockAudio() {
 // ramped, not stepped, so there is no click at start/stop. Fail-silent
 // throughout: a suspended/blocked context or any throw produces no sound and no
 // error into the workout.
-function defaultBeep() {
+export function defaultBeep() {
   try {
     const ctx = getAudioContext()
     if (!ctx) return
