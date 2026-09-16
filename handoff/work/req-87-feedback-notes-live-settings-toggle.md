@@ -1,6 +1,6 @@
 # req-87 — feedback notes: ship to the live site, gated by a Settings toggle (default off)
 
-**Status: READY — Emilio, 2026-09-16.** Revises req-86 (which shipped the feedback capture as
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-87` (`29ef166`…`29ef166`, 1 commit).** Revises req-86 (which shipped the feedback capture as
 **dev-only**, build-time stripped from production). Emilio: *"run it on the live site — only I am using
 it — but make it so I can turn it off in settings, and it should be default turned off."*
 
