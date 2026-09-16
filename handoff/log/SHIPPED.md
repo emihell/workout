@@ -1088,3 +1088,16 @@ already calls `startOrContinue` off-schedule) — reuses that surface, no new UI
 data change. Zero-routines is safe by construction (TodayEmpty only renders with ≥1 routine; even so
 `/routines` shows the Add path, never a dead picker). `./check` green (225), `--no-ff`. Builder's flagged
 trade-off for Emilio: two-tap (Start → pick a routine) vs a one-tap inline picker — inline can come later.
+
+## req-83 — a set value changed mid-workout becomes the future default (N9, gym-flow batch 2)  (merged 2026-09-16)
+
+Batch 3, req 3/3. DEC-047(c) live-apply. (The "future default after finish" half already worked via
+history-prefill; this is the immediate half.) A value entered on a set that **differs from the presented
+seed** becomes the seed for that exercise's remaining sets **this session**, until changed again.
+Mechanism: session-scoped `activeWorkout.seedOverrides` map keyed `exerciseId::wu|work` — **no schema
+bump** (optional transient field; `startWorkout` inits `{}`, `finishWorkout` **strips** it so it never
+lands on finished history; old activeWorkout without the field loads — migration-tested). Pure
+`nextSeedOverrides` compares logged-vs-presented-seed so only a genuine change is captured; `weighted`
+gates weight. **All guard rails unit-tested:** no-invent, field isolation (weight-only change leaves
+reps), no cross-exercise leak, history-prefill still finished-only, wu→first-work carry default NO.
++18 tests → **243**. `./check` green, `--no-ff`. Live in-gym carry is Emilio's check.
