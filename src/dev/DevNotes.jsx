@@ -6,22 +6,31 @@
 // render; the on/off decision lives in the gate, not here.
 //
 // Styling is entirely inline (no ui.css classes) so the shared production
-// stylesheet carries nothing from this feature. The button is small and unimposing
-// (bottom-left, low opacity until tapped) and sits on EVERY screen — including the
-// in-workout flow where the bottom menu is hidden — because that is exactly when a
-// flaw gets spotted ("while doing an exercise").
+// stylesheet carries nothing from this feature. req-88: the button lives in the
+// TOP-RIGHT corner, clear of the bottom dock, at full opacity so it reads as an
+// obviously-there control (not the faint bottom-left dot it was in req-86). It
+// sits on EVERY screen — including the in-workout flow where the bottom menu is
+// hidden — because that is exactly when a flaw gets spotted ("while doing an
+// exercise"). Both button and panel respect the iOS safe-area/notch on top+right.
 import { useState } from 'react'
 import { useHashRoute } from '../route'
 import { dropNotes, loadNotes, notesJson, saveNote } from './dev-notes.js'
 
 const Z = 2147483000 // above every app surface, incl. the bottom dock
 
+// Top/right offsets that fold in the safe-area insets, so the fixed controls
+// clear the notch/rounded corner on iOS and sit at a plain 12px gap elsewhere.
+const TOP = 'calc(env(safe-area-inset-top, 0px) + 12px)'
+const RIGHT = 'calc(env(safe-area-inset-right, 0px) + 12px)'
+
 const panelStyle = {
   position: 'fixed',
-  left: 12,
-  bottom: 12,
+  top: TOP,
+  right: RIGHT,
   zIndex: Z,
   width: 'min(360px, calc(100vw - 24px))',
+  maxHeight: 'calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px)',
+  overflowY: 'auto',
   background: '#fff',
   color: '#111',
   border: '1px solid #111',
@@ -33,19 +42,20 @@ const panelStyle = {
 
 const buttonStyle = {
   position: 'fixed',
-  left: 12,
-  bottom: 12,
+  top: TOP,
+  right: RIGHT,
   zIndex: Z,
-  width: 34,
-  height: 34,
+  width: 40,
+  height: 40,
   borderRadius: '50%',
   border: '1px solid #111',
   background: '#fff',
   color: '#111',
-  opacity: 0.45,
-  font: '15px/1 system-ui, sans-serif',
+  opacity: 1,
+  font: '18px/1 system-ui, sans-serif',
   cursor: 'pointer',
   padding: 0,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
 }
 
 const smallBtn = {
