@@ -1,8 +1,8 @@
 # Now
 
-Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–76, req-78–81, req-86** (req-10
-pending; req-24 gated; req-32 dropped; req-77 PAUSED). **Batch 3 in flight (DEC-047):** req-86 ✓; req-82
-building; then req-83. **Decided, spec-pending (not buildable yet):** req-84 auto-complete (+vs-last stats),
+Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–76, req-78–82, req-86** (req-10
+pending; req-24 gated; req-32 dropped; req-77 PAUSED). **Batch 3 in flight (DEC-047):** req-86/82 ✓;
+req-83 building (last). **Decided, spec-pending (not buildable yet):** req-84 auto-complete (+vs-last stats),
 req-85 timed exercises (schema bump — Emilio's eyes + backup-first). **Batch 2 after-batch pass still owed
 by Emilio:** req-78 req-25 Previous-then-forward browser check + confirm the 2 req-78 removals (DEC-048).
 Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
