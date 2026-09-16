@@ -1101,3 +1101,16 @@ lands on finished history; old activeWorkout without the field loads — migrati
 gates weight. **All guard rails unit-tested:** no-invent, field isolation (weight-only change leaves
 reps), no cross-exercise leak, history-prefill still finished-only, wu→first-work carry default NO.
 +18 tests → **243**. `./check` green, `--no-ff`. Live in-gym carry is Emilio's check.
+
+## req-87 — feedback notes: ship to the live site, gated by a Settings toggle (default off)  (merged 2026-09-16)
+
+Revises req-86 (Emilio: "run it on the live site — only I am using it — turn off in settings, default
+off"). Flipped the feedback-capture gating from **build-time** (`import.meta.env.DEV` DCE, stripped from
+prod) to **runtime**: the ✎ button/panel now ship in the production build and render only when a
+**Settings toggle** is ON; **default OFF = absence** of the flag key (turning off *removes* the key).
+`App.jsx` `FeedbackNotesGate` reads the flag reactively (`useSyncExternalStore`, same idiom as the
+banners) so a Settings flip shows/hides live. Flag in its **own** key `workout-feedback-enabled-v1`;
+notes still in `workout-dev-notes-v1`; **neither touches `workout-mvp-v8`** (unit-tested; no store.jsx/
+storage.js change). Ships-to-prod-inert verified (`GITHUB_PAGES=true` build grep = 7 matches, the inverse
+of req-86). +5 tests → **248**. `./check` green, `--no-ff`. Live toggle flow is Emilio's check (on the
+deployed site). `src/dev/*` kept unrenamed (renaming would strand the existing `-dev-` notes key).
