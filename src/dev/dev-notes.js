@@ -1,22 +1,28 @@
-// req-86 (N8) — dev-only "note on this page" capture store.
+// req-86 (N8) / req-87 — the "note on this page" feedback-capture store.
 //
-// A tiny in-app pipe into the backlog: while using the app in DEV, Emilio jots a
-// note tied to the current screen so a req can be made from it later. This whole
-// feature is DEV-ONLY and must never ship to the live GitHub Pages build — the
-// only render site is gated on `import.meta.env.DEV` (App.jsx), which Vite
-// statically replaces with `false` in the production build, dead-code-eliminating
-// this module and its UI out of `dist/` entirely (verified by a build grep in
-// reports/req-86.md — no key, no strings, no render).
+// A tiny in-app pipe into the backlog: Emilio jots a note tied to the current
+// screen so a req can be made from it later. req-86 shipped this DEV-ONLY (build-
+// time stripped from prod). req-87 flips the gating to RUNTIME: the button/panel now
+// ship in the production build and render only when a feedback toggle is ON (default
+// OFF), so Emilio — the only user — can turn it on in Settings on the live site. The
+// gate is `getFeedbackEnabled()` (below), read reactively via useSyncExternalStore in
+// App.jsx; there is no longer an `import.meta.env.DEV` DCE gate. (The module still
+// lives under `src/dev/` and the notes key still reads `-dev-` — the name is kept so
+// the existing key isn't stranded; it's cosmetic now, not a build mechanism.)
 //
-// Hard data-trust guard (req-86): this store lives under its OWN localStorage key
-// and NEVER reads or writes `workout-mvp-v8`. The user's real workout history is
-// untouchable by a dev convenience. The two keys share no code path.
+// Hard data-trust guard (req-86/87): BOTH keys here — the notes store and the
+// enabled flag — live under their OWN localStorage keys and NEVER read or write
+// `workout-mvp-v8`. The user's real workout history is untouchable by this feature.
 //
 // The core is pure and storage-injected so it is unit-testable under `node --test`
 // (which has no localStorage / window). The browser wrappers at the bottom bind it
 // to `window.localStorage`.
 
 export const DEV_NOTES_KEY = 'workout-dev-notes-v1'
+// req-87 — the on/off flag's own key. Default OFF is the ABSENCE of this key: an
+// unset flag reads false, so a fresh visitor/site captures and stores nothing until
+// the Settings toggle is turned on. Turning it off removes the key (restores absence).
+export const FEEDBACK_ENABLED_KEY = 'workout-feedback-enabled-v1'
 
 // Build one note record. `at` is passed in (the caller stamps the time) so the
 // core stays pure and testable. Shape: {route, timestamp, text, context}.
@@ -113,4 +119,57 @@ export function saveNote({ text, routeInfo, hash }, at) {
 
 export function dropNotes() {
   return clearNotes(browserStorage())
+}
+
+// ---- req-87 enabled flag (pure, storage-injected) ----
+
+// Default OFF: any value other than the literal 'true' (incl. an absent key) reads
+// false. Storage failures degrade to false — the feature stays off, never on.
+export function readEnabled(storage) {
+  if (!storage) return false
+  try {
+    return storage.getItem(FEEDBACK_ENABLED_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+// Turning ON writes 'true'; turning OFF REMOVES the key, so "off" is byte-for-byte
+// the fresh/default state (absence), not a stored 'false'.
+export function writeEnabled(storage, value) {
+  if (!storage) return false
+  try {
+    if (value) storage.setItem(FEEDBACK_ENABLED_KEY, 'true')
+    else storage.removeItem(FEEDBACK_ENABLED_KEY)
+    return true
+  } catch {
+    return false
+  }
+}
+
+// ---- req-87 enabled flag (subscribable browser store) ----
+//
+// Mirrors the storage.js signal trio (getX/subscribeX): an in-memory boolean plus a
+// listener set, so App.jsx's gate and the Settings toggle both track it via
+// useSyncExternalStore and a flip in Settings shows/hides the button live (no
+// reload). Initialized once from localStorage at module load, so a reload restores
+// the persisted state. Under `node --test` browserStorage() is null → reads false.
+let feedbackEnabled = readEnabled(browserStorage())
+const feedbackEnabledListeners = new Set()
+
+export function getFeedbackEnabled() {
+  return feedbackEnabled
+}
+
+export function subscribeFeedbackEnabled(listener) {
+  feedbackEnabledListeners.add(listener)
+  return () => feedbackEnabledListeners.delete(listener)
+}
+
+export function setFeedbackEnabled(value) {
+  const next = Boolean(value)
+  writeEnabled(browserStorage(), next)
+  if (feedbackEnabled === next) return
+  feedbackEnabled = next
+  for (const listener of feedbackEnabledListeners) listener()
 }
