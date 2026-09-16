@@ -1,15 +1,11 @@
 # Now
 
 Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–76, req-78–83, req-86–87** (req-10
-pending; req-24 gated; req-32 dropped; req-77 PAUSED). Batch 3 done; **req-87** (feedback notes → live
-site, Settings toggle, default off) merged after. Next: req-84 auto-complete + req-85 timed — both
-DECIDED, spec-pending (Planner owes the specs). **Decided, spec-pending (not buildable yet):** req-84 auto-complete (+vs-last stats),
-req-85 timed exercises (schema bump — Emilio's eyes + backup-first). **Batch 2 after-batch pass still owed
-by Emilio:** req-78 req-25 Previous-then-forward browser check + confirm the 2 req-78 removals (DEC-048).
+pending; req-24 gated; req-32 dropped; req-77 PAUSED). **Next: req-84** auto-complete (+vs-last stats) **+
+req-85** timed exercises (schema bump — Emilio's eyes + backup-first) — both DECIDED, spec-pending
+(Planner owes the specs). **Batch 2 after-batch pass still owed by Emilio:** the req-78 req-25
+Previous-then-forward browser check (the 2 req-78 removals are settled — DEC-048, "nice to have").
 Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
-
-**Cleared 2026-09-14 (serial batch, DEC-035):** req-65–69 — CLAUDE.md merge model, pre-push
-`--no-ff` guard (DEC-045), DECISIONS digest, Planner/Builder tags, `plan doctor` fix. Detail in SHIPPED.
 
 ## ✅ Workflow audit follow-up CLEARED (Emilio: "deal with workflow first" → shipped 2026-09-14)
 
