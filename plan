@@ -1007,7 +1007,7 @@ cmd_preview() {
     exit 1
   fi
 
-  echo "plan preview: starting vite preview on :$PREVIEW_PORT…"
+  echo "plan preview: starting vite preview on :${PREVIEW_PORT}…"
   # exec so the tracked pid IS vite (not an npm wrapper), for a clean single-kill
   # teardown. Backgrounded and log-redirected, so it outlives this command.
   ( cd "$CODE_DIR" && exec ./node_modules/.bin/vite preview \
