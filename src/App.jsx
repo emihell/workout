@@ -22,6 +22,10 @@ import { Settings } from './views/Settings'
 import { BottomMenu } from './ui/BottomMenu.jsx'
 import { Library } from './views/Library'
 import { Showcase } from './ui/Showcase.jsx'
+// req-86 (N8) — dev-only feedback capture. `import.meta.env.DEV` is a build-time
+// literal (`false` in the production build), so the render below and this import's
+// whole module chain are dead-code-eliminated out of the GitHub Pages bundle.
+import { DevNotes } from './dev/DevNotes.jsx'
 
 function SaveFailedBanner() {
   const failed = useSyncExternalStore(subscribeSaveFailed, getSaveFailed, getSaveFailed)
@@ -220,6 +224,7 @@ export default function App() {
         </ErrorBoundary>
       </main>
       <BottomMenu />
+      {import.meta.env.DEV ? <DevNotes /> : null}
     </StoreProvider>
   )
 }
