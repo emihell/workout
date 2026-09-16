@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { exportAnalytics, recordButton } from '../analytics'
+import { getFeedbackEnabled, setFeedbackEnabled, subscribeFeedbackEnabled } from '../dev/dev-notes.js'
 import { buildBackup } from '../exchange.js'
 import { downloadJson, importWithBackup } from '../import-backup'
 import { dateKey } from '../schedule'
@@ -15,6 +16,14 @@ export function Settings() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [includeAssistant, setIncludeAssistant] = useState(false)
+  // req-87 — the feedback-notes toggle. Its own localStorage key (never
+  // workout-mvp-v8); default OFF. Flipping it shows/hides the ✎ capture button
+  // app-wide immediately (App.jsx's gate subscribes to the same store).
+  const feedbackEnabled = useSyncExternalStore(
+    subscribeFeedbackEnabled,
+    getFeedbackEnabled,
+    getFeedbackEnabled,
+  )
 
   return (
     <Screen>
@@ -72,6 +81,9 @@ export function Settings() {
       <List>
         <Row to="/components">Components</Row>
       </List>
+      {/* req-87 — turn the on-page feedback-note capture button on/off. Default off;
+          persisted in its own key (never the workout data). */}
+      <Checkbox label="Feedback notes" checked={feedbackEnabled} onChange={setFeedbackEnabled} />
     </Screen>
   )
 }

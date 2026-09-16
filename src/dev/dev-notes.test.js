@@ -2,12 +2,15 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
   DEV_NOTES_KEY,
+  FEEDBACK_ENABLED_KEY,
   appendNote,
   buildNote,
   captureContext,
   clearNotes,
   notesJson,
+  readEnabled,
   readNotes,
+  writeEnabled,
   writeNotes,
 } from './dev-notes.js'
 
@@ -97,4 +100,54 @@ test('storage failures degrade to safe defaults, never throw', () => {
   assert.deepEqual(readNotes(throwing), [])
   assert.equal(writeNotes(throwing, []), false)
   assert.equal(clearNotes(throwing), false)
+})
+
+// ---- req-87 enabled flag ----
+
+test('readEnabled defaults OFF when the key is absent', () => {
+  assert.equal(readEnabled(fakeStorage()), false)
+  assert.equal(readEnabled(null), false)
+})
+
+test('readEnabled is true only for the literal "true"', () => {
+  assert.equal(readEnabled(fakeStorage({ [FEEDBACK_ENABLED_KEY]: 'true' })), true)
+  assert.equal(readEnabled(fakeStorage({ [FEEDBACK_ENABLED_KEY]: 'false' })), false)
+  assert.equal(readEnabled(fakeStorage({ [FEEDBACK_ENABLED_KEY]: '1' })), false)
+})
+
+test('writeEnabled(true) stores "true"; writeEnabled(false) REMOVES the key (off == absence)', () => {
+  const storage = fakeStorage()
+  writeEnabled(storage, true)
+  assert.equal(storage.getItem(FEEDBACK_ENABLED_KEY), 'true')
+  assert.equal(readEnabled(storage), true)
+  writeEnabled(storage, false)
+  assert.equal(storage.getItem(FEEDBACK_ENABLED_KEY), null) // absence, not 'false'
+  assert.equal(readEnabled(storage), false)
+})
+
+// Acceptance: the only localStorage keys this feature ever touches are the flag key
+// and the notes key — NEVER workout-mvp-v8 (the user's real history).
+test('the feature touches only the feedback flag + notes keys, never workout-mvp-v8', () => {
+  const storage = fakeStorage()
+  writeEnabled(storage, true)
+  appendNote(storage, buildNote({ route: '/', text: 'x' }, 't1'))
+  writeEnabled(storage, false)
+  const touched = [...storage._map.keys()].sort()
+  // 'false' removed its key, so only the notes key remains written after the run,
+  // and at no point was any key other than these two set.
+  assert.deepEqual(touched, [DEV_NOTES_KEY])
+  assert.ok(!touched.includes('workout-mvp-v8'))
+  // Both allowed keys are distinct from the workout data key.
+  assert.notEqual(DEV_NOTES_KEY, 'workout-mvp-v8')
+  assert.notEqual(FEEDBACK_ENABLED_KEY, 'workout-mvp-v8')
+})
+
+test('storage failures on the flag degrade to OFF, never throw', () => {
+  const throwing = {
+    getItem: () => { throw new Error('denied') },
+    setItem: () => { throw new Error('denied') },
+    removeItem: () => { throw new Error('denied') },
+  }
+  assert.equal(readEnabled(throwing), false)
+  assert.equal(writeEnabled(throwing, true), false)
 })

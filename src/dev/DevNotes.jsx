@@ -1,15 +1,15 @@
-// req-86 (N8) — the dev-only "note on this page" button + capture panel.
+// req-86 (N8) / req-87 — the "note on this page" button + capture panel.
 //
-// DEV-ONLY. The single render site is `{import.meta.env.DEV ? <DevNotes /> : null}`
-// in App.jsx; Vite replaces `import.meta.env.DEV` with `false` in the production
-// build, so this component, its import, and the dev-notes store are dead-code-
-// eliminated out of `dist/` — no render, no key, no strings. See dev-notes.js.
+// req-87 — this now SHIPS in the production build; it is gated at RUNTIME by the
+// feedback toggle (App.jsx's FeedbackNotesGate renders it only when ON, default
+// OFF). It is only ever mounted when enabled, so this component assumes it should
+// render; the on/off decision lives in the gate, not here.
 //
 // Styling is entirely inline (no ui.css classes) so the shared production
-// stylesheet carries nothing from this feature either. The button is small and
-// unimposing (bottom-left, low opacity until tapped) and sits on EVERY screen —
-// including the in-workout flow where the bottom menu is hidden — because that is
-// exactly when a flaw gets spotted ("while doing an exercise").
+// stylesheet carries nothing from this feature. The button is small and unimposing
+// (bottom-left, low opacity until tapped) and sits on EVERY screen — including the
+// in-workout flow where the bottom menu is hidden — because that is exactly when a
+// flaw gets spotted ("while doing an exercise").
 import { useState } from 'react'
 import { useHashRoute } from '../route'
 import { dropNotes, loadNotes, notesJson, saveNote } from './dev-notes.js'
@@ -72,8 +72,8 @@ export function DevNotes() {
       <button
         type="button"
         style={buttonStyle}
-        title="Dev: note on this page"
-        aria-label="Dev: note on this page"
+        title="Note on this page"
+        aria-label="Note on this page"
         onClick={() => {
           setStatus('')
           setOpen(true)
