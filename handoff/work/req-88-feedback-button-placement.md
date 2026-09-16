@@ -1,6 +1,6 @@
 # req-88 — make the feedback button a visible top-right floating button
 
-**Status: READY — Emilio, 2026-09-16.** Follow-up to req-86/87. Emilio found the button but it's
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-88` (`8118fca`…`8118fca`, 1 commit).** Follow-up to req-86/87. Emilio found the button but it's
 mis-placed and near-invisible: *"found it! we need a better placement — maybe top right corner?"*
 
 **Gate: ux-feel** (no data/logic change — placement + visibility only).
