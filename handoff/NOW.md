@@ -1,8 +1,8 @@
 # Now
 
-Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–87** (req-10 pending; req-24
-gated; req-32 dropped; req-77 PAUSED). **req-85 timed exercises merged — v8→v9 schema bump landed**
-(Emilio backed up + signed off; migration verified). **Nothing in flight.** Owed by Emilio (after-deploy
+Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–88** (req-10 pending; req-24
+gated; req-32 dropped; req-77 PAUSED). req-85 timed exercises = v8→v9 schema bump (Emilio backed up +
+signed off; verified). req-88 moved the feedback ✎ button to the top-right, visible. **Nothing in flight.** Owed by Emilio (after-deploy
 checks): the timed-exercise browser flow (req-85) + the req-78 req-25 Previous-then-forward check.
 Loose follow-ups (deferred): req-85 v1 gaps (timed-set duration not editable in set-edit; timed
 bodyweight still asks effort); req-78 add-backs (+30s/pause, ↑↓ marker — DEC-048 "nice to have").

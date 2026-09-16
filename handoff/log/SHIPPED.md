@@ -1145,3 +1145,12 @@ defaults`; `ok - throwing write leaves v8 intact`. +7 tests → **261**. `./chec
 **v1 gaps flagged for Emilio:** (a) set-edit can't yet change an existing timed set's duration (preserved,
 not editable there); (b) a timed bodyweight set still asks for effort. Both easy follow-ups. All timed-UI
 browser behaviour is Emilio's check on the deployed site.
+
+## req-88 — make the feedback button a visible top-right floating button  (merged 2026-09-16)
+
+Follow-up to req-86/87: Emilio found the ✎ button but it was near-invisible (`left:12; bottom:12;
+opacity:0.45; 34×34` — a holdover from its dev-only "unimposing" origin). Moved it to the **top-right**
+(full opacity, 40×40, drop shadow, `env(safe-area-inset-top/right)` for the notch); the panel now opens
+top-right with a `maxHeight` so it stays on-screen (was bottom-left). **`DevNotes.jsx` inline styles
+only** — gating (req-87 toggle), the `workout-dev-notes-v1` store, and capture shape untouched. `./check`
+green (261), `--no-ff`. Real-device notch/placement feel is Emilio's check.
