@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–90** (req-10 pending; req-24
+Updated 2026-09-16. **Shipped: req-01–09, req-11–23, req-25–31, req-33–91** (req-10 pending; req-24
 gated; req-32 dropped; req-77 PAUSED). Session retro shipped: L-014, receipt discipline, DEC-047
 visibility gate, req-89 (UI screenshot tool), req-90 (closeout auto-ledger). **Nothing building.**
 **NEEDS DECISION: req-91** per-branch preview deploy — Emilio's infra-approach call (the durable UI-blind fix). Owed by Emilio (after-deploy
