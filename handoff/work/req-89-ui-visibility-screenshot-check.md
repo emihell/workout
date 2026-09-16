@@ -1,6 +1,6 @@
 # req-89 — a headless screenshot script for pre-merge UI visibility checks
 
-**Status: READY — from the 2026-09-16 session retro.** Enacts the DEC-047 refinement (visibility of a UI
+**Status: BUILT AND MERGED, 2026-09-16 — branch `req-89` (`9c9160a`…`9c9160a`, 1 commit).** Enacts the DEC-047 refinement (visibility of a UI
 control is a pre-merge gate, not deferrable feel). Root cause it addresses: req-88 shipped an *invisible*
 feedback button because neither Builder nor Planner can drive a browser (Chrome extension unconnected in
 both sessions), so "does it render / is it visible" went unchecked until Emilio hunted for it.
