@@ -8,16 +8,8 @@ Parked to detail: **req-96** (remove finish "Next time" → light "beat last tim
 quiet). Note n1 (Finish/Abandon side-by-side) folds into PAUSED **req-77**. Owed by Emilio: **one live
 `./plan preview` run** (tailscaled up); the timed-exercise browser flow (req-85); the req-78/req-25
 Previous-then-forward check.
-Loose follow-ups (deferred): req-85 v1 gaps (timed-set duration not editable in set-edit; timed
-bodyweight still asks effort); req-78 add-backs (+30s/pause, ↑↓ marker — DEC-048 "nice to have").
-Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; phased: `work/BACKLOG.md`. Keep under 50 lines.
-
-## ✅ Workflow audit follow-up CLEARED (Emilio: "deal with workflow first" → shipped 2026-09-14)
-
-Audited on facts (`handoff/audits/workflow-2026-09-14.md`): verdict = **drift + volume, not cruft**. All merged
-(reqs 70–75): merge-gate drift reconciled, docs consolidated to one-home-per-rule (reviewer PASS, merge gate
-can't drift again), report sized-to-req, gaps filled, `from [PLANNER]`/`from [BUILDER]` tags live, migration
-reference (schema.md) refreshed. **DEC-045** (`--no-ff` guard), **DEC-046** (backup-before-migration). Detail: SHIPPED.
+Loose follow-ups (deferred): req-85 v1 gaps (timed-set duration not editable; timed bodyweight still
+asks effort). Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; index: `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
