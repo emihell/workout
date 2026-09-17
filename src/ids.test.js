@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatSetLine, isWeightedType, rpeLabel, rpeOptionValue } from './ids.js'
+import { formatSetLine, isWeightedType, roleLabel, roleTag, rpeLabel, rpeOptionValue } from './ids.js'
 
 describe('req-44 isWeightedType (unifies usesWeight/usesLoad/weighted/bodyweight)', () => {
   it('machine and free carry load', () => {
@@ -38,5 +38,21 @@ describe('effort labels', () => {
   it('shows the label on set lines, not a number', () => {
     assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 3 }), '20 kg · 10 · Moderate')
     assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 1 }), '20 kg · 10 · Easy')
+  })
+})
+
+describe('req-93 roleTag (main is unlabelled; only non-main roles carry a tag)', () => {
+  it('main and absent role → no tag', () => {
+    assert.equal(roleTag('main'), '')
+    assert.equal(roleTag(undefined), '')
+    assert.equal(roleTag(null), '')
+    assert.equal(roleTag(''), '')
+  })
+  it('non-main roles keep their label (same wording as roleLabel)', () => {
+    assert.equal(roleTag('warmup'), roleLabel('warmup'))
+    assert.equal(roleTag('finisher'), roleLabel('finisher'))
+    assert.equal(roleTag('cardio'), roleLabel('cardio'))
+    assert.equal(roleTag('warmup'), 'WU routine')
+    assert.equal(roleTag('finisher'), 'Finisher')
   })
 })

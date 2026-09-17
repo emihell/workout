@@ -70,6 +70,15 @@ export function roleLabel(role) {
   return ROUTINE_ROLES.find((item) => item.value === (role || 'main'))?.label || 'Main'
 }
 
+// req-93 — in the in-workout flow, 'main' is the default and carries no information
+// (most exercises are main), so it is shown name-only. roleTag returns a label ONLY
+// for non-main roles (warm-up, finisher, cardio); main / absent role → '' (falsy, so
+// callers filtering by Boolean drop it). roleLabel itself is unchanged — the routine
+// editor still labels all three roles.
+export function roleTag(role) {
+  return (role || 'main') === 'main' ? '' : roleLabel(role)
+}
+
 export function weekdayName(value) {
   return WEEKDAYS.find((d) => d.value === Number(value))?.label ?? ''
 }

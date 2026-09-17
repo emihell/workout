@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { RPE_OPTIONS, formatSetLine, isWeightedType, roleLabel } from '../../ids'
+import { RPE_OPTIONS, formatSetLine, isWeightedType, roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
@@ -320,7 +320,7 @@ function WorkoutItemLive({ routineId, item }) {
         item={item}
         ex={ex}
         bits={[
-          roleLabel(item.role),
+          roleTag(item.role),
           currentType === 'wu' ? 'WU set' : null,
           setProgressLabel(item, state, currentType, currentWorkIndex),
         ]}
@@ -425,7 +425,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
         routineId={routineId}
         item={item}
         ex={liveExercise(store, item)}
-        bits={[roleLabel(item.role)]}
+        bits={[roleTag(item.role)]}
       />
       <ExerciseSetupHeader item={item} ex={liveExercise(store, item)} />
     </Screen>

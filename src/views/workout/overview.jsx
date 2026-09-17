@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { roleLabel } from '../../ids'
+import { roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { findRoutine } from '../../storage'
@@ -11,6 +11,23 @@ import { Button, List, Row, Screen, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
 import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
+
+// req-93 — the exercise's label in the in-workout list. Main is the default and the
+// substance of the session, so it shows the name only, BOLD, with no "— Main". Non-main
+// roles (warm-up, finisher, cardio) keep a small, muted tag so the row reads clearly
+// distinct from a main exercise. A missing role counts as main (unlabelled) — roleTag
+// handles that. The `· WU set` / `· done` suffixes are appended by the caller, unchanged.
+function ExerciseLabel({ item }) {
+  const tag = roleTag(item.role)
+  const name = exerciseName(item)
+  return tag ? (
+    <>
+      {name} <span className="ui-role-tag">{tag}</span>
+    </>
+  ) : (
+    <strong>{name}</strong>
+  )
+}
 
 function abandonWorkout(store) {
   if (!window.confirm('Abandon?')) return
@@ -52,7 +69,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
         <List>
           {plan.items.map((item) => (
             <Row key={item.id} value={`${item.sets} ${item.sets === 1 ? 'set' : 'sets'}`}>
-              {exerciseName(item)} — {roleLabel(item.role)}
+              <ExerciseLabel item={item} />
               {item.warmup ? ' · WU set' : ''}
             </Row>
           ))}
@@ -129,7 +146,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
             // req-79 — completed exercises read muted (ui-row--done) so the eye lands
             // on what's left; not-done rows stay full emphasis. Order/meaning unchanged.
             <Row key={itemKey(item) || item.id} to={path} className={completed ? 'ui-row--done' : ''}>
-              {exerciseName(item)} — {roleLabel(item.role)}
+              <ExerciseLabel item={item} />
               {completed ? ' · done' : ''}
             </Row>
           )
