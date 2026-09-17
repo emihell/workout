@@ -11,7 +11,6 @@ duration (req-85 unused: 0 exercises `hasDuration`, timed logged as constant fre
 beat-last-time can't compare timed; pivotal Q = how to capture the actual (A editable/B countdown/C
 stopwatch). Note n1 (Finish/Abandon) folds into PAUSED **req-77**. Owed by Emilio: on-device feel of
 batch 3 + req-96 (pill overlap, real-iPhone no-zoom, beat-line wording); live `./plan preview`.
-Loose follow-ups: req-85 v1 gaps (timed-set duration not editable; timed bodyweight asks effort).
 `log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
