@@ -21,12 +21,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**IN FLIGHT — gym-flow batch 3, handed to Builder 2026-09-17 (all READY, ux-feel except n7=bug):**
-- `req-92` rest pill bigger (±30s stays dropped — DEC-048) · `req-93` main implied+bold, only
-  WU/finisher labelled · `req-94` Today one stateful list (kill double-divider) · `req-95` feedback
-  textarea font ≥16px so iOS stops zooming. Source: Emilio's in-app feedback notes JSON.
-- `req-96` **NEEDS DECISION** — remove finish "Next time" (inert without RPE) → light "beat last
-  time" line (total volume vs prev same-routine, quiet). Detail metric with Emilio before build.
+**IN FLIGHT (2026-09-17):** `req-97` handed to Builder (delete dead `formatProgressionLine`).
+`req-98` **NEEDS DECISION** — capture the ACTUAL timed duration (A editable / B countdown / C
+stopwatch); builds on req-85's `hasDuration`/`durationSec`. Batch 3 + req-96 all LIVE (top).
 
 **READY, held:**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
