@@ -120,16 +120,3 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
         : 'Same load.',
   }
 }
-
-export function formatProgressionLine(c) {
-  const weightsMoved =
-    (c.from || []).length &&
-    (c.to || []).length &&
-    JSON.stringify(c.from) !== JSON.stringify(c.to)
-  const repsMoved = JSON.stringify(c.targetsFrom || []) !== JSON.stringify(c.targetsTo || [])
-  const bits = []
-  if (weightsMoved) bits.push(`${(c.from || []).join('/')} → ${(c.to || []).join('/')} kg`)
-  if (repsMoved) bits.push(`${(c.targetsFrom || []).join('/')} → ${(c.targetsTo || []).join('/')} reps`)
-  if (!bits.length) return `${c.name}: same next time`
-  return `${c.name}: ${bits.join(' · ')}`
-}
