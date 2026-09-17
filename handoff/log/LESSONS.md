@@ -192,3 +192,28 @@ undefined variable name (bash reads the following bytes as part of the name), wh
 the build. Fixed by `${PREVIEW_PORT}`. **Lesson:** in the `plan` script especially — it's full of `…`,
 `–` (en-dash) and other non-ASCII — **always brace `${var}` when the next character is non-ASCII**, or the
 var name silently swallows it. Cheap to prevent, annoying to diagnose.
+
+## L-016 — verify a "dead/unused/write-only" claim across the full call graph before writing it into a doc  (2026-09-17)
+
+req-96 aftermath. Planner relayed Builder's flag — "`workout.progression` is write-only, `formatProgressionLine`
+unused" — into BACKLOG + a SHIPPED note as broadly removable dead code (commit 582803f). It over-reached:
+`buildFinishProgression`/`progressionForItem` still feed **`applyProgressionToRoutines`** (`store.jsx:351,377`),
+a live (RPE-gated) WRITE path that updates routine templates at finish — not dead. Caught and corrected the
+same session (req-97 narrowed to delete only `formatProgressionLine`, the one truly-unused symbol), so nothing
+bad shipped. The subtle trap flagged by the external review: the claim carried a `[measured]` tag, but the
+measurement only covered the **render** surface ("nothing renders it") and was extrapolated to "therefore
+removable" without grepping the callers. **How to apply:** before writing dead/unused/removable about a symbol,
+`grep -rn` its full call graph (readers AND writers, not just the UI), and make `[measured]` cover the exact
+claim — not a narrower fact standing in for it. See [[verify-dont-recall]] / receipts discipline (L-014).
+
+## L-017 — read the adjacent already-shipped req's code before speccing a feature or taking a design decision to Emilio  (2026-09-17)
+
+Same session, same root habit. For the req-96 "item 2" (compare timed exercises), Planner wrote a full
+"build timed-actual capture" spec AND asked Emilio two design questions (capture method A/B/C, adoption)
+**before** reading req-85's implementation. On finally reading it, the editable-actual capture (option A)
+already existed end-to-end in `SetLogForm`'s DurationTimer — so item 2 collapsed from a feature to a one-line
+guard (req-98), and a design question had been put to Emilio that a code-read would have made unnecessary.
+Both this and L-016 are one failure mode: **propose/decide from recall, then correct after reading the
+adjacent shipped code.** **How to apply:** when a task extends or touches an existing feature, read that
+feature's current *implementation* (not just its req/spec) before framing scope or asking Emilio to decide —
+the code often pre-answers the question. Cheapest guard against wasting Emilio's decisions. See [[L-016]].
