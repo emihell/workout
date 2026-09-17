@@ -6,7 +6,7 @@ import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, 
 import { completedOnDayKey, findRoutine, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
-import { Button, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { Button, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
@@ -314,21 +314,23 @@ export function Today() {
         <TodayEmpty date={todayKey} />
       )}
 
-      {completedToday.length ? (
-        <>
-          <SectionHeader>Completed today</SectionHeader>
-          <List>
-            {completedToday.map((workout) => (
-              <CompletedTodayRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
-            ))}
-          </List>
-        </>
-      ) : null}
-
+      {/* req-94 — completed-today sessions and the recent-history peek are ONE list,
+          not two adjacent <List>s. Two lists each drew their own top/bottom rule and
+          carried their own vertical margin, so the completed↔recent boundary stacked
+          a divider-under + divider-over into a thin white gap. Merged, the rows carry
+          their own state instead: a completed-today row reads near-black (its date is
+          today → .ui-workout-info--today), a recent prior-day row reads gray, so the
+          two stay distinguishable within the single list. De-dup is unchanged — the
+          recent list already excludes today's finished sessions by id (see `recent`
+          above), so nothing shows twice. Order preserved: completed today first, then
+          recent, then the History link. */}
       {recent.length === 0 && completedToday.length === 0 ? (
         <p className="ui-sub">No history yet.</p>
       ) : null}
       <List>
+        {completedToday.map((workout) => (
+          <CompletedTodayRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
+        ))}
         {recent.map((workout) =>
           workout.finishedAt ? (
             <HistoryPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
