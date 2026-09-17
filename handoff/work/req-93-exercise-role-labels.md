@@ -1,6 +1,6 @@
 # req-93 — workout exercise list: main implied+bold, only warm-up/finisher labelled (gym-flow batch 3, note n3)
 
-**Status: READY.** From Emilio's in-app note (2026-09-16, `/workout/sess-push-pull`):
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-93` (`e4bcd71`…`e4bcd71`, 1 commit).** From Emilio's in-app note (2026-09-16, `/workout/sess-push-pull`):
 *"Maybe the warm up and finisher should have slightly different text and main should be
 bold? And we don't have to say main for all of main — I think we should only show info on
 the exercises that are not main."*

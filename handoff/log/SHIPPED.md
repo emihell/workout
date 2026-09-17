@@ -1196,3 +1196,7 @@ auto-written).
 ## req-92 — rest pill bigger / more legible (gym-flow batch 3, note n2)  (merged 2026-09-17)
 
 _Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+
+## req-93 — workout exercise list: main implied+bold, only warm-up/finisher labelled (gym-flow batch 3, note n3)  (merged 2026-09-17)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
