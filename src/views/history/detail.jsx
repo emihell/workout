@@ -1,5 +1,4 @@
 import { formatSetLine, roleLabel } from '../../ids'
-import { formatProgressionLine } from '../../progress'
 import { go } from '../../route'
 import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
@@ -75,27 +74,11 @@ export function HistoryDetail({ workoutId }) {
         <NavLink to={`/history/${workout.id}/set/new`} className="ui-navlink" chevron="forward">Add set</NavLink>
       </p>
 
-      {workout.progression?.length ? (
-        <>
-          <SectionHeader>Next time</SectionHeader>
-          <List>
-            {workout.progression.map((c) => {
-              const none = c.reason === 'Skipped.' || c.reason === 'None.'
-              const next = none
-                ? c.reason
-                : c.to?.length
-                  ? `${c.to.join('/')} kg`
-                  : (c.targetsTo || []).filter(Boolean).join('/') || formatProgressionLine(c).replace(`${c.name}: `, '')
-              return (
-                <Row key={itemIdOf(c) || c.exerciseId} value={next}>
-                  {c.name}
-                </Row>
-              )
-            })}
-          </List>
-        </>
-      ) : null}
-
+      {/* req-96 — the "Next time" load-recommendation surface was removed here (and on
+          the Finish screen). It only moved with an RPE signal, which isn't logged, so it
+          just echoed the workout. workout.progression is still persisted on the record;
+          this only drops its display. History detail gets no "beat last time" line — it's
+          a past record, not a forward celebration (decided). */}
       <Button
         onClick={() => {
           if (!window.confirm(`Delete ${workoutRoutineName(workout, routine)}?`)) return
