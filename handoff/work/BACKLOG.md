@@ -200,6 +200,11 @@ behaviour call first. Numbered N1..N11 in Emilio's order.
   progression is retired in practice because RPE isn't logged — a later req could decide whether to keep
   the routine-template auto-update at all. Not dead code; a product call. See DEC-050 / req-96 / req-97.
 
+- **req-85 v1 timed gaps (deferred).** (a) **set-edit.jsx has no duration field** — you can't edit a
+  logged timed set's duration in history (only live logging is editable, `SetLogForm` DurationTimer).
+  (b) a timed **bodyweight** set still asks effort. Small; unblock when timed logging is actually in use.
+  Discovered via req-98 (which fixed the beat-last-time timed comparison, not these).
+
 **Sequencing insight:** N3/N4/N5/N6/N7 are ux-feel refinements on the shipped in-gym flow and can be
 specced fresh against the current code (batch-1's "refactor first" collision is past — that flow is
 merged). N1/N9/N10 carry behaviour decisions; N2/N8 are their own decisions. Order once decided.

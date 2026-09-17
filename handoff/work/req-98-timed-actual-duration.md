@@ -1,84 +1,65 @@
-# req-98 — log the ACTUAL duration of a timed exercise (so "beat last time" can compare it)
+# req-98 — make "beat last time" work for timed exercises (the capture already exists; guard the transitional false-win)
 
-**Status: NEEDS DECISION** (one pivotal design call below) — then READY. **Gate: ux-feel + model
-(likely persisted-data).** From Emilio 2026-09-17: item-2 of the req-96 review — "fix now", chose "spec
-it as a real req."
+**Status: READY.** **Gate: functional (correctness guard) + a doc note.** From Emilio 2026-09-17
+(item-2 of the req-96 review): capture = editable actual defaulting to target; adoption = "I'll change
+them manually".
 
-## The real problem (measured, not the parsing gap I first flagged)
+## Key finding — item 2 is ALMOST already built (verify-don't-recall win)
 
-beat-last-time (req-96) can't compare timed/cardio exercises — but not because it fails to parse. There
-is **nothing to compare**:
-- **0 sets** carry a structured `durationSec`. **0 exercises** have `hasDuration=true` — req-85's timed
-  model is shipped but **entirely unused**.
-- Emilio logs timed work as **free-text `reps`**, and it's the **target, constant across every workout**:
-  plank always `"60 sec"`, rowing/stairs always `"5-8 min"`. The actual achievement, when recorded, is
-  unstructured note text (`"1500/6:50"`, `"8 minutes"`).
-- **req-85 itself punted on this:** it logs "the **target** duration (editable), not a stopwatch actual,
-  for v1." So even a proper req-85 timed set compares target-to-target → never a win.
+I first specced a whole capture feature. Then I read req-85's code: **the editable-actual capture Emilio
+chose (option A) already exists.**
+- **Live logging** — a timed set (`ex.hasDuration && work set`, `item.jsx:263`) renders `SetLogForm`'s
+  `DurationTimer` (`ui/index.jsx:303`): an **editable** `NumberField "Duration (s)"` that defaults to the
+  target and whose value at Complete is stored as the set's `durationSec` (`ui/index.jsx:353`,
+  `item.jsx:205`). Edit it to what you actually held → the actual is logged. That IS option A.
+- **Exercise editor** already has the "Timed (count down a duration)" checkbox + default duration
+  (`Exercises.jsx:296`). So Emilio can flag plank/rowing/stairs himself — **no migration, no data edit**
+  (his "I'll change them manually").
+- **Comparison** — req-96's `beat-last-time.js` already compares `durationSec` (longest work set) and
+  has a passing "75s > 60s" test.
 
-So the missing piece is a **logged actual** for a timed set — a number that reflects what you actually
-did, distinct from the target, stored somewhere comparable. Without it, no "longer than last time" is
-possible (and the same gap blocks any future duration progression).
+So once Emilio flags his timed exercises and logs two same-routine workouts, "↑ Longer … than last
+time" works **end-to-end with no new capture code.**
 
-## Why req-85 is unused (context, needs a look during build)
+## The ONE real bug to fix
 
-Two reasons its `hasDuration` path isn't reached: (1) Emilio's timed exercises (plank=bodyweight,
-rowing/stairs=cardio) were never flagged `hasDuration` — they still use the old free-text-reps
-"Duration" (the reps field relabeled, `progress.js:43`); (2) even if flagged, req-85 stores the target,
-not the actual. This req should **build on req-85's model** (`hasDuration`, per-set `durationSec`,
-SCHEMA v9) rather than invent a parallel one — read `work/req-85-timed-exercises.md` first.
+[measured] `beat-last-time.js` `isTimed(curSets, prevSets)` returns true if **either** side has a
+`durationSec > 0`. The first workout after Emilio flags an exercise has a real `durationSec`, but its
+**prior** same-routine workout was logged the old way (free-text `reps`, no `durationSec`). So the timed
+branch compares `cur=75` vs `prev=0` → fires a **false "↑ Longer"** win against a record that has no
+comparable duration. That invents a comparison it doesn't have (DESIGN §1 / DEC-050's no-invent line).
 
-## THE decision (pivotal — everything else follows)
+**Fix:** in the timed branch, only a win when the **prior side also has real duration data** — i.e.
+`prev > 0` (both sides comparable). No prior duration → `null` (silent), same as any other "no data on
+this axis" case. Add a unit test: cur has `durationSec`, prev has none → **no win**; keep the existing
+both-sided "75s > 60s" → win.
 
-**How is the actual duration captured when logging a timed set?**
-- **A — Editable actual, defaults to target.** The timed set shows a duration field pre-filled with the
-  target; you adjust it to what you actually held, then Complete. Simplest; one field; no stopwatch.
-- **B — Countdown records elapsed-at-Complete.** Extend req-85's count-down: whatever the clock reads
-  when you tap Complete (early or past zero) is logged as the actual. Hands-free-ish; more build; needs
-  count-up-past-zero.
-- **C — Stopwatch (count-up).** Start → counts up → Complete logs elapsed. Most accurate for open-ended
-  cardio; most build; diverges from req-85's countdown UI.
+## Scope
 
-(Recommendation: **A** — smallest change, works for plank and cardio alike, and it's exactly the
-"editable actual" that makes comparison possible. B/C can come later.)
-
-## Secondary decisions (can default; confirm)
-
-- **Adoption of existing timed exercises.** Plank/rowing/stairs aren't on `hasDuration`. Options: (a)
-  flag them (a small data edit / migration) so they use the structured field going forward; (b) leave
-  history as-is and only structure new logs. *Default:* flag them going forward; **do not rewrite the
-  free-text `reps` on old finished records** (history is the user's real data — ask-gate #2).
-- **What beat-last-time compares.** Once actuals land in per-set `durationSec`, req-96's timed branch
-  already keys on `durationSec` (longest actual work set) — it starts working with **no change**, or a
-  one-line tweak. Confirm the "longer = win" axis is right (yes, per DEC-050).
-- **Rowing "5-8 min" + distance-in-note.** Distance/pace stays free-text (out of scope); this req makes
-  *duration* comparable, not distance.
-
-## Scope (once decision made)
-
-- The timed set-log flow (`item.jsx` / `set-edit.jsx`) — capture the actual duration.
-- Store it in the per-set `durationSec` (req-85's field) on the logged set.
-- Exercise adoption per the decision above (possibly a small `hasDuration` data edit / migration —
-  **if the persisted shape or many records change, that fires ask-gate #2: state what changes and to how
-  many records, add a migration test proving an older key survives**).
-- beat-last-time (`beat-last-time.js`) — confirm/enable the `durationSec` comparison.
+- `src/beat-last-time.js` — guard the timed branch (`prev > 0`, i.e. require duration on both sides).
+- `src/beat-last-time.test.js` — add the transitional-no-win case.
 
 ## Out of scope
 
-- Duration **progression** (increasing the target next time) — req-85 deferred it; still future.
-- Distance/pace/cardio metrics beyond duration.
-- The countdown/beep UI itself (req-85) unless option B/C is chosen.
+- Any new capture UI (already exists — req-85). No change to `SetLogForm`/`item.jsx`.
+- Adoption/migration — Emilio flags exercises manually via the existing editor checkbox.
+- **Editing a past timed set's duration in `set-edit.jsx`** — genuinely missing (history edit has no
+  duration field; the NOW.md req-85 v1 gap). Left as a separate small follow-up (see BACKLOG), NOT this
+  req — this req only unblocks the "beat last time" comparison.
+- Duration progression (increasing the target next time) — still future (req-85 deferred).
 
-## Acceptance criteria (draft — finalize when READY)
+## Acceptance criteria
 
-- A timed set can log an **actual** duration distinct from its target (per the chosen capture method),
-  stored numerically per set.
-- Two same-routine workouts where the actual hold is longer → beat-last-time fires "↑ Longer …".
-- Old finished records are **not** rewritten; a migration test proves an older storage key still loads
-  (if a schema bump is involved).
-- `./check` green.
+- **Guard (test):** an exercise with `durationSec` this workout and none in the prior same-routine
+  workout → **no** "longer" win (silent). The existing both-sided longer-hold case still wins.
+- **End-to-end (browser, Emilio):** flag plank as Timed, log it two same-routine sessions with a longer
+  hold the second time → Finish shows "↑ Longer plank than last time". *(Needs an active workout; Emilio
+  confirms on device.)*
+- **No regression:** `./check` green; the other beat-last-time axes (weight/reps) unchanged.
 
 ## Decisions (Emilio, 2026-09-17)
 
-- Item 2 is a real feature (capture the actual timed duration), not a beat-last-time patch — spec it.
-- Capture method: **PENDING** (A/B/C above). Adoption + comparison: defaults above unless changed.
+- Capture = editable actual defaulting to target — **already shipped in req-85**; no rebuild.
+- Adoption = manual (flag exercises in the editor); no migration.
+- Fix the transitional false-win so a newly-flagged exercise doesn't claim a bogus duration win vs an
+  old unstructured record.

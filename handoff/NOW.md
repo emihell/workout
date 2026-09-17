@@ -5,12 +5,12 @@ gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (Emilio's in-app feedb
 LIVE:** req-92 rest pill bigger · req-93 main bold/unlabelled + WU/finisher tag · req-94 Today one list,
 no header (DEC-049) · req-95 feedback textarea iOS-zoom · **req-96** "Next time"→"↑ you beat last time"
 (per-exercise any axis, name the win; `beat-last-time.js` — DEC-050). **req-96 aftermath (Emilio
-"fix now" 2026-09-17):** **req-97 READY→Builder** (delete only the truly-dead `formatProgressionLine`;
-rest of progression is LIVE, corrected). **req-98 NEEDS DECISION** — timed exercises log no ACTUAL
-duration (req-85 unused: 0 exercises `hasDuration`, timed logged as constant free-text target), so
-beat-last-time can't compare timed; pivotal Q = how to capture the actual (A editable/B countdown/C
-stopwatch). Note n1 (Finish/Abandon) folds into PAUSED **req-77**. Owed by Emilio: on-device feel of
-batch 3 + req-96 (pill overlap, real-iPhone no-zoom, beat-line wording); live `./plan preview`.
+"fix now" 2026-09-17):** **req-97 LIVE** (deleted dead `formatProgressionLine`; rest of progression is
+LIVE, corrected). **req-98 READY→Builder** — the editable timed-actual capture ALREADY exists (req-85,
+`SetLogForm` DurationTimer); Emilio flags exercises manually (no migration); the only real fix is a guard
+so a newly-flagged exercise doesn't claim a false "↑ Longer" vs an old unstructured record. Note n1
+(Finish/Abandon) folds into PAUSED **req-77**. Owed by Emilio: on-device feel of batch 3 + req-96 (pill
+overlap, real-iPhone no-zoom, beat-line wording); flag his timed exercises; live `./plan preview`.
 `log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)

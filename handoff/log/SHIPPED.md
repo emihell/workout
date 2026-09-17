@@ -1239,4 +1239,9 @@ req decides deletion. Live-on-device wording tweak is Emilio's (isolated in `bea
 
 ## req-97 — delete the now-unused formatProgressionLine (req-96 follow-up)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Deleted only `formatProgressionLine` from `src/progress.js` (its last export, lines 124–135) — zero
+callers after req-96 removed the "Next time" surfaces, no test. No helper cleanup needed (local vars
+only). Everything else in progress.js and the progression machinery
+(`buildFinishProgression`/`progressionForItem`/`applyProgressionToRoutines`, persisted
+`workout.progression`) left as-is — verified LIVE, not dead. `grep -rn formatProgressionLine src` empty;
+`./check` green (21 test files); `model.test.js` progression tests pass. Merge `a72b330`.
