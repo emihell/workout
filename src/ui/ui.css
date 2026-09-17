@@ -499,7 +499,11 @@ a.ui-btn--quiet:active {
   align-items: baseline;
   gap: var(--ui-s2);
   min-height: auto;
-  padding: var(--ui-s1) var(--ui-s3);
+  /* req-92 — bigger so the remaining time reads at arm's length mid-set. Roomier
+   * padding than the original s1/s3, sized to the larger time below. Still a single
+   * floating tap-to-skip target, top-centre, clear of the top links and bottom
+   * action bar (req-78 positioning unchanged). */
+  padding: var(--ui-s2) var(--ui-s4);
   border: 1px solid var(--ui-ink);
   border-radius: 999px;
   background: var(--ui-ink);
@@ -510,6 +514,10 @@ a.ui-btn--quiet:active {
   appearance: none;
 }
 .ui-restpill__time {
+  /* req-92 — the one thing read at a glance while resting: notably larger than body
+   * text (between body 17px and title 32px), tabular so the countdown doesn't jitter. */
+  font-size: 28px;
+  line-height: 1;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
