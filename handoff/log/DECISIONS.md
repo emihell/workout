@@ -1000,3 +1000,17 @@ header was **dropped**: a header over a list whose lower rows are prior-day figh
 recent list still excludes them by id, so nothing shows twice. Emilio confirmed headerless (2026-09-17),
 having asked and been shown the completed row is preserved. Reversible: a lightweight single heading over
 the whole merged list is a one-line add if it ever reads as contextless.
+
+## DEC-050 — "you beat last time" is per-exercise, any-axis; fire on any win, don't suppress on a regression  (Emilio, 2026-09-17)
+
+req-96. The Finish-screen celebration decides "better" by comparing each exercise to the SAME exercise
+(by id) in the previous same-routine finished workout, on that exercise's natural axis: weighted →
+heavier top set, or same weight + more reps; bodyweight → more reps; timed → longer durationSec (best
+work set each side, warm-ups excluded). The line fires if ANY exercise improved, and a regression on
+another exercise does NOT suppress it (a normal gym day still earns its line). **Total volume alone was
+rejected** (Emilio: "longer? more reps? higher weight?") — it's blind to a longer hold and to
+bodyweight/timed work, and hides a per-exercise win inside an aggregate. No-invent holds: no prior /
+no matched improvement / newly-added exercise → silent, never a "you did worse". History detail gets
+NO win line — it's a past record, not a forward celebration. req-84's total-volume "vs last time" on the
+auto-complete screen is a separate surface and stays. Reversible: the axes/thresholds live in one pure
+module (`src/beat-last-time.js`).

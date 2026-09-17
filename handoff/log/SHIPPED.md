@@ -1223,4 +1223,16 @@ De-dup + empty states preserved. `./check` green. Merge `82aae2b`.
 
 ## req-96 — replace finish "Next time" with a "you beat last time" line (per-exercise, any axis) (notes n4/n6 + new)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Removed the "Next time" load-recommendation surface from Finish (`finish.jsx`) and history detail
+(`detail.jsx`) — inert without RPE. Added a quiet "↑ …" line on Finish driven by new pure module
+`src/beat-last-time.js`: per-exercise (matched by exercise id), best work set (warm-ups excluded), on its
+natural axis — weighted → heavier or same-weight+more-reps; bodyweight → more reps; timed → longer
+`durationSec`. Fires on ANY win, never suppressed by a regression elsewhere; silent with no prior /
+no improvement / newly-added exercise (no-invent). Line names first win in workout order + "· +N more".
+17-case unit suite. Verified: real persisted sets carry `exerciseId` (`db.json` check) so it matches
+production shape; `storage.js` (`workoutVolume`/`workoutSummaryStats`) untouched → req-84 auto-complete
+intact. `./check` green (21 test files). Merge `62e5707`. Detection model = DEC-050.
+**Known limitation:** some cardio logs duration as free-text `reps` (e.g. "5-8 min") not `durationSec`, so
+those never fire a win — silent, never wrong. **Dead-code follow-up (BACKLOG):** `workout.progression` is
+now persisted-but-unrendered and `progress.js formatProgressionLine` is now unused; left intact, a later
+req decides deletion. Live-on-device wording tweak is Emilio's (isolated in `beat-last-time.js` + `.ui-beat`).

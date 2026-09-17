@@ -192,6 +192,15 @@ behaviour call first. Numbered N1..N11 in Emilio's order.
   refactor is dropped-req-32 territory — decide whether to revive it. His "several components → weird
   states" read is half-right: one file, many blocks, real state overlap.
 
+- **Dead-code cleanup after req-96 (load recommendation).** req-96 removed the "Next time" surface from
+  Finish + history detail, so nothing renders `workout.progression` anymore. [measured] it is still
+  computed by `buildFinishProgression` and persisted on every finish (write-only now), and
+  `progress.js formatProgressionLine` is now unused. `progressionForItem` (model.js) stays live for the
+  History recalc path. *Disp:* small, needs a decision — keep persisting for a future surface, or stop
+  computing/persisting it and delete `formatProgressionLine`? Left intact per req-96 scope. *Q for Emilio:*
+  is the load recommendation coming back in another form, or is it retired? (It's the RPE-driven progression
+  — retired in practice because RPE isn't logged; see DEC-050 / req-96.)
+
 **Sequencing insight:** N3/N4/N5/N6/N7 are ux-feel refinements on the shipped in-gym flow and can be
 specced fresh against the current code (batch-1's "refactor first" collision is past — that flow is
 merged). N1/N9/N10 carry behaviour decisions; N2/N8 are their own decisions. Order once decided.
