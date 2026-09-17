@@ -1248,4 +1248,11 @@ only). Everything else in progress.js and the progression machinery
 
 ## req-98 — make "beat last time" work for timed exercises (the capture already exists; guard the transitional false-win)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Verify-don't-recall win: the editable-actual timed capture Emilio asked for already shipped in req-85
+(`SetLogForm` DurationTimer logs an editable per-set `durationSec`), so item-2 needed NO capture rebuild —
+only a correctness guard. `beat-last-time.js` timed branch changed `cur > prev` → `prev > 0 && cur > prev`
+so a newly-flagged timed exercise doesn't fire a bogus "↑ Longer" against a prior logged the old way
+(free-text reps, no `durationSec`) — silent, no-invent (DEC-050). +1 test (18/18). No SetLogForm/data
+change; adoption stays manual (Emilio flags exercises). `./check` green. Merge `7d0f102`. Follow-up in
+BACKLOG: set-edit.jsx can't edit a logged timed duration (history-edit gap); timed bodyweight still asks
+effort.
