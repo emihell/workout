@@ -1195,12 +1195,20 @@ auto-written).
 
 ## req-92 — rest pill bigger / more legible (gym-flow batch 3, note n2)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+`.ui-restpill__time` → 28px tabular bold, pill padding s1/s3→s2/s4 (`ui.css`); position + tap-to-skip
+unchanged; ±30s NOT re-added (DEC-048 stands — Emilio reaffirmed). `./check` green. Merge `5cd407f`.
+On-device: no-overlap-on-narrow-phone is Emilio's after-merge feel check.
 
 ## req-93 — workout exercise list: main implied+bold, only warm-up/finisher labelled (gym-flow batch 3, note n3)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+New `roleTag()` in `ids.js` (main/absent→'', non-main→`roleLabel`; `roleLabel` untouched so the routine
+editor still labels all three). In-workout list, item screen + pre-start preview: main = bold name, no
+"— Main"; warm-up/finisher/cardio = name + small muted `.ui-role-tag`. Domino OK — `item.jsx:59` bits
+`.filter(Boolean)` drops the '' for main. New `roleTag` unit test. `./check` green. Merge `efe730e`.
 
 ## req-95 — feedback note panel: stop iOS auto-zoom on the textarea (gym-flow batch 3, note n7)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Bug: DevNotes textarea inherited the panel's 13px, so iOS Safari auto-zoomed on focus and pushed the
+fixed panel off-screen. Fixed to explicit `font: 16px/1.4` (the iOS threshold), `DevNotes.jsx`. Viewport
+meta untouched (pinch-zoom intact app-wide). `./check` green. Merge `66c5cbd`. Real-iPhone no-zoom is
+Emilio's after-merge check.

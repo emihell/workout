@@ -1,13 +1,13 @@
 # Now
 
 Updated 2026-09-17. **Shipped: req-01–09, req-11–23, req-25–31, req-33–93, req-95** (req-10 pending; req-24
-gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (from Emilio's in-app feedback JSON,
-2026-09-16) SPEC'D & handed to Builder: req-92 (rest pill bigger), req-93 (main implied+bold, only
-WU/finisher labelled), req-94 (Today one stateful list), req-95 (feedback textarea iOS-zoom fix).**
-Parked to detail: **req-96** (remove finish "Next time" → light "beat last time" line; total-volume,
-quiet). Note n1 (Finish/Abandon side-by-side) folds into PAUSED **req-77**. Owed by Emilio: **one live
-`./plan preview` run** (tailscaled up); the timed-exercise browser flow (req-85); the req-78/req-25
-Previous-then-forward check.
+gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (Emilio's in-app feedback JSON, 2026-09-16):
+req-92/93/95 BUILT+MERGED+LIVE; req-94 (Today one stateful list) BUILT on branch `req-94`, HELD — Builder
+dropped the "Completed today" SectionHeader, needs Emilio's keep/drop call before closeout.** Parked to
+detail: **req-96** (remove finish "Next time" → light "beat last time"; total-volume, quiet — open Q: how
+bodyweight/timed/AMRAP count toward volume). Note n1 (Finish/Abandon side-by-side) folds into PAUSED
+**req-77**. Owed by Emilio: **one live `./plan preview` run** (tailscaled up); the timed-exercise browser
+flow (req-85); the req-78/req-25 Previous-then-forward check.
 Loose follow-ups (deferred): req-85 v1 gaps (timed-set duration not editable; timed bodyweight still
 asks effort). Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; index: `work/BACKLOG.md`. ≤50 lines.
 
