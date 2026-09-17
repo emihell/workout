@@ -1,6 +1,6 @@
 # req-92 — rest pill bigger / more legible (gym-flow batch 3, note n2)
 
-**Status: READY.** From Emilio's in-app note (2026-09-16, `/workout/.../item/.../log`):
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-92` (`945d15f`…`945d15f`, 1 commit).** From Emilio's in-app note (2026-09-16, `/workout/.../item/.../log`):
 *"Rest pill can be but bigger and have the old +- 30 sek."*
 
 **Gate: ux-feel** (visual size only; no data/logic change).

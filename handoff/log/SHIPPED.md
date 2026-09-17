@@ -1192,3 +1192,7 @@ Builder's session): the real `.ts.net` URL over HTTPS on the phone, and the surg
 teardown live. `--no-ff`. With req-89 (Planner's screenshot gate), the UI-blindness gap is closed both
 ends. **This was the first live firing of req-90's step-4b auto-ledger — it worked** (stub + range
 auto-written).
+
+## req-92 — rest pill bigger / more legible (gym-flow batch 3, note n2)  (merged 2026-09-17)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
