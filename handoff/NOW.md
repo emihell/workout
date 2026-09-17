@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-17. **Shipped: req-01–09, req-11–23, req-25–31, req-33–93** (req-10 pending; req-24
+Updated 2026-09-17. **Shipped: req-01–09, req-11–23, req-25–31, req-33–93, req-95** (req-10 pending; req-24
 gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (from Emilio's in-app feedback JSON,
 2026-09-16) SPEC'D & handed to Builder: req-92 (rest pill bigger), req-93 (main implied+bold, only
 WU/finisher labelled), req-94 (Today one stateful list), req-95 (feedback textarea iOS-zoom fix).**
