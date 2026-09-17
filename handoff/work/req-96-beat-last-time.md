@@ -1,57 +1,95 @@
-# req-96 — replace finish "Next time" with a light "you beat last time" moment (notes n4/n6 + new)
+# req-96 — replace finish "Next time" with a "you beat last time" line (per-exercise, any axis) (notes n4/n6 + new)
 
-**Status: NEEDS DECISION — parked to detail with Emilio before it enters the build loop.**
-Do NOT ping this to Builder yet.
+**Status: READY** (design decided with Emilio 2026-09-17). **Gate: ux-feel** (a comparison
+metric + a quiet celebratory line; the exact multi-win phrasing iterates live with Emilio).
 
-From Emilio's in-app notes (2026-09-16): `/workout/.../finish` — *"The next time section —
-what is that? Is the result or next-time routine? Maybe remove it?"*; `/history/…` — *"We
-don't need 'next time' here."* And the direction (2026-09-17): *"remove it, instead we need
-a req that just shows a light and easy way if it went better this time than last time — we
-don't need to be super detailed, just a little UI thing to be proud that you did better."*
-
-**Gate: ux-feel** (surface + a comparison metric).
+From Emilio's in-app notes (2026-09-16): `/workout/.../finish` — *"The next time section — what is
+that? … Maybe remove it?"*; `/history/…` — *"We don't need 'next time' here."* Direction
+(2026-09-17): *"remove it, instead a light and easy way if it went better this time than last time
+— a little UI thing to be proud that you did better."* Then, on what "better" means:
+*"if you do it for longer than last time (75s vs 60s)? or more reps? or higher weight?"*
 
 ## Two things in one req (same screen, one swap)
 
-1. **Remove "Next time".** It's the load recommendation from `progress.js`
-   (`buildFinishProgression` → `src/views/workout/finish.jsx:42`, and
-   `src/views/history/detail.jsx:80`). It only changes weight when an **RPE/effort** signal
-   is present (down on missed reps or RPE ≥ 5, up on RPE ≤ 2 — `src/progress.js:57–122`);
-   with no RPE and reps hit, it just echoes what you did. Emilio doesn't log RPE, so it's
-   inert noise → remove from **both** finish and history detail.
-2. **Add "beat last time".** A light, quiet line on the **finish** screen that celebrates
-   doing better than the previous same-routine workout.
+1. **Remove "Next time".** It's the load recommendation (`buildFinishProgression` → `progress.js`),
+   rendered at `src/views/workout/finish.jsx:42` and `src/views/history/detail.jsx:80`. It only
+   changes when an RPE/effort signal is present (`progress.js:57–122`); Emilio doesn't log RPE, so it
+   just echoes what he did → inert. Remove from **both** finish and history detail.
+2. **Add "you beat last time".** One quiet line on the **Finish** screen, celebrating real improvement.
 
-## Direction settled with Emilio (2026-09-17)
+## Detection — per exercise, any axis (decided)
 
-- **Metric: total volume** (Σ weight × reps across the workout) vs the previous **same-routine**
-  finished workout. *("1 I think, but let's go into details before we build it.")*
-- **Loudness: one quiet line + a subtle accent** (e.g. "↑ You beat last time"), not a badge or
-  animation.
-- **Never invented:** first-ever session for a routine (no prior to compare) → show nothing.
-  Only show the line when today genuinely beat last time; say nothing when it didn't (don't
-  print "you did worse").
+Total volume alone was rejected: it's blind to a longer hold and to bodyweight/timed work, and it
+hides a per-exercise win inside an aggregate. Instead, compare **this workout to the previous
+same-routine finished workout, exercise by exercise**, each on its natural axis:
 
-## Open questions to resolve before READY
+- Match each exercise in today's workout to the **same exercise (by exercise id)** in the prior
+  workout (reuse `previousSameRoutineWorkout`, `storage.js:452`).
+- For each matched exercise, compare the **best work set** (warm-up sets `setType==='wu'` excluded,
+  matching `workoutVolume`):
+  - **Weighted** (`isWeightedType(ex.type)`): best set = highest `weight`, tiebreak highest `reps`.
+    Win if today's best is **heavier**, or **same weight with more reps**.
+  - **Bodyweight / reps**: best = highest `reps`. Win if **more reps**.
+  - **Timed** (`durationSec` present / `isDurationTarget`): best = highest `durationSec`. Win if
+    **longer**.
+- **Fire the line if ANY exercise improved.** A different exercise being *down* does NOT suppress it
+  (a normal gym day). Never show a "you did worse" message — silent when nothing improved.
 
-- **Exact metric definition:** total volume only? How are bodyweight / timed / AMRAP sets
-  counted toward "volume" (they have no kg × reps)? Does an added exercise or extra set count
-  as "better," or only load on the same prescription?
-- **Comparison target:** strictly the *previous finished workout of the same routine*, or best-
-  ever? (Direction implies previous same-routine.)
-- **Reuse:** `src/views/workout/auto-complete.jsx:80` already renders a `vs last time` /
-  `This workout` section (req-84) — check whether its comparison already computes what's needed,
-  so this line and that screen share one source of truth rather than two volume calcs.
-- **Copy + accent** for the line.
-- **History detail:** removal only (no "beat last time" there — it's a forward/celebration on
-  finish, not a past-record annotation). Confirm.
+**No-invent guardrails (DESIGN §1):**
+- First-ever same-routine workout (no prior) → show nothing.
+- An exercise with no match in the prior workout (newly added) contributes no win — never invented.
+- Comparison is a **pure, unit-tested function** (history-only input, decision inspectable — the
+  "reasoning made visible" rule). `workoutVolume`/`workoutSummaryStats` stay as-is for the
+  auto-complete screen (req-84); this is a new sibling function, not a change to those.
 
-## Acceptance criteria (draft — finalize when READY)
+## The line — name the win (decided)
 
-- Finish screen: no "Next time" section; a quiet "beat last time" line shows **only** when
-  today's total volume > the previous same-routine workout's; nothing shown on a first-ever or
-  a not-better session.
-- History detail: "Next time" removed.
-- The comparison is a tested pure function (history is the source of truth; the value the user
-  sees has its reasoning made inspectable — CLAUDE.md rule).
-- `./check` green.
+One quiet line + subtle accent, **naming what improved**, e.g. "↑ Heavier on Bench press" /
+"↑ Longer plank than last time" / "↑ More reps on Pull-ups". Not a badge/animation.
+
+- **Multiple wins:** default — name one (first improved in workout order) + a light "+N more". Exact
+  phrasing/format is **ux-feel, iterate live with Emilio** at Builder's terminal.
+
+## Scope
+
+- `src/views/workout/finish.jsx` — remove the "Next time" section; add the win line.
+- `src/views/history/detail.jsx` — remove the "Next time" section only (no win line — it's a past
+  record, not a forward celebration; confirmed).
+- `src/storage.js` (or a small sibling module) — the new per-exercise comparison function + tests.
+
+## Out of scope
+
+- The load-recommendation logic itself (`progress.js`, `buildFinishProgression`) — left intact; only
+  its finish/history *surfaces* are removed. (If nothing else renders it after this, note that in the
+  report — a later req can decide whether to delete it.)
+- The auto-complete screen's existing "vs last time" volume summary (req-84) — unchanged. Adding the
+  named-win line there too is an optional consistency follow-up, not this req.
+- RPE logging, any new persisted field, program model.
+
+## Watch-outs (CC)
+
+- Warm-up sets must be excluded from "best set" on both sides (same rule as `workoutVolume`).
+- Reps can be non-numeric ("AMRAP") and duration can be absent — parse defensively; an unparseable
+  axis is "no data", not a win.
+- Exercise identity: match on exercise id, not name/position (an exercise can move in the routine).
+
+## Acceptance criteria
+
+- **Next time gone (browser):** no "Next time" on the Finish screen or history detail.
+- **Fires on a real win (test + browser):** a workout that is heavier / more reps / longer on ≥1
+  exercise vs the prior same-routine workout shows the named line; the name matches the improved
+  exercise and axis.
+- **Silent when not better (test):** no prior, no matched improvement, or an all-same/worse workout →
+  no line (and never a "worse" message).
+- **Per-exercise, not aggregate (test):** improving one exercise while another regresses still fires.
+- **Pure function (test):** the comparison is covered by unit tests over crafted workout pairs.
+- **No regression:** `./check` green; `workoutVolume`/`workoutSummaryStats` untouched (auto-complete
+  still works).
+
+## Decisions (Emilio, 2026-09-17)
+
+- Remove "Next time" (inert without RPE) from finish + history detail.
+- "Better" = per-exercise, any axis (weight / reps / duration); fire on any win, don't suppress on a
+  regression elsewhere.
+- Name the win in one quiet line. Multi-win phrasing = implementation default (first + "+N more"),
+  iterate live.
