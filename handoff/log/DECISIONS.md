@@ -989,3 +989,14 @@ forward: **rest does not block input and is not a control surface; the next set'
 during rest.** Reversible — a future req can re-add +30s or re-surface the marker without contradicting
 this (the DEC is about rest not *blocking*, not about forbidding an optional timer nudge). Home for the
 operational behaviour: the code (`rest.jsx` RestPill, `item.jsx` form-during-rest) + req-78 in SHIPPED.
+
+## DEC-049 — Today's completed-today + recent are one list with per-row state, no section header  (Emilio, 2026-09-17)
+
+req-94. Two adjacent `<List>`s (each with its own rule + margin) stacked a divider-under+divider-over into
+a white seam at the completed↔recent boundary. Merged into one `<List>`; "today vs prior" is carried by
+row color (near-black `.ui-workout-info--today` vs gray), not by a `SectionHeader`. The "Completed today"
+header was **dropped**: a header over a list whose lower rows are prior-day fights "states in the list"
+(Emilio's own framing of the note). Completed-today sessions still render as rows (first, near-black); the
+recent list still excludes them by id, so nothing shows twice. Emilio confirmed headerless (2026-09-17),
+having asked and been shown the completed row is preserved. Reversible: a lightweight single heading over
+the whole merged list is a one-line add if it ever reads as contextless.

@@ -1215,4 +1215,8 @@ Emilio's after-merge check.
 
 ## req-94 — Today: merge "Completed today" + recent into one stateful list, kill the double-divider gap (gym-flow batch 3, note n5)  (merged 2026-09-17)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+The two adjacent `<List>`s (completed-today + recent peek) → one `<List>`, killing the stacked
+divider-under+divider-over white seam (`Today.jsx`). State is now per-row: today's completed rows read
+near-black (`.ui-workout-info--today`), prior-day rows gray — the completed session still shows as a row,
+just no longer under a "Completed today" heading (header dropped — DEC-049, Emilio confirmed headerless).
+De-dup + empty states preserved. `./check` green. Merge `82aae2b`.
