@@ -1236,3 +1236,7 @@ intact. `./check` green (21 test files). Merge `62e5707`. Detection model = DEC-
 those never fire a win — silent, never wrong. **Dead-code follow-up (BACKLOG):** `workout.progression` is
 now persisted-but-unrendered and `progress.js formatProgressionLine` is now unused; left intact, a later
 req decides deletion. Live-on-device wording tweak is Emilio's (isolated in `beat-last-time.js` + `.ui-beat`).
+
+## req-97 — delete the now-unused formatProgressionLine (req-96 follow-up)  (merged 2026-09-17)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

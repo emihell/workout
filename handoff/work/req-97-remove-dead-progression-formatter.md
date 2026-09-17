@@ -1,6 +1,6 @@
 # req-97 — delete the now-unused formatProgressionLine (req-96 follow-up)
 
-**Status: READY. Gate: functional (dead-code removal, no behaviour change).**
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-97` (`a72b330`…`a72b330`, 1 commit).**
 
 From the req-96 review: with the "Next time" surfaces gone, `formatProgressionLine` has no callers.
 Emilio (2026-09-17): fix now.
