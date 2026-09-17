@@ -10,8 +10,8 @@ axis weight/reps/duration, name the win; new `beat-last-time.js` — DEC-050). F
 n1 (Finish/Abandon side-by-side) folds into PAUSED **req-77**. Owed by Emilio: on-device feel of batch 3
 + req-96 (pill overlap, real-iPhone no-zoom, the beat-line wording); **one live `./plan preview` run**;
 the timed-exercise browser flow (req-85); req-78/req-25 check.
-Loose follow-ups (deferred): req-85 v1 gaps (timed-set duration not editable; timed bodyweight still
-asks effort). Done: `log/SHIPPED.md`. Full reqs: `work/req-*.md`; index: `work/BACKLOG.md`. ≤50 lines.
+Loose follow-ups: req-85 v1 gaps (timed-set duration not editable; timed bodyweight asks effort).
+`log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
