@@ -1220,3 +1220,7 @@ divider-under+divider-over white seam (`Today.jsx`). State is now per-row: today
 near-black (`.ui-workout-info--today`), prior-day rows gray — the completed session still shows as a row,
 just no longer under a "Completed today" heading (header dropped — DEC-049, Emilio confirmed headerless).
 De-dup + empty states preserved. `./check` green. Merge `82aae2b`.
+
+## req-96 — replace finish "Next time" with a "you beat last time" line (per-exercise, any axis) (notes n4/n6 + new)  (merged 2026-09-17)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

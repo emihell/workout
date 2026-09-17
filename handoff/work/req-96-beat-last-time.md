@@ -1,6 +1,6 @@
 # req-96 — replace finish "Next time" with a "you beat last time" line (per-exercise, any axis) (notes n4/n6 + new)
 
-**Status: READY** (design decided with Emilio 2026-09-17). **Gate: ux-feel** (a comparison
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-96` (`d45f93d`…`d45f93d`, 1 commit).** (design decided with Emilio 2026-09-17). **Gate: ux-feel** (a comparison
 metric + a quiet celebratory line; the exact multi-win phrasing iterates live with Emilio).
 
 From Emilio's in-app notes (2026-09-16): `/workout/.../finish` — *"The next time section — what is
