@@ -192,14 +192,13 @@ behaviour call first. Numbered N1..N11 in Emilio's order.
   refactor is dropped-req-32 territory — decide whether to revive it. His "several components → weird
   states" read is half-right: one file, many blocks, real state overlap.
 
-- **Dead-code cleanup after req-96 (load recommendation).** req-96 removed the "Next time" surface from
-  Finish + history detail, so nothing renders `workout.progression` anymore. [measured] it is still
-  computed by `buildFinishProgression` and persisted on every finish (write-only now), and
-  `progress.js formatProgressionLine` is now unused. `progressionForItem` (model.js) stays live for the
-  History recalc path. *Disp:* small, needs a decision — keep persisting for a future surface, or stop
-  computing/persisting it and delete `formatProgressionLine`? Left intact per req-96 scope. *Q for Emilio:*
-  is the load recommendation coming back in another form, or is it retired? (It's the RPE-driven progression
-  — retired in practice because RPE isn't logged; see DEC-050 / req-96.)
+- **Load recommendation is retired-in-practice (req-96 aftermath).** [measured, corrected 2026-09-17]
+  Only `formatProgressionLine` was actually dead → deleted in **req-97**. The rest is LIVE:
+  `buildFinishProgression`/`progressionForItem` still feed `applyProgressionToRoutines`
+  (`store.jsx:351,377`), which updates routine templates at finish (a no-op without RPE, but wired); the
+  persisted `workout.progression` field is write-only but harmless. *Open (not urgent):* the RPE-driven
+  progression is retired in practice because RPE isn't logged — a later req could decide whether to keep
+  the routine-template auto-update at all. Not dead code; a product call. See DEC-050 / req-96 / req-97.
 
 **Sequencing insight:** N3/N4/N5/N6/N7 are ux-feel refinements on the shipped in-gym flow and can be
 specced fresh against the current code (batch-1's "refactor first" collision is past — that flow is
