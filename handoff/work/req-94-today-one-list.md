@@ -1,6 +1,6 @@
 # req-94 — Today: merge "Completed today" + recent into one stateful list, kill the double-divider gap (gym-flow batch 3, note n5)
 
-**Status: READY.** From Emilio's in-app note (2026-09-16, `/`):
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-94` (`42bc632`…`42bc632`, 1 commit).** From Emilio's in-app note (2026-09-16, `/`):
 *"Complete today has a divider under it — then the history has a divider over it —
 creating a small white space. I think these components need to be reworked into a list —
 with different states in the list — to get rid of things like I just mentioned."*

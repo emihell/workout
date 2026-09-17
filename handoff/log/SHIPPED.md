@@ -1212,3 +1212,7 @@ Bug: DevNotes textarea inherited the panel's 13px, so iOS Safari auto-zoomed on 
 fixed panel off-screen. Fixed to explicit `font: 16px/1.4` (the iOS threshold), `DevNotes.jsx`. Viewport
 meta untouched (pinch-zoom intact app-wide). `./check` green. Merge `66c5cbd`. Real-iPhone no-zoom is
 Emilio's after-merge check.
+
+## req-94 — Today: merge "Completed today" + recent into one stateful list, kill the double-divider gap (gym-flow batch 3, note n5)  (merged 2026-09-17)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
