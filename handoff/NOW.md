@@ -35,8 +35,6 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 affordance. NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default (brushes core
 rule), req-84 auto-complete, req-85 timed (model shape), req-86 dev note-capture.
 
-**Still decision-gated:** req-24 inline-confirm pattern; history-recalc behaviour; req-82/83/84/85/86 (above).
-
 ## Needs decisions — parked until their phase
 
 - **`req-24` native confirm/alert → inline UI** — 10 sites; needs the inline-confirm *pattern*
