@@ -1245,3 +1245,7 @@ only). Everything else in progress.js and the progression machinery
 (`buildFinishProgression`/`progressionForItem`/`applyProgressionToRoutines`, persisted
 `workout.progression`) left as-is — verified LIVE, not dead. `grep -rn formatProgressionLine src` empty;
 `./check` green (21 test files); `model.test.js` progression tests pass. Merge `a72b330`.
+
+## req-98 — make "beat last time" work for timed exercises (the capture already exists; guard the transitional false-win)  (merged 2026-09-17)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

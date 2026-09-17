@@ -1,6 +1,6 @@
 # req-98 — make "beat last time" work for timed exercises (the capture already exists; guard the transitional false-win)
 
-**Status: READY.** **Gate: functional (correctness guard) + a doc note.** From Emilio 2026-09-17
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-98` (`7d0f102`…`7d0f102`, 1 commit).** **Gate: functional (correctness guard) + a doc note.** From Emilio 2026-09-17
 (item-2 of the req-96 review): capture = editable actual defaulting to target; adoption = "I'll change
 them manually".
 
