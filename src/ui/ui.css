@@ -334,6 +334,15 @@ a.ui-btn--quiet:active {
 .ui-row--done {
   opacity: 0.45;
 }
+/* req-93 — the small role tag on a non-main exercise row (warm-up / finisher /
+ * cardio). Main rows show just a bold name with no tag; this is the lighter,
+ * secondary treatment that makes a non-main row read as clearly distinct. Sits
+ * inside the row's body-size label, so it's visibly smaller and quieter. */
+.ui-role-tag {
+  font-size: var(--ui-text-caption);
+  font-weight: 400;
+  color: var(--ui-ink-2);
+}
 
 /* ---- Bottom menu (the global shell, req-52 / DEC-036) ---- */
 /* The main content clears the FLOATING dock: dock height + its bottom inset + the
