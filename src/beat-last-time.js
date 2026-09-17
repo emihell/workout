@@ -97,7 +97,12 @@ function compareExercise(curSets, prevSets, type) {
   if (isTimed(curSets, prevSets)) {
     const cur = maxBy(curSets, (s) => num(s.durationSec))
     const prev = maxBy(prevSets, (s) => num(s.durationSec))
-    return cur > prev ? 'longer' : null
+    // req-98 — BOTH sides must carry real duration to be comparable. A newly-flagged
+    // timed exercise whose prior same-routine workout was logged the old way (free-text
+    // reps, no durationSec) has prev === 0: no comparable prior, so it's silent rather
+    // than claiming a bogus "↑ Longer" against a record with no duration (DESIGN §1 /
+    // DEC-050 no-invent).
+    return prev > 0 && cur > prev ? 'longer' : null
   }
 
   if (isWeightedType(type)) {

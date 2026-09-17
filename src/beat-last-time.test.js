@@ -83,6 +83,15 @@ describe('req-96 beatLastTimeWins — timed axis', () => {
     const cur = workout(TIMED, [{ ex: 'plank', durationSec: 60 }])
     assert.deepEqual(beatLastTimeWins(cur, prev), [])
   })
+
+  it('req-98 — no win when the prior has no duration (newly-flagged timed exercise)', () => {
+    // Transitional: the exercise was just flagged Timed, so today has a real durationSec
+    // but the prior same-routine workout was logged the old way (free-text reps, no
+    // durationSec). No comparable prior → silent, not a bogus "↑ Longer".
+    const prev = workout(TIMED, [{ ex: 'plank', reps: '60s' }])
+    const cur = workout(TIMED, [{ ex: 'plank', durationSec: 75 }])
+    assert.deepEqual(beatLastTimeWins(cur, prev), [])
+  })
 })
 
 describe('req-96 beatLastTimeWins — no-invent guardrails', () => {
