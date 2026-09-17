@@ -1,6 +1,6 @@
 # req-95 — feedback note panel: stop iOS auto-zoom on the textarea (gym-flow batch 3, note n7)
 
-**Status: READY.** From Emilio's in-app note (2026-09-16, `/`):
+**Status: BUILT AND MERGED, 2026-09-17 — branch `req-95` (`4ed421e`…`4ed421e`, 1 commit).** From Emilio's in-app note (2026-09-16, `/`):
 *"When I write here, the iPhone zooms in — is there a way to turn that off or circumvent it?
 Because I can't see the whole modal and I have to zoom out after save."*
 
