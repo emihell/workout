@@ -5,11 +5,10 @@ gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (Emilio's in-app feedb
 BUILT+MERGED+LIVE: req-92 (rest pill bigger), req-93 (main bold/unlabelled, WU/finisher tagged), req-94
 (Today one stateful list, no header — DEC-049), req-95 (feedback textarea iOS-zoom fix).** **req-96
 BUILT+MERGED+LIVE** — finish "Next time" removed, quiet "↑ you beat last time" line (per-exercise any
-axis weight/reps/duration, name the win; new `beat-last-time.js` — DEC-050). Follow-up in BACKLOG:
-`workout.progression` now write-only + `formatProgressionLine` unused (dead-code, keep-or-delete Q). Note
-n1 (Finish/Abandon side-by-side) folds into PAUSED **req-77**. Owed by Emilio: on-device feel of batch 3
-+ req-96 (pill overlap, real-iPhone no-zoom, the beat-line wording); **one live `./plan preview` run**;
-the timed-exercise browser flow (req-85); req-78/req-25 check.
+axis weight/reps/duration, name the win; new `beat-last-time.js` — DEC-050). BACKLOG follow-up:
+`workout.progression` now write-only + `formatProgressionLine` unused (dead-code keep-or-delete Q). Note
+n1 (Finish/Abandon side-by-side) folds into PAUSED **req-77**. Owed by Emilio: on-device feel of batch 3 +
+req-96 (pill overlap, real-iPhone no-zoom, beat-line wording); live `./plan preview`; req-85 timed flow.
 Loose follow-ups: req-85 v1 gaps (timed-set duration not editable; timed bodyweight asks effort).
 `log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
