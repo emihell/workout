@@ -140,7 +140,12 @@ export function DevNotes() {
         rows={4}
         autoFocus
         placeholder="What's the flaw or improvement here?"
-        style={{ width: '100%', boxSizing: 'border-box', font: 'inherit', padding: 8, borderRadius: 6, border: '1px solid #999', resize: 'vertical' }}
+        // req-95 — an explicit 16px font (NOT the panel's inherited 13px): iOS Safari
+        // auto-zooms a focused input whose font-size is < 16px, which pushed this
+        // fixed, top-right panel off-screen. 16px is the threshold; the rest of the
+        // panel stays compact. Fix is here, not the index.html viewport (that would
+        // kill pinch-zoom app-wide).
+        style={{ width: '100%', boxSizing: 'border-box', font: '16px/1.4 system-ui, sans-serif', padding: 8, borderRadius: 6, border: '1px solid #999', resize: 'vertical' }}
       />
       <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
         <button type="button" style={{ ...smallBtn, background: '#111', color: '#fff' }} onClick={save}>
