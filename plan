@@ -9,6 +9,9 @@ plan save "message"    commit handoff/ changes from the planning worktree
 plan publish           merge planning into main, safely
 plan status            where everything is, and what's unpublished
 plan next              the single next command to run, and why
+plan ping req-N        verify req-N's doc is on main AND planning is fully
+                        published, then print a ready-to-paste handoff ping.
+                        Read-only; refuses (pointing to publish) otherwise.
 plan sync              both directions of staleness: unpublished planning
                         AND the planning worktree's own code falling behind
 plan closeout req-N    merge a built branch, flip its doc status, publish,
@@ -86,6 +89,14 @@ find_worktrees() {
   fi
 }
 
+# req-100 (R2): the NOW.md ≤N-line rule has ONE source of truth —
+# NOW_MD_RULE_LIMIT in check_handoff.py. Read it at runtime rather than restating
+# 50 here, so the guard can never disagree with the drift check. check_handoff
+# imports cleanly (all its work is behind `__main__`).
+now_md_limit() {
+  python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); import check_handoff; print(check_handoff.NOW_MD_RULE_LIMIT)' "$1"
+}
+
 cmd_save() {
   local message="${1:-}"
   if [ -z "$message" ]; then
@@ -100,6 +111,24 @@ cmd_save() {
   if [ "$here" != "$PLANNING_DIR" ]; then
     echo "plan save: run this from the planning worktree ($PLANNING_DIR), not $here" >&2
     exit 1
+  fi
+
+  # req-100 (R2): NOW.md exceeding its own ≤N-line rule is the one drift that is
+  # always the author's to fix in the SAME edit — so block it BEFORE the commit
+  # instead of surfacing it after (the post-commit report below just defers the
+  # trim to next pass; hence 10+ historical "trim NOW" commits). Refuse before
+  # `git add -A` so nothing is staged and the working tree is left untouched.
+  # `wc -l` on the working tree matches check_handoff's git-object line_count
+  # (both count newlines); the limit comes from check_handoff, never duplicated.
+  local now_md="$PLANNING_DIR/handoff/NOW.md"
+  if [ -f "$now_md" ]; then
+    local now_lines now_limit
+    now_lines="$(wc -l < "$now_md" | tr -d ' ')"
+    now_limit="$(now_md_limit "$PLANNING_DIR/scripts")"
+    if [ "$now_lines" -gt "$now_limit" ]; then
+      echo "plan save: refusing — handoff/NOW.md is $now_lines lines, over its own ≤$now_limit-line rule. Trim it, then save." >&2
+      exit 1
+    fi
   fi
 
   git add -A
@@ -230,6 +259,86 @@ cmd_publish() {
     echo "plan publish: --push — pushing main and planning to origin"
     git -C "$CODE_DIR" push origin main planning
   fi
+}
+
+# req-100 (R1): the guard the Planner runs right before handing a req to Builder.
+# It sends nothing (SendMessage is a Claude tool, not a shell command) — it
+# verifies the publish receipt and prints the ping to paste. Read-only and safe,
+# like `plan status`: no commits, merges, or push. This is the line that would
+# have stopped R1 — a spec announced as "on main" while still unpublished on
+# planning (L-019).
+cmd_ping() {
+  local arg="${1:-}"
+  if [ -z "$arg" ]; then
+    echo 'plan ping: needs a requirement, e.g. ./plan ping req-99' >&2
+    exit 1
+  fi
+  local n reqid
+  n="${arg#req-}"
+  if ! [[ "$n" =~ ^[0-9]+$ ]]; then
+    echo "plan ping: '$arg' is not a requirement id (expected req-N or N)" >&2
+    exit 1
+  fi
+  reqid="req-$n"
+
+  find_worktrees
+
+  # Resolve the requirement doc exactly as closeout does — file form first,
+  # folder/README second — from the planning worktree, then derive its
+  # repo-relative path for the on-main check.
+  local doc="" f
+  for f in "$PLANNING_DIR"/handoff/work/"$reqid"-*.md; do
+    [ -e "$f" ] && { doc="$f"; break; }
+  done
+  if [ -z "$doc" ]; then
+    for f in "$PLANNING_DIR"/handoff/work/"$reqid"-*/README.md; do
+      [ -e "$f" ] && { doc="$f"; break; }
+    done
+  fi
+  if [ -z "$doc" ]; then
+    echo "plan ping: refusing — no requirement doc handoff/work/$reqid-*.md in $PLANNING_DIR" >&2
+    exit 1
+  fi
+  local relpath="${doc#"$PLANNING_DIR"/}"
+
+  # Refuse unless the work is genuinely on main: the doc is committed on main AND
+  # planning is fully published (main..planning empty — the same signal plan
+  # status prints as "fully published"). Either alone missing means Builder would
+  # be pointed at a spec it cannot read.
+  local reasons=()
+  if ! git -C "$CODE_DIR" cat-file -e "main:$relpath" 2>/dev/null; then
+    reasons+=("the requirement doc ($relpath) is not on main yet")
+  fi
+  local unpublished n_unpub
+  unpublished="$(git -C "$CODE_DIR" log --oneline main..planning)"
+  if [ -n "$unpublished" ]; then
+    n_unpub="$(printf '%s\n' "$unpublished" | wc -l | tr -d ' ')"
+    reasons+=("$n_unpub planning commit(s) not on main")
+  fi
+  if [ "${#reasons[@]}" -gt 0 ]; then
+    echo "plan ping: refusing to hand off $reqid —" >&2
+    printf '  - %s\n' "${reasons[@]}" >&2
+    echo "plan ping: publish first — ./plan publish" >&2
+    exit 1
+  fi
+
+  # Receipt verified — print the ready-to-paste ping (Planner drops it into
+  # SendMessage). Shape mirrors PLANNING.md's handover section.
+  cat <<EOF
+plan ping: $reqid is on main and planning is fully published — ready to hand off.
+
+Paste to Builder via SendMessage:
+────────────────────────────────────────
+New req to build: $reqid. Full spec + acceptance criteria: $relpath (on main).
+
+Branch $reqid, run ./check, write reports/$reqid.md, report back ready-to-look-at
+(do NOT merge), in this shape:
+  1  what it does            2–3 plain sentences
+  2  what to test            numbered, each answerable yes or no
+  3  what you couldn't       anything needing a browser, a real device, or a
+     verify yourself         judgement about how it feels
+────────────────────────────────────────
+EOF
 }
 
 cmd_next() {
@@ -1066,6 +1175,10 @@ case "${1:-}" in
     ;;
   next)
     cmd_next
+    ;;
+  ping)
+    shift
+    cmd_ping "$@"
     ;;
   sync)
     cmd_sync
