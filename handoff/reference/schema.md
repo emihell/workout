@@ -1,16 +1,18 @@
 # Persistence: schema, migration, recommendation increments
 
-Measured from the code on 2026-09-12, re-verified 2026-09-14 (`src/storage.js`,
-`src/model.js`, `src/progress.js`). Durable facts a requirement can lean on without re-deriving.
+Measured from the code on 2026-09-12, re-verified 2026-09-14; key/version re-verified 2026-09-18
+after req-85's `v8→v9` bump (`src/storage.js`, `src/model.js`, `src/progress.js`). Durable facts a
+requirement can lean on without re-deriving.
 If the code changes, update this — a `DEC-` or req that moves the schema updates
 here in the same pass.
 
 ## Keys
 
-- **Live key:** `workout-mvp-v8`; `SCHEMA_VERSION = 8` (`model.js:3`).
-- **Legacy keys read for migration:** `workout-mvp-v7`, `-v6`, `-v5`
-  (`storage.js:5`, `LEGACY_KEYS`). Removed **only after** the v8 value is read back
-  and confirmed persisted (req-06 gate, `storage.js:removeLegacyKeysIfV8Persisted`
+- **Live key:** `workout-mvp-v9`; `SCHEMA_VERSION = 9` (`model.js:5`, `storage.js:5`). (req-85
+  bumped `v8→v9`; `v8` is now a legacy key.)
+- **Legacy keys read for migration:** `workout-mvp-v8`, `-v7`, `-v6`, `-v5`
+  (`storage.js:6`, `LEGACY_KEYS`). Removed **only after** the current (v9) value is read back
+  and confirmed persisted (req-06 gate, `storage.js:removeLegacyKeysIfCurrentPersisted`
   — a silent-failed save must never trigger a delete).
 - **Analytics** is a separate key `workout-mvp-analytics` (DEC-011), never in the
   backup, best-effort/swallowed writes — isolated from history.
@@ -19,11 +21,11 @@ here in the same pass.
 
 ## Load + migrate flow (`storage.js:loadState`, 140-184)
 
-1. Read `workout-mvp-v8`; else the first non-null legacy key (`.find(Boolean)`).
+1. Read `workout-mvp-v9`; else the first non-null legacy key (`.find(Boolean)`).
 2. No value → `emptyState()`.
 3. `JSON.parse(raw)` → `migrateState({ ...emptyState(), ...parsed })`.
-4. Re-`saveState` if there was no current v8 value or `parsed.schemaVersion !== 8`.
-5. `removeLegacyKeysIfV8Persisted()` (read-back gated).
+4. Re-`saveState` if there was no current v9 value or `parsed.schemaVersion !== 9`.
+5. `removeLegacyKeysIfCurrentPersisted()` (read-back gated).
 6. A throw in **parse/migrate** is the corrupt-but-present case (**DEC-032 / req-36,
    shipped**): latch `loadUnreadable`, return `emptyState()` under a distinct banner,
    and **`saveState` then refuses to write** — the raw value is preserved on disk and
@@ -55,6 +57,7 @@ distinct on-disk **shapes**, not distinct code paths. What it does:
 
 | version | round-trip test? | where |
 |---|---|---|
+| v8→v9 (current) | yes | `:725-815` (req-85: v8+v5 device loads into v9, timer defaults added, history untouched, throw leaves v8 intact) |
 | v8 | yes | `:206-227` |
 | v7 | yes | `:164-204` (`schemaVersion: 7`, routines shape) |
 | v6 | yes | `:107-158` (`schemaVersion: 6`, programs/sessions shape) |

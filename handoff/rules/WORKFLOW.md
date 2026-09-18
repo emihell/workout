@@ -172,10 +172,10 @@ Then, and only then, close out (`rules/CLOSEOUT.md`).
 
 ## Persisted data has no backup. Treat a migration like surgery.
 
-The user's real state is their workout history in `localStorage` (`workout-mvp-v8`).
-There is no server copy and no undo. `src/db.json` is seed/provenance, not the live
-store; the existing **v5→v8 migration** is the pattern to preserve, not break — a test
-must prove an older v5–v7 key survives the upgrade.
+The user's real state is their workout history in `localStorage` (`workout-mvp-v9`; `v8` and
+older are legacy keys read for migration). There is no server copy and no undo. `src/db.json` is
+seed/provenance, not the live store; the existing **v5→v9 migration** is the pattern to preserve,
+not break — a test must prove an older v5–v8 key survives the upgrade.
 
 The rule that governs any schema-version change or bulk rewrite of stored records —
 state what changes and to how many records, add the survives-upgrade test — is **CC's

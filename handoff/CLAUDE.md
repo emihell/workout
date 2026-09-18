@@ -194,7 +194,8 @@ are yours; behaviour is his.
 
 **2. Any change to the persisted-data schema or a bulk write to saved state.**
 This app's data is the user's own workout history in `localStorage`
-(`workout-mvp-v8`), and there is no backup and no undo. A schema-version bump, a
+(`workout-mvp-v9`; `v8` and older are legacy keys read for migration), and there is
+no backup and no undo. A schema-version bump, a
 migration, or anything that rewrites many stored records is the counterpart of an
 irreversible external call: say **what will change and to how many records**
 before doing it, and add a migration test that proves an older key survives the
