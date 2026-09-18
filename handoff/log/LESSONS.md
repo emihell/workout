@@ -217,3 +217,17 @@ Both this and L-016 are one failure mode: **propose/decide from recall, then cor
 adjacent shipped code.** **How to apply:** when a task extends or touches an existing feature, read that
 feature's current *implementation* (not just its req/spec) before framing scope or asking Emilio to decide —
 the code often pre-answers the question. Cheapest guard against wasting Emilio's decisions. See [[L-016]].
+
+## L-018 — a schema/key bump must update the reference docs in the SAME req, or the ask-gate goes stale  (2026-09-18)
+
+req-85 bumped `STORAGE_KEY` `v8→v9` and `SCHEMA_VERSION` `8→9` and shipped clean — but left every
+"live key" assertion in the docs saying `v8`: `handoff/reference/schema.md` ("Live key: `workout-mvp-v8`;
+`SCHEMA_VERSION = 8`"), the `handoff/CLAUDE.md` **ask-gate #2** (loaded every turn — it told Builder to
+protect the wrong key), `rules/WORKFLOW.md`, `README.md`, `NOTES.md`. schema.md *states its own rule*
+("If the code changes, update this — a DEC- or req that moves the schema updates here in the same pass")
+and that rule was the thing skipped. Found by Builder mid-req-99, three reqs later. **How to apply:** when
+a req changes `STORAGE_KEY`, `SCHEMA_VERSION`, `LEGACY_KEYS`, or any persisted shape, the SAME req updates
+`reference/schema.md`, the `CLAUDE.md` ask-gate key, `rules/WORKFLOW.md`, and the product docs
+(`README.md`/`NOTES.md`) — and flips old "live" wording to "legacy". Put it in the req's acceptance
+criteria. A stale live-key in the ask-gate is the dangerous one: it misdirects the one rule about not
+destroying the user's history. See [[L-016]], [[L-017]] (same family: doc/recall lagging shipped code).
