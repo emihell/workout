@@ -220,14 +220,17 @@ The full cycle:
 
 ```
 1. publish first    the req's doc + a current NOW.md must be on main — CC only sees the last publish
-2. ping             SendMessage "build req-NN"; CC reads handoff/work/req-NN-*.md itself
+2. ping             ONLY after the receipt: `git log main..planning` empty (or `plan status` "fully
+                    published"). Never tell CC work is "on main" from recall — that's L-019. Then
+                    SendMessage "build req-NN"; CC reads handoff/work/req-NN-*.md itself
 3. build            CC builds on a branch, reports back (SendMessage); notify_when_idle as backstop
 4. review           read the diff + the failure-case test yourself — "done" is a signal, not proof
 5. loop back        gaps → SendMessage CC to fix (still its branch); not a new decision, just the spec
 6. verify           run the gate; browser-test where behaviour only shows in the running app
 7. merge gate       your own testing (DEC-035, below)
 8. closeout         plan closeout req-NN  (yours, after the gate)
-9. maintain         immediately: prune NOW.md, write SHIPPED, publish — before anything else
+9. maintain         immediately: prune NOW.md (it is ≤50 lines — cut a line for every line you add,
+                    in the SAME edit; don't defer it to the save-drift warning), write SHIPPED, publish
 10. stop            do not auto-start the next; wait for Emilio's trigger
 ```
 

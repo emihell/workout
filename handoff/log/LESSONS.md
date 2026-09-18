@@ -233,3 +233,20 @@ criteria. **The concrete guard:** `git grep 'workout-mvp-v'` (the key string) re
 bump — not just schema.md — and flip every *live-key* assertion, leaving historical/past-tense refs.
 A stale live-key in the ask-gate is the dangerous one: it misdirects the one rule about not
 destroying the user's history. See [[L-016]], [[L-017]] (same family: doc/recall lagging shipped code).
+
+## L-019 — never tell Builder unpublished planning work is "on main"; the receipt is `main..planning` empty, not recall  (2026-09-18)
+
+Handing req-99 over, Planner `SendMessage`'d Builder that the spec was "already on main via the
+planning merge" — while it was still uncommitted in the planning worktree; `plan save`/`plan publish`
+hadn't run. Planner self-caught the next turn and Builder independently caught it too, so nothing was
+built against a phantom spec — **zero damage this time, large latent radius**: a false "it's on main"
+actively suppresses Builder's own "this looks stale → say so" safeguard, and Builder would have read
+the last publish (three reqs old, still on the v8 key) as the base. This is the **planner-side twin of
+[[L-016]]/[[L-017]]/[[L-018]]** — asserting from recall ahead of the receipt — but applied to *publish
+state* rather than shipped code. Three prose rules already forbid it (`PLANNING.md:174–179` "CC's
+knowledge is exactly the last publish", the cycle's publish-then-ping at `:222–223`, and `:190` "do not
+describe a draft as sent") — so another prose rule is worthless. **How to apply:** publish is a state
+you *check*, never one you remember. Before any Builder ping that names work as landed, the receipt is
+`git log main..planning` empty (or `./plan status` "fully published") — run it, don't recall it. Order
+is always: `plan save` → `plan publish` → verify → *then* SendMessage. (If the `plan ping` guard lands,
+it enforces this; until then it's manual.)
