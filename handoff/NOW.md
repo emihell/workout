@@ -9,7 +9,7 @@ no header (DEC-049) · req-95 feedback textarea iOS-zoom · **req-96** "Next tim
 guarded the timed beat-last-time comparison (editable-actual capture already existed in req-85, so only a
 false-win guard was needed). **req-99 LIVE** — Timed flag now reachable from the routine editor via
 an "Edit exercise settings →" link + hint (return-to-routine via `?from=` route param, DEC-051).
-**Nothing building.** Note n1 (Finish/Abandon) folds into PAUSED **req-77**.
+**Nothing building.**
 Owed by Emilio: on-device feel of batch 3 + req-96 + req-99 (pill overlap, real-iPhone no-zoom,
 beat-line wording, does a first-timer now find Timed); to use timed "↑ Longer", flag exercises
 (plank/rowing) via the editor's Timed checkbox; live `./plan preview`.
@@ -30,10 +30,8 @@ guards handoff (L-019); `plan save` blocks NOW.md >50 pre-commit. From the 2026-
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
-**Gym-flow batch 2 (Emilio 2026-09-14) — req-76..86** (raw: BACKLOG N1–N11). In flight this session
-(order at top); req-78 decided 2026-09-16 (remove rest view, self-paced, build last). PAUSED: req-77
-affordance. NEEDS DECISION: req-82 empty-day Start, req-83 mid-workout value→default (brushes core
-rule), req-84 auto-complete, req-85 timed (model shape), req-86 dev note-capture.
+**Gym-flow batch 2 (req-76..86): all LIVE except `req-77` (PAUSED — affordance; folds in note n1
+Finish/Abandon).**
 
 ## Needs decisions — parked until their phase
 
