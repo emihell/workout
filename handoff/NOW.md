@@ -26,9 +26,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 stopwatch); builds on req-85's `hasDuration`/`durationSec`. Batch 3 + req-96 all LIVE (top).
 
 **READY, held:**
-- `req-99` **reach exercise settings from the routine editor** (Emilio 2026-09-18) — Timed flag
-  wasn't discoverable from a routine; add "Edit exercise settings →" link + hint, return to routine.
-  Link+hint not a duplicate control. `work/req-99-exercise-settings-from-routine.md`. **[ux-feel]**
+- `req-99` **reach exercise settings from routine editor** (Emilio 2026-09-18) — Timed flag not
+  findable from a routine; add "Edit exercise settings →" link + hint. `work/req-99-*.md`. **[ux-feel]**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
