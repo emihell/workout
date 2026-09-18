@@ -250,3 +250,20 @@ you *check*, never one you remember. Before any Builder ping that names work as 
 `git log main..planning` empty (or `./plan status` "fully published") — run it, don't recall it. Order
 is always: `plan save` → `plan publish` → verify → *then* SendMessage. (If the `plan ping` guard lands,
 it enforces this; until then it's manual.)
+
+## L-020 — a rotted check that silently matches nothing is worse than no check; verify the harness still FIRES, don't trust its green  (2026-09-18)
+
+NOW.md carried a stale block for most of a session — the "Gym-flow batch 2" paragraph listed req-82/83/84/85/86
+as "NEEDS DECISION / in flight" when all five were BUILT AND MERGED. Planner missed it (edits NOW.md
+surgically — touches the added lines near the top, never re-reads the whole ≤50-line file against reality)
+AND told Emilio "no drift" on the strength of `check_handoff.py`'s green output. But [measured]
+`parse_now_md_claims` extracts `{}` from the current NOW.md: its `QUEUE_LINE_RE` (`:243`) expects a
+`[ ] req-N … READY` checkbox format and `done YYYY-MM-DD:` lines that NOW.md no longer uses, and it doesn't
+know the phrase "NEEDS DECISION" at all. So the NOW.md↔status cross-check runs on an empty claim set and can
+never fire — it reports clean by construction. **This is the dark side of "receipts over claims"
+([[L-018]]/[[L-019]]): a receipt from a check that verifies nothing is a false receipt.** How to apply:
+(1) when you touch NOW.md, re-read the WHOLE file and reconcile every req-N against its real status — it is
+capped at 50 lines precisely so this is cheap; (2) a green from a checker only means "no findings," not
+"the check exercised anything" — periodically prove a check still catches a planted failure (the way
+`plan-guards.test.sh` asserts refusals), and when a doc's format evolves, its checker's parser is now
+suspect until re-verified. A drift checker whose parser has drifted is the highest-value thing to catch.
