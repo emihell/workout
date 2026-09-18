@@ -60,6 +60,10 @@ pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
   and only drops on **Failure**/missed reps. Safe default, but worth surfacing: should
   Finish show "held — effort was Moderate" so loads sitting still is never a surprise?
   (Also remove the unreachable `alert('Pick effort')` guard — dead given the default.)
+- **`req-99` reach exercise settings from the routine editor** (READY, held) — Emilio couldn't
+  find the **Timed** flag from inside a routine (it lives on the exercise Details editor). Add an
+  "Edit exercise settings →" link + a hint when the exercise isn't timed; editing from there returns
+  to the routine. Link + hint, not a duplicate control. `work/req-99-exercise-settings-from-routine.md`.
 - **History recalc from a non-latest workout** — correcting an old session silently
   overwrites the routine's current loads. Behaviour call: only-if-latest, or always?
 - **Auto-backup before a destructive import** — import replaces all state after a
