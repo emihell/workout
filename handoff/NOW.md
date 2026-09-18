@@ -26,6 +26,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** Batch 3 + req-96 + req-97/98 + req-99 all LIVE (top).
 
 **READY, held:**
+- `req-100` **plan-tool guards** (from 2026-09-18 workflow review, B+): `plan ping` refuses handoff
+  unless the req+NOW are on main (L-019); blocking NOW.md ≤50 pre-commit in `plan save`. Tooling only.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
