@@ -243,20 +243,76 @@ DONE_LINE_RE = re.compile(r"^done \d{4}-\d{2}-\d{2}:\s*(.+)$", re.M)
 QUEUE_LINE_RE = re.compile(r"^\s*\[.\]\s*(req-\d+)\b.*?\b(READY|SHELVED|WITHDRAWN|BLOCKED)\b", re.M)
 REQID_RE = re.compile(r"req-\d+")
 
+# ---- section-aware scan of NOW.md's free prose (req-101, from L-020) -------
+# The old DONE_LINE_RE/QUEUE_LINE_RE above expect a "done <date>:" /
+# "[ ] req-N ... TAG" format NOW.md no longer writes, so on the current doc
+# they match nothing and the whole cross-check silently ran on {} — a shipped
+# req sat under a "NEEDS DECISION" line for a session and the check stayed
+# green (L-020: a rotted check is worse than none). They're kept in case those
+# formats return; the scan below is what actually reads today's prose.
+#
+# It keys off NOW.md's *stable structure*, not a checkbox format: a req-N under
+# a FORWARD-LOOKING region (a section/label that declares work not yet shipped)
+# is a "pending" claim — NOW.md asserting that req has not landed. Everything
+# else (the top "**Shipped: ...**" summary, "LIVE"/aftermath notes,
+# "## Milestone", "## Where to read") legitimately names shipped reqs and is
+# never scanned. Forward-looking regions in the current NOW.md: the
+# "## Needs decisions — parked" section, the "**READY, held:**" block, and the
+# "**IN FLIGHT:**" line.
+NOW_HEADER_RE = re.compile(r"^\s*#{1,6}\s")
+NEEDS_DECISION_HEADER_RE = re.compile(r"^\s*#{1,6}\s.*\bneeds decisions?\b", re.I)
+# A short bold label that OPENS a forward-looking block. The bold content must
+# *start* with the label word, so "**IN FLIGHT:**" / "**READY, held:**" open
+# one but a sentence merely containing the words — "**Nothing in flight.**",
+# which names shipped reqs — does not. Punctuation after the word isn't
+# hardcoded (the \b handles the ":" / "," that follow).
+FORWARD_LABEL_RE = re.compile(r"^\s*\*\*\s*(?:READY\b|IN\s+FLIGHT\b)", re.I)
+BOLD_LINE_RE = re.compile(r"^\s*\*\*")
+
 
 def parse_now_md_claims(now_md_text: str) -> dict[str, str]:
-    """reqid -> "merged" | "ready" | "shelved" | "withdrawn" | "blocked",
-    read from NOW.md's own "done <date>: req-N · req-M" lines and its
-    "[ ] req-N ... TAG" queue lines. Best-effort prose parsing — this is
-    the softest part of check 1, by design (NOW.md is free text, not a
-    table), so it only ever adds findings on a clear mismatch, never on
-    a requirement it can't confidently place."""
+    """reqid -> "merged" | "ready" | "shelved" | "withdrawn" | "blocked" |
+    "pending", read from NOW.md's own statements about each req.
+
+    Two layers, both best-effort (NOW.md is free prose, not a table — this is
+    the softest part of check 1 by design, so it only ever adds a finding on a
+    clear mismatch, never on a req it can't confidently place):
+
+      * legacy explicit formats, kept in case they return — "done <date>:
+        req-N" lines (merged) and "[ ] req-N ... TAG" queue lines;
+      * a section-aware scan (see the block comment above) — a req-N under a
+        forward-looking region is a "pending" claim (NOW.md says it hasn't
+        shipped). An explicit claim from the layer above wins over a scanned
+        one (setdefault).
+    """
     claims: dict[str, str] = {}
     for m in DONE_LINE_RE.finditer(now_md_text):
         for reqid in REQID_RE.findall(m.group(1)):
             claims[reqid] = "merged"
     for m in QUEUE_LINE_RE.finditer(now_md_text):
         claims[m.group(1)] = m.group(2).lower()
+
+    # Two independent "we are inside a forward-looking region" signals:
+    #   * a "## Needs decisions" section — holds until the next ## header;
+    #   * a bold-label block ("**IN FLIGHT:**", "**READY, held:**") — holds
+    #     until a blank line, a new header, or a new bold label (a bold line
+    #     whose label is NOT forward-looking, e.g. "**Gym-flow batch 2 …**"
+    #     naming LIVE reqs, closes the block and is itself not scanned).
+    in_needs_decision = False
+    in_forward_block = False
+    for line in now_md_text.splitlines():
+        if NOW_HEADER_RE.match(line):
+            in_needs_decision = bool(NEEDS_DECISION_HEADER_RE.match(line))
+            in_forward_block = False
+            continue
+        if line.strip() == "":
+            in_forward_block = False
+            continue
+        if BOLD_LINE_RE.match(line):
+            in_forward_block = bool(FORWARD_LABEL_RE.match(line))
+        if in_needs_decision or in_forward_block:
+            for reqid in REQID_RE.findall(line):
+                claims.setdefault(reqid, "pending")
     return claims
 
 
@@ -269,6 +325,12 @@ def _now_claim_disagrees(category: str, now_claim: str) -> bool:
         return category != "unknown"
     if now_claim == "blocked":
         return category != "blocked"
+    if now_claim == "pending":
+        # A forward-looking placement only contradicts the doc when the doc
+        # says the work actually shipped. "unknown" (can't place it), still
+        # "not-merged", or "blocked" are all consistent with "not shipped
+        # yet" — stay silent. This is the whole conservative bargain.
+        return category == "merged"
     return False
 
 
@@ -281,6 +343,19 @@ def check_status_lines(repo: str, ref: str) -> list[Finding]:
 
     for tag in tags:
         category, extra = classify_tag(tag.tag_text)
+
+        # Checked first, for every category: the merged/blocked/unknown
+        # branches below each `continue`, so a claim check left at the tail of
+        # the loop (as it was) never ran for a merged req — exactly the drift
+        # req-101 exists to catch (NOW.md lists req-N as pending while its doc
+        # is BUILT AND MERGED). _now_claim_disagrees stays conservative, so
+        # this only fires on a real contradiction.
+        now_claim = now_claims.get(tag.reqid)
+        if now_claim and _now_claim_disagrees(category, now_claim):
+            findings.append(Finding(
+                "status", "fail", tag.reqid,
+                f"NOW.md lists {tag.reqid} as {now_claim!r}, but its own doc tag implies {category!r}",
+            ))
 
         if category == "merged":
             if extra:
@@ -323,13 +398,6 @@ def check_status_lines(repo: str, ref: str) -> list[Finding]:
                 "cannot determine merge status from this tag (shelved/withdrawn/unparseable) — not a failure",
             ))
             continue
-
-        now_claim = now_claims.get(tag.reqid)
-        if now_claim and _now_claim_disagrees(category, now_claim):
-            findings.append(Finding(
-                "status", "fail", tag.reqid,
-                f"NOW.md's queue says {now_claim!r}, but the requirement's own tag implies {category!r}",
-            ))
 
     return findings
 
