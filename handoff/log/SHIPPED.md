@@ -1273,3 +1273,7 @@ default (link+hint in both New and Edit, accepting the unsaved-form loss on the 
 Planner reviewed the diff, ran the gate (286 tests + lint + build green), confirmed both
 `ExerciseFields` callers pass `settingsLink` so the hint never appears without its link. `[ux-feel]`
 open: does a first-timer now find Timed on-device — Emilio's call. Merge `0720a91`; `./check` green.
+
+## req-100 — two planning-tool guards: `plan ping` + a blocking NOW.md ≤50 pre-commit check  (merged 2026-09-18)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

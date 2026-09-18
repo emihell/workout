@@ -1,6 +1,6 @@
 # req-100 — two planning-tool guards: `plan ping` + a blocking NOW.md ≤50 pre-commit check
 
-**Status: SPEC — READY.** Tooling only (the `plan` script + `scripts/check_handoff.py`). No app code,
+**Status: BUILT AND MERGED, 2026-09-18 — branch `req-100` (`9ebe26f`…`9ebe26f`, 1 commit).** Tooling only (the `plan` script + `scripts/check_handoff.py`). No app code,
 no persisted-data change. Came out of the 2026-09-18 external workflow review (grade B+); turns two
 prose rules that were violated this session into tool refusals — the project's own philosophy
 (receipts over claims; save/publish/closeout are already guarded). See [[L-019]] and PLANNING.md
