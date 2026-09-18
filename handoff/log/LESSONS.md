@@ -229,5 +229,7 @@ and that rule was the thing skipped. Found by Builder mid-req-99, three reqs lat
 a req changes `STORAGE_KEY`, `SCHEMA_VERSION`, `LEGACY_KEYS`, or any persisted shape, the SAME req updates
 `reference/schema.md`, the `CLAUDE.md` ask-gate key, `rules/WORKFLOW.md`, and the product docs
 (`README.md`/`NOTES.md`) — and flips old "live" wording to "legacy". Put it in the req's acceptance
-criteria. A stale live-key in the ask-gate is the dangerous one: it misdirects the one rule about not
+criteria. **The concrete guard:** `git grep 'workout-mvp-v'` (the key string) repo-wide as part of the
+bump — not just schema.md — and flip every *live-key* assertion, leaving historical/past-tense refs.
+A stale live-key in the ask-gate is the dangerous one: it misdirects the one rule about not
 destroying the user's history. See [[L-016]], [[L-017]] (same family: doc/recall lagging shipped code).
