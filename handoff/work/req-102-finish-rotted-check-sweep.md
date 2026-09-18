@@ -1,6 +1,6 @@
 # req-102 — finish the rotted-check sweep: retire check_backlog_index, fix classify_tag, narrow the NOW-scan
 
-**Status: SPEC — READY.** Tooling only (`scripts/check_handoff.py` + its self-test). No app code, no
+**Status: BUILT AND MERGED, 2026-09-18 — branch `req-102` (`ea7dbdd`…`6f3b265`, 2 commits).** Tooling only (`scripts/check_handoff.py` + its self-test). No app code, no
 persisted data. Closes out the L-020 family surfaced by req-101 item #3 (Builder) + the ledger. Each
 fix ships with a self-test assertion so it can't silently re-rot.
 

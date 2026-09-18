@@ -1310,3 +1310,7 @@ plan-ledger, `./check` all green. **The repaired check proved itself during its 
 flagged NOW.md still listing req-101 as pending against the freshly-merged doc. Merge `c28c4d7`.
 Follow-ups Builder surfaced (item #3): `check_backlog_index` is fully rotted (same L-020 class) and
 `classify_tag` matches "NEEDS DECISIONS" plural but docs write it singular — both → req-102.
+
+## req-102 — finish the rotted-check sweep: retire check_backlog_index, fix classify_tag, narrow the NOW-scan  (merged 2026-09-18)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
