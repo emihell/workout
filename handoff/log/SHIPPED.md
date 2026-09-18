@@ -1259,4 +1259,17 @@ effort.
 
 ## req-99 — reach exercise settings from the routine editor (Timed discoverability)  (merged 2026-09-18)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Emilio couldn't find the **Timed** flag from inside a routine — it lives on the exercise Details
+editor and nothing signposted it. Fix (link + hint, his choice over inline; no duplicate control):
+the routine per-exercise editor (`ExerciseFields`, both `RoutineExerciseNew` and
+`RoutineExerciseEdit`) now shows an **"Edit exercise settings →"** navlink, plus a quiet hint
+*"Not timed. Edit exercise settings to add a duration."* whenever the exercise isn't timed (when it
+is, the Duration field already shows and there's no hint). Return-to-routine done with a new
+`?from=<encoded-path>` query param on the `exercise-edit` route (`route.js` `parseRoute` now splits
+the query off before path parsing — **DEC-051**); `ExerciseEdit` honours it on Save/Cancel/Back and
+falls back to `/exercises/:id` on the normal path (unchanged). Builder chose to return to the exact
+per-exercise editor (lossless on the edit path, Duration field shows immediately) and took the spec
+default (link+hint in both New and Edit, accepting the unsaved-form loss on the add-new-row path).
+Planner reviewed the diff, ran the gate (286 tests + lint + build green), confirmed both
+`ExerciseFields` callers pass `settingsLink` so the hint never appears without its link. `[ux-feel]`
+open: does a first-timer now find Timed on-device — Emilio's call. Merge `0720a91`; `./check` green.

@@ -1014,3 +1014,16 @@ no matched improvement / newly-added exercise → silent, never a "you did worse
 NO win line — it's a past record, not a forward celebration. req-84's total-volume "vs last time" on the
 auto-complete screen is a separate surface and stays. Reversible: the axes/thresholds live in one pure
 module (`src/beat-last-time.js`).
+
+## DEC-051 — routes may carry a `?from=<encoded-path>` return target; the router splits the query before path parsing  (req-99, 2026-09-18)
+
+req-99 needed "edit the exercise from a routine, then land back in that routine". The router
+(`src/route.js`) was pure path-segments — no query support. Rather than thread a return path through
+component props across the nav stack, Builder added a minimal query mechanism: `parseRoute` now splits
+`path` on `?` first, path parsing sees no `?`, and **only routes that opt in** read a param out of the
+query (today just `exercise-edit` reads `from`). Link built with `encodeURIComponent`; the value is a
+hash-body path that travels through `hashPath`/`go` untouched; missing/malformed `from` degrades to the
+normal behaviour. **This is the sanctioned pattern for a return-to target — reuse it, don't reinvent
+per-flow prop threading.** Keep params opt-in per route (never a blanket query bag), keep the value an
+encoded internal path (not arbitrary state), and keep the fallback lossless. Scope-limited: it's a
+return-nav affordance, not a general query-string state store.
