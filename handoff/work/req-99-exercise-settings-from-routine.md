@@ -1,6 +1,6 @@
 # req-99 — reach exercise settings from the routine editor (Timed discoverability)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1 gym-flow clarity. **[ux-feel]**
+**Status: BUILT AND MERGED, 2026-09-18 — branch `req-99` (`c927da5`…`c927da5`, 1 commit).** Phase 1 gym-flow clarity. **[ux-feel]**
 
 ## Why
 
