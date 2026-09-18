@@ -267,3 +267,25 @@ capped at 50 lines precisely so this is cheap; (2) a green from a checker only m
 "the check exercised anything" — periodically prove a check still catches a planted failure (the way
 `plan-guards.test.sh` asserts refusals), and when a doc's format evolves, its checker's parser is now
 suspect until re-verified. A drift checker whose parser has drifted is the highest-value thing to catch.
+
+## L-021 — two gotchas when writing `check_handoff` self-tests (req-102)  (2026-09-18)
+
+Both surfaced building/reviewing the self-tests that back the drift checker; both waste a review
+round or 20 minutes for the next person who touches `scripts/check-handoff.test.sh`.
+
+1. **`check_handoff --ref HEAD` on a feature branch flags that branch's own not-yet-merged req.** Its
+   reverse check ("tagged not-yet-merged but `<commit>` already merges it") fires because the req's
+   implementing commit IS in the branch HEAD's history while its doc still reads READY — exit 1. This
+   is a branch-checkout artifact, not a defect: `check_handoff` is meant to run against **main /
+   planning** (how `plan save`/`publish` invoke it, `--repo CODE_DIR`/`PLANNING_DIR`). It bit twice —
+   the req-101 review AND a req-102 self-test assertion that asserted "exit 0 on live HEAD" and so was
+   RED on its own branch. **How to apply:** never assert "zero findings on live HEAD" in a self-test;
+   test a check's *intent* against an isolated fixture, or assert import+`run_checks()` runs without
+   raising. When you want a real "is the repo clean" read, run it against main/planning, not a branch.
+2. **On Python 3.9, load `check_handoff` in a test via `sys.path.insert(0, dir)` + `import
+   check_handoff`, NOT `importlib.util.module_from_spec`.** The latter leaves the module out of
+   `sys.modules`, which breaks its `@dataclass` (dataclass needs the module registered) — a confusing
+   failure unrelated to your assertion. The existing test's pattern is the one to copy.
+
+Caught by running the FULL self-test output, not the `tail`ed "all passed" summary — see [[L-020]]:
+a green summary only means "no findings," so read what actually ran.

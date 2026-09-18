@@ -1313,4 +1313,20 @@ Follow-ups Builder surfaced (item #3): `check_backlog_index` is fully rotted (sa
 
 ## req-102 — finish the rotted-check sweep: retire check_backlog_index, fix classify_tag, narrow the NOW-scan  (merged 2026-09-18)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closes the L-020 family. Three fixes to `check_handoff.py`, each with a self-test assertion: **(1)**
+retired `check_backlog_index` — it validated a `## Sections`/`§N.N`/`### N.N` index against a
+`handoff/work/backlog/` tier dir that was deliberately abandoned (BACKLOG.md is now a prose index), so
+retire not repair (Emilio); removed the function, call site, its private constants, and updated the
+stale module docstring ("Three checks"→"Two") + the `Finding.check` comment. `BACKLOG_PATH` kept (the
+size check's LIVING_DOCS still uses it). **(2)** `classify_tag` now matches `NEEDS DECISIONS?` —
+singular (what docs write) and plural; parked reqs were misclassifying `unknown`. **(3)** the
+section-scan claims only the first/subject `req-N` per forward-looking line (`.search` not `.findall`),
+so an incidental cross-ref no longer false-flags a merged req — the exact bug the req-101 ledger hit.
+**Review loop-back (1 round):** Builder's first cut had a self-test assertion (`check_handoff --ref
+HEAD` = exit 0) that FAILED on its own branch — the branch-checkout artifact where check_handoff
+flags the branch's own not-yet-merged req; Planner caught it by running the full self-test (not the
+`tail`ed summary), bounced it back, and Builder replaced it with an environment-independent
+import+`run_checks()` no-exception assertion (`6f3b265`). Planner verified from the branch: all 11
+self-test assertions pass, `check_handoff` clean on main (exit 0), plan-guards/plan-ledger/`./check`
+all green; drift check fired correctly during closeout. Merge `398b95e`. Lessons: [[L-021]]. Tooling
+only — no app code, no persisted data.

@@ -23,11 +23,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-Batch 3 + req-96..99 all LIVE (top). **req-100 + req-101 LIVE** (tooling, 2026-09-18 review) — `plan
-ping` + NOW.md ≤50 guard (L-019); repaired the NOW.md drift check + self-test (L-020).
-
-**IN FLIGHT:** `req-102` handed to Builder — finish the L-020 sweep: retire dead `check_backlog_index`,
-fix `classify_tag` singular, narrow the NOW-scan to a bullet's subject req. Self-tests. Tooling only.
+**Nothing in flight.** Batch 3 + req-96..99 all LIVE (top). **req-100..102 LIVE** (tooling, 2026-09-18
+review) — `plan ping` + NOW.md ≤50 guard (L-019); repaired the NOW.md drift check + retired the dead
+backlog check + self-tests (L-020, L-021). Rotted-check sweep complete.
 
 **READY, held:**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
