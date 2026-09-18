@@ -1,6 +1,6 @@
 # req-101 — repair the rotted NOW.md↔status drift check + a planted-failure self-test
 
-**Status: SPEC — READY.** Tooling only (`scripts/check_handoff.py` + a new self-test). No app code, no
+**Status: BUILT AND MERGED, 2026-09-18 — branch `req-101` (`8ce2ff6`…`8ce2ff6`, 1 commit).** Tooling only (`scripts/check_handoff.py` + a new self-test). No app code, no
 persisted data. From [[L-020]] (2026-09-18): the NOW.md drift check silently matches nothing.
 
 ## The bug (measured)

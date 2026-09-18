@@ -1290,3 +1290,7 @@ driven live pre-merge. Planner verified: 3 live ping paths (success + two refusa
 (ping-not-on-main R1 case, ping-uncommitted, save-refuse-at-51-no-commit, save-at-50-commits) all pass;
 `plan-ledger.test.sh` regression intact; `./check` green. Merge `462f57e`. Tooling only — no app code,
 no persisted data.
+
+## req-101 — repair the rotted NOW.md↔status drift check + a planted-failure self-test  (merged 2026-09-18)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
