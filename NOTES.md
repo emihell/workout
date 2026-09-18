@@ -15,7 +15,7 @@ where recurring build-side conventions live instead.
 
 ## Data lives in the browser
 
-State is `localStorage` under `workout-mvp-v8`; the seed in `src/db.json` is
+State is `localStorage` under `workout-mvp-v9`; the seed in `src/db.json` is
 first-run/provenance data, not the live store. To reset or inspect state, use the
 app's own Settings/seed path or clear the key in devtools — don't hand-edit
 `db.json` expecting it to change a running instance. Migrations live in
