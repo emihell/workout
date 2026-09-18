@@ -1256,3 +1256,7 @@ so a newly-flagged timed exercise doesn't fire a bogus "↑ Longer" against a pr
 change; adoption stays manual (Emilio flags exercises). `./check` green. Merge `7d0f102`. Follow-up in
 BACKLOG: set-edit.jsx can't edit a logged timed duration (history-edit gap); timed bodyweight still asks
 effort.
+
+## req-99 — reach exercise settings from the routine editor (Timed discoverability)  (merged 2026-09-18)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
