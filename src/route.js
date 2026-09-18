@@ -127,8 +127,30 @@ function parseRoutineNested(rest) {
   return { screen: 'detail' }
 }
 
+// req-99 — a route may carry a `?from=<encoded-path>` return target (the exercise
+// settings link from the routine editor uses it so Save/Back land back where you
+// came from). Split the query off before path parsing so no branch sees the `?`,
+// and only the routes that opt in read a param out of it. `path` is the hash body
+// (already `#`-stripped); the query travels with it through hashPath/go untouched.
+function queryParam(rawQuery, key) {
+  for (const pair of String(rawQuery || '').split('&')) {
+    if (!pair) continue
+    const eq = pair.indexOf('=')
+    const k = eq < 0 ? pair : pair.slice(0, eq)
+    if (k !== key) continue
+    const v = eq < 0 ? '' : pair.slice(eq + 1)
+    try {
+      return decodeURIComponent(v)
+    } catch {
+      return v
+    }
+  }
+  return null
+}
+
 export function parseRoute(path) {
-  const parts = path.split('/').filter(Boolean)
+  const [rawPath, rawQuery] = String(path).split('?')
+  const parts = rawPath.split('/').filter(Boolean)
   if (parts.length === 0) return { name: 'today' }
 
   if (parts[0] === 'schedule' && parts[1] === 'loop') return { name: 'schedule-loop' }
@@ -216,7 +238,10 @@ export function parseRoute(path) {
   if (parts[0] === 'exercises' && parts[1] === 'type' && parts[2]) {
     return { name: 'exercises-type', type: parts[2] }
   }
-  if (parts[0] === 'exercises' && parts[1] && parts[2] === 'edit') return { name: 'exercise-edit', id: parts[1] }
+  if (parts[0] === 'exercises' && parts[1] && parts[2] === 'edit') {
+    const from = queryParam(rawQuery, 'from')
+    return from ? { name: 'exercise-edit', id: parts[1], from } : { name: 'exercise-edit', id: parts[1] }
+  }
   if (parts[0] === 'exercises' && parts[1]) return { name: 'exercise', id: parts[1] }
   if (parts[0] === 'exercises') return { name: 'exercises' }
 

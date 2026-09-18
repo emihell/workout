@@ -268,3 +268,56 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
     assert.equal(activeTab(undefined), 'workouts')
   })
 })
+
+// req-99 — the routine per-exercise editor links to the exercise's own Details
+// editor carrying a `?from=` return target, so Save/Cancel/Back land back on the
+// routine screen (in any of the flows that reuse ExerciseFields) instead of the
+// exercise detail screen. parseRoute must strip the query before path parsing and
+// surface `from` (decoded) only when present.
+describe('req-99 — exercise-edit carries an optional ?from= return path', () => {
+  it('parses a plain exercise-edit with no from (normal Exercises → Edit path)', () => {
+    assert.deepEqual(parseRoute('/exercises/ex-plank/edit'), {
+      name: 'exercise-edit',
+      id: 'ex-plank',
+    })
+  })
+
+  it('surfaces a decoded from target when the routine editor links in', () => {
+    const from = '/routines/rt-upper/exercise/it-9'
+    const path = `/exercises/ex-plank/edit?from=${encodeURIComponent(from)}`
+    assert.deepEqual(parseRoute(path), {
+      name: 'exercise-edit',
+      id: 'ex-plank',
+      from,
+    })
+  })
+
+  it('round-trips a nested (schedule-slot) return target through the query', () => {
+    const from = '/schedule/0/1/slot-a/exercise/it-3'
+    const path = `/exercises/ex-plank/edit?from=${encodeURIComponent(from)}`
+    const parsed = parseRoute(path)
+    assert.equal(parsed.from, from)
+    // and that return target itself parses back to the routine editor screen
+    assert.deepEqual(parseRoute(from), {
+      name: 'schedule-slot',
+      week: 0,
+      weekday: 1,
+      slotId: 'slot-a',
+      screen: 'exercise',
+      itemId: 'it-3',
+    })
+  })
+
+  it('does not let the query string leak into path parsing', () => {
+    // parts must be split off the path only — the `?from=` must not corrupt the id.
+    assert.equal(parseRoute('/exercises/ex-plank/edit?from=%2Fx').id, 'ex-plank')
+  })
+
+  it('exercise-edit still lights the Library tab whether or not from is present', () => {
+    assert.equal(activeTab(parseRoute('/exercises/ex-plank/edit').name), 'library')
+    assert.equal(
+      activeTab(parseRoute('/exercises/ex-plank/edit?from=%2Froutines%2Fr').name),
+      'library',
+    )
+  })
+})

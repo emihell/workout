@@ -12,6 +12,14 @@ function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
 }
 
+// req-99 — link from the routine per-exercise editor to the exercise's OWN Details
+// editor (where the Timed flag lives), carrying `?from=` so Save/Cancel/Back return
+// to `returnPath` — the exact routine screen the user came from, in any of the flows
+// that reuse ExerciseFields (routine / schedule slot / workout setup / history recalc).
+function exerciseSettingsLink(exerciseId, returnPath) {
+  return `/exercises/${exerciseId}/edit?from=${encodeURIComponent(returnPath)}`
+}
+
 export function navForBase(base, done, { extra = null, showDelete = true } = {}) {
   return {
     base,
@@ -266,7 +274,7 @@ export function RoutineExercisePick({ routineId, paths }) {
   )
 }
 
-function ExerciseFields({ item, onChange, onCancel, defaults, timed = false }) {
+function ExerciseFields({ item, onChange, onCancel, defaults, timed = false, settingsLink = null }) {
   const [role, setRole] = useState(item.role || defaults.role || 'main')
   const [warmup, setWarmup] = useState(Boolean(item.warmup))
   // req-30 — warmup reps come only from what the user typed (or a saved value when
@@ -342,6 +350,16 @@ function ExerciseFields({ item, onChange, onCancel, defaults, timed = false }) {
       <Field label="Kg" value={weights} onChange={(e) => setWeights(e.target.value)} />
       {timed ? (
         <Field label="Duration (s)" value={durations} onChange={(e) => setDurations(e.target.value)} />
+      ) : (
+        // req-99 — Timed lives on the exercise, not the routine row. When the exercise
+        // isn't timed there's no Duration field, so signpost where the flag actually is
+        // instead of leaving a dead end. No second checkbox here (would fork the truth).
+        <p className="ui-sub">Not timed. Edit exercise settings to add a duration.</p>
+      )}
+      {settingsLink ? (
+        <p>
+          <NavLink to={settingsLink} className="ui-navlink" chevron="forward">Edit exercise settings</NavLink>
+        </p>
       ) : null}
       <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
       <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
@@ -390,6 +408,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
         }}
         defaults={defaults}
         timed={Boolean(ex?.hasDuration)}
+        settingsLink={exerciseSettingsLink(ex.id, nav.newItem(ex.id))}
         onCancel={() => go(nav.pick)}
         onChange={(patch) => {
           store.addRoutineExercise(routine.id, { exerciseId: ex.id, ...patch })
@@ -431,6 +450,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
         item={item}
         defaults={defaults}
         timed={Boolean(ex?.hasDuration)}
+        settingsLink={exerciseSettingsLink(item.exerciseId, nav.item(itemId))}
         onCancel={() => go(parent)}
         onChange={(patch) => {
           store.updateRoutineExercise(routine.id, index, patch)
