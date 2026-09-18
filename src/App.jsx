@@ -156,7 +156,7 @@ function Screen() {
   if (route.name === 'exercise-new-manual') return <ExerciseNewManual />
   if (route.name === 'exercise-new-search') return <ExerciseNewSearch />
   if (route.name === 'exercise-new') return <ExerciseNew />
-  if (route.name === 'exercise-edit') return <ExerciseEdit key={route.id} exerciseId={route.id} />
+  if (route.name === 'exercise-edit') return <ExerciseEdit key={route.id} exerciseId={route.id} returnTo={route.from} />
   if (route.name === 'exercise') return <ExerciseDetail exerciseId={route.id} />
   if (route.name === 'workout-set') return <WorkoutSetEdit key={`${route.routineId}-${route.index}`} routineId={route.routineId} index={route.index} />
   if (route.name === 'workout-item-done') {

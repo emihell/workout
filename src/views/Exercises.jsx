@@ -248,7 +248,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
   )
 }
 
-export function ExerciseEdit({ exerciseId }) {
+export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const store = useStore()
   const ex = store.exercises.find((e) => e.id === exerciseId)
   const [name, setName] = useState(ex?.name || '')
@@ -267,9 +267,14 @@ export function ExerciseEdit({ exerciseId }) {
     return <Missing>Not found.</Missing>
   }
 
+  // req-99 — normal path returns to the exercise's own detail screen; when reached
+  // via the routine editor's "Edit exercise settings" link, `returnTo` carries the
+  // routine screen to land back on (Save, Cancel and Back all honour it).
+  const back = returnTo || `/exercises/${ex.id}`
+
   return (
     <Screen>
-      <Back to={`/exercises/${ex.id}`} />
+      <Back to={back} />
       <Title>Details</Title>
       <form
         onSubmit={(e) => {
@@ -286,7 +291,7 @@ export function ExerciseEdit({ exerciseId }) {
               ? Math.max(1, Number(durationSec) || DEFAULT_DURATION_SEC)
               : ex.durationSec ?? DEFAULT_DURATION_SEC,
           })
-          go(`/exercises/${ex.id}`)
+          go(back)
         }}
       >
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -305,7 +310,7 @@ export function ExerciseEdit({ exerciseId }) {
         <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
         <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
         <div className="ui-actions">
-          <NavLink to={`/exercises/${ex.id}`} className="ui-btn ui-btn--quiet">Cancel</NavLink>
+          <NavLink to={back} className="ui-btn ui-btn--quiet">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>
