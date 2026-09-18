@@ -155,14 +155,31 @@ printf '%s' "$reverted_out" | grep -q 'req-200' \
 
 # --- req-102 Fix 1: check_backlog_index retired ------------------------------
 # The function, its call site, and the constants used only by it are gone. Assert
-# the identifier no longer appears in the source AND the tool still runs clean on
-# the live repo (retiring a check must not break the two that remain).
+# the identifier no longer appears in the source AND that retiring it didn't break
+# the two checks that remain: the module still imports (no dangling reference to a
+# removed constant/function) and run_checks executes end to end without raising.
+#
+# Deliberately NOT "exit 0 against the live repo/HEAD": check_handoff's reverse
+# check flags any not-yet-merged req whose implementing commit is already in the
+# ref's history, so `--ref HEAD` on THIS feature branch correctly flags req-102's
+# own in-flight doc -> exit 1. That's a branch-checkout artifact of what's tagged,
+# not evidence retirement broke anything (check_handoff is invoked against
+# main/planning by plan save/publish). "Runs clean on a clean tree" is already
+# covered by case 3 (NOW_CORRECT -> exit 0, empty); intent here is import+run.
 grep -q 'check_backlog_index' "$CHECK" \
   && bad "check_backlog_index still referenced in $CHECK (should be retired)" \
   || ok "check_backlog_index is gone from the source (retired)"
-python3 "$CHECK" --repo "$ROOT" --ref HEAD >/dev/null 2>&1 \
-  && ok "check_handoff runs clean on the live repo after retirement (exit 0)" \
-  || bad "check_handoff should exit 0 on the live repo after retirement"
+fix1_run="$(python3 - "$(dirname "$CHECK")" "$CODE" 2>&1 <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import check_handoff as c          # must not raise: no dangling ref to a removed constant/check
+c.run_checks(sys.argv[2], "HEAD")  # a full run must execute end to end without raising
+print("ok")
+PY
+)"
+[ "$fix1_run" = "ok" ] \
+  && ok "check_handoff imports and run_checks executes after retirement (no dangling refs)" \
+  || bad "retiring the check broke import/run — out=[$fix1_run]"
 
 # --- req-102 Fix 2: classify_tag matches "NEEDS DECISION" singular -----------
 # Docs write the tag singular; the old \bNEEDS DECISIONS\b (plural) left a parked
