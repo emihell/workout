@@ -1,6 +1,6 @@
 """req-34: stop hand-copying what git already knows.
 
-Three checks, one command — folded into `./plan status` and `./plan
+Two checks, one command — folded into `./plan status` and `./plan
 publish` rather than a new `plan check`, since the failure mode this
 fixes is "nobody ran the check", not "there's no check to run":
 
@@ -8,13 +8,14 @@ fixes is "nobody ran the check", not "there's no check to run":
      (a merge commit, a direct commit, or an explicit hash already in the
      tag), and against `NOW.md`'s own queue where it mentions the same
      requirement.
-  2. `work/BACKLOG.md`'s `## Sections` index against the real `### N.N`
-     headings in `work/backlog/tier-*.md` — a duplicate number fails, a
-     missing index entry warns, unnumbered headings are only listed.
-  3. every size claim in `handoff/` ("N lines", or a same-file ranking
+  2. every size claim in `handoff/` ("N lines", or a same-file ranking
      like "second longest") against a real `wc -l` — except `NOW.md`'s
      own "keep this under 50 lines", which is a rule to enforce, not a
      fact to verify.
+
+(A former backlog-index check — `## Sections` / `### N.N` against
+`work/backlog/tier-*.md` — was retired in req-102 when that structure
+was abandoned; see the note where it stood.)
 
 No auto-correction anywhere (`req-27`'s reasoning: a human changes the
 code when a contract breaks — a script that silently rewrote a `Status:`
@@ -40,7 +41,6 @@ from pathlib import Path
 
 WORK_DIR = "handoff/work"
 BACKLOG_PATH = "handoff/work/BACKLOG.md"
-TIER_DIR = "handoff/work/backlog"
 NOW_MD_PATH = "handoff/NOW.md"
 
 
@@ -148,9 +148,9 @@ def find_merge_evidence(repo: str, ref: str, slug: str, reqid: str) -> str | Non
 
 @dataclass
 class Finding:
-    check: str        # "status" | "status-unknown" | "sections" | "size"
+    check: str        # "status" | "status-unknown" | "size"
     severity: str      # "fail" | "warn" | "info" | "unknown"
-    subject: str       # e.g. "req-08", "§1.7", "app/static/style.css"
+    subject: str       # e.g. "req-08", "app/static/style.css"
     message: str
 
     def __str__(self) -> str:
@@ -222,7 +222,10 @@ def classify_tag(tag_text: str) -> tuple[str, str | None]:
     m = BLOCKED_RE.search(tag_text)
     if m:
         return ("blocked", m.group(1))
-    if re.search(r"\bREADY\b|\bNEEDS DECISIONS\b", tag_text):
+    # "NEEDS DECISIONS?" matches both the singular the docs actually write
+    # ("Status: NEEDS DECISION") and the plural (req-102 Fix 2); the plural-only
+    # pattern left every parked req classified 'unknown' instead of 'not-merged'.
+    if re.search(r"\bREADY\b|\bNEEDS DECISIONS?\b", tag_text):
         return ("not-merged", None)
     # req-139: a "BUILT … NOT YET MERGED (branch req-N)" or "BUILT, …
     # awaiting merge" tag reached here because it isn't BUILT AND
@@ -311,8 +314,18 @@ def parse_now_md_claims(now_md_text: str) -> dict[str, str]:
         if BOLD_LINE_RE.match(line):
             in_forward_block = bool(FORWARD_LABEL_RE.match(line))
         if in_needs_decision or in_forward_block:
-            for reqid in REQID_RE.findall(line):
-                claims.setdefault(reqid, "pending")
+            # req-102 Fix 3: claim only the FIRST req-N on the line — the
+            # bullet's subject, in practice the backticked token that opens it —
+            # not every mention. An incidental cross-reference on the same line
+            # ("`req-102` … (from req-101 item #3)") otherwise made the scan
+            # claim the *referenced* req (req-101, already merged) as 'pending',
+            # a false finding — the exact bug the req-101 ledger hit. Tradeoff:
+            # a single bullet that legitimately introduces two new reqs claims
+            # only the first; accepted (spec) as the right call vs. false
+            # positives on cross-refs.
+            subject = REQID_RE.search(line)
+            if subject:
+                claims.setdefault(subject.group(0), "pending")
     return claims
 
 
@@ -402,53 +415,14 @@ def check_status_lines(repo: str, ref: str) -> list[Finding]:
     return findings
 
 
-# ------------------------------------------------------------- check 2: index
-
-SECTION_HEADING_RE = re.compile(r"^### (\d+\.\d+[a-z]?)\b(.*)$", re.M)
-UNNUMBERED_HEADING_RE = re.compile(r"^### (?!\d+\.\d+[a-z]?\b)(.+)$", re.M)
-INDEX_ENTRY_RE = re.compile(r"\*\*§(\d+\.\d+[a-z]?)\*\*")
-
-
-def check_backlog_index(repo: str, ref: str) -> list[Finding]:
-    findings: list[Finding] = []
-    backlog_text = read_file(repo, ref, BACKLOG_PATH)
-    if backlog_text is None:
-        return findings
-
-    sections_block_match = re.search(r"## Sections\n(.*?)(\n---|\Z)", backlog_text, re.S)
-    sections_block = sections_block_match.group(1) if sections_block_match else ""
-    declared = set(INDEX_ENTRY_RE.findall(sections_block))
-
-    seen: dict[str, list[str]] = {}
-    unnumbered: list[tuple[str, str]] = []
-    for tier_path in sorted(list_files(repo, ref, TIER_DIR)):
-        if not tier_path.endswith(".md"):
-            continue
-        text = read_file(repo, ref, tier_path) or ""
-        for m in SECTION_HEADING_RE.finditer(text):
-            seen.setdefault(m.group(1), []).append(tier_path)
-        for m in UNNUMBERED_HEADING_RE.finditer(text):
-            unnumbered.append((tier_path, m.group(1).strip()))
-
-    for number, paths in sorted(seen.items()):
-        if len(paths) > 1:
-            findings.append(Finding(
-                "sections", "fail", f"§{number}",
-                f"appears {len(paths)} times ({', '.join(paths)}) — a reference to it is ambiguous",
-            ))
-        elif number not in declared:
-            findings.append(Finding(
-                "sections", "warn", f"§{number}",
-                f"defined in {paths[0]} but missing from BACKLOG.md's index",
-            ))
-
-    for tier_path, title in unnumbered:
-        findings.append(Finding(
-            "sections", "info", tier_path,
-            f"unnumbered heading, cannot be referenced through the index: {title!r}",
-        ))
-
-    return findings
+# req-102: the former check 2, a backlog-index validator, is retired. It checked a
+# `## Sections` / `**§N.N**` / `### N.N` index against `### N.N` headings in
+# `handoff/work/backlog/tier-*.md`, but that structure was deliberately abandoned
+# — the tier dir no longer exists and BACKLOG.md is now a prose index
+# (CLAUDE.md: "BACKLOG.md is an index, not the backlog"). Unlike the L-020
+# family, the thing it enforced is gone by design, so it was removed rather than
+# repaired (Emilio, 2026-09-18) along with the constants used only by it
+# (TIER_DIR, SECTION_HEADING_RE, UNNUMBERED_HEADING_RE, INDEX_ENTRY_RE).
 
 
 # --------------------------------------------------------------- check 3: size
@@ -606,7 +580,6 @@ def check_size_claims(repo: str, ref: str) -> list[Finding]:
 def run_checks(repo: str, ref: str) -> list[Finding]:
     findings: list[Finding] = []
     findings.extend(check_status_lines(repo, ref))
-    findings.extend(check_backlog_index(repo, ref))
     findings.extend(check_size_claims(repo, ref))
     return findings
 

@@ -153,6 +153,108 @@ printf '%s' "$reverted_out" | grep -q 'req-200' \
   && bad "old regex-only parser unexpectedly caught the drift — out=[$reverted_out]" \
   || ok "old regex-only parser misses the drift (proves the fix is load-bearing)"
 
+# --- req-102 Fix 1: check_backlog_index retired ------------------------------
+# The function, its call site, and the constants used only by it are gone. Assert
+# the identifier no longer appears in the source AND the tool still runs clean on
+# the live repo (retiring a check must not break the two that remain).
+grep -q 'check_backlog_index' "$CHECK" \
+  && bad "check_backlog_index still referenced in $CHECK (should be retired)" \
+  || ok "check_backlog_index is gone from the source (retired)"
+python3 "$CHECK" --repo "$ROOT" --ref HEAD >/dev/null 2>&1 \
+  && ok "check_handoff runs clean on the live repo after retirement (exit 0)" \
+  || bad "check_handoff should exit 0 on the live repo after retirement"
+
+# --- req-102 Fix 2: classify_tag matches "NEEDS DECISION" singular -----------
+# Docs write the tag singular; the old \bNEEDS DECISIONS\b (plural) left a parked
+# req classified 'unknown' instead of 'not-merged'. Prove it directly.
+fix2_out="$(python3 - "$(dirname "$CHECK")" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import check_handoff as c
+sing, _ = c.classify_tag("NEEDS DECISION — parked until its phase")
+plur, _ = c.classify_tag("NEEDS DECISIONS — parked until its phase")
+print(sing, plur)
+PY
+)"
+[ "$fix2_out" = "not-merged not-merged" ] \
+  && ok "classify_tag: NEEDS DECISION singular AND plural -> not-merged" \
+  || bad "classify_tag singular should be not-merged — got [$fix2_out]"
+
+# --- req-102 Fix 3: NOW-scan claims only the bullet's SUBJECT req ------------
+# A forward-looking bullet whose subject is a pending req but which incidentally
+# cross-references an already-merged req on the SAME line must NOT claim the
+# merged one as pending. Real case: the req-101 ledger's
+#   - `req-AAA` … (from req-BBB item #3)
+# under **READY** made the pre-req-102 scan claim req-BBB (merged) -> false finding.
+# Fixture reuse: req-201 = pending subject (AAA), req-200 = merged cross-ref (BBB).
+NOW_FIX3='# Now
+
+Updated. **Shipped: req-01.**
+
+## Next — READY, held for go
+
+**READY, held:**
+- `req-201` genuinely pending, finish the sweep (from req-200 item #3)
+
+## Where to read
+
+nothing
+'
+set_now "$NOW_FIX3"
+out="$(run_check)"; rc=$?
+# green after Fix 3: no finding about the incidentally-referenced merged req-200,
+# and the tool is clean (req-201 pending vs its own READY doc is consistent).
+{ [ $rc -eq 0 ] && ! printf '%s' "$out" | grep -q 'req-200'; } \
+  && ok "Fix 3: incidental cross-ref to merged req-200 is NOT claimed (no false finding)" \
+  || bad "Fix 3: cross-ref to req-200 should not fire — rc=$rc out=[$out]"
+# and the scan does claim the subject req-201 as pending
+subj_claim="$(python3 - "$(dirname "$CHECK")" "$NOW_FIX3" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import check_handoff as c
+claims = c.parse_now_md_claims(sys.argv[2])
+print(claims.get("req-201"), "req-200" in claims)
+PY
+)"
+[ "$subj_claim" = "pending False" ] \
+  && ok "Fix 3: scan claims subject req-201 pending, does NOT claim cross-ref req-200" \
+  || bad "Fix 3: expected 'pending False' — got [$subj_claim]"
+# red on the pre-req-102 parser: the section-aware scan that claimed EVERY req-N
+# on the line (findall) would have claimed req-200 too -> false finding. Rebuild
+# that parser inline and confirm it produces the finding today's parser suppresses.
+reverted3_out="$(python3 - "$(dirname "$CHECK")" "$CODE" <<'PY'
+import sys
+sys.path.insert(0, sys.argv[1])
+import check_handoff as c
+def pre_req102(now_md_text):
+    claims = {}
+    for m in c.DONE_LINE_RE.finditer(now_md_text):
+        for r in c.REQID_RE.findall(m.group(1)):
+            claims[r] = "merged"
+    for m in c.QUEUE_LINE_RE.finditer(now_md_text):
+        claims[m.group(1)] = m.group(2).lower()
+    in_needs_decision = in_forward_block = False
+    for line in now_md_text.splitlines():
+        if c.NOW_HEADER_RE.match(line):
+            in_needs_decision = bool(c.NEEDS_DECISION_HEADER_RE.match(line)); in_forward_block = False; continue
+        if line.strip() == "":
+            in_forward_block = False; continue
+        if c.BOLD_LINE_RE.match(line):
+            in_forward_block = bool(c.FORWARD_LABEL_RE.match(line))
+        if in_needs_decision or in_forward_block:
+            for r in c.REQID_RE.findall(line):   # pre-Fix-3: EVERY mention
+                claims.setdefault(r, "pending")
+    return claims
+c.parse_now_md_claims = pre_req102
+for f in c.run_checks(sys.argv[2], "HEAD"):
+    if f.severity == "fail":
+        print(f)
+PY
+)"
+printf '%s' "$reverted3_out" | grep -q 'req-200' \
+  && ok "Fix 3: pre-req-102 (findall) parser DOES fire the false finding (proves the fix is load-bearing)" \
+  || bad "Fix 3: pre-req-102 parser should have produced the false finding — out=[$reverted3_out]"
+
 # ----------------------------------------------------------------------------
 if [ "$fails" -eq 0 ]; then
   printf '\nall passed\n'; exit 0
