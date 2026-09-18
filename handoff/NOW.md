@@ -23,11 +23,10 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**Nothing in flight.** Batch 3 + req-96 + req-97/98 + req-99 all LIVE (top).
+**Nothing in flight.** Batch 3 + req-96..99 all LIVE (top). **req-100 LIVE** (tooling) — `plan ping`
+guards handoff (L-019); `plan save` blocks NOW.md >50 pre-commit. From the 2026-09-18 workflow review.
 
 **READY, held:**
-- `req-100` **plan-tool guards** (from 2026-09-18 workflow review, B+): `plan ping` refuses handoff
-  unless the req+NOW are on main (L-019); blocking NOW.md ≤50 pre-commit in `plan save`. Tooling only.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

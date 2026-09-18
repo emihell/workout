@@ -1276,4 +1276,17 @@ open: does a first-timer now find Timed on-device — Emilio's call. Merge `0720
 
 ## req-100 — two planning-tool guards: `plan ping` + a blocking NOW.md ≤50 pre-commit check  (merged 2026-09-18)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+From the 2026-09-18 external workflow review (B+): turn two prose rules that were violated this
+session into tool refusals. **Guard 1 — `plan ping req-N`** (new read-only subcommand): resolves the
+req doc like `closeout`, refuses to hand off unless the doc is on main AND `main..planning` is empty
+(names what's missing, points to `plan publish`), and on success prints a ready-to-paste handoff ping.
+This is the exact guard that would have stopped R1/L-019 (a spec announced "on main" while unpublished).
+**Guard 2 — blocking NOW.md ≤50 in `plan save`**: refuses BEFORE `git add -A` if the working-tree line
+count exceeds the limit (read from `check_handoff.py:NOW_MD_RULE_LIMIT`, not a second hardcoded 50),
+leaving the tree untouched; the post-commit drift report is unchanged. Kills the recurring "trim NOW"
+churn (10+ past commits). Builder added `scripts/plan-guards.test.sh` (accepted — precedent
+`plan-ledger.test.sh`; manual, not wired into `./check`) covering the write-path refusals that can't be
+driven live pre-merge. Planner verified: 3 live ping paths (success + two refusals) + the sandbox suite
+(ping-not-on-main R1 case, ping-uncommitted, save-refuse-at-51-no-commit, save-at-50-commits) all pass;
+`plan-ledger.test.sh` regression intact; `./check` green. Merge `462f57e`. Tooling only — no app code,
+no persisted data.
