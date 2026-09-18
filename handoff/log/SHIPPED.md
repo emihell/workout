@@ -1293,4 +1293,20 @@ no persisted data.
 
 ## req-101 — repair the rotted NOW.md↔status drift check + a planted-failure self-test  (merged 2026-09-18)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+From [[L-020]]: `check_handoff.parse_now_md_claims` extracted `{}` from the current NOW.md (its regexes
+expected a checkbox/`done:` format we abandoned), so the NOW.md↔status cross-check ran on an empty set
+and could never fire. Now **section-aware**: it keys off NOW.md's stable structure — a `req-N` under a
+forward-looking region (`**READY, held:**`, `**IN FLIGHT:**`, or the `## Needs decisions` section) is a
+`pending` claim, while the top `**Shipped:**` summary, `**Nothing in flight.**` (deliberately NOT
+matched by `FORWARD_LABEL_RE`), LIVE/aftermath notes, and `## Milestone`/`## Where to read` are not
+scanned. `pending` conflicts **only** with a `merged` doc tag (conservative — no false positives).
+Builder also found and fixed a **second latent bug**: the claim check sat after the loop's `continue`
+statements, so it never ran for merged reqs even when a claim existed — moved to the top of the loop.
+Added `scripts/check-handoff.test.sh`, a planted-failure self-test that asserts the check FIRES on a
+merged-req-under-READY and stays silent when placed correctly, and proves it goes red if the parser is
+reverted to the old regex-only form. Planner verified: parse returns `{req-101,req-10,req-24:pending}`;
+`check_handoff` clean on main (exit 0); the self-test + reverted-parser proof pass; plan-guards,
+plan-ledger, `./check` all green. **The repaired check proved itself during its own closeout** — it
+flagged NOW.md still listing req-101 as pending against the freshly-merged doc. Merge `c28c4d7`.
+Follow-ups Builder surfaced (item #3): `check_backlog_index` is fully rotted (same L-020 class) and
+`classify_tag` matches "NEEDS DECISIONS" plural but docs write it singular — both → req-102.

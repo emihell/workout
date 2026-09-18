@@ -23,13 +23,13 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**Nothing in flight.** Batch 3 + req-96..99 all LIVE (top). **req-100 LIVE** (tooling) — `plan ping`
-guards handoff (L-019); `plan save` blocks NOW.md >50 pre-commit. From the 2026-09-18 workflow review.
-
-**IN FLIGHT:** `req-101` handed to Builder — repair the rotted NOW.md↔status drift check (parser
-extracts `{}` from current format, L-020) + a planted-failure self-test. Tooling only.
+**Nothing in flight.** Batch 3 + req-96..99 all LIVE (top). **req-100 + req-101 LIVE** (tooling, 2026-09-18
+review) — `plan ping` + NOW.md ≤50 guard (L-019); repaired the NOW.md drift check + self-test (L-020).
 
 **READY, held:**
+- `req-102` **finish the rotted-check sweep** (L-020 family) — `check_backlog_index` fully rotted (§N.N
+  structure BACKLOG dropped); `classify_tag` matches "NEEDS DECISIONS" plural, docs write it singular;
+  and the NOW-scan over-claims incidental cross-refs on a forward bullet. Small call on backlog check.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
