@@ -1,6 +1,6 @@
 # req-117 — taps you can take back: extra set removable, timed Previous keeps its time, History Add set on Save (audit F)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** + **[P]**: touches `workout-log.js`
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-117` (`5d8ffe5`…`5d8ffe5`, 1 commit).** Phase 1. **[ux-feel]** + **[P]**: touches `workout-log.js`
 and the history write path (DEC-057: reviewer + backup reminder).
 
 ## Why [measured, scratchpad/audit-gym/pure.mjs; history item from a code read]

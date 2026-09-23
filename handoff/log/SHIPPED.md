@@ -1497,3 +1497,7 @@ all count as logged); every guard load-bearing. Loop-back fixed the cross-midnig
 Planner's own run → `check: green — lint, 32 test file(s), and the build all passed.` Unconfirmed: preview wording; the preview
 shows Done for any same-day finish of that routine (Start from Today/Routine still works); the empty-Finish copy; History
 counts for existing records drop their skipped sets (display only).
+
+## req-117 — taps you can take back: extra set removable, timed Previous keeps its time, History Add set on Save (audit F)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
