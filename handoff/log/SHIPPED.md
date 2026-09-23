@@ -1349,4 +1349,9 @@ exercise title *below* Add set (markup order), backlog.
 
 ## req-105 — workout overview: Finish becomes a bottom button, prominent once everything's done (batch 4, F6)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `836b54b`, throwaway agent). Finish is a full-width `NavLink` with the button look (DEC-040)
+in a `.ui-workout-end` stack above Abandon: secondary, primary once `allItemsDone(active)` (new pure helper in
+`workout-log.js`, also gates the req-84 summary; tested). Rode along: `box-sizing: border-box` on `.ui-btn--block`
+(an `<a>` overflowed; buttons were already border-box). Gate: Planner's own `./check` green (23 files); the
+all-done-after-Cancel screenshot shows the primary Finish. Follow-up: `npm run shot` can't reach click-behind
+states (`--click`/`--scroll-bottom` flag) — tooling backlog.
