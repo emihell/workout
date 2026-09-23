@@ -1358,4 +1358,10 @@ states (`--click`/`--scroll-bottom` flag) — tooling backlog.
 
 ## req-106 — at the start of an exercise, a small preview of all its sets and weights (batch 4, F4)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `44ee951`, throwaway agent). New pure `setPreview` in `workout-log.js` builds one line per set through
+`initialSetFields` (same history/target/override inputs as the form); the target and timed-duration rules moved out of
+`item.jsx` into `setTargetFor` / `durationTargetFor` so form and preview can't drift. Shown under the form only while
+no set of the exercise is logged. 70/70 `workout-log` tests incl. the fixed-number case. Gate: Planner's own `./check`
+green; screenshot shows 4 lines clear of Skip/Complete. Notes: `workout-log.js` now imports `DEFAULT_DURATION_SEC` from
+`model.js` (existing cycle, safe — call-time read); Previous-undo of the only set re-shows the preview with normal prefill
+while the form shows the restored values (rare, left).
