@@ -1,6 +1,6 @@
 # req-123 — type tokens, Showcase gaps, dead CSS, tap targets, long names (audit Tier 2)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** CSS and Showcase only. No stored data.
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-123` (`8686e0b`…`8686e0b`, 1 commit).** Phase 1. **[ux-feel]** CSS and Showcase only. No stored data.
 
 ## Why [measured, re-verified on main 4172e3d]
 

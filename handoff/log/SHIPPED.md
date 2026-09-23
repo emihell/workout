@@ -1544,3 +1544,7 @@ nodes); the Showcase differs by design. Reviewer (independent, wide refactor): M
 preserved, no Button↔link swaps, DOM = focus order; 10 extra routes identical. 3 test files had syntax-only edits (named).
 Gate: Planner's own run → `check: green — lint, 36 test file(s), and the build all passed.` Follow-ups: capture the done
 view and all-done Finish; the order test is source-text only.
+
+## req-123 — type tokens, Showcase gaps, dead CSS, tap targets, long names (audit Tier 2)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
