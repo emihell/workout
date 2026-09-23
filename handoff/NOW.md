@@ -23,20 +23,20 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
 
-**Nothing in flight.** Batch 3 + req-96..99 all LIVE (top). **req-100..102 LIVE** (tooling, 2026-09-18
-review) — `plan ping` + NOW.md ≤50 guard (L-019); repaired the NOW.md drift check + retired the dead
-backlog check + self-tests (L-020, L-021). Rotted-check sweep complete.
-**Gym-flow batch 4 captured** (Emilio's feedback JSON 2026-09-17..20, F1..F10) — `work/BACKLOG.md`
-§batch 4; not specced; F2/F6/F8/F9/F10 wait on his calls (F9 reverses req-83's reps carry).
+**Nothing in flight.** req-100..102 LIVE (tooling: `plan ping`, NOW.md guard, drift check — L-019..021).
 
 **READY, held:**
+- `req-103`..`req-108`, `req-110` **gym-flow batch 4** (Emilio's feedback 2026-09-17..20; `BACKLOG.md` §batch 4):
+  103 routine rows · 104 no Previous + small title · 105 Finish button · 106 set preview · 107 overview
+  note · 108 reps stop carrying (DEC-052) · 110 Today 2-routine day. Order 104→106→108, 105→107.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
-**Gym-flow batch 2 (req-76..86): all LIVE except `req-77` (PAUSED — affordance; folds in note n1
-Finish/Abandon).**
+**Gym-flow batch 2 (req-76..86): all LIVE except `req-77` (PAUSED — affordance; folds in n1 Finish/Abandon).**
 
 ## Needs decisions — parked until their phase
+
+- **`req-109` skip / swap an exercise** (F2+F8) — swap's set plan open (Emilio, 2026-09-23). Not yet written.
 
 - **`req-24` native confirm/alert → inline UI** — 10 sites; needs the inline-confirm *pattern*
   first (bar/sheet vs two-tap vs undo). **[ux-feel]** Spec: `work/req-24-inline-confirm-alert.md`.

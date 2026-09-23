@@ -1027,3 +1027,13 @@ normal behaviour. **This is the sanctioned pattern for a return-to target — re
 per-flow prop threading.** Keep params opt-in per route (never a blanket query bag), keep the value an
 encoded internal path (not arbitrary state), and keep the fallback lossless. Scope-limited: it's a
 return-nav affordance, not a general query-string state store.
+
+## DEC-052 — a mid-workout weight change carries to the remaining sets; a reps change does not  (Emilio, 2026-09-23)
+
+Narrows req-83 (option (c), 2026-09-16), which carried a changed weight **and** reps to the rest of that
+exercise's sets this session. Emilio, from real use (push-ups, 2026-09-18): *"set 1 change also changes set
+2 — should not be that way — each set is separate from each other."* Reps targets are per set, so a reps
+carry overrode the plan; a weight change is usually meant for the rest. **Rejected:** removing the carry
+entirely (loses the warm-up 4→5 kg case req-83 was for); keeping both (the reported bug). A stale stored
+reps override is ignored, not migrated. The req-02 / DEC-002 no-history carry is a separate rule and
+unchanged. Built as req-108.
