@@ -626,9 +626,13 @@ a.ui-btn--quiet:active {
   justify-content: space-between;
   gap: var(--ui-s2);
 }
+/* req-104 — the exercise name is scoped down to section size (Emilio: "can be much
+ * smaller"): still bold and still the screen's h1, but no longer the biggest thing on
+ * the log screen. Only this row; the shared Title keeps --ui-text-title elsewhere. */
 .ui-exercise-head .ui-title {
   flex: 1 1 auto;
   min-width: 0;
+  font-size: var(--ui-text-section);
 }
 .ui-exercise-head__aside {
   flex: 0 0 auto;
