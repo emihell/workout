@@ -1606,4 +1606,15 @@ cases; Search offers only Restore; editing to an empty name now errors.
 
 ## req-128 — small leftovers: History "Main", summary vs a skipped prior, first-item rest, wake-lock, dead code (audit Tier 3 + follow-ups)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `ed65ad5`, throwaway agent). Five leftovers:
+(1) History detail rows and the subtitle follow the req-93 rule, so main is unlabelled (pure `historyGroupMeta`).
+(2) The auto-complete "vs last time" compares against the latest prior same-routine workout with `anythingLogged`
+(`summaryPriorWorkout`).
+(3) `historyPrescription` reads rest/notes from the non-replacement snapshot item.
+(4) Wake-lock holds only on `#/workout/…` routes while a workout is active (pure `wakeLockWanted` + its own hashchange listener).
+(5) Removed the dead `nextOccurrence`, `nextDateForSlot` and `parseTargets`, and their tests (3 cases, named).
+Reviewer (independent, DEC-057): MERGE-WITH-FOLLOWUPS; historyPrescription is identical to main except rest/notes when a replacement
+precedes; the summary prior matches main for all 13 db workouts; the wake-lock listener is cleaned up with no double request; History
+text is identical except "Main". Gate: Planner's own run → `check: green — lint, 42 test file(s), and the build all passed.`
+Unconfirmed: History rows stay plain text; any `/workout/…` route holds the lock. Follow-ups: an unmount test for the listener;
+`previousSameRoutineWorkout` now only has test callers.
