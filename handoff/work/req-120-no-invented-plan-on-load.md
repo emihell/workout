@@ -38,6 +38,9 @@ Both exist for **legacy** records (v5–v8 era, pre-snapshot-plan data).
 
 `src/model.js`, `src/storage.js`, `src/exchange.js`, tests. **Test edits named:** `skip-replace.test.js:297` and
 `:449` assert the v9 backfill (req-109) and change to assert its absence (a DEC-driven reversal, not a weakening).
+**Third edit (added 2026-09-23, Planner, after the build stopped on it):** `model.test.js:66-84` calls `migrateState`
+without options on a legacy-shaped fixture (`programs`, no `schemaVersion`). It passes `{ legacy: true }` explicitly;
+the safe `legacy:false` default stays.
 
 ## Order vs siblings
 
@@ -57,7 +60,7 @@ and req-119 (`model.js`).
   `applyBackup` with no schemaVersion and no `sessions` → `false`, with `sessions` → `true`.
 - **Identical otherwise (script, in the report):** main vs branch `migrateState` on a **v9 fixture** where every
   item has plan fields (not db.json, which is v8 and has none empty) → deep-equal.
-- **No regression:** `./check` green; the two named test edits only. Receipt quoted.
+- **No regression:** `./check` green; the three named test edits only. Receipt quoted.
 
 ## Decisions
 
