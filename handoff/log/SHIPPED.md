@@ -1486,4 +1486,14 @@ first Save and then update live; the wording. Follow-up: `parseTargets` in ids.j
 
 ## req-116 — Finish: Back doesn't restart auto-finish, Feel survives, no fresh Start after finishing, empty Finish warns (audit E, DEC-058 §4)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `e343a69`…`fdaa9d3`, throwaway agent, 1 review loop-back). Feel lives on the active workout's existing
+`overallFeel` (survives Back and reload; auto-finish saves it). A persisted `autoFinishDismissed` flag keeps the 10 s summary off
+once Cancel/Edit is pressed, and `finishedState` strips it. The summary never shows for an empty workout. Preview guard: an
+occurrence already finished (`finishedForPlan`: exact occurrence, `coveringWorkout`, or a same-routine finish within 6 h for an
+ad-hoc preview) shows Done + View in History, not Start. `go()`/route.js unchanged. Empty Finish: "Nothing logged", Abandon primary,
+Save anyway secondary. Set counts exclude skipped on Finish, the summary and History detail. Reviewer (independent,
+DEC-057): MERGE-WITH-FOLLOWUPS; no path loses or wrongly saves a workout (warm-up-only, timed with empty reps, and bodyweight
+all count as logged); every guard load-bearing. Loop-back fixed the cross-midnight Back and the History count. Gate:
+Planner's own run → `check: green — lint, 32 test file(s), and the build all passed.` Unconfirmed: preview wording; the preview
+shows Done for any same-day finish of that routine (Start from Today/Routine still works); the empty-Finish copy; History
+counts for existing records drop their skipped sets (display only).
