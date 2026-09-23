@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { RPE_OPTIONS, formatSetLine, isWeightedType, roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
@@ -8,8 +9,9 @@ import { useStore } from '../../store-context'
 import {
   canRemoveAddedSet,
   carriedWorkingSet,
+  createSetDraftWriter,
   durationTargetFor,
-  initialDurationFor,
+  formFieldsWithDraft,
   initialSetFields,
   itemIsMarkedDone,
   itemKey,
@@ -19,10 +21,12 @@ import {
   nextSeedOverrides,
   removeAddedSetPatch,
   reopenItemPatch,
-  restoreFromLoggedSet,
   restPatchAfterSet,
   seedOverrideKey,
   sessionExercise,
+  setDraftFor,
+  setDraftFromLoggedSet,
+  setDraftKey,
   setPreview,
   setTargetFor,
 } from '../../workout-log'
@@ -136,6 +140,38 @@ function carryFor(ex, last, currentType, workLogged) {
 // separate panel and its nextSetWeight override folded away. The rest itself now shows
 // only as the floating RestPill.
 
+// req-125 — the set-form draft writer (createSetDraftWriter, workout-log.js: debounced,
+// unit-tested) bound to the store. store.patchActive only calls the store's stable
+// setState, so the first render's function stays valid for the component's life. A
+// pending write is flushed on unmount (leaving the screen) and synchronously
+// (flushSync, so saveState runs before the page goes) when the tab is hidden or
+// unloaded — iOS reloading a backgrounded tab.
+function useSetDraftWriter(store) {
+  const [writer] = useState(() =>
+    createSetDraftWriter({
+      write: (setDraft, sync) => {
+        const patch = () => store.patchActive({ setDraft })
+        if (sync) flushSync(patch)
+        else patch()
+      },
+    }),
+  )
+  useEffect(() => {
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') writer.flush(true)
+    }
+    const onPageHide = () => writer.flush(true)
+    document.addEventListener('visibilitychange', onHide)
+    window.addEventListener('pagehide', onPageHide)
+    return () => {
+      document.removeEventListener('visibilitychange', onHide)
+      window.removeEventListener('pagehide', onPageHide)
+      writer.flush()
+    }
+  }, [writer])
+  return writer
+}
+
 function WorkoutItemLive({ routineId, item }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -146,8 +182,13 @@ function WorkoutItemLive({ routineId, item }) {
   const currentType = needsWu ? 'wu' : 'work'
   // req-106 — the target rule moved to setTargetFor (shared with the preview).
   const target = setTargetFor(item, currentType, currentWorkIndex)
-  const [restore, setRestore] = useState(null)
   const { resting } = useRestCountdown(active)
+  // req-125 — the log form's values are kept as a draft on the active workout
+  // (`setDraft`, see setDraftKey in workout-log.js) so navigation and a tab reload don't
+  // lose them. The draft is written as the user edits (useSetDraftWriter, debounced) and
+  // read only when the current set changes (draftSnap below).
+  const setSeedKey = setDraftKey(item, currentType, currentWorkIndex)
+  const draftWriter = useSetDraftWriter(store)
 
   useEffect(() => {
     if (!resting && plannedDone) markDoneAndGoToOverview(store, active, routineId, item)
@@ -176,7 +217,8 @@ function WorkoutItemLive({ routineId, item }) {
     // rest-end beep can play when the timer runs out. Fail-silent.
     unlockAudio()
     const done = finishAfterThisSet()
-    setRestore(null)
+    // req-125 — the set is logged: drop any pending draft write and clear its draft.
+    draftWriter.cancel()
     // req-109 (review) — logging a set disarms a pending Skip exercise.
     setSkipArmed(false)
     // req-83 (N9) — a field entered differently from the seed becomes the seed for
@@ -209,13 +251,14 @@ function WorkoutItemLive({ routineId, item }) {
             : null,
       },
       { ...restAfterSet(), seedOverrides },
+      { draftKey: setSeedKey },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
 
   function skipSet() {
     recordButton('skip-set')
-    setRestore(null)
+    draftWriter.cancel()
     setSkipArmed(false)
     const done = finishAfterThisSet()
     store.completeSet(
@@ -232,6 +275,7 @@ function WorkoutItemLive({ routineId, item }) {
           currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
       },
       restAfterSet(true),
+      { draftKey: setSeedKey },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -242,12 +286,15 @@ function WorkoutItemLive({ routineId, item }) {
     if (!lastLogged) return
     recordButton('previous-set')
     setSkipArmed(false)
-    const next = restoreFromLoggedSet(lastLogged)
-    next.workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
-    setRestore(next)
+    draftWriter.cancel()
+    // req-125 — the un-logged set's values become the draft of the set Previous returns
+    // to (was the `restore` component state, which a reload lost).
+    const workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
+    const key = setDraftKey(item, lastLogged.setType || 'work', workIndex)
     // req-25 — removeActiveSet clears the armed rest (restEndsAt/restPausedRemaining)
     // so going back then forward re-arms a fresh timer rather than double-counting.
     store.removeActiveSet(index)
+    store.patchActive({ setDraft: setDraftFromLoggedSet(key, lastLogged) })
   }
 
   // req-109 — Skip exercise needs two taps: the first arms it ("Tap again to skip"),
@@ -270,7 +317,6 @@ function WorkoutItemLive({ routineId, item }) {
     const patch = removeAddedSetPatch(active, itemKey(item))
     if (!patch) return
     recordButton('remove-set')
-    setRestore(null)
     setSkipArmed(false)
     store.patchActive(patch)
     if ((patch.completedItemIds || []).includes(itemKey(item))) {
@@ -301,13 +347,10 @@ function WorkoutItemLive({ routineId, item }) {
   const timedSet = Boolean(ex?.hasDuration) && currentType === 'work'
   const durationTarget = durationTargetFor(item, ex, currentWorkIndex)
   // Seed the set-log fields from the same sources the app has always used —
-  // restore (Previous), then carry (no-history working set), then history /
-  // target. Domain logic stays here; the ui/ SetLogForm only holds the values.
+  // carry (no-history working set), then history / target. Domain logic stays here;
+  // the ui/ SetLogForm only holds the values. req-125 — Previous no longer seeds via
+  // `restore`: it writes the un-logged set as the draft, laid over this seed below.
   const historyPrefill = historySetPrefill(last, { setType: currentType, workIndex: currentWorkIndex })
-  const fromRestore =
-    restore &&
-    restore.setType === currentType &&
-    (currentType === 'wu' || restore.workIndex === currentWorkIndex)
   // req-83 (N9) — the live, session-scoped seed override for this exercise+setType:
   // once a value entered this session differs from the presented seed, it seeds the
   // remaining sets (see nextSeedOverrides, applied on completeSet below). Absent for
@@ -317,8 +360,8 @@ function WorkoutItemLive({ routineId, item }) {
   // upcoming-weight override is gone (the next set's form is now the editable surface).
   const seed = initialSetFields({
     weighted,
-    fromRestore,
-    restore,
+    fromRestore: false,
+    restore: null,
     hasHistory: Boolean(last),
     history: historyPrefill,
     carry: carryFor(ex, last, currentType, state.workLogged),
@@ -328,11 +371,18 @@ function WorkoutItemLive({ routineId, item }) {
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
   // title. The value lives here (passed straight to completeSet), and the reveal
-  // (req-26 pattern) starts open only when a note is already seeded (restore/history),
+  // (req-26 pattern) starts open only when a note is already seeded (draft/history),
   // so it is never lost. Both reset per set: SetLogForm remounts by `key`, but this
   // state lives above it, so the effect re-seeds it whenever the current set changes.
-  const noteSeed = seed.note
-  const setSeedKey = `${itemKey(item)}-${currentType}-${currentWorkIndex}`
+  // req-125 — the draft is read ONCE per set: captured when setSeedKey changes (the
+  // same moment SetLogForm remounts), never as a live seed, so a debounced write landing
+  // mid-typing can't reset a field. The form starts from seed + draft; `seed` alone stays
+  // req-83's comparison base in completeSet.
+  const [draftSnap, setDraftSnap] = useState(() => ({ key: setSeedKey, draft: setDraftFor(active, setSeedKey) }))
+  if (draftSnap.key !== setSeedKey) setDraftSnap({ key: setSeedKey, draft: setDraftFor(active, setSeedKey) })
+  const draft = draftSnap.key === setSeedKey ? draftSnap.draft : setDraftFor(active, setSeedKey)
+  const formInit = formFieldsWithDraft({ seed, draft, weighted, durationTarget })
+  const noteSeed = formInit.note
   const [note, setNote] = useState(noteSeed)
   const [showNote, setShowNote] = useState(Boolean(noteSeed))
   useEffect(() => {
@@ -386,7 +436,20 @@ function WorkoutItemLive({ routineId, item }) {
           title (not inside SetLogForm). autoFocus only when opened by tapping (no
           seeded note); an empty field submits no note (unchanged behaviour). */}
       {logging && showNote ? (
-        <Field label="Note" value={note} onChange={(e) => setNote(e.target.value)} autoFocus={!noteSeed} />
+        <Field
+          label="Note"
+          value={note}
+          onChange={(e) => {
+            setNote(e.target.value)
+            draftWriter.note(setSeedKey, e.target.value, {
+              weight: formInit.weight,
+              reps: formInit.reps,
+              effort: formInit.effort,
+              durationSec: timedSet ? formInit.durationSec : undefined,
+            })
+          }}
+          autoFocus={!noteSeed}
+        />
       ) : null}
       {/* req-78 — the next set's log form shows immediately on completing a set, during
           rest included (no intermediate rest panel, no extra tap). Its Complete is live
@@ -395,22 +458,23 @@ function WorkoutItemLive({ routineId, item }) {
           the exercise is planned-done, completeSet has already advanced to the overview. */}
       {plannedDone ? null : (
         <SetLogForm
-          key={`${itemKey(item)}-${currentType}-${currentWorkIndex}`}
+          key={setSeedKey}
           weighted={weighted}
           timed={timedSet}
           showEffort={showEffort}
           repsLabel={repsLabel}
           effortOptions={RPE_OPTIONS}
-          initialWeight={seed.weight}
-          initialReps={seed.reps}
-          initialDuration={initialDurationFor({ fromRestore, restore, target: durationTarget })}
-          initialEffort={seed.effort}
+          initialWeight={formInit.weight}
+          initialReps={formInit.reps}
+          initialDuration={formInit.durationSec}
+          initialEffort={formInit.effort}
           canGoBack={canGoBack}
           onComplete={({ weight, reps, effort, durationSec }) =>
             completeSet({ weight, reps, rpe: effort, note, durationSec })
           }
           onSkip={skipSet}
           onPrevious={previousSet}
+          onChange={(values) => draftWriter.form(setSeedKey, values, note)}
         />
       )}
       {preview ? (

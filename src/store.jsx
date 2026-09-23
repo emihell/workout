@@ -5,7 +5,7 @@ import { buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, recalculatedSt
 import { clampLoopWeeks, dateKey } from './schedule'
 import { loadState, removeExerciseFromState, removeRoutineFromState, replaceItemInState, saveState } from './storage'
 import { StoreContext } from './store-context'
-import { addWorkingSetToState, finishedState, skipItemPatch } from './workout-log'
+import { addWorkingSetToState, finishedState, skipItemPatch, withLoggedSet } from './workout-log'
 
 export function StoreProvider({ children }) {
   const [state, setStateRaw] = useState(loadState)
@@ -270,17 +270,12 @@ export function StoreProvider({ children }) {
         setState((s) => replaceItemInState(s, itemId, exerciseId, id))
         return id
       },
-      completeSet(setRecord, activePatch = {}) {
+      // req-125 — `draftKey`: the set being logged; its setDraft is dropped inside this
+      // update (withLoggedSet), from the latest state.
+      completeSet(setRecord, activePatch = {}, { draftKey = null } = {}) {
         setState((s) => {
           if (!s.activeWorkout) return s
-          return {
-            ...s,
-            activeWorkout: {
-              ...s.activeWorkout,
-              ...activePatch,
-              sets: [...s.activeWorkout.sets, setRecord],
-            },
-          }
+          return { ...s, activeWorkout: withLoggedSet(s.activeWorkout, setRecord, activePatch, draftKey) }
         })
       },
       updateActiveSet(index, patch) {
