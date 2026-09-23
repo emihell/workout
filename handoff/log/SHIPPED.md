@@ -1461,4 +1461,14 @@ under today's date.
 
 ## req-120 — loading never invents plan values: backfill and baseline are legacy-only (audit C)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `6b83110`…`86144f7`, throwaway agent). **Migration change, Emilio approved ("yes") after the plain-English
+summary.** `migrateState(input, { legacy = false })`: the logged-sets backfill and the `legacyRecommendations` baseline (in
+`workoutSnapshot` AND `migrateRoutine`) run only for legacy input. `loadState` computes legacy from the raw value before the
+emptyState merge; `applyBackup` uses the new `backupIsLegacy(raw)` (version decides; none → legacy only with
+sessions/programs). The routine baseline map is still recorded. Save condition unchanged. 3 named test edits (skip-replace
+:297, :449 reversed; model.test.js:79 passes legacy:true, the third added to the spec by Planner when the build stopped
+on it). Reviewer (independent, DEC-057): MERGE-WITH-FOLLOWUPS; main vs branch loadState identical, with no writes on v9, for
+db.json v8, a saved v9, v9 + leftover v8, and v9 holding v8 data; differences only where a plan list is empty on disk
+(intended); `legacy:true` deep-equals main; every gate mutation fails tests. Gate: Planner's own run →
+`check: green — lint, 30 test file(s), and the build all passed.` Follow-ups: a test for the no-snapshot baseline gate
+(model.js:188) alone; confirm the version-less-backup rule.
