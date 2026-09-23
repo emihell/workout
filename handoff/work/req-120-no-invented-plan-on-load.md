@@ -1,6 +1,6 @@
 # req-120 — loading never invents plan values: backfill and baseline are legacy-only (audit C)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[P]** **Migration change** (`model.js`
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-120` (`6b83110`…`86144f7`, 2 commits).** Phase 1. **[P]** **Migration change** (`model.js`
 `migrateState` / `workoutSnapshot` / `migrateRoutine`, which run on every load and import). DEC-057 reviewer + backup
 reminder; **Emilio's eyes on the migration diff before merge** (DEC-035 carve-out). Revised 2026-09-23 after the
 spec review found the first draft's gaps: it missed the baseline path, had no signal plumbing, and its criteria
