@@ -1,6 +1,6 @@
 # req-125 — typed-but-not-completed set values survive navigation and reload (audit Tier 3)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[P]**: an optional field on the active workout, stripped
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-125` (`e6befb1`…`f73eefe`, 2 commits).** Phase 1. **[P]**: an optional field on the active workout, stripped
 at finish; touches `workout-log.js` / `store.jsx` (DEC-057: reviewer + backup reminder). No schema bump. Rewritten
 2026-09-23 after spec review, which found a req-83 regression risk, a typing-loss risk, and a Previous+reload loss.
 

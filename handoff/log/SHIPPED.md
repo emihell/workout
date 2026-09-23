@@ -1566,3 +1566,7 @@ double updater (main would have saved two different ids). Planner re-ran the e2e
 #/workout/r1/item/mid-…/log | Pec Fly`, no page errors. Backup: Emilio "exported before, go". Gate: Planner's own run →
 `check: green — lint, 38 test file(s), and the build all passed.` Follow-up: `replaceItem` could return null on failure
 (nearly unreachable).
+
+## req-125 — typed-but-not-completed set values survive navigation and reload (audit Tier 3)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
