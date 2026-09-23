@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react'
 import { uid } from './ids'
 import { commitBackup } from './exchange.js'
-import { buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, recalculatedState } from './model'
+import { buildPlannedWorkout, planSnapshot, recalculatedState } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
-import { loadState, removeExerciseFromState, removeRoutineFromState, replaceItemInState, saveState } from './storage'
+import { loadState, removeExerciseFromState, removeRoutineFromState, replaceItemInState, restoreExerciseInState, saveState } from './storage'
 import { StoreContext } from './store-context'
+import { exerciseFromData } from './exercise-names.js'
 import { addWorkingSetToState, finishedState, skipItemPatch, withLoggedSet } from './workout-log'
 
 export function StoreProvider({ children }) {
@@ -147,18 +148,8 @@ export function StoreProvider({ children }) {
         }))
       },
       addExercise(data) {
-        const exercise = {
-          id: uid('ex'),
-          name: data.name.trim(),
-          equipment: (data.equipment || '').trim() || 'Unknown',
-          weightStep: (data.weightStep || '').trim() || 'n/a',
-          muscles: (data.muscles || '').trim(),
-          cues: (data.cues || '').trim(),
-          type: data.type || 'free',
-          // req-85 — orthogonal timer flag + default target seconds.
-          hasDuration: Boolean(data.hasDuration),
-          durationSec: data.durationSec != null ? Number(data.durationSec) : DEFAULT_DURATION_SEC,
-        }
+        // req-127 — the record is built by exerciseFromData (exercise-names.js), unchanged.
+        const exercise = exerciseFromData(data, uid('ex'))
         setState((s) => ({ ...s, exercises: [...s.exercises, exercise] }))
         return exercise.id
       },
@@ -171,6 +162,11 @@ export function StoreProvider({ children }) {
       // req-119 — the reducer (archive when referenced, incl. the live workout) is in storage.js.
       removeExercise(exerciseId) {
         setState((s) => removeExerciseFromState(s, exerciseId))
+      },
+      // req-127 / DEC-059 §3 — un-archive ONE exercise (same id); reducer in storage.js.
+      restoreExercise(exerciseId) {
+        setState((s) => restoreExerciseInState(s, exerciseId))
+        return exerciseId
       },
       getPlannedWorkout(args) {
         return buildPlannedWorkout(state, args)

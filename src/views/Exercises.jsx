@@ -9,6 +9,7 @@ import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, R
 import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
 import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
+import { exerciseNameMatch, nameError, pickedExercisePath } from '../exercise-names.js'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -146,11 +147,31 @@ export function ExerciseNew({ returnBase = null }) {
   )
 }
 
+// req-127 — an inline field error under its input (the Routine.jsx / req-118 markup).
+function NameError({ children }) {
+  return children ? (
+    <p className="ui-field-error" role="alert">
+      {children}
+    </p>
+  ) : null
+}
+
 export function ExerciseNewManual({ returnBase = null }) {
   const store = useStore()
   const paths = createPaths(returnBase)
   const [name, setName] = useState('')
   const [type, setType] = useState('free')
+  // req-127 — the name error shows after the first Save attempt, then tracks each edit.
+  const [tried, setTried] = useState(false)
+  // req-127 / DEC-059 §3–4 — the name match found on Save ({ kind, exercise }), shown in
+  // place of Save until the name changes. Live → Use it / Create anyway; archived →
+  // Restore / Create anyway.
+  const [match, setMatch] = useState(null)
+  const error = tried ? nameError(name) : null
+  const create = () => {
+    const id = store.addExercise({ name, type, equipment: '', weightStep: '', muscles: '', cues: '' })
+    go(paths.afterCreate(id), { replace: true })
+  }
 
   return (
     <Screen>
@@ -159,18 +180,83 @@ export function ExerciseNewManual({ returnBase = null }) {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          const id = store.addExercise({ name, type, equipment: '', weightStep: '', muscles: '', cues: '' })
-          go(paths.afterCreate(id), { replace: true })
+          setTried(true)
+          if (nameError(name)) return
+          const found = exerciseNameMatch(store.exercises, name)
+          if (found) setMatch(found)
+          else create()
         }}
       >
-        <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-        <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
-        <Actions
-          retreat={<NavLink to={paths.hub} look="quiet">Cancel</NavLink>}
-          forward={<Button type="submit" variant="primary">Save</Button>}
+        <Field
+          label="Name"
+          value={name}
+          aria-invalid={Boolean(error)}
+          onChange={(e) => {
+            setName(e.target.value)
+            setMatch(null)
+          }}
         />
+        <NameError>{error}</NameError>
+        <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
+        {match ? (
+          <NameMatch match={match} paths={paths} returnBase={returnBase} store={store} onCreate={create} />
+        ) : (
+          <Actions
+            retreat={<NavLink to={paths.hub} look="quiet">Cancel</NavLink>}
+            forward={<Button type="submit" variant="primary">Save</Button>}
+          />
+        )}
       </form>
     </Screen>
+  )
+}
+
+// req-127 / DEC-059 §3–4 — the duplicate warning (live match) or the Restore offer
+// (archived match, same id). Labels and sides (unconfirmed).
+function NameMatch({ match, paths, returnBase, store, onCreate }) {
+  const { exercise } = match
+  const createAnyway = (
+    <Button variant="secondary" onClick={onCreate}>
+      Create anyway
+    </Button>
+  )
+  // Live match: Use it only navigates (DEC-040: a link, which req-122 keeps out of
+  // `forward`), so it sits left and the commit, Create anyway, right.
+  if (match.kind === 'live') {
+    return (
+      <>
+        <p className="ui-sub" role="status">An exercise called {exercise.name} already exists.</p>
+        <Actions
+          retreat={
+            <NavLink to={pickedExercisePath(paths, returnBase, exercise.id)} look="secondary">
+              Use it
+            </NavLink>
+          }
+          forward={createAnyway}
+        />
+      </>
+    )
+  }
+  return (
+    <>
+      <p className="ui-sub" role="status">
+        An exercise called {exercise.name} was deleted. Restore brings it back with its history.
+      </p>
+      <Actions
+        retreat={createAnyway}
+        forward={
+          <Button
+            variant="primary"
+            onClick={() => {
+              store.restoreExercise(exercise.id)
+              go(pickedExercisePath(paths, returnBase, exercise.id), { replace: true })
+            }}
+          >
+            Restore
+          </Button>
+        }
+      />
+    </>
   )
 }
 
@@ -197,11 +283,6 @@ export function ExerciseNewSearch({ returnBase = null }) {
   }, [])
 
   const hits = catalog ? searchExerciseCatalog(catalog, query) : []
-  const libraryNames = new Map(
-    (store.exercises || [])
-      .filter((exercise) => !exercise.archivedAt)
-      .map((exercise) => [exercise.name.trim().toLowerCase(), exercise]),
-  )
 
   return (
     <Screen>
@@ -215,14 +296,22 @@ export function ExerciseNewSearch({ returnBase = null }) {
           {query.trim().length >= 2 && hits.length === 0 ? <p className="ui-sub">No matches.</p> : null}
           <List>
             {hits.map((item) => {
-              const existing = libraryNames.get(String(item.name || '').trim().toLowerCase())
-              const action = existing ? (
-                <NavLink
-                  to={returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}
-                  look="secondary"
-                >
+              // req-127 — the shared name match (trimmed, case-insensitive): live wins,
+              // else the newest archived one is offered for Restore (same id, DEC-059 §3).
+              const match = exerciseNameMatch(store.exercises, item.name)
+              const action = match?.kind === 'live' ? (
+                <NavLink to={pickedExercisePath(paths, returnBase, match.exercise.id)} look="secondary">
                   {returnBase ? 'Add to routine' : 'Already added'}
                 </NavLink>
+              ) : match?.kind === 'archived' ? (
+                <Button
+                  onClick={() => {
+                    store.restoreExercise(match.exercise.id)
+                    go(pickedExercisePath(paths, returnBase, match.exercise.id), { replace: true })
+                  }}
+                >
+                  Restore
+                </Button>
               ) : (
                 <Button
                   disabled={busyId === item.id}
@@ -258,6 +347,9 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const step = useWeightStep(ex?.weightStep)
   const [muscles, setMuscles] = useState(ex?.muscles || '')
   const [cues, setCues] = useState(ex?.cues || '')
+  // req-127 — the name error shows after the first Save attempt, then tracks each edit.
+  const [tried, setTried] = useState(false)
+  const editNameError = tried ? nameError(name) : null
   // req-85 — orthogonal timer flag + default target seconds (any type can be timed).
   const [hasDuration, setHasDuration] = useState(Boolean(ex?.hasDuration))
   const [durationSec, setDurationSec] = useState(
@@ -281,10 +373,12 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         onSubmit={(e) => {
           e.preventDefault()
           // req-126 — a typed increment that doesn't read blocks Save (its note is shown).
+          // req-127 — an empty name is an inline error that blocks Save (was: kept the old name).
+          setTried(true)
           const saved = step.save()
-          if (saved.error) return
+          if (saved.error || nameError(name)) return
           store.updateExercise(ex.id, {
-            name: name.trim() || ex.name,
+            name: name.trim(),
             type,
             equipment: equipment.trim() || 'Unknown',
             // req-126 — untouched: the key is left out, so the stored value (or its absence) stays.
@@ -299,7 +393,8 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
           go(back)
         }}
       >
-        <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <Field label="Name" value={name} aria-invalid={Boolean(editNameError)} onChange={(e) => setName(e.target.value)} />
+        <NameError>{editNameError}</NameError>
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
         <WeightStepField step={step} />
