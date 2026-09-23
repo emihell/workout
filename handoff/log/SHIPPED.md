@@ -1594,4 +1594,12 @@ all passed.` Unconfirmed: an unreadable typed value blocks Save; `4/5` is offere
 
 ## req-127 — exercise names, Restore archived, and small routine-editor guards (audit Tier 3, DEC-059 §3–4)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `4f06298`, throwaway agent). Names are trimmed, and an empty name blocks Save (exercise and routine, including edit).
+A duplicate name shows "Use it / Create anyway" (DEC-059 §4); an archived match offers Restore (§3). The new `restoreExercise`
+(pure `restoreExerciseInState`) clears `archivedAt` on that one record, so the same id comes back with its history and the routine
+rows are not restored. Precedence: live > newest archived. No Start for an empty routine (Routines list and Today); the edge
+Up/Down are disabled. `addExercise`'s record builder was extracted verbatim. Reviewer (independent, DEC-057): MERGE-WITH-FOLLOWUPS;
+Restore diffs exactly one field on one record; nothing assumes "archived is forever"; the extracted builder deep-equals main on 4
+inputs; every mutation fails tests. One test edit (req-122 Actions count 13→15). Gate: Planner's own run → `check: green — lint, 41
+test file(s), and the build all passed.` Unconfirmed: labels and copy; Create anyway switches sides between the live and archived
+cases; Search offers only Restore; editing to an empty name now errors.
