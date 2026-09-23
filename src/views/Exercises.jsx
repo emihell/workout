@@ -4,7 +4,7 @@ import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing, NavLink } from './shared'
-import { exerciseDeletionImpact } from '../storage'
+import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
 import { Banner, Button, Checkbox, Field, List, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
 
@@ -355,9 +355,11 @@ export function ExerciseDetail({ exerciseId }) {
             impact.routines > 0
               ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'} (and any planned workouts).`
               : ''
-          const head = impact.hasHistory
-            ? `${ex.name} has past workouts and will be archived (kept in your history).`
-            : `Delete ${ex.name}?`
+          // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
+          const head = deletionConfirmHead(ex.name, {
+            hasHistory: impact.hasHistory,
+            inCurrentWorkout: exerciseInActiveWorkout(store, ex.id),
+          })
           if (!window.confirm(head + removes)) return
           store.removeExercise(ex.id)
           go('/exercises')

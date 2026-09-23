@@ -344,6 +344,80 @@ export function exerciseDeletionImpact(state, exerciseId) {
   }
 }
 
+// req-119 / DEC-058 §5 (amends DEC-031) — the in-progress workout counts as a
+// reference too: its snapshot items and its logged sets. Without this, deleting an
+// exercise or routine the live workout uses hard-deleted it, so after Finish history
+// showed a raw id and the workout's routineId pointed at nothing.
+export function exerciseInActiveWorkout(state, exerciseId) {
+  const active = state?.activeWorkout
+  if (!active) return false
+  return (
+    (active.snapshot?.items || []).some((item) => item.exerciseId === exerciseId) ||
+    (active.sets || []).some((set) => set.exerciseId === exerciseId)
+  )
+}
+
+export function routineInActiveWorkout(state, routineId) {
+  const active = state?.activeWorkout
+  if (!active) return false
+  return (active.routineId || active.sessionId || active.snapshot?.routineId) === routineId
+}
+
+// req-119 — the delete reducers, moved out of store.jsx so the archive-vs-delete rule
+// is unit-tested. Referenced = finished history (DEC-031) OR the in-progress workout
+// (DEC-058 §5) → archived via the existing `archivedAt` path; otherwise hard-deleted.
+// Everything else each delete did is unchanged: removeExercise strips the exercise
+// from every routine and planned-workout item; removeRoutine drops its schedule slots
+// and planned workouts. Neither touches activeWorkout — its snapshot is its own.
+export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().toISOString()) {
+  const referenced = exerciseDeletionImpact(s, exerciseId).hasHistory || exerciseInActiveWorkout(s, exerciseId)
+  return {
+    ...s,
+    exercises: referenced
+      ? (s.exercises || []).map((ex) => (ex.id === exerciseId ? { ...ex, archivedAt } : ex))
+      : (s.exercises || []).filter((ex) => ex.id !== exerciseId),
+    routines: (s.routines || []).map((routine) => ({
+      ...routine,
+      exercises: (routine.exercises || []).filter((item) => item.exerciseId !== exerciseId),
+    })),
+    plannedWorkouts: (s.plannedWorkouts || []).map((plan) => ({
+      ...plan,
+      items: (plan.items || []).filter((item) => item.exerciseId !== exerciseId),
+    })),
+  }
+}
+
+export function removeRoutineFromState(s, routineId, archivedAt = new Date().toISOString()) {
+  const referenced = routineDeletionImpact(s, routineId).hasHistory || routineInActiveWorkout(s, routineId)
+  return {
+    ...s,
+    routines: referenced
+      ? (s.routines || []).map((routine) => (routine.id === routineId ? { ...routine, archivedAt } : routine))
+      : (s.routines || []).filter((routine) => routine.id !== routineId),
+    schedule: {
+      ...s.schedule,
+      slots: (s.schedule?.slots || []).filter((slot) => (slot.routineId || slot.sessionId) !== routineId),
+    },
+    plannedWorkouts: (s.plannedWorkouts || []).filter((plan) => (plan.routineId || plan.sessionId) !== routineId),
+  }
+}
+
+// req-119 — the head line of the delete confirm (Exercises.jsx / Routine.jsx), pure so
+// the wording per case is tested. The current workout wins over past history in the
+// wording: it is the reference the user is in the middle of.
+export function deletionConfirmHead(name, { hasHistory, inCurrentWorkout }) {
+  if (inCurrentWorkout) return `${name} is in the current workout and will be archived (the workout keeps it).`
+  if (hasHistory) return `${name} has past workouts and will be archived (kept in your history).`
+  return `Delete ${name}?`
+}
+
+// req-114 / req-119 — Today's first-run "No data" screen: nothing at all yet. Not
+// merely "no routines": mid-workout after deleting its routine, or with history,
+// Today keeps its normal layout (Continue, the history peek).
+export function isFirstRun(state) {
+  return !(state?.routines || []).length && !(state?.workouts || []).length && !state?.activeWorkout
+}
+
 export function exercisesInHistory(workouts, exercises, routines) {
   const ids = []
   const seen = new Set()
