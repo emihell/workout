@@ -1509,3 +1509,7 @@ Save (`views/history/add-set.js`; `addSetToWorkout` removed; detail.jsx's placeh
 empty-array, reload and Previous cases; Save writes exactly one set and keeps the recalc flow (DEC-033); 5 mutations each fail
 tests. Gate: Planner's own run → `check: green — lint, 33 test file(s), and the build all passed.` Unconfirmed: Remove set first
 in the actions row; after Remove → overview; History Add set is now a `›` link; where Cancel returns.
+
+## req-119 — setup edits never reach into the live workout (audit B)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
