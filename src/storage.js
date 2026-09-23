@@ -345,15 +345,26 @@ export function exercisesInHistory(workouts, exercises, routines) {
     .sort((a, b) => (a.exercise?.name || a.id).localeCompare(b.exercise?.name || b.id))
 }
 
+// req-111 / DEC-053 — "last time" is the most recent finished workout with at least
+// one NON-skipped WORKING set of the exercise. A workout where every work set was
+// skipped (incl. "warmed up, then the machine was taken") holds no work load/reps for
+// it, so it is passed over (never reinterpreted). Only if the exercise has never had a
+// done work set does a warm-up-only workout count (it still seeds the warm-up). None →
+// null, i.e. no history, so DEC-002's kg carry applies as for a new exercise. A partly
+// skipped workout still counts; its skipped sets are returned but every reader
+// (historySetPrefill / historyPrescription) already drops them.
 export function lastSetsForExercise(workouts, exerciseId) {
   const done = [...(workouts || [])]
     .filter((w) => w.finishedAt)
     .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)))
+  let warmupOnly = null
   for (const w of done) {
     const sets = (w.sets || []).filter((s) => s.exerciseId === exerciseId)
-    if (sets.length) return { workout: w, sets }
+    const real = sets.filter((s) => !isSkippedSet(s))
+    if (real.some((s) => s.setType !== 'wu')) return { workout: w, sets }
+    if (real.length && !warmupOnly) warmupOnly = { workout: w, sets }
   }
-  return null
+  return warmupOnly
 }
 
 function workingSetsFromHistory(sets) {
@@ -450,8 +461,15 @@ export function workoutSummaryStats(active, prior, now) {
 // prior same-routine workout. `workouts` is newest-first (store.finishWorkout prepends),
 // so index 1 is the most recent prior. No duplicated key logic.
 export function previousSameRoutineWorkout(active, workouts, routines) {
-  if (!active) return null
+  return previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
+}
+
+// req-111 — every prior same-routine finished workout, newest-first (same grouping as
+// previousSameRoutineWorkout, which is its head). beat-last-time takes the whole list
+// so each exercise can look past a workout where it was entirely skipped (DEC-053).
+export function previousSameRoutineWorkouts(active, workouts, routines) {
+  if (!active) return []
   const groups = groupWorkoutsByRoutine([active, ...(workouts || [])], routines)
   const group = groups.find((g) => g.workouts[0] === active)
-  return group?.workouts[1] ?? null
+  return group ? group.workouts.slice(1) : []
 }

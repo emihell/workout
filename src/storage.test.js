@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, loadState, previousSameRoutineWorkout, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
+import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkout, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
 import { dateKey } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -811,5 +811,80 @@ describe('req-85 v9 migration round-trip', () => {
       assert.equal(map.get('workout-mvp-v9') ?? null, null) // nothing persisted
       assert.ok(map.get('workout-mvp-v8')) // the only surviving copy is kept
     })
+  })
+})
+
+// req-111 / DEC-053 — "last time" looks past a workout where the exercise was entirely
+// skipped (Finish's auto-skip writes weight 0, reps 'skipped').
+describe('req-111 lastSetsForExercise skips all-skipped workouts', () => {
+  const fin = (id, finishedAt, sets) => ({ id, finishedAt, sets })
+  const done = (weight, reps) => ({ exerciseId: 'bench', setType: 'work', weight, reps })
+  const skip = () => ({ exerciseId: 'bench', setType: 'work', weight: 0, reps: 'skipped' })
+
+  it('looks past: w2 all skipped, w1 40x8 → w1, set-1 prefill 40 kg', () => {
+    const workouts = [
+      fin('w2', '2026-09-22T10:00:00Z', [skip(), skip(), skip()]),
+      fin('w1', '2026-09-20T10:00:00Z', [done(40, '8'), done(40, '8')]),
+    ]
+    const last = lastSetsForExercise(workouts, 'bench')
+    assert.equal(last.workout.id, 'w1')
+    assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 0 }), { weight: '40', reps: '8' })
+    assert.equal(historyPrescription(workouts, 'bench').suggestedWeights[0], 40)
+  })
+
+  it('only skipped history → null (no history), not the skipped workout', () => {
+    const workouts = [fin('w1', '2026-09-20T10:00:00Z', [skip(), skip()])]
+    assert.equal(lastSetsForExercise(workouts, 'bench'), null)
+    assert.equal(historyPrescription(workouts, 'bench'), null)
+  })
+
+  it('partial skip is still history: w2 1 done + 2 skipped → w2, done set is set 1', () => {
+    const workouts = [
+      fin('w2', '2026-09-22T10:00:00Z', [done(45, '6'), skip(), skip()]),
+      fin('w1', '2026-09-20T10:00:00Z', [done(40, '8')]),
+    ]
+    const last = lastSetsForExercise(workouts, 'bench')
+    assert.equal(last.workout.id, 'w2')
+    assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 0 }), { weight: '45', reps: '6' })
+  })
+
+  const wu = (weight, reps) => ({ exerciseId: 'bench', setType: 'wu', weight, reps })
+
+  it('warm-up done + all work skipped is passed over: older 40x8 → older, work set 1 prefills 40', () => {
+    const workouts = [
+      fin('w2', '2026-09-22T10:00:00Z', [wu(20, '10'), skip(), skip()]),
+      fin('w1', '2026-09-20T10:00:00Z', [wu(20, '12'), done(40, '8'), done(40, '8')]),
+    ]
+    const last = lastSetsForExercise(workouts, 'bench')
+    assert.equal(last.workout.id, 'w1')
+    assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 0 }), { weight: '40', reps: '8' })
+    const rx = historyPrescription(workouts, 'bench')
+    assert.deepEqual(rx.suggestedWeights, [40, 40])
+    assert.deepEqual(rx.warmup, { reps: '12' })
+  })
+
+  it('warm-up-only history ever → that workout (seeds the warm-up, work blank)', () => {
+    const workouts = [fin('w1', '2026-09-20T10:00:00Z', [wu(20, '10'), skip(), skip()])]
+    const last = lastSetsForExercise(workouts, 'bench')
+    assert.equal(last.workout.id, 'w1')
+    assert.deepEqual(historySetPrefill(last, { setType: 'wu' }), { weight: '20', reps: '10' })
+    assert.deepEqual(historySetPrefill(last, { setType: 'work', workIndex: 0 }), { weight: '', reps: '' })
+    assert.equal(historyPrescription(workouts, 'bench'), null)
+  })
+})
+
+describe('req-111 previousSameRoutineWorkouts', () => {
+  const wk = (id, routineId, name) => ({ id, routineId, snapshot: { routineId, routineName: name } })
+  const active = wk('active', 'r1', 'Push')
+
+  it('every prior same-routine workout newest-first; head equals previousSameRoutineWorkout', () => {
+    const workouts = [wk('w3', 'r1', 'Push'), wk('x', 'r2', 'Pull'), wk('w1', 'r1', 'Push')]
+    assert.deepEqual(previousSameRoutineWorkouts(active, workouts, []).map((w) => w.id), ['w3', 'w1'])
+    assert.equal(previousSameRoutineWorkout(active, workouts, []).id, 'w3')
+  })
+
+  it('no active / no same-routine → []', () => {
+    assert.deepEqual(previousSameRoutineWorkouts(null, [], []), [])
+    assert.deepEqual(previousSameRoutineWorkouts(active, [wk('x', 'r2', 'Pull')], []), [])
   })
 })

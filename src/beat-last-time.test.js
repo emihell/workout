@@ -166,3 +166,43 @@ describe('req-96 beatLastTimeLine', () => {
     assert.equal(beatLastTimeLine(null), null)
   })
 })
+
+// req-111 / DEC-053 — skipped sets never count on either side; a prior where the
+// exercise was entirely skipped is looked past to the one before.
+describe('req-111 beatLastTimeWins — skipped sets', () => {
+  const skipped = { ex: 'bench', weight: 0, reps: 'skipped' }
+
+  it('no false win: prev all skipped, the one before 40 kg, today 40 kg → no win', () => {
+    const cur = workout(WEIGHTED, [{ ex: 'bench', weight: 40, reps: 8 }])
+    const skippedWeek = workout(WEIGHTED, [skipped, skipped])
+    const before = workout(WEIGHTED, [{ ex: 'bench', weight: 40, reps: 8 }])
+    assert.deepEqual(beatLastTimeWins(cur, [skippedWeek, before]), [])
+    // the single-prior form also reports no false "heavier" against the 0 kg record
+    assert.deepEqual(beatLastTimeWins(cur, skippedWeek), [])
+  })
+
+  it('same current vs a 35 kg one before the skipped week → heavier', () => {
+    const cur = workout(WEIGHTED, [{ ex: 'bench', weight: 40, reps: 8 }])
+    const skippedWeek = workout(WEIGHTED, [skipped, skipped])
+    const before = workout(WEIGHTED, [{ ex: 'bench', weight: 35, reps: 8 }])
+    assert.deepEqual(beatLastTimeWins(cur, [skippedWeek, before]).map((w) => w.kind), ['heavier'])
+  })
+
+  it('skipped this time: current bench all skipped, prior 40 → no bench win', () => {
+    const cur = workout(WEIGHTED, [skipped, skipped])
+    const prev = workout(WEIGHTED, [{ ex: 'bench', weight: 40, reps: 8 }])
+    assert.deepEqual(beatLastTimeWins(cur, [prev]), [])
+    assert.deepEqual(beatLastTimeWins(cur, prev), [])
+  })
+
+  it('a skipped set on the current side does not hide a real win in the same exercise', () => {
+    const cur = workout(WEIGHTED, [{ ex: 'bench', weight: 45, reps: 8 }, skipped])
+    const prev = workout(WEIGHTED, [{ ex: 'bench', weight: 40, reps: 8 }])
+    assert.deepEqual(beatLastTimeWins(cur, [prev]).map((w) => w.kind), ['heavier'])
+  })
+
+  it('empty prior list → silent', () => {
+    const cur = workout(WEIGHTED, [{ ex: 'bench', weight: 40, reps: 8 }])
+    assert.deepEqual(beatLastTimeWins(cur, []), [])
+  })
+})

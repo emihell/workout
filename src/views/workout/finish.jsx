@@ -3,7 +3,7 @@ import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { buildFinishProgression } from '../../model'
 import { beatLastTimeLine, beatLastTimeWins } from '../../beat-last-time'
-import { previousSameRoutineWorkout } from '../../storage'
+import { previousSameRoutineWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
 import { Back, Missing } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
@@ -41,9 +41,10 @@ function FinishScreen({ routineId }) {
   // req-96 — a quiet "you beat last time" line: any exercise heavier / more reps /
   // longer than the previous same-routine workout. Pure + inspectable; silent when
   // there's no prior or nothing improved (never a "you did worse"). Same prior-workout
-  // selection the auto-complete summary uses (req-84).
-  const prior = previousSameRoutineWorkout(active, store.workouts, store.routines)
-  const beatLine = beatLastTimeLine(beatLastTimeWins(active, prior, store.exercises))
+  // selection the auto-complete summary uses (req-84). req-111 — the whole prior list,
+  // so an exercise entirely skipped last time compares against the one before (DEC-053).
+  const priors = previousSameRoutineWorkouts(active, store.workouts, store.routines)
+  const beatLine = beatLastTimeLine(beatLastTimeWins(active, priors, store.exercises))
 
   const name = active?.snapshot?.routineName || active?.snapshot?.sessionName
 
