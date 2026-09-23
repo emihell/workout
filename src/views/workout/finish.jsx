@@ -7,8 +7,9 @@ import { previousSameRoutineWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
 import { Back, Missing } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { activeNote } from '../../workout-note.js'
-import { isActiveFor } from './helpers'
+import { anythingLogged, loggedSetCount } from '../../workout-log'
+import { activeFeel, activeNote } from '../../workout-note.js'
+import { abandonWorkout, isActiveFor } from './helpers'
 import { RestPill } from './rest'
 
 export function WorkoutFinish({ routineId }) {
@@ -21,8 +22,11 @@ export function WorkoutFinish({ routineId }) {
 
 function FinishScreen({ routineId }) {
   const store = useStore()
-  const [overallFeel, setOverallFeel] = useState('')
   const active = store.activeWorkout
+  // req-116 — Feel lives on the active workout (its existing overallFeel, like the
+  // req-107 note), written through patchActive, so Back and returning keeps the choice
+  // and the auto-complete path saves it. A legacy active workout reads as '' (activeFeel).
+  const overallFeel = activeFeel(active)
   // req-107 — ONE workout note: the Note field is the active workout's overallNote
   // (pre-filled from the overview), and edits write straight back through patchActive,
   // so Back to the overview and returning shows the edit. What's saved is the note at
@@ -30,7 +34,12 @@ function FinishScreen({ routineId }) {
   const overallNote = activeNote(active)
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
   const [minutes] = useState(() => Math.max(1, Math.round((Date.now() - started.getTime()) / 60000)))
-  const setCount = (active?.sets || []).length
+  // req-116 — only non-skipped sets count (a logged warm-up counts); the auto-complete
+  // summary counts the same way (workoutSummaryStats → loggedSetCount).
+  const setCount = loggedSetCount(active)
+  // req-116 / DEC-058 §4 — nothing logged (every set skipped, or none at all): warn,
+  // make Abandon the primary action, and keep "Save anyway" as the secondary one.
+  const empty = !anythingLogged(active)
   // req-40 — the saved core comes from the ONE shared progressionForItem helper
   // (identical to the History recalc path); req-84 — the same builder now feeds the
   // auto-complete path, so both persist byte-identical progression. req-96 removed the
@@ -62,16 +71,26 @@ function FinishScreen({ routineId }) {
           {beatLine}
         </p>
       ) : null}
+      {empty ? (
+        <p className="ui-sub" role="status">
+          <strong>Nothing logged.</strong> No set in this workout was logged — abandon it, or save it anyway.
+        </p>
+      ) : null}
       <SectionHeader>Feel</SectionHeader>
       <SegmentedControl
         options={['Easy', 'Good', 'Hard', 'Exhausting']}
         value={overallFeel}
-        onChange={setOverallFeel}
+        onChange={(feel) => store.patchActive({ overallFeel: feel })}
         ariaLabel="Feel"
       />
       <Textarea label="Note" value={overallNote} onChange={(e) => store.patchActive({ overallNote: e.target.value })} rows={3} />
+      {empty ? (
+        <Button variant="primary" block onClick={() => abandonWorkout(store)}>
+          Abandon
+        </Button>
+      ) : null}
       <Button
-        variant="primary"
+        variant={empty ? 'secondary' : 'primary'}
         block
         onClick={() => {
           recordButton('finish-workout')
@@ -79,7 +98,7 @@ function FinishScreen({ routineId }) {
           go('/')
         }}
       >
-        Save
+        {empty ? 'Save anyway' : 'Save'}
       </Button>
     </Screen>
   )

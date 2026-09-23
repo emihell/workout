@@ -1,5 +1,7 @@
 import { itemKey, itemLoggingState } from '../../workout-log'
 import { itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
+import { recordButton } from '../../analytics'
+import { go } from '../../route'
 import { Missing } from '../shared'
 
 // req-76 — the item log/done path builders now live in the JSX-free workout-paths
@@ -30,4 +32,13 @@ export function MissingItem() {
 export function itemSetsPath(routineId, item, workout) {
   if (!item) return `/workout/${routineId}`
   return itemCurrentPath(routineId, item, itemLoggingState(workout, item).plannedDone)
+}
+
+// Discard the active workout (confirm first). Shared by the overview's Abandon and, since
+// req-116, the Finish screen's "Nothing logged" Abandon.
+export function abandonWorkout(store) {
+  if (!window.confirm('Abandon?')) return
+  recordButton('abandon-workout')
+  store.abandonWorkout()
+  go('/')
 }

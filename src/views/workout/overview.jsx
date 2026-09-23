@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { roleTag } from '../../ids'
 import { go } from '../../route'
-import { recordButton } from '../../analytics'
-import { planDateFor } from '../../schedule'
+import { finishedForPlan } from '../../current-workout'
+import { dateKey, planDateFor } from '../../schedule'
 import { findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
-import { allItemsDone, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
+import { allItemsDone, autoCompleteArmed, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
-import { exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
+import { weekdayDate } from '../history/helpers'
+import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
 import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
 
@@ -31,19 +32,8 @@ function ExerciseLabel({ item }) {
   )
 }
 
-function abandonWorkout(store) {
-  if (!window.confirm('Abandon?')) return
-  recordButton('abandon-workout')
-  store.abandonWorkout()
-  go('/')
-}
-
 export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   const store = useStore()
-  // req-84 — once the auto-complete summary is cancelled, keep it dismissed for this
-  // mount (all items are still done, so it would otherwise re-show immediately). A
-  // fresh visit to the overview remounts and re-arms it — the intended "all done" cue.
-  const [autoDismissed, setAutoDismissed] = useState(false)
   // req-107 — the "Add note" reveal (req-26/req-80 pattern). Tapping opens the field
   // for this mount; once the note has text it stays shown on every visit.
   const [noteOpen, setNoteOpen] = useState(false)
@@ -68,6 +58,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
       return <Missing>Not found.</Missing>
     }
     const previewMeta = [plan.focus, plan.date].filter(Boolean).join(' · ')
+    // req-116 — the guard for Back after Finish: an occurrence that already has a
+    // finished workout shows Done and a link to it in History, never a fresh Start.
+    const done = finishedForPlan(store.workouts, plan)
     return (
       <Screen>
         <Back to="/" />
@@ -80,7 +73,16 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
             </Row>
           ))}
         </List>
-        {plan.items.length ? (
+        {done ? (
+          <>
+            <p className="ui-sub">Done {weekdayDate(dateKey(done.finishedAt))}</p>
+            <p>
+              <NavLink to={`/history/${done.id}`} className="ui-navlink" chevron="forward">
+                View in History
+              </NavLink>
+            </p>
+          </>
+        ) : plan.items.length ? (
           <Button
             variant="primary"
             block
@@ -124,14 +126,18 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   // req-84 — every exercise done (same per-item test the list rows use). When true the
   // overview shows the auto-complete summary instead of the list; NOT before then.
   // req-105 — the test lives in workout-log.js (allItemsDone) and also drives Finish.
+  // req-116 — the summary's gate is autoCompleteArmed: all done, something logged (an
+  // all-skipped workout never auto-finishes, DEC-058 §4), and not yet dismissed. Cancel
+  // and Edit set the persisted autoFinishDismissed flag, so Back from Finish (a remount)
+  // and a reload no longer re-arm the countdown.
   const allDone = allItemsDone(active)
-  if (allDone && !autoDismissed) {
+  if (autoCompleteArmed(active)) {
     return (
       <AutoCompleteSummary
         routineId={routineId}
         active={active}
         store={store}
-        onCancel={() => setAutoDismissed(true)}
+        onCancel={() => store.patchActive({ autoFinishDismissed: true })}
       />
     )
   }

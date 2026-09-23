@@ -43,10 +43,23 @@ test('a block-styled anchor fits its container (border-box on .ui-btn--block)', 
   assert.match(css.slice(start, css.indexOf('}', start)), /box-sizing: border-box/)
 })
 
+// req-116 — the summary gate moved to workout-log.autoCompleteArmed (allItemsDone +
+// something logged + not dismissed; unit-tested in req-116.test.js). allDone still
+// styles Finish; the mount-local autoDismissed state is gone (the flag is persisted).
 test('one allDone test gates both the summary and the Finish style', () => {
   assert.match(workout, /const allDone = allItemsDone\(active\)/)
-  assert.match(workout, /if \(allDone && !autoDismissed\)/)
+  assert.match(workout, /if \(autoCompleteArmed\(active\)\)/)
+  assert.doesNotMatch(workout, /autoDismissed/)
+  assert.match(workout, /onCancel=\{\(\) => store\.patchActive\(\{ autoFinishDismissed: true \}\)\}/)
   assert.doesNotMatch(workout, /items\.every\(/)
+})
+
+// req-116 — the preview guard: a covered occurrence shows Done + History, not Start.
+test('the preview shows Done (finishedForPlan) instead of Start once finished', () => {
+  const w = fnBody('Workout')
+  assert.match(w, /const done = finishedForPlan\(store\.workouts, plan\)/)
+  assert.ok(w.indexOf('{done ? (') < w.indexOf('startOrContinue('), 'the Done branch comes before Start')
+  assert.match(w, /to=\{`\/history\/\$\{done\.id\}`\}/)
 })
 
 // req-107 — one workout note on the active workout, shared by the overview and Finish.

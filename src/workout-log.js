@@ -108,10 +108,11 @@ export function withSkippedUnloggedSets(workout) {
 // req-112 / DEC-056: `routines` is NOT touched — updating the routine is a deliberate
 // choice (History recalc), never a side effect of Finish. req-83 (N9) — the live
 // seed-override map is transient session state, dropped so it never lands on the
-// finished-history record (which feeds history-prefill from `sets` alone).
+// finished-history record (which feeds history-prefill from `sets` alone). req-116 —
+// the auto-finish dismissed flag is transient in the same way and is dropped too.
 export function finishedState(state, { overallNote, overallFeel, progression = [] } = {}, finishedAt = new Date().toISOString()) {
   if (!state?.activeWorkout) return state
-  const { seedOverrides, ...activeToFinish } = state.activeWorkout
+  const { seedOverrides, autoFinishDismissed: _dismissed, ...activeToFinish } = state.activeWorkout
   const finished = withSkippedUnloggedSets({
     ...activeToFinish,
     finishedAt,
@@ -232,6 +233,27 @@ export function allItemsDone(workout) {
   const items = workout?.snapshot?.items || []
   if (items.length === 0) return false
   return items.every((item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone)
+}
+
+// req-116 / DEC-058 §4 — the sets that were actually logged: every set that is not a
+// skipped record. A logged warm-up counts (unconfirmed). Drives the Finish screen's and
+// the auto-complete summary's set count, and the "Nothing logged" warning.
+export function loggedSetCount(workout) {
+  return (workout?.sets || []).filter((set) => !isSkippedSet(set)).length
+}
+
+export function anythingLogged(workout) {
+  return loggedSetCount(workout) > 0
+}
+
+// req-116 — the auto-complete summary's gate. It shows only when every exercise is
+// done, something was actually logged (an all-skipped workout never auto-finishes,
+// DEC-058 §4), and it hasn't been dismissed for this workout. `autoFinishDismissed` is
+// an optional flag on the ACTIVE workout (set by Cancel or Edit, so Back from Finish
+// and a reload don't re-arm the 10 s countdown); finishedState strips it. A legacy
+// active workout without the flag reads as not dismissed.
+export function autoCompleteArmed(workout) {
+  return allItemsDone(workout) && !workout?.autoFinishDismissed && anythingLogged(workout)
 }
 
 // req-11 / DEC-013, refined by req-25 — the activeWorkout patch that marks an

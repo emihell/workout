@@ -11,12 +11,15 @@ import { autoFinishArgs } from '../../workout-note.js'
 // mounts this instead of the list: a "great job" summary (volume/duration/sets, each
 // with a delta vs the previous SAME-routine workout when one exists) and a ~10s
 // countdown that auto-commits the finish. The finish it writes is identical to the
-// manual Finish screen's (empty Feel, buildFinishProgression), so this adds no new
-// persisted shape — see store.finishWorkout / finish.jsx. req-107 — the Note is the
+// manual Finish screen's (the active Feel, buildFinishProgression), so this adds no new
+// persisted shape — see store.finishWorkout / finish.jsx. req-116: Sets counts only
+// non-skipped sets (workoutSummaryStats → loggedSetCount). req-107 — the Note is the
 // active workout's note (written on the overview), not '', so it isn't lost silently.
 //
-// Cancel stops the countdown and returns to the overview with NOTHING finished (the
-// parent suppresses the summary until the screen remounts). Edit opens the manual
+// Cancel stops the countdown and returns to the overview with NOTHING finished. req-116 —
+// Cancel and Edit both set `autoFinishDismissed` on the active workout, so the summary
+// stays dismissed for this workout (a remount or reload doesn't re-arm it). Feel is the
+// active workout's overallFeel (chosen on Finish), '' when none was chosen. Edit opens the manual
 // Finish screen so Feel/Note/progression can be set. The countdown is a UI-only timer
 // (a deadline + 250ms tick, the useRestCountdown pattern) — never the persisted
 // restEndsAt, which carries pause/skip semantics.
@@ -95,6 +98,9 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
         block
         onClick={() => {
           recordButton('auto-finish-edit')
+          // req-116 — Edit dismisses the summary for this workout (persisted flag), so
+          // Back from Finish returns to the overview, not a fresh countdown.
+          store.patchActive({ autoFinishDismissed: true })
           go(`/workout/${routineId}/finish`)
         }}
       >

@@ -1,4 +1,4 @@
-import { dateKey, occurrenceId } from './schedule.js'
+import { coveringWorkout, dateKey, occurrenceId } from './schedule.js'
 
 // req-114 / DEC-058 §2 — the ONE "current" rule for the in-progress workout. It is
 // current if it was started today (local calendar day) OR within the last 6 hours, so
@@ -35,4 +35,34 @@ export function otherTodayOccurrences(todays, active, todayKey) {
     const slotRoutine = routine?.id || slot.routineId
     return !(offScheduleToday && slotRoutine === activeRoutine)
   })
+}
+
+// req-116 — the workout preview's guard: the finished workout that already covers the
+// previewed plan's occurrence, or null. Browser Back after Finish lands on the preview
+// (`go()` always pushes a hash entry); without this it offered a fresh Start one tap from
+// the workout just saved. An exact occurrence match first, then the same coveringWorkout
+// test Today's Done uses, so the preview says Done exactly when Today does. The ad hoc
+// preview (`/workout/R`, no slot) is therefore Done once R was finished that day — the
+// Routine screen's own Start (not the preview) still starts R again.
+// req-116 review — Back after a CROSS-MIDNIGHT finish (slot started Tue 23:50, finished
+// Wed 00:10) lands on the ad hoc preview dated Wed, which no date test covers. So for
+// the ad hoc plan a same-routine workout FINISHED within the last 6 h also covers it —
+// the DEC-058 §2 window (CURRENT_WINDOW_MS), as isCurrentWorkout uses. `now` injected.
+export function finishedForPlan(workouts, plan, now = new Date()) {
+  if (!plan) return null
+  const sameRoutine = (w) => (w.routineId || w.sessionId) === plan.routineId
+  const exact = (workouts || []).find(
+    (w) => w.finishedAt && plan.occurrenceId && w.occurrenceId === plan.occurrenceId && sameRoutine(w),
+  )
+  if (exact) return exact
+  const covering = coveringWorkout(workouts, plan.routineId, plan.date, plan.scheduleSlotId || null)
+  if (covering || plan.scheduleSlotId) return covering
+  const nowMs = new Date(now).getTime()
+  return (
+    (workouts || []).find((w) => {
+      if (!w.finishedAt || !sameRoutine(w)) return false
+      const elapsed = nowMs - new Date(w.finishedAt).getTime()
+      return elapsed >= 0 && elapsed <= CURRENT_WINDOW_MS
+    }) || null
+  )
 }

@@ -1,7 +1,7 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
-import { isSkippedSet } from './workout-log.js'
+import { isSkippedSet, loggedSetCount } from './workout-log.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -456,10 +456,12 @@ function workoutMinutes(startedAt, end) {
 // the three numbers plus a per-number delta. No prior → deltas is null: the summary
 // shows the stats but INVENTS no comparison (DESIGN §1, the no-invent rule). Selection
 // of `prior` (previousSameRoutineWorkout) is separate and equally testable.
+// req-116 — `sets` counts only non-skipped sets (loggedSetCount), on both sides of the
+// delta, so the summary matches the Finish screen and compares like with like.
 export function workoutSummaryStats(active, prior, now) {
   const volume = workoutVolume(active)
   const duration = workoutMinutes(active?.startedAt, now)
-  const sets = (active?.sets || []).length
+  const sets = loggedSetCount(active)
   if (!prior) return { volume, duration, sets, deltas: null }
   return {
     volume,
@@ -468,7 +470,7 @@ export function workoutSummaryStats(active, prior, now) {
     deltas: {
       volume: volume - workoutVolume(prior),
       duration: duration - workoutMinutes(prior.startedAt, new Date(prior.finishedAt).getTime()),
-      sets: sets - (prior.sets || []).length,
+      sets: sets - loggedSetCount(prior),
     },
   }
 }

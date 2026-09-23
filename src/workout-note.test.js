@@ -1,7 +1,7 @@
 // req-107 — the active-workout note helpers (workout-note.js).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { activeNote, autoFinishArgs } from './workout-note.js'
+import { activeFeel, activeNote, autoFinishArgs } from './workout-note.js'
 import { migrateState } from './model.js'
 import { emptyState } from './storage.js'
 
@@ -9,6 +9,19 @@ test('auto-finish saves the overview note, not an empty string', () => {
   const progression = [{ routineItemId: 'i1' }]
   const args = autoFinishArgs({ overallNote: 'Shoulder felt tight' }, progression)
   assert.deepEqual(args, { overallNote: 'Shoulder felt tight', overallFeel: '', progression })
+})
+
+// req-116 — Feel lives on the active workout; auto-complete saves the chosen one.
+test('auto-finish saves the Feel chosen on Finish (active overallFeel)', () => {
+  const args = autoFinishArgs({ overallNote: '', overallFeel: 'Hard' }, [])
+  assert.equal(args.overallFeel, 'Hard')
+})
+
+test('auto-finish with no Feel chosen still saves an empty Feel (never invented)', () => {
+  assert.equal(autoFinishArgs({ overallFeel: '' }, []).overallFeel, '')
+  assert.equal(autoFinishArgs({}, []).overallFeel, '')
+  assert.equal(autoFinishArgs(null, []).overallFeel, '')
+  assert.equal(activeFeel({ overallFeel: null }), '')
 })
 
 test('auto-finish with no note saves an empty note, as before', () => {
