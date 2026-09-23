@@ -346,20 +346,25 @@ export function exercisesInHistory(workouts, exercises, routines) {
 }
 
 // req-111 / DEC-053 — "last time" is the most recent finished workout with at least
-// one NON-skipped set of the exercise. A workout where it was entirely skipped holds no
-// load/reps data for it, so it is passed over (never reinterpreted); none left → null,
-// i.e. no history, so DEC-002's kg carry applies as for a new exercise. A partly
+// one NON-skipped WORKING set of the exercise. A workout where every work set was
+// skipped (incl. "warmed up, then the machine was taken") holds no work load/reps for
+// it, so it is passed over (never reinterpreted). Only if the exercise has never had a
+// done work set does a warm-up-only workout count (it still seeds the warm-up). None →
+// null, i.e. no history, so DEC-002's kg carry applies as for a new exercise. A partly
 // skipped workout still counts; its skipped sets are returned but every reader
 // (historySetPrefill / historyPrescription) already drops them.
 export function lastSetsForExercise(workouts, exerciseId) {
   const done = [...(workouts || [])]
     .filter((w) => w.finishedAt)
     .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)))
+  let warmupOnly = null
   for (const w of done) {
     const sets = (w.sets || []).filter((s) => s.exerciseId === exerciseId)
-    if (sets.some((s) => !isSkippedSet(s))) return { workout: w, sets }
+    const real = sets.filter((s) => !isSkippedSet(s))
+    if (real.some((s) => s.setType !== 'wu')) return { workout: w, sets }
+    if (real.length && !warmupOnly) warmupOnly = { workout: w, sets }
   }
-  return null
+  return warmupOnly
 }
 
 function workingSetsFromHistory(sets) {
