@@ -274,9 +274,8 @@ live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 
   against an all-skipped prior; (b) an exercise with only warm-up history gets neither a work prefill nor the
   DEC-002 kg carry (pre-existing). Small.
 
-- **req-109 follow-ups:** (a) **Q for Emilio:** Skip exercise leaves the running rest timer going (per-set Skip
-  clears it) — keep? (b) `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
-  replacement they read its rest 0. (c) **Investigate (pre-existing, main):** in the reviewer's run a routine item's
+- **req-109 follow-ups:** (a) ~~Q: Skip exercise leaves a running rest going~~ — **keep** (Emilio, DEC-056). (b) `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
+  replacement they read its rest 0. (c) ~~Investigate~~ → found + decided: **req-112** / DEC-056. in the reviewer's run a routine item's
   `suggestedWeights` went [30,30]→[30] after a finish with 1 logged + 1 skipped set (`progressionForItem`) — check the
   routine template doesn't lose per-set weights on a skipped set.
 
@@ -284,6 +283,10 @@ live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 
 (both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
 
 ## Phase 2 — the program-creation flow  (next; the hard one)
+
+- **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
+  becomes a clean choice, e.g. at the end of a schedule loop (Emilio, 2026-09-23). Shape open: when it's offered,
+  what it shows (last loop's actuals vs the routine), per-exercise accept.
 
 Emilio's "we should start creating programs." Today the app has **routines** (reusable
 templates) and a **schedule** (weekly slots). A "program" is the layer above: a multi-

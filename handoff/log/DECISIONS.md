@@ -1080,3 +1080,18 @@ req-103 stays with the Builder (already started), and req-104 onward goes to thr
 **working** set. A workout where only the warm-up was done and every work set was skipped (warm up, then
 the machine is taken) is passed over. A warm-up-only workout counts only when the exercise has never had
 a done work set, so it can still seed the warm-up.
+
+## DEC-056 — the routine is never updated automatically at Finish; updating it is a deliberate choice  (Emilio, 2026-09-23)
+
+Emilio: *"maybe we should not auto update? update should maybe be a clean choice? something to do after you
+finish a loop?"* Until now `finishWorkout` wrote next kg/reps onto the routine every time
+(`applyProgressionToRoutines`, `store.jsx`), which already sat badly with DESIGN §2's "nothing silently rewrites the
+plan". The investigation that prompted this found the write was also wrong on skipped sets: `recommendNextPrescription`
+(`progress.js:67`) matched each logged set to a target by its position among the logged sets only, so skipping set 1
+compared set 2 to set 1's target and could lower the weight (35×8 on target 8 → `[32.5]`), and a skipped set wiped its
+own saved weight (`[30,35]` → `[30]`). **Decided:** Finish stops writing the routine. The in-gym flow doesn't need it:
+prefill comes from history (DESIGN §1). The routine keeps what you set, which is what README's "prescription … next
+time's source of truth" means. The explicit post-correction recalc (preview, then Apply/Skip, `recalc.jsx`) stays. It is
+already a choice, and its maths is fixed to be per-set (req-112). **Later (Phase 2):** a deliberate "review and update
+the routine" step, e.g. at the end of a schedule loop. Its shape is still open. **Also:** Skip exercise leaves an
+already-running rest going; it never starts one (Emilio: "keep").

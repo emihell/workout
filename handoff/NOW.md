@@ -26,6 +26,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Gym-flow batch 4 (req-103..111) all LIVE 2026-09-23** — owed by Emilio: its on-device test list. req-100..102 LIVE (tooling: `plan ping`, NOW.md guard, drift check — L-019..021).
 
 **READY, held:**
+- `req-112` **Finish stops rewriting the routine; recalc maths per set** (DEC-056). Small, functional.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
