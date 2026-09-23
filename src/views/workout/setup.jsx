@@ -5,9 +5,10 @@ import { useStore } from '../../store-context'
 import { itemLoggingState } from '../../workout-log'
 import { navForBase, RoutineScreens } from '../Routine'
 import { Back, Missing } from '../shared'
-import { Actions, Button, Field, NavLink, Screen, Textarea, Title } from '../../ui/index.jsx'
+import { Actions, Button, NavLink, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './helpers'
 import { RestPill } from './rest'
+import { useWeightStep, WeightStepField } from '../weight-step-field.jsx'
 
 export function WorkoutItemExercise({ routineId, itemId }) {
   const store = useStore()
@@ -15,7 +16,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   const mine = isActiveFor(active, routineId)
   const item = mine ? findItem(active.snapshot?.items, itemId) : null
   const ex = item ? exerciseById(store.exercises, item.exerciseId) : null
-  const [weightStep, setWeightStep] = useState(ex?.weightStep || '')
+  const step = useWeightStep(ex?.weightStep)
   const [cues, setCues] = useState(ex?.cues || '')
 
   if (!mine || !item) {
@@ -45,8 +46,11 @@ export function WorkoutItemExercise({ routineId, itemId }) {
       <form
         onSubmit={(event) => {
           event.preventDefault()
+          // req-126 — a typed increment that doesn't read blocks Save (its note is shown).
+          const saved = step.save()
+          if (saved.error) return
           store.updateExercise(ex.id, {
-            weightStep: weightStep.trim() || 'n/a',
+            weightStep: saved.value,
             cues: cues.trim(),
           })
           go(
@@ -55,11 +59,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           )
         }}
       >
-        <Field
-          label="Weight step"
-          value={weightStep}
-          onChange={(event) => setWeightStep(event.target.value)}
-        />
+        <WeightStepField step={step} />
         <Textarea
           label="Form cues"
           value={cues}

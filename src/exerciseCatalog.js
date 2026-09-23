@@ -128,7 +128,9 @@ export function catalogItemToExercise(item) {
     name: String(item.name || '').trim(),
     type,
     equipment: equipmentLabel === 'Body Only' ? 'Bodyweight' : equipmentLabel,
-    weightStep: type === 'bodyweight' || type === 'cardio' ? 'n/a' : type === 'machine' ? '5' : '2',
+    // req-126 / DEC-059 §2 — the catalog doesn't know the gym's increments: leave it empty
+    // instead of inventing 5 (machine) or 2 (free).
+    weightStep: 'n/a',
     muscles: [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].map(titleCase).join(', '),
     cues: (item.instructions || []).join('\n').trim(),
   }
