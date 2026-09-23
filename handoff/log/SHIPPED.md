@@ -1475,4 +1475,11 @@ db.json v8, a saved v9, v9 + leftover v8, and v9 holding v8 data; differences on
 
 ## req-118 — routine editor reads numbers correctly (audit A, DEC-058 §1, §6, §7)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `cb98ced`, throwaway agent). The routine item editor saves through a new pure parser
+(`routine-item-parse.js`): `/` separates everywhere, `,` separates in Reps/Duration and is a decimal point in Kg (DEC-058 §1, §6);
+tokens are parsed by position, and an invalid or negative token is an inline error that blocks Save; Sets is authoritative (a longer
+list is an error), and a shorter list repeats its last value (§7); an empty Kg/Duration stays `[]` (req-120 keeps it empty across
+reloads). 25 parser tests; the builder's puppeteer run: `22,5` → 22.5, and "2 sets, 3 reps given." blocks Save. No trigger files
+(DEC-057), so no reviewer. Gate: Planner's own run → `check: green — lint, 31 test file(s), and the build all passed.`; the screenshot
+shows the inline error. Unconfirmed: blank Sets uses the longest list; an empty token (`8//8`) is an error; errors show after the
+first Save and then update live; the wording. Follow-up: `parseTargets` in ids.js has no caller now (dead).
