@@ -148,6 +148,14 @@ function queryParam(rawQuery, key) {
   return null
 }
 
+function safeDecode(segment) {
+  try {
+    return decodeURIComponent(segment)
+  } catch {
+    return segment
+  }
+}
+
 export function parseRoute(path) {
   const [rawPath, rawQuery] = String(path).split('?')
   const parts = rawPath.split('/').filter(Boolean)
@@ -305,6 +313,15 @@ export function parseRoute(path) {
   }
   if (parts[0] === 'history' && parts[1] && parts[2] === 'routine') {
     return { name: 'history-routine', id: parts[1], ...parseRoutineNested(parts.slice(3)) }
+  }
+  // req-117 — the History add-set form (unsaved until Save): exercise + item ids.
+  if (parts[0] === 'history' && parts[1] && parts[2] === 'set' && parts[3] === 'new' && parts[4] && parts[5]) {
+    return {
+      name: 'history-set-add',
+      id: parts[1],
+      exerciseId: safeDecode(parts[4]),
+      itemId: safeDecode(parts[5]),
+    }
   }
   if (parts[0] === 'history' && parts[1] && parts[2] === 'set' && parts[3] === 'new') {
     return { name: 'history-set-new', id: parts[1] }

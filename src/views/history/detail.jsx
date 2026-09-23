@@ -5,8 +5,8 @@ import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
+import { historyAddSetPath } from './add-set'
 import {
-  addSetToWorkout,
   itemIdOf,
   routineTitle,
   whenLabel,
@@ -131,9 +131,17 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
           </Row>
         ))}
       </List>
-      <Button onClick={() => addSetToWorkout(store, workout, actualExerciseId, itemIdOf(snapshotItem))}>
-        Add set
-      </Button>
+      {/* req-117 — opens the add form (unsaved until Save); was a Button that wrote a
+          placeholder set first. Navigation, so it wears the link treatment (DESIGN §4). */}
+      <p>
+        <NavLink
+          to={historyAddSetPath(workout, actualExerciseId, itemIdOf(snapshotItem) || null)}
+          className="ui-navlink"
+          chevron="forward"
+        >
+          Add set
+        </NavLink>
+      </p>
     </Screen>
   )
 }

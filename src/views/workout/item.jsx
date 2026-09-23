@@ -6,17 +6,20 @@ import { isDurationTarget } from '../../progress'
 import { exerciseById, historySetPrefill, lastSetsForExercise } from '../../storage'
 import { useStore } from '../../store-context'
 import {
+  canRemoveAddedSet,
   carriedWorkingSet,
   durationTargetFor,
+  initialDurationFor,
   initialSetFields,
-  isSkippedSet,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
   lastLoggedSetIndex,
   markItemDonePatch,
   nextSeedOverrides,
+  removeAddedSetPatch,
   reopenItemPatch,
+  restoreFromLoggedSet,
   restPatchAfterSet,
   seedOverrideKey,
   setPreview,
@@ -129,17 +132,8 @@ function carryFor(ex, last, currentType, workLogged) {
   }
 }
 
-function restoreFromLoggedSet(set) {
-  const skipped = isSkippedSet(set)
-  return {
-    setType: set.setType || 'work',
-    workIndex: set.setType === 'wu' ? 0 : null,
-    weight: set.weight != null && Number(set.weight) !== 0 ? String(set.weight) : '',
-    reps: skipped ? '' : set.reps != null && set.reps !== '' ? String(set.reps) : '',
-    rpe: set.rpe != null && set.rpe !== '' ? String(set.rpe) : '',
-    note: skipped ? '' : set.note || '',
-  }
-}
+// req-117 — restoreFromLoggedSet moved to workout-log.js (pure, unit-tested; it now
+// also restores a timed set's logged seconds).
 
 // req-78 — the req-27 RestUpcoming panel (an editable "next weight" shown during a
 // blocking rest) is gone. Rest no longer blocks: the next set's own log form is shown
@@ -272,6 +266,23 @@ function WorkoutItemLive({ routineId, item }) {
     return () => clearTimeout(id)
   }, [skipArmed])
 
+  // req-117 — "Remove set": undo an "Add set" whose set hasn't been logged yet. Pops
+  // the last (unlogged, added) set and recomputes done; when every remaining set is
+  // logged the exercise is done again and this returns to the overview, as completing
+  // its last set does (DEC-013).
+  const removable = canRemoveAddedSet(active, item)
+  function removeSet() {
+    const patch = removeAddedSetPatch(active, itemKey(item))
+    if (!patch) return
+    recordButton('remove-set')
+    setRestore(null)
+    setSkipArmed(false)
+    store.patchActive(patch)
+    if ((patch.completedItemIds || []).includes(itemKey(item))) {
+      go(`/workout/${routineId}`, { replace: true })
+    }
+  }
+
   function skipExercise() {
     if (!skipArmed) {
       setSkipArmed(true)
@@ -397,7 +408,7 @@ function WorkoutItemLive({ routineId, item }) {
           effortOptions={RPE_OPTIONS}
           initialWeight={seed.weight}
           initialReps={seed.reps}
-          initialDuration={durationTarget}
+          initialDuration={initialDurationFor({ fromRestore, restore, target: durationTarget })}
           initialEffort={seed.effort}
           canGoBack={canGoBack}
           onComplete={({ weight, reps, effort, durationSec }) =>
@@ -420,6 +431,12 @@ function WorkoutItemLive({ routineId, item }) {
           (a NavLink wearing the button look, DEC-040). */}
       {logging ? (
         <div className="ui-actions ui-exercise-actions">
+          {/* req-117 — only on an unlogged extra set (canRemoveAddedSet). */}
+          {removable ? (
+            <Button variant="quiet" onClick={removeSet}>
+              Remove set
+            </Button>
+          ) : null}
           <Button variant="quiet" onClick={skipExercise}>
             {skipArmed ? 'Tap again to skip' : 'Skip exercise'}
           </Button>
@@ -466,6 +483,13 @@ export function WorkoutItemDone({ routineId, itemId }) {
       ) : (
         <p className="ui-sub">None.</p>
       )}
+      <ExerciseTitle
+        routineId={routineId}
+        item={item}
+        ex={liveExercise(store, item)}
+        bits={[roleTag(item.role)]}
+      />
+      <ExerciseSetupHeader item={item} ex={liveExercise(store, item)} />
       <Button
         onClick={() => {
           // Re-opening a completed exercise: clear the done mark first so the
@@ -477,13 +501,6 @@ export function WorkoutItemDone({ routineId, itemId }) {
       >
         Add set
       </Button>
-      <ExerciseTitle
-        routineId={routineId}
-        item={item}
-        ex={liveExercise(store, item)}
-        bits={[roleTag(item.role)]}
-      />
-      <ExerciseSetupHeader item={item} ex={liveExercise(store, item)} />
     </Screen>
   )
 }
