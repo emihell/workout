@@ -84,11 +84,14 @@ export function roleTag(role) {
 // `[role tag] · WU set · N sets · kg`. Main is unlabelled (roleTag); empty parts are
 // dropped so a minimal item reads just `1 set` with no stray separators. kg shows
 // only when some suggested weight is > 0, joined by a no-break space so `kg` never
-// wraps alone.
+// wraps alone. req-113 — a weight that is 0, empty or missing means "no weight" (DESIGN
+// §1), so it prints as `—`, never `0`: [0, 40] → `—/40 kg`.
 export function routineItemMeta(item) {
   const sets = item.sets || 1
   const weights = item.suggestedWeights || []
-  const kg = weights.some((weight) => Number(weight) > 0) ? `${weights.join('/')}\u00a0kg` : ''
+  const kg = weights.some((weight) => Number(weight) > 0)
+    ? `${Array.from(weights, (weight) => (Number(weight) > 0 ? weight : '—')).join('/')}\u00a0kg`
+    : ''
   return [roleTag(item.role), item.warmup ? 'WU set' : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
     .filter(Boolean)
     .join(' · ')
