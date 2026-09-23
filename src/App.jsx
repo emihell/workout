@@ -227,20 +227,26 @@ function Screen() {
 }
 
 export default function App() {
+  // req-115 — the outer ErrorBoundary is the last resort: a render throw in
+  // StoreProvider, a banner or the menu (outside <main>) shows the fallback instead
+  // of unmounting the whole tree to a blank page. The inner one still handles a
+  // screen throw with the nav left visible.
   return (
-    <StoreProvider>
-      <WakeLock />
-      <RestEndCue />
-      <SaveFailedBanner />
-      <LoadUnreadableBanner />
-      <ExternalChangeBanner />
-      <main className="ui-main">
-        <ErrorBoundary>
-          <Screen />
-        </ErrorBoundary>
-      </main>
-      <BottomMenu />
-      <FeedbackNotesGate />
-    </StoreProvider>
+    <ErrorBoundary>
+      <StoreProvider>
+        <WakeLock />
+        <RestEndCue />
+        <SaveFailedBanner />
+        <LoadUnreadableBanner />
+        <ExternalChangeBanner />
+        <main className="ui-main">
+          <ErrorBoundary>
+            <Screen />
+          </ErrorBoundary>
+        </main>
+        <BottomMenu />
+        <FeedbackNotesGate />
+      </StoreProvider>
+    </ErrorBoundary>
   )
 }

@@ -155,27 +155,69 @@ const COLLECTION_FIELDS = [
   'draftWorkouts',
 ]
 
-function collectionsAreArrays(root) {
+// req-115 (audit D) — the req-39 array check, deepened: every element of every
+// collection must be a plain object, and every nested collection an array. A `[null]`
+// element either throws inside migrateState or passes it and crashes a later render,
+// so it is rejected here, at the import boundary, with the same friendly message.
+// migrateState itself stays unguarded (see req-39 above).
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+// Absent (undefined) is fine — migrateState defaults it; present must be an array of
+// plain objects, each also passing `each` (its nested checks) when one is given.
+function arrayOfObjects(value, each) {
+  if (value === undefined) return true
+  if (!Array.isArray(value)) return false
+  return value.every((element) => isPlainObject(element) && (!each || each(element)))
+}
+
+function snapshotValid(snapshot) {
+  if (snapshot === undefined || snapshot === null) return true
+  return isPlainObject(snapshot) && arrayOfObjects(snapshot.items)
+}
+
+function workoutValid(workout) {
+  return arrayOfObjects(workout.sets) && snapshotValid(workout.snapshot)
+}
+
+function routineValid(routine) {
+  return arrayOfObjects(routine.exercises)
+}
+
+const NESTED_CHECKS = {
+  exercises: null,
+  routines: routineValid,
+  sessions: routineValid,
+  programs: (program) => arrayOfObjects(program.sessions, routineValid),
+  workouts: workoutValid,
+  draftWorkouts: workoutValid,
+  plannedWorkouts: (plan) => arrayOfObjects(plan.items),
+}
+
+function collectionsAreValid(root) {
   for (const field of COLLECTION_FIELDS) {
-    if (root[field] !== undefined && !Array.isArray(root[field])) return false
+    if (!arrayOfObjects(root[field], NESTED_CHECKS[field])) return false
   }
-  // `?.` keeps a non-object/absent schedule safe; only a present, non-array `slots`
-  // (the migrateState `.map` site) is a reject.
-  if (root.schedule?.slots !== undefined && !Array.isArray(root.schedule.slots)) return false
+  // `?.` keeps a non-object/absent schedule safe; only a present `slots` (the
+  // migrateState `.map` site) is checked.
+  if (!arrayOfObjects(root.schedule?.slots)) return false
+  const active = root.activeWorkout
+  if (active !== undefined && active !== null && !(isPlainObject(active) && workoutValid(active))) return false
   return true
 }
 
 export function unwrapBackup(payload) {
   if (!payload || typeof payload !== 'object') return null
   if (payload.kind === BACKUP_KIND) {
-    if (!payload.state || typeof payload.state !== 'object') return null
-    return collectionsAreArrays(payload.state) ? payload : null
+    if (!isPlainObject(payload.state)) return null
+    return collectionsAreValid(payload.state) ? payload : null
   }
   if (
     Array.isArray(payload.exercises) &&
     (Array.isArray(payload.routines) || Array.isArray(payload.sessions) || Array.isArray(payload.programs))
   ) {
-    return collectionsAreArrays(payload) ? payload : null
+    return collectionsAreValid(payload) ? payload : null
   }
   return null
 }
@@ -199,4 +241,15 @@ export function applyBackup(payload) {
       slots: (state.schedule?.slots || []).length,
     },
   }
+}
+
+// req-115 (audit D) — the one import step, pure so it is unit-tested. applyBackup runs
+// to completion BEFORE setState is called: on a bad file it throws to the caller
+// (Settings/Today's existing error path) and setState is never called, so state is
+// unchanged. store.applyBackup used to run it INSIDE the setState updater, where React
+// swallowed the throw and re-threw it during render, above every ErrorBoundary.
+export function commitBackup(payload, setState) {
+  const result = applyBackup(payload)
+  setState(() => result.state)
+  return result
 }

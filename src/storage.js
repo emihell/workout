@@ -167,6 +167,12 @@ export function loadState() {
   // parse counts too (it is the only surviving copy).
   try {
     const parsed = JSON.parse(raw)
+    // req-115 — a value that parses to a non-plain-object ("x", [1,2], 42, null) is
+    // unreadable too: spreading it would "succeed", overwrite it with empty state and
+    // delete the legacy keys. Throw into the DEC-032 path below instead.
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('stored value is not an object')
+    }
     const state = migrateState({ ...emptyState(), ...parsed })
     setLoadUnreadable(false)
     if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION) {
