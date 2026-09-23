@@ -365,7 +365,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - Tap targets below 44px: `.ui-addnote` ≈ 22px on the in-gym screens (`ui.css:660`). Long unbroken names overflow
   at 390px (no `overflow-wrap`).
 
-**Tier 3 — improvements**
+**Tier 3 — improvements** → **specced 2026-09-23 as req-124..129** (DEC-059); Phase 2 items stay for program-creation planning
 - A replacement starts with 1 set (a 3-set swap costs 6 extra taps); Replace should land on the new exercise.
 - Typed-but-uncompleted set values are lost on navigation/reload (`SetLogForm` local state). Keep a draft on the
   active workout.
@@ -378,7 +378,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - **Phase 2 input** (routine-creation friction): four parallel slash-strings (Sets/Reps/Kg/Duration) → a per-set
   grid; the catalog search should be in the picker, multi-select; required Focus; one tap per reorder step; per-item rest.
 - Tests: TZ-set schedule tests; a StoreProvider render test for import; a v9 snapshot round-trip test.
-- Stale backlog notes found: native-dialog count is 14 not 13; N1 "Start disabled" is outdated.
+- ~~Stale backlog notes~~: native-dialog count is **14** (req-24); N1's "Start disabled" was fixed by req-82 (routine picker).
 
 ## Phase 2 — the program-creation flow  (next; the hard one)
 

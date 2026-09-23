@@ -1140,3 +1140,15 @@ Built as req-114..120 (BACKLOG §Flow audit Tier 1).
 6. **In Reps and Duration, `,` separates sets** like `/`: they're whole numbers, so `8,8,8` means three sets.
    **Only Kg** treats `,` as a decimal point.
 7. **Kg with fewer values than Sets repeats the last value** (`40` for 3 sets → 40/40/40), as Reps already does.
+
+## DEC-059 — flow-audit Tier 3 calls  (Emilio, 2026-09-23)
+
+1. **A replacement exercise keeps starting with 1 blank set** (DEC req-109 "blank state" stands); Replace now
+   lands on the new exercise.
+2. **Weight step is entered as a number ("Increment (kg)", comma or dot) plus an "Alternating (4/5)" option**, and
+   catalog imports leave it empty instead of inventing 5 or 2. The stored field keeps its string form (`"2.5"`,
+   `"Alt 4/5"`, `"n/a"`), so no migration.
+3. **Re-adding an archived exercise offers Restore**, which brings back the same exercise with its history, instead
+   of creating a duplicate.
+4. **A duplicate exercise name warns but allows** ("An exercise called Bench already exists": use it, or create
+   anyway).
