@@ -1425,3 +1425,7 @@ as DEC-056 reversals (named in the report); 13 new in `finish-routine.test.js`; 
 corrected. Gate: Planner's own `./check` green (27 files), and the Planner's original repro re-run on the branch: set1-skipped
 35×8 → `[30,35]` (was `[32.5]`), BW targets `['15','9']`. Notes: a skipped hole with no routine weight records 0; recalc's
 "Update?" screen shows no numbers (Phase 2 review step).
+
+## req-113 — routine editor shows "—", not "0", for a set with no weight (DEC-056 correction)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
