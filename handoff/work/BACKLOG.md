@@ -353,7 +353,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   auto-finish does too after Skip ×N. *Q:* warn and offer Abandon?
 - **Changing the loop length** moves "this week" (`store.jsx:127-136`). *Q:* re-anchor?
 
-**Tier 2 — component library** (adoption is high; findings are concentrated)
+**Tier 2 — component library** (adoption is high; findings are concentrated) → **specced 2026-09-23 as req-121..123**
 - 5 navigation-only `<Button onClick={go}>` → NavLink (DEC-040): `Today.jsx:221`, `Routine.jsx:96,365`,
   `setup.jsx:70`, `auto-complete.jsx:93`.
 - The `App.jsx:36,54,73` banners are raw unstyled divs and the Reload button is raw → `Banner`/`Button`.
