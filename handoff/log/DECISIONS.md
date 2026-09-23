@@ -1053,3 +1053,11 @@ exercise as having no history if there is none. Found by the batch-4 review: a s
 with no kg next session, and beat-last-time reported a false "heavier" win against the skipped record's 0 kg.
 Skip/swap (req-109) would have made this the normal case. Not inventing data: skipped records are
 excluded, never reinterpreted. Built as req-111, before req-109.
+
+## DEC-054 — batches go to the Builder session, not ephemeral agents  (Emilio, 2026-09-23)
+
+Supersedes DEC-037's "batches use fresh ephemeral agents". Planner spawned a subagent to build req-103 in
+batch 4; Emilio: *"usually you send you the builder - not an external bot?"* The practice since DEC-047 (batch
+mode keeps Builder's session alive) is: Planner pings the **Builder session** (`SendMessage`) one req at a
+time, merges, pings the next. The discarded subagent attempt left no commits. Ephemeral subagents stay fine
+for **read-only** work (independent spec/diff reviews).
