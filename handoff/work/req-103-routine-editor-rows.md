@@ -17,7 +17,7 @@ slot. "Main" prints on nearly every row. req-93 made main implied in the **worko
 - Each exercise row is **two lines**: line 1 the exercise name (the existing link to the item
   editor); line 2 a small muted meta line: `[role tag] · WU set · N sets · kg`.
 - **Main is not labelled** (the req-93 rule, via `roleTag`); warm-up / finisher / cardio keep their
-  tag on the meta line. Absent role = main.
+  tag on the meta line (existing wording, e.g. `WU routine` — `ids.js:62`). Absent role = main.
 - Up/Down stay where they are and keep working.
 
 ## Scope

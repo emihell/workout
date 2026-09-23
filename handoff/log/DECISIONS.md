@@ -1037,3 +1037,19 @@ carry overrode the plan; a weight change is usually meant for the rest. **Reject
 entirely (loses the warm-up 4→5 kg case req-83 was for); keeping both (the reported bug). A stale stored
 reps override is ignored, not migrated. The req-02 / DEC-002 no-history carry is a separate rule and
 unchanged. Built as req-108.
+
+**DEC-052 amendment (Emilio, 2026-09-23, after the batch-4 external review):** the reps carry stops on
+**no-history** exercises too. DEC-002's carry (from the last working set logged this session, when the
+exercise has no finished history) keeps the **kg**, and reps come from the set's target, or empty. The review
+showed (`setLogSeed({hasHistory:false, carry:{reps:'12'}, target:'15'})` → reps `"12"`) that keeping DEC-002
+whole would reproduce the push-ups complaint on every new exercise. DEC-002's kg half stands.
+
+## DEC-053 — "last time" skips a workout where that exercise was entirely skipped  (Emilio, 2026-09-23)
+
+A workout in which every set of an exercise is skipped holds no load or reps data for that exercise, so it
+is not "last time" for it. History prefill (`lastSetsForExercise` and its consumers) and the "you beat last
+time" comparison look past it to the most recent workout where the exercise was actually done, or treat the
+exercise as having no history if there is none. Found by the batch-4 review: a skipped exercise came back
+with no kg next session, and beat-last-time reported a false "heavier" win against the skipped record's 0 kg.
+Skip/swap (req-109) would have made this the normal case. Not inventing data: skipped records are
+excluded, never reinterpreted. Built as req-111, before req-109.

@@ -18,7 +18,8 @@ two-routine day looks like the same day printed twice.
 - **Two or more:** **one** date line, then each routine under it: its name — focus, and its own Start
   (or `Done …` once finished), in schedule order. It reads as one day with N routines.
 - The in-progress hero (`TodayHero`, DEC-038) still replaces the whole today block while a workout
-  started today is active, as now.
+  started today is active, as now — so while routine 1 is in progress, routine 2's Start is hidden until
+  routine 1 is finished or abandoned. Unchanged, by design.
 
 ## Scope
 

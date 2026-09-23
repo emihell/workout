@@ -15,12 +15,16 @@ From Emilio's in-app note (2026-09-18, `/workout/sess-push-pull`): *"Able to add
 
 - The overview gets an **"Add note"** control that reveals a note field (the req-26/req-80 pattern).
   Once there is text, the field stays shown.
-- The note is kept on the **active workout** (an optional field), so it survives leaving the overview,
-  logging sets and reloading.
-- **Finish screen:** its Note field **starts with that text** and is still editable; what's saved is
-  whatever the field holds at Finish.
-- **Auto-complete** (req-84) saves the overview note as the workout's note instead of `''`. Otherwise
-  a note written on the overview would be lost silently.
+- The note is kept on the **active workout**, so it survives leaving the overview, logging sets and
+  reloading. **Reuse the existing `activeWorkout.overallNote`** — `startWorkout` already creates it as `''`
+  (`store.jsx:241`) and `finishWorkout` writes it (`:369`). Don't add a second field. [review 2026-09-23]
+- **Finish screen:** its Note field shows the **same note**, editable, and edits **write back** to the active
+  workout's note — so Back from Finish and returning, or going back to the overview, shows the edit. One
+  shared note (Emilio, 2026-09-23). What's saved is the note at Finish.
+- **Auto-complete** (req-84) saves the note instead of `''`. Otherwise a note written on the overview
+  would be lost silently. Build the auto-finish arguments in a **pure helper** in a `.js` module (e.g.
+  `autoFinishArgs(active, …)` → `{ overallNote: active.overallNote || '', overallFeel: '', progression }`),
+  called by `auto-complete.jsx:49-50` — tests can't import `.jsx` (`workout-paths.js:4`).
 - Abandon discards it with the workout (unchanged semantics).
 
 ## Scope
@@ -42,10 +46,11 @@ After req-105 (same overview file), before req-109.
   note is still there.
 - **Carried to Finish (browser):** press Finish → the Note field holds the overview text; save → the
   history detail shows it.
-- **Failure case — auto-complete:** finish every exercise and let the summary auto-finish → the saved
-  workout carries the overview note (unit test on the finish call's input; not `''`).
-- **Failure case — older active workout (unit):** an active workout saved **without** the new field
-  loads, and the overview + Finish show an empty note (no crash, no "undefined").
+- **Write-through (browser):** edit the note on Finish → Back → overview shows the edited text.
+- **Failure case — auto-complete (unit):** the auto-finish helper, given an active workout with a note,
+  returns that note (not `''`); given none, returns `''`.
+- **Failure case — older active workout (unit):** an active workout **without** `overallNote` (a legacy
+  draft / `continueDraft`) loads, and the overview + Finish show an empty note (no crash, no "undefined").
 - **Empty note:** no note typed → the saved workout's note is `''`, as today.
 - **No regression:** `./check` green; no `STORAGE_KEY` / schema-version change.
 
