@@ -486,6 +486,12 @@ a.ui-btn--quiet:active {
   color: var(--ui-ink-2);
   margin: 0 0 var(--ui-s3);
 }
+/* req-110 — a multi-routine day: one date line, then each routine (name + its own
+ * Start or Done) as a sub-block. Consecutive routines get a section-size gap so each
+ * Start reads as belonging to the name above it, not the one below. */
+.ui-today-workout__routine + .ui-today-workout__routine {
+  margin-top: var(--ui-s4);
+}
 /* req-53 — the "in progress" marker beside the routine info in the emphasized
  * hero block (today's slot or the standalone hero). The grayscale eyebrow look,
  * inline and set off from the name so it reads as a status, not part of it. */

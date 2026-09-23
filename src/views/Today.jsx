@@ -115,11 +115,15 @@ function UpcomingRow({ store, date, slot, routine, todayKey }) {
 // `TodayHero` (which replaces the whole today block), and a stale active workout
 // (started a prior day) is a Continue row lower down, not the hero. So today's slot
 // block only ever shows Start (or Done); the Continue path lives elsewhere.
-function TodayWorkout({ store, routine, slot, date }) {
+// req-110 — a day with two+ routines is ONE day: the date line prints once, then
+// each routine (name — focus, and its own Start or `Done …`) in schedule order.
+// With one routine the markup is exactly the pre-req-110 block (date, name, Start).
+// Each routine keeps the full-width primary Start (one clearly-tappable Start per
+// routine); `__routine` only spaces the routines apart under the shared date.
+function TodayRoutine({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
   return (
-    <div className="ui-today-workout">
-      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
+    <>
       <p className="ui-today-workout__name">
         {routine.name}
         {routine.focus ? ` — ${routine.focus}` : ''}
@@ -128,6 +132,23 @@ function TodayWorkout({ store, routine, slot, date }) {
         <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
       ) : (
         <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
+      )}
+    </>
+  )
+}
+
+function TodayWorkouts({ store, todays, date }) {
+  return (
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
+      {todays.length === 1 ? (
+        <TodayRoutine store={store} routine={todays[0].routine} slot={todays[0].slot} date={date} />
+      ) : (
+        todays.map(({ slot, routine }) => (
+          <div key={slot.id} className="ui-today-workout__routine">
+            <TodayRoutine store={store} routine={routine} slot={slot} date={date} />
+          </div>
+        ))
       )}
     </div>
   )
@@ -307,9 +328,7 @@ export function Today() {
       {activeStartedToday ? (
         <TodayHero store={store} workout={mine} />
       ) : todays.length ? (
-        todays.map(({ slot, routine }) => (
-          <TodayWorkout key={slot.id} store={store} routine={routine} slot={slot} date={todayKey} />
-        ))
+        <TodayWorkouts store={store} todays={todays} date={todayKey} />
       ) : (
         <TodayEmpty date={todayKey} />
       )}
