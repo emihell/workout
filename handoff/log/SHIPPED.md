@@ -1355,3 +1355,7 @@ in a `.ui-workout-end` stack above Abandon: secondary, primary once `allItemsDon
 (an `<a>` overflowed; buttons were already border-box). Gate: Planner's own `./check` green (23 files); the
 all-done-after-Cancel screenshot shows the primary Finish. Follow-up: `npm run shot` can't reach click-behind
 states (`--click`/`--scroll-bottom` flag) — tooling backlog.
+
+## req-106 — at the start of an exercise, a small preview of all its sets and weights (batch 4, F4)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

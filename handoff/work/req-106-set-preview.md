@@ -1,6 +1,6 @@
 # req-106 — at the start of an exercise, a small preview of all its sets and weights (batch 4, F4)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]**
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-106` (`44ee951`…`44ee951`, 1 commit).** Phase 1. **[ux-feel]**
 
 From Emilio's in-app note (2026-09-18, `/workout/…/item/…overhead-db-press/log`): *"In the start of a
 exercise, at the bottom, show preview of the other sets and their weight, small little text, this is
