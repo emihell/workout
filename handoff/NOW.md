@@ -18,9 +18,10 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23** found 34 new issues → `BACKLOG.md` §Flow audit (Tier 1 A–G, 4 calls for Emilio).
 
 **READY, held:**
-- `req-114`..`req-120` **flow-audit Tier 1** (DEC-058): 114 dates/Today · 115 safe import · 116 Finish nav ·
-  117 undoable taps · 118 routine-editor parsing · 119 setup vs live workout · 120 no invented plan on load (migration).
-  Proposed order 114,115,116,117,118,119,120; 115/116/117/119/120 [P] → reviewer + backup (DEC-057).
+- `req-114`..`req-120` **flow-audit Tier 1** (DEC-058; specs reviewed + revised 2026-09-23): 114 dates/Today ·
+  115 safe import · 116 Finish nav · 117 undoable taps · 118 routine-editor parsing · 119 setup vs live · 120 no
+  invented plan on load. Order **115,114,120,118,116,117,119**. All but 118 [P] → reviewer + backup (DEC-057);
+  120 = migration → Emilio sees the diff.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

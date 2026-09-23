@@ -1132,3 +1132,11 @@ From the 2026-09-23 flow audit (BACKLOG §Flow audit), each answered and confirm
 4. **Finishing with nothing logged warns and offers Abandon** instead of silently saving a workout of skipped
    sets. The auto-complete path never auto-finishes an empty workout.
 Built as req-114..120 (BACKLOG §Flow audit Tier 1).
+
+**DEC-058 additions (Emilio, 2026-09-23, after the Tier 1 spec review):**
+5. **Amends DEC-031:** "referenced" now also includes the **in-progress workout** (its snapshot items and sets).
+   Deleting an exercise or routine it uses **archives** it, like finished-history references, and the confirm
+   says it's in the current workout. Emilio chose archive over blocking the delete.
+6. **In Reps and Duration, `,` separates sets** like `/`: they're whole numbers, so `8,8,8` means three sets.
+   **Only Kg** treats `,` as a decimal point.
+7. **Kg with fewer values than Sets repeats the last value** (`40` for 3 sets → 40/40/40), as Reps already does.

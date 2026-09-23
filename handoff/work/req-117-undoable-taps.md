@@ -18,16 +18,25 @@ and the history write path (DEC-057: reviewer + backup reminder).
 ## The behaviour
 
 1. An **extra set that hasn't been logged yet** shows a **Remove set** control on its log screen **(unconfirmed)**.
-   Removing it shrinks the set count back and restores the done mark. Logged sets are unaffected.
+   "Extra" is persisted: Add set increments a snapshot-item field (e.g. `addedSets`, carried through
+   `migrateState` → `workoutSnapshot` by its spread, WORKFLOW check 5). Remove pops the last set **and** the target
+   and weight `withOneMoreSet` appended (`workout-log.js:26-36`), decrements the field, and the done state is
+   recomputed (all remaining planned sets logged → done). Only the last, unlogged, added set can be removed.
 2. The done view puts the exercise title above Add set (a markup order fix, BACKLOG req-104 follow-up).
 3. Previous on a timed set restores the logged duration.
-4. History "Add set" opens the form **without writing**. The set and snapshot item are created only on Save.
-   Cancel leaves the record unchanged.
+4. History "Add set" opens the form **without writing**, on a new route (today's `/history/:id/set/:index` needs an
+   existing set, `helpers.js:119`). The set and snapshot item are created only on Save. Cancel leaves the record
+   unchanged.
 
 ## Scope
 
 `item.jsx`, `workout-log.js`, `ui/index.jsx` (SetLogForm initial duration if needed), `history/helpers.js`,
-`history/edit.jsx`, `set-edit.jsx`, tests.
+`history/edit.jsx`, `set-edit.jsx`, `route.js` + `App.jsx` (the new History add route), tests. Logic under test goes
+in pure `.js` helpers (`restoreFromLoggedSet` moves out of `item.jsx`).
+
+## Order vs siblings
+
+After req-116 (same `item.jsx` / `overview.jsx` / `workout-log.js` / `route.js`), before req-119.
 
 ## Acceptance criteria
 

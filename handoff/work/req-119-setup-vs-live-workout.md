@@ -17,17 +17,24 @@ snapshot field (DEC-057: reviewer + backup reminder).
 
 ## The behaviour
 
-1. **The active workout counts as a reference**: its snapshot items and sets. Deleting a referenced exercise or
-   routine archives it (as for history, DEC-031), and the confirm names the live workout.
+1. **The active workout counts as a reference** (DEC-058 §5, amending DEC-031): its snapshot items and sets.
+   Deleting a referenced exercise or routine archives it, and the confirm says it's in the current workout.
 2. **Today's first-run empty state** requires no routines **and** no workouts **and** no active workout.
-3. **The live set form reads type and Timed from the snapshot.** Snapshot items gain `hasDuration` at Start (an
-   optional field; missing → read the live exercise, the old behaviour). Only weight step and cues, edited from
-   inside the workout (`workout/setup.jsx`), apply live.
+3. **The live set form reads type and Timed from the snapshot.** Snapshot items gain `hasDuration` when they're
+   built: in `buildPlannedWorkout` (`planSnapshot` has no access to exercises, `model.js:478-485`) **and** in
+   `replacementItem` (req-109). Missing → read the live exercise, the old behaviour. `completeSet`'s `ex.type`
+   (`item.jsx:210`) reads the snapshot too. Only weight step and cues, edited from inside the workout
+   (`workout/setup.jsx`), apply live. **(unconfirmed)** Name, equipment and durationSec also come from the snapshot
+   mid-workout.
 
 ## Scope
 
-`store.jsx` (remove paths + confirm-impact helpers), `Today.jsx`, `item.jsx`, `model.js` (`planSnapshot` adds
-`hasDuration`), tests.
+`store.jsx` (remove paths + confirm-impact helpers, as pure `.js` helpers for the tests), `Today.jsx`, `item.jsx`,
+`model.js` (`buildPlannedWorkout`), `workout-log.js` (`replacementItem`), tests.
+
+## Order vs siblings
+
+**Last** of Tier 1: after req-116 and req-117 (`item.jsx`) and req-120 (`model.js`).
 
 ## Acceptance criteria
 
@@ -38,9 +45,10 @@ snapshot field (DEC-057: reviewer + backup reminder).
 - **Failure case — Library edit (browser/unit):** mid-workout, set the exercise to Timed + bodyweight → the current
   set form is unchanged (kg shown, no countdown).
 - **Old active workout (unit):** a snapshot item without `hasDuration` → falls back to the live exercise (unchanged).
-- **No regression:** `./check` green; `migrateState` output identical for existing data (compare main vs branch on
-  db.json, as req-109's reviewer did). Receipt quoted.
+- **Replacement (unit):** a req-109 replacement item carries `hasDuration` from its exercise.
+- **No regression:** `./check` green. Receipt quoted.
 
 ## Decisions
 
-- Archive-on-live-reference, and snapshot type/Timed. Planner's reading of DESIGN §3 / DEC-031 **(unconfirmed)**.
+- Archive-on-live-reference (Emilio, DEC-058 §5, amends DEC-031).
+- Snapshot type/Timed (DESIGN §3); name/equipment/duration from the snapshot too **(unconfirmed)**.
