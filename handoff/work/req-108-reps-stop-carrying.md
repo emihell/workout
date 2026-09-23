@@ -1,6 +1,6 @@
 # req-108 — a changed reps value no longer carries to the next sets; weight still does (batch 4, F9)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. Behaviour change — **DEC-052** (narrows req-83).
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-108` (`634d20b`…`634d20b`, 1 commit).** Phase 1. Behaviour change — **DEC-052** (narrows req-83).
 
 From Emilio's in-app note (2026-09-18, push-ups): *"I think we added that set 1 change - also changes
 set 2 - should not be that way - each set is separate from each other"*. Chosen 2026-09-23: **weight only**
