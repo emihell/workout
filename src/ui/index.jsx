@@ -29,9 +29,27 @@ export function Button({ variant = 'secondary', block = false, type = 'button', 
 }
 
 // NavLink — the single nav-link primitive (src/views/shared.jsx, DEC-016),
-// styled for the library (≥44px hit area, optional ‹/› chevron).
-export function NavLink({ className, ...rest }) {
-  return <BaseNavLink className={cx('ui-navlink', className)} {...rest} />
+// styled for the library (≥44px hit area, optional ‹/› chevron). Views import THIS
+// one (req-122). `look`: 'link' (default, `.ui-navlink`) | 'primary' | 'secondary' |
+// 'quiet' (a link wearing the Button look — it navigates, it doesn't write, DEC-040)
+// | 'plain' (no library class: an in-text link). `block` = full width (button looks).
+export function NavLink({ look = 'link', ...rest }) {
+  return <BaseNavLink look={look} {...rest} />
+}
+
+// Actions (req-122) — a screen's row of actions (`.ui-actions`). DESIGN §4 order is
+// owned here, not by each call site: `retreat` first (left), `lateral` between,
+// `forward` last (right). Markup order = visual and focus order — never row-reverse.
+// Each slot takes a node (a fragment for several); an empty slot renders nothing.
+// `className` appends a modifier (e.g. `ui-exercise-actions`).
+export function Actions({ retreat, lateral, forward, className }) {
+  return (
+    <div className={cx('ui-actions', className)}>
+      {retreat}
+      {lateral}
+      {forward}
+    </div>
+  )
 }
 
 // SegmentedControl — radio group as equal-width segments; selected set apart by

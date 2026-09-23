@@ -33,7 +33,8 @@ test('Finish is a NavLink with the button look (DEC-040), above Abandon', () => 
   assert.ok(workout.startsWith('<NavLink', open), 'Finish must be a NavLink, not a Button')
   const abandon = workout.indexOf('Abandon', finish)
   assert.ok(abandon > finish, 'Finish must sit above Abandon')
-  assert.match(workout, /ui-btn ui-btn--\$\{allDone \? 'primary' : 'secondary'\} ui-btn--block/)
+  // req-122 — the button look is NavLink's `look`/`block` props (same classes, via lookClass).
+  assert.match(workout, /look=\{allDone \? 'primary' : 'secondary'\} block/)
 })
 
 test('a block-styled anchor fits its container (border-box on .ui-btn--block)', () => {

@@ -6,8 +6,7 @@ import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, 
 import { completedOnDayKey, findRoutine, isFirstRun, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
-import { Button, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
-import { NavLink } from './shared'
+import { Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 // req-114 — the Start names its occurrence (slot@date), so startOrContinue only
@@ -252,7 +251,7 @@ function TodayEmpty({ date }) {
       <p className="ui-today-workout__date">{weekdayDate(date)}</p>
       <p className="ui-today-workout__name">Nothing scheduled today.</p>
       {/* req-121 — navigation only, so a NavLink with the button look (DEC-040). */}
-      <NavLink to="/routines" className="ui-btn ui-btn--primary ui-btn--block">
+      <NavLink to="/routines" look="primary" block>
         Start new workout
       </NavLink>
     </div>

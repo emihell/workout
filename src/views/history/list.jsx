@@ -2,8 +2,8 @@ import { dateKey } from '../../schedule'
 import { exerciseById, exercisesInHistory, findRoutine, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
 import { abandonInProgress, continueInProgress } from '../../workout-actions'
-import { Back, NavLink } from '../shared'
-import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
+import { Back } from '../shared'
+import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import {
   compactDate,
   groupWorkoutsByMonth,
@@ -90,7 +90,7 @@ export function History({ month = null }) {
       <Back to="/" />
       <Title>History</Title>
       <p>
-        <NavLink to="/history/exercises" className="ui-navlink" chevron="forward">By exercise</NavLink>
+        <NavLink to="/history/exercises" chevron="forward">By exercise</NavLink>
       </p>
       {inProgress.length ? (
         <>

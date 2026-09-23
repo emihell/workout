@@ -1,8 +1,8 @@
 import { go } from '../../route'
 import { useStore } from '../../store-context'
 import { navForBase, RoutineScreens } from '../Routine'
-import { Back, Missing, NavLink } from '../shared'
-import { Button, Screen, Title } from '../../ui/index.jsx'
+import { Back, Missing } from '../shared'
+import { Actions, Button, NavLink, Screen, Title } from '../../ui/index.jsx'
 import { whenLabel, workoutRoutineId, workoutRoutineName } from './helpers'
 
 export function HistoryRecalculate({ workoutId }) {
@@ -22,23 +22,25 @@ export function HistoryRecalculate({ workoutId }) {
       </p>
       {routinePath ? (
         <p>
-          <NavLink to={routinePath} className="ui-navlink" chevron="forward">Routine</NavLink>
+          <NavLink to={routinePath} chevron="forward">Routine</NavLink>
         </p>
       ) : null}
       {/* DESIGN §4: Skip dismisses the recalc (retreat) → left; Apply commits
           (forward) → right. */}
-      <div className="ui-actions">
-        <NavLink to={`/history/${workout.id}`} className="ui-btn ui-btn--quiet">Skip</NavLink>
-        <Button
-          variant="primary"
-          onClick={() => {
-            store.recalculateFuturePlans(workout.id)
-            go(`/history/${workout.id}`)
-          }}
-        >
-          Apply
-        </Button>
-      </div>
+      <Actions
+        retreat={<NavLink to={`/history/${workout.id}`} look="quiet">Skip</NavLink>}
+        forward={
+          <Button
+            variant="primary"
+            onClick={() => {
+              store.recalculateFuturePlans(workout.id)
+              go(`/history/${workout.id}`)
+            }}
+          >
+            Apply
+          </Button>
+        }
+      />
     </Screen>
   )
 }

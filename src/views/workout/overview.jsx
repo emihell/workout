@@ -7,8 +7,8 @@ import { findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
 import { allItemsDone, autoCompleteArmed, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
-import { Back, Missing, NavLink } from '../shared'
-import { Button, List, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
+import { Back, Missing } from '../shared'
+import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
 import { weekdayDate } from '../history/helpers'
 import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
@@ -77,7 +77,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           <>
             <p className="ui-sub">Done {weekdayDate(dateKey(done.finishedAt))}</p>
             <p>
-              <NavLink to={`/history/${done.id}`} className="ui-navlink" chevron="forward">
+              <NavLink to={`/history/${done.id}`} chevron="forward">
                 View in History
               </NavLink>
             </p>
@@ -99,7 +99,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           </Button>
         ) : (
           <p>
-            <NavLink to={scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`} className="ui-navlink" chevron="forward">
+            <NavLink to={scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}/setup` : `/workout/${routineId}/setup`} chevron="forward">
               Add exercises
             </NavLink>
           </p>
@@ -187,10 +187,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           done (i.e. after the auto-complete summary is cancelled). It navigates without
           writing, so per DEC-040 it's a NavLink wearing the button look, not a Button. */}
       <div className="ui-workout-end">
-        <NavLink
-          to={`/workout/${routineId}/finish`}
-          className={`ui-btn ui-btn--${allDone ? 'primary' : 'secondary'} ui-btn--block`}
-        >
+        <NavLink to={`/workout/${routineId}/finish`} look={allDone ? 'primary' : 'secondary'} block>
           Finish
         </NavLink>
         <Button variant="quiet" block onClick={() => abandonWorkout(store)}>

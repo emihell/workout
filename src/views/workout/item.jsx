@@ -27,8 +27,8 @@ import {
   setTargetFor,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
-import { Back, ExercisesLink, Missing, NavLink } from '../shared'
-import { Button, Field, List, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
+import { Back, ExercisesLink, Missing } from '../shared'
+import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath, MissingItem } from './helpers'
 import { RestPill, useRestCountdown } from './rest'
 import { unlockAudio } from '../../rest-cue'
@@ -65,7 +65,7 @@ function ExerciseTitle({ routineId, item, ex, bits, aside }) {
       <div className="ui-exercise-head">
         <Title>
           {inLibrary ? (
-            <NavLink to={exerciseEditorPath(routineId, item)}>{name}</NavLink>
+            <NavLink to={exerciseEditorPath(routineId, item)} look="plain">{name}</NavLink>
           ) : (
             name
           )}
@@ -425,20 +425,25 @@ function WorkoutItemLive({ routineId, item }) {
           exercise writes (a Button, two taps); Replace exercise only opens the picker
           (a NavLink wearing the button look, DEC-040). */}
       {logging ? (
-        <div className="ui-actions ui-exercise-actions">
-          {/* req-117 — only on an unlogged extra set (canRemoveAddedSet). */}
-          {removable ? (
-            <Button variant="quiet" onClick={removeSet}>
-              Remove set
-            </Button>
-          ) : null}
-          <Button variant="quiet" onClick={skipExercise}>
-            {skipArmed ? 'Tap again to skip' : 'Skip exercise'}
-          </Button>
-          <NavLink to={itemReplacePath(routineId, item)} className="ui-btn ui-btn--quiet">
-            Replace exercise
-          </NavLink>
-        </div>
+        <Actions
+          className="ui-exercise-actions"
+          lateral={
+            <>
+              {/* req-117 — only on an unlogged extra set (canRemoveAddedSet). */}
+              {removable ? (
+                <Button variant="quiet" onClick={removeSet}>
+                  Remove set
+                </Button>
+              ) : null}
+              <Button variant="quiet" onClick={skipExercise}>
+                {skipArmed ? 'Tap again to skip' : 'Skip exercise'}
+              </Button>
+              <NavLink to={itemReplacePath(routineId, item)} look="quiet">
+                Replace exercise
+              </NavLink>
+            </>
+          }
+        />
       ) : null}
       {/* req-26 — the equipment + cues block that sat under the buttons is removed
           to declutter the mid-set screen. Cues stay reachable: the exercise Title

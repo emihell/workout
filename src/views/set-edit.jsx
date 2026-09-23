@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { RPE_OPTIONS, rpeOptionValue } from '../ids'
-import { Button, Field, NumberField, SectionHeader, SegmentedControl } from '../ui/index.jsx'
-import { NavLink } from './shared'
+import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedControl } from '../ui/index.jsx'
 
 // req-18 / DEC-021 #2 — the shared kg / reps / effort / note editor for a single
 // already-logged set, used by both WorkoutSetEdit (a set in the active workout)
@@ -70,12 +69,10 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
         </>
       ) : null}
       <Field label="Note" value={note} onChange={(event) => setNote(event.target.value)} />
-      <div className="ui-actions">
-        <NavLink to={cancelTo} className="ui-btn ui-btn--quiet">Cancel</NavLink>
-        <Button type="submit" variant="primary">
-          Save
-        </Button>
-      </div>
+      <Actions
+        retreat={<NavLink to={cancelTo} look="quiet">Cancel</NavLink>}
+        forward={<Button type="submit" variant="primary">Save</Button>}
+      />
     </form>
   )
 }

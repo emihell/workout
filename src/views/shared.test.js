@@ -19,7 +19,9 @@ test('Back takes a `to` (its logical parent) and defaults to Today', () => {
 })
 
 test('req-62 — Back is a NavLink to `to` (DEC-016 nav = link), a ‹ back-chevron, not a button', () => {
-  assert.match(src, /<NavLink to=\{to\} className="ui-navlink" chevron="back">Back<\/NavLink>/)
+  // req-122 — the `.ui-navlink` treatment is `look="link"` (lookClass maps it), not a hand-written class.
+  assert.match(src, /<NavLink to=\{to\} look="link" chevron="back">Back<\/NavLink>/)
+  assert.match(src, /const classes = \[lookClass\(look, block\), className\]/)
   // it must NOT be a <button> doing imperative navigation
   assert.doesNotMatch(src, /<button[^>]*onClick=\{\(\) => go\(to\)\}/)
 })
