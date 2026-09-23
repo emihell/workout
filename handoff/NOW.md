@@ -26,9 +26,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** req-100..102 LIVE (tooling: `plan ping`, NOW.md guard, drift check — L-019..021).
 
 **READY, held:**
-- `req-109`, `req-111` **gym-flow batch 4** (103–108, 110 LIVE) (feedback 2026-09-17..20; reviewed 2026-09-23; `BACKLOG.md` §batch 4):
-  111 skip-proof "last time" (DEC-053) ·
-  109 skip/replace (model.js — reviewer). Build order 111,109.
+- `req-109` **gym-flow batch 4**, last one (103–108, 110–111 LIVE; `BACKLOG.md` §batch 4): skip/replace
+  (model.js — independent reviewer before merge).
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

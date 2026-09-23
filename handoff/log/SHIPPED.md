@@ -1395,4 +1395,10 @@ Gate: Planner's own `./check` green (25 files); one-done screenshot confirmed cl
 
 ## req-111 — "last time" looks past a workout where that exercise was entirely skipped (DEC-053)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `5cabbfd`…`80a1a15`, throwaway agent, 1 review loop-back). DEC-053: `lastSetsForExercise` returns the newest
+finished workout with a non-skipped **working** set, else the newest with any non-skipped set (warm-up-only history),
+else null — so a skipped week (incl. warm-up-then-skip) is passed over for prefill and `historyPrescription`.
+`beat-last-time` drops skipped sets on both sides and, given the new `previousSameRoutineWorkouts` list (finish.jsx),
+compares each exercise to the newest prior where it was done. No stored record rewritten; no existing test edited; 76/76.
+Loop-back: the first cut counted a warm-up-only workout as last time (my spec wording) — tightened, DEC-053 clarified.
+Gate: Planner's own `./check` green; screenshot shows 40 kg prefilled past an all-skipped week.
