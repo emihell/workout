@@ -61,20 +61,43 @@ PREVIEW_LOG="${TMPDIR:-/tmp}/workout-plan-preview.log"
 # Sets PLANNING_DIR / CODE_DIR from `git worktree list`, keyed on branch name
 # rather than a hardcoded path — req-02 may move things, Emilio may rename
 # either checkout directory.
+#
+# req-129: a worktree NESTED inside another listed worktree (a throwaway build
+# agent's, under `workout-codebase/.claude/worktrees/`) is never the code
+# worktree, so it is skipped. Before this the last non-planning worktree listed
+# won, and an agent's worktree on `req-120` made `plan publish` refuse ("code
+# worktree is on 'req-120'"). Nesting is a path-prefix test against the other
+# listed worktrees, so no directory name is hardcoded and the branch-keyed
+# design holds.
+worktree_is_nested() {
+  local candidate="$1" other
+  while IFS= read -r other; do
+    [ -n "$other" ] && [ "$other" != "$candidate" ] || continue
+    case "$candidate" in
+      "$other"/*) return 0 ;;
+    esac
+  done <<<"$2"
+  return 1
+}
+
 find_worktrees() {
   PLANNING_DIR=""
   CODE_DIR=""
-  local path=""
+  local path="" line all_paths
+  all_paths="$(git worktree list --porcelain | sed -n 's/^worktree //p')"
   while IFS= read -r line; do
     case "$line" in
       worktree\ *)
         path="${line#worktree }"
+        if worktree_is_nested "$path" "$all_paths"; then
+          path=""
+        fi
         ;;
       branch\ refs/heads/planning)
-        PLANNING_DIR="$path"
+        [ -n "$path" ] && PLANNING_DIR="$path"
         ;;
       branch\ refs/heads/*)
-        CODE_DIR="$path"
+        [ -n "$path" ] && CODE_DIR="$path"
         ;;
     esac
   done < <(git worktree list --porcelain)
@@ -579,6 +602,34 @@ print(result)
 PY
 }
 
+# req-129 (DEC-057 / L-023): the independent-reviewer trigger comes from the
+# FILES a req touches, not its Gate tag. Given a merge commit, print a warning
+# (stdout; the caller routes it) when its diff touches a trigger path and the
+# merged `reports/<reqid>.md` names no reviewer. Prints nothing otherwise.
+# Non-blocking by design — it is a reminder, never a refusal.
+#   trigger paths: src/ store*, model, storage, progress, workout-log, and the
+#   migration/load path (migrat*, load*, exchange, import-backup); *.test.js
+#   files are excluded — a test edit changes no stored data or prefill.
+#   reviewer: the report matches `reviewer` case-insensitively (which covers
+#   "Reviewer" and "independent reviewer", the req-129 wording).
+REVIEWER_TRIGGER_RE='^src/(.*/)?(store[^/]*|model|storage|progress|workout-log|migrat[^/]*|load[^/]*|exchange|import-backup)\.(js|jsx|mjs)$'
+
+reviewer_warning() {
+  local code_dir="$1" merge="$2" reqid="$3" touched report
+  touched="$(git -C "$code_dir" diff --name-only "$merge^1" "$merge" 2>/dev/null \
+    | grep -Ev '\.test\.(js|jsx|mjs)$' | grep -E "$REVIEWER_TRIGGER_RE" || true)"
+  [ -n "$touched" ] || return 0
+  report="$(git -C "$code_dir" show "$merge:reports/$reqid.md" 2>/dev/null || true)"
+  if [ -n "$report" ] && grep -qi 'reviewer' <<<"$report"; then
+    return 0
+  fi
+  local why="names no independent reviewer"
+  [ -n "$report" ] || why="is missing, so names no independent reviewer"
+  echo "plan closeout: WARNING — $reqid touches DEC-057 trigger path(s) but reports/$reqid.md $why:"
+  printf '%s\n' "$touched" | sed 's/^/  /'
+  echo "  (DEC-057: the reviewer comes BEFORE merge. Not blocking — record why none ran, or get one now.)"
+}
+
 cmd_closeout() {
   local arg="${1:-}"
   if [ -z "$arg" ]; then
@@ -742,6 +793,15 @@ cmd_closeout() {
     echo "plan closeout: WARNING — $now not found; shipped range not bumped." >&2
   fi
 
+  # 4c. req-129 (DEC-057): reviewer reminder from the merged diff's files. Printed
+  # now and again in the final summary, since publish's ./check output scrolls it
+  # away. Never blocks: the merge has already landed.
+  local review_warn=""
+  if [ -n "$merge_commit" ]; then
+    review_warn="$(reviewer_warning "$CODE_DIR" "$merge_commit" "$reqid")"
+    [ -z "$review_warn" ] || printf '%s\n' "$review_warn" >&2
+  fi
+
   # 5. Save the flip on planning, publish planning->main (runs ./check), push
   # both branches, drop the branch. ./plan save must run from the planning
   # worktree, so it is invoked there in a subshell.
@@ -767,6 +827,10 @@ cmd_closeout() {
   echo "  1. SHIPPED.md — replace the ${reqid} stub line with the real entry (what changed / verified)."
   echo "  2. NOW.md — move the \"Building:\" marker off ${reqid}; add any DEC-/L- from the build."
   echo "  3. ./plan save \"$reqid ledger\"  &&  ./plan publish --push"
+  if [ -n "$review_warn" ]; then
+    echo
+    printf '%s\n' "$review_warn"
+  fi
 }
 
 # req-33: one read-only command that verifies first-machine setup and explains
