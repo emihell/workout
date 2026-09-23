@@ -1,20 +1,21 @@
 // req-109 — Skip exercise / Replace exercise mid-workout. The pure helpers live in
 // workout-log.js; the persisted-data half is the workoutSnapshot guard in model.js,
 // exercised here through the REAL migrateState (what storage.loadState runs on every
-// load) and the REAL buildFinishProgression + applyProgressionToRoutines (what
-// store.finishWorkout applies to the routine).
+// load) and the REAL buildFinishProgression, finishedState and recalculatedState
+// (store.finishWorkout / store.recalculateFuturePlans).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  applyProgressionToRoutines,
   buildFinishProgression,
   buildPlannedWorkout,
   migrateState,
   planSnapshot,
+  recalculatedState,
 } from './model.js'
 import { historyPrescription, historySetPrefill, lastSetsForExercise } from './storage.js'
 import {
   allItemsDone,
+  finishedState,
   initialSetFields,
   isAddedMidWorkout,
   itemAllSkipped,
@@ -305,10 +306,14 @@ describe('req-109 Replace exercise (replaceItemPatch + replacementItem)', () => 
     assert.deepEqual(rep.targets, ['12', '12']) // the reviewer's probe result
   })
 
-  it('template untouched: finishing the reloaded state leaves the routine as the same workout without the replacement', () => {
+  // req-112 — Finish no longer writes the routine (DEC-056), so this now runs the path
+  // that still does: the real finish reducer, then History recalc on that workout.
+  it('template untouched: finish + recalc on the reloaded state leaves the routine as the same workout without the replacement', () => {
     const finishRoutines = (s) => {
       const progression = buildFinishProgression(s.exercises, s.activeWorkout)
-      return applyProgressionToRoutines(s.routines, s.activeWorkout.routineId, progression)
+      const finished = finishedState(s, { progression }, '2026-09-23T11:00:00.000Z')
+      assert.equal(finished.routines, s.routines, 'Finish itself leaves routines alone')
+      return recalculatedState(finished, s.activeWorkout.id).routines
     }
     // with the replacement (in the routine's exercise), one set logged on it (60×7), reloaded
     let withRep = replace(baseState(), 'ex-c')

@@ -91,13 +91,25 @@ describe('req-83 store wiring for live seed overrides', () => {
     assert.match(body[0], /seedOverrides:\s*\{\}/, 'startWorkout must init seedOverrides: {}')
   })
 
-  it('finishWorkout drops seedOverrides so it never lands on finished history', () => {
-    const body = src.match(/finishWorkout\(\{[\s\S]*?\n {6}\},/)
+  // req-112 — the finish reducer moved to workout-log.finishedState; the seedOverrides
+  // drop is now asserted behaviourally there (finish-routine.test.js). This guard
+  // checks the store delegates to it, so that test covers what the store does.
+  it('finishWorkout delegates to finishedState (which drops seedOverrides)', () => {
+    const body = src.match(/finishWorkout\(args\)\s*\{[\s\S]*?\n {6}\},/)
     assert.ok(body, 'finishWorkout method not found in store.jsx')
-    assert.match(
-      body[0],
-      /const \{ seedOverrides, \.\.\.\w+ \} = s\.activeWorkout/,
-      'finishWorkout must strip seedOverrides off the finished record',
-    )
+    assert.match(body[0], /setState\(\(s\) => finishedState\(s, args\)\)/)
+  })
+})
+
+// req-112 / DEC-056 — Finish never writes the routine. The only routine write from a
+// finished workout is the explicit History recalc (recalculatedState).
+describe('req-112 store: no routine write at Finish', () => {
+  const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
+
+  it('store.jsx no longer applies progression anywhere; recalc goes through recalculatedState', () => {
+    assert.equal(/applyProgressionToRoutines/.test(src), false)
+    const body = src.match(/recalculateFuturePlans\(workoutId\)\s*\{[\s\S]*?\n {6}\},/)
+    assert.ok(body, 'recalculateFuturePlans not found in store.jsx')
+    assert.match(body[0], /recalculatedState\(s, workoutId\)/)
   })
 })

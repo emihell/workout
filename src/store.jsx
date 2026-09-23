@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react'
 import { uid } from './ids'
 import { applyBackup as applyBackupFn } from './exchange.js'
-import { applyProgressionToRoutines, buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, progressionFromWorkout } from './model'
+import { buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, recalculatedState } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
 import { historyPrescription, loadState, saveState } from './storage'
 import { StoreContext } from './store-context'
-import { addWorkingSetToState, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withSkippedUnloggedSets } from './workout-log'
+import { addWorkingSetToState, finishedState, itemKey, replaceItemPatch, replacementItem, skipItemPatch } from './workout-log'
 
 export function StoreProvider({ children }) {
   const [state, setStateRaw] = useState(loadState)
@@ -369,49 +369,12 @@ export function StoreProvider({ children }) {
         }))
       },
       recalculateFuturePlans(workoutId) {
-        setState((s) => {
-          const workout = (s.workouts || []).find((candidate) => candidate.id === workoutId)
-          if (!workout) return s
-          return {
-            ...s,
-            routines: applyProgressionToRoutines(
-              s.routines,
-              workout.routineId || workout.sessionId,
-              progressionFromWorkout(s, workout),
-            ),
-          }
-        })
+        setState((s) => recalculatedState(s, workoutId))
       },
-      finishWorkout({ overallNote, overallFeel, progression = [] }) {
-        setState((s) => {
-          if (!s.activeWorkout) return s
-          // req-83 (N9) — the live seed-override map is transient session state; it is
-          // dropped at finish so it never lands on the finished-history record (which
-          // feeds history-prefill from `sets` alone).
-          const { seedOverrides, ...activeToFinish } = s.activeWorkout
-          const finished = withSkippedUnloggedSets({
-            ...activeToFinish,
-            finishedAt: new Date().toISOString(),
-            overallNote: overallNote || '',
-            overallFeel: overallFeel || '',
-            restEndsAt: null,
-            restPausedRemaining: null,
-            progression,
-          })
-          return {
-            ...s,
-            routines: applyProgressionToRoutines(
-              s.routines,
-              finished.routineId || finished.sessionId,
-              progression,
-            ),
-            plannedWorkouts: (s.plannedWorkouts || []).filter(
-              (plan) => plan.occurrenceId !== s.activeWorkout.occurrenceId,
-            ),
-            activeWorkout: null,
-            workouts: [finished, ...s.workouts],
-          }
-        })
+      // req-112 / DEC-056 — Finish never writes the routine; the pure reducer is in
+      // workout-log.js so the manual and auto-complete paths are unit-tested through it.
+      finishWorkout(args) {
+        setState((s) => finishedState(s, args))
       },
       applyBackup(payload) {
         let result

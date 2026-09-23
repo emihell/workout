@@ -336,8 +336,9 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
 }
 
 // req-40 (F-CODE-1) — the single, canonical per-item progression computation shared
-// by BOTH the Finish screen (finish.jsx, what a finished workout SAVES onto the
-// routine) and `progressionFromWorkout` (the History recalc path). It used to be
+// by BOTH the Finish screen (finish.jsx, the `progression` record a finished workout
+// stores — req-112 / DEC-056: stored only, no longer written onto the routine) and
+// `progressionFromWorkout` (the History recalc path, the one that writes the routine). It used to be
 // computed twice with divergent set-matching, so the same workout could yield two
 // different saved recommendations (fails DESIGN §2). This reconciles to the fuller
 // model.js semantics (DEC at merge): match a working set by `routineItemId ||
@@ -354,17 +355,17 @@ export function progressionForItem(exercises, workout, item) {
       weightStep: item.weightStep,
     }
   const itemIdValue = item.routineItemId || item.sessionItemId || item.id
-  const sets = (workout?.sets || []).filter((set) => {
+  // req-112 — every working set in log order, skipped included, so position = the
+  // set's own work index (the index the log form uses: count of prior working sets).
+  const workSets = (workout?.sets || []).filter((set) => {
     const setItemId = set.routineItemId || set.sessionItemId
-    return (
-      set.setType !== 'wu' &&
-      (setItemId === itemIdValue || setItemId === item.id) &&
-      !isSkippedSet(set)
-    )
+    return set.setType !== 'wu' && (setItemId === itemIdValue || setItemId === item.id)
   })
+  const sets = workSets.filter((set) => !isSkippedSet(set))
   const recommendation = recommendNextPrescription({
     targets: item.targets,
-    sets,
+    weights: item.suggestedWeights,
+    sets: workSets,
     exercise,
   })
   return {
@@ -408,6 +409,22 @@ export function progressionFromWorkout(state, workout) {
     const { routineItemId, to, targetsTo } = progressionForItem(state.exercises, workout, item)
     return { routineItemId, to, targetsTo }
   })
+}
+
+// History → correct → "Update?" → Apply (store.recalculateFuturePlans): the ONE path
+// that writes a workout's recommendation onto its routine (req-112 / DEC-056 — Finish
+// no longer does). Unknown workout → the same state.
+export function recalculatedState(state, workoutId) {
+  const workout = (state.workouts || []).find((candidate) => candidate.id === workoutId)
+  if (!workout) return state
+  return {
+    ...state,
+    routines: applyProgressionToRoutines(
+      state.routines,
+      workout.routineId || workout.sessionId,
+      progressionFromWorkout(state, workout),
+    ),
+  }
 }
 
 export function buildPlannedWorkout(state, { routineId, date, scheduleSlotId = null, occurrenceId = null }) {

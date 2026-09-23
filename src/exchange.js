@@ -46,7 +46,7 @@ export const ASSISTANT = {
     schedule:
       'loopWeeks 1–4. slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history.',
     workout:
-      'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, stores the snapshot in workouts, and ticks suggestedWeights/targets on the routine from completed (non-skipped) history. Do not invent completed workouts.',
+      'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, and stores the snapshot in workouts. Finish never changes the routine; only an explicit History recalculation writes suggestedWeights/targets onto it. Do not invent completed workouts.',
     ids: 'Reuse existing ids. New ones: ex-…, rtn-…, si-…, slot-…, wo-… Existing routine ids may still be sess-….',
   },
   import: {

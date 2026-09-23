@@ -49,14 +49,37 @@ function isAmrap(value) {
   return String(value || '').toLowerCase().includes('amrap')
 }
 
+// Same predicate as workout-log.js isSkippedSet (not imported: workout-log imports
+// model, which imports this file).
+function isSkipped(set) {
+  return String(set?.reps || '').toLowerCase() === 'skipped'
+}
+
 function countableReps(value) {
   if (isDurationTarget(value) || isAmrap(value)) return null
   return parseReps(value)
 }
 
-export function recommendNextPrescription({ targets, sets, exercise }) {
+// req-112 / DEC-056 — per set. `sets` is POSITIONAL by work-set index: sets[i] is the
+// item's i-th working set, and a skipped (or null / not yet logged) entry is left as the
+// routine has it — `weights[i]` (the routine's suggestedWeights) and `targets[i]` stay.
+// Each logged set is judged against ITS OWN index's target. It used to take only the
+// logged sets, so skipping set 1 judged set 2 against set 1's target and dropped a
+// weight. The result keeps every routine weight (never shrinks). It only reaches past
+// them up to the last logged set; a skipped hole with no routine weight reads 0 (the
+// app's "no weight", as a bodyweight set already records).
+export function recommendNextPrescription({ targets, weights: routineWeights, sets, exercise }) {
   const nextTargets = [...(targets || [])]
-  const weights = []
+  const baseWeights = routineWeights || []
+  const positional = sets || []
+  let lastLogged = -1
+  positional.forEach((set, index) => {
+    if (set && !isSkipped(set)) lastLogged = index
+  })
+  const weights = Array.from(
+    { length: Math.max(baseWeights.length, lastLogged + 1) },
+    (_, index) => Number(baseWeights[index]) || 0,
+  )
   let movedUp = false
   let movedDown = false
   // req-42 / DEC-030 — computed once (exercise is constant across the sets). With no
@@ -64,7 +87,8 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
   // 'keep' and the reported weight never contradicts the action.
   const hasIncrements = validWeights(exercise).length > 0
 
-  ;(sets || []).forEach((set, index) => {
+  positional.forEach((set, index) => {
+    if (!set || isSkipped(set)) return
     const actualWeight = Number(set.weight) || 0
     const actualReps = parseReps(set.reps)
     const targetReps = countableReps(targets?.[index] ?? targets?.at(-1))
@@ -73,7 +97,7 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
     const bodyweight = !isWeightedType(exercise?.type)
 
     if (bodyweight || actualWeight <= 0) {
-      weights.push(actualWeight)
+      weights[index] = actualWeight
       if (exercise?.type === 'bodyweight' && targetReps != null) {
         if (missed || rpe >= 5) {
           nextTargets[index] = String(Math.max(1, targetReps - 1))
@@ -88,20 +112,20 @@ export function recommendNextPrescription({ targets, sets, exercise }) {
 
     if (missed || rpe >= 5) {
       if (hasIncrements) {
-        weights.push(moveToValidWeight(actualWeight, exercise, -1))
+        weights[index] = moveToValidWeight(actualWeight, exercise, -1)
         movedDown = true
       } else {
-        weights.push(actualWeight)
+        weights[index] = actualWeight
       }
     } else if (!missed && rpe != null && rpe <= 2) {
       if (hasIncrements) {
-        weights.push(moveToValidWeight(actualWeight, exercise, 1))
+        weights[index] = moveToValidWeight(actualWeight, exercise, 1)
         movedUp = true
       } else {
-        weights.push(actualWeight)
+        weights[index] = actualWeight
       }
     } else {
-      weights.push(actualWeight)
+      weights[index] = actualWeight
     }
   })
 
