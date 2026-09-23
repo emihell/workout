@@ -274,6 +274,12 @@ live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 
   against an all-skipped prior; (b) an exercise with only warm-up history gets neither a work prefill nor the
   DEC-002 kg carry (pre-existing). Small.
 
+- **req-109 follow-ups:** (a) **Q for Emilio:** Skip exercise leaves the running rest timer going (per-set Skip
+  clears it) — keep? (b) `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
+  replacement they read its rest 0. (c) **Investigate (pre-existing, main):** in the reviewer's run a routine item's
+  `suggestedWeights` went [30,30]→[30] after a finish with 1 logged + 1 skipped set (`progressionForItem`) — check the
+  routine template doesn't lose per-set weights on a skipped set.
+
 **Specced 2026-09-23:** F1→req-103, F3+F5→req-104, F6→req-105, F4→req-106, F7→req-107, F9→req-108 (DEC-052), F10→req-110; F2+F8→req-109 (blank-state replace; external review found the migrate-on-load blockers); review also found → req-111 (DEC-053). **Grouping (original):** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
 (both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
 

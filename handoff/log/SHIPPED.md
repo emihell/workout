@@ -1405,4 +1405,12 @@ Gate: Planner's own `./check` green; screenshot shows 40 kg prefilled past an al
 
 ## req-109 — skip a whole exercise, or replace it with another, mid-workout (batch 4, F2+F8)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `7a574f8`…`ab2d443`, throwaway agent; independent reviewer MERGE-WITH-FOLLOWUPS, 1 loop-back).
+Skip exercise (two-tap arm, 3s reset) logs remaining sets via the shared `skippedSet`; an all-skipped row reads
+`· skipped`. Replace exercise → picker (`/workout/:r/item/:id/replace`) → original skipped + a blank item inserted after it
+(`addedMidWorkout: true`, unique `uid('mid')` key, role = original's, rest from its own last snapshot). `workoutSnapshot`:
+a marked item is returned as written (no template match, no backfill); other items' backfill ignores its sets; key-less
+legacy sets never attribute to it. Reviewer: main vs branch `migrateState` on db.json + 13 adversarial variants → ALL
+IDENTICAL; no path writes a replacement onto the template. Loop-back: guard-2 test (fails with the guard off), history
+detail resolves items id-first (`snapshot-item.js`), arm clears on set actions. No schema bump; existing tests unmodified;
+368 pass. Gate: Planner's own `./check` green (26 files); screenshots confirmed controls + overview after replace.
