@@ -1,6 +1,6 @@
 # req-103 — routine editor: two-line exercise rows, main unlabelled (gym-flow batch 4, F1)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]**
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-103` (`bcce94a`…`bcce94a`, 1 commit).** Phase 1. **[ux-feel]**
 
 From Emilio's in-app note (2026-09-17, `/routines/sess-upper`): *"This list is messy, maybe two does
 within each row? Do we need to say main on each main exercise?"*

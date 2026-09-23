@@ -196,6 +196,7 @@ The primary way build work flows now: **you ping code CC directly** (`SendMessag
 session, e.g. `workout-codebase-a4`), it builds and reports back, you verify and close.
 
 **Choose the lane by whether the DESIGN is settled (DEC-037), not by tag or batch/single:**
+- **Lanes are DEC-055** (batch → throwaway agents; live/feel and watched single reqs → Builder session).
 - **Settled + mechanical → autonomous ephemeral agents (batches).** Spawn a fresh
   general-purpose build agent **per req in its own isolated worktree** (no `/clear` — there
   is none; the fix is not reusing a session). It builds branch `req-N` off `main`, runs
