@@ -1,7 +1,7 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
-import { isSkippedSet, loggedSetCount } from './workout-log.js'
+import { isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -385,6 +385,26 @@ export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().t
       items: (plan.items || []).filter((item) => item.exerciseId !== exerciseId),
     })),
   }
+}
+
+// req-124 — the Replace exercise reducer, moved out of store.jsx (logic unchanged from
+// req-109) so the caller can pick the new item's `id` BEFORE the setState updater and
+// navigate to it. Returns `s` unchanged (same reference) when there is no active
+// workout, the exercise or the original item is unknown, or the patch fails — in that
+// case no item with `id` exists.
+export function replaceItemInState(s, itemId, exerciseId, id) {
+  const active = s.activeWorkout
+  const exercise = (s.exercises || []).find((candidate) => candidate.id === exerciseId)
+  const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
+  if (!active || !exercise || !original) return s
+  const replacement = replacementItem({
+    id,
+    original,
+    exercise,
+    restSec: historyPrescription(s.workouts, exerciseId)?.restSec,
+  })
+  const patch = replaceItemPatch(active, itemId, replacement)
+  return patch ? { ...s, activeWorkout: { ...active, ...patch } } : s
 }
 
 export function removeRoutineFromState(s, routineId, archivedAt = new Date().toISOString()) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { useStore } from '../../store-context'
@@ -12,7 +12,8 @@ import { RestPill } from './rest'
 // library's exercises, archived ones excluded, with the RoutineExercisePick search.
 // Picking one is an action (it writes): the original's remaining sets are logged
 // skipped and a blank item for the picked exercise is inserted directly after it, for
-// this workout only (store.replaceItem). Back / Cancel change nothing. An exercise that
+// this workout only (store.replaceItem), and the picker lands on the new item's log
+// screen (req-124). Back / Cancel change nothing. An exercise that
 // is already done can't be replaced (re-open it first), so a done item bounces back to
 // the overview.
 export function WorkoutItemReplace({ routineId, itemId }) {
@@ -22,9 +23,12 @@ export function WorkoutItemReplace({ routineId, itemId }) {
   const item = mine ? findItem(active.snapshot?.items, itemId) : null
   const done = Boolean(item && (itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone))
   const [query, setQuery] = useState('')
+  // req-124 — a pick marks the original done (skipped), which would re-fire the bounce
+  // below and override the navigation to the new item; a picked screen never bounces.
+  const picked = useRef(false)
 
   useEffect(() => {
-    if (done) go(`/workout/${routineId}`, { replace: true })
+    if (done && !picked.current) go(`/workout/${routineId}`, { replace: true })
   }, [done, routineId])
 
   if (!mine || !item || done) return <MissingItem />
@@ -39,8 +43,10 @@ export function WorkoutItemReplace({ routineId, itemId }) {
 
   function pick(exerciseId) {
     recordButton('replace-exercise')
-    store.replaceItem(itemKey(item), exerciseId)
-    go(`/workout/${routineId}`, { replace: true })
+    picked.current = true
+    // req-124 — land on the new exercise's log screen (replacing the picker in history).
+    const newKey = store.replaceItem(itemKey(item), exerciseId)
+    go(itemLogPath(routineId, { id: newKey }), { replace: true })
   }
 
   return (

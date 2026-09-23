@@ -3,9 +3,9 @@ import { uid } from './ids'
 import { commitBackup } from './exchange.js'
 import { buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, recalculatedState } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
-import { historyPrescription, loadState, removeExerciseFromState, removeRoutineFromState, saveState } from './storage'
+import { loadState, removeExerciseFromState, removeRoutineFromState, replaceItemInState, saveState } from './storage'
 import { StoreContext } from './store-context'
-import { addWorkingSetToState, finishedState, itemKey, replaceItemPatch, replacementItem, skipItemPatch } from './workout-log'
+import { addWorkingSetToState, finishedState, skipItemPatch } from './workout-log'
 
 export function StoreProvider({ children }) {
   const [state, setStateRaw] = useState(loadState)
@@ -263,21 +263,12 @@ export function StoreProvider({ children }) {
       // req-109 — Replace exercise: the original skipped, a blank item for `exerciseId`
       // inserted after it (this workout only; the routine is never touched). Rest comes
       // from the exercise's own last finished snapshot, else none.
+      // req-124 — the new item's id is generated before the updater and returned, so the
+      // picker can land on the new exercise's log screen (reducer: replaceItemInState).
       replaceItem(itemId, exerciseId) {
-        setState((s) => {
-          const active = s.activeWorkout
-          const exercise = (s.exercises || []).find((candidate) => candidate.id === exerciseId)
-          const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
-          if (!active || !exercise || !original) return s
-          const replacement = replacementItem({
-            id: uid('mid'),
-            original,
-            exercise,
-            restSec: historyPrescription(s.workouts, exerciseId)?.restSec,
-          })
-          const patch = replaceItemPatch(active, itemId, replacement)
-          return patch ? { ...s, activeWorkout: { ...active, ...patch } } : s
-        })
+        const id = uid('mid')
+        setState((s) => replaceItemInState(s, itemId, exerciseId, id))
+        return id
       },
       completeSet(setRecord, activePatch = {}) {
         setState((s) => {
