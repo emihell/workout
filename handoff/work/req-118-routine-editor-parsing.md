@@ -1,6 +1,6 @@
 # req-118 — routine editor reads numbers correctly (audit A, DEC-058 §1, §6, §7)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** Setup input only; no stored-data rewrite.
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-118` (`cb98ced`…`cb98ced`, 1 commit).** Phase 1. **[ux-feel]** Setup input only; no stored-data rewrite.
 **Depends on req-120** (otherwise a cleared Kg is refilled on reload, see Why). Revised 2026-09-23 after the spec
 review.
 
