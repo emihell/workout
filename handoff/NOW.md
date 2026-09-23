@@ -26,9 +26,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** req-100..102 LIVE (tooling: `plan ping`, NOW.md guard, drift check — L-019..021).
 
 **READY, held:**
-- `req-103`..`req-108`, `req-110` **gym-flow batch 4** (Emilio's feedback 2026-09-17..20; `BACKLOG.md` §batch 4):
+- `req-103`..`req-110` **gym-flow batch 4** (Emilio's feedback 2026-09-17..20; `BACKLOG.md` §batch 4):
   103 routine rows · 104 no Previous + small title · 105 Finish button · 106 set preview · 107 overview
-  note · 108 reps stop carrying (DEC-052) · 110 Today 2-routine day. Order 104→106→108, 105→107.
+  note · 108 reps stop carrying (DEC-052) · 109 skip/swap · 110 Today 2-routine day. 104→106→108→109, 105→107→109.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
@@ -36,7 +36,6 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Needs decisions — parked until their phase
 
-- **`req-109` skip / swap an exercise** (F2+F8) — swap's set plan open (Emilio, 2026-09-23). Not yet written.
 
 - **`req-24` native confirm/alert → inline UI** — 10 sites; needs the inline-confirm *pattern*
   first (bar/sheet vs two-tap vs undo). **[ux-feel]** Spec: `work/req-24-inline-confirm-alert.md`.
