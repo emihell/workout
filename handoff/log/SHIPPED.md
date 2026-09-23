@@ -1392,3 +1392,7 @@ Closeout 2026-09-23 (branch `2f1ecaa`, throwaway agent). Today's block split int
 (Builder's call: two equal routines, no ranking — reversible). 5 static-source tests (`today.test.js`). Builder's
 puppeteer: grouped (one date, two Starts), 2nd Start opens `sess-lower`/`slot-wed-lower`, one-done keeps the other's Start.
 Gate: Planner's own `./check` green (25 files); one-done screenshot confirmed clear of the dock.
+
+## req-111 — "last time" looks past a workout where that exercise was entirely skipped (DEC-053)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
