@@ -20,7 +20,13 @@ import {
   isSkippedSet,
   seedOverrideKey,
   nextSeedOverrides,
+  setTargetFor,
+  durationTargetFor,
+  setPreview,
+  setPreviewText,
 } from './workout-log.js'
+import { historySetPrefill, lastSetsForExercise } from './storage.js'
+import { DEFAULT_DURATION_SEC } from './model.js'
 
 describe('req-44 isSkippedSet (one shared guarded predicate)', () => {
   it('is true for reps "skipped", case-insensitive', () => {
@@ -677,5 +683,132 @@ describe('req-83 nextSeedOverrides (only a changed field propagates)', () => {
       seed: { weight: '5', reps: '8' }, logged: { weight: '6', reps: '8' },
     })
     assert.deepEqual(next, { 'ex1::work': { weight: '6' } })
+  })
+})
+
+// req-106 — the start-of-exercise preview. Uses the REAL history path
+// (lastSetsForExercise + historySetPrefill from storage.js), the same the view binds.
+describe('req-106 setPreview (start-of-exercise set preview)', () => {
+  const finished = (sets, finishedAt = '2026-09-20T10:00:00Z') => ({ finishedAt, sets })
+  const hist = (exerciseId, rows) =>
+    rows.map(([setType, weight, reps]) => ({ exerciseId, setType, weight, reps }))
+  const odp = {
+    exerciseId: 'odp',
+    routineItemId: 'ri-odp',
+    sets: 3,
+    warmup: { reps: 10 },
+    targets: ['8', '8', '6'],
+  }
+  const workouts = [
+    finished(hist('odp', [['wu', 10, '10'], ['work', 20, '8'], ['work', 22, '8'], ['work', 24, '6']])),
+  ]
+  function previewFor(item, { workouts: ws = workouts, ex = {}, weighted = true, seedOverrides } = {}) {
+    const last = lastSetsForExercise(ws, item.exerciseId)
+    return setPreview({
+      item,
+      ex,
+      weighted,
+      hasHistory: Boolean(last),
+      historyFor: (at) => historySetPrefill(last, at),
+      seedOverrides,
+    })
+  }
+
+  it('fixed numbers: WU 10×10, work 20×8 / 22×8 / 24×6 → exact lines', () => {
+    assert.deepEqual(
+      previewFor(odp).map((line) => line.text),
+      ['WU · 10 kg × 10', '1 · 20 kg × 8', '2 · 22 kg × 8', '3 · 24 kg × 6'],
+    )
+  })
+
+  it('right mechanism: each line equals initialSetFields for that set', () => {
+    const last = lastSetsForExercise(workouts, 'odp')
+    const lines = previewFor(odp)
+    const slots = [['wu', 0], ['work', 0], ['work', 1], ['work', 2]]
+    assert.equal(lines.length, slots.length)
+    slots.forEach(([setType, workIndex], i) => {
+      const form = initialSetFields({
+        weighted: true,
+        fromRestore: false,
+        restore: null,
+        hasHistory: true,
+        history: historySetPrefill(last, { setType, workIndex }),
+        carry: null,
+        target: setTargetFor(odp, setType, workIndex),
+        override: undefined,
+      })
+      assert.equal(lines[i].setType, setType)
+      assert.equal(lines[i].weight, form.weight)
+      assert.equal(lines[i].reps, form.reps)
+    })
+  })
+
+  it('failure case — no finished history: no kg on any line, reps from targets', () => {
+    const lines = previewFor(odp, { workouts: [] })
+    assert.deepEqual(lines.map((line) => line.weight), ['', '', '', ''])
+    assert.deepEqual(lines.map((line) => line.reps), ['10', '8', '8', '6'])
+    assert.deepEqual(
+      lines.map((line) => line.text),
+      ['WU · — × 10', '1 · — × 8', '2 · — × 8', '3 · — × 6'],
+    )
+  })
+
+  it('an unfinished workout is not history (no kg)', () => {
+    const lines = previewFor(odp, { workouts: [{ sets: workouts[0].sets }] })
+    assert.ok(lines.every((line) => line.weight === ''))
+  })
+
+  it('a set beyond the history has no kg — never copied from an earlier set', () => {
+    const lines = previewFor({ ...odp, sets: 4, targets: ['8', '8', '6', '6'] })
+    assert.equal(lines[4].text, '4 · — × 6')
+  })
+
+  it('a session seed override from an earlier item of the same exercise shows, as the form would', () => {
+    const lines = previewFor(odp, { seedOverrides: { 'odp::work': { weight: '26' }, 'other::work': { weight: '99' } } })
+    assert.deepEqual(
+      lines.map((line) => line.text),
+      ['WU · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'],
+    )
+  })
+
+  it('no warm-up → work lines only', () => {
+    const lines = previewFor({ ...odp, warmup: null })
+    assert.deepEqual(lines.map((line) => line.label), ['1', '2', '3'])
+  })
+
+  it('bodyweight: reps only, never a kg (even with a weight in history)', () => {
+    const pushups = { exerciseId: 'pu', sets: 2, targets: ['12', '10'] }
+    const ws = [finished(hist('pu', [['work', 5, '12'], ['work', 5, '10']]))]
+    const lines = previewFor(pushups, { workouts: ws, weighted: false })
+    assert.deepEqual(lines.map((line) => line.text), ['1 · 12', '2 · 10'])
+    assert.ok(lines.every((line) => line.weight === ''))
+  })
+
+  it('timed: work sets show the duration (per-set, then last in list); the WU stays reps', () => {
+    const plank = { exerciseId: 'pl', sets: 3, warmup: { reps: 5 }, targets: ['', '', ''], durations: [45, 60] }
+    const lines = previewFor(plank, { workouts: [], weighted: false, ex: { hasDuration: true, durationSec: 20 } })
+    assert.deepEqual(lines.map((line) => line.text), ['WU · 5', '1 · 45s', '2 · 60s', '3 · 60s'])
+    assert.deepEqual(lines.map((line) => line.durationSec), [null, 45, 60, 60])
+  })
+})
+
+describe('req-106 durationTargetFor / setTargetFor (moved out of item.jsx)', () => {
+  it('duration: per-set → last in list → exercise default → app default', () => {
+    assert.equal(durationTargetFor({ durations: [40, 50] }, { durationSec: 20 }, 0), 40)
+    assert.equal(durationTargetFor({ durations: [40, 50] }, { durationSec: 20 }, 5), 50)
+    assert.equal(durationTargetFor({ durations: [] }, { durationSec: 20 }, 0), 20)
+    assert.equal(durationTargetFor({}, {}, 0), DEFAULT_DURATION_SEC)
+  })
+  it('target: WU reps for wu; per-set → last target → empty for work', () => {
+    const item = { warmup: { reps: 10 }, targets: ['8', '6'] }
+    assert.equal(setTargetFor(item, 'wu', 0), '10')
+    assert.equal(setTargetFor(item, 'work', 1), '6')
+    assert.equal(setTargetFor(item, 'work', 4), '6')
+    assert.equal(setTargetFor({}, 'work', 0), '')
+    assert.equal(setTargetFor({}, 'wu', 0), '')
+  })
+  it('setPreviewText shows the kg slot as absent, never 0', () => {
+    assert.equal(setPreviewText({ label: '1', weight: '', reps: '8', durationSec: null }, true), '1 · — × 8')
+    assert.equal(setPreviewText({ label: '1', weight: '20', reps: '', durationSec: null }, true), '1 · 20 kg × —')
   })
 })

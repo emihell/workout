@@ -1,4 +1,7 @@
 import { rpeOptionValue } from './ids.js'
+// DEFAULT_DURATION_SEC is read only inside durationTargetFor (call time), so the
+// model.js <-> workout-log.js import cycle is safe under ESM live bindings.
+import { DEFAULT_DURATION_SEC } from './model.js'
 
 export function itemKey(item) {
   return item?.routineItemId || item?.sessionItemId || item?.id || ''
@@ -283,6 +286,71 @@ export function initialSetFields({ weighted, fromRestore, restore, hasHistory, h
       : 3
   const note = fromRestore ? restore.note : ''
   return { weight: seed.weight, reps: seed.reps, effort, note }
+}
+
+// req-106 — the target reps a set's log form presents: the warm-up's reps for a 'wu'
+// set, else this working set's routine target, else the last target in the list, else
+// empty. Was inline in WorkoutItemLive; shared with setPreview so the two can't drift.
+export function setTargetFor(item, setType, workIndex) {
+  if (setType === 'wu') return String(item?.warmup?.reps ?? '')
+  const targets = item?.targets || []
+  return targets[workIndex] ?? targets[targets.length - 1] ?? ''
+}
+
+// req-85, moved here by req-106 — a timed exercise's work-set target seconds: this
+// set's routine duration, else the last one in the list, else the exercise default,
+// else the app default. Was view code (item.jsx); shared by the log form and the
+// start-of-exercise preview so the two can't drift.
+export function durationTargetFor(item, ex, workIndex) {
+  const durations = item?.durations || []
+  return durations[workIndex] ?? durations[durations.length - 1] ?? ex?.durationSec ?? DEFAULT_DURATION_SEC
+}
+
+// req-106 — the start-of-exercise preview: one entry per set of the item (warm-up
+// first when there is one), each holding EXACTLY what that set's log form would
+// prefill if you reached it now. At the start nothing is logged, so restore and carry
+// are null; weight/reps go through initialSetFields with the same history / target /
+// session seed-override inputs the form uses (DESIGN §1 — a set with no history has no
+// kg, never a guessed or copied one). `historyFor({ setType, workIndex })` is the
+// caller's historySetPrefill bound to the exercise's last finished sets (a callback so
+// this module stays free of storage.js). Timed work sets carry their target seconds
+// in place of reps, as the form does.
+export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides }) {
+  const overrides = seedOverrides || {}
+  const slots = []
+  if (item?.warmup) slots.push({ setType: 'wu', workIndex: 0 })
+  for (let i = 0; i < workCountFor(item); i++) slots.push({ setType: 'work', workIndex: i })
+  return slots.map(({ setType, workIndex }) => {
+    const fields = initialSetFields({
+      weighted,
+      fromRestore: false,
+      restore: null,
+      hasHistory,
+      history: historyFor({ setType, workIndex }),
+      carry: null,
+      target: setTargetFor(item, setType, workIndex),
+      override: overrides[seedOverrideKey(item.exerciseId, setType)],
+    })
+    const timed = Boolean(ex?.hasDuration) && setType === 'work'
+    const entry = {
+      setType,
+      workIndex,
+      label: setType === 'wu' ? 'WU' : String(workIndex + 1),
+      weight: fields.weight,
+      reps: timed ? '' : fields.reps,
+      durationSec: timed ? durationTargetFor(item, ex, workIndex) : null,
+    }
+    return { ...entry, text: setPreviewText(entry, weighted) }
+  })
+}
+
+// req-106 — one preview line: "1 · 20 kg × 8". A weighted set with no kg shows "—" in
+// the kg slot (absent, not invented); bodyweight shows the reps alone; a timed set
+// shows its seconds ("30s", as formatSetLine does) in place of reps.
+export function setPreviewText({ label, weight, reps, durationSec }, weighted) {
+  const amount = durationSec != null ? `${durationSec}s` : reps || '—'
+  const body = weighted ? `${weight ? `${weight} kg` : '—'} × ${amount}` : amount
+  return `${label} · ${body}`
 }
 
 // req-25 — the rest-patch decision, made pure so "when does rest run after a set"
