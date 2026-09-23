@@ -1378,4 +1378,9 @@ Follow-up: with the note open on an 8-exercise routine, Abandon falls below the 
 
 ## req-108 — a changed reps value no longer carries to the next sets; weight still does (batch 4, F9)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `634d20b`, throwaway agent). DEC-052 + amendment: `setLogSeed` takes reps only from the set's target (or
+empty) unless restoring via Previous; `nextSeedOverrides` records only a changed weight (a stale stored `reps` is passed
+through, never read or rewritten — no migration); `carryFor` returns kg only. 5 req-83/req-02 tests edited as deliberate
+reversals (each commented), 9 added incl. a seed→log→next-seed loop and preview consistency; 79/79. Builder's puppeteer:
+push-ups set 2 after logging 12 → Reps 15; chest press 20→22 → set 2 22 kg × 8. Gate: Planner's own `./check` green;
+screenshot shows Reps 15.
