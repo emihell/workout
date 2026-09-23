@@ -2,5 +2,6 @@
 // exactly the screens App.jsx imports; WorkoutItemLive stays internal to item.jsx.
 export { Workout, WorkoutItem } from './overview'
 export { WorkoutItemLog, WorkoutItemDone, WorkoutSetEdit } from './item'
+export { WorkoutItemReplace } from './replace'
 export { WorkoutItemExercise, WorkoutSetup } from './setup'
 export { WorkoutFinish } from './finish'

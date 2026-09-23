@@ -5,7 +5,7 @@ import { recordButton } from '../../analytics'
 import { findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
-import { allItemsDone, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
+import { allItemsDone, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
@@ -150,7 +150,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
             // on what's left; not-done rows stay full emphasis. Order/meaning unchanged.
             <Row key={itemKey(item) || item.id} to={path} className={completed ? 'ui-row--done' : ''}>
               <ExerciseLabel item={item} />
-              {completed ? ' · done' : ''}
+              {/* req-109 — a done row whose sets are ALL skipped reads "skipped"; one
+                  logged set and it reads done (derived from the sets, no marker). */}
+              {completed ? (itemAllSkipped(active, item) ? ' · skipped' : ' · done') : ''}
             </Row>
           )
         })}

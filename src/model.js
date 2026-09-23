@@ -1,6 +1,6 @@
 import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
-import { isSkippedSet } from './workout-log.js'
+import { isAddedMidWorkout, isSkippedSet } from './workout-log.js'
 
 export const SCHEMA_VERSION = 9
 
@@ -82,7 +82,18 @@ function workoutSnapshot(state, workout, origin = state) {
   const routineId = workout.routineId || workout.sessionId
   const found = findRoutineInState(state.routines, routineId)
   if (workout.snapshot) {
+    // req-109 — items added mid-workout (a replacement, isAddedMidWorkout) and their
+    // sets' keys. With none (every workout before req-109) this set is empty and the
+    // branch below behaves byte-for-byte as it always has.
+    const midWorkoutKeys = new Set(
+      (workout.snapshot.items || []).filter(isAddedMidWorkout).map((item) => item.routineItemId).filter(Boolean),
+    )
     const items = (workout.snapshot.items || []).map((item) => {
+      // req-109 — a mid-workout item is kept exactly as written: no routine-template
+      // match (by id or exerciseId), so it keeps its own unique routineItemId and
+      // finish never writes it onto the routine; and no targets/weights backfill, so
+      // it stays blank across reloads (its prefill comes from its own history).
+      if (isAddedMidWorkout(item)) return item
       const templateItem = found.routine?.exercises?.find(
         (candidate) =>
           candidate.id === (item.routineItemId || item.sessionItemId) ||
@@ -95,7 +106,10 @@ function workoutSnapshot(state, workout, origin = state) {
         return (
           (setItemId === itemIdValue || set.exerciseId === item.exerciseId) &&
           set.setType !== 'wu' &&
-          !isSkippedSet(set)
+          !isSkippedSet(set) &&
+          // req-109 — a replacement's sets never backfill another item of the same
+          // exercise (always true when the workout has no mid-workout item).
+          !midWorkoutKeys.has(setItemId)
         )
       })
       const baseline = templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
@@ -115,7 +129,11 @@ function workoutSnapshot(state, workout, origin = state) {
           : actualWorkingSets.map((set) => Number(set.weight) || 0),
       }
     })
-    const itemByExercise = new Map(items.map((item) => [item.exerciseId, item]))
+    // req-109 — a key-less legacy set is attributed to a routine item, never to a
+    // mid-workout one (same Map as before when there is none).
+    const itemByExercise = new Map(
+      items.filter((item) => !isAddedMidWorkout(item)).map((item) => [item.exerciseId, item]),
+    )
     const snapshot = { ...workout.snapshot, items }
     delete snapshot.sessionId
     delete snapshot.sessionName

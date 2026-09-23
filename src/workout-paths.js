@@ -14,6 +14,11 @@ export function itemDonePath(routineId, item) {
   return `/workout/${routineId}/item/${itemKey(item)}/done`
 }
 
+// req-109 — the Replace exercise picker for an item.
+export function itemReplacePath(routineId, item) {
+  return `/workout/${routineId}/item/${itemKey(item)}/replace`
+}
+
 // One branch, written once: a done exercise goes to its done screen, otherwise its
 // log screen. The `done` boolean varies by caller (marked-done+plannedDone on the
 // overview, plannedDone alone on the setup form), so it stays an argument.
