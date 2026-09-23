@@ -3,9 +3,9 @@ import { uid } from './ids'
 import { applyBackup as applyBackupFn } from './exchange.js'
 import { applyProgressionToRoutines, buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, progressionFromWorkout } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
-import { loadState, saveState } from './storage'
+import { historyPrescription, loadState, saveState } from './storage'
 import { StoreContext } from './store-context'
-import { addWorkingSetToState, withSkippedUnloggedSets } from './workout-log'
+import { addWorkingSetToState, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withSkippedUnloggedSets } from './workout-log'
 
 export function StoreProvider({ children }) {
   const [state, setStateRaw] = useState(loadState)
@@ -288,6 +288,32 @@ export function StoreProvider({ children }) {
       },
       addWorkingSet(itemId) {
         setState((s) => addWorkingSetToState(s, itemId))
+      },
+      // req-109 — Skip exercise: remaining sets of the item logged skipped, item done.
+      skipItem(itemId) {
+        setState((s) => {
+          const patch = s.activeWorkout ? skipItemPatch(s.activeWorkout, itemId) : null
+          return patch ? { ...s, activeWorkout: { ...s.activeWorkout, ...patch } } : s
+        })
+      },
+      // req-109 — Replace exercise: the original skipped, a blank item for `exerciseId`
+      // inserted after it (this workout only; the routine is never touched). Rest comes
+      // from the exercise's own last finished snapshot, else none.
+      replaceItem(itemId, exerciseId) {
+        setState((s) => {
+          const active = s.activeWorkout
+          const exercise = (s.exercises || []).find((candidate) => candidate.id === exerciseId)
+          const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
+          if (!active || !exercise || !original) return s
+          const replacement = replacementItem({
+            id: uid('mid'),
+            original,
+            exercise,
+            restSec: historyPrescription(s.workouts, exerciseId)?.restSec,
+          })
+          const patch = replaceItemPatch(active, itemId, replacement)
+          return patch ? { ...s, activeWorkout: { ...active, ...patch } } : s
+        })
       },
       completeSet(setRecord, activePatch = {}) {
         setState((s) => {

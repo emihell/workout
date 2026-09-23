@@ -25,9 +25,12 @@ import {
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing, NavLink } from '../shared'
 import { Button, Field, List, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath, MissingItem } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath, MissingItem } from './helpers'
 import { RestPill, useRestCountdown } from './rest'
 import { unlockAudio } from '../../rest-cue'
+
+// req-109 — how long an armed "Skip exercise" waits for its second tap.
+const SKIP_EXERCISE_ARM_MS = 3000
 
 function liveExercise(store, item) {
   return (
@@ -185,6 +188,8 @@ function WorkoutItemLive({ routineId, item }) {
     unlockAudio()
     const done = finishAfterThisSet()
     setRestore(null)
+    // req-109 (review) — logging a set disarms a pending Skip exercise.
+    setSkipArmed(false)
     // req-83 (N9) — a field entered differently from the seed becomes the seed for
     // this exercise's remaining sets this session. Compared against `seed` (what the
     // form presented, incl. any earlier override); only a changed field propagates.
@@ -222,6 +227,7 @@ function WorkoutItemLive({ routineId, item }) {
   function skipSet() {
     recordButton('skip-set')
     setRestore(null)
+    setSkipArmed(false)
     const done = finishAfterThisSet()
     store.completeSet(
       {
@@ -246,12 +252,35 @@ function WorkoutItemLive({ routineId, item }) {
     const lastLogged = index >= 0 ? active.sets[index] : null
     if (!lastLogged) return
     recordButton('previous-set')
+    setSkipArmed(false)
     const next = restoreFromLoggedSet(lastLogged)
     next.workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
     setRestore(next)
     // req-25 — removeActiveSet clears the armed rest (restEndsAt/restPausedRemaining)
     // so going back then forward re-arms a fresh timer rather than double-counting.
     store.removeActiveSet(index)
+  }
+
+  // req-109 — Skip exercise needs two taps: the first arms it ("Tap again to skip"),
+  // which disarms by itself after SKIP_EXERCISE_ARM_MS; the second logs every remaining
+  // set of this exercise as skipped, marks it done and returns to the overview. No
+  // native confirm: it's a mis-tap guard, not a warning (Emilio, 2026-09-23).
+  const [skipArmed, setSkipArmed] = useState(false)
+  useEffect(() => {
+    if (!skipArmed) return undefined
+    const id = setTimeout(() => setSkipArmed(false), SKIP_EXERCISE_ARM_MS)
+    return () => clearTimeout(id)
+  }, [skipArmed])
+
+  function skipExercise() {
+    if (!skipArmed) {
+      setSkipArmed(true)
+      return
+    }
+    recordButton('skip-exercise')
+    setSkipArmed(false)
+    store.skipItem(itemKey(item))
+    go(`/workout/${routineId}`, { replace: true })
   }
 
   const canGoBack = state.logged.length > 0
@@ -384,6 +413,20 @@ function WorkoutItemLive({ routineId, item }) {
             <li key={`${line.setType}-${line.workIndex}`}>{line.text}</li>
           ))}
         </ul>
+      ) : null}
+      {/* req-109 — exercise-level lateral actions, in normal flow below the form (the
+          set-level Previous · Skip · Complete bar stays pinned at the bottom). Skip
+          exercise writes (a Button, two taps); Replace exercise only opens the picker
+          (a NavLink wearing the button look, DEC-040). */}
+      {logging ? (
+        <div className="ui-actions ui-exercise-actions">
+          <Button variant="quiet" onClick={skipExercise}>
+            {skipArmed ? 'Tap again to skip' : 'Skip exercise'}
+          </Button>
+          <NavLink to={itemReplacePath(routineId, item)} className="ui-btn ui-btn--quiet">
+            Replace exercise
+          </NavLink>
+        </div>
       ) : null}
       {/* req-26 — the equipment + cues block that sat under the buttons is removed
           to declutter the mid-set screen. Cues stay reachable: the exercise Title

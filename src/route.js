@@ -254,6 +254,10 @@ export function parseRoute(path) {
   if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3] && parts[4] === 'exercise') {
     return { name: 'workout-item-exercise', routineId: parts[1], itemId: parts[3] }
   }
+  // req-109 — the Replace exercise picker, reached from the item's log screen.
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3] && parts[4] === 'replace') {
+    return { name: 'workout-item-replace', routineId: parts[1], itemId: parts[3] }
+  }
   if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3] && parts[4] === 'log') {
     return { name: 'workout-item-log', routineId: parts[1], itemId: parts[3] }
   }

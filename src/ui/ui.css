@@ -713,3 +713,13 @@ a.ui-btn--quiet:active {
   gap: var(--ui-s2);
   align-items: center;
 }
+
+/* req-109 — the exercise-level lateral actions (Skip exercise · Replace exercise) on
+ * the log screen: two equal quiet buttons in normal flow under the set preview, so
+ * .ui-main's --ui-dock-clear bottom padding keeps them above the pinned set-log bar. */
+.ui-exercise-actions {
+  margin-top: var(--ui-s4);
+}
+.ui-exercise-actions .ui-btn {
+  flex: 1 1 0;
+}

@@ -12,6 +12,7 @@ import {
   workoutRoutineId,
   workoutRoutineName,
 } from './helpers'
+import { snapshotItemFor } from './snapshot-item.js'
 
 export function HistoryDetail({ workoutId }) {
   const store = useStore()
@@ -58,9 +59,8 @@ export function HistoryDetail({ workoutId }) {
       <List>
         {groups.map((group) => {
           const ex = exerciseById(store.exercises, group.exerciseId)
-          const snapshotItem = snapshot?.items?.find(
-            (item) => itemIdOf(item) === group.routineItemId || item.exerciseId === group.exerciseId,
-          )
+          // req-109 — id first, exerciseId only as the fallback (snapshot-item.js).
+          const snapshotItem = snapshotItemFor(snapshot?.items, group.routineItemId, group.exerciseId)
           const n = group.items.length
           return (
             <Row key={group.routineItemId} to={`/history/${workout.id}/exercise/${group.routineItemId}`}>
@@ -95,9 +95,8 @@ export function HistoryDetail({ workoutId }) {
 export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
-  const snapshotItem = workout?.snapshot?.items?.find(
-    (item) => itemIdOf(item) === exerciseId || item.exerciseId === exerciseId,
-  )
+  // req-109 — the route param is an item id (or a legacy exerciseId): id first.
+  const snapshotItem = snapshotItemFor(workout?.snapshot?.items, exerciseId)
   const actualExerciseId = snapshotItem?.exerciseId || exerciseId
   const ex = exerciseById(store.exercises, actualExerciseId)
   const items = (workout?.sets || [])

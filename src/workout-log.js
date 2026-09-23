@@ -75,26 +75,102 @@ function skippedSet({ item, setType, workIndex }) {
   }
 }
 
+// Pushes a `skippedSet` onto `sets` (in place) for every set of `item` not yet logged:
+// the warm-up if it has one and none is logged, then working sets up to its planned
+// count. req-109 — extracted unchanged from withSkippedUnloggedSets so "Skip exercise"
+// records exactly the sets Finish would have recorded as skipped.
+function pushSkippedUnloggedSets(sets, item) {
+  const logged = () => setsForItem(sets, item)
+  if (item.warmup && !logged().some((set) => set.setType === 'wu')) {
+    sets.push(skippedSet({ item, setType: 'wu', workIndex: 0 }))
+  }
+  const workCount = workCountFor(item)
+  while (logged().filter((set) => set.setType !== 'wu').length < workCount) {
+    const workIndex = logged().filter((set) => set.setType !== 'wu').length
+    sets.push(skippedSet({ item, setType: 'work', workIndex }))
+  }
+}
+
 export function withSkippedUnloggedSets(workout) {
   if (!workout) return workout
   const sets = [...(workout.sets || [])]
-  for (const item of workout.snapshot?.items || []) {
-    const logged = () => setsForItem(sets, item)
-    if (item.warmup && !logged().some((set) => set.setType === 'wu')) {
-      sets.push(skippedSet({ item, setType: 'wu', workIndex: 0 }))
-    }
-    const workCount = workCountFor(item)
-    while (logged().filter((set) => set.setType !== 'wu').length < workCount) {
-      const workIndex = logged().filter((set) => set.setType !== 'wu').length
-      sets.push(skippedSet({ item, setType: 'work', workIndex }))
-    }
-  }
+  for (const item of workout.snapshot?.items || []) pushSkippedUnloggedSets(sets, item)
   const keys = (workout.snapshot?.items || []).map((item) => itemKey(item)).filter(Boolean)
   return {
     ...workout,
     sets,
     completedItemIds: [...new Set([...(workout.completedItemIds || []), ...keys])],
   }
+}
+
+// req-109 — "Skip exercise": the activeWorkout patch that logs every remaining
+// (unlogged) set of ONE item as skipped (the same skippedSet records Finish writes)
+// and marks it done. Sets already logged stay. Rest is left as it is: a rest armed by
+// the last real set still applies before the next exercise. Unknown item → null.
+export function skipItemPatch(workout, itemId) {
+  const item = (workout?.snapshot?.items || []).find((candidate) => itemKey(candidate) === itemId)
+  if (!item) return null
+  const sets = [...(workout.sets || [])]
+  pushSkippedUnloggedSets(sets, item)
+  return { sets, ...markItemDonePatch(workout, item) }
+}
+
+// req-109 — the marker on a snapshot item added mid-workout (a replacement). It tells
+// workoutSnapshot (model.js) to skip, for this item, the routine-template match and the
+// targets/weights backfill, so the item keeps its own unique routineItemId (never a
+// template id → applyProgressionToRoutines never writes it onto the routine) and stays
+// blank across reloads. Persisted on the snapshot item; absent on every other item.
+export function isAddedMidWorkout(item) {
+  return item?.addedMidWorkout === true
+}
+
+// req-109 — the blank replacement item for `exercise`, inserted after `original`.
+// 1 working set, no reps target, no suggested weight, no warm-up, no notes: nothing is
+// copied from the original but its ROLE (a slot value: a warm-up replacement still
+// reads as a warm-up). `restSec` is the caller's — the rest of this exercise's own last
+// finished snapshot (historyPrescription), else 0. `id` must be unique and must not be
+// a routine template item's id; it is both `id` and `routineItemId`. Prefill then comes
+// from the exercise's own history through the normal log-form rule (DEC-053).
+export function replacementItem({ id, original, exercise, restSec }) {
+  return {
+    id,
+    routineItemId: id,
+    exerciseId: exercise.id,
+    exerciseName: exercise.name || 'Exercise',
+    equipment: exercise.equipment || '',
+    exerciseType: exercise.type || 'free',
+    weightStep: exercise.weightStep || 'n/a',
+    role: original?.role || 'main',
+    sets: 1,
+    targets: [],
+    suggestedWeights: [],
+    durations: [],
+    restSec: Number(restSec) || 0,
+    notes: '',
+    warmup: null,
+    addedMidWorkout: true,
+  }
+}
+
+// req-109 — "Replace exercise": skip the original exactly as Skip exercise does, then
+// insert `replacement` directly after it. This workout only: the routine is untouched.
+// Unknown original → null.
+export function replaceItemPatch(workout, itemId, replacement) {
+  const skip = skipItemPatch(workout, itemId)
+  if (!skip) return null
+  const items = []
+  for (const item of workout.snapshot?.items || []) {
+    items.push(item)
+    if (itemKey(item) === itemId) items.push(replacement)
+  }
+  return { ...skip, snapshot: { ...workout.snapshot, items } }
+}
+
+// req-109 — the overview's "skipped" state: the item has sets and every one of them is
+// skipped. Derived from the sets alone (no stored marker); one logged set → not skipped.
+export function itemAllSkipped(workout, item) {
+  const logged = setsForItem(workout?.sets, item)
+  return logged.length > 0 && logged.every(isSkippedSet)
 }
 
 export function itemLoggingState(workout, item) {

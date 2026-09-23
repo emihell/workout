@@ -16,7 +16,7 @@ import {
 } from './views/Routine'
 import { ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
-import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
+import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { Settings } from './views/Settings'
 import { BottomMenu } from './ui/BottomMenu.jsx'
@@ -167,6 +167,9 @@ function Screen() {
   }
   if (route.name === 'workout-item-log') {
     return <WorkoutItemLog key={`${route.routineId}-${route.itemId}`} routineId={route.routineId} itemId={route.itemId} />
+  }
+  if (route.name === 'workout-item-replace') {
+    return <WorkoutItemReplace key={`${route.routineId}-${route.itemId}`} routineId={route.routineId} itemId={route.itemId} />
   }
   if (route.name === 'workout-item') {
     return <WorkoutItem key={`${route.routineId}-${route.itemId}`} routineId={route.routineId} itemId={route.itemId} />
