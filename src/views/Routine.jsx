@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, parseTargets, routineItemMeta } from '../ids'
+import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, routineItemMeta } from '../ids'
+import { parseRoutineItem } from '../routine-item-parse'
 import { go } from '../route'
 import { routineById, historyPrescription, routineDeletionImpact } from '../storage'
 import { useStore } from '../store-context'
@@ -272,6 +273,16 @@ export function RoutineExercisePick({ routineId, paths }) {
   )
 }
 
+// req-118 — an inline field error under its input. Grayscale like the rest of the UI
+// (DESIGN): weight and a leading marker carry it, not colour.
+function FieldError({ children }) {
+  return (
+    <p className="ui-field-error" role="alert">
+      {children}
+    </p>
+  )
+}
+
 function ExerciseFields({ item, onChange, onCancel, defaults, timed = false, settingsLink = null }) {
   const [role, setRole] = useState(item.role || defaults.role || 'main')
   const [warmup, setWarmup] = useState(Boolean(item.warmup))
@@ -292,41 +303,31 @@ function ExerciseFields({ item, onChange, onCancel, defaults, timed = false, set
     return value == null || value === '' ? '' : String(value)
   })
   const [notes, setNotes] = useState(item.notes || '')
-  // req-85 — per-set target seconds for a timed exercise, entered like Kg (slash/comma
-  // separated) and stored parallel to targets. Only shown when the exercise is timed.
+  // req-85 — per-set target seconds for a timed exercise, slash/comma separated (req-118:
+  // like Reps; Kg treats `,` as a decimal) and stored parallel to targets. Only shown
+  // when the exercise is timed.
   const [durations, setDurations] = useState((item.durations || []).join('/'))
+  // req-118 — errors appear after the first Save attempt and then track each edit, so a
+  // fixed field clears its message at once. Parsing is routine-item-parse.js (pure, tested).
+  const [tried, setTried] = useState(false)
+  const parsed = parseRoutineItem({ sets, reps: targets, kg: weights, duration: durations, timed })
+  const errors = tried ? parsed.errors : {}
+  const errorText = (field) => (errors[field] ? <FieldError>{errors[field].message}</FieldError> : null)
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        const enteredSets = Number(sets)
-        const targetParts = String(targets || '')
-          .split(/[/,]/)
-          .map((value) => value.trim())
-          .filter(Boolean)
-        const weightParts = String(weights || '')
-          .split(/[/,]/)
-          .map((value) => Number(value.trim()))
-          .filter(Number.isFinite)
-        const durationParts = String(durations || '')
-          .split(/[/,]/)
-          .map((value) => Number(value.trim()))
-          .filter(Number.isFinite)
-        const count = Math.max(
-          Number.isFinite(enteredSets) && enteredSets > 0 ? enteredSets : 0,
-          targetParts.length,
-          weightParts.length,
-          timed ? durationParts.length : 0,
-          1,
-        )
+        setTried(true)
+        if (Object.keys(parsed.errors).length) return
+        const { value } = parsed
         onChange({
           role,
           warmup: warmup ? { reps: warmupReps } : null,
-          sets: count,
-          targets: parseTargets(targets, count),
-          suggestedWeights: weightParts.slice(0, count),
-          durations: timed ? durationParts.slice(0, count) : item.durations || [],
+          sets: value.sets,
+          targets: value.targets,
+          suggestedWeights: value.suggestedWeights,
+          durations: timed ? value.durations : item.durations || [],
           restSec: Math.max(0, Number(restSec) || 0),
           notes,
         })
@@ -344,10 +345,28 @@ function ExerciseFields({ item, onChange, onCancel, defaults, timed = false, set
         />
       ) : null}
       <Field label="Sets" type="number" min="1" value={sets} onChange={(e) => setSets(e.target.value)} />
-      <Field label="Reps" value={targets} onChange={(e) => setTargets(e.target.value)} />
-      <Field label="Kg" value={weights} onChange={(e) => setWeights(e.target.value)} />
+      {errorText('sets')}
+      <Field label="Reps" value={targets} aria-invalid={Boolean(errors.reps)} onChange={(e) => setTargets(e.target.value)} />
+      {errorText('reps')}
+      {/* req-118 — decimal keypad: `,` is Kg's decimal point (DEC-058 §1), `/` separates. */}
+      <Field
+        label="Kg"
+        inputMode="decimal"
+        value={weights}
+        aria-invalid={Boolean(errors.kg)}
+        onChange={(e) => setWeights(e.target.value)}
+      />
+      {errorText('kg')}
       {timed ? (
-        <Field label="Duration (s)" value={durations} onChange={(e) => setDurations(e.target.value)} />
+        <>
+          <Field
+            label="Duration (s)"
+            value={durations}
+            aria-invalid={Boolean(errors.duration)}
+            onChange={(e) => setDurations(e.target.value)}
+          />
+          {errorText('duration')}
+        </>
       ) : (
         // req-99 — Timed lives on the exercise, not the routine row. When the exercise
         // isn't timed there's no Duration field, so signpost where the flag actually is
