@@ -1341,4 +1341,8 @@ Gotcha: `.ui-navlink`'s left inset misaligns a line under it; fixed by dropping 
 
 ## req-104 — exercise screens: drop "Previous" from the done view, smaller exercise title (batch 4, F3+F5)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Merge (closeout 2026-09-23; branch `bdc5704`…`56f4b7b`, throwaway build agent, DEC-055). The done view drops its
+Previous section; the exercise title on the log/done screens is scoped to `--ui-text-section` (22px) via
+`.ui-exercise-head .ui-title`, the shared `Title` untouched. Static-source test `item.test.js` (3/3). Gate: Planner's
+own `./check` green (22 test files); log-screen screenshot confirmed. Follow-up: the done view renders the
+exercise title *below* Add set (markup order), backlog.

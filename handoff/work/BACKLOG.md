@@ -266,6 +266,8 @@ live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 
 
 - **History detail still prints "Main"** (req-103 follow-up) — `history/detail.jsx:68,120`; apply the req-93 rule. Small.
 
+- **Done view: exercise title renders below Add set** (req-104 follow-up) — `WorkoutItemDone` markup order. Small.
+
 **Specced 2026-09-23:** F1→req-103, F3+F5→req-104, F6→req-105, F4→req-106, F7→req-107, F9→req-108 (DEC-052), F10→req-110; F2+F8→req-109 (blank-state replace; external review found the migrate-on-load blockers); review also found → req-111 (DEC-053). **Grouping (original):** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
 (both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
 
