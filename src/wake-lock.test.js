@@ -57,10 +57,27 @@ function makeDoc() {
   }
 }
 
+// req-128 — a minimal window: a settable location.hash plus hashchange listeners.
+function makeWindow(hash) {
+  const listeners = {}
+  return {
+    location: { hash },
+    listeners,
+    addEventListener(type, fn) {
+      ;(listeners[type] ||= []).push(fn)
+    },
+    removeEventListener(type, fn) {
+      listeners[type] = (listeners[type] || []).filter((f) => f !== fn)
+    },
+  }
+}
+
 describe('WakeLock', () => {
   let originalNavigator
   let originalDocument
+  let originalWindow
   let doc
+  let win
 
   beforeEach(() => {
     originalNavigator = globalThis.navigator
@@ -77,6 +94,16 @@ describe('WakeLock', () => {
       configurable: true,
       writable: true,
     })
+    // req-128 — the lock now also needs a /workout/… route open, so every existing
+    // case runs on the workout overview (unchanged expectations); the route test below
+    // moves off it.
+    originalWindow = globalThis.window
+    win = makeWindow('#/workout/r1')
+    Object.defineProperty(globalThis, 'window', {
+      value: win,
+      configurable: true,
+      writable: true,
+    })
   })
 
   afterEach(() => {
@@ -87,6 +114,11 @@ describe('WakeLock', () => {
     })
     Object.defineProperty(globalThis, 'document', {
       value: originalDocument,
+      configurable: true,
+      writable: true,
+    })
+    Object.defineProperty(globalThis, 'window', {
+      value: originalWindow,
       configurable: true,
       writable: true,
     })
@@ -200,6 +232,29 @@ describe('WakeLock', () => {
     // Must not throw and must not register a visibility listener.
     await assert.doesNotReject(render({ occurrenceId: 'w1' }))
     assert.equal((doc.listeners.visibilitychange || []).length, 0)
+  })
+
+  it('req-128: leaving the workout route releases; coming back re-acquires', async () => {
+    await render({ occurrenceId: 'w1' })
+    const wl = globalThis.navigator.wakeLock
+    assert.equal(wl.requests.length, 1)
+    const fireHash = async (hash) => {
+      await act(async () => {
+        win.location.hash = hash
+        for (const fn of win.listeners.hashchange || []) fn()
+        await tick()
+      })
+    }
+    await fireHash('#/settings')
+    assert.equal(wl.sentinels[0].releaseCount, 1, 'released on Settings')
+    await fireHash('#/workout/r1/item/i1')
+    assert.equal(wl.requests.length, 2, 're-acquired back in the workout')
+  })
+
+  it('req-128: an active workout on a non-workout route never requests', async () => {
+    win.location.hash = '#/settings'
+    await render({ occurrenceId: 'w1' })
+    assert.equal(globalThis.navigator.wakeLock.requests.length, 0)
   })
 
   it('swallows a rejecting request without throwing', async () => {

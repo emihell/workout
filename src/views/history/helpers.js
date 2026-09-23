@@ -1,8 +1,23 @@
-import { dateKey } from '../../schedule'
+import { roleTag } from '../../ids.js'
+import { dateKey } from '../../schedule.js'
 
 // Shared helpers for the history screens (req-19 split of History.jsx): id/name
 // resolution, date formatting + grouping. Used by more than one history/ screen module. `workoutMonthKey` stays
 // internal (only groupWorkoutsByMonth uses it).
+
+// req-128 — a History detail exercise row's meta after the name: the req-93 rule, so
+// main (or an absent role) is unlabelled and only warm-up/finisher/cardio carry a tag
+// (roleTag); then the existing `WU set` marker and the set count. Was `roleLabel`, which
+// printed "Main" on nearly every row.
+export function historyGroupMeta(snapshotItem, setCount) {
+  return [
+    roleTag(snapshotItem?.role),
+    snapshotItem?.warmup ? 'WU set' : '',
+    `${setCount} set${setCount === 1 ? '' : 's'}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}
 
 export function itemIdOf(obj) {
   return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''

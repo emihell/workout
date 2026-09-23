@@ -1,4 +1,4 @@
-import { formatSetLine, roleLabel } from '../../ids'
+import { formatSetLine, roleTag } from '../../ids'
 import { go } from '../../route'
 import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
@@ -7,6 +7,7 @@ import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { historyAddSetPath } from './add-set'
 import {
+  historyGroupMeta,
   itemIdOf,
   routineTitle,
   whenLabel,
@@ -63,11 +64,10 @@ export function HistoryDetail({ workoutId }) {
           const ex = exerciseById(store.exercises, group.exerciseId)
           // req-109 — id first, exerciseId only as the fallback (snapshot-item.js).
           const snapshotItem = snapshotItemFor(snapshot?.items, group.routineItemId, group.exerciseId)
-          const n = group.items.length
           return (
             <Row key={group.routineItemId} to={`/history/${workout.id}/exercise/${group.routineItemId}`}>
               {snapshotItem?.exerciseName || ex?.name || group.exerciseId}
-              {` — ${roleLabel(snapshotItem?.role)}${snapshotItem?.warmup ? ' · WU set' : ''} · ${n} set${n === 1 ? '' : 's'}`}
+              {` — ${historyGroupMeta(snapshotItem, group.items.length)}`}
             </Row>
           )
         })}
@@ -118,7 +118,8 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
       <Back to={`/history/${workout.id}`} />
       <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
       <p className="ui-sub">
-        {[roleLabel(snapshotItem?.role), snapshotItem?.warmup ? 'WU set' : null, whenLabel(workout)]
+        {/* req-128 — req-93 rule: main unlabelled (roleTag), non-main tagged. */}
+        {[roleTag(snapshotItem?.role), snapshotItem?.warmup ? 'WU set' : null, whenLabel(workout)]
           .filter(Boolean)
           .join(' · ')}
       </p>

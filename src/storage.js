@@ -1,7 +1,7 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
-import { isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
+import { anythingLogged, isAddedMidWorkout, isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -516,7 +516,12 @@ export function historyPrescription(workouts, exerciseId) {
   const work = workingSetsFromHistory(last.sets)
   if (!work.length) return null
   const weights = work.map((set) => Number(set.weight) || 0)
-  const snapshotItem = (last.workout?.snapshot?.items || []).find((item) => item.exerciseId === exerciseId)
+  // req-128 — the exercise can sit in the snapshot twice: its own routine item and a
+  // req-109 replacement (rest 0, no notes) inserted for another item — possibly BEFORE
+  // its own. Rest and notes are the routine item's, so prefer the item that was not
+  // added mid-workout; only if every match was (replacement-only) fall back to the first.
+  const matches = (last.workout?.snapshot?.items || []).filter((item) => item.exerciseId === exerciseId)
+  const snapshotItem = matches.find((item) => !isAddedMidWorkout(item)) || matches[0]
   const wu = last.sets.find((set) => set.setType === 'wu' && !isSkippedSet(set))
   return {
     sets: work.length,
@@ -563,7 +568,7 @@ function workoutMinutes(startedAt, end) {
 // same-routine finished workout (or null), and a `now` clock for duration, it returns
 // the three numbers plus a per-number delta. No prior → deltas is null: the summary
 // shows the stats but INVENTS no comparison (DESIGN §1, the no-invent rule). Selection
-// of `prior` (previousSameRoutineWorkout) is separate and equally testable.
+// of `prior` (summaryPriorWorkout, req-128) is separate and equally testable.
 // req-116 — `sets` counts only non-skipped sets (loggedSetCount), on both sides of the
 // delta, so the summary matches the Finish screen and compares like with like.
 export function workoutSummaryStats(active, prior, now) {
@@ -591,6 +596,14 @@ export function workoutSummaryStats(active, prior, now) {
 // so index 1 is the most recent prior. No duplicated key logic.
 export function previousSameRoutineWorkout(active, workouts, routines) {
   return previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
+}
+
+// req-128 — the prior the auto-complete summary compares against: the most recent
+// previous same-routine workout in which anything was logged (anythingLogged). An
+// all-skipped prior holds no volume/sets to compare with, so its deltas would be
+// nonsense; it is passed over. None → null → workoutSummaryStats shows no deltas.
+export function summaryPriorWorkout(active, workouts, routines) {
+  return previousSameRoutineWorkouts(active, workouts, routines).find(anythingLogged) ?? null
 }
 
 // req-111 — every prior same-routine finished workout, newest-first (same grouping as
