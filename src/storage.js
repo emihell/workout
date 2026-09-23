@@ -174,7 +174,11 @@ export function loadState() {
     if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
       throw new Error('stored value is not an object')
     }
-    const migrated = migrateState({ ...emptyState(), ...parsed })
+    // req-120 (audit C) — legacy is read from the RAW value (the merge below injects
+    // schemaVersion 9): a legacy key, or a current key not yet at v9, gets the legacy
+    // plan backfill; a v9 key never does. Same condition as the save below.
+    const legacy = !current || Number(parsed.schemaVersion) !== SCHEMA_VERSION
+    const migrated = migrateState({ ...emptyState(), ...parsed }, { legacy })
     // req-114 (audit G) — a stored schedule with no `anchor` (an import from before
     // applyBackup defaulted it) gets this Monday, and is saved once so the anchor is
     // fixed on disk rather than re-defaulted to a new "this Monday" every week. A
@@ -184,7 +188,7 @@ export function loadState() {
     const anchorDefaulted = schedule !== migrated.schedule
     const state = anchorDefaulted ? { ...migrated, schedule } : migrated
     setLoadUnreadable(false)
-    if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION || anchorDefaulted) {
+    if (legacy || anchorDefaulted) {
       saveState(state)
     }
     // Only reached when this device had data (fresh migration, or already current

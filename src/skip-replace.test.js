@@ -294,7 +294,11 @@ describe('req-109 Replace exercise (replaceItemPatch + replacementItem)', () => 
     assert.deepEqual([c.routineItemId, c.targets, c.suggestedWeights], ['ri-c', ['12', '12'], [30, 30]])
   })
 
-  it('the guard is load-bearing: the same item WITHOUT the marker is backfilled on reload', () => {
+  // req-120 (DEC-driven reversal, DESIGN §1/§3) — this asserted the v9 reload backfill
+  // (['12','12'], the reviewer's probe). v9 no longer backfills at all, so the same item
+  // WITHOUT the marker stays empty on a v9 reload too; the guard's load-bearing proof
+  // moves to legacy input (the next test), the only place the backfill still runs.
+  it('req-120: the same item WITHOUT the marker is NOT backfilled on a v9 reload either', () => {
     let state = replace(baseState(), 'ex-c')
     const items = state.activeWorkout.snapshot.items.map((item, i) => {
       if (i !== 1) return item
@@ -303,7 +307,20 @@ describe('req-109 Replace exercise (replaceItemPatch + replacementItem)', () => 
     })
     state = withActive(state, { snapshot: { ...state.activeWorkout.snapshot, items } })
     const rep = reload(state).activeWorkout.snapshot.items[1]
-    assert.deepEqual(rep.targets, ['12', '12']) // the reviewer's probe result
+    assert.deepEqual([rep.targets, rep.suggestedWeights], [[], []])
+  })
+
+  it('req-120: the guard is still load-bearing for LEGACY input: unmarked → backfilled, marked → not', () => {
+    const legacyReload = (s) => migrateState(JSON.parse(JSON.stringify(s)), { legacy: true })
+    const marked = replace(baseState(), 'ex-c')
+    assert.deepEqual(legacyReload(marked).activeWorkout.snapshot.items[1].targets, [])
+    const items = marked.activeWorkout.snapshot.items.map((item, i) => {
+      if (i !== 1) return item
+      const { addedMidWorkout, ...rest } = item
+      return rest
+    })
+    const unmarked = withActive(marked, { snapshot: { ...marked.activeWorkout.snapshot, items } })
+    assert.deepEqual(legacyReload(unmarked).activeWorkout.snapshot.items[1].targets, ['12', '12'])
   })
 
   // req-112 — Finish no longer writes the routine (DEC-056), so this now runs the path
@@ -446,12 +463,29 @@ describe('req-109 guard 2 — a replacement’s sets never backfill a same-exerc
     assert.deepEqual(after.suggestedWeights, []) // not [60]
   })
 
-  it('control: the routine item’s OWN logged set still backfills it (unchanged behaviour)', () => {
+  // req-120 (DEC-driven reversal, DESIGN §1/§3) — this asserted that the item's own
+  // logged set backfills it on a v9 reload ([['11'], [32.5]]). That backfill is the
+  // invented plan req-120 removes: on v9 the item stays empty. The legacy control is next.
+  it('req-120: the routine item’s OWN logged set no longer backfills it on a v9 reload', () => {
     let state = baseState({ cEmpty: true })
     const c = state.activeWorkout.snapshot.items[1]
     state = withActive(state, { sets: [loggedSet(c, { weight: 32.5, reps: 11 })] })
     const after = reload(state).activeWorkout.snapshot.items[1]
-    assert.deepEqual([after.targets, after.suggestedWeights], [['11'], [32.5]])
+    assert.deepEqual([after.targets, after.suggestedWeights], [[], []])
+  })
+
+  it('req-120 control: for LEGACY input the item’s own logged set still backfills it; the replacement’s never', () => {
+    const legacyReload = (s) => migrateState(JSON.parse(JSON.stringify(s)), { legacy: true })
+    let own = baseState({ cEmpty: true })
+    const c = own.activeWorkout.snapshot.items[1]
+    own = withActive(own, { sets: [loggedSet(c, { weight: 32.5, reps: 11 })] })
+    const ownAfter = legacyReload(own).activeWorkout.snapshot.items[1]
+    assert.deepEqual([ownAfter.targets, ownAfter.suggestedWeights], [['11'], [32.5]])
+    let rep = replace(baseState({ cEmpty: true }), 'ex-c')
+    const r = rep.activeWorkout.snapshot.items[1]
+    rep = withActive(rep, { sets: [...rep.activeWorkout.sets, loggedSet(r, { weight: 60, reps: 7 })] })
+    const cAfter = legacyReload(rep).activeWorkout.snapshot.items[2]
+    assert.deepEqual([cAfter.targets, cAfter.suggestedWeights], [[], []])
   })
 })
 
