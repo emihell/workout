@@ -1,6 +1,6 @@
 # req-128 — small leftovers: History "Main", summary vs a skipped prior, first-item rest, wake-lock, dead code (audit Tier 3 + follow-ups)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[P]**: touches `storage.js` / `schedule.js` (DEC-057:
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-128` (`ed65ad5`…`ed65ad5`, 1 commit).** Phase 1. **[P]**: touches `storage.js` / `schedule.js` (DEC-057:
 reviewer + backup reminder). No stored-data change.
 
 ## Why (each is a follow-up already in BACKLOG, re-verified on main)
