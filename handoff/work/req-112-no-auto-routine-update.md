@@ -1,6 +1,6 @@
 # req-112 — Finish no longer rewrites the routine; recalc maths goes per set (DEC-056)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[functional]** Touches the finish write path
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-112` (`7a0614f`…`7a0614f`, 1 commit).** Phase 1. **[functional]** Touches the finish write path
 (`store.jsx`) and `progress.js`. No schema bump and no stored-data rewrite: it **stops** a write, it doesn't
 add one.
 

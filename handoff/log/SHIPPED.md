@@ -1414,3 +1414,7 @@ legacy sets never attribute to it. Reviewer: main vs branch `migrateState` on db
 IDENTICAL; no path writes a replacement onto the template. Loop-back: guard-2 test (fails with the guard off), history
 detail resolves items id-first (`snapshot-item.js`), arm clears on set actions. No schema bump; existing tests unmodified;
 368 pass. Gate: Planner's own `./check` green (26 files); screenshots confirmed controls + overview after replace.
+
+## req-112 — Finish no longer rewrites the routine; recalc maths goes per set (DEC-056)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
