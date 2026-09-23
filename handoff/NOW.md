@@ -18,7 +18,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23: Tier 1 (req-114..120) and Tier 2 (req-121..123) LIVE**; Tier 3 in `BACKLOG.md` §Flow audit.
 
 **READY, held:**
-- `req-126`..`req-129` **flow-audit Tier 3** (DEC-059; 124–125 LIVE): 126 weight
+- `req-127`..`req-129` **flow-audit Tier 3** (DEC-059; 124–126 LIVE): 126 weight
   step · 127 names/Restore/guards · 128 small leftovers · 129 planning tooling. **Batch approved** — Emilio: "lets do
   t3" (2026-09-23). [P] 124–128 → reviewer + backup reminder. Specs revised after review. Backup: "exported before, go".
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents

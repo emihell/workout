@@ -1581,4 +1581,13 @@ double Previous, re-completing set 1 carries its weight (main kept the later set
 
 ## req-126 — weight step: a number plus an alternating option; catalog doesn't invent one (audit Tier 3, DEC-059 §2)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `aeaa830`…`2cb2be2`, throwaway agent, 1 review loop-back). Both the exercise editor and the in-workout setup screen
+have an "Increment (kg)" field (comma or dot) and an "Alternating (4/5)" checkbox. A new single-value parser
+(`src/weight-step.js`) is used by both editors and by `validWeights`: stored `2,5`/`2.5 kg`/`5 kg` now move recommendations, and
+`+2.5`/`2.` read as on main. Catalog imports save `n/a`. An untouched Save leaves `weightStep` out of the patch, so every stored
+shape (missing, '', null, 'abc', '4/5', a number) is kept verbatim, and an unreadable value shows "Can't read …". Reviewer
+(independent, DEC-057): MERGE-WITH-FOLLOWUPS; drove both screens with 10 stored shapes untouched and with other fields edited,
+and all were identical; 33 values compared with main. The loop-back fixed `+2.5`/`2.` and made the untouched Save verbatim. One named
+test edit (exerciseCatalog.test.js:68 '5'→'n/a'). Gate: Planner's own run → `check: green — lint, 40 test file(s), and the build
+all passed.` Unconfirmed: an unreadable typed value blocks Save; `4/5` is offered only as note text; the detail line hides
+`n/a`; the editor defaults to empty; readable free-text values now move recommendations.
