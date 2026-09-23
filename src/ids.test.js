@@ -76,3 +76,16 @@ describe('req-103 routineItemMeta (routine editor row meta line)', () => {
     assert.equal(routineItemMeta({ sets: 2, suggestedWeights: ['', ''] }), '2 sets')
   })
 })
+
+describe('req-113 routineItemMeta shows — for a set with no weight', () => {
+  it('a 0, empty or missing weight prints as —, never 0', () => {
+    assert.ok(routineItemMeta({ sets: 2, suggestedWeights: [0, 40] }).includes('—/40\u00a0kg'))
+    assert.ok(routineItemMeta({ sets: 3, suggestedWeights: [40, 0, 45] }).includes('40/—/45\u00a0kg'))
+    assert.ok(routineItemMeta({ sets: 2, suggestedWeights: ['', 40] }).includes('—/40\u00a0kg'))
+    assert.ok(routineItemMeta({ sets: 2, suggestedWeights: [null, 40] }).includes('—/40\u00a0kg'))
+  })
+  it('all-zero or empty weights still print no kg part', () => {
+    assert.equal(routineItemMeta({ sets: 2, suggestedWeights: [0, 0] }), '2 sets')
+    assert.equal(routineItemMeta({ sets: 2, suggestedWeights: [] }), '2 sets')
+  })
+})
