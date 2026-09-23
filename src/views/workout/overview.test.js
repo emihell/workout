@@ -48,3 +48,25 @@ test('one allDone test gates both the summary and the Finish style', () => {
   assert.match(workout, /if \(allDone && !autoDismissed\)/)
   assert.doesNotMatch(workout, /items\.every\(/)
 })
+
+// req-107 — one workout note on the active workout, shared by the overview and Finish.
+test('the overview note is the active workout overallNote, written through patchActive', () => {
+  assert.match(workout, /Add note/)
+  assert.match(workout, /value=\{activeNote\(active\)\}/)
+  assert.match(workout, /store\.patchActive\(\{ overallNote: e\.target\.value \}\)/)
+  // Once the note has text the field stays shown (not only after tapping Add note).
+  assert.match(workout, /noteOpen \|\| activeNote\(active\) \?/)
+  // The note sits above the Finish/Abandon block.
+  assert.ok(workout.indexOf('Add note') < workout.indexOf('to={`/workout/${routineId}/finish`}'))
+})
+
+test('Finish shows and writes back the same note; auto-complete saves it', () => {
+  const finish = readFileSync(join(here, 'finish.jsx'), 'utf8')
+  assert.doesNotMatch(finish, /setOverallNote/, 'no Finish-local note state')
+  assert.match(finish, /const overallNote = activeNote\(active\)/)
+  assert.match(finish, /store\.patchActive\(\{ overallNote: e\.target\.value \}\)/)
+  assert.match(finish, /store\.finishWorkout\(\{ overallNote, overallFeel, progression \}\)/)
+  const auto = readFileSync(join(here, 'auto-complete.jsx'), 'utf8')
+  assert.doesNotMatch(auto, /overallNote: ''/)
+  assert.match(auto, /store\.finishWorkout\(autoFinishArgs\(active, progression\)\)/)
+})
