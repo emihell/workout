@@ -1333,4 +1333,8 @@ only — no app code, no persisted data.
 
 ## req-103 — routine editor: two-line exercise rows, main unlabelled (gym-flow batch 4, F1)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Merge `304e1cf` (branch `bcce94a`, built by the Builder session). Routine-editor rows are now a name line over a
+muted meta line from a pure `routineItemMeta` (`ids.js`, unit-tested); main is unlabelled (req-93 rule). Gate:
+Planner's own `./check` green in a throwaway worktree (21 test files); screenshot confirmed the rows render.
+Follow-up surfaced: History detail (`history/detail.jsx:68,120`) still prints "Main" on every row. Backlog.
+Gotcha: `.ui-navlink`'s left inset misaligns a line under it; fixed by dropping the link's left padding in the stack.
