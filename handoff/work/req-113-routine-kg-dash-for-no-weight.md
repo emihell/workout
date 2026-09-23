@@ -1,6 +1,6 @@
 # req-113 — routine editor shows "—", not "0", for a set with no weight (DEC-056 correction)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** Display only: `src/ids.js`. No stored
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-113` (`88d8e44`…`88d8e44`, 1 commit).** Phase 1. **[ux-feel]** Display only: `src/ids.js`. No stored
 data changes.
 
 Emilio, 2026-09-23 (confirming Planner's call): show `—`, never a number, for a set the routine has no
