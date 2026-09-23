@@ -1569,4 +1569,12 @@ double updater (main would have saved two different ids). Planner re-ran the e2e
 
 ## req-125 — typed-but-not-completed set values survive navigation and reload (audit Tier 3)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `e6befb1`…`f73eefe`, throwaway agent, 1 review loop-back). The typed values of the current set (weight, reps,
+effort, duration, note) are kept as `activeWorkout.setDraft` (keyed `item|wu/work|i`, a 300 ms debounced write, flushed on unmount
+and on pagehide/visibilitychange) and read once per set, so navigation or a reload keeps them. The `restore` state is gone: Previous
+writes the un-logged set as the draft. The req-83 comparison base stays the chain seed. Complete/Skip clear the draft inside the
+store update (new pure `withLoggedSet`); `finishedState` strips it. Reviewer (independent, DEC-057): MERGE-WITH-FOLLOWUPS; no path
+logs unseen values (Complete within 300 ms, Abandon/Finish + reload, new workout); no React warnings; loop-back added the
+store-level clear and wiring tests (each mutation fails exactly one). Typing latency matches main (~20 ms / 20 keys). Gate: Planner's
+own run → `check: green — lint, 39 test file(s), and the build all passed.` Unconfirmed: the preview shows the seed; after a
+double Previous, re-completing set 1 carries its weight (main kept the later set's).
