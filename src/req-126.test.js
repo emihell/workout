@@ -47,6 +47,14 @@ describe('req-126 validWeights reads the shared single-value parser', () => {
     for (const v of ['n/a', '', 'abc']) assert.deepEqual(validWeights({ weightStep: v }), [], v)
   })
 
+  it("hand-written list: '+2.5' and '2.' read the same as main (review loop-back)", () => {
+    assert.deepEqual(validWeights({ weightStep: '+2.5' }), validWeightsMain({ weightStep: '+2.5' }))
+    assert.deepEqual(validWeights({ weightStep: '2.' }), validWeightsMain({ weightStep: '2.' }))
+    assert.deepEqual(validWeights({ weightStep: '+2.5' }).slice(0, 2), [2.5, 5])
+    assert.deepEqual(validWeights({ weightStep: '2.' }).slice(0, 3), [2, 4, 6])
+    for (const text of ['1e1', '0x5']) assert.deepEqual(validWeights({ weightStep: text }), [], text)
+  })
+
   it('hand-written failure list: newly parse', () => {
     const cases = { '2,5': 2.5, '2.5 kg': 2.5, '2,5 kg': 2.5, '5 kg': 5 }
     for (const [text, step] of Object.entries(cases)) {
@@ -103,7 +111,7 @@ describe('req-126 editor fields and Save', () => {
     const f = weightStepFields('abc')
     assert.equal(f.unreadable, 'abc')
     assert.equal(weightStepNote(f), "Can't read 'abc' — enter an increment")
-    assert.deepEqual(weightStepToSave(f, { stored: 'abc', touched: false }), { value: 'abc' })
+    assert.deepEqual(weightStepToSave(f, { stored: 'abc', touched: false }), { unchanged: true, value: 'abc' })
   })
 
   it('a typed value that does not read blocks Save with the note', () => {
@@ -113,15 +121,29 @@ describe('req-126 editor fields and Save', () => {
 
   it("'4/5' is offered as Alternating", () => {
     assert.match(weightStepNote(weightStepFields('4/5')), /Alternating \(4\/5\)\?/)
-    assert.deepEqual(weightStepToSave(weightStepFields('4/5'), { stored: '4/5', touched: false }), { value: '4/5' })
+    assert.deepEqual(weightStepToSave(weightStepFields('4/5'), { stored: '4/5', touched: false }), {
+      unchanged: true,
+      value: '4/5',
+    })
   })
 
+  // Review loop-back (edit to this branch's own test): an untouched Save of a missing / '' /
+  // null step is now `unchanged` (the field is left as stored), no longer { value: 'n/a' }.
   it('stored values open as expected; a missing field opens empty (not an invented 2.5)', () => {
     assert.deepEqual(weightStepFields('Alt 4/5'), { amount: '', alternating: true, unreadable: null })
     assert.deepEqual(weightStepFields(undefined), { amount: '', alternating: false, unreadable: null })
     assert.deepEqual(weightStepFields('n/a'), { amount: '', alternating: false, unreadable: null })
     assert.deepEqual(weightStepFields('2,5'), { amount: '2,5', alternating: false, unreadable: null })
-    assert.deepEqual(weightStepToSave(weightStepFields(undefined), { stored: undefined, touched: false }), { value: 'n/a' })
+    for (const stored of [undefined, null, '']) {
+      assert.deepEqual(weightStepToSave(weightStepFields(stored), { stored, touched: false }), {
+        unchanged: true,
+        value: stored,
+      })
+    }
+    // A touched step that ends empty still saves 'n/a'.
+    assert.deepEqual(weightStepToSave({ ...weightStepFields(undefined), amount: '' }, { stored: undefined, touched: true }), {
+      value: 'n/a',
+    })
   })
 
   it('detail line wording', () => {

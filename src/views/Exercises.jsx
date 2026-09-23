@@ -287,7 +287,8 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
             name: name.trim() || ex.name,
             type,
             equipment: equipment.trim() || 'Unknown',
-            weightStep: saved.value,
+            // req-126 — untouched: the key is left out, so the stored value (or its absence) stays.
+            ...(saved.unchanged ? {} : { weightStep: saved.value }),
             muscles: muscles.trim(),
             cues: cues.trim(),
             hasDuration,

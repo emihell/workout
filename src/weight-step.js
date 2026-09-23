@@ -7,8 +7,10 @@ export const ALTERNATING = 'Alt 4/5'
 export const NO_STEP = 'n/a'
 
 // Same number shape as req-118's Kg field, but ONE value: `/` is an error here, not a
-// set separator (so this is deliberately not routine-item-parse's parseKg).
-const STEP_NUMBER = /^(?:\d+(?:\.\d+)?|\.\d+)$/
+// set separator (so this is deliberately not routine-item-parse's parseKg). A leading
+// '+' and a trailing '.' are accepted because main's Number() read them ('+2.5', '2.')
+// and the old free-text editor saved them verbatim; '1e1', '0x5', negatives still fail.
+const STEP_NUMBER = /^\+?(?:\d+(?:\.\d*)?|\.\d+)$/
 
 // One increment in kg, or null. Comma is a decimal point (DEC-058 §1); an optional
 // `kg` suffix; must be > 0.
@@ -48,10 +50,11 @@ export function weightStepNote(fields) {
 }
 
 // What Save writes. `touched` is false until the user changes the number or the
-// checkbox: an untouched step writes back exactly what was stored (so an unreadable
-// 'abc' is never silently replaced). Returns { value } or { error }.
+// checkbox: an untouched step is `{ unchanged: true }` — Save leaves the field exactly as
+// stored, whatever its shape (an unreadable 'abc', '', null, or absent), so nothing is
+// silently replaced. Otherwise { value } or { error }.
 export function weightStepToSave(fields, { stored, touched }) {
-  if (!touched) return { value: stored == null || stored === '' ? NO_STEP : stored }
+  if (!touched) return { unchanged: true, value: stored }
   if (fields.alternating) return { value: ALTERNATING }
   const text = String(fields.amount ?? '').trim()
   if (!text) return { value: NO_STEP }

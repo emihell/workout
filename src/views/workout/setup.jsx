@@ -50,7 +50,8 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           const saved = step.save()
           if (saved.error) return
           store.updateExercise(ex.id, {
-            weightStep: saved.value,
+            // req-126 — untouched: the key is left out, so the stored value (or its absence) stays.
+            ...(saved.unchanged ? {} : { weightStep: saved.value }),
             cues: cues.trim(),
           })
           go(
