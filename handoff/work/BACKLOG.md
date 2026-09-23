@@ -287,6 +287,9 @@ leaves the routine alone; History correct → Apply changes it.
 - **Dropped report items (retro 2026-09-23), small:** Abandon falls below the fold with the overview note open on
   an 8-exercise routine (req-107); the `.ui-navlink` left inset misaligns a second line under a link (req-103 gotcha).
 
+- **Tooling: the pre-push fast-forward guard false-positives** when a req branch was just created at main's tip
+  (2026-09-23: `req-120 (1dd4b54)` refused while the build agent hadn't committed yet). Exempt a branch with no
+  commits beyond main. Small.
 - **Tooling: `plan closeout` warns when the diff touches store/model/storage/progress/workout-log/migration and
   the SHIPPED gate line names no reviewer** (DEC-057, L-023).
 
