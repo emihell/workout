@@ -111,18 +111,18 @@ export function WorkoutItemLog({ routineId, itemId }) {
   return <WorkoutItemLive routineId={routineId} item={item} />
 }
 
-// req-02 / DEC-002: for an exercise with NO finished-workout history, the kg+reps
+// req-02 / DEC-002: for an exercise with NO finished-workout history, the kg
 // carried onto the next working set — the most recent non-skipped working set
 // logged this session. Null for a with-history exercise (`last` present), a
 // warm-up set, or when nothing has been logged yet, so the existing history /
-// blank-kg / target-reps paths stay untouched.
+// blank-kg / target-reps paths stay untouched. req-108 (DEC-052 amendment) — kg
+// only: reps no longer carry; each set prefills its own target.
 function carryFor(ex, last, currentType, workLogged) {
   if (last || currentType !== 'work') return null
   const src = carriedWorkingSet(workLogged)
   if (!src) return null
   return {
     weight: src.weight != null && Number(src.weight) !== 0 ? String(src.weight) : '',
-    reps: src.reps != null && src.reps !== '' ? String(src.reps) : '',
   }
 }
 
@@ -188,7 +188,8 @@ function WorkoutItemLive({ routineId, item }) {
     // req-83 (N9) — a field entered differently from the seed becomes the seed for
     // this exercise's remaining sets this session. Compared against `seed` (what the
     // form presented, incl. any earlier override); only a changed field propagates.
-    // Merged into the same activeWorkout patch as the rest timer.
+    // Merged into the same activeWorkout patch as the rest timer. req-108 (DEC-052) —
+    // weight only; a reps change stays on its own set.
     const seedOverrides = nextSeedOverrides(active.seedOverrides, {
       exerciseId: item.exerciseId,
       setType: currentType,
