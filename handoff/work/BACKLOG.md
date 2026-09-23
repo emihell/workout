@@ -293,6 +293,75 @@ leaves the routine alone; History correct → Apply changes it.
 **Specced 2026-09-23:** F1→req-103, F3+F5→req-104, F6→req-105, F4→req-106, F7→req-107, F9→req-108 (DEC-052), F10→req-110; F2+F8→req-109 (blank-state replace; external review found the migrate-on-load blockers); review also found → req-111 (DEC-053). **Grouping (original):** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
 (both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
 
+### Flow audit — 2026-09-23 (5 parallel read-only reviewers; every item carries evidence in its reviewer's report)
+
+Emilio asked for a start-to-finish scan of every flow plus component-library use. 34 new findings. Planner spot-checked
+the top three in code (`Routine.jsx:305-309` splits kg on `,`; `store.jsx:379` runs `applyBackupFn` inside the
+setState updater; `model.js:124-130` backfills empty targets/weights from logged sets). **Not yet specced.** Grouped
+into proposed reqs. **[P]** = persisted-data / shared-model (DEC-057: reviewer + backup before merge).
+
+**Tier 1 — data and trust bugs**
+- **A. Routine editor parsing** (`Routine.jsx:305-322`): kg `22,5` → 2 sets `[22,5]`; lowering Sets doesn't take
+  (count = max of all lists); a non-numeric kg shifts later weights onto the wrong sets (`abc/20` → set 1 = 20);
+  negative kg accepted; a blank Duration → a `0` s target (beats the exercise default). *Q:* accept `,` as a
+  decimal point (Swedish keyboard)? Recommend yes, with `/` the only separator.
+- **B. Setup edits reach into the live workout [P]:** deleting an exercise or routine that's in the active
+  workout hard-deletes it (`store.jsx:44-66,191-200` count only finished workouts), so history later points at
+  nothing, and Today shows the first-run "No data" screen mid-workout (`Today.jsx:268`). A Library edit (type,
+  Timed) changes the live set form (`item.jsx:35-44,295`) although the snapshot says otherwise (DESIGN §3).
+- **C. Load-time backfill invents plan values [P]** (`model.js:124-130`): an item with empty targets/weights gets
+  them from the logged sets on every load, on history and on the active workout. A mid-workout reload gives
+  set 2 a target from set 1's reps (DESIGN §1). Limit it to legacy (pre-v9) snapshots.
+- **D. A bad import blanks the app** (`store.jsx:379-386`): `applyBackupFn` throws inside the updater and above the
+  ErrorBoundary. Reachable by picking the analytics export. Stored data survives. Also: a v9 value that parses to
+  a non-object is overwritten and the v8 key deleted (`storage.js:169-178`, nit). Validate one level deeper.
+- **E. Finish navigation:** Back from Finish when all done re-arms the 10s auto-finish and drops the chosen Feel
+  (`finish.jsx:24,53`, `overview.jsx:45`), measured in the running app. After Finish, browser Back lands on a working
+  Start for the same routine (navigate with `replace`, measured).
+- **F. Irreversible taps:** a mis-tapped "Add set" on a done exercise can't be removed and writes a skipped set
+  (`item.jsx:469`, `workout-log.js:26-57`); Previous on a timed set loses its duration (`item.jsx:132-142`); History
+  "Add set" writes a placeholder set before Save (`history/helpers.js:81-120`).
+- **G. Dates and schedule [P for the anchor]:** the workout preview uses the UTC date (`overview.jsx:55`; found by
+  two reviewers); an imported schedule has no `anchor`, so weeks 2–4 never show (`exchange.js:109`, `schedule.js:32`);
+  the anchor is parsed as UTC (`schedule.js:7,32`); Today doesn't clamp `loopWeeks` (`Today.jsx:244`); `Done` prints a
+  raw ISO date (`Today.jsx:104,132`).
+
+**Needs Emilio's call**
+- **Midnight:** a workout started 23:50 stops being the Today hero at 00:05, and Start then offers to abandon it
+  (`Today.jsx:257`, `workout-actions.js:44`). *Q:* stale = started more than N hours ago?
+- **Two-routine day while one is in progress:** the hero hides the second routine (`Today.jsx:328`; the gap between
+  DEC-038 and req-110). *Q:* show the hero plus the remaining routine under the date?
+- **Finish with nothing logged** saves a workout of skipped sets and marks the day Done (`workout-log.js:112`); the
+  auto-finish does too after Skip ×N. *Q:* warn and offer Abandon?
+- **Changing the loop length** moves "this week" (`store.jsx:127-136`). *Q:* re-anchor?
+
+**Tier 2 — component library** (adoption is high; findings are concentrated)
+- 5 navigation-only `<Button onClick={go}>` → NavLink (DEC-040): `Today.jsx:221`, `Routine.jsx:96,365`,
+  `setup.jsx:70`, `auto-complete.jsx:93`.
+- The `App.jsx:36,54,73` banners are raw unstyled divs and the Reload button is raw → `Banner`/`Button`.
+- The library `NavLink` (`ui/index.jsx:32`) is imported by 0 views; views hand-add `ui-btn …` classes 10× → one
+  NavLink with a `look` prop. An `Actions` row primitive (12 `ui-actions` sites), fixing `history/list.jsx:44-45`
+  (Continue left of Abandon).
+- `--ui-fs-lg` is undefined and `28px` hardcoded (`ui.css:578,611`); dead `.ui-showcase__row`; Showcase lacks
+  secondary/quiet/block buttons, back-chevron and button-look NavLinks, and two-action rows.
+- Tap targets below 44px: `.ui-addnote` ≈ 22px on the in-gym screens (`ui.css:660`). Long unbroken names overflow
+  at 390px (no `overflow-wrap`).
+
+**Tier 3 — improvements**
+- A replacement starts with 1 set (a 3-set swap costs 6 extra taps); Replace should land on the new exercise.
+- Typed-but-uncompleted set values are lost on navigation/reload (`SetLogForm` local state). Keep a draft on the
+  active workout.
+- Wake-lock holds for a days-old stale workout (`wake-lock.js:21`); Finish's "N sets" counts skipped sets.
+- Dead code: `plannedWorkouts` is never written [P]; `nextOccurrence`/`nextDateForSlot` have test-only callers;
+  route.js's visits stack.
+- Setup data quality: free-text weight step and invented catalog steps (`exerciseCatalog.js:131`); blank or
+  duplicate names; re-adding an archived exercise splits its history (no un-archive); Start on an empty routine
+  (`Routine.jsx:68`).
+- **Phase 2 input** (routine-creation friction): four parallel slash-strings (Sets/Reps/Kg/Duration) → a per-set
+  grid; the catalog search should be in the picker, multi-select; required Focus; one tap per reorder step; per-item rest.
+- Tests: TZ-set schedule tests; a StoreProvider render test for import; a v9 snapshot round-trip test.
+- Stale backlog notes found: native-dialog count is 14 not 13; N1 "Start disabled" is outdated.
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it

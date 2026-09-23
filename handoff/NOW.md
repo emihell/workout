@@ -15,7 +15,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (batches → throwaway agents, DEC-055)
 
-**Nothing in flight.**
+**Nothing in flight.** **Flow audit 2026-09-23** found 34 new issues → `BACKLOG.md` §Flow audit (Tier 1 A–G, 4 calls for Emilio).
 
 **READY, held:**
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
