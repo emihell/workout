@@ -15,6 +15,7 @@ import {
   RestPill,
   Row,
   Screen,
+  SectionHeader,
   SegmentedControl,
   Select,
   SetLogForm,
@@ -30,7 +31,7 @@ const EFFORT = [
 ]
 
 // The block label is a small eyebrow caption (e.g. "BUTTON"), not a section
-// header — SectionHeader is the 22px h2 tier, demonstrated inside the set-log form.
+// header — SectionHeader is the 22px h2 tier, shown in its own block (req-123).
 function Block({ heading, children }) {
   return (
     <div className="ui-showcase__block">
@@ -93,15 +94,36 @@ export function Showcase() {
         <Title>Title, no subtitle</Title>
       </Block>
 
+      {/* req-123 — every variant, plus `block` (full width) and disabled. */}
       <Block heading="Button">
-        <Button variant="primary">Primary</Button>
-        <p className="ui-field__label">variants: primary / secondary / quiet</p>
+        <Actions
+          lateral={
+            <>
+              <Button variant="primary">Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="quiet">Quiet</Button>
+              <Button disabled>Disabled</Button>
+            </>
+          }
+        />
+        <Actions forward={<Button variant="primary" block>Primary, block</Button>} />
+        <Actions forward={<Button variant="quiet" block>Quiet, block</Button>} />
+        <p className="ui-field__label">variant: primary / secondary (default) / quiet · block · disabled</p>
       </Block>
 
+      <Block heading="Section header">
+        <SectionHeader>Section header</SectionHeader>
+      </Block>
+
+      {/* req-123 — the default link look with each chevron. */}
       <Block heading="Nav link">
+        <NavLink to="/settings" chevron="back">
+          Back
+        </NavLink>
         <NavLink to="/settings" chevron="forward">
           Settings
         </NavLink>
+        <p className="ui-field__label">chevron: back ‹ / forward ›</p>
       </Block>
 
       {/* req-122 — a NavLink wearing the Button look: it navigates, never writes (DEC-040). */}
@@ -185,7 +207,12 @@ export function Showcase() {
           >
             Bench press — Work · 3 sets
           </Row>
+          {/* req-123 — a completed exercise in the workout overview (req-79). */}
+          <Row to="/exercises" className="ui-row--done">
+            Chest press · done
+          </Row>
         </List>
+        <p className="ui-field__label">last row: ui-row--done (a completed exercise)</p>
       </Block>
 
       <Block heading="Banner">
