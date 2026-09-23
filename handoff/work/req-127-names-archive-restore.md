@@ -1,6 +1,6 @@
 # req-127 — exercise names, Restore archived, and small routine-editor guards (audit Tier 3, DEC-059 §3–4)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[P]**: a new store action (un-archive) in `store.jsx`
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-127` (`4f06298`…`4f06298`, 1 commit).** Phase 1. **[P]**: a new store action (un-archive) in `store.jsx`
 (DEC-057: reviewer + backup reminder). No schema bump.
 
 ## Why [measured, audit setup reviewer]

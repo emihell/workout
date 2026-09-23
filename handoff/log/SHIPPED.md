@@ -1591,3 +1591,7 @@ and all were identical; 33 values compared with main. The loop-back fixed `+2.5`
 test edit (exerciseCatalog.test.js:68 '5'→'n/a'). Gate: Planner's own run → `check: green — lint, 40 test file(s), and the build
 all passed.` Unconfirmed: an unreadable typed value blocks Save; `4/5` is offered only as note text; the detail line hides
 `n/a`; the editor defaults to empty; readable free-text values now move recommendations.
+
+## req-127 — exercise names, Restore archived, and small routine-editor guards (audit Tier 3, DEC-059 §3–4)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
