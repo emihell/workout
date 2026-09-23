@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "demo": "vite build && vite preview --port 4173 --strictPort --host 127.0.0.1",
-    "shot": "node scripts/screenshot.mjs"
+    "shot": "node scripts/screenshot.mjs",
+    "capture": "node scripts/capture.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

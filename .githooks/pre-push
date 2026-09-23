@@ -19,11 +19,30 @@
 #     the branch still exists, then deletes it — the tip is never on the spine.
 #   - `plan publish` fast-forwards `planning`'s doc commits onto main; those are
 #     not the tip of any `req-*` branch, so nothing matches.
+#   - req-129: a just-created, still-empty `req-*` branch at main's unpushed tip
+#     (reflog holds only "branch: Created from …") — see never_moved below.
 #
 # Escape hatch (never silent): WORKOUT_ALLOW_FF=1 git push ...
 set -euo pipefail
 
 zero='0000000000000000000000000000000000000000'
+
+# req-129: a req-* branch that was just created and never moved (e.g. a build
+# about to start, branched at an unpushed main tip) sits ON the spine without
+# having been fast-forwarded — it carries no commits of its own, so there is no
+# range to lose. It is exempt only when EVERY reflog entry is the creation
+# ("branch: Created from …"). Any other entry — a commit, a merge, a reset, a
+# rebase — means the branch moved and must still be refused. No reflog at all
+# (disabled or expired) is unknown, so it is not exempt: fail closed.
+never_moved() {
+  local subjects
+  subjects="$(git reflog show --format=%gs "$1" -- 2>/dev/null)" || return 1
+  [ -n "$subjects" ] || return 1
+  if grep -qv '^branch: Created from ' <<<"$subjects"; then
+    return 1
+  fi
+  return 0
+}
 
 violations=()
 
@@ -48,6 +67,9 @@ while read -r _local_ref local_sha remote_ref remote_sha; do
     [ -n "$ref" ] || continue
     local_tip="$(git rev-parse --verify "$ref^{commit}" 2>/dev/null)" || continue
     if grep -qxF "$local_tip" <<<"$spine"; then
+      if never_moved "$ref"; then
+        continue
+      fi
       violations+=("${ref#refs/heads/}  ($(git rev-parse --short "$local_tip"))")
     fi
   done < <(git for-each-ref --format='%(refname)' 'refs/heads/req-*')

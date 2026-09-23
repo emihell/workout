@@ -94,5 +94,33 @@ after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
   && ok "save at 50 lines commits normally (exit $rc)" \
   || bad "save at 50 lines should commit — rc=$rc out=$out"
 
+echo "# publish — a build agent's worktree NESTED in the code worktree, on req-120 (req-129)"
+# The real layout: workout-codebase/.claude/worktrees/agent-*/ on a req branch,
+# listed after the code + planning worktrees. Before req-129 the last listed
+# non-planning worktree won, so publish refused "code worktree is on 'req-120'".
+# ./check is stubbed green (the fixture has no app); .claude/worktrees/ is
+# ignored as in the real repo, so the nested checkout doesn't dirty main.
+( cd "$CODE" && printf '#!/usr/bin/env bash\necho "check: stub green"\n' > check && chmod +x check \
+    && printf '.claude/worktrees/\n' > .gitignore && git add -A && git commit -qm "check stub" )
+mkdir -p "$CODE/.claude/worktrees"
+git -C "$CODE" worktree add -q -b req-120 "$CODE/.claude/worktrees/zz-agent-req120"
+# L-020: prove the fixture reproduces the bug — the pre-req-129 rule ("last
+# non-planning branch worktree wins") must pick the nested one here.
+old_pick="$(git -C "$CODE" worktree list --porcelain | awk '
+  /^worktree /{p=substr($0,10)} /^branch refs\/heads\//{ if ($2!="refs/heads/planning") c=p } END{print c}')"
+case "$old_pick" in */.claude/worktrees/zz-agent-req120) ok "fixture: the old last-wins rule picks the nested req-120 worktree (bug reproduced)";;
+  *) bad "fixture: old rule should pick the nested worktree, got '$old_pick'";; esac
+( cd "$PLAN_WT" && printf '# doc\n' > handoff/work/req-080-nested.md && git add -A && git commit -qm "req-080 spec" )
+out="$(cd "$PLAN_WT" && "$PLAN" publish 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] \
+    && ! printf '%s' "$out" | grep -q "is on 'req-120'" \
+    && printf '%s' "$out" | grep -q 'plan publish: merged' \
+    && git -C "$CODE" cat-file -e main:handoff/work/req-080-nested.md; } \
+  && ok "publish picks the top-level code worktree on main, skips the nested req-120 one (exit $rc)" \
+  || bad "publish should skip the nested worktree — rc=$rc out=$out"
+out="$(cd "$CODE" && "$PLAN" status 2>&1)"; rc=$?
+[ $rc -eq 0 ] && ok "status also runs with the nested worktree present (exit $rc)" || bad "status — rc=$rc out=$out"
+git -C "$CODE" worktree remove --force "$CODE/.claude/worktrees/zz-agent-req120"
+
 echo
 if [ "$fails" -eq 0 ]; then echo "plan-guards: all checks passed."; else echo "plan-guards: $fails FAILED"; exit 1; fi

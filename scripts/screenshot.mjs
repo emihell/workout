@@ -17,7 +17,17 @@
 //                      (the app's own migrateState runs on it — pass any schema).
 //   --build            force `npm run build` even if dist/ already exists
 //   --full             full-page screenshot (default: just the viewport)
-//   --wait <ms>        extra settle delay after render (default 250)
+//   --wait <ms>        extra settle delay after render (default 250), and after
+//                      each --click
+//   --click "<text>"   req-129: after load, click the button/link whose visible
+//                      text is <text> (exact, trimmed; else the only one that
+//                      contains it). Repeatable, applied in order, so a state
+//                      behind two taps is `--click "Start" --click "Complete"`.
+//                      Exits non-zero, with no PNG, when the text isn't found.
+//   --scroll-bottom    req-129: scroll the page and every scrollable container to
+//                      the bottom before the shot (content below the fold)
+//
+//   npm run shot -- /workout/sess-upper --seed active.json --click "Cancel"
 
 import { execSync } from 'node:child_process'
 import { createReadStream, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs'
@@ -31,7 +41,7 @@ const DIST = join(ROOT, 'dist')
 const STORAGE_KEY = 'workout-mvp-v9' // must match src/storage.js
 
 function parseArgs(argv) {
-  const opts = { route: '/', viewport: '390x844', wait: 250, full: false, build: false }
+  const opts = { route: '/', viewport: '390x844', wait: 250, full: false, build: false, clicks: [], scrollBottom: false }
   const rest = []
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -41,6 +51,11 @@ function parseArgs(argv) {
     else if (a === '--wait') opts.wait = Number(argv[++i])
     else if (a === '--build') opts.build = true
     else if (a === '--full') opts.full = true
+    else if (a === '--click') {
+      const text = argv[++i]
+      if (text == null || text.trim() === '') throw new Error('--click needs the text to click')
+      opts.clicks.push(text)
+    } else if (a === '--scroll-bottom') opts.scrollBottom = true
     else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`)
     else rest.push(a)
   }
@@ -86,6 +101,39 @@ function serveDist() {
   })
 }
 
+// req-129: click the clickable element showing `text`. An exact (trimmed) match
+// wins; otherwise a single element that contains the text. None, or more than one
+// containing match with no exact one, is an error — never a guess.
+async function clickByText(page, text) {
+  const result = await page.evaluate((wanted) => {
+    const norm = (s) => s.replace(/\s+/g, ' ').trim()
+    const els = [...document.querySelectorAll('button, a, [role="button"], summary, label')]
+      .filter((el) => !el.disabled && el.getClientRects().length > 0)
+    const exact = els.filter((el) => norm(el.textContent) === wanted)
+    const partial = els.filter((el) => norm(el.textContent).includes(wanted))
+    const pick = exact.length ? exact : partial
+    if (pick.length === 0) return { error: `no button or link with text "${wanted}"` }
+    if (!exact.length && pick.length > 1) {
+      return { error: `"${wanted}" is ambiguous: ${pick.map((el) => `"${norm(el.textContent)}"`).join(', ')}` }
+    }
+    pick[0].scrollIntoView({ block: 'center' })
+    pick[0].click()
+    return { clicked: norm(pick[0].textContent), tag: pick[0].tagName.toLowerCase() }
+  }, text.trim())
+  if (result.error) throw new Error(`--click: ${result.error}`)
+  return result
+}
+
+async function scrollToBottom(page) {
+  await page.evaluate(() => {
+    window.scrollTo(0, document.scrollingElement.scrollHeight)
+    for (const el of document.querySelectorAll('*')) {
+      const oy = getComputedStyle(el).overflowY
+      if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) el.scrollTop = el.scrollHeight
+    }
+  })
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2))
 
@@ -125,9 +173,21 @@ async function main() {
     const url = `http://127.0.0.1:${port}/#${route}`
     await page.goto(url, { waitUntil: 'networkidle0' })
     await page.waitForSelector('#root > *', { timeout: 10000 })
-    if (opts.wait > 0) await new Promise((r) => setTimeout(r, opts.wait))
+    const settle = () => (opts.wait > 0 ? new Promise((r) => setTimeout(r, opts.wait)) : null)
+    await settle()
+    for (const text of opts.clicks) {
+      const { clicked, tag } = await clickByText(page, text)
+      await settle()
+      console.log(`Clicked <${tag}> "${clicked}"  → now at ${new URL(page.url()).hash || '#/'}`)
+    }
+    if (opts.scrollBottom) {
+      await scrollToBottom(page)
+      await settle()
+    }
     await page.screenshot({ path: outPath, fullPage: opts.full })
-    console.log(`Wrote ${outPath}  (route ${route}, ${w}x${h}${seedValue ? ', seeded' : ''})`)
+    const extras = [seedValue ? 'seeded' : '', opts.clicks.length ? `${opts.clicks.length} click(s)` : '', opts.scrollBottom ? 'scrolled to bottom' : '']
+      .filter(Boolean)
+    console.log(`Wrote ${outPath}  (route ${route}, ${w}x${h}${extras.map((e) => `, ${e}`).join('')})`)
   } finally {
     await browser.close()
     server.close()
