@@ -1365,3 +1365,7 @@ no set of the exercise is logged. 70/70 `workout-log` tests incl. the fixed-numb
 green; screenshot shows 4 lines clear of Skip/Complete. Notes: `workout-log.js` now imports `DEFAULT_DURATION_SEC` from
 `model.js` (existing cycle, safe — call-time read); Previous-undo of the only set re-shows the preview with normal prefill
 while the form shows the restored values (rare, left).
+
+## req-107 — a workout note on the workout overview, carried to Finish (batch 4, F7)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

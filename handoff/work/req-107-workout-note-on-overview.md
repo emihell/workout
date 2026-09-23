@@ -1,6 +1,6 @@
 # req-107 — a workout note on the workout overview, carried to Finish (batch 4, F7)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** Persisted-adjacent (transient
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-107` (`279f185`…`279f185`, 1 commit).** Phase 1. **[ux-feel]** Persisted-adjacent (transient
 `activeWorkout` field; **no schema-version bump**).
 
 From Emilio's in-app note (2026-09-18, `/workout/sess-push-pull`): *"Able to add notes here as well"*
