@@ -1512,4 +1512,14 @@ in the actions row; after Remove → overview; History Add set is now a `›` li
 
 ## req-119 — setup edits never reach into the live workout (audit B)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `cbdec8b`, throwaway agent). DEC-058 §5: the in-progress workout (snapshot items, logged sets, its
+routine) counts as a reference, so deleting what it uses archives through the existing `archivedAt` path. The delete logic is
+now pure `removeExerciseFromState` / `removeRoutineFromState` in storage.js, and both confirms say "is in the current workout
+and will be archived". Today's first-run "No data" needs no routines, workouts or active workout. Snapshot items gain
+`hasDuration` (buildPlannedWorkout + replacementItem); pure `sessionExercise` gives the live set form name/equipment/type/Timed
+from the snapshot, while weight step, cues and durationSec stay live; an older item without the field falls back to the old
+behaviour. Reviewer (independent, DEC-057): MERGE-WITH-FOLLOWUPS; main vs branch across 288 delete cases → only the 3 intended
+archive diffs, nothing newly hard-deleted, side effects identical; 5 mutations each fail tests. Gate: Planner's own run →
+`check: green — lint, 34 test file(s), and the build all passed.` Follow-ups: the logged-sets reference clause is untested
+(probably unreachable); legacy draftWorkouts not counted. Unconfirmed: confirm wording; name/equipment frozen mid-workout;
+durationSec live.

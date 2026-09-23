@@ -295,6 +295,8 @@ leaves the routine alone; History correct → Apply changes it.
 - **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
   `item.jsx` passes the restored duration to the form (covered by puppeteer only) — a small jsdom/puppeteer smoke;
   (b) History Add/Edit set can't capture `durationSec` for a timed exercise (pre-existing, joins the req-85 gap).
+- **req-119 follow-ups (low):** the logged-sets branch of `exerciseInActiveWorkout` is untested (probably unreachable);
+  legacy `draftWorkouts` aren't counted as references.
 - **Tooling: `plan closeout` warns when the diff touches store/model/storage/progress/workout-log/migration and
   the SHIPPED gate line names no reviewer** (DEC-057, L-023).
 
@@ -303,7 +305,8 @@ leaves the routine alone; History correct → Apply changes it.
 
 ### Flow audit — 2026-09-23 (5 parallel read-only reviewers; every item carries evidence in its reviewer's report)
 
-Emilio asked for a start-to-finish scan of every flow plus component-library use. 34 new findings. Planner spot-checked
+Emilio asked for a start-to-finish scan of every flow plus component-library use. 34 new findings. **Tier 1 (A–G) SHIPPED
+2026-09-23 as req-114..120** (DEC-058); Tiers 2–3 below are still open. Planner spot-checked
 the top three in code (`Routine.jsx:305-309` splits kg on `,`; `store.jsx:379` runs `applyBackupFn` inside the
 setState updater; `model.js:124-130` backfills empty targets/weights from logged sets). **Not yet specced.** Grouped
 into proposed reqs. **[P]** = persisted-data / shared-model (DEC-057: reviewer + backup before merge).
