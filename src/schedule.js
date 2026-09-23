@@ -3,8 +3,22 @@ export function clampLoopWeeks(n) {
   return Math.min(4, Math.max(1, Math.round(v)))
 }
 
+// req-114 (audit G) — a date-only 'YYYY-MM-DD' string is a LOCAL calendar day.
+// `new Date('2026-09-21')` parses it as UTC midnight, which west of UTC is the
+// evening before (dateKey('2026-09-21') was 2026-09-20 in New York) and flips the
+// loop week of a stored anchor. Timestamps and Date objects pass through unchanged.
+const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
+
+export function toLocalDate(value) {
+  if (typeof value === 'string') {
+    const m = DATE_ONLY.exec(value)
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  }
+  return new Date(value)
+}
+
 export function mondayOf(date) {
-  const d = new Date(date)
+  const d = toLocalDate(date)
   d.setHours(0, 0, 0, 0)
   const day = d.getDay()
   const diff = day === 0 ? -6 : 1 - day
@@ -13,7 +27,7 @@ export function mondayOf(date) {
 }
 
 export function dateKey(date) {
-  const d = new Date(date)
+  const d = toLocalDate(date)
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
@@ -21,7 +35,7 @@ export function dateKey(date) {
 }
 
 export function addDays(date, n) {
-  const d = new Date(date)
+  const d = toLocalDate(date)
   d.setHours(0, 0, 0, 0)
   d.setDate(d.getDate() + n)
   return d
@@ -35,17 +49,39 @@ export function loopWeekIndex(schedule, date = new Date()) {
   return ((weeks % loop) + loop) % loop
 }
 
+export function defaultAnchor(now = new Date()) {
+  return dateKey(mondayOf(now))
+}
+
 export function defaultSchedule() {
   return {
     loopWeeks: 1,
-    anchor: dateKey(mondayOf(new Date())),
+    anchor: defaultAnchor(),
     slots: [],
   }
 }
 
+// req-114 (audit G) — an imported (or hand-edited) schedule may carry no `anchor`,
+// and loopWeekIndex then anchors on the QUERIED date, so every week reads as week 0
+// and weeks 2–4 never show. Default it to this Monday — what a new schedule gets.
+// Called by applyBackup and loadState, NOT migrateState: the default depends on the
+// clock, so it must be written once (loadState saves), not recomputed every load.
+// Returns the same object when an anchor is already there.
+export function withDefaultAnchor(schedule, now = new Date()) {
+  if (!schedule || schedule.anchor) return schedule
+  return { ...schedule, anchor: defaultAnchor(now) }
+}
+
+// req-114 (audit G) — the workout preview's plan date: the route's date, else TODAY
+// as a local calendar day (overview.jsx used the UTC date, so 00:00–02:00 in Sweden
+// previewed — and minted an adhoc occurrence for — yesterday).
+export function planDateFor(date, now = new Date()) {
+  return date || dateKey(now)
+}
+
 export function slotsOn(schedule, date) {
   const week = loopWeekIndex(schedule, date)
-  const weekday = new Date(date).getDay()
+  const weekday = toLocalDate(date).getDay()
   return (schedule?.slots || []).filter((s) => Number(s.week) === week && Number(s.weekday) === weekday)
 }
 
@@ -64,7 +100,7 @@ export function occurrenceId(slotId, date) {
 }
 
 export function nextDateForSlot(schedule, slot, fromDate = new Date(), includeToday = true) {
-  const start = new Date(fromDate)
+  const start = toLocalDate(fromDate)
   start.setHours(0, 0, 0, 0)
   const loop = clampLoopWeeks(schedule?.loopWeeks)
   for (let offset = includeToday ? 0 : 1; offset <= loop * 7; offset++) {
@@ -112,7 +148,7 @@ export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlot
 }
 
 export function nextOccurrence(routines, schedule, routineId, workouts = [], fromDate = new Date()) {
-  const start = new Date(fromDate)
+  const start = toLocalDate(fromDate)
   start.setHours(0, 0, 0, 0)
   const loop = clampLoopWeeks(schedule?.loopWeeks)
   for (let i = 0; i < (loop + 1) * 7; i++) {
@@ -130,7 +166,7 @@ export function nextOccurrence(routines, schedule, routineId, workouts = [], fro
 
 export function remainingInLoop(routines, schedule, fromDate = new Date()) {
   const loop = clampLoopWeeks(schedule?.loopWeeks)
-  const start = new Date(fromDate)
+  const start = toLocalDate(fromDate)
   start.setHours(0, 0, 0, 0)
   const items = []
   for (let i = 1; i <= loop * 7; i++) {

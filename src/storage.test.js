@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkout, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
-import { dateKey } from './schedule.js'
+import { dateKey, mondayOf } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
 // no-ops (the iOS/Safari Private Mode failure the req-06 read-back defends
@@ -886,5 +886,80 @@ describe('req-111 previousSameRoutineWorkouts', () => {
   it('no active / no same-routine → []', () => {
     assert.deepEqual(previousSameRoutineWorkouts(null, [], []), [])
     assert.deepEqual(previousSameRoutineWorkouts(active, [wk('x', 'r2', 'Pull')], []), [])
+  })
+})
+
+// req-114 (audit G) — a stored schedule with no `anchor` is defaulted to this Monday
+// by loadState and written ONCE (the named single-field save); a second load finds it
+// and writes nothing; a present anchor is untouched and triggers no write.
+describe('req-114 loadState defaults a missing schedule anchor, saved once', () => {
+  function counting(seed) {
+    const map = new Map(Object.entries(seed))
+    const writes = []
+    const previous = globalThis.localStorage
+    globalThis.localStorage = {
+      getItem: (key) => (map.has(key) ? map.get(key) : null),
+      setItem: (key, value) => {
+        writes.push(key)
+        map.set(key, String(value))
+      },
+      removeItem: (key) => map.delete(key),
+    }
+    return { map, writes, restore: () => (globalThis.localStorage = previous) }
+  }
+  const stored = (schedule) =>
+    JSON.stringify({
+      ...emptyState(),
+      routines: [{ id: 'rtn-1', name: 'Upper', focus: '', exercises: [] }],
+      schedule,
+    })
+
+  it('no anchor → this Monday, written once; a second load writes nothing', () => {
+    const { map, writes, restore } = counting({
+      'workout-mvp-v9': stored({ loopWeeks: 2, slots: [{ id: 's1', week: 1, weekday: 3, routineId: 'rtn-1' }] }),
+    })
+    try {
+      const first = loadState()
+      const monday = dateKey(mondayOf(new Date()))
+      assert.equal(first.schedule.anchor, monday)
+      assert.deepEqual(writes, ['workout-mvp-v9'])
+      const disk = JSON.parse(map.get('workout-mvp-v9'))
+      assert.equal(disk.schedule.anchor, monday)
+      // Only the anchor changed: slots, loopWeeks, routines as stored.
+      assert.equal(disk.schedule.loopWeeks, 2)
+      assert.deepEqual(disk.schedule.slots, [{ id: 's1', week: 1, weekday: 3, routineId: 'rtn-1' }])
+      assert.equal(disk.routines[0].id, 'rtn-1')
+      const second = loadState()
+      assert.equal(second.schedule.anchor, monday)
+      assert.deepEqual(writes, ['workout-mvp-v9']) // still one write
+    } finally {
+      restore()
+    }
+  })
+
+  it('an existing anchor is untouched and nothing is written', () => {
+    const value = stored({ loopWeeks: 2, anchor: '2026-08-24', slots: [] })
+    const { map, writes, restore } = counting({ 'workout-mvp-v9': value })
+    try {
+      const state = loadState()
+      assert.equal(state.schedule.anchor, '2026-08-24')
+      assert.deepEqual(writes, [])
+      assert.equal(map.get('workout-mvp-v9'), value)
+    } finally {
+      restore()
+    }
+  })
+})
+
+// req-114 / DEC-058 §2 — staleInProgressWorkouts follows the shared "current" rule:
+// a workout started 23:50 is not stale at 00:05 (it is the hero); 6 h 01 m on, it is.
+describe('req-114 staleInProgressWorkouts uses the 6 h "current" rule', () => {
+  it('pre-midnight start is current just after midnight; 6 h 01 m later it is stale', () => {
+    const started = new Date(2026, 8, 22, 23, 50)
+    const state = { activeWorkout: { id: 'a1', startedAt: started.toISOString() }, draftWorkouts: [] }
+    const at0005 = new Date(2026, 8, 23, 0, 5)
+    assert.deepEqual(staleInProgressWorkouts(state, dateKey(at0005), at0005), [])
+    const later = new Date(started.getTime() + (6 * 60 + 1) * 60000)
+    assert.deepEqual(staleInProgressWorkouts(state, dateKey(later), later), [state.activeWorkout])
   })
 })

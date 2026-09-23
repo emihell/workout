@@ -1,5 +1,6 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
-import { dateKey, defaultSchedule } from './schedule.js'
+import { isCurrentWorkout } from './current-workout.js'
+import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
 import { isSkippedSet } from './workout-log.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
@@ -173,9 +174,17 @@ export function loadState() {
     if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
       throw new Error('stored value is not an object')
     }
-    const state = migrateState({ ...emptyState(), ...parsed })
+    const migrated = migrateState({ ...emptyState(), ...parsed })
+    // req-114 (audit G) — a stored schedule with no `anchor` (an import from before
+    // applyBackup defaulted it) gets this Monday, and is saved once so the anchor is
+    // fixed on disk rather than re-defaulted to a new "this Monday" every week. A
+    // present anchor is untouched, and then nothing extra is written. Not in
+    // migrateState: the default is clock-dependent.
+    const schedule = withDefaultAnchor(migrated.schedule)
+    const anchorDefaulted = schedule !== migrated.schedule
+    const state = anchorDefaulted ? { ...migrated, schedule } : migrated
     setLoadUnreadable(false)
-    if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION) {
+    if (!current || Number(parsed.schemaVersion) !== SCHEMA_VERSION || anchorDefaulted) {
       saveState(state)
     }
     // Only reached when this device had data (fresh migration, or already current
@@ -224,15 +233,15 @@ export function completedOnDayKey(workouts, dayKey) {
 
 // req-55 / DEC-038 — the unfinished in-progress workouts to surface for resolution
 // (Continue / Abandon). Exactly one workout can be actively in progress; it is only
-// "stale" here once it was STARTED on a prior day (dateKey(startedAt) !== todayKey) —
-// an active workout started today is the today-page hero, not a stale row. Legacy
+// "stale" here once it is no longer CURRENT — req-114 / DEC-058 §2: started today or
+// within the last 6 h (isCurrentWorkout) is the today-page hero, not a stale row. Legacy
 // `draftWorkouts` (the removed multi-draft feature) are always surfaced so old data
 // can be resolved through the normal UI, then the field drains empty. These are
 // NEVER finished history: they live outside `workouts` and never feed progress.js.
-export function staleInProgressWorkouts(state, todayKey) {
+export function staleInProgressWorkouts(state, todayKey = dateKey(new Date()), now = new Date()) {
   const items = []
   const active = state?.activeWorkout
-  if (active && dateKey(active.startedAt) !== todayKey) items.push(active)
+  if (active && !isCurrentWorkout(active, now, todayKey)) items.push(active)
   for (const draft of state?.draftWorkouts || []) items.push(draft)
   return items
 }

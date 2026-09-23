@@ -42,7 +42,8 @@ test('each routine gets its own Start with its own slot, or Done once covered', 
   const routine = fnBody('TodayRoutine')
   assert.match(routine, /coveringWorkout\(store\.workouts, routine\.id, date, slot\.id\)/)
   assert.match(routine, /<StartButton store=\{store\} routine=\{routine\} slot=\{slot\} date=\{date\} variant="primary" block \/>/)
-  assert.match(routine, /Done \{dateKey\(done\.finishedAt\)\}/)
+  // req-114 — `Done` now prints the shared weekdayDate format (was the raw ISO key).
+  assert.match(routine, /Done \{weekdayDate\(dateKey\(done\.finishedAt\)\)\}/)
   // StartButton threads the slot through to the workout (scheduleSlotId)
   assert.match(fnBody('StartButton'), /scheduleSlotId: slot\.id/)
 })
@@ -56,4 +57,38 @@ test('one routine renders the pre-req-110 shape (no __routine wrapper)', () => {
 
 test('consecutive routines are spaced apart', () => {
   assert.match(css, /\.ui-today-workout__routine \+ \.ui-today-workout__routine \{\s*margin-top: var\(--ui-s4\);/)
+})
+
+// req-114 — loop clamp, the current rule, and the hero plus the rest of the day.
+test('Today clamps loopWeeks like Schedule (an imported 6 reads as 4)', () => {
+  const today = src.slice(src.indexOf('export function Today('))
+  assert.match(today, /const loop = clampLoopWeeks\(schedule\?\.loopWeeks\)/)
+  assert.doesNotMatch(src, /Math\.max\(1, Number\(schedule\?\.loopWeeks\)/)
+})
+
+test('the hero is the CURRENT workout and keeps today\'s other occurrences', () => {
+  const today = src.slice(src.indexOf('export function Today('))
+  assert.match(today, /isCurrentWorkout\(mine, now, todayKey\)/)
+  assert.match(today, /otherTodayOccurrences\(todays, hero, todayKey\)/)
+  assert.match(today, /<TodayHero store=\{store\} workout=\{hero\} others=\{others\} date=\{todayKey\} \/>/)
+  assert.doesNotMatch(today, /dateKey\(mine\.startedAt\)/)
+  const hero = fnBody('TodayHero')
+  // one date line — today's, not the workout's own date
+  assert.equal(hero.match(/ui-today-workout__date/g)?.length, 1)
+  assert.match(hero, /weekdayDate\(date\)/)
+  assert.match(hero, /<TodayRoutine store=\{store\} routine=\{routine\} slot=\{slot\} date=\{date\} \/>/)
+})
+
+test('every Start names its occurrence; Done rows use weekdayDate', () => {
+  assert.match(fnBody('StartButton'), /occurrenceId: occurrenceId\(slot\.id, date\)/)
+  assert.doesNotMatch(src, /Done \$\{dateKey\(/)
+  assert.doesNotMatch(src, /Done \{dateKey\(/)
+})
+
+// req-114 review — the hero's Continue resumes by id, never through startOrContinue's
+// fresh-clock "current" re-check (which could ask to abandon just past the 6 h edge).
+test('the hero Continue calls continueInProgress, not startOrContinue', () => {
+  const hero = fnBody('HeroRoutine')
+  assert.match(hero, /onClick=\{\(\) => continueInProgress\(store, workout\)\}/)
+  assert.doesNotMatch(hero, /startOrContinue\(/)
 })

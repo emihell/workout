@@ -1,5 +1,6 @@
 import { EXERCISE_TYPES, ROUTINE_ROLES, WEEKDAYS } from './ids.js'
 import { migrateState } from './model.js'
+import { withDefaultAnchor } from './schedule.js'
 import { emptyState } from './storage.js'
 
 export const BACKUP_KIND = 'workout-mvp-backup'
@@ -44,7 +45,7 @@ export const ASSISTANT = {
       notes: 'Free text cues.',
     },
     schedule:
-      'loopWeeks 1–4. slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history.',
+      'loopWeeks 1–4. anchor is the YYYY-MM-DD Monday of loop week 1 (keep it when editing; if absent, the app sets it to the Monday of the import week). slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history.',
     workout:
       'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, and stores the snapshot in workouts. Finish never changes the routine; only an explicit History recalculation writes suggestedWeights/targets onto it. Do not invent completed workouts.',
     ids: 'Reuse existing ids. New ones: ex-…, rtn-…, si-…, slot-…, wo-… Existing routine ids may still be sess-….',
@@ -108,6 +109,7 @@ export const ASSISTANT = {
       ],
       schedule: {
         loopWeeks: 1,
+        anchor: '2026-08-24',
         slots: [{ id: 'slot-sess-upper', week: 0, weekday: 1, routineId: 'sess-upper' }],
       },
       workouts: 'Keep the existing array unless asked to edit history.',
@@ -259,7 +261,11 @@ export function applyBackup(payload) {
   if (doc.kind === BACKUP_KIND && Number(doc.version) !== BACKUP_VERSION) {
     throw new Error('Not a workout-mvp-backup v1 document.')
   }
-  const state = migrateState({ ...emptyState(), ...raw })
+  const migrated = migrateState({ ...emptyState(), ...raw })
+  // req-114 (audit G) — the imported schedule replaces the default one wholesale, so
+  // an anchor-less file would anchor every week on the queried date (always week 0).
+  // Default it to this Monday, like a new schedule; the import's save persists it.
+  const state = { ...migrated, schedule: withDefaultAnchor(migrated.schedule) }
   return {
     state,
     summary: {

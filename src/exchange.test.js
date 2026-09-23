@@ -1,11 +1,13 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  ASSISTANT,
   BACKUP_KIND,
   applyBackup,
   buildBackup,
   unwrapBackup,
 } from './exchange.js'
+import { addDays, dateKey, loopWeekIndex, mondayOf } from './schedule.js'
 
 const base = {
   exercises: [
@@ -152,5 +154,28 @@ describe('req-39 malformed-backup validation', () => {
     assert.equal(summary.workouts, 0)
     assert.equal(state.workouts.length, 0)
     assert.equal(state.schedule.slots.length, 0)
+  })
+})
+
+// req-114 (audit G) — an imported schedule replaces the default wholesale; without an
+// anchor every week read as week 0. applyBackup defaults it to this Monday; a present
+// anchor is kept as imported. The template documents the field.
+describe('req-114 applyBackup defaults a missing schedule anchor', () => {
+  it('no anchor → the Monday of the current week, so a 2-week loop cycles', () => {
+    const { state } = applyBackup({ kind: BACKUP_KIND, version: 1, state: { ...base, schedule: { loopWeeks: 2, slots: [] } } })
+    const monday = mondayOf(new Date())
+    assert.equal(state.schedule.anchor, dateKey(monday))
+    const weeks = [0, 1, 2, 3, 4].map((w) => loopWeekIndex(state.schedule, addDays(monday, 7 * w + 2)))
+    assert.deepEqual(weeks, [0, 1, 0, 1, 0])
+  })
+
+  it('a present anchor is untouched', () => {
+    const { state } = applyBackup({ kind: BACKUP_KIND, version: 1, state: { ...base, schedule: { loopWeeks: 2, anchor: '2026-08-24', slots: [] } } })
+    assert.equal(state.schedule.anchor, '2026-08-24')
+  })
+
+  it('the exchange template documents anchor', () => {
+    assert.match(ASSISTANT.import.stateShape.schedule.anchor, /^\d{4}-\d{2}-\d{2}$/)
+    assert.match(ASSISTANT.howTheAppWorks.schedule, /anchor/)
   })
 })

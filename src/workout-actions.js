@@ -1,3 +1,4 @@
+import { isCurrentWorkout } from './current-workout.js'
 import { go, hashPath } from './route.js'
 import { dateKey } from './schedule.js'
 import { itemIsMarkedDone, itemLoggingState } from './workout-log.js'
@@ -36,13 +37,14 @@ export function startOrContinue(store, routineId, options = {}) {
   const active = store.activeWorkout
   const activeId = workoutRoutineId(active)
   // "Continuing the same in-progress workout" — same routine, (when an
-  // occurrence is named) the same occurrence, AND started today. A stale active
-  // started on a prior day is a genuinely different workout: tapping today's
-  // Start must abandon-on-new, not silently resume yesterday's sets under
-  // yesterday's occurrence/date (DEC-038). Anything else is different too.
+  // occurrence is named) the same occurrence, AND current. A stale active is a
+  // genuinely different workout: tapping today's Start must abandon-on-new, not
+  // silently resume yesterday's sets under yesterday's occurrence/date (DEC-038).
+  // Anything else is different too. req-114 / DEC-058 §2 — "current" is the one
+  // shared rule (started today OR within 6 h), so a 23:50 workout continues at 00:05.
   const sameOccurrence = !config.occurrenceId || active?.occurrenceId === config.occurrenceId
-  const startedToday = !!active && dateKey(active.startedAt) === dateKey(new Date())
-  const continuingSame = !!active && activeId === routineId && sameOccurrence && startedToday
+  const current = isCurrentWorkout(active)
+  const continuingSame = !!active && activeId === routineId && sameOccurrence && current
   // req-55 / DEC-038 — start-while-active abandons the current, with a warning
   // (replaces the old "Save draft?" path). Cancel: do nothing, keep the active one.
   if (active && !continuingSame) {
