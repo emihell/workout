@@ -3,9 +3,10 @@
 // the preview guard. Exercised through the REAL reducers/helpers (finishedState,
 // skipItemPatch, migrateState, workoutSummaryStats, finishedForPlan).
 import { describe, it } from 'node:test'
+import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
-import { finishedForPlan } from './schedule.js'
+import { finishedForPlan } from './current-workout.js'
 import { emptyState, workoutSummaryStats } from './storage.js'
 import {
   anythingLogged,
@@ -199,5 +200,49 @@ describe('req-116 preview guard (finishedForPlan)', () => {
     assert.equal(finishedForPlan([{ ...finishedSlot, routineId: 'r2' }], planSlot), null)
     assert.equal(finishedForPlan([{ ...finishedSlot, finishedAt: null }], planSlot), null)
     assert.equal(finishedForPlan([finishedSlot], null), null)
+  })
+})
+
+describe('req-116 review — cross-midnight finish covers the ad hoc preview (6 h window)', () => {
+  // Slot S started Tue 23:50, finished Wed 00:10 (local, Europe/Stockholm = UTC+2).
+  const crossMidnight = {
+    id: 'wo-x',
+    routineId: 'r1',
+    scheduleSlotId: 'S',
+    scheduledFor: '2026-09-23',
+    occurrenceId: 'S@2026-09-23',
+    startedAt: '2026-09-23T21:50:00.000Z',
+    finishedAt: '2026-09-23T22:10:00.000Z',
+  }
+  const adhocWed = { routineId: 'r1', date: '2026-09-24', scheduleSlotId: null, occurrenceId: 'adhoc-r1@2026-09-24' }
+
+  it('Back to the ad hoc preview dated Wed, 5 min after finishing → Done (that workout)', () => {
+    assert.equal(finishedForPlan([crossMidnight], adhocWed, new Date('2026-09-23T22:15:00.000Z')), crossMidnight)
+  })
+  it('exactly 6 h after finishing still covers; after 6 h it does not (Start again)', () => {
+    assert.equal(finishedForPlan([crossMidnight], adhocWed, new Date('2026-09-24T04:10:00.000Z')), crossMidnight)
+    assert.equal(finishedForPlan([crossMidnight], adhocWed, new Date('2026-09-24T04:11:00.000Z')), null)
+  })
+  it('another routine finished recently does not cover it', () => {
+    assert.equal(finishedForPlan([{ ...crossMidnight, routineId: 'r2' }], adhocWed, new Date('2026-09-23T22:15:00.000Z')), null)
+  })
+  it('a SLOT preview never uses the 6 h window (its own date test only)', () => {
+    const slotWed = { routineId: 'r1', date: '2026-09-24', scheduleSlotId: 'S', occurrenceId: 'S@2026-09-24' }
+    assert.equal(finishedForPlan([crossMidnight], slotWed, new Date('2026-09-23T22:15:00.000Z')), null)
+  })
+})
+
+describe('req-116 review — History detail counts sets like Finish and the summary', () => {
+  it('detail.jsx uses loggedSetCount, not sets.length', () => {
+    const src = readFileSync(new URL('./views/history/detail.jsx', import.meta.url), 'utf8')
+    assert.match(src, /`\$\{loggedSetCount\(workout\)\} sets`/)
+    assert.doesNotMatch(src, /`\$\{sets\.length\} sets`/)
+  })
+  it('the finished record of 1 WU + 2 work + 1 skipped counts 3', () => {
+    const s = baseState()
+    const it = itemOf(s)
+    const withSets = withActive(s, { sets: [set(it, 'wu', 20, 10), set(it, 'work', 30, 10), set(it, 'work', 35, 8), skipped(it)] })
+    const finished = finishedState(withSets, { progression: [] }, '2026-09-23T11:00:00.000Z').workouts[0]
+    assert.equal(loggedSetCount(finished), 3)
   })
 })

@@ -2,6 +2,7 @@ import { formatSetLine, roleLabel } from '../../ids'
 import { go } from '../../route'
 import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
+import { loggedSetCount } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import {
@@ -42,7 +43,8 @@ export function HistoryDetail({ workoutId }) {
         {[
           whenLabel(workout),
           durationLabel(workout.startedAt, workout.finishedAt),
-          `${sets.length} sets`,
+          // req-116 — skipped sets aren't counted, matching Finish and the summary.
+          `${loggedSetCount(workout)} sets`,
           `${workoutVolume(workout)} kg`,
         ]
           .filter(Boolean)
