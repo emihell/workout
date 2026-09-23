@@ -1444,3 +1444,7 @@ main and branch; mutations M1–M4 each fail tests; loop-back made nested null l
 main). Backup reminder given; Emilio confirmed export ("yes"). Gate: Planner's own run →
 `check: green — lint, 28 test file(s), and the build all passed.`; `safe-import.test.js` 35/35. Unconfirmed: error text
 stays "Not a workout database backup."; the outer boundary reuses the existing fallback.
+
+## req-114 — dates and Today: local date everywhere, imported schedule anchor, midnight, two-routine hero (audit G, DEC-058)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

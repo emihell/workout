@@ -1,6 +1,6 @@
 # req-114 — dates and Today: local date everywhere, imported schedule anchor, midnight, two-routine hero (audit G, DEC-058)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[functional]** + **[P]**: defaults a missing `schedule.anchor`
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-114` (`04ae31e`…`5f494a5`, 2 commits).** Phase 1. **[functional]** + **[P]**: defaults a missing `schedule.anchor`
 on import and on load, with one save (DEC-057: reviewer + backup reminder before merge). No schema bump.
 Revised 2026-09-23 after the spec review.
 
@@ -47,7 +47,7 @@ Revised 2026-09-23 after the spec review.
 
 ## Scope
 
-`overview.jsx`, `schedule.js`, `model.js` (`migrateState` anchor default), `exchange.js` (template string),
+`overview.jsx`, `schedule.js`, `exchange.js` (template string),
 `Today.jsx`, `workout-actions.js`, `storage.js` (`staleInProgressWorkouts`, `loadState` anchor default),
 `exchange.js` (`applyBackup` anchor default), tests. JSX logic under test goes in pure `.js` helpers (tests can't
 import `.jsx`, `store.test.js:12-16`). req-38 fixed the same UTC bug in `store.jsx` but missed `overview.jsx:55`.
