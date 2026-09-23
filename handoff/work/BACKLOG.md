@@ -292,6 +292,9 @@ leaves the routine alone; History correct → Apply changes it.
   commits beyond main. Small.
 - **Tooling: `plan publish` reads a throwaway agent's nested worktree** (`workout-codebase/.claude/worktrees/agent-*`)
   as the code worktree and refuses ("code worktree is on 'req-120'"), 2026-09-23. Resolve the code worktree by exact path.
+- **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
+  `item.jsx` passes the restored duration to the form (covered by puppeteer only) — a small jsdom/puppeteer smoke;
+  (b) History Add/Edit set can't capture `durationSec` for a timed exercise (pre-existing, joins the req-85 gap).
 - **Tooling: `plan closeout` warns when the diff touches store/model/storage/progress/workout-log/migration and
   the SHIPPED gate line names no reviewer** (DEC-057, L-023).
 

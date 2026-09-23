@@ -1500,4 +1500,12 @@ counts for existing records drop their skipped sets (display only).
 
 ## req-117 — taps you can take back: extra set removable, timed Previous keeps its time, History Add set on Save (audit F)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `5d8ffe5`, throwaway agent). An extra set added with Add set is persisted as snapshot-item `addedSets`,
+and while it is unlogged its log screen shows **Remove set**. That pops the set together with the target/weight `withOneMoreSet`
+appended, and the done state is recomputed. Previous on a timed set restores `durationSec` (`restoreFromLoggedSet` moved to
+workout-log.js). The done view puts the title above Add set. History Add set opens the form on a new route and writes only on
+Save (`views/history/add-set.js`; `addSetToWorkout` removed; detail.jsx's placeholder write removed too). Reviewer
+(independent, DEC-057): MERGE-WITH-FOLLOWUPS; Remove can't touch a logged or planned set, including warm-up, replacement,
+empty-array, reload and Previous cases; Save writes exactly one set and keeps the recalc flow (DEC-033); 5 mutations each fail
+tests. Gate: Planner's own run → `check: green — lint, 33 test file(s), and the build all passed.` Unconfirmed: Remove set first
+in the actions row; after Remove → overview; History Add set is now a `›` link; where Cancel returns.
