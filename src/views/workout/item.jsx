@@ -378,8 +378,9 @@ export function WorkoutItemDone({ routineId, itemId }) {
 
   if (!mine || !item) return <MissingItem />
 
+  // req-104 — no "Previous" section here (Emilio: "Don't need to show previous");
+  // the log screen still reads the last finished sets for its prefills.
   const today = itemLoggingState(active, item).logged
-  const previous = lastSetsForExercise(store.workouts, item.exerciseId)
 
   return (
     <Screen>
@@ -396,16 +397,6 @@ export function WorkoutItemDone({ routineId, itemId }) {
               </Row>
             )
           })}
-        </List>
-      ) : (
-        <p className="ui-sub">None.</p>
-      )}
-      <SectionHeader>Previous</SectionHeader>
-      {previous ? (
-        <List>
-          {previous.sets.map((set, index) => (
-            <Row key={index}>{formatSetLine(set)}</Row>
-          ))}
         </List>
       ) : (
         <p className="ui-sub">None.</p>
