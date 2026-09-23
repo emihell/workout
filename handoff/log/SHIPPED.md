@@ -1535,4 +1535,12 @@ History screenshot shows the new order.
 
 ## req-122 — one NavLink with a `look` prop, and an Actions row primitive (audit Tier 2)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `39e1e52`, throwaway agent). One NavLink with `look="link|primary|secondary|quiet|plain"` and `block`
+(the class mapping in pure `views/nav-look.js`; the base link stays in shared.jsx to avoid a circular import); views
+hand-write 0 `ui-btn`/`ui-navlink`/`ui-actions` classes; a new `<Actions retreat lateral forward>` at 13 sites (the spec said 12)
+owns the DOM order. ExercisesLink uses `chevron="back"`. Visual no-op: the builder's main-vs-branch capture (frozen clock,
+DOM + PNG) had 21/23 screens identical; set-log differs by sub-pixel anti-aliasing only (a chevron split into two text
+nodes); the Showcase differs by design. Reviewer (independent, wide refactor): MERGE-WITH-FOLLOWUPS; every `to` and handler
+preserved, no Button↔link swaps, DOM = focus order; 10 extra routes identical. 3 test files had syntax-only edits (named).
+Gate: Planner's own run → `check: green — lint, 36 test file(s), and the build all passed.` Follow-ups: capture the done
+view and all-done Finish; the order test is source-text only.

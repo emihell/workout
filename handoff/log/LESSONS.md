@@ -307,3 +307,12 @@ keyed off `[persisted-data]` in practice, so neither ran for them. req-109 was t
 got both, and its reviewer caught real should-fixes. **How to apply:** decide the checks from the diff's files
 (WORKFLOW READY check 5). A `plan closeout` warning when such a diff lands with no reviewer line would make it
 mechanical (BACKLOG tooling).
+
+## L-024 — a "visual no-op" is proven by a repeatable before/after capture, and a text-node split shows up in it  (2026-09-23)
+
+req-122 (a wide NavLink/Actions refactor) was verified by building main and the branch, freezing the clock, seeding the
+same state through the UI, and comparing `#root` innerHTML and PNG bytes on 23 screens (a before-vs-before rerun matched,
+so the capture was repeatable). The only pixel diff came from `chevron="back"` splitting "‹ Exercises" into two text
+nodes: identical DOM text, sub-pixel anti-aliasing. **How to apply:** for any refactor claimed invisible, require this
+capture (the script is in the req-122 report) and treat a pixel-only diff with identical DOM as explainable, not a
+failure. Add the screens the change touches but the standard set misses (the reviewer found 6 uncovered call sites).
