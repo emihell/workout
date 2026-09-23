@@ -15,11 +15,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (batches → throwaway agents, DEC-055)
 
-**Nothing in flight.** **Flow audit 2026-09-23 Tier 1 LIVE** (req-114..120, DEC-058); Tiers 2–3 in `BACKLOG.md` §Flow audit.
+**Nothing in flight.** **Flow audit 2026-09-23: Tier 1 (req-114..120) and Tier 2 (req-121..123) LIVE**; Tier 3 in `BACKLOG.md` §Flow audit.
 
 **READY, held:**
-- `req-123` last — **flow-audit Tier 2 (121, 122 LIVE), component library** (§Flow audit Tier 2). **Batch approved** —
-  Emilio: "do tier 2" (2026-09-23). No stored data; the wide refactor had its reviewer.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

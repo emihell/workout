@@ -1547,4 +1547,11 @@ view and all-done Finish; the order test is source-text only.
 
 ## req-123 — type tokens, Showcase gaps, dead CSS, tap targets, long names (audit Tier 2)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `8686e0b`, throwaway agent). New `--ui-text-emphasis` (28px) for the rest-pill time; the timer count uses
+`--ui-text-section` (20→22px, unconfirmed); no raw font-size outside the token block; dead `.ui-showcase__row` removed; the Showcase
+shows every Button variant, the NavLink looks, the Actions row, `ui-row--done` and SectionHeader. "Add note" has a 44px tap area with
+the visible pill unchanged (a `::before` pill, a transparent border, negative margins); the exercise-name link on the log screen
+also went 26→44px. Long names wrap (`overflow-wrap: anywhere`, with values/buttons opted out): scrollWidth 651/954 → 390. Capture
+(L-024) main vs branch: 20 identical; log screen + overview differ only by corner anti-aliasing inside Add note's box. 8
+CSS tests. No trigger files. Gate: Planner's own run → `check: green — lint, 37 test file(s), and the build all passed.`;
+the zoom screenshot shows Add note visually identical.
