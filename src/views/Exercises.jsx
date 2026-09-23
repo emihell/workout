@@ -3,9 +3,9 @@ import { catalogItemToExercise, loadExerciseCatalog, searchExerciseCatalog } fro
 import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
-import { Back, Missing, NavLink } from './shared'
+import { Back, Missing } from './shared'
 import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
-import { Banner, Button, Checkbox, Field, List, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
+import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
 
 const TYPE_LABELS = {
@@ -88,7 +88,7 @@ export function Exercises({ type = null }) {
     <Screen>
       <Title>Exercises</Title>
       <p>
-        <NavLink to="/exercises/new" className="ui-navlink" chevron="forward">Add exercise</NavLink>
+        <NavLink to="/exercises/new" chevron="forward">Add exercise</NavLink>
       </p>
       <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
       {q ? (
@@ -163,12 +163,10 @@ export function ExerciseNewManual({ returnBase = null }) {
       >
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
-        <div className="ui-actions">
-          <NavLink to={paths.hub} className="ui-btn ui-btn--quiet">Cancel</NavLink>
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-        </div>
+        <Actions
+          retreat={<NavLink to={paths.hub} look="quiet">Cancel</NavLink>}
+          forward={<Button type="submit" variant="primary">Save</Button>}
+        />
       </form>
     </Screen>
   )
@@ -219,7 +217,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
               const action = existing ? (
                 <NavLink
                   to={returnBase ? paths.afterCreate(existing.id) : `/exercises/${existing.id}`}
-                  className="ui-btn ui-btn--secondary"
+                  look="secondary"
                 >
                   {returnBase ? 'Add to routine' : 'Already added'}
                 </NavLink>
@@ -309,12 +307,10 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         ) : null}
         <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
         <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
-        <div className="ui-actions">
-          <NavLink to={back} className="ui-btn ui-btn--quiet">Cancel</NavLink>
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-        </div>
+        <Actions
+          retreat={<NavLink to={back} look="quiet">Cancel</NavLink>}
+          forward={<Button type="submit" variant="primary">Save</Button>}
+        />
       </form>
     </Screen>
   )
@@ -332,7 +328,7 @@ export function ExerciseDetail({ exerciseId }) {
       <Back to="/exercises" />
       <Title>{ex.name}</Title>
       <p>
-        <NavLink to={`/exercises/${ex.id}/edit`} className="ui-navlink" chevron="forward">Edit</NavLink>
+        <NavLink to={`/exercises/${ex.id}/edit`} chevron="forward">Edit</NavLink>
       </p>
       <p className="ui-sub">
         {[ex.equipment, typeLabel(ex.type), ex.weightStep, ex.hasDuration ? `Timed ${ex.durationSec}s` : null]

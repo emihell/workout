@@ -3,6 +3,7 @@
 // of the app's real flow.
 import { useEffect, useState } from 'react'
 import {
+  Actions,
   Banner,
   Button,
   Checkbox,
@@ -101,6 +102,33 @@ export function Showcase() {
         <NavLink to="/settings" chevron="forward">
           Settings
         </NavLink>
+      </Block>
+
+      {/* req-122 — a NavLink wearing the Button look: it navigates, never writes (DEC-040). */}
+      <Block heading="Nav link — button looks">
+        <NavLink to="/settings" look="primary">
+          Primary
+        </NavLink>
+        <NavLink to="/settings" look="secondary">
+          Secondary
+        </NavLink>
+        <NavLink to="/settings" look="quiet">
+          Quiet
+        </NavLink>
+        <NavLink to="/settings" look="primary" block>
+          Primary, block
+        </NavLink>
+        <p className="ui-field__label">look: link (default) / primary / secondary / quiet / plain · block</p>
+      </Block>
+
+      {/* req-122 — DESIGN §4 order is the component's: retreat left, lateral between,
+          forward right. */}
+      <Block heading="Actions">
+        <Actions
+          retreat={<NavLink to="/settings" look="quiet">Cancel</NavLink>}
+          lateral={<Button>Skip</Button>}
+          forward={<Button variant="primary">Save</Button>}
+        />
       </Block>
 
       <Block heading="Segmented control">

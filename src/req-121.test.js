@@ -37,14 +37,15 @@ test('Today empty day: "Start new workout" is a NavLink to /routines with the pr
   assert.doesNotMatch(body, /<Button\b/)
   assert.match(
     body,
-    /<NavLink to="\/routines" className="ui-btn ui-btn--primary ui-btn--block">\s*Start new workout\s*<\/NavLink>/,
+    // req-122 — the button look is the NavLink `look`/`block` props, not hand-written classes.
+    /<NavLink to="\/routines" look="primary" block>\s*Start new workout\s*<\/NavLink>/,
   )
 })
 
 test('Routine forms: Cancel is a NavLink to cancelTo, no onCancel handler left', () => {
   for (const name of ['RoutineNewForm', 'ExerciseFields']) {
     const body = fnBody(routine, name)
-    assert.match(body, /<NavLink to=\{cancelTo\} className="ui-btn ui-btn--secondary">Cancel<\/NavLink>/, name)
+    assert.match(body, /<NavLink to=\{cancelTo\} look="secondary">Cancel<\/NavLink>/, name) // req-122: look prop
     assert.doesNotMatch(body, /onCancel/, name)
     assert.doesNotMatch(body, />Cancel<\/Button>/, name)
   }
@@ -60,7 +61,7 @@ test('Routine forms: Cancel is a NavLink to cancelTo, no onCancel handler left',
 test('Workout exercise setup: Cancel is a NavLink to backTo', () => {
   const body = fnBody(setup, 'WorkoutItemExercise')
   assert.doesNotMatch(body, NAV_BUTTON)
-  assert.match(body, /<NavLink to=\{backTo\} className="ui-btn ui-btn--secondary">Cancel<\/NavLink>/)
+  assert.match(body, /<NavLink to=\{backTo\} look="secondary">Cancel<\/NavLink>/) // req-122: look prop
 })
 
 test('App: no raw role="alert" div and no raw <button>; banners use Banner, Reload uses Button', () => {

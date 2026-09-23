@@ -3,8 +3,8 @@ import { go } from '../../route'
 import { exerciseById, findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
-import { Back, Missing, NavLink } from '../shared'
-import { Button, List, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
+import { Back, Missing } from '../shared'
+import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
 import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
 
@@ -38,12 +38,10 @@ export function HistoryEdit({ workoutId }) {
           ariaLabel="Feel"
         />
         <Textarea label="Note" value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
-        <div className="ui-actions">
-          <NavLink to={`/history/${workout.id}`} className="ui-btn ui-btn--quiet">Cancel</NavLink>
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-        </div>
+        <Actions
+          retreat={<NavLink to={`/history/${workout.id}`} look="quiet">Cancel</NavLink>}
+          forward={<Button type="submit" variant="primary">Save</Button>}
+        />
       </form>
     </Screen>
   )

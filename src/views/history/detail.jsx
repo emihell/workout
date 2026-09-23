@@ -3,8 +3,8 @@ import { go } from '../../route'
 import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-log'
-import { Back, Missing, NavLink } from '../shared'
-import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
+import { Back, Missing } from '../shared'
+import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { historyAddSetPath } from './add-set'
 import {
   itemIdOf,
@@ -52,7 +52,7 @@ export function HistoryDetail({ workoutId }) {
       </p>
       <p className="ui-sub">
         {workout.overallFeel ? `${workout.overallFeel} · ` : ''}
-        <NavLink to={`/history/${workout.id}/edit`} className="ui-navlink" chevron="forward">Edit</NavLink>
+        <NavLink to={`/history/${workout.id}/edit`} chevron="forward">Edit</NavLink>
       </p>
       {workout.overallNote ? <p className="ui-sub">{workout.overallNote}</p> : null}
 
@@ -73,7 +73,7 @@ export function HistoryDetail({ workoutId }) {
         })}
       </List>
       <p>
-        <NavLink to={`/history/${workout.id}/set/new`} className="ui-navlink" chevron="forward">Add set</NavLink>
+        <NavLink to={`/history/${workout.id}/set/new`} chevron="forward">Add set</NavLink>
       </p>
 
       {/* req-96 — the "Next time" load-recommendation surface was removed here (and on
@@ -136,7 +136,6 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
       <p>
         <NavLink
           to={historyAddSetPath(workout, actualExerciseId, itemIdOf(snapshotItem) || null)}
-          className="ui-navlink"
           chevron="forward"
         >
           Add set

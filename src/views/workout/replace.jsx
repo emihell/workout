@@ -3,8 +3,8 @@ import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { useStore } from '../../store-context'
 import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
-import { Back, NavLink } from '../shared'
-import { Button, Field, List, Row, Screen, Title } from '../../ui/index.jsx'
+import { Back } from '../shared'
+import { Actions, Button, Field, List, NavLink, Row, Screen, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, MissingItem } from './helpers'
 import { RestPill } from './rest'
 
@@ -65,11 +65,7 @@ export function WorkoutItemReplace({ routineId, itemId }) {
           </Row>
         ))}
       </List>
-      <div className="ui-actions">
-        <NavLink to={backTo} className="ui-btn ui-btn--quiet">
-          Cancel
-        </NavLink>
-      </div>
+      <Actions retreat={<NavLink to={backTo} look="quiet">Cancel</NavLink>} />
     </Screen>
   )
 }

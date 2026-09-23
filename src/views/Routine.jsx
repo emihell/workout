@@ -6,8 +6,8 @@ import { deletionConfirmHead, routineById, historyPrescription, routineDeletionI
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
-import { Back, Missing, NavLink } from './shared'
-import { Button, Checkbox, Field, List, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
+import { Back, Missing } from './shared'
+import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 
 function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
@@ -49,7 +49,7 @@ export function Routines() {
     <Screen>
       <Title>Routines</Title>
       <p>
-        <NavLink to="/routines/new" className="ui-navlink" chevron="forward">Add routine</NavLink>
+        <NavLink to="/routines/new" chevron="forward">Add routine</NavLink>
       </p>
       {routines.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -63,7 +63,7 @@ export function Routines() {
             key={routine.id}
             action={
               <>
-                <NavLink to={routinePath(routine.id)} className="ui-btn ui-btn--secondary">
+                <NavLink to={routinePath(routine.id)} look="secondary">
                   Edit
                 </NavLink>
                 <Button variant="secondary" onClick={() => startOrContinue(store, routine.id)}>
@@ -95,12 +95,10 @@ export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
     >
       <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
       <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
-      <div className="ui-actions">
-        <NavLink to={cancelTo} className="ui-btn ui-btn--secondary">Cancel</NavLink>
-        <Button type="submit" variant="primary">
-          {submitLabel}
-        </Button>
-      </div>
+      <Actions
+        retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
+        forward={<Button type="submit" variant="primary">{submitLabel}</Button>}
+      />
     </form>
   )
 }
@@ -141,11 +139,11 @@ export function RoutineDetail({ routineId, paths }) {
       <p className="ui-sub">
         {meta}
         {meta ? ' · ' : ''}
-        <NavLink to={nav.edit} className="ui-navlink" chevron="forward">Edit</NavLink>
+        <NavLink to={nav.edit} chevron="forward">Edit</NavLink>
       </p>
       <SectionHeader>Exercises</SectionHeader>
       <p>
-        <NavLink to={nav.pick} className="ui-navlink" chevron="forward">Add exercise</NavLink>
+        <NavLink to={nav.pick} chevron="forward">Add exercise</NavLink>
       </p>
       {routine.exercises.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -163,7 +161,7 @@ export function RoutineDetail({ routineId, paths }) {
             >
               {/* req-103 — two lines: name (link to the item editor), then a muted meta line. */}
               <span className="ui-row__stack">
-                <NavLink to={nav.item(item.id)} className="ui-navlink">{ex?.name || item.exerciseId}</NavLink>
+                <NavLink to={nav.item(item.id)}>{ex?.name || item.exerciseId}</NavLink>
                 <span className="ui-row__meta">{routineItemMeta(item)}</span>
               </span>
             </Row>
@@ -223,12 +221,10 @@ export function RoutineEdit({ routineId, paths }) {
       >
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
-        <div className="ui-actions">
-          <NavLink to={nav.base} className="ui-btn ui-btn--quiet">Cancel</NavLink>
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-        </div>
+        <Actions
+          retreat={<NavLink to={nav.base} look="quiet">Cancel</NavLink>}
+          forward={<Button type="submit" variant="primary">Save</Button>}
+        />
       </form>
     </Screen>
   )
@@ -256,7 +252,7 @@ export function RoutineExercisePick({ routineId, paths }) {
       <Back to={nav.base} />
       <Title>Add exercise</Title>
       <p>
-        <NavLink to={nav.create} className="ui-navlink" chevron="forward">Create exercise</NavLink>
+        <NavLink to={nav.create} chevron="forward">Create exercise</NavLink>
       </p>
       {store.exercises.length === 0 ? (
         <p className="ui-sub">None.</p>
@@ -380,17 +376,15 @@ function ExerciseFields({ item, onChange, cancelTo, defaults, timed = false, set
       )}
       {settingsLink ? (
         <p>
-          <NavLink to={settingsLink} className="ui-navlink" chevron="forward">Edit exercise settings</NavLink>
+          <NavLink to={settingsLink} chevron="forward">Edit exercise settings</NavLink>
         </p>
       ) : null}
       <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
       <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
-      <div className="ui-actions">
-        <NavLink to={cancelTo} className="ui-btn ui-btn--secondary">Cancel</NavLink>
-        <Button type="submit" variant="primary">
-          Save
-        </Button>
-      </div>
+      <Actions
+        retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
+        forward={<Button type="submit" variant="primary">Save</Button>}
+      />
     </form>
   )
 }

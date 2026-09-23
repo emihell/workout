@@ -4,8 +4,8 @@ import { exerciseById } from '../../storage'
 import { useStore } from '../../store-context'
 import { itemLoggingState } from '../../workout-log'
 import { navForBase, RoutineScreens } from '../Routine'
-import { Back, Missing, NavLink } from '../shared'
-import { Button, Field, Screen, Textarea, Title } from '../../ui/index.jsx'
+import { Back, Missing } from '../shared'
+import { Actions, Button, Field, NavLink, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './helpers'
 import { RestPill } from './rest'
 
@@ -66,13 +66,11 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           onChange={(event) => setCues(event.target.value)}
           rows={3}
         />
-        <div className="ui-actions">
-          {/* req-121 — Cancel only navigates (to backTo), so a NavLink (DEC-040). */}
-          <NavLink to={backTo} className="ui-btn ui-btn--secondary">Cancel</NavLink>
-          <Button type="submit" variant="primary">
-            Save
-          </Button>
-        </div>
+        {/* req-121 — Cancel only navigates (to backTo), so a NavLink (DEC-040). */}
+        <Actions
+          retreat={<NavLink to={backTo} look="secondary">Cancel</NavLink>}
+          forward={<Button type="submit" variant="primary">Save</Button>}
+        />
       </form>
     </Screen>
   )
