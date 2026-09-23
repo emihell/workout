@@ -30,6 +30,7 @@ import {
 } from './workout-log.js'
 import { parseRoute } from './route.js'
 import { itemReplacePath } from './workout-paths.js'
+import { snapshotItemFor } from './views/history/snapshot-item.js'
 
 const EXERCISES = [
   { id: 'ex-a', name: 'Chest Press', equipment: 'Machine', type: 'machine', weightStep: '5' },
@@ -40,7 +41,7 @@ const EXERCISES = [
 // A current-schema state: routine r1 = A (ex-a: 3 sets 10/8/6 @ 40/45/50, warm-up,
 // rest 120) then C (ex-c: 2 sets 12/12 @ 30/30). The active workout is started the real
 // way (buildPlannedWorkout → planSnapshot, as store.startWorkout does).
-function baseState({ workouts = [] } = {}) {
+function baseState({ workouts = [], cEmpty = false } = {}) {
   const state = migrateState({
     schemaVersion: 9,
     exercises: EXERCISES,
@@ -66,8 +67,8 @@ function baseState({ workouts = [] } = {}) {
             role: 'main',
             restSec: 90,
             sets: 2,
-            targets: ['12', '12'],
-            suggestedWeights: [30, 30],
+            targets: cEmpty ? [] : ['12', '12'],
+            suggestedWeights: cEmpty ? [] : [30, 30],
           },
         ],
       },
@@ -423,5 +424,55 @@ describe('req-109 picker route', () => {
     // the neighbours are unchanged
     assert.equal(parseRoute('/workout/r1/item/ri-a/log').name, 'workout-item-log')
     assert.equal(parseRoute('/workout/r1/item/ri-a').name, 'workout-item')
+  })
+})
+
+// req-109 review loop-back — guard 2 in workoutSnapshot: a replacement's logged sets
+// never backfill a routine item of the same exercise whose targets/weights are empty.
+describe('req-109 guard 2 — a replacement’s sets never backfill a same-exercise routine item', () => {
+  it('routine C with EMPTY targets/weights + replacement C logged 60×7 → after migrateState, C is still empty', () => {
+    let state = replace(baseState({ cEmpty: true }), 'ex-c')
+    const [, rep, c] = state.activeWorkout.snapshot.items
+    assert.deepEqual([c.routineItemId, c.targets, c.suggestedWeights], ['ri-c', [], []])
+    state = withActive(state, { sets: [...state.activeWorkout.sets, loggedSet(rep, { weight: 60, reps: 7 })] })
+    const after = reload(state).activeWorkout.snapshot.items[2]
+    assert.equal(after.routineItemId, 'ri-c')
+    assert.deepEqual(after.targets, []) // not ['7']
+    assert.deepEqual(after.suggestedWeights, []) // not [60]
+  })
+
+  it('control: the routine item’s OWN logged set still backfills it (unchanged behaviour)', () => {
+    let state = baseState({ cEmpty: true })
+    const c = state.activeWorkout.snapshot.items[1]
+    state = withActive(state, { sets: [loggedSet(c, { weight: 32.5, reps: 11 })] })
+    const after = reload(state).activeWorkout.snapshot.items[1]
+    assert.deepEqual([after.targets, after.suggestedWeights], [['11'], [32.5]])
+  })
+})
+
+describe('req-109 history detail — snapshotItemFor resolves by id first', () => {
+  // ri-a replaced by C; the routine's own ri-c is also C (accessory + WU).
+  const items = [
+    { routineItemId: 'ri-a', exerciseId: 'ex-a', role: 'main', warmup: { reps: 10 } },
+    { routineItemId: 'mid-1', exerciseId: 'ex-c', role: 'main', warmup: null, addedMidWorkout: true },
+    { routineItemId: 'ri-c', exerciseId: 'ex-c', role: 'accessory', warmup: { reps: 8 } },
+  ]
+  it('the ri-c row resolves to ri-c (accessory + WU), not the earlier replacement', () => {
+    const got = snapshotItemFor(items, 'ri-c', 'ex-c')
+    assert.equal(got.routineItemId, 'ri-c')
+    assert.equal(got.role, 'accessory')
+    assert.ok(got.warmup)
+    // the old first-hit find picked the replacement — the bug this fixes
+    const old = items.find((item) => item.routineItemId === 'ri-c' || item.exerciseId === 'ex-c')
+    assert.equal(old.routineItemId, 'mid-1')
+  })
+  it('the replacement row resolves to the replacement', () => {
+    assert.equal(snapshotItemFor(items, 'mid-1', 'ex-c').routineItemId, 'mid-1')
+  })
+  it('falls back to exerciseId only when no item has the id (legacy key / exercise route param)', () => {
+    assert.equal(snapshotItemFor(items, 'history-wo-ex-a', 'ex-a').routineItemId, 'ri-a')
+    assert.equal(snapshotItemFor(items, 'ex-a').routineItemId, 'ri-a')
+    assert.equal(snapshotItemFor(items, 'nope', 'ex-zzz'), null)
+    assert.equal(snapshotItemFor(undefined, 'ri-a'), null)
   })
 })

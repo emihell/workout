@@ -188,6 +188,8 @@ function WorkoutItemLive({ routineId, item }) {
     unlockAudio()
     const done = finishAfterThisSet()
     setRestore(null)
+    // req-109 (review) — logging a set disarms a pending Skip exercise.
+    setSkipArmed(false)
     // req-83 (N9) — a field entered differently from the seed becomes the seed for
     // this exercise's remaining sets this session. Compared against `seed` (what the
     // form presented, incl. any earlier override); only a changed field propagates.
@@ -225,6 +227,7 @@ function WorkoutItemLive({ routineId, item }) {
   function skipSet() {
     recordButton('skip-set')
     setRestore(null)
+    setSkipArmed(false)
     const done = finishAfterThisSet()
     store.completeSet(
       {
@@ -249,6 +252,7 @@ function WorkoutItemLive({ routineId, item }) {
     const lastLogged = index >= 0 ? active.sets[index] : null
     if (!lastLogged) return
     recordButton('previous-set')
+    setSkipArmed(false)
     const next = restoreFromLoggedSet(lastLogged)
     next.workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
     setRestore(next)

@@ -130,7 +130,10 @@ function workoutSnapshot(state, workout, origin = state) {
       }
     })
     // req-109 — a key-less legacy set is attributed to a routine item, never to a
-    // mid-workout one (same Map as before when there is none).
+    // mid-workout one (same Map as before when there is none). Defensive only: this Map
+    // is read solely for sets with no routineItemId/sessionItemId, which are pre-snapshot
+    // legacy data and can't coexist with a replacement (every set logged since carries
+    // its item key), so no test can reach it through a real flow.
     const itemByExercise = new Map(
       items.filter((item) => !isAddedMidWorkout(item)).map((item) => [item.exerciseId, item]),
     )
