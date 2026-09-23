@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatSetLine, isWeightedType, roleLabel, roleTag, rpeLabel, rpeOptionValue } from './ids.js'
+import { formatSetLine, isWeightedType, roleLabel, roleTag, routineItemMeta, rpeLabel, rpeOptionValue } from './ids.js'
 
 describe('req-44 isWeightedType (unifies usesWeight/usesLoad/weighted/bodyweight)', () => {
   it('machine and free carry load', () => {
@@ -54,5 +54,25 @@ describe('req-93 roleTag (main is unlabelled; only non-main roles carry a tag)',
     assert.equal(roleTag('cardio'), roleLabel('cardio'))
     assert.equal(roleTag('warmup'), 'WU routine')
     assert.equal(roleTag('finisher'), 'Finisher')
+  })
+})
+
+describe('req-103 routineItemMeta (routine editor row meta line)', () => {
+  it('minimal item (no role, no warm-up, no weights) is just "1 set" — no stray separators, no Main', () => {
+    assert.equal(routineItemMeta({ exerciseId: 'x' }), '1 set')
+  })
+  it('main is unlabelled; warm-up set, set count and kg join with " · "', () => {
+    const meta = routineItemMeta({ role: 'main', warmup: true, sets: 3, suggestedWeights: [20, 22, 24] })
+    assert.equal(meta, 'WU set · 3 sets · 20/22/24\u00a0kg')
+    assert.ok(!meta.includes('Main'))
+  })
+  it('non-main roles keep their tag first', () => {
+    assert.equal(routineItemMeta({ role: 'warmup', sets: 2 }), 'WU routine · 2 sets')
+    assert.equal(routineItemMeta({ role: 'finisher', sets: 1 }), 'Finisher · 1 set')
+    assert.equal(routineItemMeta({ role: 'cardio' }), 'Cardio · 1 set')
+  })
+  it('all-zero / empty weights print no kg', () => {
+    assert.equal(routineItemMeta({ sets: 2, suggestedWeights: [0, '0'] }), '2 sets')
+    assert.equal(routineItemMeta({ sets: 2, suggestedWeights: ['', ''] }), '2 sets')
   })
 })
