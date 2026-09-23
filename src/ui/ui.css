@@ -42,12 +42,16 @@
   --ui-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* type scale (DEC-020) — the ONE source of truth for text sizes. Every
-   * component references these; there are no ad-hoc font-size values anywhere. */
+   * component references these; no font-size outside this block is a raw value
+   * (req-123 locks it in src/ui/type-scale.test.js). */
   --ui-text-caption: 13px; /* eyebrow labels, field labels, captions */
   --ui-text-body: 17px; /* default text, buttons, inputs, list rows */
   --ui-text-section: 22px; /* SectionHeader / h2 */
   --ui-text-title: 32px; /* Title / h1 screen titles */
   --ui-text-display: 40px; /* big data numbers (e.g. kg NumberField) */
+  /* req-123 — the rest-pill countdown: read at a glance mid-rest, between section
+   * and title. Was a raw 28px on .ui-restpill__time. */
+  --ui-text-emphasis: 28px;
 }
 
 /* Base link treatment (req-15): the app is fully migrated onto the library, so
@@ -366,6 +370,21 @@ a.ui-btn--quiet:active {
 .ui-row__chev {
   color: var(--ui-ink-3);
 }
+/* req-123 — a long unbroken name (titles, row labels, subtitles) wraps instead of
+ * widening the page at 390px. `anywhere` (not `break-word`) so it also lowers the
+ * min-content width, letting a flex row's label shrink. Values, chevrons and action
+ * buttons opt back out so "Start"/"Down" never break mid-word. */
+.ui-title,
+.ui-section,
+.ui-sub,
+.ui-row {
+  overflow-wrap: anywhere;
+}
+.ui-row__value,
+.ui-row__action,
+.ui-row__chev {
+  overflow-wrap: normal;
+}
 /* req-79 — a completed exercise in the active-workout overview reads muted so the
  * eye lands on the not-done rows. Opacity dims the whole row uniformly (label,
  * value, chevron) and works in both themes without per-token overrides. Row order
@@ -588,8 +607,9 @@ a.ui-btn--quiet:active {
 }
 .ui-restpill__time {
   /* req-92 — the one thing read at a glance while resting: notably larger than body
-   * text (between body 17px and title 32px), tabular so the countdown doesn't jitter. */
-  font-size: 28px;
+   * text (between body 17px and title 32px), tabular so the countdown doesn't jitter.
+   * req-123 — the size is now the scale's emphasis token (same 28px). */
+  font-size: var(--ui-text-emphasis);
   line-height: 1;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -622,7 +642,9 @@ a.ui-btn--quiet:active {
   min-width: 3.5em;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  font-size: var(--ui-fs-lg, 1.25rem);
+  /* req-123 — was an undefined token with a 1.25rem fallback, so always 20px, off
+   * the scale. Now the section tier (22px). */
+  font-size: var(--ui-text-section);
   font-weight: 600;
   padding-bottom: var(--ui-s2);
 }
@@ -670,11 +692,40 @@ a.ui-btn--quiet:active {
   flex: 0 0 auto;
 }
 /* A deliberately small, quiet button — smaller than a full tap-height Button so it
- * reads as a secondary affordance beside the title, not a primary action. */
+ * reads as a secondary affordance beside the title, not a primary action.
+ * req-123 — the TAP area is the full --ui-tap (the ≥44px floor, ui/index.jsx:3) while
+ * the VISIBLE box stays the old caption + s1-padding + hairline size (--ui-addnote-h,
+ * 23px): the button's own border goes transparent and ::before draws the hairline
+ * pill at the old height, centred. Negative block margins give back the extra height
+ * so the layout around it (the title row, the overview's Finish stack) doesn't move. */
 .ui-addnote {
-  min-height: auto;
-  padding: var(--ui-s1) var(--ui-s2);
+  --ui-addnote-h: calc(var(--ui-text-caption) + 2 * var(--ui-s1) + 2px);
+  position: relative;
+  min-height: var(--ui-tap);
+  margin-block: calc((var(--ui-addnote-h) - var(--ui-tap)) / 2);
+  padding: 0 var(--ui-s2);
   font-size: var(--ui-text-caption);
+  border-color: transparent;
+}
+.ui-addnote::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: var(--ui-addnote-h);
+  margin: auto 0;
+  box-sizing: border-box;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  pointer-events: none;
+}
+/* req-123 — the log screen's exercise-name link (a plain in-text link inside the h1)
+ * measured 26px tall. Vertical padding on an inline box grows its hit area without
+ * touching the line box, so the name looks and sits exactly as before. */
+.ui-exercise-head .ui-title > a {
+  padding-block: calc((var(--ui-tap) - 1em) / 2);
 }
 
 /* req-106 — the start-of-exercise set preview: small muted text, one line per set,
@@ -720,12 +771,6 @@ a.ui-btn--quiet:active {
 /* ---- Showcase scaffolding only ---- */
 .ui-showcase__block {
   margin-bottom: var(--ui-s4);
-}
-.ui-showcase__row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-s2);
-  align-items: center;
 }
 
 /* req-109 — the exercise-level lateral actions (Skip exercise · Replace exercise) on
