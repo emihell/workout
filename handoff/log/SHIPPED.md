@@ -1402,3 +1402,7 @@ else null — so a skipped week (incl. warm-up-then-skip) is passed over for pre
 compares each exercise to the newest prior where it was done. No stored record rewritten; no existing test edited; 76/76.
 Loop-back: the first cut counted a warm-up-only workout as last time (my spec wording) — tightened, DEC-053 clarified.
 Gate: Planner's own `./check` green; screenshot shows 40 kg prefilled past an all-skipped week.
+
+## req-109 — skip a whole exercise, or replace it with another, mid-workout (batch 4, F2+F8)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

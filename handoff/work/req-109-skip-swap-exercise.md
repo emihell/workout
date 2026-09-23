@@ -1,6 +1,6 @@
 # req-109 — skip a whole exercise, or replace it with another, mid-workout (batch 4, F2+F8)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[persisted-data]** + **[ux-feel]**. No
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-109` (`7a574f8`…`ab2d443`, 2 commits).** Phase 1. **[persisted-data]** + **[ux-feel]**. No
 schema-version bump, but it touches the **shared migration path** (`src/model.js` `workoutSnapshot`),
 which runs on the active workout on every load → **independent reviewer required before merge** (DEC-035).
 
