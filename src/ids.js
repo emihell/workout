@@ -73,10 +73,25 @@ export function roleLabel(role) {
 // req-93 — in the in-workout flow, 'main' is the default and carries no information
 // (most exercises are main), so it is shown name-only. roleTag returns a label ONLY
 // for non-main roles (warm-up, finisher, cardio); main / absent role → '' (falsy, so
-// callers filtering by Boolean drop it). roleLabel itself is unchanged — the routine
-// editor still labels all three roles.
+// callers filtering by Boolean drop it). roleLabel itself is unchanged (the item
+// editor's role picker still lists every role); req-103 extends the rule to the
+// routine editor's exercise rows via routineItemMeta below.
 export function roleTag(role) {
   return (role || 'main') === 'main' ? '' : roleLabel(role)
+}
+
+// req-103 — the muted second line of a routine-editor exercise row:
+// `[role tag] · WU set · N sets · kg`. Main is unlabelled (roleTag); empty parts are
+// dropped so a minimal item reads just `1 set` with no stray separators. kg shows
+// only when some suggested weight is > 0, joined by a no-break space so `kg` never
+// wraps alone.
+export function routineItemMeta(item) {
+  const sets = item.sets || 1
+  const weights = item.suggestedWeights || []
+  const kg = weights.some((weight) => Number(weight) > 0) ? `${weights.join('/')}\u00a0kg` : ''
+  return [roleTag(item.role), item.warmup ? 'WU set' : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
+    .filter(Boolean)
+    .join(' · ')
 }
 
 export function weekdayName(value) {

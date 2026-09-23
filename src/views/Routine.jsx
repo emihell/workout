@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, parseTargets, roleLabel } from '../ids'
+import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, parseTargets, routineItemMeta } from '../ids'
 import { go } from '../route'
 import { routineById, historyPrescription, routineDeletionImpact } from '../storage'
 import { useStore } from '../store-context'
@@ -148,12 +148,6 @@ export function RoutineDetail({ routineId, paths }) {
       <List>
         {routine.exercises.map((item, index) => {
           const ex = store.exercises.find((e) => e.id === item.exerciseId)
-          const kg = (item.suggestedWeights || []).some((weight) => Number(weight) > 0)
-            ? ` · ${(item.suggestedWeights || []).join('/')} kg`
-            : ''
-          const itemMeta = `${roleLabel(item.role)}${item.warmup ? ' · WU set' : ''} · ${item.sets || 1} ${
-            (item.sets || 1) === 1 ? 'set' : 'sets'
-          }${kg}`
           return (
             <Row
               key={item.id || `${item.exerciseId}-${index}`}
@@ -164,7 +158,11 @@ export function RoutineDetail({ routineId, paths }) {
                 </>
               }
             >
-              <NavLink to={nav.item(item.id)} className="ui-navlink">{ex?.name || item.exerciseId}</NavLink> — {itemMeta}
+              {/* req-103 — two lines: name (link to the item editor), then a muted meta line. */}
+              <span className="ui-row__stack">
+                <NavLink to={nav.item(item.id)} className="ui-navlink">{ex?.name || item.exerciseId}</NavLink>
+                <span className="ui-row__meta">{routineItemMeta(item)}</span>
+              </span>
             </Row>
           )
         })}
