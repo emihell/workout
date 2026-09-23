@@ -20,9 +20,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **READY, held:**
 - `req-114`..`req-120` **flow-audit Tier 1** (DEC-058; specs reviewed + revised 2026-09-23): 114 dates/Today ·
   115 safe import · 116 Finish nav · 117 undoable taps · 118 routine-editor parsing · 119 setup vs live · 120 no
-  invented plan on load. Order **115,114,120,118,116,117,119**. All but 118 [P] → reviewer + backup (DEC-057);
+  invented plan on load. Order **115 (LIVE),114,120,118,116,117,119**. All but 118 [P] → reviewer + backup (DEC-057);
   120 = migration → Emilio sees the diff.
-  **Batch approved** — Emilio: "go" (2026-09-23, after the list above). Backup export: asked, not yet confirmed.
+  **Batch approved** — Emilio: "go" (2026-09-23, after the list above). Backup export: confirmed ("yes").
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

@@ -1435,4 +1435,12 @@ screenshot reads "WU set · 2 sets · —/40 kg". Reviewer: none (display-only, 
 
 ## req-115 — a bad import shows an error instead of blanking the app (audit D)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `f81120f`…`34bde68`, throwaway agent, 1 review loop-back). Import is validated and applied BEFORE setState
+(pure `commitBackup` in exchange.js), so a bad file throws to the caller's error message instead of blanking the app; recursive
+validation (elements must be plain objects; null/falsy nested values treated as absent, as main's migrateState does);
+a non-object v9 value takes the DEC-032 unreadable path (was: spread, overwritten, v8 deleted); an outer ErrorBoundary
+above StoreProvider. Reviewer (independent, DEC-057): MERGE-WITH-FOLLOWUPS; every app-made backup imports identically on
+main and branch; mutations M1–M4 each fail tests; loop-back made nested null lenient (11 accept tests, same counts as
+main). Backup reminder given; Emilio confirmed export ("yes"). Gate: Planner's own run →
+`check: green — lint, 28 test file(s), and the build all passed.`; `safe-import.test.js` 35/35. Unconfirmed: error text
+stays "Not a workout database backup."; the outer boundary reuses the existing fallback.
