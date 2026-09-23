@@ -99,22 +99,6 @@ export function occurrenceId(slotId, date) {
   return `${slotId}@${dateKey(date)}`
 }
 
-export function nextDateForSlot(schedule, slot, fromDate = new Date(), includeToday = true) {
-  const start = toLocalDate(fromDate)
-  start.setHours(0, 0, 0, 0)
-  const loop = clampLoopWeeks(schedule?.loopWeeks)
-  for (let offset = includeToday ? 0 : 1; offset <= loop * 7; offset++) {
-    const date = addDays(start, offset)
-    if (
-      loopWeekIndex(schedule, date) === Number(slot.week) &&
-      date.getDay() === Number(slot.weekday)
-    ) {
-      return date
-    }
-  }
-  return null
-}
-
 export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlotId = null) {
   const done = (workouts || []).filter((w) => {
     const id = w.routineId || w.sessionId
@@ -145,23 +129,6 @@ export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlot
   const tagged = done.find((w) => w.scheduledFor === scheduledDate)
   if (tagged) return tagged
   return done.find((w) => !w.scheduledFor && dateKey(w.finishedAt) === scheduledDate) || null
-}
-
-export function nextOccurrence(routines, schedule, routineId, workouts = [], fromDate = new Date()) {
-  const start = toLocalDate(fromDate)
-  start.setHours(0, 0, 0, 0)
-  const loop = clampLoopWeeks(schedule?.loopWeeks)
-  for (let i = 0; i < (loop + 1) * 7; i++) {
-    const d = addDays(start, i)
-    const key = dateKey(d)
-    const found = slotsOn(schedule, d)
-      .map((slot) => resolveSlot(routines, slot))
-      .filter((x) => x.routine?.id === routineId)
-    if (found.length && !coveringWorkout(workouts, routineId, key)) {
-      return { date: d, key, ...found[0] }
-    }
-  }
-  return null
 }
 
 export function remainingInLoop(routines, schedule, fromDate = new Date()) {

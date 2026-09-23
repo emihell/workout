@@ -1,6 +1,6 @@
 // No JSX here (the component renders null), so `node --test` can import it
 // directly — same reason error-boundary.js stays plain .js.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore } from './store-context.js'
 
 // Screen Wake Lock while a workout is active (req-09). Phones sleep after ~30s
@@ -16,9 +16,35 @@ import { useStore } from './store-context.js'
 // release rejection is swallowed. A wake-lock failure must never throw or
 // disrupt the workout, its logging, or its save path (the workout is sacred).
 //
+// req-128 — and only while a `/workout/…` route is open. A days-old stale active
+// workout (or browsing Settings/History mid-workout) no longer keeps the screen on;
+// returning to the workout re-acquires it. Pure so it is unit-tested.
+//
 // Renders nothing.
+export function wakeLockWanted(activeWorkout, hash) {
+  if (activeWorkout == null) return false
+  const path = String(hash || '').replace(/^#/, '')
+  return path.startsWith('/workout/')
+}
+
+function currentHash() {
+  return typeof window !== 'undefined' && window.location ? window.location.hash || '' : ''
+}
+
+// Its own hashchange subscription, not useHashRoute (which also records a screen view).
+function useHash() {
+  const [hash, setHash] = useState(currentHash)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.addEventListener) return
+    const onHash = () => setHash(currentHash())
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  return hash
+}
+
 export function WakeLock() {
-  const active = useStore().activeWorkout != null
+  const active = wakeLockWanted(useStore().activeWorkout, useHash())
   const sentinelRef = useRef(null)
 
   useEffect(() => {

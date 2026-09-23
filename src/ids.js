@@ -101,19 +101,6 @@ export function weekdayName(value) {
   return WEEKDAYS.find((d) => d.value === Number(value))?.label ?? ''
 }
 
-export function parseTargets(text, setCount) {
-  const n = Number(setCount) || 1
-  const parts = String(text || '')
-    .split(/[/,]/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-  if (parts.length === 0) return []
-  if (parts.length === 1) return Array.from({ length: n }, () => parts[0])
-  const out = [...parts]
-  while (out.length < n) out.push(out[out.length - 1])
-  return out.slice(0, n)
-}
-
 export function formatTargets(targets) {
   return (targets || []).map((value) => String(value).trim()).filter(Boolean).join('/')
 }

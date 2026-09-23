@@ -3,7 +3,7 @@ import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { buildFinishProgression } from '../../model'
 import { defaultBeep } from '../../rest-cue.js'
-import { previousSameRoutineWorkout, workoutSummaryStats } from '../../storage'
+import { summaryPriorWorkout, workoutSummaryStats } from '../../storage'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
 
@@ -38,7 +38,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   const [now, setNow] = useState(() => Date.now())
   const committedRef = useRef(false)
   const [stats] = useState(() => {
-    const prior = previousSameRoutineWorkout(active, store.workouts, store.routines)
+    const prior = summaryPriorWorkout(active, store.workouts, store.routines)
     return workoutSummaryStats(active, prior, mountNow)
   })
 
