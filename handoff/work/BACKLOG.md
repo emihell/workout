@@ -311,6 +311,13 @@ the top three in code (`Routine.jsx:305-309` splits kg on `,`; `store.jsx:379` r
 setState updater; `model.js:124-130` backfills empty targets/weights from logged sets). **Not yet specced.** Grouped
 into proposed reqs. **[P]** = persisted-data / shared-model (DEC-057: reviewer + backup before merge).
 
+**Tier 1 on-device test list (Emilio owes, 2026-09-23):** 1 routine editor: Kg "22,5" saves 22.5; Sets 2 + Reps 8/8/8
+shows an error · 2 importing the analytics file shows an error, app stays up · 3 a workout past midnight stays the Today hero ·
+4 two routines today, one in progress → the other still has Start · 5 all done → Edit → pick Feel → Back → no countdown, Feel
+kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish says "Nothing logged" · 8 Add set on a done exercise
+→ Remove set undoes it · 9 History Add set → Cancel leaves the workout unchanged · 10 delete an exercise you're using mid-workout
+→ archived, the workout still finishes · 11 clear a routine's Kg → reload → stays empty.
+
 **Tier 1 — data and trust bugs**
 - **A. Routine editor parsing** (`Routine.jsx:305-322`): kg `22,5` → 2 sets `[22,5]`; lowering Sets doesn't take
   (count = max of all lists); a non-numeric kg shifts later weights onto the wrong sets (`abc/20` → set 1 = 20);
