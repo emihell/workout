@@ -1458,3 +1458,7 @@ verified: anchor write only when missing, and DEC-032 paths write nothing; 0 day
 load-bearing. Gate: Planner's own run → `check: green — lint, 29 test file(s), and the build all passed.` Unconfirmed:
 anchor-less import = week 1; upcoming Starts now ask before abandoning; exactly 6 h 00 m counts as current; the hero shows
 under today's date.
+
+## req-120 — loading never invents plan values: backfill and baseline are legacy-only (audit C)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
