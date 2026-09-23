@@ -1061,3 +1061,17 @@ batch 4; Emilio: *"usually you send you the builder - not an external bot?"* The
 mode keeps Builder's session alive) is: Planner pings the **Builder session** (`SendMessage`) one req at a
 time, merges, pings the next. The discarded subagent attempt left no commits. Ephemeral subagents stay fine
 for **read-only** work (independent spec/diff reviews).
+
+## DEC-055 — batches go to throwaway agents; the Builder session is for live and single work  (Emilio, 2026-09-23)
+
+Supersedes DEC-054 (same day) and restores DEC-037's lanes, now with the reason stated. Emilio: *"would it
+be better to send batches to throwaway agents? that way context would not build if i am not available to
+clear"*. A batch of N reqs through one Builder session fills its context (compaction by the end, with the
+riskiest req last). A fresh agent per req needs no `/clear`. Lanes:
+- **Batch** (Emilio away, design settled) → one throwaway build agent per req, in its own worktree; it
+  reports to Planner, who merges and dispatches the next.
+- **Live design / feel work** → Emilio + the Builder session, iterating on screen.
+- **A single req Emilio wants to watch or gate**, and quick fixes while he's at the keyboard → the Builder
+  session (Planner pings it; Emilio `/clear`s between reqs).
+Cost accepted: batch builds aren't visible in the Builder terminal; Planner relays the results. Batch 4:
+req-103 stays with the Builder (already started), and req-104 onward goes to throwaway agents.
