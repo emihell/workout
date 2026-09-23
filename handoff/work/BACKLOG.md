@@ -213,6 +213,60 @@ behaviour call first. Numbered N1..N11 in Emilio's order.
 specced fresh against the current code (batch-1's "refactor first" collision is past — that flow is
 merged). N1/N9/N10 carry behaviour decisions; N2/N8 are their own decisions. Order once decided.
 
+### Gym-flow notes — batch 4, Emilio 2026-09-17..20 (in-app feedback JSON, app `378e47f`)
+
+Pasted 2026-09-23. [measured] `git log 378e47f..main -- src` is empty, so every note still applies to
+live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 in Emilio's order.
+
+- **F1 — routine editor list is messy; two lines per row? drop "Main".** `/routines/:id`.
+  [measured] `Routine.jsx:154` renders `name — Main · WU set · 3 sets · 20/22/24 kg` on one line
+  with Up/Down buttons beside it. req-93 already made main implied in the *workout* list; the editor
+  was not touched. *Disp:* small, READY-able: name line + muted meta line; main unlabelled (req-93 rule).
+- **F2 — "if I can't do a machine I should be able to add another exercise"** (workout overview).
+  [measured] no path exists: the workout's items are a snapshot fixed at Start (`model.js`), and
+  setup (`workout/setup.jsx`) only edits an existing item's exercise details. *Disp:* medium,
+  **behaviour Q:** *swap* this exercise for another (the original counts as skipped) vs *add* an extra
+  exercise to the list, or both. Pairs with F8. Writes `activeWorkout.snapshot` (transient, no schema bump).
+- **F3 — done view: "don't need to show Previous".** [measured] `WorkoutItemDone` (`item.jsx`) renders
+  Today sets, then a **Previous** section (last finished workout's sets). *Disp:* tiny, READY: remove it.
+- **F4 — at the start of an exercise, a small preview of all its sets + weights at the bottom** of the
+  log screen, "so you can grab all weights at the start". [measured] nothing like it; each set's seed is
+  computed only for the current set (`initialSetFields`, `item.jsx`). *Disp:* small–medium. **Guard
+  (DESIGN §1):** each preview line must come from the same seed the log form would show for that set
+  (history per set index / carry / target); a no-history set shows no kg, never an invented one.
+  *Q:* show only before the first set, or always (shrinking as sets are logged)? Recommend always.
+- **F5 — log screen: exercise title much smaller.** [measured] `ExerciseTitle` uses the page `Title`
+  (`item.jsx`). *Disp:* tiny, READY.
+- **F6 — Finish: make it the last row of the list or its own thing at the bottom; when everything is done
+  make it easy to press (floating button?).** [measured] Finish is a lone `Row` in a second `List` right
+  under the exercises (`overview.jsx`) so it reads as another exercise. When all are done the req-84
+  auto-complete summary replaces the list — but once Cancelled, the plain Finish row is all that's left.
+  *Disp:* small. *Q:* recommend a bottom **Finish button** (not a row) that turns **primary** when all
+  exercises are done; a floating button only if that isn't enough (DEC-048 already floats the rest pill).
+- **F7 — "able to add notes here as well"** (workout overview). [measured] the only workout-level note is
+  Finish's `overallNote` (`finish.jsx:23`, component state), and auto-complete finishes with
+  `overallNote: ''` (`auto-complete.jsx:50`). *Disp:* small–medium: a note on the overview, held on
+  `activeWorkout` (optional transient field, no schema bump), pre-filling Finish's Note — and
+  auto-complete must carry it, or the note is silently lost.
+- **F8 — "add ability to skip whole exercise?"** [measured] only per-set Skip exists (`skipSet`,
+  `item.jsx`). *Disp:* small–medium. *Q:* recommend "Skip exercise" = log every remaining set as skipped
+  (the same record `skipSet` writes), so history shows it was skipped, not missing. Pairs with F2.
+- **F9 — "set 1 change also changes set 2 — each set is separate".** Push-ups (bodyweight → reps).
+  [measured] **this is req-83 working as built** — `nextSeedOverrides` (`workout-log.js:244`) carries a
+  changed weight **and** reps to the remaining sets of that exercise; Emilio chose that live-apply on
+  2026-09-16 (req-83 §Decisions, option (c)). **A reversal — his call.** Options: (a) remove the carry entirely; (b) keep the
+  weight carry, stop the reps carry (reps targets are per set; a weight change is usually meant for the
+  rest). Recommend (b).
+- **F10 — Today: "show 2x routines or similar if a day has more than one routine".** [measured] today
+  renders one full `TodayWorkout` block per routine (each with its own date line + full-width Start,
+  `Today.jsx:310`); the upcoming peek shows the next 2 *slots*, so a future day with two routines fills
+  both rows with the same date (`Today.jsx:223`). *Q:* **which surface** (today's block, the upcoming
+  peek, or the schedule) and what should "2x" look like (a count badge, one date header with the routines
+  grouped under it)?
+
+**Grouping:** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
+(both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 Emilio's "we should start creating programs." Today the app has **routines** (reusable
