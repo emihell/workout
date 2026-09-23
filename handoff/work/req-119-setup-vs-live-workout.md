@@ -1,6 +1,6 @@
 # req-119 — setup edits never reach into the live workout (audit B)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[P]**: store delete paths, and a new optional
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-119` (`cbdec8b`…`cbdec8b`, 1 commit).** Phase 1. **[P]**: store delete paths, and a new optional
 snapshot field (DEC-057: reviewer + backup reminder).
 
 ## Why [measured, scratchpad/audit-setup]
