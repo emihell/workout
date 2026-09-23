@@ -3,11 +3,11 @@ import { RPE_OPTIONS, formatSetLine, isWeightedType, roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
-import { DEFAULT_DURATION_SEC } from '../../model'
 import { exerciseById, historySetPrefill, lastSetsForExercise } from '../../storage'
 import { useStore } from '../../store-context'
 import {
   carriedWorkingSet,
+  durationTargetFor,
   initialSetFields,
   isSkippedSet,
   itemIsMarkedDone,
@@ -19,6 +19,8 @@ import {
   reopenItemPatch,
   restPatchAfterSet,
   seedOverrideKey,
+  setPreview,
+  setTargetFor,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing, NavLink } from '../shared'
@@ -150,9 +152,8 @@ function WorkoutItemLive({ routineId, item }) {
   const state = itemLoggingState(active, item)
   const { needsWu, workCount, currentWorkIndex, plannedDone } = state
   const currentType = needsWu ? 'wu' : 'work'
-  const target = needsWu
-    ? String(item.warmup?.reps ?? '')
-    : item.targets?.[currentWorkIndex] ?? item.targets?.[item.targets.length - 1] ?? ''
+  // req-106 — the target rule moved to setTargetFor (shared with the preview).
+  const target = setTargetFor(item, currentType, currentWorkIndex)
   const [restore, setRestore] = useState(null)
   const { resting } = useRestCountdown(active)
 
@@ -260,12 +261,9 @@ function WorkoutItemLive({ routineId, item }) {
   // stays reps-based). Target seconds: this set's routine duration, else the last one
   // in the list, else the exercise default, else the app default. Never invents beyond
   // that default target (the value is editable and logged as the target, v1).
+  // req-106 — the rule itself moved to durationTargetFor (shared with the preview).
   const timedSet = Boolean(ex?.hasDuration) && currentType === 'work'
-  const durationTarget =
-    item.durations?.[currentWorkIndex] ??
-    item.durations?.[item.durations.length - 1] ??
-    ex?.durationSec ??
-    DEFAULT_DURATION_SEC
+  const durationTarget = durationTargetFor(item, ex, currentWorkIndex)
   // Seed the set-log fields from the same sources the app has always used —
   // restore (Previous), then carry (no-history working set), then history /
   // target. Domain logic stays here; the ui/ SetLogForm only holds the values.
@@ -309,6 +307,22 @@ function WorkoutItemLive({ routineId, item }) {
   // input), so the note affordance shows whenever the form does: any time the exercise
   // isn't planned-done. (`resting` no longer gates the form.)
   const logging = !plannedDone
+  // req-106 — at the start of the exercise (no set of it logged yet), a small read-only
+  // preview of every set's weight/reps so all the weights can be picked up at once.
+  // Each line is exactly what that set's form would prefill (setPreview → the same
+  // initialSetFields inputs as `seed` above). Gone once the first set is completed or
+  // skipped.
+  const preview =
+    logging && state.logged.length === 0
+      ? setPreview({
+          item,
+          ex,
+          weighted,
+          hasHistory: Boolean(last),
+          historyFor: (at) => historySetPrefill(last, at),
+          seedOverrides: active.seedOverrides,
+        })
+      : null
 
   return (
     <Screen>
@@ -363,6 +377,13 @@ function WorkoutItemLive({ routineId, item }) {
           onPrevious={previousSet}
         />
       )}
+      {preview ? (
+        <ul className="ui-setpreview" aria-label="Sets">
+          {preview.map((line) => (
+            <li key={`${line.setType}-${line.workIndex}`}>{line.text}</li>
+          ))}
+        </ul>
+      ) : null}
       {/* req-26 — the equipment + cues block that sat under the buttons is removed
           to declutter the mid-set screen. Cues stay reachable: the exercise Title
           is a link to the exercise editor (which shows them). */}

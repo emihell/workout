@@ -657,6 +657,19 @@ a.ui-btn--quiet:active {
   font-size: var(--ui-text-caption);
 }
 
+/* req-106 — the start-of-exercise set preview: small muted text, one line per set,
+ * below the log form. Read-only (plain list, no tap target). Sits in normal flow, so
+ * .ui-main's --ui-dock-clear bottom padding keeps it above the fixed action bar. */
+.ui-setpreview {
+  list-style: none;
+  margin: var(--ui-s3) 0 0;
+  padding: 0;
+  font-size: var(--ui-text-caption);
+  line-height: 1.5;
+  color: var(--ui-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
 /* req-78 — the req-27 ".ui-upcoming" rest panel was removed with its RestUpcoming
  * component (the upcoming-weight edit folded into the always-present next-set form). */
 
