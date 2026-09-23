@@ -1,6 +1,6 @@
 # req-126 — weight step: a number plus an alternating option; catalog doesn't invent one (audit Tier 3, DEC-059 §2)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[P]**: touches `progress.js` (DEC-057: reviewer +
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-126` (`aeaa830`…`2cb2be2`, 2 commits).** Phase 1. **[P]**: touches `progress.js` (DEC-057: reviewer +
 backup reminder). No stored-data rewrite: the field keeps its string form.
 
 ## Why [measured, audit setup reviewer]

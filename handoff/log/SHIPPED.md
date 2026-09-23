@@ -1578,3 +1578,7 @@ logs unseen values (Complete within 300 ms, Abandon/Finish + reload, new workout
 store-level clear and wiring tests (each mutation fails exactly one). Typing latency matches main (~20 ms / 20 keys). Gate: Planner's
 own run → `check: green — lint, 39 test file(s), and the build all passed.` Unconfirmed: the preview shows the seed; after a
 double Previous, re-completing set 1 carries its weight (main kept the later set's).
+
+## req-126 — weight step: a number plus an alternating option; catalog doesn't invent one (audit Tier 3, DEC-059 §2)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
