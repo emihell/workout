@@ -147,6 +147,25 @@ export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlot
   return done.find((w) => !w.scheduledFor && dateKey(w.finishedAt) === scheduledDate) || null
 }
 
+// req-116 — the workout preview's guard: the finished workout that already covers the
+// previewed plan's occurrence, or null. Browser Back after Finish lands on the preview
+// (`go()` always pushes a hash entry); without this it offered a fresh Start one tap from
+// the workout just saved. An exact occurrence match first, then the same coveringWorkout
+// test Today's Done uses, so the preview says Done exactly when Today does. The ad hoc
+// preview (`/workout/R`, no slot) is therefore Done once R was finished that day — the
+// Routine screen's own Start (not the preview) still starts R again.
+export function finishedForPlan(workouts, plan) {
+  if (!plan) return null
+  const exact = (workouts || []).find(
+    (w) =>
+      w.finishedAt &&
+      plan.occurrenceId &&
+      w.occurrenceId === plan.occurrenceId &&
+      (w.routineId || w.sessionId) === plan.routineId,
+  )
+  return exact || coveringWorkout(workouts, plan.routineId, plan.date, plan.scheduleSlotId || null)
+}
+
 export function nextOccurrence(routines, schedule, routineId, workouts = [], fromDate = new Date()) {
   const start = toLocalDate(fromDate)
   start.setHours(0, 0, 0, 0)

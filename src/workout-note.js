@@ -13,9 +13,18 @@ export function activeNote(active) {
   return typeof note === 'string' ? note : ''
 }
 
-// The store.finishWorkout arguments for the req-84 auto-complete commit. Feel stays
-// empty (auto-complete never invents a Feel, DESIGN §1); the note is whatever the user
-// wrote on the overview — '' when they wrote none, exactly as before req-107.
+// req-116 — Feel lives on the active workout too (its existing `overallFeel`, created
+// '' by startWorkout), so a Feel chosen on Finish survives Back and a reload. A legacy
+// active workout without the field reads as ''.
+export function activeFeel(active) {
+  const feel = active?.overallFeel
+  return typeof feel === 'string' ? feel : ''
+}
+
+// The store.finishWorkout arguments for the req-84 auto-complete commit. The note is
+// whatever the user wrote on the overview — '' when they wrote none, exactly as before
+// req-107. req-116 — Feel is whatever the user chose on Finish (activeFeel); still ''
+// when they chose none, so auto-complete never invents a Feel (DESIGN §1).
 export function autoFinishArgs(active, progression) {
-  return { overallNote: activeNote(active), overallFeel: '', progression }
+  return { overallNote: activeNote(active), overallFeel: activeFeel(active), progression }
 }
