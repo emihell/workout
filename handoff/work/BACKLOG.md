@@ -365,7 +365,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - Tap targets below 44px: `.ui-addnote` ≈ 22px on the in-gym screens (`ui.css:660`). Long unbroken names overflow
   at 390px (no `overflow-wrap`).
 
-**Tier 3 — improvements** → **specced 2026-09-23 as req-124..129** (DEC-059); Phase 2 items stay for program-creation planning
+**Tier 3 — improvements** → **SHIPPED 2026-09-23 as req-124..129** (DEC-059); Phase 2 items stay for program-creation planning
 - A replacement starts with 1 set (a 3-set swap costs 6 extra taps); Replace should land on the new exercise.
 - Typed-but-uncompleted set values are lost on navigation/reload (`SetLogForm` local state). Keep a draft on the
   active workout.

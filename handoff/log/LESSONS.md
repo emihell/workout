@@ -316,3 +316,12 @@ so the capture was repeatable). The only pixel diff came from `chevron="back"` s
 nodes: identical DOM text, sub-pixel anti-aliasing. **How to apply:** for any refactor claimed invisible, require this
 capture (the script is in the req-122 report) and treat a pixel-only diff with identical DOM as explainable, not a
 failure. Add the screens the change touches but the standard set misses (the reviewer found 6 uncovered call sites).
+
+## L-025 — a guard exemption must not reopen the hole the guard exists for  (2026-09-23)
+
+The pre-push fast-forward guard false-positived on a fresh, still-empty req branch at main's tip (req-120). The first spec fix
+("exempt a branch with no commits beyond main") would have exempted exactly the fast-forwarded branches the guard refuses; the
+spec review caught it. req-129 instead exempts only a branch whose reflog shows nothing but its creation, and its self-test
+proves that an FF'd branch **with** commits is still refused. A narrow hole remains: `git branch req-N <unmerged sha>` followed
+by an FF. **How to apply:** every exemption to a safety check gets a self-test of the case the check exists to catch, run
+against the new code **and** failing against a copy that has the exemption but not the check.

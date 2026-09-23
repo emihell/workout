@@ -1621,4 +1621,13 @@ Unconfirmed: History rows stay plain text; any `/workout/…` route holds the lo
 
 ## req-129 — planning tooling fixes found this session (BACKLOG tooling items)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `9bdf8ac`, throwaway agent). `plan`'s find_worktrees skips worktrees nested inside another one, so a
+throwaway agent's worktree no longer poses as the code worktree. The pre-push FF guard exempts a req branch only if its reflog shows
+nothing but its creation, so an FF'd branch with commits is still refused. `plan closeout` warns when the merge diff touches a DEC-057
+trigger file and `reports/req-N.md` names no reviewer. `npm run shot` gains `--click` (exits non-zero on missing text) and
+`--scroll-bottom`. New `npm run capture -- --base --head` (the L-024 comparison: 23 screens, exit 1 on a diff, 2 on 0 screens).
+Self-tests: plan-guards 10 ok, pre-push 6 ok (new), plan-ledger 30 ok, check-handoff all passed. Planner's receipt on the real repo
+with a nested agent worktree present: old `plan status` → "code worktree req-129" (wrong); req-129's → "planning is fully merged,
+both worktrees clean". Gate: Planner's own run → `check: green — lint, 42 test file(s), and the build all passed.`,
+`pre-push: all checks passed.`, `plan-guards: all checks passed.` Reviewer: none (infra; no app trigger files). Follow-up: a branch
+created by `git branch req-N <unmerged sha>` and then FF'd would be wrongly exempt (narrow; L-025).
