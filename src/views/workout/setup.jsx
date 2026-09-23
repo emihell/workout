@@ -4,7 +4,7 @@ import { exerciseById } from '../../storage'
 import { useStore } from '../../store-context'
 import { itemLoggingState } from '../../workout-log'
 import { navForBase, RoutineScreens } from '../Routine'
-import { Back, Missing } from '../shared'
+import { Back, Missing, NavLink } from '../shared'
 import { Button, Field, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './helpers'
 import { RestPill } from './rest'
@@ -67,13 +67,8 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           rows={3}
         />
         <div className="ui-actions">
-          <Button
-            onClick={() =>
-              go(itemCurrentPath(routineId, item, itemLoggingState(active, item).plannedDone))
-            }
-          >
-            Cancel
-          </Button>
+          {/* req-121 — Cancel only navigates (to backTo), so a NavLink (DEC-040). */}
+          <NavLink to={backTo} className="ui-btn ui-btn--secondary">Cancel</NavLink>
           <Button type="submit" variant="primary">
             Save
           </Button>

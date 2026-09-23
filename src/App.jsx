@@ -5,6 +5,7 @@ import { ErrorBoundary } from './error-boundary'
 import { WakeLock } from './wake-lock'
 import { RestEndCue } from './rest-cue'
 import { useHashRoute } from './route'
+import { Banner, Button } from './ui/index.jsx'
 import { Today } from './views/Today'
 import {
   RoutineNew,
@@ -29,13 +30,15 @@ import { Showcase } from './ui/Showcase.jsx'
 import { DevNotes } from './dev/DevNotes.jsx'
 import { getFeedbackEnabled, subscribeFeedbackEnabled } from './dev/dev-notes.js'
 
+// req-121 — the three app banners use the library Banner (role="alert" kept) and
+// Reload the library Button, instead of raw unstyled div/button elements.
 function SaveFailedBanner() {
   const failed = useSyncExternalStore(subscribeSaveFailed, getSaveFailed, getSaveFailed)
   if (!failed) return null
   return (
-    <div role="alert">
+    <Banner role="alert">
       Couldn't save your last change. Your data may not persist — export a backup from Settings.
-    </div>
+    </Banner>
   )
 }
 
@@ -51,10 +54,10 @@ function LoadUnreadableBanner() {
   )
   if (!unreadable) return null
   return (
-    <div role="alert">
+    <Banner role="alert">
       Couldn't read your saved data. It's still on this device but unreadable — don't clear
       your browser data. Nothing you do now will be saved. Seek recovery before making changes.
-    </div>
+    </Banner>
   )
 }
 
@@ -70,10 +73,10 @@ function ExternalChangeBanner() {
   )
   if (!changed) return null
   return (
-    <div role="alert">
+    <Banner role="alert">
       Another tab changed your data — reload to see the latest.{' '}
-      <button type="button" onClick={() => window.location.reload()}>Reload</button>
-    </div>
+      <Button onClick={() => window.location.reload()}>Reload</Button>
+    </Banner>
   )
 }
 
