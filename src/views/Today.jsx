@@ -4,7 +4,7 @@ import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
 import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
-import { completedOnDayKey, findRoutine, staleInProgressWorkouts } from '../storage'
+import { completedOnDayKey, findRoutine, isFirstRun, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
@@ -243,10 +243,9 @@ function InProgressPeekRow({ store, workout, todayKey }) {
 // workout" that opens the routine picker (the existing Routines list at
 // `/routines`, whose per-row Start already calls startOrContinue off-schedule —
 // DEC-047 (a): reuse that surface, don't invent one, and no ad-hoc/blank workout).
-// TodayEmpty only ever renders when at least one routine exists — Today()'s
-// `!routines.length` early return handles the zero-routines case with the no-data
-// screen (which itself links to /routines → Add routine), so the picker is never
-// empty from here.
+// Today()'s isFirstRun early return (req-119: no routines, no workouts, no active
+// workout) handles the empty-app case with the no-data screen. With history but every
+// routine deleted, TodayEmpty can render and its picker (/routines) offers Add routine.
 function TodayEmpty({ date }) {
   return (
     <div className="ui-today-workout">
@@ -302,7 +301,9 @@ export function Today() {
     ...(store.workouts || []).filter((workout) => !completedTodayIds.has(workout.id)),
   ]).slice(0, 2)
 
-  if (!routines.length) {
+  // req-119 — first run is no routines AND no workouts AND no active workout (was
+  // `!routines.length`, which showed "No data" mid-workout and with history).
+  if (isFirstRun(store)) {
     return (
       <Screen>
         <Title subtitle="No data. Import, or start empty.">Today</Title>

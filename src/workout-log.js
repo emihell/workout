@@ -231,6 +231,8 @@ export function replacementItem({ id, original, exercise, restSec }) {
     equipment: exercise.equipment || '',
     exerciseType: exercise.type || 'free',
     weightStep: exercise.weightStep || 'n/a',
+    // req-119 — Timed frozen from the replacement's exercise, as buildPlannedWorkout does.
+    hasDuration: Boolean(exercise.hasDuration),
     role: original?.role || 'main',
     sets: 1,
     targets: [],
@@ -240,6 +242,31 @@ export function replacementItem({ id, original, exercise, restSec }) {
     notes: '',
     warmup: null,
     addedMidWorkout: true,
+  }
+}
+
+// req-119 (DESIGN §3) — the exercise the live set form reads, for one snapshot item.
+// `live` is the Library exercise (null when deleted). A snapshot item that carries
+// `hasDuration` (built by buildPlannedWorkout / replacementItem since req-119) is
+// authoritative for what was frozen at Start: name, equipment, type and Timed. Only
+// weight step and cues (edited from inside the workout, workout/setup.jsx), plus
+// durationSec (no snapshot field), stay live. An item WITHOUT `hasDuration` (a
+// workout started before req-119) reads the live exercise exactly as before.
+export function sessionExercise(live, item) {
+  const fallback = {
+    name: item.exerciseName,
+    equipment: item.equipment,
+    type: item.exerciseType,
+    weightStep: item.weightStep,
+    cues: '',
+  }
+  if (!('hasDuration' in item)) return live || fallback
+  return {
+    ...(live || fallback),
+    name: item.exerciseName,
+    equipment: item.equipment,
+    type: item.exerciseType,
+    hasDuration: Boolean(item.hasDuration),
   }
 }
 

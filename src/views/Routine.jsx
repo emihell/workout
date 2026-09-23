@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, routineItemMeta } from '../ids'
 import { parseRoutineItem } from '../routine-item-parse'
 import { go } from '../route'
-import { routineById, historyPrescription, routineDeletionImpact } from '../storage'
+import { deletionConfirmHead, routineById, historyPrescription, routineDeletionImpact, routineInActiveWorkout } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
@@ -180,9 +180,11 @@ export function RoutineDetail({ routineId, paths }) {
             if (impact.plans > 0)
               parts.push(`${impact.plans} planned workout${impact.plans === 1 ? '' : 's'}`)
             const removes = parts.length ? ` This removes ${parts.join(' and ')}.` : ''
-            const head = impact.hasHistory
-              ? `${routine.name} has past workouts and will be archived (kept in your history).`
-              : `Delete ${routine.name}?`
+            // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
+            const head = deletionConfirmHead(routine.name, {
+              hasHistory: impact.hasHistory,
+              inCurrentWorkout: routineInActiveWorkout(store, routine.id),
+            })
             if (!window.confirm(head + removes)) return
             store.removeRoutine(routine.id)
             go(nav.done)

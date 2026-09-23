@@ -3,7 +3,7 @@ import { uid } from './ids'
 import { commitBackup } from './exchange.js'
 import { buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, recalculatedState } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
-import { historyPrescription, loadState, saveState } from './storage'
+import { historyPrescription, loadState, removeExerciseFromState, removeRoutineFromState, saveState } from './storage'
 import { StoreContext } from './store-context'
 import { addWorkingSetToState, finishedState, itemKey, replaceItemPatch, replacementItem, skipItemPatch } from './workout-log'
 
@@ -41,29 +41,9 @@ export function StoreProvider({ children }) {
       updateRoutine(routineId, patch) {
         patchRoutine(routineId, (routine) => ({ ...routine, ...patch }))
       },
+      // req-119 — the reducer (archive when referenced, incl. the live workout) is in storage.js.
       removeRoutine(routineId) {
-        setState((s) => {
-          const referenced = (s.workouts || []).some(
-            (workout) => (workout.routineId || workout.sessionId) === routineId,
-          )
-          return {
-            ...s,
-            routines: referenced
-              ? (s.routines || []).map((routine) =>
-                  routine.id === routineId ? { ...routine, archivedAt: new Date().toISOString() } : routine,
-                )
-              : (s.routines || []).filter((routine) => routine.id !== routineId),
-            schedule: {
-              ...s.schedule,
-              slots: (s.schedule?.slots || []).filter(
-                (slot) => (slot.routineId || slot.sessionId) !== routineId,
-              ),
-            },
-            plannedWorkouts: (s.plannedWorkouts || []).filter(
-              (plan) => (plan.routineId || plan.sessionId) !== routineId,
-            ),
-          }
-        })
+        setState((s) => removeRoutineFromState(s, routineId))
       },
       addRoutineExercise(routineId, item) {
         patchRoutine(routineId, (routine) => ({
@@ -188,25 +168,9 @@ export function StoreProvider({ children }) {
           exercises: s.exercises.map((ex) => (ex.id === exerciseId ? { ...ex, ...patch } : ex)),
         }))
       },
+      // req-119 — the reducer (archive when referenced, incl. the live workout) is in storage.js.
       removeExercise(exerciseId) {
-        setState((s) => ({
-          ...s,
-          exercises: (s.workouts || []).some((workout) =>
-            (workout.sets || []).some((set) => set.exerciseId === exerciseId),
-          )
-            ? s.exercises.map((ex) =>
-                ex.id === exerciseId ? { ...ex, archivedAt: new Date().toISOString() } : ex,
-              )
-            : s.exercises.filter((ex) => ex.id !== exerciseId),
-          routines: (s.routines || []).map((routine) => ({
-            ...routine,
-            exercises: (routine.exercises || []).filter((item) => item.exerciseId !== exerciseId),
-          })),
-          plannedWorkouts: (s.plannedWorkouts || []).map((plan) => ({
-            ...plan,
-            items: (plan.items || []).filter((item) => item.exerciseId !== exerciseId),
-          })),
-        }))
+        setState((s) => removeExerciseFromState(s, exerciseId))
       },
       getPlannedWorkout(args) {
         return buildPlannedWorkout(state, args)

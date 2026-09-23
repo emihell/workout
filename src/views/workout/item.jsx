@@ -22,6 +22,7 @@ import {
   restoreFromLoggedSet,
   restPatchAfterSet,
   seedOverrideKey,
+  sessionExercise,
   setPreview,
   setTargetFor,
 } from '../../workout-log'
@@ -35,16 +36,10 @@ import { unlockAudio } from '../../rest-cue'
 // req-109 — how long an armed "Skip exercise" waits for its second tap.
 const SKIP_EXERCISE_ARM_MS = 3000
 
+// req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
+// workout-log.js); weight step and cues stay live. Old snapshots read live as before.
 function liveExercise(store, item) {
-  return (
-    exerciseById(store.exercises, item.exerciseId) || {
-      name: item.exerciseName,
-      equipment: item.equipment,
-      type: item.exerciseType,
-      weightStep: item.weightStep,
-      cues: '',
-    }
-  )
+  return sessionExercise(exerciseById(store.exercises, item.exerciseId), item)
 }
 
 function exerciseEditorPath(routineId, item) {

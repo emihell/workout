@@ -458,6 +458,9 @@ export function buildPlannedWorkout(state, { routineId, date, scheduleSlotId = n
       equipment: exercise?.equipment || '',
       exerciseType: exercise?.type || 'free',
       weightStep: exercise?.weightStep || 'n/a',
+      // req-119 — Timed is frozen at Start like exerciseType, so a Library edit mid-
+      // workout can't turn the live set form into a countdown (DESIGN §3).
+      hasDuration: Boolean(exercise?.hasDuration),
       role: item.role || 'main',
       sets,
       targets,
