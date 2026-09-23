@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-09-18. **Shipped: req-01–09, req-11–23, req-25–31, req-33–107** (req-10 pending; req-24
+Updated 2026-09-18. **Shipped: req-01–09, req-11–23, req-25–31, req-33–108** (req-10 pending; req-24
 gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (Emilio's in-app feedback JSON, 2026-09-16) all
 LIVE:** req-92 rest pill bigger · req-93 main bold/unlabelled + WU/finisher tag · req-94 Today one list,
 no header (DEC-049) · req-95 feedback textarea iOS-zoom · **req-96** "Next time"→"↑ you beat last time"

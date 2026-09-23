@@ -1375,3 +1375,7 @@ Finish shows/edits the same value (its local state removed); auto-complete saves
 change, no schema bump. Builder's puppeteer run: 13/13 (persist across reload, Finish write-through, History shows
 it, legacy active workout). Gate: Planner's own `./check` green (24 files); screenshot shows the note field.
 Follow-up: with the note open on an 8-exercise routine, Abandon falls below the fold (scrollable).
+
+## req-108 — a changed reps value no longer carries to the next sets; weight still does (batch 4, F9)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
