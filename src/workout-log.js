@@ -206,16 +206,21 @@ export function carriedWorkingSet(workLogged) {
 // carry/history/target — never invented (DESIGN §1). It sits BELOW restore (a
 // Previous re-edit shows the set's own logged values) and ABOVE carry/history.
 // `weighted` still gates kg, so a weight override never lands on a bodyweight set.
+//
+// req-108 / DEC-052 (+ amendment) — only WEIGHT carries. Reps never come from the
+// override or the no-history carry: every set prefills its own target for that set
+// index, else empty ("each set is separate from each other"). A `reps` still stored on
+// an active workout's override (saved before req-108) is ignored here, not migrated;
+// likewise a carry's `reps`. The no-history kg carry (DEC-002) is unchanged.
 export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target, override }) {
   if (fromRestore) {
     return { weight: weighted ? restore.weight : '', reps: restore.reps }
   }
   const ov = override || {}
   const baseWeight = !hasHistory && carry ? carry.weight : history.weight
-  const baseReps = !hasHistory && carry ? carry.reps : target || ''
   return {
     weight: weighted ? (ov.weight != null ? ov.weight : baseWeight) : '',
-    reps: ov.reps != null ? ov.reps : baseReps,
+    reps: target || '',
   }
 }
 
@@ -227,21 +232,14 @@ export function seedOverrideKey(exerciseId, setType) {
   return `${exerciseId}::${setType === 'wu' ? 'wu' : 'work'}`
 }
 
-// A weight/reps normalized the same way the seed sources stringify them, so a value
+// A weight normalized the same way the seed sources stringify it, so a value
 // re-entered unchanged compares equal (no spurious override). Weight compares
-// numerically ('5' === '5.0' === 5); reps compares as trimmed strings (targets can be
-// non-numeric, e.g. a duration).
+// numerically ('5' === '5.0' === 5). (req-108 — the reps twins went with the reps carry.)
 function weightSeedString(weight) {
   return weight != null && weight !== '' && Number(weight) !== 0 ? String(weight) : ''
 }
-function repsSeedString(reps) {
-  return reps != null && reps !== '' ? String(reps) : ''
-}
 function sameWeight(a, b) {
   return (Number(a) || 0) === (Number(b) || 0)
-}
-function sameReps(a, b) {
-  return repsSeedString(a) === repsSeedString(b)
 }
 
 // req-83 (N9) — the next seed-override map after a set is logged. For the current
@@ -254,19 +252,17 @@ function sameReps(a, b) {
 // override. Returns the SAME map (by identity) when nothing changed, so the caller
 // can skip a needless write. Pure: keyed by exerciseId, it can never leak across
 // exercises, and this is unit-tested rather than reasoned about.
+// req-108 / DEC-052 — a reps change is no longer recorded (reps don't carry). A stale
+// `reps` already on `prev` (an active workout saved before req-108) is passed through
+// untouched — not rewritten — and setLogSeed never reads it.
 export function nextSeedOverrides(overrides, { exerciseId, setType, weighted, seed, logged }) {
   const map = overrides || {}
   const key = seedOverrideKey(exerciseId, setType)
   const prev = map[key] || {}
-  const next = { ...prev }
-  if (weighted && !sameWeight(logged.weight, seed.weight)) {
-    next.weight = weightSeedString(logged.weight)
-  }
-  if (!sameReps(logged.reps, seed.reps)) {
-    next.reps = repsSeedString(logged.reps)
-  }
-  if (next.weight === prev.weight && next.reps === prev.reps) return map
-  return { ...map, [key]: next }
+  if (!weighted || sameWeight(logged.weight, seed.weight)) return map
+  const weight = weightSeedString(logged.weight)
+  if (weight === prev.weight) return map
+  return { ...map, [key]: { ...prev, weight } }
 }
 
 // Everything the live set-log form starts from, decided from inputs alone — the

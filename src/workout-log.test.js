@@ -356,20 +356,24 @@ describe('carriedWorkingSet (req-02 source)', () => {
 describe('setLogSeed (req-02 prefill order)', () => {
   const history = { weight: '', reps: '' }
 
-  it('carry (main): no history, weighted → carried kg + reps both prefill', () => {
+  // req-108 (DEC-052 amendment) — edited: this asserted kg + reps both carry. Reps no
+  // longer carry; the kg half of DEC-002 stands, reps come from the set's own target.
+  it('carry (main): no history, weighted → carried kg prefills, reps from the target', () => {
     const seed = setLogSeed({
       weighted: true,
       fromRestore: false,
       restore: null,
       hasHistory: false,
       history,
-      carry: { weight: '40', reps: '10' },
+      carry: { weight: '40', reps: '12' },
       target: '10',
     })
     assert.deepEqual(seed, { weight: '40', reps: '10' })
   })
 
-  it('reps carry overrides the per-set target', () => {
+  // req-108 (DEC-052 amendment) — edited: was "reps carry overrides the per-set target"
+  // (asserted reps '8' from the carry). Reversed: the target wins, the carry's reps are ignored.
+  it('a carried reps value never overrides the per-set target', () => {
     const seed = setLogSeed({
       weighted: true,
       fromRestore: false,
@@ -379,7 +383,16 @@ describe('setLogSeed (req-02 prefill order)', () => {
       carry: { weight: '42.5', reps: '8' },
       target: '10',
     })
-    assert.equal(seed.reps, '8')
+    assert.equal(seed.reps, '10')
+    assert.equal(seed.weight, '42.5')
+  })
+
+  // req-108 acceptance — "Reps separate, no history (unit)".
+  it('req-108: no history, carry of 12 reps, target 15 → reps 15; no target → empty; kg still carries', () => {
+    const base = { weighted: true, fromRestore: false, restore: null, hasHistory: false, history, carry: { weight: '30', reps: '12' } }
+    assert.deepEqual(setLogSeed({ ...base, target: '15' }), { weight: '30', reps: '15' })
+    assert.deepEqual(setLogSeed({ ...base, target: '' }), { weight: '30', reps: '' })
+    assert.deepEqual(setLogSeed({ ...base, target: undefined }), { weight: '30', reps: '' })
   })
 
   it('first working set of a no-history exercise: blank kg, target reps', () => {
@@ -570,7 +583,10 @@ describe('req-83 setLogSeed override (live carry of a changed field)', () => {
     assert.deepEqual(seed, { weight: '5', reps: '8' })
   })
 
-  it('reps override replaces the target; weight untouched (field isolation)', () => {
+  // req-108 (DEC-052) — edited: was "reps override replaces the target" (asserted reps
+  // '6'). Reversed: a reps value on the override (a stale one, stored before req-108)
+  // is ignored — the target wins — and weight is still untouched.
+  it('failure case — a stale reps override is ignored: reps come from the target', () => {
     const seed = setLogSeed({
       weighted: true,
       fromRestore: false,
@@ -581,7 +597,21 @@ describe('req-83 setLogSeed override (live carry of a changed field)', () => {
       target: '8',
       override: { reps: '6' },
     })
-    assert.deepEqual(seed, { weight: '4', reps: '6' })
+    assert.deepEqual(seed, { weight: '4', reps: '8' })
+  })
+
+  it('req-108: a stale override holding weight AND reps → weight carries, reps from the target', () => {
+    const seed = setLogSeed({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: true,
+      history,
+      carry: null,
+      target: '8',
+      override: { weight: '5', reps: '6' },
+    })
+    assert.deepEqual(seed, { weight: '5', reps: '8' })
   })
 
   it('no override → identical to the pre-req-83 seed', () => {
@@ -604,6 +634,7 @@ describe('req-83 setLogSeed override (live carry of a changed field)', () => {
     assert.deepEqual(seed, { weight: '99', reps: '99' })
   })
 
+  // req-108 — edited: expected reps '6' (the override's); now the target '8'.
   it('a weight override never lands on a bodyweight (not weighted) set', () => {
     const seed = setLogSeed({
       weighted: false,
@@ -615,7 +646,7 @@ describe('req-83 setLogSeed override (live carry of a changed field)', () => {
       target: '8',
       override: { weight: '5', reps: '6' },
     })
-    assert.deepEqual(seed, { weight: '', reps: '6' })
+    assert.deepEqual(seed, { weight: '', reps: '8' })
   })
 })
 
@@ -628,9 +659,36 @@ describe('req-83 nextSeedOverrides (only a changed field propagates)', () => {
     assert.deepEqual(next, { 'ex1::work': { weight: '5' } })
   })
 
-  it('changing only reps records reps, not weight (field isolation)', () => {
-    const next = at('ex1', 'work', true, { weight: '4', reps: '8' }, { weight: '4', reps: '6' })
-    assert.deepEqual(next, { 'ex1::work': { reps: '6' } })
+  // req-108 (DEC-052) — edited: was "changing only reps records reps" (asserted
+  // { reps: '6' }). Reversed: a reps change records nothing, and returns the SAME map.
+  it('changing only reps records nothing (reps do not carry)', () => {
+    const map = {}
+    const next = nextSeedOverrides(map, {
+      exerciseId: 'ex1', setType: 'work', weighted: true,
+      seed: { weight: '4', reps: '8' }, logged: { weight: '4', reps: '6' },
+    })
+    assert.equal(next, map)
+  })
+
+  it('req-108: changing weight AND reps records only the weight', () => {
+    const next = at('ex1', 'work', true, { weight: '20', reps: '8' }, { weight: '22', reps: '6' })
+    assert.deepEqual(next, { 'ex1::work': { weight: '22' } })
+  })
+
+  it('req-108: a stale stored reps override is passed through untouched, never rewritten', () => {
+    const map = { 'ex1::work': { weight: '5', reps: '6' } }
+    assert.equal(
+      nextSeedOverrides(map, {
+        exerciseId: 'ex1', setType: 'work', weighted: true,
+        seed: { weight: '5', reps: '8' }, logged: { weight: '5', reps: '7' },
+      }),
+      map,
+    )
+    const next = nextSeedOverrides(map, {
+      exerciseId: 'ex1', setType: 'work', weighted: true,
+      seed: { weight: '5', reps: '8' }, logged: { weight: '6', reps: '8' },
+    })
+    assert.deepEqual(next, { 'ex1::work': { weight: '6', reps: '6' } })
   })
 
   it('logging the seed unchanged records nothing and returns the SAME map', () => {
@@ -683,6 +741,67 @@ describe('req-83 nextSeedOverrides (only a changed field propagates)', () => {
       seed: { weight: '5', reps: '8' }, logged: { weight: '6', reps: '8' },
     })
     assert.deepEqual(next, { 'ex1::work': { weight: '6' } })
+  })
+})
+
+// req-108 (DEC-052 + amendment) — the whole per-set loop, driven through the real
+// seed → log → nextSeedOverrides → next seed path: weight carries, reps never do.
+describe('req-108 per-set reps (weight carries, reps stay per set)', () => {
+  const item = { exerciseId: 'ex1', sets: 3, targets: ['10', '8', '6'] }
+  // Runs the sets in order, logging `logs[i]` on set i, and returns each set's seed.
+  function run({ hasHistory, historyFor, logs, weighted = true }) {
+    let overrides = {}
+    const logged = []
+    const seeds = []
+    for (let i = 0; i < logs.length + 1 && i < 3; i++) {
+      const src = carriedWorkingSet(logged)
+      // the pre-req-108 carry shape (kg + reps), to prove setLogSeed ignores its reps
+      const carry = !hasHistory && src ? { weight: String(src.weight || ''), reps: String(src.reps) } : null
+      const seed = initialSetFields({
+        weighted,
+        fromRestore: false,
+        restore: null,
+        hasHistory,
+        history: historyFor(i),
+        carry,
+        target: setTargetFor(item, 'work', i),
+        override: overrides[seedOverrideKey('ex1', 'work')],
+      })
+      seeds.push(seed)
+      if (i >= logs.length) break
+      const entry = { weight: logs[i].weight ?? seed.weight, reps: logs[i].reps ?? seed.reps }
+      overrides = nextSeedOverrides(overrides, { exerciseId: 'ex1', setType: 'work', weighted, seed, logged: entry })
+      logged.push({ setType: 'work', ...entry })
+    }
+    return seeds
+  }
+  const withHistory = (i) => ({ weight: ['20', '20', '20'][i], reps: '' })
+  const noHistory = () => ({ weight: '', reps: '' })
+
+  it('targets 10/8/6, set 1 logged with 9 → set 2 seeds 8, set 3 seeds 6 (with history)', () => {
+    const seeds = run({ hasHistory: true, historyFor: withHistory, logs: [{ reps: '9' }, {}] })
+    assert.deepEqual(seeds.map((x) => x.reps), ['10', '8', '6'])
+  })
+
+  it('targets 10/8/6, set 1 logged with 9 → set 2 seeds 8, set 3 seeds 6 (no history)', () => {
+    const seeds = run({ hasHistory: false, historyFor: noHistory, logs: [{ weight: '30', reps: '9' }, {}] })
+    assert.deepEqual(seeds.map((x) => x.reps), ['10', '8', '6'])
+    assert.deepEqual(seeds.map((x) => x.weight), ['', '30', '30']) // DEC-002 kg carry stands
+  })
+
+  it('with history, 20→22 kg on set 1 → set 2 prefills 22 kg from seedOverrides, reps = its target', () => {
+    const seeds = run({ hasHistory: true, historyFor: withHistory, logs: [{ weight: '22' }] })
+    assert.deepEqual(seeds[1], { weight: '22', reps: '8', effort: 3, note: '' })
+  })
+
+  it('bodyweight (push-ups), targets 15/15/15, set 1 logged 12 → set 2 prefills 15', () => {
+    const pushups = { exerciseId: 'ex1', sets: 3, targets: ['15', '15', '15'] }
+    let overrides = {}
+    const base = { weighted: false, fromRestore: false, restore: null, hasHistory: true, history: { weight: '', reps: '15' }, carry: null }
+    const seed1 = initialSetFields({ ...base, target: setTargetFor(pushups, 'work', 0), override: undefined })
+    overrides = nextSeedOverrides(overrides, { exerciseId: 'ex1', setType: 'work', weighted: false, seed: seed1, logged: { weight: '', reps: '12' } })
+    const seed2 = initialSetFields({ ...base, target: setTargetFor(pushups, 'work', 1), override: overrides['ex1::work'] })
+    assert.equal(seed2.reps, '15')
   })
 })
 
@@ -769,6 +888,31 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
       lines.map((line) => line.text),
       ['WU · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'],
     )
+  })
+
+  // req-108 acceptance — "Preview consistent": with a weight override (and a stale reps
+  // one), each line still equals initialSetFields for that set — weight from the
+  // override, reps from the set's own target.
+  it('req-108: with seedOverrides[k].weight (+ a stale reps), each line equals initialSetFields', () => {
+    const seedOverrides = { 'odp::work': { weight: '26', reps: '3' } }
+    const last = lastSetsForExercise(workouts, 'odp')
+    const lines = previewFor(odp, { seedOverrides })
+    const slots = [['wu', 0], ['work', 0], ['work', 1], ['work', 2]]
+    slots.forEach(([setType, workIndex], i) => {
+      const form = initialSetFields({
+        weighted: true,
+        fromRestore: false,
+        restore: null,
+        hasHistory: true,
+        history: historySetPrefill(last, { setType, workIndex }),
+        carry: null,
+        target: setTargetFor(odp, setType, workIndex),
+        override: seedOverrides[seedOverrideKey('odp', setType)],
+      })
+      assert.equal(lines[i].weight, form.weight)
+      assert.equal(lines[i].reps, form.reps)
+    })
+    assert.deepEqual(lines.map((line) => line.text), ['WU · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'])
   })
 
   it('no warm-up → work lines only', () => {
