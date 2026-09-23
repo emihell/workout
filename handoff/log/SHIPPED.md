@@ -1447,4 +1447,14 @@ stays "Not a workout database backup."; the outer boundary reuses the existing f
 
 ## req-114 — dates and Today: local date everywhere, imported schedule anchor, midnight, two-routine hero (audit G, DEC-058)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `04ae31e`…`5f494a5`, throwaway agent, 1 review loop-back). Preview uses the local date; date-only strings parse as local
+y-m-d (`schedule.js`); an anchor-less schedule gets this Monday in `applyBackup` and in `loadState` (one save, only the anchor
+changes); Today clamps `loopWeeks`; `Done` shows `weekdayDate`; one pure `isCurrentWorkout` (today or within 6 h, DEC-058 §2)
+drives the hero, `startOrContinue` and `staleInProgressWorkouts`; the hero sits under today's date with today's other
+occurrences (StartButton now names its occurrence). TZ tests run in child processes under Stockholm and New York.
+Reviewer (independent, DEC-057): DO-NOT-MERGE → loop-back fixed a routine shown twice (off-schedule workout of a
+scheduled routine) and a hero Continue that could ask to abandon at the 6 h edge (now `continueInProgress`). Reviewer
+verified: anchor write only when missing, and DEC-032 paths write nothing; 0 day-grouping shifts in 4 TZs; each fix
+load-bearing. Gate: Planner's own run → `check: green — lint, 29 test file(s), and the build all passed.` Unconfirmed:
+anchor-less import = week 1; upcoming Starts now ask before abandoning; exactly 6 h 00 m counts as current; the hero shows
+under today's date.
