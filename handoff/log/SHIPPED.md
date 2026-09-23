@@ -1532,3 +1532,7 @@ Schedule.jsx:166) and the workout-setup Cancel. Auto-complete's Edit stays a But
 `Banner role="alert"`, and Reload is a `Button`. History's in-progress row has Abandon left and Continue right. 6 static tests.
 No trigger files (DEC-057). Gate: Planner's own run → `check: green — lint, 35 test file(s), and the build all passed.`; the
 History screenshot shows the new order.
+
+## req-122 — one NavLink with a `look` prop, and an Actions row primitive (audit Tier 2)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

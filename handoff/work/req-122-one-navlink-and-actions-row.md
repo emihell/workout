@@ -1,6 +1,6 @@
 # req-122 — one NavLink with a `look` prop, and an Actions row primitive (audit Tier 2)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** A wide refactor across views, so an
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-122` (`39e1e52`…`39e1e52`, 1 commit).** Phase 1. **[ux-feel]** A wide refactor across views, so an
 **independent reviewer** runs before merge (DEC-035: wide blast radius). No stored data.
 
 ## Why [measured, re-verified on main 4172e3d]
