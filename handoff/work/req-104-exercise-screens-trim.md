@@ -1,6 +1,6 @@
 # req-104 — exercise screens: drop "Previous" from the done view, smaller exercise title (batch 4, F3+F5)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]**
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-104` (`bdc5704`…`56f4b7b`, 2 commits).** Phase 1. **[ux-feel]**
 
 From Emilio's in-app notes (2026-09-18):
 - F3, `/workout/…/item/…/done`: *"Don't need to show previous"*
