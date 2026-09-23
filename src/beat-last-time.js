@@ -9,6 +9,7 @@
 // This is a NEW sibling to workoutVolume/workoutSummaryStats, not a change to them —
 // req-84's auto-complete "vs last time" volume summary still uses those untouched.
 import { isWeightedType } from './ids.js'
+import { isSkippedSet } from './workout-log.js'
 
 // Parse a stored numeric field defensively. Reps can be non-numeric ("AMRAP") and
 // duration can be absent; anything that isn't a finite number reads as 0 — i.e. "no
@@ -22,8 +23,24 @@ function num(value) {
 // The working sets logged for one exercise in a workout — warm-up sets excluded, the
 // same rule workoutVolume applies (setType === 'wu'). Matched by exercise id, not name
 // or position, so an exercise that moved in the routine still matches.
+// req-111 / DEC-053 — skipped sets (weight 0, reps 'skipped') are excluded on both
+// sides: they hold no data, so a skipped week can't hand today a false "heavier", and an
+// exercise skipped entirely today has no sets and so no win.
 function workSetsFor(workout, exerciseId) {
-  return (workout?.sets || []).filter((s) => s.exerciseId === exerciseId && s.setType !== 'wu')
+  return (workout?.sets || []).filter(
+    (s) => s.exerciseId === exerciseId && s.setType !== 'wu' && !isSkippedSet(s),
+  )
+}
+
+// req-111 / DEC-053 — the prior work sets for one exercise: from the most recent prior
+// (newest-first) where it has non-skipped work sets, looking past workouts where it was
+// entirely skipped. None → [] → silent (DEC-050 no-invent).
+function priorWorkSetsFor(priors, exerciseId) {
+  for (const prior of priors) {
+    const sets = workSetsFor(prior, exerciseId)
+    if (sets.length) return sets
+  }
+  return []
 }
 
 // Exercise ids in workout order, de-duplicated. The snapshot's item order is the
@@ -124,13 +141,17 @@ function compareExercise(curSets, prevSets, type) {
 // workout order. Empty when there is no prior, or nothing improved. Each entry:
 // { exerciseId, name, kind }. A regression on another exercise never suppresses a win
 // elsewhere — a normal gym day still gets its line.
+// req-111 — `prior` is one workout or a newest-first list of prior same-routine
+// workouts (previousSameRoutineWorkouts); with a list, each exercise compares against
+// the most recent one where it was actually done.
 export function beatLastTimeWins(current, prior, exercises = []) {
-  if (!current || !prior) return []
+  const priors = (Array.isArray(prior) ? prior : [prior]).filter(Boolean)
+  if (!current || !priors.length) return []
   const wins = []
   for (const exerciseId of orderedExerciseIds(current)) {
     const kind = compareExercise(
       workSetsFor(current, exerciseId),
-      workSetsFor(prior, exerciseId),
+      priorWorkSetsFor(priors, exerciseId),
       exerciseTypeFor(current, exerciseId, exercises),
     )
     if (kind) wins.push({ exerciseId, name: exerciseNameFor(current, exerciseId, exercises), kind })
