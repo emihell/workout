@@ -8,7 +8,6 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import {
-  clearSetDraftPatch,
   createSetDraftWriter,
   finishedState,
   formFieldsWithDraft,
@@ -22,6 +21,7 @@ import {
   setDraftFromForm,
   setDraftFromLoggedSet,
   setDraftKey,
+  withLoggedSet,
 } from './workout-log.js'
 
 const EXERCISES = [
@@ -160,11 +160,7 @@ describe('req-125 req-83 carry still compares against the chain seed', () => {
       logged: { weight: form.weight, reps: form.reps },
     })
     assert.deepEqual(seedOverrides[seedOverrideKey(a.exerciseId, 'work')], { weight: '42' })
-    state = withActive(state, {
-      sets: [...state.activeWorkout.sets, logged(a, { weight: 42, reps: 8 })],
-      seedOverrides,
-      ...clearSetDraftPatch(state.activeWorkout, key),
-    })
+    state = { ...state, activeWorkout: withLoggedSet(state.activeWorkout, logged(a, { weight: 42, reps: 8 }), { seedOverrides }, key) }
     state = reload(state)
     assert.equal(currentKey(state, itemA(state)), `${itemKey(a)}|work|2`)
     const next = formFor(state, itemA(state), { target: '6', override: state.activeWorkout.seedOverrides[seedOverrideKey(a.exerciseId, 'work')] })
@@ -182,10 +178,26 @@ describe('req-125 cleared, stale, stripped', () => {
     let state = onSet2()
     const key = currentKey(state, itemA(state))
     state = withActive(state, { setDraft: setDraftFromForm(key, { weight: '42', reps: '7', effort: 3 }, '') })
-    const patch = clearSetDraftPatch(state.activeWorkout, key)
-    assert.deepEqual(Object.keys(patch), ['setDraft'])
-    state = reload(withActive(state, { sets: [...state.activeWorkout.sets, logged(itemA(state), { weight: 42, reps: 7 })], ...patch }))
-    assert.equal('setDraft' in state.activeWorkout, false)
+    const next = withLoggedSet(state.activeWorkout, logged(itemA(state), { weight: 42, reps: 7 }), { restEndsAt: 1 }, key)
+    assert.equal('setDraft' in next, false)
+    assert.equal(next.sets.length, 3)
+    assert.equal(next.restEndsAt, 1)
+    assert.equal('setDraft' in reload({ ...state, activeWorkout: next }).activeWorkout, false)
+    // without a draftKey the reducer is the old merge (sets appended, patch merged)
+    const old = withLoggedSet(state.activeWorkout, logged(itemA(state)), { restEndsAt: 2 })
+    assert.deepEqual(old, { ...state.activeWorkout, restEndsAt: 2, sets: [...state.activeWorkout.sets, logged(itemA(state))] })
+  })
+
+  it('a draft written AFTER the render snapshot is still cleared (decided from the latest state)', () => {
+    const rendered = onSet2() // what the render saw: no draft yet
+    const key = currentKey(rendered, itemA(rendered))
+    assert.equal(rendered.activeWorkout.setDraft, undefined)
+    // the debounced write lands in the same tick, queued ahead of Complete's update
+    const latest = withActive(rendered, { setDraft: setDraftFromForm(key, { weight: '42', reps: '7', effort: 3 }, '') })
+    const next = withLoggedSet(latest.activeWorkout, logged(itemA(latest), { weight: 42, reps: 7 }), {}, key)
+    assert.equal('setDraft' in next, false)
+    // …so Remove set / Skip exercise + reopen can't resurface it: nothing is left under that key
+    assert.equal(setDraftFor({ ...next, sets: next.sets.slice(0, -1) }, key), null)
   })
 
   it('logging a DIFFERENT set leaves the draft alone; a draft whose key does not match is ignored', () => {
@@ -193,7 +205,8 @@ describe('req-125 cleared, stale, stripped', () => {
     const a = itemA(state)
     const draft = setDraftFromForm(currentKey(state, a), { weight: '42', reps: '7', effort: 3 }, '')
     state = withActive(state, { setDraft: draft })
-    assert.deepEqual(clearSetDraftPatch(state.activeWorkout, `${itemKey(state.activeWorkout.snapshot.items[1])}|work|0`), {})
+    const other = withLoggedSet(state.activeWorkout, logged(state.activeWorkout.snapshot.items[1]), {}, `${itemKey(state.activeWorkout.snapshot.items[1])}|work|0`)
+    assert.deepEqual(other.setDraft, draft)
     // set 2 logged elsewhere (e.g. the history editor path) → current is set 3 → ignored
     state = withActive(state, { sets: [...state.activeWorkout.sets, logged(a, { weight: 45, reps: 8 })] })
     assert.equal(setDraftFor(state.activeWorkout, currentKey(state, a)), null)
@@ -329,5 +342,30 @@ describe('req-125 no mid-typing reset (static)', () => {
       assert.equal(uses.length, 1, prop)
       assert.match(uses[0], /useState\(/, prop)
     }
+  })
+})
+
+describe('req-125 Complete / Skip wiring (static)', () => {
+  const item = readFileSync(new URL('./views/workout/item.jsx', import.meta.url), 'utf8')
+  const store = readFileSync(new URL('./store.jsx', import.meta.url), 'utf8')
+  const body = (name) => {
+    const start = item.indexOf(`  function ${name}(`)
+    assert.ok(start >= 0, name)
+    return item.slice(start, item.indexOf('\n  }\n', start))
+  }
+
+  for (const name of ['completeSet', 'skipSet']) {
+    it(`${name} cancels the pending write first, then logs with draftKey: setSeedKey`, () => {
+      const src = body(name)
+      const cancel = src.indexOf('draftWriter.cancel()')
+      const log = src.indexOf('store.completeSet(')
+      assert.ok(cancel >= 0, `${name} calls draftWriter.cancel()`)
+      assert.ok(log > cancel, `${name} cancels before store.completeSet`)
+      assert.match(src.slice(log), /\{ draftKey: setSeedKey \},?\s*\)/, `${name} passes draftKey to store.completeSet`)
+    })
+  }
+
+  it('store.completeSet clears inside its functional update via withLoggedSet', () => {
+    assert.match(store, /completeSet\(setRecord, activePatch = \{\}, \{ draftKey = null \} = \{\}\) \{\s*setState\(\(s\) => \{[\s\S]*?withLoggedSet\(s\.activeWorkout, setRecord, activePatch, draftKey\)/)
   })
 })

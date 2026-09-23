@@ -9,7 +9,6 @@ import { useStore } from '../../store-context'
 import {
   canRemoveAddedSet,
   carriedWorkingSet,
-  clearSetDraftPatch,
   createSetDraftWriter,
   durationTargetFor,
   formFieldsWithDraft,
@@ -251,7 +250,8 @@ function WorkoutItemLive({ routineId, item }) {
             ? item.suggestedWeights[currentWorkIndex]
             : null,
       },
-      { ...restAfterSet(), seedOverrides, ...clearSetDraftPatch(active, setSeedKey) },
+      { ...restAfterSet(), seedOverrides },
+      { draftKey: setSeedKey },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
@@ -274,7 +274,8 @@ function WorkoutItemLive({ routineId, item }) {
         targetWeight:
           currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
       },
-      { ...restAfterSet(true), ...clearSetDraftPatch(active, setSeedKey) },
+      restAfterSet(true),
+      { draftKey: setSeedKey },
     )
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }

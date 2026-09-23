@@ -652,12 +652,17 @@ export function createSetDraftWriter({
   }
 }
 
-// The activeWorkout patch that clears the draft once ITS set is Completed or Skipped
-// (merged into the same completeSet patch). A draft for another set is left alone — it
-// is ignored by setDraftFor anyway, and stripped at finish. `undefined` so the saved
-// JSON has no `setDraft` at all.
-export function clearSetDraftPatch(workout, key) {
-  return workout?.setDraft?.key === key ? { setDraft: undefined } : {}
+// store.completeSet's reducer (moved here so it is unit-tested): append the logged set,
+// merge the caller's patch (rest, req-83 seedOverrides), and — req-125 — drop the draft
+// when ITS set (`draftKey`) is the one just Completed or Skipped. Decided from the
+// workout the store update receives (the LATEST state), not the render's copy, so a
+// debounced draft write that landed just before Complete can't survive keyed to a set
+// already logged. A draft for another set is left alone (setDraftFor ignores it; finish
+// strips it). Without `draftKey` this is exactly the old merge.
+export function withLoggedSet(workout, setRecord, activePatch = {}, draftKey = null) {
+  const next = { ...workout, ...activePatch, sets: [...(workout?.sets || []), setRecord] }
+  if (draftKey != null && next.setDraft?.key === draftKey) delete next.setDraft
+  return next
 }
 
 // req-106 — the target reps a set's log form presents: the warm-up's reps for a 'wu'
