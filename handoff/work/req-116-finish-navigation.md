@@ -1,6 +1,6 @@
 # req-116 — Finish: Back doesn't restart auto-finish, Feel survives, no fresh Start after finishing, empty Finish warns (audit E, DEC-058 §4)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** + **[P]**: an optional field on the
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-116` (`e343a69`…`fdaa9d3`, 2 commits).** Phase 1. **[ux-feel]** + **[P]**: an optional field on the
 active workout (stripped at finish), and touches `workout-log.js` (DEC-057: reviewer + backup reminder). Revised
 2026-09-23 after the spec review. The first draft's `replace` fix couldn't work: `go()` always assigns
 `location.hash` (`route.js:81-87`), and `{replace}` only rewrites the in-app visit stack.

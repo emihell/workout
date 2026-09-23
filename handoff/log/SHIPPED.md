@@ -1483,3 +1483,7 @@ reloads). 25 parser tests; the builder's puppeteer run: `22,5` → 22.5, and "2 
 (DEC-057), so no reviewer. Gate: Planner's own run → `check: green — lint, 31 test file(s), and the build all passed.`; the screenshot
 shows the inline error. Unconfirmed: blank Sets uses the longest list; an empty token (`8//8`) is an error; errors show after the
 first Save and then update live; the wording. Follow-up: `parseTargets` in ids.js has no caller now (dead).
+
+## req-116 — Finish: Back doesn't restart auto-finish, Feel survives, no fresh Start after finishing, empty Finish warns (audit E, DEC-058 §4)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
