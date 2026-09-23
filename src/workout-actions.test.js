@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, afterEach } from 'node:test'
+import { describe, it, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -272,5 +272,57 @@ describe('req-55 store.jsx is one-in-progress (source guard)', () => {
     assert.match(src, /continueDraft\s*\(/)
     assert.match(src, /abandonDraft\s*\(/)
     assert.match(src, /abandonWorkout\s*\(\)/)
+  })
+})
+
+// req-114 / DEC-058 §2 — "continuing the same workout" uses the shared current rule
+// (started today OR within 6 h), and today's Start names its occurrence. The clock is
+// faked (mock.timers Date) at Wed 2026-09-23 00:05 local.
+describe('req-114 startOrContinue across midnight', () => {
+  beforeEach(() => mock.timers.enable({ apis: ['Date'], now: new Date(2026, 8, 23, 0, 5) }))
+  afterEach(() => mock.timers.reset())
+
+  const tuesdayR = () => ({
+    id: 'a1',
+    routineId: 'rtn-r',
+    scheduleSlotId: 'slot-tue',
+    occurrenceId: 'slot-tue@2026-09-22',
+    startedAt: new Date(2026, 8, 22, 23, 50).toISOString(),
+  })
+
+  it('the hero Continue (no occurrence) on a Tue 23:50 workout at Wed 00:05 → continues, no confirm', () => {
+    const store = fakeStore({ activeWorkout: tuesdayR() })
+    startOrContinue(store, 'rtn-r')
+    assert.deepEqual(confirmMessages, [])
+    assert.deepEqual(names(store), [])
+  })
+
+  it("Wed's slot of the same routine (its own occurrence) → asks before abandoning", () => {
+    const store = fakeStore({ activeWorkout: tuesdayR() })
+    confirmReturn = false
+    startOrContinue(store, 'rtn-r', {
+      scheduledFor: '2026-09-23',
+      scheduleSlotId: 'slot-wed',
+      occurrenceId: 'slot-wed@2026-09-23',
+    })
+    assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
+    assert.deepEqual(names(store), []) // Cancel keeps the Tuesday workout
+  })
+
+  it('the same occurrence named explicitly → continues', () => {
+    const store = fakeStore({ activeWorkout: tuesdayR() })
+    startOrContinue(store, 'rtn-r', { occurrenceId: 'slot-tue@2026-09-22' })
+    assert.deepEqual(confirmMessages, [])
+    assert.deepEqual(names(store), [])
+  })
+
+  it('started yesterday 08:00, now 09:00 → stale: abandon-on-new', () => {
+    mock.timers.setTime(new Date(2026, 8, 23, 9, 0).getTime())
+    const store = fakeStore({
+      activeWorkout: { ...tuesdayR(), startedAt: new Date(2026, 8, 22, 8, 0).toISOString() },
+    })
+    startOrContinue(store, 'rtn-r')
+    assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
+    assert.deepEqual(names(store), ['abandonWorkout', 'startWorkout'])
   })
 })

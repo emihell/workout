@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
+import { planDateFor } from '../../schedule'
 import { findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
@@ -52,7 +53,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   const plan = !mine
     ? store.getPlannedWorkout({
         routineId,
-        date: date || new Date().toISOString().slice(0, 10),
+        // req-114 — local today, not the UTC date (00:00–02:00 in Sweden was yesterday).
+        date: planDateFor(date),
         scheduleSlotId,
       })
     : null

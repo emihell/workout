@@ -2,13 +2,18 @@ import { recordButton } from '../analytics'
 import { go } from '../route'
 import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
-import { coveringWorkout, dateKey, loopWeekIndex, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
+import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
+import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
 import { completedOnDayKey, findRoutine, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { Button, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
+// req-114 — the Start names its occurrence (slot@date), so startOrContinue only
+// "continues" the active workout when it IS this occurrence. Without it, today's slot
+// of the same routine a pre-midnight workout came from silently resumed yesterday's
+// occurrence; now it goes through the one-active rule (DEC-038 abandon-on-new confirm).
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   return (
     <Button
@@ -18,6 +23,7 @@ function StartButton({ store, routine, slot, date, label = 'Start', variant, blo
         startOrContinue(store, routine.id, {
           scheduledFor: date,
           scheduleSlotId: slot.id,
+          occurrenceId: occurrenceId(slot.id, date),
         })
       }
     >
@@ -101,7 +107,7 @@ function UpcomingRow({ store, date, slot, routine, todayKey }) {
   const startAction =
     !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
   return (
-    <Row value={done ? `Done ${dateKey(done.finishedAt)}` : null} action={startAction}>
+    <Row value={done ? `Done ${weekdayDate(dateKey(done.finishedAt))}` : null} action={startAction}>
       <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} today={dk === todayKey} />
     </Row>
   )
@@ -111,10 +117,11 @@ function UpcomingRow({ store, date, slot, routine, todayKey }) {
 // main call to action. Iter 8: a two-line stack — the bold date on top, then
 // "name — focus" as a secondary line — then a large, primary, full-width Start.
 // `Done …` shows once logged. req-55/DEC-038: this block never carries the
-// in-progress state — an active workout started today is rendered as the single
-// `TodayHero` (which replaces the whole today block), and a stale active workout
-// (started a prior day) is a Continue row lower down, not the hero. So today's slot
-// block only ever shows Start (or Done); the Continue path lives elsewhere.
+// in-progress state — a current active workout is the single hero (`TodayHero`,
+// which req-114 renders above today's other occurrences), and a stale active
+// workout is a Continue row lower down, not the hero. So a today routine only
+// ever shows Start (or Done); the Continue path lives elsewhere. req-114: `Done`
+// uses the shared weekdayDate format, like every other row.
 // req-110 — a day with two+ routines is ONE day: the date line prints once, then
 // each routine (name — focus, and its own Start or `Done …`) in schedule order.
 // With one routine the markup is exactly the pre-req-110 block (date, name, Start).
@@ -129,7 +136,7 @@ function TodayRoutine({ store, routine, slot, date }) {
         {routine.focus ? ` — ${routine.focus}` : ''}
       </p>
       {done ? (
-        <p className="ui-sub">Done {dateKey(done.finishedAt)}</p>
+        <p className="ui-sub">Done {weekdayDate(dateKey(done.finishedAt))}</p>
       ) : (
         <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
       )}
@@ -154,19 +161,17 @@ function TodayWorkouts({ store, todays, date }) {
   )
 }
 
-// req-55 / DEC-038 — the single in-progress hero. While a workout is in progress and
-// was STARTED today, it REPLACES today's scheduled Start block (Emilio: "the one
-// started should always take the place of the start … when it's finished we can see
-// today's routine again with the start button"). Holds whether the started workout
-// is today's slot, tomorrow-started-early, or off-schedule — it is the one hero, no
-// second hero. Reuses the Today block's look (`.ui-today-workout`). Name/focus/date
-// resolve from the workout's OWN record (snapshot name survives a deleted/archived
-// routine — DESIGN §1, never invented). Same resume call (continue the active one).
-function TodayHero({ store, workout }) {
+// req-55 / DEC-038 — the single in-progress hero: name/focus resolve from the
+// workout's OWN record (snapshot name survives a deleted/archived routine — DESIGN §1,
+// never invented), marked in progress, with Continue (same resume call). req-114 /
+// DEC-058: it no longer REPLACES today's block — it sits inside it, under today's
+// date (a 23:50 workout viewed at 00:05 reads under the new day), above today's other
+// occurrences. It is the one hero whatever it was started from (today's slot,
+// tomorrow's started early, off-schedule).
+function HeroRoutine({ store, workout }) {
   const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
   return (
-    <div className="ui-today-workout">
-      <p className="ui-today-workout__date">{weekdayDate(workoutDateKey(workout))}</p>
+    <>
       <p className="ui-today-workout__name">
         {workoutRoutineName(workout, routine)}
         {workout.snapshot?.focus ? ` — ${workout.snapshot.focus}` : ''}
@@ -175,6 +180,32 @@ function TodayHero({ store, workout }) {
       <Button variant="primary" block onClick={() => startOrContinue(store, activeRoutineId(workout))}>
         Continue
       </Button>
+    </>
+  )
+}
+
+// req-114 / DEC-058 §3 — today's block while a current workout is in progress: TODAY's
+// date once, the in-progress workout first, then today's OTHER occurrences (`others`,
+// from otherTodayOccurrences) each with its own Start/Done, spaced like req-110's
+// routines. With no others it is the date and the hero alone (the req-55 shape).
+function TodayHero({ store, workout, others, date }) {
+  return (
+    <div className="ui-today-workout">
+      <p className="ui-today-workout__date">{weekdayDate(date)}</p>
+      {others.length === 0 ? (
+        <HeroRoutine store={store} workout={workout} />
+      ) : (
+        <>
+          <div className="ui-today-workout__routine">
+            <HeroRoutine store={store} workout={workout} />
+          </div>
+          {others.map(({ slot, routine }) => (
+            <div key={slot.id} className="ui-today-workout__routine">
+              <TodayRoutine store={store} routine={routine} slot={slot} date={date} />
+            </div>
+          ))}
+        </>
+      )}
     </div>
   )
 }
@@ -241,7 +272,8 @@ export function Today() {
   // the nearest just above the today hero. `remainingInLoop` is ascending (nearest
   // first) and stays that way for its other callers — the flip is render-time only.
   const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2).reverse()
-  const loop = Math.max(1, Number(schedule?.loopWeeks) || 1)
+  // req-114 — clamp like Schedule does (an imported 6 read "Week 1 of 6").
+  const loop = clampLoopWeeks(schedule?.loopWeeks)
   const week = loopWeekIndex(schedule, now)
   const mine = store.activeWorkout
   const completedToday = completedOnDayKey(store.workouts, todayKey)
@@ -251,17 +283,19 @@ export function Today() {
   // (by id, so it tracks whatever the section renders) and reads as prior-day history.
   const completedTodayIds = new Set(completedToday.map((workout) => workout.id))
   // req-55 / DEC-038 — the single in-progress workout is the today hero only while it
-  // was STARTED today; then it replaces today's scheduled Start block. Once it ages to
-  // a prior day it is "stale": no longer the hero (today's Start shows normally), and
-  // it surfaces as a Continue row instead. Legacy drafts count as stale too.
-  const activeStartedToday = !!mine && dateKey(mine.startedAt) === todayKey
+  // is CURRENT (req-114 / DEC-058 §2: started today or within the last 6 h). Once
+  // stale it is no longer the hero (today's Start shows normally) and surfaces as a
+  // Continue row instead. Legacy drafts count as stale too. req-114 / DEC-058 §3: the
+  // hero sits in today's block with today's OTHER occurrences, not instead of them.
+  const hero = isCurrentWorkout(mine, now, todayKey) ? mine : null
+  const others = hero ? otherTodayOccurrences(todays, hero, todayKey) : todays
   // req-55 — the recent peek shows finished history AND any stale/unfinished
   // in-progress workout (started a prior day, or a legacy draft) as a Continue row,
   // merged by date so a stale one appears only when it falls in the recent window.
   // req-81 — today's finished workouts are excluded here; they live in "Completed
   // today" above (stale in-progress are never finished, so none are in that set).
   const recent = sortWorkoutsByDate([
-    ...staleInProgressWorkouts(store, todayKey),
+    ...staleInProgressWorkouts(store, todayKey, now),
     ...(store.workouts || []).filter((workout) => !completedTodayIds.has(workout.id)),
   ]).slice(0, 2)
 
@@ -320,13 +354,14 @@ export function Today() {
       </List>
       {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
 
-      {/* req-55 / DEC-038 — an in-progress workout started today IS the single hero,
-          replacing today's scheduled block(s). No second hero. On finish/abandon it
-          is gone and today's scheduled block returns with Start. A stale in-progress
-          (prior day) is not the hero — today shows normally; it appears as a Continue
+      {/* req-55 / DEC-038 — a current in-progress workout IS the single hero. No second
+          hero. req-114 / DEC-058 §3: it heads today's block (today's date), and the
+          day's other occurrences stay below it with their own Start/Done. On
+          finish/abandon it is gone and the block is the plain scheduled one. A stale
+          in-progress is not the hero — today shows normally; it appears as a Continue
           row in the recent peek below. */}
-      {activeStartedToday ? (
-        <TodayHero store={store} workout={mine} />
+      {hero ? (
+        <TodayHero store={store} workout={hero} others={others} date={todayKey} />
       ) : todays.length ? (
         <TodayWorkouts store={store} todays={todays} date={todayKey} />
       ) : (

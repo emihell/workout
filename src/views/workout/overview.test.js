@@ -70,3 +70,10 @@ test('Finish shows and writes back the same note; auto-complete saves it', () =>
   assert.doesNotMatch(auto, /overallNote: ''/)
   assert.match(auto, /store\.finishWorkout\(autoFinishArgs\(active, progression\)\)/)
 })
+
+// req-114 (audit G) — the preview's plan date is the local day (planDateFor, unit-tested
+// under TZ=Europe/Stockholm in dates-tz.cases.js), never the UTC toISOString date.
+test('the preview plan date is local (planDateFor), not the UTC date', () => {
+  assert.match(fnBody('Workout'), /date: planDateFor\(date\)/)
+  assert.doesNotMatch(src, /toISOString\(\)\.slice\(0, 10\)/)
+})
