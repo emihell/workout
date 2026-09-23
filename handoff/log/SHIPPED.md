@@ -1330,3 +1330,7 @@ import+`run_checks()` no-exception assertion (`6f3b265`). Planner verified from 
 self-test assertions pass, `check_handoff` clean on main (exit 0), plan-guards/plan-ledger/`./check`
 all green; drift check fired correctly during closeout. Merge `398b95e`. Lessons: [[L-021]]. Tooling
 only — no app code, no persisted data.
+
+## req-103 — routine editor: two-line exercise rows, main unlabelled (gym-flow batch 4, F1)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
