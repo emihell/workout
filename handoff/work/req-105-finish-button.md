@@ -1,6 +1,6 @@
 # req-105 — workout overview: Finish becomes a bottom button, prominent once everything's done (batch 4, F6)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]**
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-105` (`836b54b`…`836b54b`, 1 commit).** Phase 1. **[ux-feel]**
 
 From Emilio's in-app note (2026-09-18, `/workout/sess-push-pull`): *"Last exercise and finish - if finish
 is gonna be a part of the list - make it the last press of the list - or make its own thing at the

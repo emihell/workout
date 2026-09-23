@@ -1346,3 +1346,7 @@ Previous section; the exercise title on the log/done screens is scoped to `--ui-
 `.ui-exercise-head .ui-title`, the shared `Title` untouched. Static-source test `item.test.js` (3/3). Gate: Planner's
 own `./check` green (22 test files); log-screen screenshot confirmed. Follow-up: the done view renders the
 exercise title *below* Add set (markup order), backlog.
+
+## req-105 — workout overview: Finish becomes a bottom button, prominent once everything's done (batch 4, F6)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
