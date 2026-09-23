@@ -177,7 +177,10 @@ function HeroRoutine({ store, workout }) {
         {workout.snapshot?.focus ? ` — ${workout.snapshot.focus}` : ''}
         <InProgressMark />
       </p>
-      <Button variant="primary" block onClick={() => startOrContinue(store, activeRoutineId(workout))}>
+      {/* req-114 review — resume BY ID (continueInProgress never abandons). The hero is
+          decided with the render-time clock; startOrContinue re-checks "current" with a
+          fresh one, so a tap just past the 6 h edge would have asked to abandon it. */}
+      <Button variant="primary" block onClick={() => continueInProgress(store, workout)}>
         Continue
       </Button>
     </>

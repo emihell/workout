@@ -84,3 +84,11 @@ test('every Start names its occurrence; Done rows use weekdayDate', () => {
   assert.doesNotMatch(src, /Done \$\{dateKey\(/)
   assert.doesNotMatch(src, /Done \{dateKey\(/)
 })
+
+// req-114 review — the hero's Continue resumes by id, never through startOrContinue's
+// fresh-clock "current" re-check (which could ask to abandon just past the 6 h edge).
+test('the hero Continue calls continueInProgress, not startOrContinue', () => {
+  const hero = fnBody('HeroRoutine')
+  assert.match(hero, /onClick=\{\(\) => continueInProgress\(store, workout\)\}/)
+  assert.doesNotMatch(hero, /startOrContinue\(/)
+})

@@ -107,4 +107,17 @@ describe(`req-114 dates under TZ=${TZ}`, () => {
     const fromWednesday = { routineId: 'r', occurrenceId: `${wed.id}@2026-09-23` }
     assert.deepEqual(otherTodayOccurrences(todays, fromWednesday, '2026-09-23').map((x) => x.slot.id), ['slot-wed-2'])
   })
+
+  it('an off-schedule workout of a routine scheduled today drops that slot (no duplicate row)', () => {
+    const todays = [
+      { slot: { id: 'slot-wed', routineId: 'r' }, routine: { id: 'r' } },
+      { slot: { id: 'slot-wed-2', routineId: 'q' }, routine: { id: 'q' } },
+    ]
+    // Started from the Routine screen today: adhoc occurrence, no slot.
+    const adhocToday = { routineId: 'r', scheduleSlotId: null, occurrenceId: 'adhoc-r@2026-09-23', performedOn: '2026-09-23' }
+    assert.deepEqual(otherTodayOccurrences(todays, adhocToday, '2026-09-23').map((x) => x.slot.id), ['slot-wed-2'])
+    // The same adhoc workout from before midnight: today's R slot is a different day's workout, listed.
+    const adhocTuesday = { ...adhocToday, occurrenceId: 'adhoc-r@2026-09-22', performedOn: '2026-09-22' }
+    assert.deepEqual(otherTodayOccurrences(todays, adhocTuesday, '2026-09-23').map((x) => x.slot.id), ['slot-wed', 'slot-wed-2'])
+  })
 })
