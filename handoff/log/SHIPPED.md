@@ -1338,3 +1338,7 @@ muted meta line from a pure `routineItemMeta` (`ids.js`, unit-tested); main is u
 Planner's own `./check` green in a throwaway worktree (21 test files); screenshot confirmed the rows render.
 Follow-up surfaced: History detail (`history/detail.jsx:68,120`) still prints "Main" on every row. Backlog.
 Gotcha: `.ui-navlink`'s left inset misaligns a line under it; fixed by dropping the link's left padding in the stack.
+
+## req-104 — exercise screens: drop "Previous" from the done view, smaller exercise title (batch 4, F3+F5)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
