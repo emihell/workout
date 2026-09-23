@@ -5,7 +5,7 @@ import { recordButton } from '../../analytics'
 import { findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
-import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
+import { allItemsDone, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
@@ -117,9 +117,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
 
   // req-84 — every exercise done (same per-item test the list rows use). When true the
   // overview shows the auto-complete summary instead of the list; NOT before then.
-  const allDone = items.every(
-    (item) => itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone,
-  )
+  // req-105 — the test lives in workout-log.js (allItemsDone) and also drives Finish.
+  const allDone = allItemsDone(active)
   if (allDone && !autoDismissed) {
     return (
       <AutoCompleteSummary
@@ -152,12 +151,21 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           )
         })}
       </List>
-      <List>
-        <Row to={`/workout/${routineId}/finish`}>Finish</Row>
-      </List>
-      <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
-        Abandon
-      </Button>
+      {/* req-105 — Finish is a bottom button above Abandon, not a list row (it read as
+          another exercise). Secondary while work is left; primary once every exercise is
+          done (i.e. after the auto-complete summary is cancelled). It navigates without
+          writing, so per DEC-040 it's a NavLink wearing the button look, not a Button. */}
+      <div className="ui-workout-end">
+        <NavLink
+          to={`/workout/${routineId}/finish`}
+          className={`ui-btn ui-btn--${allDone ? 'primary' : 'secondary'} ui-btn--block`}
+        >
+          Finish
+        </NavLink>
+        <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
+          Abandon
+        </Button>
+      </div>
     </Screen>
   )
 }

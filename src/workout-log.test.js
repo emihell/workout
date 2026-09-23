@@ -2,6 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { rpeOptionValue } from './ids.js'
 import {
+  allItemsDone,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
@@ -90,6 +91,35 @@ describe('workout logging', () => {
     assert.equal('restEndsAt' in patch, false)
     assert.equal('restPausedRemaining' in patch, false)
     assert.equal(itemIsMarkedDone({ completedItemIds: patch.completedItemIds }, item), true)
+  })
+
+  // req-105 — the one "every exercise done" test: gates the auto-complete summary and
+  // promotes Finish to primary. Done = marked done OR planned-done, per item.
+  describe('req-105 allItemsDone', () => {
+    const first = { id: 'pi-si-a', routineItemId: 'si-a', exerciseId: 'ex-a', sets: 1, warmup: null }
+    const last = { id: 'pi-si-b', routineItemId: 'si-b', exerciseId: 'ex-b', sets: 1, warmup: null }
+    const snapshot = { items: [first, last] }
+    const workSet = (it) => ({ routineItemId: it.routineItemId, exerciseId: it.exerciseId, setType: 'work', reps: '8' })
+
+    it('is false with the last item done and the first open', () => {
+      assert.equal(allItemsDone({ snapshot, completedItemIds: ['si-b'], sets: [workSet(last)] }), false)
+    })
+    it('is false for a just-started workout (nothing logged)', () => {
+      assert.equal(allItemsDone({ snapshot, completedItemIds: [], sets: [] }), false)
+    })
+    it('is true when every item is marked done', () => {
+      assert.equal(allItemsDone({ snapshot, completedItemIds: ['si-a', 'si-b'], sets: [] }), true)
+    })
+    it('is true when every item is planned-done (sets logged, not marked)', () => {
+      assert.equal(allItemsDone({ snapshot, completedItemIds: [], sets: [workSet(first), workSet(last)] }), true)
+    })
+    it('is true for a mix of marked-done and planned-done', () => {
+      assert.equal(allItemsDone({ snapshot, completedItemIds: ['si-a'], sets: [workSet(last)] }), true)
+    })
+    it('is false for an empty or missing workout', () => {
+      assert.equal(allItemsDone({ snapshot: { items: [] }, sets: [] }), false)
+      assert.equal(allItemsDone(null), false)
+    })
   })
 
   it('mark-done is idempotent and preserves other completed ids', () => {
