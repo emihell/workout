@@ -18,7 +18,6 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.**
 
 **READY, held:**
-- `req-113` **routine editor shows `—` not `0` for a set with no weight** (DEC-056 correction). Tiny.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 

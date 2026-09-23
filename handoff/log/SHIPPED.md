@@ -1428,4 +1428,7 @@ corrected. Gate: Planner's own `./check` green (27 files), and the Planner's ori
 
 ## req-113 — routine editor shows "—", not "0", for a set with no weight (DEC-056 correction)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `88d8e44`, throwaway agent). `routineItemMeta` prints a 0/empty/missing weight as `—` (`[0,40]` → `—/40 kg`);
+all-zero/empty still prints no kg part; req-103 tests unmodified. Display only, `ids.js`: no DEC-057 reviewer/backup trigger.
+Gate: Planner's own run in a throwaway worktree → `check: green — lint, 27 test file(s), and the build all passed.`;
+screenshot reads "WU set · 2 sets · —/40 kg". Reviewer: none (display-only, no trigger file).
