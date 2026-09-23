@@ -151,6 +151,19 @@ the same size.
 **4 — Ask what the numbers in the requirement were measured from.** A number with no
 stated source is a number nobody has checked.
 
+**5 — Trigger the safety checks from the FILES, not the tag (DEC-057).** If the req touches `store.jsx`,
+`model.js`, `storage.js`, `progress.js`, `workout-log.js`, or any migration/load path, then: an **independent
+reviewer** runs on the diff before merge, **and** Emilio gets the **backup reminder** (DEC-046) before merge.
+This applies whatever the Gate tag says. (2026-09-23: req-111 and req-112 were tagged `[functional]`, touched
+storage, store, model and progress, and got neither.) For any field on `activeWorkout` or a snapshot, name the
+load/migrate path it passes through (`migrateState` → `workoutSnapshot`) in the spec. req-109's first draft
+missed it.
+
+**6 — Every call you make on Emilio's behalf that a user would SEE is marked `(unconfirmed)`** in the
+Decisions section, and goes on his end-of-batch list. The same applies to a builder's "Possible DEC".
+Unmarked, it reads as decided and nobody asks (2026-09-23: req-109's skipped rule, labels and rest;
+req-110's two primary Starts; req-112's `0` weight).
+
 **And for a bug, a reproduction.** Any statement that the code does X — in a
 requirement, a message, or a review — states how to reproduce it and shows the
 output. Not the code path, not the reasoning: the command (or test) and what it
@@ -233,7 +246,7 @@ loosen it. **Batch mode** is a distinct exception, entered **only** by Emilio's 
 approval **with planning up front** (which reqs, what order) before any of them starts.
 Inside an approved batch:
 
-- **Serial-but-continuous.** One req/branch at a time (DEC-035 still: Builder builds,
+- **Serial-but-continuous.** One req/branch at a time (a **throwaway build agent per req**, DEC-055;
   Planner merges), but **don't stop between them** — build → `./check` → merge →
   dispatch the next — and give **one summary at the end**, not per-req.
 - **Relaxed per-req testing — but "feel" is deferrable, "does it render / is it visible"
@@ -246,8 +259,10 @@ Inside an approved batch:
   no browser in either session, the pre-merge visibility check is a scripted screenshot of
   the changed screen (see the UI-visibility check tool) or, until that exists, Emilio's
   fast eyeball on the deployed change — but it is a gate, not an after-thought.
-- **Don't clear sessions mid-batch.** Builder's and Planner's both stay alive for
-  continuity — Emilio is intentionally out of the loop and context must carry across.
+- **No `/clear` needed mid-batch.** Each req gets a fresh agent (DEC-055), and the Planner's session
+  stays alive for continuity. The Builder session is for live and single work, not batches.
+- **Record the approval.** The batch's reqs, order and Emilio's go (quoted) go in NOW.md before the first
+  dispatch (DEC-047 requires it, and 2026-09-23 had no receipt).
 - **The behaviour-decision gate still applies.** A gated req still needs Emilio's call,
   resolved in the pre-batch planning. Only *testing* is relaxed, never *decisions*.
 

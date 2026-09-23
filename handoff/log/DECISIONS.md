@@ -1095,3 +1095,27 @@ time's source of truth" means. The explicit post-correction recalc (preview, the
 already a choice, and its maths is fixed to be per-set (req-112). **Later (Phase 2):** a deliberate "review and update
 the routine" step, e.g. at the end of a schedule loop. Its shape is still open. **Also:** Skip exercise leaves an
 already-running rest going; it never starts one (Emilio: "keep").
+
+**DEC-056 correction (independent retro, 2026-09-23):** DEC-056 calls the post-correction recalc a "preview,
+then Apply/Skip". The "Update?" screen (`recalc.jsx`) shows **no numbers**. It is a choice, but a blind one.
+Showing the numbers belongs to the Phase 2 review step (BACKLOG). Also: where a skipped set sits before a
+logged one and the routine has no weight there, recalc records `0`, and the routine editor would show
+`0/40 kg`. Emilio (2026-09-23): show `—` for it, never a number → req-113.
+
+## DEC-057 — safety checks follow the files; a question isn't a decision; unconfirmed calls are marked  (Emilio, 2026-09-23)
+
+From an independent retro of the batch-4 session, whose findings Emilio accepted ("yes"):
+1. **Reviewer and backup triggers come from the files a req touches** (store, model, storage, progress,
+   workout-log, migration/load), not from its Gate tag. The independent reviewer (DEC-035) and the backup
+   reminder (DEC-046) both come **before** merge. req-111 and req-112 were tagged `[functional]` and got
+   neither.
+2. **A question from Emilio is not a DEC** until he confirms. DEC-054 was recorded from a question and
+   reversed by the next question (DEC-055) within two minutes.
+3. **Calls made on his behalf that a user would see are marked `(unconfirmed)`** and go on his end-of-batch
+   list, and so does a builder's "Possible DEC". Batch 4's list was confirmed in one go ("lets go with your
+   calls"): req-109's skipped rule, role and rest, labels, no-remove, picker not hiding the original;
+   req-110's two primary Starts; req-112 skipped-keeps-routine-value; `—` not `0` (req-113).
+4. **SHIPPED's gate line quotes `./check`'s output** and names the reviewer.
+The retro also showed that "make spec review standard" is already in DEC-035 (it didn't fire), and that the
+closeout ledger is mostly automated already (req-90). Neither needed a new rule. Rules in WORKFLOW.md §READY
+checks 5–6 and PLANNING.md.

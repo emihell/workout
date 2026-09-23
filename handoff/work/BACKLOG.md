@@ -216,7 +216,7 @@ merged). N1/N9/N10 carry behaviour decisions; N2/N8 are their own decisions. Ord
 ### Gym-flow notes — batch 4, Emilio 2026-09-17..20 (in-app feedback JSON, app `378e47f`)
 
 Pasted 2026-09-23. [measured] `git log 378e47f..main -- src` is empty, so every note still applies to
-live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 in Emilio's order.
+live code. All Phase 1. **All specced and LIVE 2026-09-23** (req-103..112, see the mapping line below). F1..F10 in Emilio's order.
 
 - **F1 — routine editor list is messy; two lines per row? drop "Main".** `/routines/:id`.
   [measured] `Routine.jsx:154` renders `name — Main · WU set · 3 sets · 20/22/24 kg` on one line
@@ -275,9 +275,20 @@ live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 
   DEC-002 kg carry (pre-existing). Small.
 
 - **req-109 follow-ups:** (a) ~~Q: Skip exercise leaves a running rest going~~ — **keep** (Emilio, DEC-056). (b) `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
-  replacement they read its rest 0. (c) ~~Investigate~~ → found + decided: **req-112** / DEC-056. in the reviewer's run a routine item's
-  `suggestedWeights` went [30,30]→[30] after a finish with 1 logged + 1 skipped set (`progressionForItem`) — check the
-  routine template doesn't lose per-set weights on a skipped set.
+  replacement they read its rest 0. (c) routine lost per-set weights on a skipped set → **fixed in req-112** (DEC-056).
+
+**On-device test list (Emilio owes, 2026-09-23):** 1 routine-editor rows two-line, no "Main" · 2 log title smaller,
+Add note beside it · 3 done view has no Previous · 4 Finish is a bottom button, black when all done · 5 set preview
+before set 1, gone after · 6 overview note → same on Finish, survives reload · 7 push-ups set 2 shows its own target;
+weight change carries · 8 two-routine day under one date · 9 Skip exercise two-tap, row reads skipped · 10 Replace →
+original skipped, blank replacement under it · 11 after a skip, weights come back from the last real time · 12 Finish
+leaves the routine alone; History correct → Apply changes it.
+
+- **Dropped report items (retro 2026-09-23), small:** Abandon falls below the fold with the overview note open on
+  an 8-exercise routine (req-107); the `.ui-navlink` left inset misaligns a second line under a link (req-103 gotcha).
+
+- **Tooling: `plan closeout` warns when the diff touches store/model/storage/progress/workout-log/migration and
+  the SHIPPED gate line names no reviewer** (DEC-057, L-023).
 
 **Specced 2026-09-23:** F1→req-103, F3+F5→req-104, F6→req-105, F4→req-106, F7→req-107, F9→req-108 (DEC-052), F10→req-110; F2+F8→req-109 (blank-state replace; external review found the migrate-on-load blockers); review also found → req-111 (DEC-053). **Grouping (original):** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
 (both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.

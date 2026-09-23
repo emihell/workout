@@ -76,6 +76,14 @@ schema shape, or "that isn't possible" is a claim to be tested. In a browser-onl
 app the cheap test is a unit test, a console line against the real model, or
 reading the actual `src/` — not reasoning harder.
 
+**A question from Emilio is not a decision (DEC-057, L-022).** "Would it be better to…?" or "maybe we should…?" get
+an answer and a recommendation. Only once he confirms ("yes", "go", "do it") does it become a `DEC-`. Confirm
+it back in one line first.
+
+**A merge's gate line quotes the receipt (DEC-057).** SHIPPED's `Gate:` line pastes `./check`'s green line
+and names the reviewer (or says why none ran). "Green" alone is a claim, and the record can't show a gate
+happened.
+
 **Your own completion-claims need a receipt beside them, not just care.** "Done",
 "verified", "verbatim", "lost", "0 hits", "merged", "pushed" are claims — the command
 output that proves each sits **beside** the word (a `git log --all`, a diff, a `./check`

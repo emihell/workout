@@ -1,18 +1,10 @@
 # Now
 
-Updated 2026-09-18. **Shipped: req-01–09, req-11–23, req-25–31, req-33–108, req-110–111, req-109, req-112** (req-10 pending; req-24
-gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 3 (Emilio's in-app feedback JSON, 2026-09-16) all
-LIVE:** req-92 rest pill bigger · req-93 main bold/unlabelled + WU/finisher tag · req-94 Today one list,
-no header (DEC-049) · req-95 feedback textarea iOS-zoom · **req-96** "Next time"→"↑ you beat last time"
-(per-exercise any axis, name the win; `beat-last-time.js` — DEC-050). **req-96 aftermath (Emilio
-"fix now" 2026-09-17):** **req-97 + req-98 LIVE** — req-97 deleted dead `formatProgressionLine`; req-98
-guarded the timed beat-last-time comparison (editable-actual capture already existed in req-85, so only a
-false-win guard was needed). **req-99 LIVE** — Timed flag now reachable from the routine editor via
-an "Edit exercise settings →" link + hint (return-to-routine via `?from=` route param, DEC-051).
-**Nothing building.**
-Owed by Emilio: on-device feel of batch 3 + req-96 + req-99 (pill overlap, real-iPhone no-zoom,
-beat-line wording, does a first-timer now find Timed); to use timed "↑ Longer", flag exercises
-(plank/rowing) via the editor's Timed checkbox; live `./plan preview`.
+Updated 2026-09-23. **Shipped: req-01–09, req-11–23, req-25–31, req-33–108, req-110–111, req-109, req-112** (req-10 pending; req-24
+gated; req-32 dropped; req-77 PAUSED). **Gym-flow batch 4 LIVE 2026-09-23:** Emilio's feedback JSON
+(F1..F10) → req-103..111, plus req-112 (Finish no longer rewrites the routine, DEC-056). DEC-052..057, L-022/023.
+**Owed by Emilio:** the batch-4 on-device test list (`work/BACKLOG.md` §batch 4, 12 items); older: batch-3 feel
+(pill overlap, iPhone no-zoom, beat-line wording, Timed discoverability).
 `log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -21,18 +13,18 @@ beat-line wording, does a first-timer now find Timed); to use timed "↑ Longer"
 
 Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 backend/users/exercise-DB/AI/styling (gated on the backend fork).
 
-## Next — READY, held for Emilio's go (built via DEC-037 ephemeral-agent batches)
+## Next — READY, held for Emilio's go (batches → throwaway agents, DEC-055)
 
-**Nothing in flight.** **Gym-flow batch 4 (req-103..111) all LIVE 2026-09-23** — owed by Emilio: its on-device test list. req-100..102 LIVE (tooling: `plan ping`, NOW.md guard, drift check — L-019..021).
+**Nothing in flight.**
 
 **READY, held:**
+- `req-113` **routine editor shows `—` not `0` for a set with no weight** (DEC-056 correction). Tiny.
 - `req-10` **first-time-exercise setup flow** — auto-prompt on a no-history exercise; never invents
   the first weight (DEC-012). Larger; needs flow design first. **[ux-feel]**
 
 **Gym-flow batch 2 (req-76..86): all LIVE except `req-77` (PAUSED — affordance; folds in n1 Finish/Abandon).**
 
 ## Needs decisions — parked until their phase
-
 
 - **`req-24` native confirm/alert → inline UI** — 10 sites; needs the inline-confirm *pattern*
   first (bar/sheet vs two-tap vs undo). **[ux-feel]** Spec: `work/req-24-inline-confirm-alert.md`.

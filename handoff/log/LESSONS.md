@@ -289,3 +289,21 @@ round or 20 minutes for the next person who touches `scripts/check-handoff.test.
 
 Caught by running the FULL self-test output, not the `tail`ed "all passed" summary — see [[L-020]]:
 a green summary only means "no findings," so read what actually ran.
+
+## L-022 — a question from the owner got recorded as a decision, then reversed by his next question  (2026-09-23)
+
+Emilio asked *"usually you send you the builder - not an external bot?"*. Planner wrote DEC-054 ("batches go
+to the Builder") and edited PLANNING.md. Two minutes later he asked *"would it be better to send batches to
+throwaway agents?"* and DEC-055 reversed it. The fault wasn't the rule conflict (DEC-037 vs recent practice).
+It was treating a question as an instruction: two DECs of churn, and a stopped subagent's work thrown away.
+**How to apply:** answer a question with a recommendation. Write the DEC only after he confirms, and confirm
+it back in one line (DEC-057 §2).
+
+## L-023 — the Gate tag decided which safety checks ran, so shared-code reqs skipped them  (2026-09-23)
+
+req-111 (`storage.js` `lastSetsForExercise`, which drives every prefill) and req-112 (`store.jsx` finish path,
+`model.js`, `progress.js`) were tagged `[functional]`. The independent reviewer and the backup reminder were
+keyed off `[persisted-data]` in practice, so neither ran for them. req-109 was tagged `[persisted-data]` and
+got both, and its reviewer caught real should-fixes. **How to apply:** decide the checks from the diff's files
+(WORKFLOW READY check 5). A `plan closeout` warning when such a diff lands with no reviewer line would make it
+mechanical (BACKLOG tooling).
