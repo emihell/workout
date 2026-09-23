@@ -1558,4 +1558,11 @@ the zoom screenshot shows Add note visually identical.
 
 ## req-124 — Replace exercise lands on the new exercise (audit Tier 3, DEC-059 §1)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `81fe2ca`, throwaway agent). Replace lands on the new exercise's log screen: `store.replaceItem` generates the
+id before the updater and returns it (the reducer moved verbatim to `storage.replaceItemInState`), and `replace.jsx` navigates to it.
+A `picked` ref stops the picker's done-bounce (the builder's first browser run caught it landing on the overview). Reviewer
+(independent, DEC-057): MERGE-WITH-FOLLOWUPS; the reducer deep-equals main's on 6 inputs, and it's now idempotent under StrictMode's
+double updater (main would have saved two different ids). Planner re-ran the e2e on a fresh build → `after Replace:
+#/workout/r1/item/mid-…/log | Pec Fly`, no page errors. Backup: Emilio "exported before, go". Gate: Planner's own run →
+`check: green — lint, 38 test file(s), and the build all passed.` Follow-up: `replaceItem` could return null on failure
+(nearly unreachable).
