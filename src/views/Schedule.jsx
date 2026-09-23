@@ -163,7 +163,7 @@ export function ScheduleDayAdd({ week, weekday }) {
             store.addSlot({ week, weekday, routineId: id })
             go(dayPath)
           }}
-          onCancel={() => go(dayPath)}
+          cancelTo={dayPath}
         />
       ) : (
         <List>

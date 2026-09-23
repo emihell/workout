@@ -80,7 +80,9 @@ export function Routines() {
   )
 }
 
-export function RoutineNewForm({ onSave, onCancel, submitLabel = 'Next' }) {
+// req-121 — Cancel only navigates, so it's a NavLink to `cancelTo` (DEC-040), not a
+// Button calling go(); callers pass the path instead of an onCancel handler.
+export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
   const [name, setName] = useState('')
   const [focus, setFocus] = useState('Machines')
 
@@ -94,7 +96,7 @@ export function RoutineNewForm({ onSave, onCancel, submitLabel = 'Next' }) {
       <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
       <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
       <div className="ui-actions">
-        <Button onClick={onCancel}>Cancel</Button>
+        <NavLink to={cancelTo} className="ui-btn ui-btn--secondary">Cancel</NavLink>
         <Button type="submit" variant="primary">
           {submitLabel}
         </Button>
@@ -115,7 +117,7 @@ export function RoutineNew() {
           const id = store.addRoutine({ name, focus })
           go(routinePath(id))
         }}
-        onCancel={() => go('/routines')}
+        cancelTo="/routines"
       />
     </Screen>
   )
@@ -285,7 +287,8 @@ function FieldError({ children }) {
   )
 }
 
-function ExerciseFields({ item, onChange, onCancel, defaults, timed = false, settingsLink = null }) {
+// req-121 — `cancelTo` (a path) replaces onCancel: Cancel is a NavLink (DEC-040).
+function ExerciseFields({ item, onChange, cancelTo, defaults, timed = false, settingsLink = null }) {
   const [role, setRole] = useState(item.role || defaults.role || 'main')
   const [warmup, setWarmup] = useState(Boolean(item.warmup))
   // req-30 — warmup reps come only from what the user typed (or a saved value when
@@ -383,7 +386,7 @@ function ExerciseFields({ item, onChange, onCancel, defaults, timed = false, set
       <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
       <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
       <div className="ui-actions">
-        <Button onClick={onCancel}>Cancel</Button>
+        <NavLink to={cancelTo} className="ui-btn ui-btn--secondary">Cancel</NavLink>
         <Button type="submit" variant="primary">
           Save
         </Button>
@@ -428,7 +431,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
         defaults={defaults}
         timed={Boolean(ex?.hasDuration)}
         settingsLink={exerciseSettingsLink(ex.id, nav.newItem(ex.id))}
-        onCancel={() => go(nav.pick)}
+        cancelTo={nav.pick}
         onChange={(patch) => {
           store.addRoutineExercise(routine.id, { exerciseId: ex.id, ...patch })
           go(nav.base)
@@ -470,7 +473,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
         defaults={defaults}
         timed={Boolean(ex?.hasDuration)}
         settingsLink={exerciseSettingsLink(item.exerciseId, nav.item(itemId))}
-        onCancel={() => go(parent)}
+        cancelTo={parent}
         onChange={(patch) => {
           store.updateRoutineExercise(routine.id, index, patch)
           go(parent)

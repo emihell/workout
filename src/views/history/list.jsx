@@ -41,10 +41,11 @@ function InProgressHistoryRow({ store, workout }) {
     <Row
       action={
         <>
-          <Button onClick={() => continueInProgress(store, workout)}>Continue</Button>
+          {/* req-121 — DESIGN §4: retreat (Abandon) left, forward (Continue) right. */}
           <Button variant="quiet" onClick={() => abandonInProgress(store, workout)}>
             Abandon
           </Button>
+          <Button onClick={() => continueInProgress(store, workout)}>Continue</Button>
         </>
       }
     >
