@@ -166,44 +166,72 @@ function isPlainObject(value) {
 
 // Absent (undefined) is fine — migrateState defaults it; present must be an array of
 // plain objects, each also passing `each` (its nested checks) when one is given.
+// Used strict for top-level collections (req-39: a present `exercises: null` was
+// already a reject on main).
 function arrayOfObjects(value, each) {
   if (value === undefined) return true
   if (!Array.isArray(value)) return false
   return value.every((element) => isPlainObject(element) && (!each || each(element)))
 }
 
+// Nested collections: migrateState reads them as `x || []`, so `null` is absent too
+// (hand/AI-edited backups write `sets: null`). Elements are still plain objects only.
+function nestedArrayOfObjects(value, each) {
+  return value === null || arrayOfObjects(value, each)
+}
+
+// A falsy snapshot is absent to migrateState (`if (workout.snapshot)`); a truthy one
+// must be an object whose items are an array of objects (or null/absent).
 function snapshotValid(snapshot) {
-  if (snapshot === undefined || snapshot === null) return true
-  return isPlainObject(snapshot) && arrayOfObjects(snapshot.items)
+  if (!snapshot) return true
+  return isPlainObject(snapshot) && nestedArrayOfObjects(snapshot.items)
 }
 
 function workoutValid(workout) {
-  return arrayOfObjects(workout.sets) && snapshotValid(workout.snapshot)
+  return nestedArrayOfObjects(workout.sets) && snapshotValid(workout.snapshot)
 }
 
 function routineValid(routine) {
-  return arrayOfObjects(routine.exercises)
+  return nestedArrayOfObjects(routine.exercises)
 }
 
 const NESTED_CHECKS = {
   exercises: null,
   routines: routineValid,
-  sessions: routineValid,
-  programs: (program) => arrayOfObjects(program.sessions, routineValid),
   workouts: workoutValid,
   draftWorkouts: workoutValid,
-  plannedWorkouts: (plan) => arrayOfObjects(plan.items),
+  plannedWorkouts: (plan) => nestedArrayOfObjects(plan.items),
 }
 
 function collectionsAreValid(root) {
+  // Top-level: present must be an array (req-39), for every collection field.
   for (const field of COLLECTION_FIELDS) {
+    if (root[field] !== undefined && !Array.isArray(root[field])) return false
+  }
+  for (const field of Object.keys(NESTED_CHECKS)) {
     if (!arrayOfObjects(root[field], NESTED_CHECKS[field])) return false
+  }
+  // `programs[]` and their `sessions[]` elements are always read (model.js
+  // programLabelFrom walks `(program.sessions || []).some(routine => routine.id …)`),
+  // so those elements must be objects; `program.sessions: null` is absent.
+  if (!arrayOfObjects(root.programs, (program) => nestedArrayOfObjects(program.sessions))) return false
+  // Legacy routine CONTENTS are checked only where model.js flattenRoutines migrates
+  // them: `routines` when non-empty, else `sessions` when non-empty, else
+  // `programs[].sessions`. An unread legacy field (e.g. `sessions: [null]` next to a
+  // non-empty `routines`) is dropped by migrateState and can't crash.
+  if (!root.routines?.length) {
+    if (root.sessions?.length) {
+      if (!arrayOfObjects(root.sessions, routineValid)) return false
+    } else if (!arrayOfObjects(root.programs, (program) => nestedArrayOfObjects(program.sessions, routineValid))) {
+      return false
+    }
   }
   // `?.` keeps a non-object/absent schedule safe; only a present `slots` (the
   // migrateState `.map` site) is checked.
   if (!arrayOfObjects(root.schedule?.slots)) return false
+  // Falsy is "no active workout" to migrateState (`source.activeWorkout ? … : null`).
   const active = root.activeWorkout
-  if (active !== undefined && active !== null && !(isPlainObject(active) && workoutValid(active))) return false
+  if (active && !(isPlainObject(active) && workoutValid(active))) return false
   return true
 }
 

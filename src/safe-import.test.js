@@ -80,6 +80,41 @@ describe('req-115 commitBackup — failure cases throw, state unchanged', () => 
   }
 })
 
+// Review loop-back: hand/AI-edited backups that main imports fine must still import.
+// migrateState treats these as absent (`x || []`, `if (workout.snapshot)`,
+// `source.activeWorkout ? … : null`, flattenRoutines ignoring sessions/programs when
+// `routines` is non-empty). Expected summaries were measured against main's
+// applyBackup (reports/req-115.md) — same counts here pins the leniency.
+describe('req-115 lenient nested nulls still import (same counts as main)', () => {
+  const edit = (mutate) => {
+    const state = validState()
+    mutate(state)
+    return wrap(state)
+  }
+  const full = { routines: 1, exercises: 1, workouts: 1, slots: 1 }
+  const cases = {
+    'workouts[0].sets: null': edit((s) => { s.workouts[0].sets = null }),
+    'workouts[0].snapshot.items: null': edit((s) => { s.workouts[0].snapshot = { routineId: 'rtn-1', items: null } }),
+    'workouts[0].snapshot: false': edit((s) => { s.workouts[0].snapshot = false }),
+    'routines[0].exercises: null': edit((s) => { s.routines[0].exercises = null }),
+    'plannedWorkouts[0].items: null': edit((s) => { s.plannedWorkouts = [{ id: 'p', routineId: 'rtn-1', date: '2026-09-30', items: null }] }),
+    'activeWorkout: false': edit((s) => { s.activeWorkout = false }),
+    'activeWorkout: ""': edit((s) => { s.activeWorkout = '' }),
+    'activeWorkout.sets: null': edit((s) => { s.activeWorkout = { id: 'a', routineId: 'rtn-1', startedAt: '2026-09-23T10:00:00.000Z', sets: null } }),
+    'programs[0].sessions: null next to non-empty routines': edit((s) => { s.programs = [{ id: 'g', name: 'G', sessions: null }] }),
+    'sessions: [null] next to non-empty routines': edit((s) => { s.sessions = [null] }),
+    'sessions[0].exercises: [null] next to non-empty routines': edit((s) => { s.sessions = [{ id: 'x', exercises: [null] }] }),
+  }
+  for (const [name, payload] of Object.entries(cases)) {
+    it(`${name} → imports, summary ${JSON.stringify(full)}`, () => {
+      const store = fakeStore(emptyState())
+      const result = commitBackup(payload, store.setState)
+      assert.equal(store.calls, 1)
+      assert.deepEqual(result.summary, full)
+    })
+  }
+})
+
 describe('req-115 commitBackup — success', () => {
   it('a valid backup imports as before and round-trips deep-equal', () => {
     const source = applyBackup(wrap(validState())).state // canonical (migrated) form
