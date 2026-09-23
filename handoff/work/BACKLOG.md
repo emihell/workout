@@ -286,7 +286,7 @@ live code. All Phase 1. Grounded against the code; **not yet specced**. F1..F10 
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
   becomes a clean choice, e.g. at the end of a schedule loop (Emilio, 2026-09-23). Shape open: when it's offered,
-  what it shows (last loop's actuals vs the routine), per-exercise accept.
+  what it shows (last loop's actuals vs the routine), per-exercise accept. Note (req-112): the recalc "Update?" screen shows no numbers today. The review step should show them.
 
 Emilio's "we should start creating programs." Today the app has **routines** (reusable
 templates) and a **schedule** (weekly slots). A "program" is the layer above: a multi-

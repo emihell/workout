@@ -1417,4 +1417,11 @@ detail resolves items id-first (`snapshot-item.js`), arm clears on set actions. 
 
 ## req-112 — Finish no longer rewrites the routine; recalc maths goes per set (DEC-056)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `7a0614f`, Builder session). DEC-056: Finish (manual + auto-complete) no longer writes the routine. The
+store reducer moved verbatim into pure `finishedState` (`workout-log.js`), minus the `applyProgressionToRoutines` call. Only
+History recalc (Apply, via new pure `recalculatedState`) writes the routine. `recommendNextPrescription` is positional by
+work-set index and takes the routine's weights: a skipped set keeps the routine value, and arrays never shrink. 2 tests edited
+as DEC-056 reversals (named in the report); 13 new in `finish-routine.test.js`; 382/382. README + exchange.js AI-schema lines
+corrected. Gate: Planner's own `./check` green (27 files), and the Planner's original repro re-run on the branch: set1-skipped
+35×8 → `[30,35]` (was `[32.5]`), BW targets `['15','9']`. Notes: a skipped hole with no routine weight records 0; recalc's
+"Update?" screen shows no numbers (Phase 2 review step).
