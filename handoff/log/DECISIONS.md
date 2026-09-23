@@ -1119,3 +1119,16 @@ From an independent retro of the batch-4 session, whose findings Emilio accepted
 The retro also showed that "make spec review standard" is already in DEC-035 (it didn't fire), and that the
 closeout ledger is mostly automated already (req-90). Neither needed a new rule. Rules in WORKFLOW.md §READY
 checks 5–6 and PLANNING.md.
+
+## DEC-058 — flow-audit calls: comma is a decimal point; "current" = started within 6 h; hero keeps the day's other routines; an empty Finish warns  (Emilio, 2026-09-23)
+
+From the 2026-09-23 flow audit (BACKLOG §Flow audit), each answered and confirmed back:
+1. **"22,5" means 22.5.** In weight fields the comma is a decimal point, and `/` is the only separator between
+   sets. Emilio chose (a) over rejecting the comma. The Swedish keypad may only offer a comma.
+2. **An in-progress workout counts as current if it was started today OR within the last 6 hours.** A workout
+   started at 23:50 stays the Today hero at 00:05. Narrows DEC-038's "prior day = stale" (Emilio: "do it").
+3. **On a day with two or more routines, the hero shows the one in progress and the others stay visible**
+   under the same date with their own Start/Done. This closes the gap between DEC-038 and req-110.
+4. **Finishing with nothing logged warns and offers Abandon** instead of silently saving a workout of skipped
+   sets. The auto-complete path never auto-finishes an empty workout.
+Built as req-114..120 (BACKLOG §Flow audit Tier 1).
