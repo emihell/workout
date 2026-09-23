@@ -279,8 +279,9 @@ export function RestPill({ seconds = 0, onSkip }) {
 //
 // Props: `weighted` shows the kg field; `showEffort` shows the effort control
 // (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
-// "Duration"; `effortOptions` overrides the segments. The reps field is a full
-// keyboard (not decimal-only) so durations like "30 min" can be typed.
+// "Duration"; `effortOptions` overrides the segments; `onChange` (req-125) hears
+// edits. The reps field is a full keyboard (not decimal-only) so durations like
+// "30 min" can be typed.
 // req-85 — the in-set count-down for a timed exercise. A SECOND, concurrent timer
 // with its OWN local state (a deadline + a 250ms tick) — deliberately NOT the
 // persisted restEndsAt, so starting it never touches the rest pill/cue and the two
@@ -354,11 +355,29 @@ export function SetLogForm({
   onComplete,
   onSkip,
   onPrevious,
+  onChange,
 }) {
   const [weight, setWeight] = useState(initialWeight)
   const [reps, setReps] = useState(initialReps)
   const [duration, setDuration] = useState(String(initialDuration || ''))
   const [effort, setEffort] = useState(initialEffort)
+  // req-125 — `onChange` (optional) hears every user edit with the form's full current
+  // values, so the caller can keep a draft of the un-logged set. It fires from the edit
+  // itself (not an effect), so mounting or remounting writes nothing. `durationSec` is the
+  // typed seconds as entered, present only on a timed form.
+  function edit(field, value) {
+    const next = { weight, reps, effort, duration, [field]: value }
+    if (field === 'weight') setWeight(value)
+    else if (field === 'reps') setReps(value)
+    else if (field === 'effort') setEffort(value)
+    else setDuration(value)
+    onChange?.({
+      weight: next.weight,
+      reps: next.reps,
+      effort: next.effort,
+      durationSec: timed ? next.duration : undefined,
+    })
+  }
   return (
     <form
       className="ui-setlog"
@@ -374,16 +393,16 @@ export function SetLogForm({
     >
       <div className="ui-setlog__nums">
         {weighted ? (
-          <NumberField label="kg" value={weight} onChange={(e) => setWeight(e.target.value)} />
+          <NumberField label="kg" value={weight} onChange={(e) => edit('weight', e.target.value)} />
         ) : null}
         {timed ? (
-          <DurationTimer seconds={duration} onSecondsChange={setDuration} />
+          <DurationTimer seconds={duration} onSecondsChange={(value) => edit('duration', value)} />
         ) : (
           <Field
             label={repsLabel}
             className="ui-input--num"
             value={reps}
-            onChange={(e) => setReps(e.target.value)}
+            onChange={(e) => edit('reps', e.target.value)}
             required
           />
         )}
@@ -391,7 +410,7 @@ export function SetLogForm({
       {showEffort ? (
         <>
           <SectionHeader>Effort</SectionHeader>
-          <SegmentedControl options={effortOptions} value={effort} onChange={setEffort} ariaLabel="Effort" />
+          <SegmentedControl options={effortOptions} value={effort} onChange={(value) => edit('effort', value)} ariaLabel="Effort" />
         </>
       ) : null}
       {/* req-80 — pinned to the absolute bottom (thumb reach) via .ui-setlog__actions.
