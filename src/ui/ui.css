@@ -186,10 +186,22 @@ a.ui-btn--quiet:active {
 .ui-btn--block {
   display: flex;
   width: 100%;
+  /* req-105 — a <button> is border-box by UA default, an <a> is not: without this a
+   * block-styled anchor (a.ui-btn--block) overflows its container by padding+border. */
+  box-sizing: border-box;
 }
 .ui-btn:disabled {
   color: var(--ui-ink-3);
   cursor: default;
+}
+
+/* req-105 — the workout overview's bottom actions (Finish over Abandon): a stack set
+ * apart from the exercise list above it, with a gap between the two buttons. */
+.ui-workout-end {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-s2);
+  margin-top: var(--ui-s4);
 }
 
 /* ---- NavLink (the shared primitive, styled) ---- */

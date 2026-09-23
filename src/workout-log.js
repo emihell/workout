@@ -117,6 +117,16 @@ export function itemIsMarkedDone(workout, item) {
   return ids.includes(key)
 }
 
+// req-105 — every exercise in the live workout is done: marked done, or its planned
+// sets are all logged (plannedDone) — the same per-item test the overview rows use.
+// Gates the req-84 auto-complete summary and promotes the overview's Finish button to
+// primary. An empty workout is NOT all done (the overview's empty branch never asks).
+export function allItemsDone(workout) {
+  const items = workout?.snapshot?.items || []
+  if (items.length === 0) return false
+  return items.every((item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone)
+}
+
 // req-11 / DEC-013, refined by req-25 — the activeWorkout patch that marks an
 // exercise done. Since req-11 this fires on completing the last set (was: the
 // review screen's "Done" button), so the mark-done transition is a pure, testable
