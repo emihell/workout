@@ -5,13 +5,15 @@ import { buildFinishProgression } from '../../model'
 import { defaultBeep } from '../../rest-cue.js'
 import { previousSameRoutineWorkout, workoutSummaryStats } from '../../storage'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
+import { autoFinishArgs } from '../../workout-note.js'
 
 // req-84 — auto-complete a finished routine. When every exercise is done the overview
 // mounts this instead of the list: a "great job" summary (volume/duration/sets, each
 // with a delta vs the previous SAME-routine workout when one exists) and a ~10s
 // countdown that auto-commits the finish. The finish it writes is identical to the
-// manual Finish screen's (empty Feel/Note, buildFinishProgression), so this adds no
-// new persisted shape — see store.finishWorkout / finish.jsx.
+// manual Finish screen's (empty Feel, buildFinishProgression), so this adds no new
+// persisted shape — see store.finishWorkout / finish.jsx. req-107 — the Note is the
+// active workout's note (written on the overview), not '', so it isn't lost silently.
 //
 // Cancel stops the countdown and returns to the overview with NOTHING finished (the
 // parent suppresses the summary until the screen remounts). Edit opens the manual
@@ -47,7 +49,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
     // taps; defaultBeep is fail-silent if not.
     defaultBeep()
     const progression = buildFinishProgression(store.exercises, active)
-    store.finishWorkout({ overallNote: '', overallFeel: '', progression })
+    store.finishWorkout(autoFinishArgs(active, progression))
     go('/')
   }
 

@@ -7,7 +7,8 @@ import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
 import { allItemsDone, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing, NavLink } from '../shared'
-import { Button, List, Row, Screen, Title } from '../../ui/index.jsx'
+import { Button, List, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
+import { activeNote } from '../../workout-note.js'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
 import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
@@ -42,6 +43,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   // mount (all items are still done, so it would otherwise re-show immediately). A
   // fresh visit to the overview remounts and re-arms it — the intended "all done" cue.
   const [autoDismissed, setAutoDismissed] = useState(false)
+  // req-107 — the "Add note" reveal (req-26/req-80 pattern). Tapping opens the field
+  // for this mount; once the note has text it stays shown on every visit.
+  const [noteOpen, setNoteOpen] = useState(false)
   const { routine } = findRoutine(store.routines, routineId)
   const active = store.activeWorkout
   const mine = isActiveFor(active, routineId)
@@ -151,6 +155,23 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           )
         })}
       </List>
+      {/* req-107 — a workout note, kept on the active workout (its existing overallNote,
+          written through patchActive) so it survives leaving, logging and reloading.
+          The Finish screen shows and edits the same note. autoFocus only when opened
+          by tapping; a note that already has text renders the field without it. */}
+      {noteOpen || activeNote(active) ? (
+        <Textarea
+          label="Note"
+          value={activeNote(active)}
+          onChange={(e) => store.patchActive({ overallNote: e.target.value })}
+          rows={3}
+          autoFocus={noteOpen}
+        />
+      ) : (
+        <Button variant="quiet" className="ui-addnote" onClick={() => setNoteOpen(true)}>
+          Add note
+        </Button>
+      )}
       {/* req-105 — Finish is a bottom button above Abandon, not a list row (it read as
           another exercise). Secondary while work is left; primary once every exercise is
           done (i.e. after the auto-complete summary is cancelled). It navigates without

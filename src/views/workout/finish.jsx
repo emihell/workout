@@ -7,6 +7,7 @@ import { previousSameRoutineWorkout } from '../../storage'
 import { useStore } from '../../store-context'
 import { Back, Missing } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
+import { activeNote } from '../../workout-note.js'
 import { isActiveFor } from './helpers'
 import { RestPill } from './rest'
 
@@ -20,9 +21,13 @@ export function WorkoutFinish({ routineId }) {
 
 function FinishScreen({ routineId }) {
   const store = useStore()
-  const [overallNote, setOverallNote] = useState('')
   const [overallFeel, setOverallFeel] = useState('')
   const active = store.activeWorkout
+  // req-107 — ONE workout note: the Note field is the active workout's overallNote
+  // (pre-filled from the overview), and edits write straight back through patchActive,
+  // so Back to the overview and returning shows the edit. What's saved is the note at
+  // Finish. A legacy active workout without the field reads as '' (activeNote).
+  const overallNote = activeNote(active)
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
   const [minutes] = useState(() => Math.max(1, Math.round((Date.now() - started.getTime()) / 60000)))
   const setCount = (active?.sets || []).length
@@ -63,7 +68,7 @@ function FinishScreen({ routineId }) {
         onChange={setOverallFeel}
         ariaLabel="Feel"
       />
-      <Textarea label="Note" value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
+      <Textarea label="Note" value={overallNote} onChange={(e) => store.patchActive({ overallNote: e.target.value })} rows={3} />
       <Button
         variant="primary"
         block
