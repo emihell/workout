@@ -1618,3 +1618,7 @@ precedes; the summary prior matches main for all 13 db workouts; the wake-lock l
 text is identical except "Main". Gate: Planner's own run → `check: green — lint, 42 test file(s), and the build all passed.`
 Unconfirmed: History rows stay plain text; any `/workout/…` route holds the lock. Follow-ups: an unmount test for the listener;
 `previousSameRoutineWorkout` now only has test callers.
+
+## req-129 — planning tooling fixes found this session (BACKLOG tooling items)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
