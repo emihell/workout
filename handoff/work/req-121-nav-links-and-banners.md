@@ -1,6 +1,6 @@
 # req-121 — navigation-only buttons become links; app banners use the library (audit Tier 2)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** Presentation only; no stored data. No DEC-057
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-121` (`cb5b509`…`cb5b509`, 1 commit).** Phase 1. **[ux-feel]** Presentation only; no stored data. No DEC-057
 trigger files.
 
 ## Why [measured by the 2026-09-23 UI audit, re-verified on main 4172e3d]
