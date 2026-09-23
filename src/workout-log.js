@@ -103,6 +103,34 @@ export function withSkippedUnloggedSets(workout) {
   }
 }
 
+// store.finishWorkout's reducer (manual Finish and the req-84 auto-complete both call
+// it). The finished record carries `progression` as history (recalc reads it), but
+// req-112 / DEC-056: `routines` is NOT touched — updating the routine is a deliberate
+// choice (History recalc), never a side effect of Finish. req-83 (N9) — the live
+// seed-override map is transient session state, dropped so it never lands on the
+// finished-history record (which feeds history-prefill from `sets` alone).
+export function finishedState(state, { overallNote, overallFeel, progression = [] } = {}, finishedAt = new Date().toISOString()) {
+  if (!state?.activeWorkout) return state
+  const { seedOverrides, ...activeToFinish } = state.activeWorkout
+  const finished = withSkippedUnloggedSets({
+    ...activeToFinish,
+    finishedAt,
+    overallNote: overallNote || '',
+    overallFeel: overallFeel || '',
+    restEndsAt: null,
+    restPausedRemaining: null,
+    progression,
+  })
+  return {
+    ...state,
+    plannedWorkouts: (state.plannedWorkouts || []).filter(
+      (plan) => plan.occurrenceId !== state.activeWorkout.occurrenceId,
+    ),
+    activeWorkout: null,
+    workouts: [finished, ...(state.workouts || [])],
+  }
+}
+
 // req-109 — "Skip exercise": the activeWorkout patch that logs every remaining
 // (unlogged) set of ONE item as skipped (the same skippedSet records Finish writes)
 // and marks it done. Sets already logged stay. Rest is left as it is: a rest armed by
