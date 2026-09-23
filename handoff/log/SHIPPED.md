@@ -1603,3 +1603,7 @@ Restore diffs exactly one field on one record; nothing assumes "archived is fore
 inputs; every mutation fails tests. One test edit (req-122 Actions count 13→15). Gate: Planner's own run → `check: green — lint, 41
 test file(s), and the build all passed.` Unconfirmed: labels and copy; Create anyway switches sides between the live and archived
 cases; Search offers only Restore; editing to an empty name now errors.
+
+## req-128 — small leftovers: History "Main", summary vs a skipped prior, first-item rest, wake-lock, dead code (audit Tier 3 + follow-ups)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
