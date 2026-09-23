@@ -1523,3 +1523,7 @@ archive diffs, nothing newly hard-deleted, side effects identical; 5 mutations e
 `check: green — lint, 34 test file(s), and the build all passed.` Follow-ups: the logged-sets reference clause is untested
 (probably unreachable); legacy draftWorkouts not counted. Unconfirmed: confirm wording; name/equipment frozen mid-workout;
 durationSec live.
+
+## req-121 — navigation-only buttons become links; app banners use the library (audit Tier 2)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
