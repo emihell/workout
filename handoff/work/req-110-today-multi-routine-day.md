@@ -1,6 +1,6 @@
 # req-110 — Today: a day with two routines reads as one day with two routines (batch 4, F10)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]**
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-110` (`2f1ecaa`…`2f1ecaa`, 1 commit).** Phase 1. **[ux-feel]**
 
 From Emilio's in-app note (2026-09-20, `/`): *"Need to show 2x Rutines or similar of a day has more than
 one rutine on it"*. Clarified 2026-09-23: it's **today's block**, and the routines should be **grouped

@@ -1384,3 +1384,7 @@ through, never read or rewritten — no migration); `carryFor` returns kg only. 
 reversals (each commented), 9 added incl. a seed→log→next-seed loop and preview consistency; 79/79. Builder's puppeteer:
 push-ups set 2 after logging 12 → Reps 15; chest press 20→22 → set 2 22 kg × 8. Gate: Planner's own `./check` green;
 screenshot shows Reps 15.
+
+## req-110 — Today: a day with two routines reads as one day with two routines (batch 4, F10)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
