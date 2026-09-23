@@ -23,6 +23,14 @@ export function workCountFor(item) {
   return Number(item?.sets) || 1
 }
 
+// req-117 — `addedSets` counts the sets "Add set" appended to this snapshot item (this
+// workout only). Optional and persisted on the item: absent reads as 0 (every item
+// before req-117), and workoutSnapshot (model.js) carries it through its item spread.
+// It is what makes an extra set removable (canRemoveAddedSet / withOneLessSet).
+export function addedSetCount(item) {
+  return Math.max(0, Number(item?.addedSets) || 0)
+}
+
 export function withOneMoreSet(item) {
   const targets = [...(item?.targets || [])]
   const weights = [...(item?.suggestedWeights || [])]
@@ -33,6 +41,60 @@ export function withOneMoreSet(item) {
     sets: (Number(item?.sets) || 1) + 1,
     targets: [...targets, lastTarget],
     suggestedWeights: lastWeight != null ? [...weights, lastWeight] : weights,
+    addedSets: addedSetCount(item) + 1,
+  }
+}
+
+// req-117 — the exact inverse of withOneMoreSet: one set fewer, the target it appended
+// popped (it always appends one), and the weight popped only when it appended one.
+// withOneMoreSet appends a weight iff the list's last entry is non-null, and the
+// appended copy is that same non-null value, so "last entry non-null" after the add
+// is exactly "a weight was appended". `addedSets` is decremented (dropped at 0, so a
+// fully undone item reads as it did before Add set). No added set → unchanged item.
+export function withOneLessSet(item) {
+  const added = addedSetCount(item)
+  const sets = Number(item?.sets) || 1
+  if (added === 0 || sets <= 1) return item
+  const weights = [...(item?.suggestedWeights || [])]
+  const { addedSets: _added, ...rest } = item
+  return {
+    ...rest,
+    sets: sets - 1,
+    targets: (item.targets || []).slice(0, -1),
+    suggestedWeights: weights.at(-1) != null ? weights.slice(0, -1) : weights,
+    ...(added > 1 ? { addedSets: added - 1 } : {}),
+  }
+}
+
+// req-117 — "Remove set" shows while the set on the log screen is an extra (added)
+// set that hasn't been logged: every planned set (and the warm-up) is logged and the
+// next one is one of the `addedSets`. Removing pops the LAST set, which is unlogged
+// here and a copy of the same appended target/weight, so a logged set is never touched.
+export function canRemoveAddedSet(workout, item) {
+  const added = addedSetCount(item)
+  if (added === 0) return false
+  const { needsWu, workLogged, workCount } = itemLoggingState(workout, item)
+  if (needsWu) return false
+  return workLogged.length < workCount && workLogged.length >= workCount - added
+}
+
+// req-117 — the activeWorkout patch for "Remove set": the item one set shorter
+// (withOneLessSet), and the done state recomputed — every remaining planned set logged
+// → marked done again, exactly the state before Add set. Null when there is nothing to
+// remove (unknown item, or its current set isn't an unlogged added one).
+export function removeAddedSetPatch(workout, itemId) {
+  const items = workout?.snapshot?.items || []
+  const item = items.find((candidate) => itemKey(candidate) === itemId)
+  if (!item || !canRemoveAddedSet(workout, item)) return null
+  const shorter = withOneLessSet(item)
+  const snapshot = {
+    ...workout.snapshot,
+    items: items.map((candidate) => (candidate === item ? shorter : candidate)),
+  }
+  const done = itemLoggingState(workout, shorter).plannedDone
+  return {
+    snapshot,
+    ...(done ? markItemDonePatch(workout, shorter) : {}),
   }
 }
 
@@ -312,6 +374,30 @@ export function carriedWorkingSet(workLogged) {
     if (!isSkippedSet(sets[i])) return sets[i]
   }
   return null
+}
+
+// req-117 — the log form's values for a set being un-logged by "Previous" (moved here
+// from item.jsx so it is testable). A timed set also restores its logged seconds
+// (`durationSec`), so Previous on a timed set shows the time just logged, not the
+// target (DESIGN §5). Absent on a reps set.
+export function restoreFromLoggedSet(set) {
+  const skipped = isSkippedSet(set)
+  return {
+    setType: set.setType || 'work',
+    workIndex: set.setType === 'wu' ? 0 : null,
+    weight: set.weight != null && Number(set.weight) !== 0 ? String(set.weight) : '',
+    reps: skipped ? '' : set.reps != null && set.reps !== '' ? String(set.reps) : '',
+    rpe: set.rpe != null && set.rpe !== '' ? String(set.rpe) : '',
+    note: skipped ? '' : set.note || '',
+    ...(!skipped && set.durationSec != null ? { durationSec: Number(set.durationSec) || 0 } : {}),
+  }
+}
+
+// req-117 — the seconds a timed set's form starts from: the restored (Previous) set's
+// logged duration when there is one, else the target (durationTargetFor).
+export function initialDurationFor({ fromRestore, restore, target }) {
+  if (fromRestore && restore?.durationSec != null) return restore.durationSec
+  return target
 }
 
 // kg + reps to prefill the set-log form, in priority order (req-02 / DEC-002):

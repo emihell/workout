@@ -17,7 +17,7 @@ import {
 import { ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
 import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
-import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
+import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetAdd, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { Settings } from './views/Settings'
 import { BottomMenu } from './ui/BottomMenu.jsx'
 import { Library } from './views/Library'
@@ -215,6 +215,16 @@ function Screen() {
         screen={route.screen}
         itemId={route.itemId}
         exerciseId={route.exerciseId}
+      />
+    )
+  }
+  if (route.name === 'history-set-add') {
+    return (
+      <HistorySetAdd
+        key={`${route.id}-${route.itemId}`}
+        workoutId={route.id}
+        exerciseId={route.exerciseId}
+        itemId={route.itemId}
       />
     )
   }

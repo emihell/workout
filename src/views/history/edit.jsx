@@ -5,7 +5,8 @@ import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
 import { Back, Missing, NavLink } from '../shared'
 import { Button, List, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { addSetToWorkout, itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
+import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
+import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
 
 export function HistoryEdit({ workoutId }) {
   const store = useStore()
@@ -103,12 +104,54 @@ export function HistorySetNew({ workoutId }) {
       <List>
         {choices.map((choice) => (
           <Row key={choice.routineItemId || choice.exerciseId}>
-            <Button onClick={() => addSetToWorkout(store, workout, choice.exerciseId, choice.routineItemId)}>
+            {/* req-117 — opens the add form; nothing is written until its Save. */}
+            <Button onClick={() => go(historyAddSetPath(workout, choice.exerciseId, choice.routineItemId))}>
               {choice.name || choice.exerciseId}
             </Button>
           </Row>
         ))}
       </List>
+    </Screen>
+  )
+}
+
+// req-117 — the History add-set form. The set is an unsaved draft (historyAddSetDraft);
+// Save writes it (and its snapshot item, if new) in one updateWorkout, then goes on to
+// the recalc preview as editing a set does. Cancel/Back write nothing: they return to
+// the exercise's page when the workout already has it, else to the workout.
+export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
+  const store = useStore()
+  const workout = store.workouts.find((x) => x.id === workoutId)
+
+  if (!workout || !exerciseId || !itemId) {
+    return <Missing>Not found.</Missing>
+  }
+
+  const known =
+    (workout.snapshot?.items || []).some((item) => itemIdOf(item) === itemId) ||
+    (workout.sets || []).some((set) => itemIdOf(set) === itemId)
+  const backTo = known ? `/history/${workout.id}/exercise/${itemId}` : `/history/${workout.id}`
+
+  return (
+    <Screen>
+      <Back to={backTo} />
+      <p className="ui-sub">{workoutRoutineName(workout, null)}</p>
+      <Title>Add set</Title>
+      <SetEditForm
+        set={historyAddSetDraft(workout, exerciseId, itemId)}
+        showLoad
+        showEffort
+        setTypeOptions={[
+          { value: 'wu', label: 'WU set' },
+          { value: 'work', label: 'Work' },
+        ]}
+        cancelTo={backTo}
+        onSave={(values) => {
+          const exercise = exerciseById(store.exercises, exerciseId)
+          store.updateWorkout(workout.id, withHistorySet(workout, { exerciseId, itemId, exercise, values }))
+          go(`/history/${workout.id}/recalculate`)
+        }}
+      />
     </Screen>
   )
 }

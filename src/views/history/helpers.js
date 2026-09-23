@@ -1,10 +1,7 @@
-import { go } from '../../route'
 import { dateKey } from '../../schedule'
-import { exerciseById } from '../../storage'
 
 // Shared helpers for the history screens (req-19 split of History.jsx): id/name
-// resolution, date formatting + grouping, and the add-a-set-to-a-finished-workout
-// mutation. Used by more than one history/ screen module. `workoutMonthKey` stays
+// resolution, date formatting + grouping. Used by more than one history/ screen module. `workoutMonthKey` stays
 // internal (only groupWorkoutsByMonth uses it).
 
 export function itemIdOf(obj) {
@@ -71,55 +68,8 @@ export function sortWorkoutsByDate(workouts) {
   })
 }
 
-export function addSetToWorkout(store, workout, exerciseId, routineItemId = null) {
-  const last = (workout.sets || [])
-    .filter((s) =>
-      routineItemId ? itemIdOf(s) === routineItemId : s.exerciseId === exerciseId,
-    )
-    .at(-1)
-  const resolvedItemId = routineItemId || itemIdOf(last) || `history-${workout.id}-${exerciseId}`
-  const sets = [
-    ...(workout.sets || []),
-    {
-      exerciseId,
-      routineItemId: resolvedItemId,
-      setType: 'work',
-      weight: last?.weight || 0,
-      reps: '',
-      rpe: null,
-      note: '',
-    },
-  ]
-  const exercise = exerciseById(store.exercises, exerciseId)
-  const snapshot = workout.snapshot
-    ? {
-        ...workout.snapshot,
-        items: (workout.snapshot.items || []).some(
-          (item) => itemIdOf(item) === resolvedItemId,
-        )
-          ? workout.snapshot.items
-          : [
-              ...(workout.snapshot.items || []),
-              {
-                routineItemId: resolvedItemId,
-                exerciseId,
-                exerciseName: exercise?.name || 'Deleted exercise',
-                equipment: exercise?.equipment || '',
-                exerciseType: exercise?.type || 'free',
-                weightStep: exercise?.weightStep || 'n/a',
-                role: 'main',
-                targets: [],
-                suggestedWeights: [],
-                restSec: 0,
-                notes: 'Added during history correction',
-                warmup: null,
-              },
-            ],
-      }
-    : workout.snapshot
-  store.updateWorkout(workout.id, { sets, snapshot })
-  go(`/history/${workout.id}/set/${sets.length - 1}`)
-}
+// req-117 — addSetToWorkout (which wrote a placeholder set before the form opened) is
+// gone; History "Add set" now opens the form unsaved and writes on Save (add-set.js).
 
 function workoutMonthKey(workout) {
   const key = workoutDateKey(workout)
