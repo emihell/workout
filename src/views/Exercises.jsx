@@ -7,6 +7,8 @@ import { Back, Missing } from './shared'
 import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
+import { describeWeightStep } from '../weight-step.js'
+import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -252,7 +254,8 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const [name, setName] = useState(ex?.name || '')
   const [type, setType] = useState(ex?.type || 'free')
   const [equipment, setEquipment] = useState(ex?.equipment || '')
-  const [weightStep, setWeightStep] = useState(ex?.weightStep || '2.5')
+  // req-126 — defaults to empty (was an invented '2.5' for a missing field).
+  const step = useWeightStep(ex?.weightStep)
   const [muscles, setMuscles] = useState(ex?.muscles || '')
   const [cues, setCues] = useState(ex?.cues || '')
   // req-85 — orthogonal timer flag + default target seconds (any type can be timed).
@@ -277,11 +280,15 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
       <form
         onSubmit={(e) => {
           e.preventDefault()
+          // req-126 — a typed increment that doesn't read blocks Save (its note is shown).
+          const saved = step.save()
+          if (saved.error) return
           store.updateExercise(ex.id, {
             name: name.trim() || ex.name,
             type,
             equipment: equipment.trim() || 'Unknown',
-            weightStep: weightStep.trim() || 'n/a',
+            // req-126 — untouched: the key is left out, so the stored value (or its absence) stays.
+            ...(saved.unchanged ? {} : { weightStep: saved.value }),
             muscles: muscles.trim(),
             cues: cues.trim(),
             hasDuration,
@@ -295,7 +302,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
-        <Field label="Weight step" value={weightStep} onChange={(e) => setWeightStep(e.target.value)} />
+        <WeightStepField step={step} />
         <Checkbox label="Timed (count down a duration)" checked={hasDuration} onChange={setHasDuration} />
         {hasDuration ? (
           <NumberField
@@ -331,7 +338,7 @@ export function ExerciseDetail({ exerciseId }) {
         <NavLink to={`/exercises/${ex.id}/edit`} chevron="forward">Edit</NavLink>
       </p>
       <p className="ui-sub">
-        {[ex.equipment, typeLabel(ex.type), ex.weightStep, ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
+        {[ex.equipment, typeLabel(ex.type), describeWeightStep(ex.weightStep), ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
           .filter(Boolean)
           .join(' · ')}
       </p>

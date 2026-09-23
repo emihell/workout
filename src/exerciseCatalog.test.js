@@ -61,11 +61,12 @@ describe('exercise catalog search', () => {
 })
 
 describe('catalog mapping', () => {
-  it('maps machine strength to machine with a 5 kg step', () => {
+  // req-126 (named test edit) — was '5': the catalog no longer invents a step (DEC-059 §2).
+  it('maps machine strength to machine with no invented step', () => {
     const exercise = catalogItemToExercise(catalog[0])
     assert.equal(exercise.type, 'machine')
     assert.equal(exercise.equipment, 'Machine')
-    assert.equal(exercise.weightStep, '5')
+    assert.equal(exercise.weightStep, 'n/a')
     assert.equal(exercise.muscles, 'Chest, Triceps, Shoulders')
     assert.match(exercise.cues, /Press the handles/)
   })

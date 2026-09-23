@@ -1,10 +1,11 @@
 import { isWeightedType } from './ids.js'
+import { ALTERNATING, parseWeightStep } from './weight-step.js'
 
 export function validWeights(exercise, max = 250) {
   if (Array.isArray(exercise?.weightOptions) && exercise.weightOptions.length) {
     return [...exercise.weightOptions].map(Number).filter(Number.isFinite).sort((a, b) => a - b)
   }
-  if (exercise?.weightStep === 'Alt 4/5') {
+  if (exercise?.weightStep === ALTERNATING) {
     const out = []
     let weight = 9
     let addFive = true
@@ -15,8 +16,10 @@ export function validWeights(exercise, max = 250) {
     }
     return out
   }
-  const step = Number(exercise?.weightStep)
-  if (!Number.isFinite(step) || step <= 0) return []
+  // req-126 — the shared single-value parser: stored '2,5', '2.5 kg', '5 kg' now read
+  // as their increment (they used to be [] → a silent hold). '4/5', 'abc', 'n/a' → [].
+  const step = parseWeightStep(exercise?.weightStep)
+  if (step == null) return []
   const out = []
   for (let weight = step; weight <= max; weight += step) {
     out.push(Math.round(weight * 100) / 100)
