@@ -1,6 +1,6 @@
 # req-115 — a bad import shows an error instead of blanking the app (audit D)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[functional]** + **[P]**: touches `store.jsx`,
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-115` (`f81120f`…`34bde68`, 2 commits).** Phase 1. **[functional]** + **[P]**: touches `store.jsx`,
 `storage.js` and the import path (DEC-057: reviewer + backup reminder before merge).
 
 ## Why [measured, scratchpad/audit-history/import-test.mjs]

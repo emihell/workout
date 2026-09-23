@@ -1432,3 +1432,7 @@ Closeout 2026-09-23 (branch `88d8e44`, throwaway agent). `routineItemMeta` print
 all-zero/empty still prints no kg part; req-103 tests unmodified. Display only, `ids.js`: no DEC-057 reviewer/backup trigger.
 Gate: Planner's own run in a throwaway worktree → `check: green — lint, 27 test file(s), and the build all passed.`;
 screenshot reads "WU set · 2 sets · —/40 kg". Reviewer: none (display-only, no trigger file).
+
+## req-115 — a bad import shows an error instead of blanking the app (audit D)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
