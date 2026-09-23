@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { uid } from './ids'
-import { applyBackup as applyBackupFn } from './exchange.js'
+import { commitBackup } from './exchange.js'
 import { buildPlannedWorkout, DEFAULT_DURATION_SEC, planSnapshot, recalculatedState } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
 import { historyPrescription, loadState, saveState } from './storage'
@@ -376,13 +376,9 @@ export function StoreProvider({ children }) {
       finishWorkout(args) {
         setState((s) => finishedState(s, args))
       },
+      // req-115 — validate + migrate first, then set; a bad file throws to the caller.
       applyBackup(payload) {
-        let result
-        setState(() => {
-          result = applyBackupFn(payload)
-          return result.state
-        })
-        return result
+        return commitBackup(payload, setState)
       },
     }
   }, [state, setState])

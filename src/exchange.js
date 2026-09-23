@@ -155,27 +155,97 @@ const COLLECTION_FIELDS = [
   'draftWorkouts',
 ]
 
-function collectionsAreArrays(root) {
+// req-115 (audit D) — the req-39 array check, deepened: every element of every
+// collection must be a plain object, and every nested collection an array. A `[null]`
+// element either throws inside migrateState or passes it and crashes a later render,
+// so it is rejected here, at the import boundary, with the same friendly message.
+// migrateState itself stays unguarded (see req-39 above).
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+// Absent (undefined) is fine — migrateState defaults it; present must be an array of
+// plain objects, each also passing `each` (its nested checks) when one is given.
+// Used strict for top-level collections (req-39: a present `exercises: null` was
+// already a reject on main).
+function arrayOfObjects(value, each) {
+  if (value === undefined) return true
+  if (!Array.isArray(value)) return false
+  return value.every((element) => isPlainObject(element) && (!each || each(element)))
+}
+
+// Nested collections: migrateState reads them as `x || []`, so `null` is absent too
+// (hand/AI-edited backups write `sets: null`). Elements are still plain objects only.
+function nestedArrayOfObjects(value, each) {
+  return value === null || arrayOfObjects(value, each)
+}
+
+// A falsy snapshot is absent to migrateState (`if (workout.snapshot)`); a truthy one
+// must be an object whose items are an array of objects (or null/absent).
+function snapshotValid(snapshot) {
+  if (!snapshot) return true
+  return isPlainObject(snapshot) && nestedArrayOfObjects(snapshot.items)
+}
+
+function workoutValid(workout) {
+  return nestedArrayOfObjects(workout.sets) && snapshotValid(workout.snapshot)
+}
+
+function routineValid(routine) {
+  return nestedArrayOfObjects(routine.exercises)
+}
+
+const NESTED_CHECKS = {
+  exercises: null,
+  routines: routineValid,
+  workouts: workoutValid,
+  draftWorkouts: workoutValid,
+  plannedWorkouts: (plan) => nestedArrayOfObjects(plan.items),
+}
+
+function collectionsAreValid(root) {
+  // Top-level: present must be an array (req-39), for every collection field.
   for (const field of COLLECTION_FIELDS) {
     if (root[field] !== undefined && !Array.isArray(root[field])) return false
   }
-  // `?.` keeps a non-object/absent schedule safe; only a present, non-array `slots`
-  // (the migrateState `.map` site) is a reject.
-  if (root.schedule?.slots !== undefined && !Array.isArray(root.schedule.slots)) return false
+  for (const field of Object.keys(NESTED_CHECKS)) {
+    if (!arrayOfObjects(root[field], NESTED_CHECKS[field])) return false
+  }
+  // `programs[]` and their `sessions[]` elements are always read (model.js
+  // programLabelFrom walks `(program.sessions || []).some(routine => routine.id …)`),
+  // so those elements must be objects; `program.sessions: null` is absent.
+  if (!arrayOfObjects(root.programs, (program) => nestedArrayOfObjects(program.sessions))) return false
+  // Legacy routine CONTENTS are checked only where model.js flattenRoutines migrates
+  // them: `routines` when non-empty, else `sessions` when non-empty, else
+  // `programs[].sessions`. An unread legacy field (e.g. `sessions: [null]` next to a
+  // non-empty `routines`) is dropped by migrateState and can't crash.
+  if (!root.routines?.length) {
+    if (root.sessions?.length) {
+      if (!arrayOfObjects(root.sessions, routineValid)) return false
+    } else if (!arrayOfObjects(root.programs, (program) => nestedArrayOfObjects(program.sessions, routineValid))) {
+      return false
+    }
+  }
+  // `?.` keeps a non-object/absent schedule safe; only a present `slots` (the
+  // migrateState `.map` site) is checked.
+  if (!arrayOfObjects(root.schedule?.slots)) return false
+  // Falsy is "no active workout" to migrateState (`source.activeWorkout ? … : null`).
+  const active = root.activeWorkout
+  if (active && !(isPlainObject(active) && workoutValid(active))) return false
   return true
 }
 
 export function unwrapBackup(payload) {
   if (!payload || typeof payload !== 'object') return null
   if (payload.kind === BACKUP_KIND) {
-    if (!payload.state || typeof payload.state !== 'object') return null
-    return collectionsAreArrays(payload.state) ? payload : null
+    if (!isPlainObject(payload.state)) return null
+    return collectionsAreValid(payload.state) ? payload : null
   }
   if (
     Array.isArray(payload.exercises) &&
     (Array.isArray(payload.routines) || Array.isArray(payload.sessions) || Array.isArray(payload.programs))
   ) {
-    return collectionsAreArrays(payload) ? payload : null
+    return collectionsAreValid(payload) ? payload : null
   }
   return null
 }
@@ -199,4 +269,15 @@ export function applyBackup(payload) {
       slots: (state.schedule?.slots || []).length,
     },
   }
+}
+
+// req-115 (audit D) — the one import step, pure so it is unit-tested. applyBackup runs
+// to completion BEFORE setState is called: on a bad file it throws to the caller
+// (Settings/Today's existing error path) and setState is never called, so state is
+// unchanged. store.applyBackup used to run it INSIDE the setState updater, where React
+// swallowed the throw and re-threw it during render, above every ErrorBoundary.
+export function commitBackup(payload, setState) {
+  const result = applyBackup(payload)
+  setState(() => result.state)
+  return result
 }
