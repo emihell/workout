@@ -1387,4 +1387,8 @@ screenshot shows Reps 15.
 
 ## req-110 — Today: a day with two routines reads as one day with two routines (batch 4, F10)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `2f1ecaa`, throwaway agent). Today's block split into `TodayWorkouts` (date line once) + `TodayRoutine`
+(name — focus + its own Start / `Done …`); one-routine days render the pre-req markup. Both Starts stay full-width primary
+(Builder's call: two equal routines, no ranking — reversible). 5 static-source tests (`today.test.js`). Builder's
+puppeteer: grouped (one date, two Starts), 2nd Start opens `sess-lower`/`slot-wed-lower`, one-done keeps the other's Start.
+Gate: Planner's own `./check` green (25 files); one-done screenshot confirmed clear of the dock.
