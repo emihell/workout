@@ -1472,3 +1472,7 @@ db.json v8, a saved v9, v9 + leftover v8, and v9 holding v8 data; differences on
 (intended); `legacy:true` deep-equals main; every gate mutation fails tests. Gate: Planner's own run →
 `check: green — lint, 30 test file(s), and the build all passed.` Follow-ups: a test for the no-snapshot baseline gate
 (model.js:188) alone; confirm the version-less-backup rule.
+
+## req-118 — routine editor reads numbers correctly (audit A, DEC-058 §1, §6, §7)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
