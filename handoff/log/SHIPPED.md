@@ -1368,4 +1368,10 @@ while the form shows the restored values (rare, left).
 
 ## req-107 — a workout note on the workout overview, carried to Finish (batch 4, F7)  (merged 2026-09-23)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+Closeout 2026-09-23 (branch `279f185`, throwaway agent). One workout note: the overview gets an "Add note" reveal (below the list,
+above Finish) bound to the existing `activeWorkout.overallNote` via `patchActive` (functional merge, per keystroke);
+Finish shows/edits the same value (its local state removed); auto-complete saves it through new pure
+`autoFinishArgs` (`src/workout-note.js`, with `activeNote` reading a missing field as ''). No store/model/storage
+change, no schema bump. Builder's puppeteer run: 13/13 (persist across reload, Finish write-through, History shows
+it, legacy active workout). Gate: Planner's own `./check` green (24 files); screenshot shows the note field.
+Follow-up: with the note open on an 8-exercise routine, Abandon falls below the fold (scrollable).
