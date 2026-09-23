@@ -1555,3 +1555,7 @@ also went 26→44px. Long names wrap (`overflow-wrap: anywhere`, with values/but
 (L-024) main vs branch: 20 identical; log screen + overview differ only by corner anti-aliasing inside Add note's box. 8
 CSS tests. No trigger files. Gate: Planner's own run → `check: green — lint, 37 test file(s), and the build all passed.`;
 the zoom screenshot shows Add note visually identical.
+
+## req-124 — Replace exercise lands on the new exercise (audit Tier 3, DEC-059 §1)  (merged 2026-09-23)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

@@ -1,6 +1,6 @@
 # req-124 — Replace exercise lands on the new exercise (audit Tier 3, DEC-059 §1)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[ux-feel]** + **[P]**: `store.replaceItem` changes its return (DEC-057: reviewer + backup reminder). Revised
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-124` (`81fe2ca`…`81fe2ca`, 1 commit).** Phase 1. **[ux-feel]** + **[P]**: `store.replaceItem` changes its return (DEC-057: reviewer + backup reminder). Revised
 2026-09-23 after spec review.
 
 ## Why [measured, audit gym reviewer]
