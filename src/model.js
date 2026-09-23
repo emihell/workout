@@ -21,22 +21,25 @@ function itemId(routineId, item, index) {
   return item.id || `si-${routineId}-${index}-${item.exerciseId}`
 }
 
-function migrateRoutine(routine, exercises, legacyRecommendations) {
+function migrateRoutine(routine, exercises, legacyRecommendations, legacy) {
   return {
     ...routine,
     archivedAt: routine.archivedAt || null,
     exercises: (routine.exercises || []).map((item, index) => {
       const id = itemId(routine.id, item, index)
       const ex = exercises.find((candidate) => candidate.id === item.exerciseId)
-      const legacy = legacyRecommendations[id]
-      if (!legacy && (item.targets?.length || item.suggestedWeights?.length)) {
+      const recorded = legacyRecommendations[id]
+      if (!recorded && (item.targets?.length || item.suggestedWeights?.length)) {
         legacyRecommendations[id] = {
           targets: [...(item.targets || [])],
           suggestedWeights: [...(item.suggestedWeights || [])],
           sets: Number(item.sets) || (item.targets || []).length || 1,
         }
       }
-      const baseline = legacyRecommendations[id]
+      // req-120 (audit C) — the recorded baseline refills empty lists only for legacy
+      // (pre-v9) input. On v9 an empty list is the user's own choice and stays empty
+      // (DESIGN §1: never invent). Recording above still runs, so the map is unchanged.
+      const baseline = legacy ? legacyRecommendations[id] : null
       const targets = item.targets?.length ? [...item.targets] : [...(baseline?.targets || [])]
       const suggestedWeights = item.suggestedWeights?.length
         ? [...item.suggestedWeights]
@@ -59,13 +62,13 @@ function migrateRoutine(routine, exercises, legacyRecommendations) {
   }
 }
 
-function flattenRoutines(source, exercises, legacyRecommendations) {
+function flattenRoutines(source, exercises, legacyRecommendations, legacy) {
   const existing = source.routines?.length ? source.routines : source.sessions
   if (Array.isArray(existing) && existing.length) {
-    return existing.map((routine) => migrateRoutine(routine, exercises, legacyRecommendations))
+    return existing.map((routine) => migrateRoutine(routine, exercises, legacyRecommendations, legacy))
   }
   return (source.programs || []).flatMap((program) =>
-    (program.sessions || []).map((routine) => migrateRoutine(routine, exercises, legacyRecommendations)),
+    (program.sessions || []).map((routine) => migrateRoutine(routine, exercises, legacyRecommendations, legacy)),
   )
 }
 
@@ -78,7 +81,7 @@ function programLabelFrom(source, routineId) {
   return { programId: null, programName: '' }
 }
 
-function workoutSnapshot(state, workout, origin = state) {
+function workoutSnapshot(state, workout, origin = state, legacy = false) {
   const routineId = workout.routineId || workout.sessionId
   const found = findRoutineInState(state.routines, routineId)
   if (workout.snapshot) {
@@ -112,7 +115,12 @@ function workoutSnapshot(state, workout, origin = state) {
           !midWorkoutKeys.has(setItemId)
         )
       })
-      const baseline = templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
+      // req-120 (audit C) — the baseline and the logged-sets backfill below fill a
+      // snapshot's EMPTY targets/weights only for legacy (pre-v9) input. On v9 the
+      // snapshot is frozen at Start: empty stays empty (DESIGN §1, §3), so set 2's
+      // target is never invented from set 1's reps.
+      const baseline = legacy && templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
+      const backfillSets = legacy ? actualWorkingSets : []
       const { sessionItemId, ...rest } = item
       return {
         ...rest,
@@ -123,10 +131,10 @@ function workoutSnapshot(state, workout, origin = state) {
         weightStep: item.weightStep || exercise?.weightStep || 'n/a',
         targets: item.targets?.length
           ? item.targets
-          : [...(baseline?.targets || actualWorkingSets.map((set) => String(set.reps || '')))],
+          : [...(baseline?.targets || backfillSets.map((set) => String(set.reps || '')))],
         suggestedWeights: item.suggestedWeights?.length
           ? item.suggestedWeights
-          : actualWorkingSets.map((set) => Number(set.weight) || 0),
+          : backfillSets.map((set) => Number(set.weight) || 0),
       }
     })
     // req-109 — a key-less legacy set is attributed to a routine item, never to a
@@ -175,7 +183,9 @@ function workoutSnapshot(state, workout, origin = state) {
     seen.add(set.exerciseId)
     const ex = (state.exercises || []).find((x) => x.id === set.exerciseId)
     const templateItem = found.routine?.exercises?.find((x) => x.exerciseId === set.exerciseId)
-    const baseline = templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
+    // req-120 — the recorded baseline is legacy-only here too. This branch rebuilds a
+    // MISSING snapshot (pre-snapshot data), so its logged-set reconstruction stays.
+    const baseline = legacy && templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
     const actualWorkingSets = (workout.sets || []).filter(
       (candidate) =>
         candidate.exerciseId === set.exerciseId &&
@@ -250,11 +260,15 @@ export function findRoutineInState(routines, routineId) {
   return { routine }
 }
 
-export function migrateState(input) {
+// req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from
+// the RAW stored value, before any `{ ...emptyState(), ...raw }` merge (which injects
+// schemaVersion 9). Only legacy input gets the plan backfill/baseline; the default is
+// the safe side (false: never invent a plan value).
+export function migrateState(input, { legacy = false } = {}) {
   const source = structuredClone(input || {})
   const exercises = Array.isArray(source.exercises) ? source.exercises : []
   const legacyRecommendations = { ...(source.legacyRecommendations || {}) }
-  const routines = flattenRoutines(source, exercises, legacyRecommendations)
+  const routines = flattenRoutines(source, exercises, legacyRecommendations, legacy)
 
   const interim = {
     ...source,
@@ -302,13 +316,13 @@ export function migrateState(input) {
   return {
     ...interim,
     workouts: (source.workouts || []).map((workout) =>
-      stripLegacyWorkoutKeys(workoutSnapshot(interim, workout, source)),
+      stripLegacyWorkoutKeys(workoutSnapshot(interim, workout, source, legacy)),
     ),
     draftWorkouts: (source.draftWorkouts || []).map((workout) =>
-      stripLegacyWorkoutKeys(workoutSnapshot(interim, workout, source)),
+      stripLegacyWorkoutKeys(workoutSnapshot(interim, workout, source, legacy)),
     ),
     activeWorkout: source.activeWorkout
-      ? stripLegacyWorkoutKeys(workoutSnapshot(interim, source.activeWorkout, source))
+      ? stripLegacyWorkoutKeys(workoutSnapshot(interim, source.activeWorkout, source, legacy))
       : null,
   }
 }

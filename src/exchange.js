@@ -1,5 +1,5 @@
 import { EXERCISE_TYPES, ROUTINE_ROLES, WEEKDAYS } from './ids.js'
-import { migrateState } from './model.js'
+import { SCHEMA_VERSION, migrateState } from './model.js'
 import { withDefaultAnchor } from './schedule.js'
 import { emptyState } from './storage.js'
 
@@ -252,6 +252,15 @@ export function unwrapBackup(payload) {
   return null
 }
 
+// req-120 (audit C) — whether an imported state predates v9, read from the RAW state
+// before the emptyState merge. A present schemaVersion decides; a missing one (the
+// assistant's stateShape has none) is legacy only when the pre-v9 `sessions` /
+// `programs` collections are present — otherwise it is treated as v9.
+export function backupIsLegacy(raw) {
+  if (raw.schemaVersion != null) return Number(raw.schemaVersion) !== SCHEMA_VERSION
+  return raw.sessions != null || raw.programs != null
+}
+
 export function applyBackup(payload) {
   const doc = unwrapBackup(payload)
   if (!doc) {
@@ -261,7 +270,7 @@ export function applyBackup(payload) {
   if (doc.kind === BACKUP_KIND && Number(doc.version) !== BACKUP_VERSION) {
     throw new Error('Not a workout-mvp-backup v1 document.')
   }
-  const migrated = migrateState({ ...emptyState(), ...raw })
+  const migrated = migrateState({ ...emptyState(), ...raw }, { legacy: backupIsLegacy(raw) })
   // req-114 (audit G) — the imported schedule replaces the default one wholesale, so
   // an anchor-less file would anchor every week on the queried date (always week 0).
   // Default it to this Monday, like a new schedule; the import's save persists it.

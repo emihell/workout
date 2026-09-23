@@ -76,7 +76,9 @@ describe('state migration', () => {
       notes: '',
       warmup: null,
     }
-    const migrated = migrateState(source)
+    // req-120 — the baseline refill is legacy-only; this fixture is legacy-shaped
+    // (programs, no schemaVersion), so it says so, as loadState/applyBackup do.
+    const migrated = migrateState(source, { legacy: true })
     const item = migrated.routines[0].exercises[0]
     assert.equal(item.sets, 1)
     assert.deepEqual(item.targets, ['5-8 min'])
