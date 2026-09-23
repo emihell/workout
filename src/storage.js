@@ -387,6 +387,20 @@ export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().t
   }
 }
 
+// req-127 / DEC-059 §3 — Restore: the inverse of the archive branch above, on ONE
+// record. Clears `archivedAt` (to null, the normalized shape, model.js) on that same
+// exercise, so its id — and with it history and "last time" — comes back. It does NOT
+// bring back the routine / planned-workout rows the archive removed. Returns `s`
+// unchanged (same reference) for an unknown or non-archived id.
+export function restoreExerciseInState(s, exerciseId) {
+  const target = (s.exercises || []).find((ex) => ex.id === exerciseId)
+  if (!target || !target.archivedAt) return s
+  return {
+    ...s,
+    exercises: s.exercises.map((ex) => (ex.id === exerciseId ? { ...ex, archivedAt: null } : ex)),
+  }
+}
+
 // req-124 — the Replace exercise reducer, moved out of store.jsx (logic unchanged from
 // req-109) so the caller can pick the new item's `id` BEFORE the setState updater and
 // navigate to it. Returns `s` unchanged (same reference) when there is no active

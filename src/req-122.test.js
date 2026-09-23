@@ -84,5 +84,7 @@ test('call sites that pass both put the retreat link in retreat and the commit i
   assert.deepEqual(hits(/forward=\{<NavLink/g), [])
   assert.deepEqual(hits(/retreat=\{<Button[^>]*variant="primary"/g), [])
   const count = views.reduce((n, { src }) => n + (src.match(/<Actions\b/g) || []).length, 0)
-  assert.equal(count, 13) // the 13 hand-written .ui-actions rows (12 + item.jsx's ui-exercise-actions)
+  // the 13 hand-written .ui-actions rows (12 + item.jsx's ui-exercise-actions), plus
+  // req-127's two name-match rows in Exercises.jsx (duplicate warning, Restore offer)
+  assert.equal(count, 15)
 })

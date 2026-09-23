@@ -6,6 +6,7 @@ import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, 
 import { completedOnDayKey, findRoutine, isFirstRun, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
+import { routineStartable } from '../exercise-names.js'
 import { Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
@@ -13,7 +14,11 @@ import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, work
 // "continues" the active workout when it IS this occurrence. Without it, today's slot
 // of the same routine a pre-midnight workout came from silently resumed yesterday's
 // occurrence; now it goes through the one-active rule (DEC-038 abandon-on-new confirm).
+// req-127 — no Start on an empty routine (it made an empty active workout and could
+// abandon a real one); the preview already hides it (overview.jsx). Covers today's
+// block and the upcoming rows.
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
+  if (!routineStartable(routine)) return null
   return (
     <Button
       variant={variant}

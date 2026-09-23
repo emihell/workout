@@ -5,6 +5,7 @@ import { go } from '../route'
 import { deletionConfirmHead, routineById, historyPrescription, routineDeletionImpact, routineInActiveWorkout } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
+import { nameError, routineStartable } from '../exercise-names.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing } from './shared'
 import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
@@ -66,9 +67,12 @@ export function Routines() {
                 <NavLink to={routinePath(routine.id)} look="secondary">
                   Edit
                 </NavLink>
-                <Button variant="secondary" onClick={() => startOrContinue(store, routine.id)}>
-                  Start
-                </Button>
+                {/* req-127 — no Start on an empty routine (it made an empty workout), as in the preview. */}
+                {routineStartable(routine) ? (
+                  <Button variant="secondary" onClick={() => startOrContinue(store, routine.id)}>
+                    Start
+                  </Button>
+                ) : null}
               </>
             }
           >
@@ -85,15 +89,21 @@ export function Routines() {
 export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
   const [name, setName] = useState('')
   const [focus, setFocus] = useState('Machines')
+  // req-127 — trimmed; empty is an inline error that blocks Save (after the first try).
+  const [tried, setTried] = useState(false)
+  const error = tried ? nameError(name) : null
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        onSave({ name, focus })
+        setTried(true)
+        if (nameError(name)) return
+        onSave({ name: name.trim(), focus })
       }}
     >
-      <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+      <Field label="Name" value={name} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
+      {error ? <FieldError>{error}</FieldError> : null}
       <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
       <Actions
         retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
@@ -154,8 +164,16 @@ export function RoutineDetail({ routineId, paths }) {
               key={item.id || `${item.exerciseId}-${index}`}
               action={
                 <>
-                  <Button onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>Up</Button>
-                  <Button onClick={() => store.moveRoutineExercise(routine.id, index, 1)}>Down</Button>
+                  {/* req-127 — edge moves did nothing; now disabled. */}
+                  <Button disabled={index === 0} onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>
+                    Up
+                  </Button>
+                  <Button
+                    disabled={index === routine.exercises.length - 1}
+                    onClick={() => store.moveRoutineExercise(routine.id, index, 1)}
+                  >
+                    Down
+                  </Button>
                 </>
               }
             >
@@ -203,6 +221,9 @@ export function RoutineEdit({ routineId, paths }) {
   const nav = pathsFor(routineId, paths)
   const [name, setName] = useState(routine?.name || '')
   const [focus, setFocus] = useState(routine?.focus || 'Machines')
+  // req-127 — empty name blocks Save with an inline error (was: kept the old name).
+  const [tried, setTried] = useState(false)
+  const error = tried ? nameError(name) : null
 
   if (!routine) {
     return <Missing>Not found.</Missing>
@@ -215,11 +236,14 @@ export function RoutineEdit({ routineId, paths }) {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          store.updateRoutine(routine.id, { name: name.trim() || routine.name, focus })
+          setTried(true)
+          if (nameError(name)) return
+          store.updateRoutine(routine.id, { name: name.trim(), focus })
           go(nav.base)
         }}
       >
-        <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Field label="Name" value={name} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
+        {error ? <FieldError>{error}</FieldError> : null}
         <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
         <Actions
           retreat={<NavLink to={nav.base} look="quiet">Cancel</NavLink>}
