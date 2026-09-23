@@ -1075,3 +1075,8 @@ riskiest req last). A fresh agent per req needs no `/clear`. Lanes:
   session (Planner pings it; Emilio `/clear`s between reqs).
 Cost accepted: batch builds aren't visible in the Builder terminal; Planner relays the results. Batch 4:
 req-103 stays with the Builder (already started), and req-104 onward goes to throwaway agents.
+
+**DEC-053 clarification (req-111 review loop-back, 2026-09-23):** "actually done" means a non-skipped
+**working** set. A workout where only the warm-up was done and every work set was skipped (warm up, then
+the machine is taken) is passed over. A warm-up-only workout counts only when the exercise has never had
+a done work set, so it can still seed the warm-up.

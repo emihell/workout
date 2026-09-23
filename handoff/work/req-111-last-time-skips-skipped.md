@@ -1,6 +1,6 @@
 # req-111 — "last time" looks past a workout where that exercise was entirely skipped (DEC-053)
 
-**Status: SPEC — READY, held for Emilio's go.** Phase 1. **[functional]** Found by the batch-4 external
+**Status: BUILT AND MERGED, 2026-09-23 — branch `req-111` (`5cabbfd`…`80a1a15`, 2 commits).** Phase 1. **[functional]** Found by the batch-4 external
 review (2026-09-23); fix chosen by Emilio the same day. Built **before req-109** (skip/swap makes an
 all-skipped exercise the normal case).
 
