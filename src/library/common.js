@@ -386,8 +386,8 @@ const ROWS = [
   ['Power_Snatch', 'olympic', 'barbell', 'hamstrings glute-max quads deltoids', 'traps lower-back triceps', 'weight-reps', 'fam-snatch', ['Barbell Power Snatch']],
   ['Ring_Dips', 'vertical-push', 'suspension bodyweight', 'triceps mid-lower-chest', 'front-delt', 'bodyweight-reps', 'fam-dip', ['Gymnastic Ring Dips', 'Rings Dip']],
   ['Rope_Climb', 'vertical-pull', 'bodyweight', 'lats', 'biceps forearms rhomboids', 'bodyweight-reps', 'fam-rope-climb', ['Rope Climbs', 'Rope Climbing']],
-  ['own-archer-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Archer Push-Ups', 'Archer Press-Up'], true],
-  ['own-archer-pull-up', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Archer Pull-Ups', 'Archer Chin-Up'], true],
+  ['own-archer-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Archer Push-Ups', 'Archer Press-Up']],
+  ['own-archer-pull-up', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Archer Pull-Ups', 'Archer Chin-Up']],
   ['own-l-sit', 'core-stability', 'bodyweight', 'abs hip-flexors', 'triceps quads', 'time', 'fam-own-l-sit', ['L-Sit Hold', 'L Sit']],
   ['own-dragon-flag', 'core-flexion', 'bench bodyweight', 'abs', 'hip-flexors lats', 'bodyweight-reps', 'fam-leg-raise', ['Dragon Flags', 'Dragon Flag Raise']],
   ['own-front-lever', 'vertical-pull', 'pull-up-bar bodyweight', 'lats abs', 'rear-delt rhomboids', 'time', 'fam-own-front-lever', ['Front Lever Hold']],
@@ -734,6 +734,7 @@ export const DIFFICULTY_LISTS = {
     'own-suspension-curl', 'own-dumbbell-front-squat', 'own-reverse-plank', 'own-terminal-knee-extension',
     // req-151 batch 5
     'Isometric_Neck_Exercise_-_Sides', 'Lying_One-Arm_Lateral_Raise', 'Standing_Front_Barbell_Raise_Over_Head',
+    'Barbell_Shrug_Behind_The_Back', // req-151 coach review
   ],
   intermediate: [
     'Decline_Barbell_Bench_Press', 'Dips_-_Chest_Version',
@@ -760,9 +761,10 @@ export const DIFFICULTY_LISTS = {
     'own-overhead-carry', 'own-stability-ball-pike', 'own-windshield-wipers',
     'Push-Ups_With_Feet_On_An_Exercise_Ball',
     // req-151 batch 5
-    'Barbell_Rear_Delt_Row', 'Barbell_Shrug_Behind_The_Back', 'Bent-Arm_Barbell_Pullover', 'Body_Tricep_Press',
+    'Barbell_Rear_Delt_Row', 'Bent-Arm_Barbell_Pullover', 'Body_Tricep_Press',
     'One-Arm_Kettlebell_Military_Press_To_The_Side', 'V-Bar_Pullup', 'JM_Press', 'Zercher_Squats', 'Tire_Flip',
     'Clean_Pull', 'Snatch_Pull', 'own-reverse-nordic', 'own-spoto-press',
+    'own-archer-push-up', // req-151 coach review
   ],
   advanced: [
     'Power_Clean', 'Clean_and_Jerk', 'Snatch', 'Hang_Clean', 'Clean', 'Overhead_Squat',
@@ -771,7 +773,7 @@ export const DIFFICULTY_LISTS = {
     'Clean_and_Press',
     // req-151 batch 5
     'Power_Jerk', 'Split_Jerk', 'Hang_Snatch', 'Power_Snatch', 'Rope_Climb', 'Ring_Dips', 'own-archer-pull-up',
-    'own-archer-push-up', 'own-back-lever', 'own-front-lever', 'own-dragon-flag', 'own-l-sit',
+    'own-back-lever', 'own-front-lever', 'own-dragon-flag', 'own-l-sit',
   ],
 }
 

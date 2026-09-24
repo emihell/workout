@@ -3954,9 +3954,9 @@ const TEXT = {
   ],
   Tire_Flip: [
     'Lifting and pushing a heavy tire end over end, a full-body power exercise.',
-    ['Chest into the tire', 'Drive with the legs and hips', 'Push through at the top'],
+    ['Back flat', 'Drive with the legs and hips', 'Push through at the top'],
     [
-      'Squat down, grip the bottom of the tire and press your chest into it.',
+      'Set your hips higher than in a squat, grip the bottom of the tire and rest your chest on it.',
       'Drive with your legs and hips to lift the tire up and forward.',
       'As it rises, step in and switch your hands to push it over.',
       'Reset and repeat.',
@@ -3980,7 +3980,7 @@ const TEXT = {
     [
       'Stand with the bar over your mid foot and take a wide grip, back flat.',
       'Push the floor away to lift the bar, keeping it close to your legs.',
-      'As it passes your hips, drive them forward and rise onto your toes with a shrug.',
+      'As it reaches your upper thighs, drive your hips forward and rise onto your toes with a shrug.',
       'Lower the bar back to the floor with control.',
     ],
     ['Bending the arms early', 'Hips shooting up first', 'Bar drifting forward'],
@@ -3997,21 +3997,21 @@ const TEXT = {
     ['Leaning forward in the dip', 'Pressing the bar out slowly', 'Catching with soft elbows'],
   ],
   Split_Jerk: [
-    'A jerk where the feet split front and back to drop under the bar, for moving the heaviest loads overhead.',
-    ['Dip straight down', 'Split fast and wide', 'Lock out before recovering'],
+    'A jerk where the feet split to drop under the bar, for moving the heaviest loads overhead.',
+    ['Dip straight down', 'Split long, feet hip-width apart', 'Lock out before recovering'],
     [
       'Stand with the bar racked on the front of your shoulders, feet under your hips.',
       'Dip by bending your knees with your torso upright.',
       'Drive up hard and split your feet front and back as you push under the bar.',
-      'Catch it overhead with locked arms, then step your feet back together.',
+      'Catch it overhead with locked arms, then step the front foot back and the back foot forward to stand.',
     ],
     ['Leaning forward in the dip', 'Splitting too narrow to balance', 'Recovering before the bar is locked'],
   ],
   Hang_Snatch: [
-    'A snatch started from the hang above the knees, pulling the bar overhead in one movement.',
+    'A snatch started from the hang, pulling the bar overhead in one movement.',
     ['Bar close to the body', 'Hips drive the bar', 'Punch up and lock out'],
     [
-      'Stand with a wide grip on the bar and hinge until it rests just above your knees.',
+      'Stand with a wide grip on the bar and hinge until it hangs just above or just below your knees.',
       'Drive your hips forward and shrug to send the bar up close to your body.',
       'Pull yourself under the bar and catch it overhead with locked arms.',
       'Stand up, then lower the bar with control.',
@@ -4031,7 +4031,7 @@ const TEXT = {
   ],
   Ring_Dips: [
     'A dip on gymnastic rings, which adds balance work to the chest, triceps and shoulders.',
-    ['Rings close to the body', 'Turn the rings out at the top', 'Control the bottom'],
+    ['Rings close to the body', 'Turn the rings out at the top', 'Shoulders down, away from the ears'],
     [
       'Grip a ring in each hand and jump or step up to support yourself with straight arms.',
       'Keep the rings close to your sides.',
@@ -4086,20 +4086,21 @@ const TEXT = {
   ],
   'own-dragon-flag': [
     'Lowering a straight body from the upper back on a bench, for the whole front of the core.',
-    ['Body straight from shoulders to feet', 'Hips never bend', 'Lower slowly'],
+    ['Body straight from shoulders to feet', 'Hips never bend', 'Lower back pressed flat'],
     [
       'Lie on a bench and grip it behind your head.',
       'Lift your body up onto your upper back so it forms a straight line from shoulders to feet.',
       'Lower your straight body slowly toward the bench.',
       'Raise it again before your hips touch.',
     ],
-    ['Bending at the hips', 'Resting weight on the neck', 'Dropping down fast'],
+    ['Bending at the hips', 'Arching the lower back', 'Resting weight on the neck'],
   ],
   'own-front-lever': [
     'Hanging from a bar and holding the body horizontal, face up, for the lats and core.',
     ['Arms straight', 'Press the bar toward the hips', 'Body straight'],
     [
       'Hang from a pull-up bar with straight arms and an overhand grip.',
+      'Start with the knees tucked, and straighten the legs over time as you get stronger.',
       'Press the bar down toward your hips and lift your body up.',
       'Hold it horizontal and face up, with your body straight.',
       'Lower with control to a hang.',
@@ -4111,7 +4112,8 @@ const TEXT = {
     ['Arms straight', 'Squeeze the glutes', 'Body straight'],
     [
       'Hang from a bar or rings and tuck your legs through your arms into an inverted hang.',
-      'Lower your body behind you until it is horizontal, face down.',
+      'Start with the knees tucked, and straighten the legs over time as you get stronger.',
+      'Lower slowly, only as far as the shoulders allow, until your body is horizontal and face down.',
       'Hold with your body straight.',
       'Return to the inverted hang to finish.',
     ],

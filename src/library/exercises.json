@@ -2992,7 +2992,7 @@
     "common": true,
     "family": "fam-shrug",
     "staple": false,
-    "difficulty": "intermediate",
+    "difficulty": "beginner",
     "description": "A shrug holding the barbell behind the body, which shifts the work toward the middle traps.",
     "formCues": [
       "Arms stay straight",
@@ -15922,14 +15922,14 @@
     "family": "fam-snatch",
     "staple": false,
     "difficulty": "advanced",
-    "description": "A snatch started from the hang above the knees, pulling the bar overhead in one movement.",
+    "description": "A snatch started from the hang, pulling the bar overhead in one movement.",
     "formCues": [
       "Bar close to the body",
       "Hips drive the bar",
       "Punch up and lock out"
     ],
     "steps": [
-      "Stand with a wide grip on the bar and hinge until it rests just above your knees.",
+      "Stand with a wide grip on the bar and hinge until it hangs just above or just below your knees.",
       "Drive your hips forward and shrug to send the bar up close to your body.",
       "Pull yourself under the bar and catch it overhead with locked arms.",
       "Stand up, then lower the bar with control."
@@ -29646,7 +29646,7 @@
     "formCues": [
       "Rings close to the body",
       "Turn the rings out at the top",
-      "Control the bottom"
+      "Shoulders down, away from the ears"
     ],
     "steps": [
       "Grip a ring in each hand and jump or step up to support yourself with straight arms.",
@@ -35476,7 +35476,7 @@
     "steps": [
       "Stand with the bar over your mid foot and take a wide grip, back flat.",
       "Push the floor away to lift the bar, keeping it close to your legs.",
-      "As it passes your hips, drive them forward and rise onto your toes with a shrug.",
+      "As it reaches your upper thighs, drive your hips forward and rise onto your toes with a shrug.",
       "Lower the bar back to the floor with control."
     ],
     "mistakes": [
@@ -35953,17 +35953,17 @@
     "family": "fam-jerk",
     "staple": false,
     "difficulty": "advanced",
-    "description": "A jerk where the feet split front and back to drop under the bar, for moving the heaviest loads overhead.",
+    "description": "A jerk where the feet split to drop under the bar, for moving the heaviest loads overhead.",
     "formCues": [
       "Dip straight down",
-      "Split fast and wide",
+      "Split long, feet hip-width apart",
       "Lock out before recovering"
     ],
     "steps": [
       "Stand with the bar racked on the front of your shoulders, feet under your hips.",
       "Dip by bending your knees with your torso upright.",
       "Drive up hard and split your feet front and back as you push under the bar.",
-      "Catch it overhead with locked arms, then step your feet back together."
+      "Catch it overhead with locked arms, then step the front foot back and the back foot forward to stand."
     ],
     "mistakes": [
       "Leaning forward in the dip",
@@ -40560,12 +40560,12 @@
     "difficulty": "intermediate",
     "description": "Lifting and pushing a heavy tire end over end, a full-body power exercise.",
     "formCues": [
-      "Chest into the tire",
+      "Back flat",
       "Drive with the legs and hips",
       "Push through at the top"
     ],
     "steps": [
-      "Squat down, grip the bottom of the tire and press your chest into it.",
+      "Set your hips higher than in a squat, grip the bottom of the tire and rest your chest on it.",
       "Drive with your legs and hips to lift the tire up and forward.",
       "As it rises, step in and switch your hands to push it over.",
       "Reset and repeat."
@@ -47712,7 +47712,7 @@
   {
     "name": "Archer Push-Up",
     "force": "push",
-    "level": "advanced",
+    "level": "intermediate",
     "mechanic": "compound",
     "equipment": "body only",
     "primaryMuscles": [
@@ -47761,11 +47761,11 @@
       "bodyweight"
     ],
     "logAs": "bodyweight-reps",
-    "unilateral": true,
+    "unilateral": false,
     "common": true,
     "family": "fam-push-up",
     "staple": false,
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "description": "A wide push-up that shifts the weight toward one arm at a time, a step toward the one-arm push-up.",
     "formCues": [
       "Straight arm stays long",
@@ -47833,7 +47833,7 @@
       "bodyweight"
     ],
     "logAs": "bodyweight-reps",
-    "unilateral": true,
+    "unilateral": false,
     "common": true,
     "family": "fam-pull-up",
     "staple": false,
@@ -47988,7 +47988,7 @@
     "formCues": [
       "Body straight from shoulders to feet",
       "Hips never bend",
-      "Lower slowly"
+      "Lower back pressed flat"
     ],
     "steps": [
       "Lie on a bench and grip it behind your head.",
@@ -47998,8 +47998,8 @@
     ],
     "mistakes": [
       "Bending at the hips",
-      "Resting weight on the neck",
-      "Dropping down fast"
+      "Arching the lower back",
+      "Resting weight on the neck"
     ]
   },
   {
@@ -48069,6 +48069,7 @@
     ],
     "steps": [
       "Hang from a pull-up bar with straight arms and an overhand grip.",
+      "Start with the knees tucked, and straighten the legs over time as you get stronger.",
       "Press the bar down toward your hips and lift your body up.",
       "Hold it horizontal and face up, with your body straight.",
       "Lower with control to a hang."
@@ -48095,7 +48096,7 @@
     ],
     "instructions": [
       "Hang from a bar or rings and tuck your legs through your arms into an inverted hang.",
-      "Lower your body behind you until it is horizontal, face down.",
+      "Lower slowly, only as far as the shoulders allow, until your body is horizontal and face down.",
       "Hold with your body straight, then return to the inverted hang."
     ],
     "category": "strength",
@@ -48150,7 +48151,8 @@
     ],
     "steps": [
       "Hang from a bar or rings and tuck your legs through your arms into an inverted hang.",
-      "Lower your body behind you until it is horizontal, face down.",
+      "Start with the knees tucked, and straighten the legs over time as you get stronger.",
+      "Lower slowly, only as far as the shoulders allow, until your body is horizontal and face down.",
       "Hold with your body straight.",
       "Return to the inverted hang to finish."
     ],

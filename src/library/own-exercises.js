@@ -1036,7 +1036,7 @@ export const OWN_EXERCISES = [
   {
     name: 'Archer Push-Up',
     force: 'push',
-    level: 'advanced',
+    level: 'intermediate',
     mechanic: 'compound',
     equipment: 'body only',
     primaryMuscles: ['chest'],
@@ -1128,7 +1128,7 @@ export const OWN_EXERCISES = [
     secondaryMuscles: ['chest', 'biceps'],
     instructions: [
       'Hang from a bar or rings and tuck your legs through your arms into an inverted hang.',
-      'Lower your body behind you until it is horizontal, face down.',
+      'Lower slowly, only as far as the shoulders allow, until your body is horizontal and face down.',
       'Hold with your body straight, then return to the inverted hang.',
     ],
     category: 'strength',

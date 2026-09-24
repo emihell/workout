@@ -62,15 +62,12 @@ describe('batch 5', () => {
   })
 
   it('each is found first by its shown name', () => {
-    for (const id of Object.keys(BATCH_5)) {
-      if (id === 'own-l-sit') continue
-      assert.equal(firstShown(shownName(byId.get(id))), id, id)
-    }
-    // Flagged in reports/req-151.md (search, not data; no reader changes here): "L-Sit" compacts to a substring of
-    // "Wall Sit", a staple, so Wall Sit fills the first tier and L-Sit leads the rest (L-027's class, in names).
-    const lsit = searchCommonFirst(library, 'L-Sit')
-    assert.deepEqual(lsit.common.map((item) => item.id), ['own-wall-sit'])
-    assert.equal(lsit.rest[0].id, 'own-l-sit')
+    for (const id of Object.keys(BATCH_5)) assert.equal(firstShown(shownName(byId.get(id))), id, id)
+    // Search fix (sanctioned, this branch): an exact own-name hit on a non-staple leads the first tier.
+    // "l-sit" compacts to a substring of "Wall Sit" (a staple), which used to push L-Sit behind "Show more".
+    const lsit = searchCommonFirst(library, 'l-sit')
+    assert.deepEqual(lsit.common.map((item) => item.id), ['own-l-sit', 'own-wall-sit'])
+    assert.deepEqual(lsit.rest, [])
   })
 
   it('the queue is done: PENDING_ADDS empty, no merge-later row, no rough entry offered in Search', () => {
