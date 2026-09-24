@@ -2,9 +2,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import {
   catalogItemToExercise,
-  fromRepdbItem,
   inferExerciseType,
-  mergeCatalogs,
   searchExerciseCatalog,
 } from './exerciseCatalog.js'
 import { EXTRA_EXERCISES } from './exerciseExtras.js'
@@ -86,55 +84,7 @@ describe('catalog mapping', () => {
   })
 })
 
-describe('merged catalogs', () => {
-  it('adds pike and diamond push-ups from the second catalog', () => {
-    const extra = [
-      fromRepdbItem({
-        id: 'pike-push-ups',
-        name_en: 'Pike Push Ups',
-        is_bodyweight: true,
-        category: 'strength',
-        primary_muscles: ['anterior_deltoid'],
-        secondary_muscles: ['triceps_brachii'],
-        instructions_en: ['Hips high.', 'Lower your head toward the floor.'],
-      }),
-      fromRepdbItem({
-        id: 'diamond-push-ups',
-        name_en: 'Diamond Push Ups',
-        is_bodyweight: true,
-        category: 'strength',
-        primary_muscles: ['triceps_brachii'],
-        secondary_muscles: ['pectoralis_major'],
-        instructions_en: ['Hands form a diamond.', 'Lower your chest.'],
-      }),
-    ]
-    const merged = mergeCatalogs(catalog, extra)
-    const pike = searchExerciseCatalog(merged, 'pike push')
-    const diamond = searchExerciseCatalog(merged, 'diamond')
-    assert.equal(pike[0].name, 'Pike Push Ups')
-    assert.equal(diamond[0].name, 'Diamond Push Ups')
-    const copied = catalogItemToExercise(diamond[0])
-    assert.equal(copied.type, 'bodyweight')
-    assert.equal(copied.equipment, 'Bodyweight')
-  })
-
-  it('does not duplicate a push-up that is already in the first catalog', () => {
-    const extra = [
-      fromRepdbItem({
-        id: 'pushups',
-        name_en: 'Push-Ups',
-        is_bodyweight: true,
-        category: 'strength',
-        primary_muscles: [],
-        secondary_muscles: [],
-        instructions_en: [],
-      }),
-    ]
-    const merged = mergeCatalogs([{ name: 'Pushups', equipment: 'body only' }], extra)
-    assert.equal(merged.length, 1)
-    assert.equal(merged[0].name, 'Pushups')
-  })
-})
+// req-139 (sanctioned edit) — the two "merged catalogs" tests left with the RepDB merge.
 
 describe('local extras', () => {
   it('finds Prone YTW by ytw', () => {

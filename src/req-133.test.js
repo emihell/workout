@@ -219,7 +219,8 @@ describe('muscleGroups', () => {
 
 describe('own-* entries carry the legacy fields', () => {
   it('equipment, category, instructions, and muscles today\'s readers accept', () => {
-    assert.equal(OWN_EXERCISES.length, 9)
+    // req-139 (sanctioned edit) — was 9: + the 10 missing staples + 5 more (DEC-064).
+    assert.equal(OWN_EXERCISES.length, 24)
     for (const own of OWN_EXERCISES) {
       assert.ok(own.id.startsWith('own-'))
       assert.ok(own.equipment && own.category && own.instructions.length >= 3, own.id)
@@ -242,41 +243,43 @@ describe('own-* entries carry the legacy fields', () => {
 })
 
 // Written before the build (spec §Search receipts); library list only, no RepDB.
+// req-139 (sanctioned edit) — compared by entry id (was the name): display names changed
+// what is shown, the entries must not change.
 describe('search receipts (top-1)', () => {
   for (const [query, first] of [
-    ['bench press', 'Barbell Bench Press - Medium Grip'],
-    ['squat', 'Barbell Squat'],
-    ['deadlift', 'Barbell Deadlift'],
-    ['rdl', 'Romanian Deadlift'],
-    ['ohp', 'Standing Military Press'],
-    ['skull crusher', 'EZ-Bar Skullcrusher'],
-    ['db row', 'One-Arm Dumbbell Row'],
-    ['lat pulldown', 'Wide-Grip Lat Pulldown'],
-    ['face pull', 'Face Pull'],
-    ['hip thrust', 'Barbell Hip Thrust'],
-    ['lateral raise', 'Side Lateral Raise'], // free-db's standing dumbbell lateral raise
-    ['leg curl', 'Seated Leg Curl'],
-    ['leg press', 'Leg Press'],
+    ['bench press', 'Barbell_Bench_Press_-_Medium_Grip'],
+    ['squat', 'Barbell_Squat'],
+    ['deadlift', 'Barbell_Deadlift'],
+    ['rdl', 'Romanian_Deadlift'],
+    ['ohp', 'Standing_Military_Press'],
+    ['skull crusher', 'EZ-Bar_Skullcrusher'],
+    ['db row', 'One-Arm_Dumbbell_Row'],
+    ['lat pulldown', 'Wide-Grip_Lat_Pulldown'],
+    ['face pull', 'Face_Pull'],
+    ['hip thrust', 'Barbell_Hip_Thrust'],
+    ['lateral raise', 'Side_Lateral_Raise'], // free-db's standing dumbbell lateral raise
+    ['leg curl', 'Seated_Leg_Curl'],
+    ['leg press', 'Leg_Press'],
     ['pull up', 'Pullups'],
     ['chin up', 'Chin-Up'],
-    ['dips', 'Dips - Triceps Version'],
+    ['dips', 'Dips_-_Triceps_Version'],
     ['plank', 'Plank'],
     ['push up', 'Pushups'],
-    ['cable fly', 'Cable Crossover'],
-    ['preacher curl', 'Preacher Curl'],
-    ['hammer curl', 'Hammer Curls'],
-    ['t-bar row', 'T-Bar Row with Handle'],
-    ['farmer walk', "Farmer's Walk"],
-    ['treadmill', 'Running, Treadmill'],
-    ['rowing', 'Rowing, Stationary'],
+    ['cable fly', 'Cable_Crossover'],
+    ['preacher curl', 'Preacher_Curl'],
+    ['hammer curl', 'Hammer_Curls'],
+    ['t-bar row', 'T-Bar_Row_with_Handle'],
+    ['farmer walk', 'Farmers_Walk'],
+    ['treadmill', 'Running_Treadmill'],
+    ['rowing', 'Rowing_Stationary'],
     // Tag review additions.
-    ['calf raise', 'Standing Calf Raises'],
-    ['lunge', 'Dumbbell Lunges'],
-    ['bicycle crunch', 'Bicycle Crunch'],
-    ['weighted dip', 'Weighted Dip'],
+    ['calf raise', 'Standing_Calf_Raises'],
+    ['lunge', 'Dumbbell_Lunges'],
+    ['bicycle crunch', 'own-bicycle-crunch'],
+    ['weighted dip', 'own-weighted-dip'],
   ]) {
     it(`"${query}" → ${first}`, () => {
-      assert.equal(searchExerciseCatalog(library, query)[0]?.name, first)
+      assert.equal(searchExerciseCatalog(library, query)[0]?.id, first)
     })
   }
 })

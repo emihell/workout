@@ -7,8 +7,8 @@
 // the tables here (and in src/library/common.js, own-exercises.js) and re-run the
 // script (exerciseLibrary.test.js fails on drift).
 //
-// Nothing from RepDB goes in the library, links included: RepDB stays a live,
-// unmodified fetch in exerciseCatalog.js.
+// Nothing from RepDB goes in the library, links included. Since req-139 (DEC-064 §2)
+// search reads this library only; RepDB returns for pictures only (req-131).
 //
 // Ids are stored data (exercise.libraryId) and permanent: free-db ids unchanged,
 // `extra-*` for the extras, `own-*` for entries of ours. Never rename or reuse one.
@@ -37,6 +37,8 @@ export const FREE_DB_PHOTO_BASE = `https://cdn.jsdelivr.net/gh/yuhonas/free-exer
 // The fields we add to a free-db entry (stripped again to prove the rest is unchanged).
 export const OWN_FIELDS = [
   'aliases', 'muscleGroups', 'photos',
+  // req-139 — our display name, on common entries only (shownName).
+  'displayName',
   // req-133 — the DEC-062 fields, on common entries only (no reader until req-134/135/132).
   'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family',
 ]
@@ -184,7 +186,12 @@ export const FREE_DB_EQUIPMENT_TO_LIST = {
 // Aliases never allowed on their own (req-130 review: they reorder single-word search).
 const BARE_ALIAS_KEYS = new Set(['press', 'row', 'machine'])
 
-export const COMMON_COUNT_RANGE = [130, 170]
+export const COMMON_COUNT_RANGE = [170, 200]
+
+// req-139 / DEC-064 §1 — the name the app shows: our display name, else free-db's.
+export function shownName(entry) {
+  return String(entry?.displayName ?? entry?.name ?? '')
+}
 
 // The group root of a tree node (undefined for an unknown id).
 export function muscleGroupOf(nodeId) {
@@ -235,7 +242,7 @@ export function muscleTreeProblems(tree = MUSCLE_TREE) {
   return problems
 }
 
-const NEW_FIELDS = ['muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family']
+const NEW_FIELDS = ['displayName', 'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family']
 
 // Everything the fixed structure rejects, one line each ([] = clean). Run by
 // deriveLibrary (the build refuses) and by the tests (against failing fixtures too).
@@ -245,19 +252,41 @@ export function libraryProblems(list, {
 } = {}) {
   const problems = []
   const bad = (entry, message) => problems.push(`${entry.id}: ${message}`)
-  const nameOwner = new Map(list.map((entry) => [catalogNameKey(entry.name), entry.id]))
-  const aliasOwner = new Map()
   const families = new Map()
   for (const entry of list) {
     if (entry.common) families.set(entry.family, (families.get(entry.family) || 0) + 1)
   }
+  // req-139 — the key rules. Every name, display name and alias key, with its owner.
+  const owners = new Map()
+  const own = (key, entry, kind) => {
+    if (!key) return
+    if (!owners.has(key)) owners.set(key, [])
+    owners.get(key).push({ id: entry.id, kind, common: Boolean(entry.common) })
+  }
   for (const entry of list) {
+    own(catalogNameKey(entry.name), entry, 'name')
+    if (entry.displayName !== undefined) own(catalogNameKey(entry.displayName), entry, 'displayName')
+    for (const alias of new Set((entry.aliases || []).map(catalogNameKey))) own(alias, entry, 'alias')
+  }
+  // A display name or alias key clashes with anything on another entry, except that
+  // one on a common entry may shadow a non-common entry's name (search prefers the
+  // common one; the resolver keeps exact name first).
+  const clashes = (entry, key) => (owners.get(key) || []).filter((other) =>
+    other.id !== entry.id && !(entry.common && other.kind === 'name' && !other.common))
+  const clashText = (other) => (other.kind === 'name' ? `is ${other.id}'s name`
+    : other.kind === 'displayName' ? `is also on ${other.id} (its display name)` : `is also on ${other.id}`)
+  for (const entry of list) {
+    if (entry.displayName !== undefined) {
+      const key = catalogNameKey(entry.displayName)
+      if (!String(entry.displayName).trim()) bad(entry, 'empty display name')
+      if (entry.displayName === entry.name) bad(entry, 'display name equals its name')
+      for (const other of clashes(entry, key)) bad(entry, `display name "${entry.displayName}" ${clashText(other)}`)
+    }
     for (const alias of entry.aliases || []) {
       const key = catalogNameKey(alias)
       if (BARE_ALIAS_KEYS.has(key)) bad(entry, `bare alias "${alias}"`)
-      if (aliasOwner.has(key) && aliasOwner.get(key) !== entry.id) bad(entry, `alias "${alias}" is also on ${aliasOwner.get(key)}`)
-      aliasOwner.set(key, entry.id)
-      if (nameOwner.has(key) && nameOwner.get(key) !== entry.id) bad(entry, `alias "${alias}" is ${nameOwner.get(key)}'s name`)
+      if (entry.displayName !== undefined && key === catalogNameKey(entry.displayName)) bad(entry, `alias "${alias}" repeats its display name`)
+      for (const other of clashes(entry, key)) bad(entry, `alias "${alias}" ${clashText(other)}`)
     }
     if (entry.id.startsWith('own-')) {
       for (const muscle of [...(entry.primaryMuscles || []), ...(entry.secondaryMuscles || [])]) {
@@ -317,6 +346,7 @@ function withOwnFields(entry, { aliases = [], photos = [], tags }) {
   out.muscleGroups = tags ? groupsForMuscles(tags.muscles) : muscleGroupsFor(entry.primaryMuscles)
   out.photos = photos
   if (tags) {
+    if (tags.displayName !== undefined) out.displayName = tags.displayName
     out.muscles = tags.muscles
     out.pattern = tags.pattern
     out.equipmentList = tags.equipmentList
@@ -370,11 +400,13 @@ const indexes = new WeakMap()
 function indexFor(library) {
   let index = indexes.get(library)
   if (!index) {
-    index = { byId: new Map(), byName: new Map(), byAlias: new Map() }
+    index = { byId: new Map(), byName: new Map(), byDisplayName: new Map(), byAlias: new Map() }
     for (const entry of library) {
       index.byId.set(entry.id, entry)
       const nameKey = catalogNameKey(entry.name)
       if (nameKey && !index.byName.has(nameKey)) index.byName.set(nameKey, entry)
+      const displayKey = catalogNameKey(entry.displayName)
+      if (displayKey && !index.byDisplayName.has(displayKey)) index.byDisplayName.set(displayKey, entry)
       for (const alias of entry.aliases || []) {
         const aliasKey = catalogNameKey(alias)
         if (aliasKey && !index.byAlias.has(aliasKey)) index.byAlias.set(aliasKey, entry)
@@ -386,12 +418,15 @@ function indexFor(library) {
 }
 
 // The library entry for a stored exercise: its libraryId when that's in the library,
-// else the exact name key, else an alias key, else null. No fuzzy guess.
+// else the exact name key (free-db name, then our display name), else an alias key,
+// else null. No fuzzy guess. req-139: exact name stays ahead of alias, so a stored
+// "Air Bike" without a libraryId is free-db's crunch, not Fan Bike (common-first is
+// search only).
 export function libraryEntryFor(exercise, library) {
   if (!exercise || !library) return null
   const index = indexFor(library)
   if (exercise.libraryId && index.byId.has(exercise.libraryId)) return index.byId.get(exercise.libraryId)
   const key = catalogNameKey(exercise.name)
   if (!key) return null
-  return index.byName.get(key) || index.byAlias.get(key) || null
+  return index.byName.get(key) || index.byDisplayName.get(key) || index.byAlias.get(key) || null
 }

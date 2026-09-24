@@ -1,8 +1,8 @@
-import { catalogNameKey, loadExerciseLibrary } from './exerciseLibrary.js'
+import { catalogNameKey, loadExerciseLibrary, shownName } from './exerciseLibrary.js'
 
-// req-130 — free-exercise-db is no longer fetched: our library (exerciseLibrary.js) is a
-// pinned copy of it with the extras folded in. RepDB stays a live, unmodified fetch.
-const REPDB_URL = 'https://cdn.jsdelivr.net/gh/RepDB/exercise-dataset@main/exercises.json'
+// req-139 / DEC-064 §2 — search reads our library only (exerciseLibrary.js: the pinned
+// free-db copy, the extras, our own entries). RepDB is no longer fetched here; it comes
+// back for pictures only (req-131). Exercises already added from RepDB are untouched.
 
 const MACHINE_EQUIPMENT = new Set(['machine', 'cable'])
 const BODYWEIGHT_EQUIPMENT = new Set(['body only', 'foam roll', 'bodyweight', 'body weight', 'none', ''])
@@ -10,47 +10,7 @@ const MACHINE_EQUIPMENT_HINTS = /machine|pec deck|leg press|leg curl|leg extensi
 
 let catalogPromise = null
 
-function fetchJson(url) {
-  return fetch(url).then((response) => {
-    if (!response.ok) throw new Error('Could not load.')
-    return response.json()
-  })
-}
-
-export { catalogNameKey }
-
-export function fromRepdbItem(item) {
-  const equipmentRaw = String(item.equipment || '').toLowerCase().replace(/_/g, ' ')
-  let equipment = 'body only'
-  if (!item.is_bodyweight && equipmentRaw) {
-    if (MACHINE_EQUIPMENT_HINTS.test(equipmentRaw)) equipment = 'machine'
-    else if (equipmentRaw === 'cable') equipment = 'cable'
-    else equipment = equipmentRaw
-  }
-  return {
-    id: `repdb-${item.id}`,
-    name: String(item.name_en || item.name || '').trim(),
-    equipment,
-    category: item.category || 'strength',
-    primaryMuscles: item.primary_muscles || [],
-    secondaryMuscles: item.secondary_muscles || [],
-    instructions: item.instructions_en || item.instructions || [],
-  }
-}
-
-export function mergeCatalogs(primary, extra) {
-  const merged = []
-  const seen = new Set()
-  for (const item of [...(primary || []), ...(extra || [])]) {
-    const name = String(item?.name || '').trim()
-    if (!name) continue
-    const key = catalogNameKey(name)
-    if (!key || seen.has(key)) continue
-    seen.add(key)
-    merged.push(item)
-  }
-  return merged
-}
+export { catalogNameKey, shownName }
 
 // Test hook: forget the cached catalog so the next load starts over.
 export function resetExerciseCatalog() {
@@ -58,26 +18,19 @@ export function resetExerciseCatalog() {
 }
 
 // `loadLibrary` is injectable for tests only; the app always uses our library chunk.
+// A failed load is an error ("Could not load."), never cached: the next open retries.
 export function loadExerciseCatalog({ loadLibrary = loadExerciseLibrary } = {}) {
   if (!catalogPromise) {
-    catalogPromise = Promise.allSettled([loadLibrary(), fetchJson(REPDB_URL)]).then(
-      (results) => {
-        const libraryOk = results[0].status === 'fulfilled' && Array.isArray(results[0].value)
-        const library = libraryOk ? results[0].value : []
-        const repdbPayload = results[1].status === 'fulfilled' ? results[1].value : null
-        const repdb = Array.isArray(repdbPayload?.exercises) ? repdbPayload.exercises.map(fromRepdbItem) : []
-        // Dedupe stays name-only (never on aliases): RepDB's "Lat Pulldown" etc. still appear.
-        const merged = mergeCatalogs(library, repdb)
-        // req-130 review — a RepDB-only list is shown but never cached: the next open
-        // retries the library chunk instead of keeping a partial catalog all session.
-        if (!libraryOk) catalogPromise = null
-        if (!merged.length) throw new Error('Could not load.')
-        return merged
-      },
-    ).catch((error) => {
-      catalogPromise = null
-      throw error
-    })
+    catalogPromise = Promise.resolve()
+      .then(() => loadLibrary())
+      .then((library) => {
+        if (!Array.isArray(library) || !library.length) throw new Error('Could not load.')
+        return library
+      })
+      .catch(() => {
+        catalogPromise = null
+        throw new Error('Could not load.')
+      })
   }
   return catalogPromise
 }
@@ -88,15 +41,20 @@ function compactText(value) {
     .replace(/[^a-z0-9]+/g, '')
 }
 
-export function searchExerciseCatalog(list, query, limit = 25) {
+// Every item matching `query`, ranked: exact name or alias (0), name prefix (1), name
+// contains (2), alias contains (2.5), muscle/equipment (3); ties alphabetical by the
+// shown name. req-139 — the shown name (displayName ?? name) is the name; when a display
+// name exists, free-db's name counts as an alias.
+function rankedHits(list, query) {
   const q = String(query || '').trim().toLowerCase()
   if (q.length < 2) return []
   const qCompact = compactText(q)
   const qKey = catalogNameKey(q)
   const scored = []
   for (const item of list || []) {
-    const name = String(item.name || '').toLowerCase()
-    const aliases = (item.aliases || []).join(' ').toLowerCase()
+    const name = shownName(item).toLowerCase()
+    const aliasList = item.displayName !== undefined ? [item.name, ...(item.aliases || [])] : item.aliases || []
+    const aliases = aliasList.join(' ').toLowerCase()
     const muscles = [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].join(' ').toLowerCase()
     const equipment = String(item.equipment || '').toLowerCase()
     const compactName = compactText(name)
@@ -104,7 +62,9 @@ export function searchExerciseCatalog(list, query, limit = 25) {
     let score = -1
     // req-130 — a whole alias equal to the query scores like an exact name (the word
     // split below never matched a multi-word alias).
-    if (name === q || (qKey && (item.aliases || []).some((alias) => catalogNameKey(alias) === qKey))) score = 0
+    // req-139 — the shown name also matches on its key ("pull up" = "Pull-Up"): an alias
+    // that repeats the display name was dropped, and this keeps its exact hit.
+    if (name === q || (qKey && (catalogNameKey(name) === qKey || aliasList.some((alias) => catalogNameKey(alias) === qKey)))) score = 0
     // req-130 review — no alias word-split here: a single word inside a multi-word
     // alias ("press" in "Triceps Press") would outrank real name hits. A partial alias
     // hit ranks just below a partial name hit, so aliases never reorder name matches.
@@ -115,7 +75,21 @@ export function searchExerciseCatalog(list, query, limit = 25) {
     if (score >= 0) scored.push({ item, score, name })
   }
   scored.sort((a, b) => a.score - b.score || a.name.localeCompare(b.name))
-  return scored.slice(0, limit).map((row) => row.item)
+  return scored.map((row) => row.item)
+}
+
+export function searchExerciseCatalog(list, query, limit = 25) {
+  return rankedHits(list, query).slice(0, limit)
+}
+
+// req-139 / DEC-064 §3 — what Search shows: the common hits, and the rest of the
+// library on request. Each part ranked as above and capped at `limit`; `restCount` is
+// the untruncated count ("Show N more"). With no common hit, Search shows `rest` directly.
+export function searchCommonFirst(list, query, limit = 25) {
+  const hits = rankedHits(list, query)
+  const common = hits.filter((item) => item.common)
+  const rest = hits.filter((item) => !item.common)
+  return { common: common.slice(0, limit), rest: rest.slice(0, limit), restCount: rest.length }
 }
 
 function titleCase(value) {
@@ -135,16 +109,12 @@ export function inferExerciseType(equipment, category) {
   return 'free'
 }
 
-// req-130 — only entries of our library link back to it; RepDB hits are live-only.
-export function isLibraryItem(item) {
-  return Boolean(item?.id) && !String(item.id).startsWith('repdb-')
-}
-
 export function catalogItemToExercise(item) {
   const type = inferExerciseType(item.equipment, item.category)
   const equipmentLabel = item.equipment ? titleCase(item.equipment) : type === 'bodyweight' ? 'Bodyweight' : 'Unknown'
   return {
-    name: String(item.name || '').trim(),
+    // req-139 — the name saved is the shown one; libraryId keeps the link.
+    name: shownName(item).trim(),
     type,
     equipment: equipmentLabel === 'Body Only' ? 'Bodyweight' : equipmentLabel,
     // req-126 / DEC-059 §2 — the catalog doesn't know the gym's increments: leave it empty
@@ -152,6 +122,7 @@ export function catalogItemToExercise(item) {
     weightStep: 'n/a',
     muscles: [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].map(titleCase).join(', '),
     cues: (item.instructions || []).join('\n').trim(),
-    ...(isLibraryItem(item) ? { libraryId: item.id } : {}),
+    // req-130 — every catalog item is a library entry since req-139 (no RepDB hits).
+    ...(item.id ? { libraryId: String(item.id) } : {}),
   }
 }
