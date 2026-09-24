@@ -1,3 +1,6 @@
+// req-150 — a frozen copy of main's src/progress.js at b74a179 (before the safe-hold), used only by
+// req-150.test.js to prove the output is unchanged for numeric targets and non-assisted exercises.
+// Never imported by the app.
 import { isWeightedType } from './ids.js'
 import { ALTERNATING, parseWeightStep } from './weight-step.js'
 
@@ -63,27 +66,6 @@ function countableReps(value) {
   return parseReps(value)
 }
 
-// req-150 / DEC-075 — hold instead of guessing. No new rule: where the app can't judge a set
-// correctly, that set keeps its kg and target, whatever the effort. req-149 sets real rules.
-// A target the app can't read as a single whole number (a range "8-12", AMRAP, a duration,
-// any other text) holds. An empty or missing target is "not set" and is judged as before.
-export function unreadableTarget(value) {
-  const text = String(value ?? '').trim()
-  return text !== '' && !/^\d+$/.test(text)
-}
-
-// Assisted machines/bands: the kg is assistance (more = easier), so the normal step would move
-// the wrong way. Interim detection by library id or name, until req-149's flag.
-export const ASSISTED_LIBRARY_IDS = ['own-assisted-pull-up', 'own-assisted-dip', 'Band_Assisted_Pull-Up']
-export function isAssistedExercise(exercise) {
-  return ASSISTED_LIBRARY_IDS.includes(exercise?.libraryId) || /assisted/i.test(String(exercise?.name ?? ''))
-}
-
-export const HOLD_REASONS = {
-  target: "Target isn't a single number — kept as is.",
-  assisted: 'Assisted: kept as is.',
-}
-
 // req-112 / DEC-056 — per set. `sets` is POSITIONAL by work-set index: sets[i] is the
 // item's i-th working set, and a skipped (or null / not yet logged) entry is left as the
 // routine has it — `weights[i]` (the routine's suggestedWeights) and `targets[i]` stay.
@@ -110,18 +92,10 @@ export function recommendNextPrescription({ targets, weights: routineWeights, se
   // valid increment the weighted branch holds instead of moving, so action stays
   // 'keep' and the reported weight never contradicts the action.
   const hasIncrements = validWeights(exercise).length > 0
-  const assisted = isAssistedExercise(exercise)
-  const held = new Set()
 
   positional.forEach((set, index) => {
     if (!set || isSkipped(set)) return
     const actualWeight = Number(set.weight) || 0
-    // req-150 — a held set keeps what was done (its kg; its target stays in nextTargets).
-    if (assisted || unreadableTarget(targets?.[index] ?? targets?.at(-1))) {
-      weights[index] = actualWeight
-      held.add(assisted ? 'assisted' : 'target')
-      return
-    }
     const actualReps = parseReps(set.reps)
     const targetReps = countableReps(targets?.[index] ?? targets?.at(-1))
     const rpe = set.rpe == null ? null : Number(set.rpe)
@@ -165,17 +139,14 @@ export function recommendNextPrescription({ targets, weights: routineWeights, se
     nextTargets.push(nextTargets.at(-1) ?? '')
   }
 
-  const base = movedDown
-    ? 'Load down.'
-    : movedUp
-      ? 'Load up.'
-      : 'Same load.'
-  // req-150 — a held set says why; with nothing held the reason is exactly as before.
-  const holdNote = [...held].map((why) => HOLD_REASONS[why]).join(' ')
   return {
     weights,
     targets: nextTargets,
     action: movedDown ? 'down' : movedUp ? 'up' : 'keep',
-    reason: holdNote ? `${base} ${holdNote}` : base,
+    reason: movedDown
+      ? 'Load down.'
+      : movedUp
+        ? 'Load up.'
+        : 'Same load.',
   }
 }
