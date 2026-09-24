@@ -396,6 +396,12 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   description, tips, instructions rewritten clearer. Written from
   free-db's instructions + general knowledge; **never from RepDB text** (DEC-060 §3). Content job for agents in
   batches, sample-reviewed. After req-130.
+- **`req-134` muscle search + filter** — group chips (beginner) with "More specific" → muscles/parts (advanced);
+  several = either, "must hit all" toggle (DEC-062 §5); the search box also matches muscle aliases ("deltoid").
+  Custom exercises need a muscle pick from the same tree (stored field → persisted-data). After req-133.
+- **`req-135` alternatives button** — same pattern + same primary muscle, family first, your equipment first;
+  linked exercises only until custom ones have muscles. After req-133 (+req-134 for custom).
+- **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
 - **Our own styled exercise figures** (after req-131) — pose keyframes per exercise + a shared renderer, animated,
   offline, one style, can show all the time. Prototype 2026-09-24 (leg press, 48×32 pixel sprite, 2 poses
   interpolated) reads but is crude — style needs iteration. **Reference only free-db photos / general knowledge,

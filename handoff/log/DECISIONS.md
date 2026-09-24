@@ -1178,3 +1178,20 @@ Built as req-130..133 (BACKLOG §Exercise library).
 tables and re-runs the script. Library ids are permanent once stored (`libraryId`, req-130 §2). Implementation rule, no user
 effect.
 
+## DEC-062 — the library's structure: a three-level muscle tree, one movement pattern, fixed lists, "common" first  (Emilio, 2026-09-24)
+
+1. **Muscles are a tree: group → muscle → part** (Arms → Biceps; Shoulders → Deltoids → Rear delt). Each level has
+   everyday and anatomical search names ("arm", "delts", "deltoid", "six pack"). Entries are tagged at the finest
+   level (primary/secondary); parents are derived. Choosing a level includes everything under it. Emilio: useful for
+   beginners who search "arm" and for advanced users who pick "deltoid". Two levels where a third adds nothing.
+2. **Fixed lists** for movement pattern (one per entry), equipment (several), and how it's logged (`logAs` +
+   one-sided); a test rejects anything off-list. Full lists: req-133.
+3. **Quality before breadth:** the ~150 common gym exercises get every field first, flagged `common` (search ranks
+   them first later); the rest stay as they are.
+4. **Planning/agents may fill in the obvious, rewrite text and add widely used aliases** (Emilio: "fill in info that
+   is obvious to you, improve text if needed, add aliases that you know are used a lot"). Text is ours, never RepDB's
+   (DEC-060 §3).
+5. **Muscle filter default (later req-134):** several groups = **either** (union), with a "must hit all" toggle.
+Rejected: keeping the 17 free-db muscles (too coarse for alternatives/programs); tagging all 879 now (cost, and
+rough tags on obscure entries are worse than none). Built as req-133.
+
