@@ -56,10 +56,11 @@ describe('the triage', () => {
   })
 
   // req-145 (sanctioned count pin) — batch 2 wrote 27 merge-later targets: those rows are merges now.
-  it('697 rows: 124 finish, 146 merge, 30 merge-later, 397 hide', () => {
+  // req-147 (DEC-074 §1) — batch 3 wrote 16 more merge-later targets.
+  it('697 rows: 124 finish, 162 merge, 14 merge-later, 397 hide', () => {
     const count = (triage) => rows.filter((row) => row.class === triage).length
     assert.equal(rows.length, 697)
-    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 146, 30, 397])
+    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 162, 14, 397])
   })
 
   it('every non-common entry that isn\'t hidden is finish; no finish row is hidden', () => {
@@ -109,10 +110,12 @@ describe('hidden and mergedInto fields', () => {
     assert.deepEqual(problemsFor('Hamstring_Stretch', { mergedInto: 'Plank' }), ['Hamstring_Stretch: mergedInto without hidden'])
     assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'Nope' }), ['Car_Deadlift: mergedInto "Nope" is not in the library'])
     assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'Atlas_Stones' }), ['Car_Deadlift: mergedInto "Atlas_Stones", which is hidden'])
-    assert.equal(byId.get('Groin_and_Back_Stretch').mergedInto, 'own-butterfly-stretch')
-    assert.deepEqual(problemsFor('Groin_and_Back_Stretch', {}), [])
-    assert.deepEqual(problemsFor('Groin_and_Back_Stretch', {}, { pendingTargets: [] }),
-      ['Groin_and_Back_Stretch: mergedInto "own-butterfly-stretch" is not in the library'])
+    // req-147 (DEC-074 §2) — was Groin_and_Back_Stretch → own-butterfly-stretch, now written; no
+    // row points at a queued add any more, so a hidden entry is given a pending target.
+    assert.ok(PENDING_ADDS.includes('own-l-sit'))
+    assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'own-l-sit' }), [])
+    assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'own-l-sit' }, { pendingTargets: [] }),
+      ['Car_Deadlift: mergedInto "own-l-sit" is not in the library'])
   })
 
   it('triageProblems catches a missing, doubled, unknown or mis-targeted row (fixtures)', () => {
@@ -122,12 +125,12 @@ describe('hidden and mergedInto fields', () => {
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { class: 'drop' })), ['triage Car_Deadlift: class "drop"'])
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { reason: ' ' })), ['triage Car_Deadlift: no reason'])
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { target: 'Plank' })), ['triage Car_Deadlift: a target on a non-merge row'])
-    // req-145 (edit NOT a count pin; flagged) — was Hamstring_Stretch, which batch 2 wrote; same intent.
-    assert.deepEqual(triageProblems(library, edit('Air_Bike', { target: 'Inchworm' })),
-      ['triage Air_Bike: merge target "Inchworm" is not a common entry'])
-    // req-145 (edit NOT a count pin; flagged) — was 90_90_Hamstring, a merge since batch 2; same intent.
-    assert.deepEqual(triageProblems(library, edit('Two-Arm_Kettlebell_Row', { target: 'Plank' })),
-      ['triage Two-Arm_Kettlebell_Row: merge-later target "Plank" is neither a finish row nor a queued add'])
+    // req-145/147 (DEC-074 §2) — was Hamstring_Stretch, then Inchworm, both written since; same intent.
+    assert.deepEqual(triageProblems(library, edit('Air_Bike', { target: 'Tire_Flip' })),
+      ['triage Air_Bike: merge target "Tire_Flip" is not a common entry'])
+    // req-145/147 (DEC-074 §2) — was 90_90_Hamstring, then Two-Arm_Kettlebell_Row, both merges since; same intent.
+    assert.deepEqual(triageProblems(library, edit('Scissors_Jump', { target: 'Plank' })),
+      ['triage Scissors_Jump: merge-later target "Plank" is neither a finish row nor a queued add'])
   })
 
   // Coach review — a merge must not cross logAs or the load scale (equipment).
@@ -167,7 +170,7 @@ describe('Search skips hidden entries', () => {
   it('"Show more" holds only written non-staples and finish rows', () => {
     const shown = library.filter((entry) => listable(entry) && !entry.staple)
     for (const entry of shown) assert.ok(entry.common || rowOf.get(entry.id)?.class === 'finish', entry.id)
-    assert.equal(shown.filter((entry) => !entry.common).length, 92) // req-145 (sanctioned count pin): 124 − batch 2's 32 promotions
+    assert.equal(shown.filter((entry) => !entry.common).length, 57) // req-145/147 (DEC-074 §1): 124 − 32 − 35 promotions
   })
 
   it('a hidden entry the user already has still shows: Already added (live), Restore (archived)', () => {
@@ -210,10 +213,12 @@ describe('merged names find their target', () => {
   })
 
   it('merge-later: a finish target shows in its own tier (the rest); a queued own-* target shows nothing', () => {
-    assert.equal(rowOf.get('Two-Arm_Kettlebell_Row').target, 'One-Arm_Kettlebell_Row')
-    assert.deepEqual(searchCommonFirst(library, 'two-arm kettlebell row'), { common: [], rest: [byId.get('One-Arm_Kettlebell_Row')], restCount: 1 })
-    assert.equal(byId.get('Groin_and_Back_Stretch').mergedInto, 'own-butterfly-stretch')
-    assert.deepEqual(searchCommonFirst(library, 'groin and back stretch'), { common: [], rest: [], restCount: 0 })
+    // req-147 (DEC-074 §2) — both subjects were written by batch 3: Scissors_Jump → Split_Jump is
+    // still merge-later to a finish row; no row targets a queued add, so a hidden entry gets one.
+    assert.equal(rowOf.get('Scissors_Jump').class, 'merge-later')
+    assert.deepEqual(searchCommonFirst(library, 'scissors jump'), { common: [], rest: [byId.get('Split_Jump')], restCount: 1 })
+    const pending = library.map((entry) => (entry.id === 'Car_Deadlift' ? { ...entry, mergedInto: 'own-l-sit' } : entry))
+    assert.deepEqual(searchCommonFirst(pending, 'car deadlift'), { common: [], rest: [], restCount: 0 })
   })
 
   it('a redirect never adds a hidden entry, and a partial name doesn\'t redirect', () => {

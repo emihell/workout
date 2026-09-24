@@ -198,7 +198,7 @@ export const FREE_DB_EQUIPMENT_TO_LIST = {
 // Aliases never allowed on their own (req-130 review: they reorder single-word search).
 const BARE_ALIAS_KEYS = new Set(['press', 'row', 'machine'])
 
-export const COMMON_COUNT_RANGE = [240, 280] // req-145: 258 after batch 2
+export const COMMON_COUNT_RANGE = [280, 320] // req-147: 298 after batch 3
 
 // req-139 / DEC-064 §1 — the name the app shows: our display name, else free-db's.
 export function shownName(entry) {
