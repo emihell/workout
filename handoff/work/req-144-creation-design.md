@@ -6,6 +6,11 @@ creation UX"). Emilio 2026-09-24: creating exercises and routines is "the hardes
 between a first time gym goer and an advanced user are so far apart… but i want support for both". It absorbs `req-10`
 (first-time exercise setup) and the DEC-056 "review and update the routine" step as inputs.
 
+## Answered
+
+- **Q1 + Q2 core (DEC-071):** design for the complete first-timer only; advanced later, never disturbing the simple
+  routine.
+
 ## Open questions (answered in the sessions, each becoming a DEC-)
 
 1. **Personas:** who exactly are we designing for? (Draft: first-timer with no plan · someone ~1 year in with a routine

@@ -1302,3 +1302,16 @@ Supersedes DEC-065 §1 ("kept only for its pictures").
 4. **Images/animations are a completely separate req** (the avatar work).
 Planning's call: "ship only our schema" moves to req-132, where the readers switch to our fields.
 
+## DEC-071 — design for the complete beginner first; the simple routine is the core  (Emilio, 2026-09-24)
+
+"lets build from the perspective of a fresh beginner - me - and start there - priority one is to make the app as
+accessible as possible for someone completely new/first time at the gym - to start using the app and start to get into a
+routine - the advanced options we keep in mind - but we dont design for right now - when the easy flow is in - we can start
+adding complexity - but with the rule of not disturbing the simple routine - that is the core that you build upon."
+1. **Persona #1 = the first-time gym-goer** (Emilio as the stand-in). req-144 designs this flow only.
+2. **Advanced options are kept in mind, not designed now.** The model must not rule them out (planning checks
+   extensibility), but no advanced UI is designed yet.
+3. **The rule for everything added later:** it must not disturb the simple routine. The beginner flow is the core that
+   everything else builds on.
+Answers req-144 Q1 (persona) and the core of Q2 (the rule's wording is refined in session).
+
