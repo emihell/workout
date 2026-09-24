@@ -17,7 +17,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **Audit follow-ups (DEC-085), in order:** ~~`req-156`~~ (merged) → `req-157` import when unreadable [P] →
+- **Audit follow-ups (DEC-085), in order:** `req-157` import when unreadable [P] →
   `req-158` stop dead fields [P] → `req-159` `plan qa` + smoke gate → `req-160` skills. Planning: DEC digest/archive, stale
   docs, lanes draft, README/DESIGN drafts. Later: `storage.js` split. **Emilio:** Builder's permission mode, a fresh
   Export, remove the `git commit:*`/`git reset:*` grants.
