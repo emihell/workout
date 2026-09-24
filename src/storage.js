@@ -498,6 +498,15 @@ function workingSetsFromHistory(sets) {
   return (sets || []).filter((set) => set.setType !== 'wu' && !isSkippedSet(set))
 }
 
+// req-152 — whether the last finished workout has a set at this index at all (a set
+// beyond its count — e.g. one "Add set" appended — has none, so its kg may carry).
+export function historyHasSetAt(last, { setType, workIndex } = {}) {
+  if (!last?.sets?.length) return false
+  return setType === 'wu'
+    ? last.sets.some((candidate) => candidate.setType === 'wu' && !isSkippedSet(candidate))
+    : Boolean(workingSetsFromHistory(last.sets)[workIndex])
+}
+
 export function historySetPrefill(last, { setType, workIndex } = {}) {
   if (!last?.sets?.length) return { weight: '', reps: '' }
   const set =

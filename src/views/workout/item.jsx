@@ -4,11 +4,11 @@ import { RPE_OPTIONS, formatSetLine, isWeightedType, roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
-import { exerciseById, historySetPrefill, lastSetsForExercise } from '../../storage'
+import { exerciseById, historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../storage'
 import { useStore } from '../../store-context'
 import {
   canRemoveAddedSet,
-  carriedWorkingSet,
+  carryForSet,
   createSetDraftWriter,
   durationTargetFor,
   formFieldsWithDraft,
@@ -114,21 +114,6 @@ export function WorkoutItemLog({ routineId, itemId }) {
   if (markedDone) return <MissingItem />
 
   return <WorkoutItemLive routineId={routineId} item={item} />
-}
-
-// req-02 / DEC-002: for an exercise with NO finished-workout history, the kg
-// carried onto the next working set — the most recent non-skipped working set
-// logged this session. Null for a with-history exercise (`last` present), a
-// warm-up set, or when nothing has been logged yet, so the existing history /
-// blank-kg / target-reps paths stay untouched. req-108 (DEC-052 amendment) — kg
-// only: reps no longer carry; each set prefills its own target.
-function carryFor(ex, last, currentType, workLogged) {
-  if (last || currentType !== 'work') return null
-  const src = carriedWorkingSet(workLogged)
-  if (!src) return null
-  return {
-    weight: src.weight != null && Number(src.weight) !== 0 ? String(src.weight) : '',
-  }
 }
 
 // req-117 — restoreFromLoggedSet moved to workout-log.js (pure, unit-tested; it now
@@ -359,8 +344,9 @@ function WorkoutItemLive({ routineId, item }) {
     fromRestore: false,
     restore: null,
     hasHistory: Boolean(last),
+    historyHasSet: historyHasSetAt(last, { setType: currentType, workIndex: currentWorkIndex }),
     history: historyPrefill,
-    carry: carryFor(ex, last, currentType, state.workLogged),
+    carry: carryForSet(currentType, state.workLogged),
     target,
     override,
   })
@@ -407,7 +393,7 @@ function WorkoutItemLive({ routineId, item }) {
       : null
 
   return (
-    <Screen>
+    <Screen className="ui-screen--rest">
       <ExercisesLink routineId={routineId} />
       {/* req-78 — the running rest is a small floating pill (self-hides when no rest). */}
       <RestPill />
@@ -525,7 +511,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
   const today = itemLoggingState(active, item).logged
 
   return (
-    <Screen>
+    <Screen className="ui-screen--rest">
       <ExercisesLink routineId={routineId} />
       <RestPill />
       <SectionHeader>Today</SectionHeader>
@@ -581,7 +567,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   }
 
   return (
-    <Screen>
+    <Screen className="ui-screen--rest">
       <Back to={itemPath} />
       <RestPill />
       <p className="ui-sub">{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>

@@ -58,7 +58,7 @@ function FinishScreen({ routineId }) {
   const name = active?.snapshot?.routineName || active?.snapshot?.sessionName
 
   return (
-    <Screen>
+    <Screen className="ui-screen--rest">
       <Back to={`/workout/${routineId}`} />
       <RestPill />
       <Title>Finish</Title>
@@ -95,7 +95,7 @@ function FinishScreen({ routineId }) {
         onClick={() => {
           recordButton('finish-workout')
           store.finishWorkout({ overallNote, overallFeel, progression })
-          go('/')
+          go('/', { replace: true })
         }}
       >
         {empty ? 'Save anyway' : 'Save'}

@@ -9,11 +9,15 @@ import { dateKey } from '../../schedule.js'
 // main (or an absent role) is unlabelled and only warm-up/finisher/cardio carry a tag
 // (roleTag); then the existing `WU set` marker and the set count. Was `roleLabel`, which
 // printed "Main" on nearly every row.
-export function historyGroupMeta(snapshotItem, setCount) {
+//
+// req-152 (QA-4) — `skipped`: every set of the exercise was skipped, so the count reads
+// "skipped" instead (the live overview's word, req-109). The caller passes the count of
+// logged (non-skipped) sets, as the header does (req-116).
+export function historyGroupMeta(snapshotItem, setCount, { skipped = false } = {}) {
   return [
     roleTag(snapshotItem?.role),
     snapshotItem?.warmup ? 'WU set' : '',
-    `${setCount} set${setCount === 1 ? '' : 's'}`,
+    skipped ? 'skipped' : `${setCount} set${setCount === 1 ? '' : 's'}`,
   ]
     .filter(Boolean)
     .join(' · ')

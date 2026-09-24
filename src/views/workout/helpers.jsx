@@ -41,5 +41,5 @@ export async function abandonWorkout(store) {
   if (!(await askConfirm('Abandon?', { confirmLabel: 'Abandon' }))) return
   recordButton('abandon-workout')
   store.abandonWorkout()
-  go('/')
+  go('/', { replace: true })
 }
