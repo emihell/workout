@@ -202,6 +202,26 @@ export function loadState() {
   }
 }
 
+// req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — Import is the one way out of the
+// unreadable state. It reads the raw value that made the load unreadable, FRESH from disk
+// with loadState's own key choice (current key, else the first legacy key), so the file it
+// downloads is exactly what is stored. null when not unreadable, or when the value is gone.
+export function readUnreadableRaw() {
+  if (!getLoadUnreadable()) return null
+  try {
+    const current = localStorage.getItem(STORAGE_KEY)
+    return current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean) || null
+  } catch {
+    return null
+  }
+}
+
+// req-157 — lifts the DEC-032 write lock. Only importWithBackup calls it, and only after the
+// raw value has been handed to the download (or is already gone from disk).
+export function releaseUnreadable() {
+  setLoadUnreadable(false)
+}
+
 export function saveState(state) {
   // req-36 / DEC-032 — the stored value was unreadable; refuse to overwrite it so
   // the corrupt-but-possibly-recoverable key is preserved untouched. No setItem.
