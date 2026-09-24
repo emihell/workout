@@ -410,8 +410,10 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - **`req-138` library text pass** (READY — `work/req-138-library-text-pass.md`; split from req-133 by its spec review) — for the common entries: `description`
   (≤120 chars), `cues` (2–3, ≤70 chars each), `steps` (≥3, clear), `mistakes` (1–3). Ours, from free-db's
   instructions + general knowledge, never RepDB (DEC-060 §3). Feeds req-131; runs before it.
-- **`req-136` "something's wrong" tap** on an exercise → a note (wrong muscle / bad cue / …) into the in-app
-  feedback JSON, so the library improves from real use. Small.
+- **`req-136` "something's wrong" tap** — *mostly covered already*: the feedback note button (req-86..88, behind the
+  Settings toggle) works on every screen and records route + exerciseId. Remaining gap: the note doesn't carry the
+  **libraryId**. Planning's call 2026-09-24: don't build 136 standalone; fold "add libraryId (and shown name) to the
+  note context on exercise/library screens" into req-134.
 - **`req-137` offline library + images** — keep the library chunk (and later pictures) available with no signal
   (service worker / cache). Infra; before own images.
 - **Emilio's backup conversion** — one-off script: match → show mapping → write on his OK (DEC-063 §2, ask-gate #2).
@@ -427,7 +429,16 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   browser-only; a **shared** gym library that users contribute to needs the backend (Phase 3 fork). Feeds
   req-135 (alternatives with what's here) and Phase 2 programs.
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
-- **Our own styled exercise figures** (after req-131) — **one base animation per movement pattern** + equipment
+- **Avatars + the app's pixel-art style (Emilio-led, 2026-09-24)** — Emilio wants avatars in the app and calls them
+  "crucial to the style of the app"; he'll supply reference pictures and wants to be closely involved (live lane,
+  DEC-055: Emilio + session, not a batch). Planning's notes for the spec: **the avatar is the figure that does the
+  exercises**, so one character carries the whole app, and exercise figures follow the avatar style (supersedes the
+  separate style pilot); build as **skeleton + layers** (body, hair, clothes…) from day 1 so every exercise animation
+  works with any avatar; a **dedicated pixel-art agent** (its own definition: grid size, palette, outline and frame
+  rules, Emilio's references) plus a **deterministic renderer + validator** (palette-only, on-grid), so consistency
+  comes from constraints rather than taste. References: Emilio's own and free-db photos; never RepDB images (term 5).
+  No prior req exists [measured: grep of handoff + git log for "avatar"]. Before own figures.
+- **Our own styled exercise figures** (now under Avatars above) (after req-131) — **one base animation per movement pattern** + equipment
   variants (DEC-063 §4), 5-exercise style pilot early; pose keyframes + a shared renderer, animated,
   offline, one style, can show all the time. Prototype 2026-09-24 (leg press, 48×32 pixel sprite, 2 poses
   interpolated) reads but is crude — style needs iteration. **Reference only free-db photos / general knowledge,
