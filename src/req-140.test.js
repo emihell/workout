@@ -58,6 +58,15 @@ const BATCH_2 = [
   'Scapular_Pull-Up', 'own-bear-crawl', 'extra-prone-ytw', 'extra-reverse-snow-angels', 'Inchworm', 'Worlds_Greatest_Stretch',
   'Knee_Across_The_Body', 'Ankle_On_The_Knee', 'Front_Leg_Raises', 'Hug_Knees_To_Chest', 'own-butterfly-stretch',
   'own-pigeon-stretch', 'own-couch-stretch', 'Side_Neck_Stretch',
+  // req-148 batch 4 (DEC-074 §5)
+  'Kneeling_Forearm_Stretch', 'The_Straddle', 'Round_The_World_Shoulder_Stretch', 'Plate_Pinch', 'Wrist_Roller', 'Svend_Press',
+  'Drag_Curl', 'Seated_Triceps_Press', 'Kneeling_High_Pulley_Row', 'Kettlebell_Sumo_High_Pull', 'Two-Arm_Kettlebell_Military_Press',
+  'Kettlebell_Windmill', 'One-Arm_Kettlebell_Clean', 'One-Arm_Kettlebell_Snatch', 'Alternating_Renegade_Row',
+  'Weighted_Sissy_Squat', 'Barbell_Step_Ups', 'Reverse_Grip_Bent-Over_Rows', 'Reverse_Hyperextension', 'Sled_Drag_-_Harness',
+  'Landmine_180s', 'Clean_and_Press', 'Dumbbell_Clean', 'Knee_Tuck_Jump', 'Lateral_Bound', 'Split_Jump', 'Standing_Long_Jump',
+  'Plyo_Push-up', 'Suspended_Reverse_Crunch', 'Suspended_Push-Up', 'Suspended_Split_Squat', 'own-suspension-curl',
+  'own-suspension-leg-curl', 'own-dumbbell-front-squat', 'own-overhead-carry', 'own-reverse-plank', 'own-stability-ball-pike',
+  'own-windshield-wipers', 'own-terminal-knee-extension', 'Push-Ups_With_Feet_On_An_Exercise_Ball',
 ]
 const ALIASES = [
   ['Bench Pull', 'own-seal-row'], ['Cable Tricep Pushdown', 'Triceps_Pushdown'],
@@ -82,7 +91,7 @@ describe('batch 1', () => {
       assert.equal(entry.staple, staple, id)
     }
     for (const id of Object.keys(PROMOTE)) assert.ok(!id.startsWith('own-') && !id.startsWith('extra-'), id)
-    assert.equal(common.length, 298) // req-145/147 (DEC-074 §1): + batches 2 and 3
+    assert.equal(common.length, 338) // req-145/147/148 (DEC-074 §1): + batches 2–4
   })
 
   it('no own add shares a name key with any free-db entry (promote before add)', () => {
