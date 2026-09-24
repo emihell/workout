@@ -1,6 +1,6 @@
 # req-145 — library batch 2: the next ≤40 from the parity queue, fully written
 
-**Status: BUILT, NOT merged — branch `req-145`** — Phase 1, **data only**. **Gate: functional**. It's a follow-on batch under req-140's spec (DEC-066 §2),
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-145` (`906f4f3`…`7c5eaf1`, 2 commits).** — Phase 1, **data only**. **Gate: functional**. It's a follow-on batch under req-140's spec (DEC-066 §2),
 so its rules, validators and receipts apply unchanged. Emilio 2026-09-24: "yes lets finish this". It uses the lighter
 process (planning, 2026-09-24): no separate spec review, since it reuses req-140's reviewed spec; a coach QA of the
 written entries before merge.
