@@ -416,6 +416,13 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   (service worker / cache). Infra; before own images.
 - **Emilio's backup conversion** — one-off script: match → show mapping → write on his OK (DEC-063 §2, ask-gate #2).
 - **Order (DEC-063 §4):** 133 → 134 → 136 → 132 (+ live library link) → 137 → 138 → 131 → 135 → own images (pilot early).
+- **Gyms (future, Emilio 2026-09-24)** — a user adds their own gym, or picks one from a gym library, and lists its
+  equipment, so the app knows what's available and can filter alternatives / build programs within it. Notes for
+  the spec: equipment uses the DEC-062 `equipmentList` vocabulary (maybe + specific machines, e.g. "Star Trac leg
+  curl"); **weight step belongs to a gym's machine, not the exercise** (the same exercise steps differently per gym
+  — DEC-059 §2); a workout needs "which gym am I at" (default: the user's home gym). A user's own gyms fit
+  browser-only; a **shared** gym library that users contribute to needs the backend (Phase 3 fork). Feeds
+  req-135 (alternatives with what's here) and Phase 2 programs.
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
 - **Our own styled exercise figures** (after req-131) — **one base animation per movement pattern** + equipment
   variants (DEC-063 §4), 5-exercise style pilot early; pose keyframes + a shared renderer, animated,
