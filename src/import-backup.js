@@ -1,35 +1,38 @@
 import { applyBackup as validateBackup, buildBackup } from './exchange.js'
 import { askConfirm } from './ui/confirm.js'
 import { dateKey } from './schedule.js'
-import { getLoadUnreadable, readUnreadableRaw, releaseUnreadable } from './storage.js'
+import { getLoadUnreadable, keepUnreadableCopy, readUnreadableRaw, releaseUnreadable } from './storage.js'
+
+// req-157 — the object URL is revoked a while AFTER the click, not synchronously: revoking
+// straight away can cancel a download the browser hasn't started reading yet.
+const REVOKE_AFTER_MS = 60_000
+
+function downloadBlob(filename, blob) {
+  const href = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = href
+  link.download = filename
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(href), REVOKE_AFTER_MS)
+}
 
 // The one download implementation, shared by Settings' Export button and the
 // destructive-import safety backup below (was duplicated in Settings.jsx).
 export function downloadJson(filename, data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-  const href = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = href
-  link.download = filename
-  link.click()
-  URL.revokeObjectURL(href)
+  downloadBlob(filename, new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
 }
 
-// req-157 — a string saved as-is (no JSON re-serialising), so the unreadable value is
-// downloaded exactly as stored.
+// req-157 — a string saved as-is (no JSON re-serialising). A Blob is UTF-8, so an unpaired
+// surrogate becomes U+FFFD here; the on-device copy (keepUnreadableCopy) keeps it exactly.
 export function downloadText(filename, text) {
-  const blob = new Blob([text], { type: 'text/plain' })
-  const href = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = href
-  link.download = filename
-  link.click()
-  URL.revokeObjectURL(href)
+  downloadBlob(filename, new Blob([text], { type: 'text/plain' }))
 }
 
 export const REPLACE_MESSAGE = 'Replace all data on this device?'
 export const REPLACE_UNREADABLE_MESSAGE =
-  "Replace all data on this device? The saved data that couldn't be read will be downloaded first, exactly as stored."
+  "Replace all data on this device? The saved data that couldn't be read is kept as a copy on this device and downloaded first."
+export const KEEP_FAILED_MESSAGE =
+  "Couldn't keep a copy of the unreadable data on this device, so nothing was imported. It is still stored as it was."
 
 // req-07 / DEC-004 — the single destructive-import path both import sites call.
 //
@@ -49,14 +52,23 @@ export const REPLACE_UNREADABLE_MESSAGE =
 // validation error (current state left untouched, nothing asked, nothing downloaded)
 // so each site surfaces the same error it does today.
 //
-// req-157 (audit F-RISK-5, DEC-085 §2) — in the unreadable state (DEC-032: saveState refuses
-// every write so the stored value survives), Import used to report success and save
-// nothing. Now, after the same validate-first check and a confirm that says so, it
-// downloads the raw stored string as `workout-unreadable-<date>.txt` IN PLACE OF the usual
-// backup (which would only hold the empty in-memory state), then lifts the lock, then
-// imports — so the import is really saved. Cancel or a bad file: nothing downloaded, lock
-// kept. If the value is already gone from disk there is nothing to keep: the lock is lifted
-// and the usual backup runs. `unreadableRaw` / `release` / `downloadRaw` are injected for tests.
+// req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — in the unreadable state saveState
+// refuses every write so the stored value survives; Import used to report success and save
+// nothing. Now, after the same validate-first check and a confirm that says so, the raw
+// value is never put at risk: in order,
+//   1. read it fresh from disk (after the confirm);
+//   2. keep an on-device copy under `workout-mvp-unreadable-<ISO time>`, read back ===; if
+//      that fails → throw KEEP_FAILED_MESSAGE (the sites show it inline): lock kept, nothing
+//      saved;
+//   3. download it as `workout-unreadable-<date>.txt` IN PLACE OF the usual backup (which
+//      would only hold the empty in-memory state); a throw here also keeps the lock;
+//   4. only then lift the lock and import, so the import is really saved.
+// A download that returns proves nothing reached the user (iOS asks "Download?" later) —
+// that is why step 2 comes first. The copy is never deleted by the app.
+// If getItem says the value is gone there is nothing to keep: the usual backup runs, then
+// the lock lifts. If getItem THROWS we can't tell → abort, lock kept.
+// Cancel or a bad file: nothing read, kept, downloaded or saved. `unreadable`,
+// `unreadableRaw`, `keepCopy`, `release`, `downloadRaw` are injected for tests.
 export async function importWithBackup({
   store,
   payload,
@@ -65,20 +77,23 @@ export async function importWithBackup({
   downloadRaw = downloadText,
   unreadable = getLoadUnreadable,
   unreadableRaw = readUnreadableRaw,
+  keepCopy = keepUnreadableCopy,
   release = releaseUnreadable,
 }) {
   validateBackup(payload)
-  const raw = unreadable() ? unreadableRaw() : null
-  if (!(await ask(raw != null ? REPLACE_UNREADABLE_MESSAGE : REPLACE_MESSAGE))) return null
+  const locked = unreadable()
+  if (!(await ask(locked ? REPLACE_UNREADABLE_MESSAGE : REPLACE_MESSAGE))) return null
   const today = dateKey(new Date())
-  if (raw != null) {
-    downloadRaw(`workout-unreadable-${today}.txt`, raw)
-    release()
+  const read = locked ? unreadableRaw() : { unlocked: true }
+  if (read.error) throw new Error(KEEP_FAILED_MESSAGE)
+  if (read.raw != null) {
+    if (keepCopy(read.raw).error) throw new Error(KEEP_FAILED_MESSAGE)
+    downloadRaw(`workout-unreadable-${today}.txt`, read.raw)
   } else {
-    if (unreadable()) release()
     // buildBackup(store) uses dataOnly() — the store's functions are filtered out —
     // and structuredClone, so this is a stable snapshot of state before the replace.
     download(`workout-database-${today}.json`, buildBackup(store))
   }
+  if (locked) release()
   return store.applyBackup(payload)
 }

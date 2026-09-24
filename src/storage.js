@@ -203,21 +203,45 @@ export function loadState() {
 }
 
 // req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — Import is the one way out of the
-// unreadable state. It reads the raw value that made the load unreadable, FRESH from disk
-// with loadState's own key choice (current key, else the first legacy key), so the file it
-// downloads is exactly what is stored. null when not unreadable, or when the value is gone.
+// unreadable state. It reads the raw value that made the load unreadable FRESH from disk,
+// with loadState's own key choice (the current key, else the first legacy key):
+//   { raw }    — the stored string;
+//   { gone }   — getItem answered and nothing is stored any more (nothing left to keep);
+//   { error }  — getItem THREW: we can't tell, so the caller must keep the lock;
+//   { unlocked } — not in the unreadable state.
 export function readUnreadableRaw() {
-  if (!getLoadUnreadable()) return null
+  if (!getLoadUnreadable()) return { unlocked: true }
   try {
     const current = localStorage.getItem(STORAGE_KEY)
-    return current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean) || null
+    const raw = current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean)
+    return raw ? { raw } : { gone: true }
   } catch {
-    return null
+    return { error: true }
   }
 }
 
-// req-157 — lifts the DEC-032 write lock. Only importWithBackup calls it, and only after the
-// raw value has been handed to the download (or is already gone from disk).
+// req-157 — the on-device copy of the unreadable value, kept BEFORE the lock is lifted, so
+// the raw string survives even if its download never reaches the user (iOS asks "Download?"
+// after the page has moved on; a home-screen app can ignore a blob download). Written with
+// setItem and read back: only an exact === match counts. The key is never read by the app,
+// never migrated, and NEVER deleted by it — it's there for recovery by hand. localStorage
+// keeps JS strings as they are, so an unpaired surrogate (a value cut mid-emoji) survives
+// here even though a UTF-8 download can't carry it.
+export const UNREADABLE_COPY_PREFIX = 'workout-mvp-unreadable-'
+
+export function keepUnreadableCopy(raw, now = new Date()) {
+  const key = `${UNREADABLE_COPY_PREFIX}${now.toISOString()}`
+  try {
+    localStorage.setItem(key, raw)
+    if (localStorage.getItem(key) !== raw) return { error: true, key }
+    return { key }
+  } catch {
+    return { error: true, key }
+  }
+}
+
+// req-157 — lifts the DEC-032 write lock. Only importWithBackup calls it: after the copy is
+// kept and the download call has returned (or when getItem said the value is gone).
 export function releaseUnreadable() {
   setLoadUnreadable(false)
 }
