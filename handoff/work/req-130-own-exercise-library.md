@@ -25,9 +25,9 @@ req-131 "How to" button, req-132 one Add screen, req-133 text pass (BACKLOG §Ex
    provenance and licence recorded beside it, plus `EXTRA_EXERCISES` folded in. Search reads **this** instead of
    the free-db CDN JSON. RepDB stays a live fetch, used unmodified, as today (its extra ~499 names still show).
 2. **Added per entry (all ours):**
-   - `aliases` — real gym names for the movement, **English only (unconfirmed)**. Must include the 22-seed
+   - `aliases` — real gym names for the movement, **English only**. Must include the 22-seed
      table below. Search matches aliases (it already scores an `aliases` field, `exerciseCatalog.js:~92`).
-   - `muscleGroups` — derived from `primaryMuscles` by one fixed table **(unconfirmed)**: Chest ← chest ·
+   - `muscleGroups` — derived from `primaryMuscles` by one fixed table: Chest ← chest ·
      Back ← lats, middle back, lower back, traps · Shoulders ← shoulders, neck · Arms ← biceps, triceps,
      forearms · Legs ← quadriceps, hamstrings, glutes, calves, abductors, adductors · Core ← abdominals.
      A script/test derives it; not hand-typed.
@@ -39,7 +39,7 @@ req-131 "How to" button, req-132 one Add screen, req-133 text pass (BACKLOG §Ex
 3. **Adding from Search saves `libraryId`** (the entry's id) on the new exercise. Manual add saves none.
    Existing exercises are **not** touched; req-131 resolves them at read time (below).
 4. **One resolver** `libraryEntryFor(exercise, library)` — `libraryId` → exact name key → alias → `null`.
-   No fuzzy/closest guess. The 22 seed names resolve per this table **(picks marked `?` unconfirmed)**:
+   No fuzzy/closest guess. The 22 seed names resolve per this table (picks marked `?` were planning's, confirmed):
 
    Rowing → Rowing, Stationary · Chest Press → Leverage Chest Press · Lat Pulldown → Wide-Grip Lat Pulldown ? ·
    Shoulder Press → Machine Shoulder (Military) Press · Biceps Curl → Machine Bicep Curl · Triceps Press → Dip
@@ -50,7 +50,7 @@ req-131 "How to" button, req-132 one Add screen, req-133 text pass (BACKLOG §Ex
    Dumbbell Shoulder Press · Pull-Ups (BW) → Pullups · Dips (BW) → Dips - Triceps Version ? · Hanging Knee
    Raises → **a new entry of ours, "Hanging Knee Raise"** (free-db has only Hanging Leg Raise; no photos).
 5. **RepDB credit** — the exact line "Exercise data by RepDB (repdb.co)", linked, on the **Search screen** and
-   in **Settings** **(unconfirmed placement)**.
+   in **Settings**.
 
 ## Scope
 
@@ -98,7 +98,7 @@ fields. Check export/import (`exchange.js`, `import-backup.js`) carries `library
 
 ## Decisions made on Emilio's behalf
 
-- behaviour **(unconfirmed)**: English-only aliases; the muscle-group table; the `?` picks above; a new "Hanging
+- behaviour: English-only aliases; the muscle-group table; the `?` picks above; a new "Hanging
   Knee Raise" entry rather than mapping to Hanging Leg Raise; credit on Search + Settings.
 - implementation: file location/shape, lazy loading, the derive script, link URL form — builder's call.
 
