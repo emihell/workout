@@ -5,7 +5,7 @@ import { buildPlannedWorkout, planSnapshot, recalculatedState } from './model'
 import { clampLoopWeeks, dateKey } from './schedule'
 import { loadState, removeExerciseFromState, removeRoutineFromState, replaceItemInState, restoreExerciseInState, saveState } from './storage'
 import { StoreContext } from './store-context'
-import { exerciseFromData } from './exercise-names.js'
+import { exerciseFromData, patchExercise } from './exercise-names.js'
 import { addWorkingSetToState, finishedState, skipItemPatch, withLoggedSet } from './workout-log'
 
 export function StoreProvider({ children }) {
@@ -156,7 +156,7 @@ export function StoreProvider({ children }) {
       updateExercise(exerciseId, patch) {
         setState((s) => ({
           ...s,
-          exercises: s.exercises.map((ex) => (ex.id === exerciseId ? { ...ex, ...patch } : ex)),
+          exercises: s.exercises.map((ex) => (ex.id === exerciseId ? patchExercise(ex, patch) : ex)),
         }))
       },
       // req-119 — the reducer (archive when referenced, incl. the live workout) is in storage.js.

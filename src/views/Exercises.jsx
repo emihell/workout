@@ -3,6 +3,7 @@ import { catalogItemToExercise, loadExerciseCatalog, searchExerciseCatalog } fro
 import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
+import { RepdbCredit } from './credits'
 import { Back, Missing } from './shared'
 import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
@@ -333,6 +334,8 @@ export function ExerciseNewSearch({ returnBase = null }) {
           </List>
         </>
       ) : null}
+      {/* req-130 — Search shows RepDB data: its licence asks for a visible credit. */}
+      <RepdbCredit />
     </Screen>
   )
 }

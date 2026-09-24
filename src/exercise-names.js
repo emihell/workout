@@ -53,7 +53,15 @@ export function exerciseFromData(data, id) {
     // req-85 — orthogonal timer flag + default target seconds.
     hasDuration: Boolean(data.hasDuration),
     durationSec: data.durationSec != null ? Number(data.durationSec) : DEFAULT_DURATION_SEC,
+    // req-130 — the library entry it was added from; absent (never null/'') otherwise.
+    ...(data.libraryId ? { libraryId: String(data.libraryId) } : {}),
   }
+}
+
+// req-130 — the record store.updateExercise writes: the patch merged over the stored
+// record, so fields an edit doesn't send (libraryId, archivedAt) are kept.
+export function patchExercise(exercise, patch) {
+  return { ...exercise, ...patch }
 }
 
 // req-127 — where picking an existing exercise (Use it / Restore) continues to: in a

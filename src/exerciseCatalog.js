@@ -1,6 +1,7 @@
-import { EXTRA_EXERCISES } from './exerciseExtras.js'
+import { catalogNameKey, loadExerciseLibrary } from './exerciseLibrary.js'
 
-const FREE_EXERCISE_DB_URL = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/dist/exercises.json'
+// req-130 — free-exercise-db is no longer fetched: our library (exerciseLibrary.js) is a
+// pinned copy of it with the extras folded in. RepDB stays a live, unmodified fetch.
 const REPDB_URL = 'https://cdn.jsdelivr.net/gh/RepDB/exercise-dataset@main/exercises.json'
 
 const MACHINE_EQUIPMENT = new Set(['machine', 'cable'])
@@ -16,12 +17,7 @@ function fetchJson(url) {
   })
 }
 
-export function catalogNameKey(name) {
-  return String(name || '')
-    .toLowerCase()
-    .replace(/push[\s-]*ups?/g, 'pushup')
-    .replace(/[^a-z0-9]+/g, '')
-}
+export { catalogNameKey }
 
 export function fromRepdbItem(item) {
   const equipmentRaw = String(item.equipment || '').toLowerCase().replace(/_/g, ' ')
@@ -56,14 +52,25 @@ export function mergeCatalogs(primary, extra) {
   return merged
 }
 
-export function loadExerciseCatalog() {
+// Test hook: forget the cached catalog so the next load starts over.
+export function resetExerciseCatalog() {
+  catalogPromise = null
+}
+
+// `loadLibrary` is injectable for tests only; the app always uses our library chunk.
+export function loadExerciseCatalog({ loadLibrary = loadExerciseLibrary } = {}) {
   if (!catalogPromise) {
-    catalogPromise = Promise.allSettled([fetchJson(FREE_EXERCISE_DB_URL), fetchJson(REPDB_URL)]).then(
+    catalogPromise = Promise.allSettled([loadLibrary(), fetchJson(REPDB_URL)]).then(
       (results) => {
-        const freeDb = results[0].status === 'fulfilled' && Array.isArray(results[0].value) ? results[0].value : []
+        const libraryOk = results[0].status === 'fulfilled' && Array.isArray(results[0].value)
+        const library = libraryOk ? results[0].value : []
         const repdbPayload = results[1].status === 'fulfilled' ? results[1].value : null
         const repdb = Array.isArray(repdbPayload?.exercises) ? repdbPayload.exercises.map(fromRepdbItem) : []
-        const merged = mergeCatalogs(freeDb, [...repdb, ...EXTRA_EXERCISES])
+        // Dedupe stays name-only (never on aliases): RepDB's "Lat Pulldown" etc. still appear.
+        const merged = mergeCatalogs(library, repdb)
+        // req-130 review — a RepDB-only list is shown but never cached: the next open
+        // retries the library chunk instead of keeping a partial catalog all session.
+        if (!libraryOk) catalogPromise = null
         if (!merged.length) throw new Error('Could not load.')
         return merged
       },
@@ -85,18 +92,25 @@ export function searchExerciseCatalog(list, query, limit = 25) {
   const q = String(query || '').trim().toLowerCase()
   if (q.length < 2) return []
   const qCompact = compactText(q)
+  const qKey = catalogNameKey(q)
   const scored = []
   for (const item of list || []) {
     const name = String(item.name || '').toLowerCase()
     const aliases = (item.aliases || []).join(' ').toLowerCase()
     const muscles = [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].join(' ').toLowerCase()
     const equipment = String(item.equipment || '').toLowerCase()
-    const compactName = compactText(`${name} ${aliases}`)
+    const compactName = compactText(name)
+    const compactAliases = compactText(aliases)
     let score = -1
-    if (name === q) score = 0
-    else if (name.startsWith(q) || aliases.split(/\s+/).some((alias) => alias === q)) score = 1
-    else if (name.includes(q) || aliases.includes(q)) score = 2
-    else if (qCompact.length >= 3 && compactName.includes(qCompact)) score = 2
+    // req-130 — a whole alias equal to the query scores like an exact name (the word
+    // split below never matched a multi-word alias).
+    if (name === q || (qKey && (item.aliases || []).some((alias) => catalogNameKey(alias) === qKey))) score = 0
+    // req-130 review — no alias word-split here: a single word inside a multi-word
+    // alias ("press" in "Triceps Press") would outrank real name hits. A partial alias
+    // hit ranks just below a partial name hit, so aliases never reorder name matches.
+    else if (name.startsWith(q)) score = 1
+    else if (name.includes(q) || (qCompact.length >= 3 && compactName.includes(qCompact))) score = 2
+    else if (aliases.includes(q) || (qCompact.length >= 3 && compactAliases.includes(qCompact))) score = 2.5
     else if (muscles.includes(q) || equipment.includes(q)) score = 3
     if (score >= 0) scored.push({ item, score, name })
   }
@@ -121,6 +135,11 @@ export function inferExerciseType(equipment, category) {
   return 'free'
 }
 
+// req-130 — only entries of our library link back to it; RepDB hits are live-only.
+export function isLibraryItem(item) {
+  return Boolean(item?.id) && !String(item.id).startsWith('repdb-')
+}
+
 export function catalogItemToExercise(item) {
   const type = inferExerciseType(item.equipment, item.category)
   const equipmentLabel = item.equipment ? titleCase(item.equipment) : type === 'bodyweight' ? 'Bodyweight' : 'Unknown'
@@ -133,5 +152,6 @@ export function catalogItemToExercise(item) {
     weightStep: 'n/a',
     muscles: [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].map(titleCase).join(', '),
     cues: (item.instructions || []).join('\n').trim(),
+    ...(isLibraryItem(item) ? { libraryId: item.id } : {}),
   }
 }

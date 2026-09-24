@@ -5,6 +5,7 @@ import { buildBackup } from '../exchange.js'
 import { downloadJson, importWithBackup } from '../import-backup'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
+import { RepdbCredit } from './credits'
 import { Actions, Banner, Button, Checkbox, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
 
 function backupLines(summary) {
@@ -89,6 +90,8 @@ export function Settings() {
       {/* req-87 — turn the on-page feedback-note capture button on/off. Default off;
           persisted in its own key (never the workout data). */}
       <Checkbox label="Feedback notes" checked={feedbackEnabled} onChange={setFeedbackEnabled} />
+      {/* req-130 — the credit RepDB's licence asks for on an about/credits screen. */}
+      <RepdbCredit />
     </Screen>
   )
 }
