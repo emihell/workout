@@ -1818,3 +1818,17 @@ exit regression (Planner's browser run, L-036) → fixed with tests failing on `
 Finish → Save / Save anyway / Abandon → `#/`; overview Abandon → `#/`; old finish + item URL → `#/workout/sess-lower`; bogus
 → "Not found."; import errors clear on Today + Settings; 0 native dialogs. Reviewer: the first round's (DEC-057 §1 didn't
 fire — no store/model/storage/workout-log change); the final diff is route-free.
+
+## req-154 — a comma kg ("22,5") is saved as 22.5, not 0 (audit F-TRUST-1, DEC-058 §1)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `317f526`…`ae81620`, 3 commits; the first adds the code audit
+`audits/2026-09-24.md`, unchanged — `cmp` identical to planning's copy). One shared typed-kg parse (`kg-input.js`) used by
+the routine editor, weight-step and, via `views/set-values.js`, all four set saves (live log, active set edit, History
+edit, History add set); unreadable text blocks Save with an inline error; the kg carry gets the parsed value. No stored
+data rewritten (past 0s can't be told from real ones). Gate: Builder `check: green — lint, 58 test file(s), and the build
+all passed.`; independent reviewer (DEC-057 §1: workout-log) in an archive copy → `# tests 918 # pass 918 # fail 0`, **no
+blockers**, 1 should-fix (a trailing "22," / "22." is refused — was saved as 22) + 2 nits (duration "30,5" still → 0) →
+**req-155**; Planner's browser run of the branch build (typed keystrokes "22,5"): WU 22.5 stored; "abc" → "Can't read 'abc'
+as kg — use a number like 22,5.", no set; "62,5" → 62.5 and carries; set edit "2,5,5" → error, stays, "20,5" → 20.5;
+History edit "17,5" → 17.5; History add "abc" → error, 28 sets kept; "12,5" → 12.5. Not verified: a real Swedish iPhone
+keypad.
