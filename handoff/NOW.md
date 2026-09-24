@@ -17,6 +17,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
+- **`req-154` comma kg saved as 0 on the live log** (audit F-TRUST-1, DEC-058) — sent to Builder 2026-09-24.
+- **Audits 2026-09-24:** code (`audits/2026-09-24.md`, 17 new: 3 bugs) + workflow (`audits/workflow-2026-09-24.md`) —
+  Emilio's decision list pending.
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
   search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
 - **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
