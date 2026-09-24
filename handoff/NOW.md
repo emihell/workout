@@ -18,8 +18,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **Next: `req-131` "How to" button** — to spec (BACKLOG §Exercise library). req-130 LIVE 2026-09-24.
-  Unconfirmed calls from req-130 for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename;
+- **Next: `req-131` "How to" button** — to spec (BACKLOG §Exercise library). Own library LIVE 2026-09-24.
+  Unconfirmed calls (library req) for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename;
   whole-library aliases → req-133; RepDB pictures joined at runtime.
 - `req-10` **first-time-exercise setup flow** — waiting (Emilio 2026-09-24: "core still needs improvement");
   spec predates ~100 reqs, rescan before building. **[ux-feel]**
