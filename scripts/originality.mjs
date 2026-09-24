@@ -1,8 +1,11 @@
 // req-138 — the originality receipt (a one-off check, not a test). Compares our library
 // text with a pinned RepDB copy cached OUTSIDE the repo and prints only OUR lines and
-// their scores — never a RepDB sentence.
+// their scores — never a RepDB sentence. The cache lives in the gitignored .vendor-cache/.
 //
-//   node scripts/originality.mjs <cached repdb exercises.json>
+//   node scripts/originality.mjs [cached repdb exercises.json] [--runs-only] [--lines] [--scores]
+//
+// Default input: .vendor-cache/repdb-<pinned sha>.json (gitignored, DEC-066).
+// --runs-only: Measure 2 only — the gate since DEC-065 §3.
 //
 // Measure 1, per common entry with a same-named RepDB entry (catalogNameKey of the shown
 // name or an alias == RepDB's English name): the share of our word-4-grams (all four text
@@ -17,11 +20,10 @@ import { catalogNameKey, shownName, TEXT_FIELDS } from '../src/exerciseLibrary.j
 
 const FLAG = 0.15
 const RUN = 12
-const repdbPath = process.argv[2]
-if (!repdbPath) {
-  console.error('usage: node scripts/originality.mjs <cached repdb exercises.json>')
-  process.exit(1)
-}
+const REPDB_SHA = '9ed9357f09c7566ea0256c57ebd6374ebb8b575e'
+const RUNS_ONLY = process.argv.includes('--runs-only')
+const repdbPath = process.argv.slice(2).find((arg) => !arg.startsWith('--'))
+  || fileURLToPath(new URL(`../.vendor-cache/repdb-${REPDB_SHA}.json`, import.meta.url))
 const repdbFile = JSON.parse(readFileSync(repdbPath, 'utf8'))
 const repdb = Array.isArray(repdbFile) ? repdbFile : repdbFile.exercises
 const library = JSON.parse(readFileSync(fileURLToPath(new URL('../src/library/exercises.json', import.meta.url)), 'utf8'))
@@ -88,10 +90,15 @@ function measure(label, entries, linesOf) {
     if (match) scored.push({ id: entry.id, score: share(lines, match) })
     for (const line of lines) if (longRun(line)) runLines.push({ id: entry.id, line })
   }
+  console.log(`\n## ${label}`)
+  if (RUNS_ONLY) {
+    console.log(`lines with a >=${RUN}-token run: ${runLines.length}`)
+    for (const { id, line } of runLines) console.log(`  RUN  ${id}: ${line}`)
+    return { scored, flagged: [], runLines }
+  }
   const { n, max, median } = stats(scored.map((s) => s.score))
   const flagged = scored.filter((s) => s.score > FLAG).sort((a, b) => b.score - a.score)
   const top = scored.slice().sort((a, b) => b.score - a.score)[0]
-  console.log(`\n## ${label}`)
   console.log(`matched ${n}/${entries.length} · max ${fmt(max)}${top ? ` (${top.id})` : ''} · median ${fmt(median)} · flagged >${FLAG}: ${flagged.length} · lines with a >=${RUN}-token run: ${runLines.length}`)
   for (const { id, score } of flagged) console.log(`  FLAG ${fmt(score)} ${id}`)
   for (const { id, line } of runLines) console.log(`  RUN  ${id}: ${line}`)

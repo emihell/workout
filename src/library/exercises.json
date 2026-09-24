@@ -110,6 +110,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-crunch",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine crunch against a weight stack that trains the abs.",
     "formCues": [
       "Curl the torso, not the arms",
@@ -186,6 +188,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-ab-roller",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A roll of an ab wheel forward from the knees and back that trains the abs to resist arching.",
     "formCues": [
       "Ribs down, glutes tight",
@@ -930,6 +934,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated dumbbell press that rotates the palms as you press, working the front and side delts.",
     "formCues": [
       "Start palms facing you",
@@ -1284,6 +1290,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A leg curl lying on your back with your heels on a stability ball, training the hamstrings and glutes.",
     "formCues": [
       "Hips stay lifted",
@@ -1362,6 +1370,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pull-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A pull-up with a resistance band under the feet or knees that takes some of your bodyweight.",
     "formCues": [
       "Shoulders down before you pull",
@@ -1534,6 +1544,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-rear-delt-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A resistance band pulled apart in front of the chest that trains the rear delts and upper back.",
     "formCues": [
       "Arms straight at shoulder height",
@@ -1709,6 +1721,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell press lying on a flat bench that trains the chest, triceps and front delts.",
     "formCues": [
       "Shoulder blades pinched and down",
@@ -1788,6 +1802,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing curl of a straight barbell that trains the biceps.",
     "formCues": [
       "Elbows pinned to your sides",
@@ -1915,6 +1931,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-deadlift",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell lifted from the floor to standing that trains the glutes, hamstrings and lower back.",
     "formCues": [
       "Bar over the mid foot",
@@ -2025,6 +2043,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-hip-thrust",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hip bridge lying on the floor with a barbell over the hips that trains the glutes.",
     "formCues": [
       "Heels close to the glutes",
@@ -2170,6 +2190,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-hip-thrust",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell hip thrust with the upper back on a bench that trains the glutes.",
     "formCues": [
       "Chin tucked, ribs down",
@@ -2217,7 +2239,8 @@
     "aliases": [
       "Incline Barbell Press",
       "Incline Bench",
-      "BB Incline Press"
+      "BB Incline Press",
+      "Incline Barbell Bench Press"
     ],
     "muscleGroups": [
       "Chest"
@@ -2250,6 +2273,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-incline-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell press on an incline bench that shifts the work toward the upper chest and front delts.",
     "formCues": [
       "Bench at a low incline",
@@ -2363,6 +2388,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A forward lunge with the bar on your back, working the quads and glutes one leg at a time.",
     "formCues": [
       "Long enough step for both knees to bend",
@@ -2567,6 +2594,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-shrug",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell held at arm length and lifted by shrugging, which trains the traps.",
     "formCues": [
       "Lift straight up to the ears",
@@ -2756,6 +2785,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A squat with a barbell across the upper back that trains the quads and glutes.",
     "formCues": [
       "Brace before you descend",
@@ -2942,6 +2973,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-battling-ropes",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Heavy ropes whipped in waves from an athletic stance, a conditioning effort for the shoulders and core.",
     "formCues": [
       "Athletic stance, knees bent",
@@ -3082,6 +3115,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dip with your hands on a bench behind you that trains the triceps using bodyweight.",
     "formCues": [
       "Hips stay close to the bench",
@@ -3446,6 +3481,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell row with the torso hinged forward that trains the lats, upper back and rear delts.",
     "formCues": [
       "Flat back, hinged at the hips",
@@ -3671,6 +3708,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A row with a dumbbell in each hand while hinged forward that trains the lats, upper back and rear delts.",
     "formCues": [
       "Flat back, chest out",
@@ -3851,6 +3890,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-stationary-bike",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Pedalling a stationary bike, a low-impact cardio effort that works the quads and glutes.",
     "formCues": [
       "Slight knee bend at the bottom",
@@ -4097,6 +4138,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A squat with no weight that trains the quads and glutes and grooves the squat pattern.",
     "formCues": [
       "Feet about shoulder width",
@@ -4177,6 +4220,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A lunge that steps forward continuously across the floor, training the quads and glutes.",
     "formCues": [
       "Tall torso, eyes forward",
@@ -4390,12 +4435,64 @@
       "Box_Squat/1.jpg"
     ],
     "id": "Box_Squat",
+    "aliases": [
+      "Barbell Box Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Box_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Box_Squat/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "barbell",
+      "box"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A barbell squat to a box behind you that trains the quads and glutes and teaches the hips to sit back.",
+    "formCues": [
+      "Sit back to the box",
+      "Stay tight on the box",
+      "Shins close to vertical"
+    ],
+    "steps": [
+      "Set a box behind you at a height where your thighs are about parallel when seated.",
+      "Unrack the bar onto your upper back and stand in front of the box.",
+      "Push your hips back and sit down until you touch the box.",
+      "Pause briefly without relaxing, then drive up to standing."
+    ],
+    "mistakes": [
+      "Dropping onto the box and losing tension",
+      "Rocking back to stand up"
     ]
   },
   {
@@ -4619,6 +4716,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-hip-thrust",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hip bridge lying on the floor with no weight that trains the glutes.",
     "formCues": [
       "Feet flat, knees bent",
@@ -4691,6 +4790,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine fly, the pec deck, that trains the chest as the arms close in front of you.",
     "formCues": [
       "Handles at chest height",
@@ -4733,12 +4834,55 @@
       "Cable_Chest_Press/1.jpg"
     ],
     "id": "Cable_Chest_Press",
+    "aliases": [
+      "Seated Cable Chest Press"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Chest_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Chest_Press/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A seated press between two cables that trains the chest, triceps and front delts.",
+    "formCues": [
+      "Handles at mid chest height",
+      "Back against the pad",
+      "Press forward, not up"
+    ],
+    "steps": [
+      "Set the handles level with your mid chest and sit with your back against the pad.",
+      "Grip the handles with your elbows bent and slightly below your shoulders.",
+      "Press the handles forward until your arms are nearly straight.",
+      "Let them come back slowly until you feel a stretch across the chest."
+    ],
+    "mistakes": [
+      "Shoulders roll forward off the pad",
+      "Handles set so high the shoulders shrug"
     ]
   },
   {
@@ -4798,6 +4942,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing cable fly from high pulleys that trains the chest as the hands sweep down and together.",
     "formCues": [
       "Slight forward lean from the hips",
@@ -4864,6 +5010,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-crunch",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A kneeling crunch pulling a rope down from a high cable that trains the abs.",
     "formCues": [
       "Hips stay still",
@@ -4974,6 +5122,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-hammer-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hammer curl with a rope on a low cable that trains the brachialis and biceps with constant tension.",
     "formCues": [
       "Neutral grip on the rope",
@@ -5332,6 +5482,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-rear-delt-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing reverse fly between two cables that trains the rear delts and upper back.",
     "formCues": [
       "Cross the cables in front of you",
@@ -5431,6 +5583,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-triceps-extension",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An overhead cable extension with a rope, facing away from the machine, that trains the triceps in a long stretch.",
     "formCues": [
       "Elbows point forward",
@@ -5787,6 +5941,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-calf-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A calf press on the leg press machine, pushing the platform with the balls of the feet.",
     "formCues": [
       "Only the balls of the feet on the platform",
@@ -6601,6 +6757,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pull-up",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A pull-up with an underhand grip that trains the lats and puts more of the work on the biceps.",
     "formCues": [
       "Palms facing you, shoulder width",
@@ -6717,12 +6875,75 @@
       "Clean/1.jpg"
     ],
     "id": "Clean",
+    "aliases": [
+      "Squat Clean",
+      "Barbell Clean",
+      "Full Clean"
+    ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-clean",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A barbell lift from the floor to the shoulders, caught in a full squat, that trains full-body power.",
+    "formCues": [
+      "Bar close from floor to catch",
+      "Full hip drive",
+      "Catch deep with elbows high"
+    ],
+    "steps": [
+      "Stand with the bar over your mid foot and grip it just outside your legs.",
+      "Lift the bar off the floor with a flat back, keeping it close to your legs.",
+      "Drive your hips through explosively as the bar reaches your thighs.",
+      "Pull yourself under the bar and catch it on your shoulders in a full squat.",
+      "Stand up out of the squat with the bar racked."
+    ],
+    "mistakes": [
+      "Bar swings away from the body",
+      "Elbows drop and the bar rolls forward"
     ]
   },
   {
@@ -6906,6 +7127,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-clean",
+    "staple": true,
+    "difficulty": "advanced",
     "description": "A barbell cleaned from the floor to the shoulders, then driven overhead, training the whole body.",
     "formCues": [
       "Clean first, then reset",
@@ -7101,6 +7324,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A flat bench press with a shoulder-width grip that puts more of the work on the triceps.",
     "formCues": [
       "Hands about shoulder width",
@@ -7475,6 +7700,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-concentration-curls",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated one-arm curl with the elbow braced against the inner thigh that isolates the biceps.",
     "formCues": [
       "Elbow braced on the inner thigh",
@@ -7769,6 +7996,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-crunch",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A curl of the shoulders off the floor, lying on your back, that trains the abs.",
     "formCues": [
       "Curl the ribs toward the hips",
@@ -7906,6 +8135,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dead-bug",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A slow reach of the opposite arm and leg while lying on your back that trains the abs.",
     "formCues": [
       "Lower back pressed to the floor",
@@ -8057,6 +8288,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell press on a decline bench that shifts the work toward the lower chest and triceps.",
     "formCues": [
       "Legs locked under the pads",
@@ -8135,12 +8368,48 @@
       "Decline_Crunch/1.jpg"
     ],
     "id": "Decline_Crunch",
+    "aliases": [
+      "Decline Bench Crunch"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Crunch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Crunch/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bench",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A crunch on a decline bench with the feet hooked in, a harder crunch that trains the abs.",
+    "formCues": [
+      "Feet locked under the pads",
+      "Curl the ribs toward the hips",
+      "Lower with control"
+    ],
+    "steps": [
+      "Hook your feet under the pads of a decline bench and lie back.",
+      "Place your fingertips lightly beside your head or cross your arms on your chest.",
+      "Curl your shoulders up by drawing your ribs toward your hips.",
+      "Lower yourself slowly until your shoulders are near the bench."
+    ],
+    "mistakes": [
+      "Yanking the head forward with the hands",
+      "Dropping back onto the bench"
     ]
   },
   {
@@ -8362,6 +8631,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-push-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A push-up with the feet raised on a bench, a harder version that shifts work toward the upper chest.",
     "formCues": [
       "Feet on the bench, hands just outside the shoulders",
@@ -8472,12 +8743,69 @@
       "Deficit_Deadlift/1.jpg"
     ],
     "id": "Deficit_Deadlift",
+    "aliases": [
+      "Deficit Deadlifts"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Deficit_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Deficit_Deadlift/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-deadlift",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A deadlift standing on a low platform, which adds range and trains the pull from the floor.",
+    "formCues": [
+      "Shins to the bar",
+      "Hips lower than in a deadlift",
+      "Flat back off the floor"
+    ],
+    "steps": [
+      "Stand on a low plate or platform with the bar over your mid foot.",
+      "Hinge down and grip the bar just outside your legs.",
+      "Bend your knees until your shins touch the bar, then flatten your back and brace.",
+      "Stand up by pushing through the platform, keeping the bar close.",
+      "Lower the bar back to the floor under control."
+    ],
+    "mistakes": [
+      "Platform so high the back rounds",
+      "Hips shoot up before the bar moves"
     ]
   },
   {
@@ -8576,6 +8904,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine dip that trains the triceps and chest by pressing handles down beside you.",
     "formCues": [
       "Seat set so the handles start high",
@@ -8653,6 +8983,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A dip on parallel bars with a forward lean that trains the lower chest and triceps.",
     "formCues": [
       "Lean the torso forward",
@@ -8732,6 +9064,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A dip on parallel bars with an upright torso that trains mainly the triceps.",
     "formCues": [
       "Torso stays upright",
@@ -9181,6 +9515,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A flat-bench press with a dumbbell in each hand that trains the chest, triceps and front delts.",
     "formCues": [
       "Shoulder blades squeezed together",
@@ -9295,6 +9631,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing curl with a dumbbell in each hand that trains the biceps.",
     "formCues": [
       "Palms turn up as you curl",
@@ -9375,12 +9713,56 @@
       "Dumbbell_Floor_Press/1.jpg"
     ],
     "id": "Dumbbell_Floor_Press",
+    "aliases": [
+      "DB Floor Press"
+    ],
     "muscleGroups": [
+      "Chest",
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Floor_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Floor_Press/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-floor-press",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A dumbbell press lying on the floor that trains the chest and triceps with a built-in stop.",
+    "formCues": [
+      "Elbows at an angle to the body",
+      "Pause at the floor",
+      "Press the dumbbells together up"
+    ],
+    "steps": [
+      "Sit on the floor with a dumbbell on each thigh, then lie back and bring them to your chest.",
+      "Bend your knees and set your feet flat.",
+      "Press the dumbbells up until your arms are straight.",
+      "Lower them until your upper arms rest lightly on the floor, then press again."
+    ],
+    "mistakes": [
+      "Dropping the elbows hard onto the floor",
+      "Dumbbells drifting toward the face"
     ]
   },
   {
@@ -9437,6 +9819,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A flat-bench fly with dumbbells that stretches and trains the chest through a wide arc.",
     "formCues": [
       "Soft bend in the elbows",
@@ -9521,6 +9905,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell row lying face down on an incline bench that trains the lats and upper back without loading the lower back.",
     "formCues": [
       "Chest on the pad",
@@ -9638,6 +10024,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A lunge holding a dumbbell in each hand that trains the quads and glutes.",
     "formCues": [
       "Torso tall, dumbbells at your sides",
@@ -10012,6 +10400,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A lunge that steps backward holding dumbbells, training the quads and glutes with less stress on the front knee.",
     "formCues": [
       "Step straight back",
@@ -10157,7 +10547,8 @@
       "Overhead DB Press",
       "DB Shoulder Press",
       "Dumbbell Overhead Press",
-      "Seated DB Shoulder Press"
+      "Seated DB Shoulder Press",
+      "Seated Dumbbell Shoulder Press"
     ],
     "muscleGroups": [
       "Shoulders"
@@ -10185,6 +10576,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell press from the shoulders to overhead that trains the delts and triceps.",
     "formCues": [
       "Back against the pad",
@@ -10254,6 +10647,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-shrug",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A shrug with a dumbbell in each hand at your sides that trains the traps.",
     "formCues": [
       "Dumbbells hang at your sides",
@@ -10322,6 +10717,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-dumbbell-side-bend",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A sideways bend holding a dumbbell in one hand that trains the obliques.",
     "formCues": [
       "Bend straight to the side",
@@ -10477,6 +10874,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A step up onto a box or bench holding dumbbells that trains the quads and glutes.",
     "formCues": [
       "Whole foot on the box",
@@ -10641,6 +11040,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing curl of an EZ bar, whose angled grip sits easier on the wrists, that trains the biceps.",
     "formCues": [
       "Hands on the angled grips",
@@ -10685,7 +11086,8 @@
     "aliases": [
       "Skull Crushers",
       "Skullcrushers",
-      "EZ Bar Skull Crusher"
+      "EZ Bar Skull Crusher",
+      "Lying Tricep Extension"
     ],
     "muscleGroups": [
       "Arms"
@@ -10710,6 +11112,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-skull-crusher",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An EZ bar lowered toward the head while lying on a bench, then pressed back up, training the triceps.",
     "formCues": [
       "Upper arms stay still",
@@ -10949,6 +11353,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-elliptical-trainer",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A gliding stride on an elliptical machine, a low-impact cardio effort for the legs.",
     "formCues": [
       "Stand tall",
@@ -11212,6 +11618,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-face-pull",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A rope pulled from a high cable toward the face that trains the rear delts and upper back.",
     "formCues": [
       "Pull toward the eyes",
@@ -11263,7 +11671,9 @@
       "Farmers Walk",
       "Farmer Carry",
       "Farmers Carry",
-      "Farmer's Carry"
+      "Farmer's Carry",
+      "Dumbbell Farmer's Walk",
+      "Kettlebell Farmer's Walk"
     ],
     "muscleGroups": [
       "Back",
@@ -11305,6 +11715,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-farmers-walk",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A walk carrying heavy weights at your sides that trains the grip, traps and core.",
     "formCues": [
       "Stand tall, shoulders down",
@@ -11504,6 +11916,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A raise of straight legs lying on a bench or the floor that trains the abs and hip flexors.",
     "formCues": [
       "Lower back pressed down",
@@ -11610,12 +12024,56 @@
       "Floor_Press/1.jpg"
     ],
     "id": "Floor_Press",
+    "aliases": [
+      "Barbell Floor Press"
+    ],
     "muscleGroups": [
+      "Chest",
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Floor_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Floor_Press/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-floor-press",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A barbell press lying on the floor, which stops the elbows at the floor and trains the triceps and chest.",
+    "formCues": [
+      "Upper arms touch the floor lightly",
+      "Wrists over elbows",
+      "Pause, then press"
+    ],
+    "steps": [
+      "Set the bar in a rack low enough to reach from the floor and lie under it.",
+      "Grip the bar about shoulder width apart and unrack it with straight arms.",
+      "Lower the bar until your upper arms rest lightly on the floor.",
+      "Pause briefly, then press the bar back up."
+    ],
+    "mistakes": [
+      "Bouncing the elbows off the floor",
+      "Elbows flared straight out"
     ]
   },
   {
@@ -11676,12 +12134,57 @@
       "Flutter_Kicks/1.jpg"
     ],
     "id": "Flutter_Kicks",
+    "aliases": [
+      "Flutter Kicks",
+      "Flutters"
+    ],
     "muscleGroups": [
-      "Legs"
+      "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Flutter_Kicks/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Flutter_Kicks/1.jpg"
+    ],
+    "displayName": "Flutter Kick",
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A lying hold with the legs kicking up and down in small, quick strokes, which trains the abs and hip flexors.",
+    "formCues": [
+      "Lower back pressed down",
+      "Legs long, small kicks",
+      "Steady rhythm"
+    ],
+    "steps": [
+      "Lie on your back with your hands under your hips or at your sides.",
+      "Lift your legs a little off the floor with your knees straight.",
+      "Kick your legs up and down in small, quick strokes.",
+      "Keep kicking at a steady pace until the timer ends."
+    ],
+    "mistakes": [
+      "Lower back arches off the floor",
+      "Kicks get big and slow"
     ]
   },
   {
@@ -11810,12 +12313,62 @@
       "Freehand_Jump_Squat/1.jpg"
     ],
     "id": "Freehand_Jump_Squat",
+    "aliases": [
+      "Squat Jump",
+      "Squat Jumps",
+      "Jump Squats"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Freehand_Jump_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Freehand_Jump_Squat/1.jpg"
+    ],
+    "displayName": "Jump Squat",
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "plyometric",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-freehand-jump-squat",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A bodyweight squat that finishes in a jump, training leg power.",
+    "formCues": [
+      "Squat to a comfortable depth",
+      "Jump straight up",
+      "Land soft into the next rep"
+    ],
+    "steps": [
+      "Stand with your feet about shoulder width apart.",
+      "Squat down with your arms reaching back.",
+      "Swing your arms and jump straight up as high as you can.",
+      "Land softly with bent knees and go straight into the next squat."
+    ],
+    "mistakes": [
+      "Landing with straight, stiff legs",
+      "Knees collapse inward on landing"
     ]
   },
   {
@@ -11949,6 +12502,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A squat with the barbell held on the front of the shoulders that keeps the torso upright and trains the quads.",
     "formCues": [
       "Elbows high, upper arms level",
@@ -12069,6 +12624,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-front-box-jump",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A two-footed jump onto a box that trains leg power.",
     "formCues": [
       "Swing the arms to jump",
@@ -12211,6 +12768,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-front-dumbbell-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell raise straight in front of you that trains the front delts.",
     "formCues": [
       "Arms nearly straight",
@@ -12574,6 +13133,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-glute-ham-raise",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A knee curl on a glute-ham bench that trains the hamstrings from the knee and hip together.",
     "formCues": [
       "Knees just behind the pad",
@@ -12645,6 +13206,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-glute-kickback",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A kickback of one leg on all fours that trains the glutes with bodyweight.",
     "formCues": [
       "Back flat, core tight",
@@ -12728,6 +13291,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A squat holding a kettlebell or dumbbell at the chest that trains the quads and glutes.",
     "formCues": [
       "Weight held tight to the chest",
@@ -12805,6 +13370,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-good-morning",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A hip hinge with a barbell on the upper back that trains the hamstrings and lower back.",
     "formCues": [
       "Bar on the upper back",
@@ -13009,6 +13576,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A machine squat leaning back against a pad on an angled sled that trains the quads.",
     "formCues": [
       "Back and head on the pad",
@@ -13084,6 +13653,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-hammer-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell curl with the palms facing each other that trains the brachialis, biceps and forearms.",
     "formCues": [
       "Thumbs up, palms in",
@@ -13220,12 +13791,57 @@
       "Handstand_Push-Ups/1.jpg"
     ],
     "id": "Handstand_Push-Ups",
+    "aliases": [
+      "HSPU",
+      "Wall Handstand Push-Up"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Handstand_Push-Ups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Handstand_Push-Ups/1.jpg"
+    ],
+    "displayName": "Handstand Push-Up",
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-handstand-push-up",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A push-up upside down in a handstand against a wall, which trains the shoulders and triceps.",
+    "formCues": [
+      "Hands a little wider than shoulders",
+      "Head lowers to a tripod with the hands",
+      "Body stays stacked"
+    ],
+    "steps": [
+      "Kick up into a handstand with your heels resting on a wall.",
+      "Set your hands a little wider than your shoulders.",
+      "Bend your elbows and lower your head toward the floor under control.",
+      "Press back up until your arms are straight."
+    ],
+    "mistakes": [
+      "Dropping onto the head",
+      "Back arches hard away from the wall"
     ]
   },
   {
@@ -13257,12 +13873,77 @@
       "Hang_Clean/1.jpg"
     ],
     "id": "Hang_Clean",
+    "aliases": [
+      "Hang Power Clean"
+    ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hang_Clean/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hang_Clean/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-clean",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "An explosive clean started with the bar at the thighs, which trains hip power and the catch.",
+    "formCues": [
+      "Start at mid thigh",
+      "Jump and shrug hard",
+      "Fast elbows under the bar"
+    ],
+    "steps": [
+      "Stand holding the bar at your thighs with a grip just outside your legs.",
+      "Push your hips back so the bar slides to just above your knees.",
+      "Drive your hips forward explosively and shrug the bar up close to your body.",
+      "Pull yourself under the bar and catch it on your shoulders in a partial squat.",
+      "Stand up tall with the bar on your shoulders."
+    ],
+    "mistakes": [
+      "Pulling with bent arms too early",
+      "Catching with the elbows pointing down"
     ]
   },
   {
@@ -13475,6 +14156,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-raise",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A straight-leg lift from a dead hang on a bar that works the abs and hip flexors.",
     "formCues": [
       "Start from a still hang",
@@ -13515,12 +14198,62 @@
       "Hanging_Pike/1.jpg"
     ],
     "id": "Hanging_Pike",
+    "aliases": [
+      "T2B",
+      "TTB"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hanging_Pike/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hanging_Pike/1.jpg"
+    ],
+    "displayName": "Toes to Bar",
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "obliques",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A hanging leg raise that brings the toes all the way up to the bar, training the abs and hip flexors.",
+    "formCues": [
+      "Shoulders active, not relaxed",
+      "Legs as straight as you can",
+      "Lower without swinging"
+    ],
+    "steps": [
+      "Hang from a pull-up bar with an overhand grip, legs together.",
+      "Press the bar down slightly to set your shoulders.",
+      "Raise your legs in front of you until your toes touch the bar.",
+      "Lower your legs slowly to a still hang."
+    ],
+    "mistakes": [
+      "Swinging to throw the legs up",
+      "Bending the knees to reach the bar every rep"
     ]
   },
   {
@@ -13912,6 +14645,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-hyperextensions-back-extensions",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hinge over a back extension bench that trains the lower back, glutes and hamstrings.",
     "formCues": [
       "Pad just below the hips",
@@ -14280,6 +15015,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell curl lying back on an incline bench that trains the biceps from a stretched position.",
     "formCues": [
       "Arms hang straight down",
@@ -14354,6 +15091,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell fly on an incline bench that trains the upper chest through a wide arc.",
     "formCues": [
       "Low incline on the bench",
@@ -14468,6 +15207,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-incline-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell press on an incline bench that trains the upper chest, triceps and front delts.",
     "formCues": [
       "Bench at a low incline",
@@ -14506,12 +15247,57 @@
       "Incline_Hammer_Curls/1.jpg"
     ],
     "id": "Incline_Hammer_Curls",
+    "aliases": [
+      "Incline DB Hammer Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Hammer_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Hammer_Curls/1.jpg"
+    ],
+    "displayName": "Incline Hammer Curl",
+    "muscles": [
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hammer-curl",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A hammer curl lying back on an incline bench that trains the brachialis and biceps from a stretch.",
+    "formCues": [
+      "Arms hang straight down",
+      "Palms face each other",
+      "Elbows stay back"
+    ],
+    "steps": [
+      "Set a bench to an incline and lie back holding a dumbbell in each hand.",
+      "Let your arms hang straight down with your palms facing your body.",
+      "Curl the dumbbells up, keeping your palms facing in.",
+      "Lower them slowly until your arms are straight."
+    ],
+    "mistakes": [
+      "Shoulders roll forward off the bench",
+      "Elbows swing forward to finish"
     ]
   },
   {
@@ -14603,6 +15389,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-push-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A push-up with the hands raised on a bench or box, an easier version that trains the chest and triceps.",
     "formCues": [
       "Hands on the edge, shoulder width",
@@ -14943,6 +15731,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-inverted-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A bodyweight row hanging under a low bar that trains the upper back and lats.",
     "formCues": [
       "Body straight from heels to head",
@@ -15270,6 +16060,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-jackknife-sit-up",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A V-shaped crunch that brings straight arms and legs up to meet over the hips, training the abs and hip flexors.",
     "formCues": [
       "Arms and legs rise together",
@@ -16043,6 +16835,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-kettlebell-turkish-get-up-lunge-style",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A slow rise from lying to standing with a kettlebell held overhead, training the shoulders and core.",
     "formCues": [
       "Eyes on the bell",
@@ -16287,6 +17081,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A knee raise in a captain's chair, propped on the forearms, that works the abs and hip flexors.",
     "formCues": [
       "Lower back glued to the backrest",
@@ -16980,6 +17776,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-extensions",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine extension of the knees that isolates the quads.",
     "formCues": [
       "Knees lined up with the pivot",
@@ -17094,6 +17892,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine press of a sled with the legs that trains the quads and glutes.",
     "formCues": [
       "Lower back stays on the seat",
@@ -17203,6 +18003,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine press that trains the chest, triceps and front delts on a fixed path.",
     "formCues": [
       "Handles level with mid chest",
@@ -17373,6 +18175,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-incline-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A machine press on an upward angle that targets the upper chest with a guided path.",
     "formCues": [
       "Handles start at upper chest height",
@@ -17452,6 +18256,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine row with a chest pad that trains the lats and upper back on a fixed path.",
     "formCues": [
       "Chest against the pad",
@@ -17788,6 +18594,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A cable fly from low pulleys that trains the upper chest as the hands sweep up and together.",
     "formCues": [
       "Palms facing up and forward",
@@ -18268,6 +19076,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-skull-crusher",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A lying triceps extension with a dumbbell in each hand, lowered beside the head, that trains the triceps.",
     "formCues": [
       "Palms face each other",
@@ -18490,6 +19300,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A face-down machine curl of the knees that isolates the hamstrings.",
     "formCues": [
       "Hips pressed into the pad",
@@ -18821,6 +19633,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine curl with the upper arms on a pad that trains the biceps.",
     "formCues": [
       "Armpits snug to the pad",
@@ -18861,12 +19675,52 @@
       "Machine_Preacher_Curls/1.jpg"
     ],
     "id": "Machine_Preacher_Curls",
+    "aliases": [
+      "Preacher Curl Machine"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Preacher_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Preacher_Curls/1.jpg"
+    ],
+    "displayName": "Machine Preacher Curl",
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-preacher-curl",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A seated preacher curl on a machine that trains the biceps with the upper arms supported.",
+    "formCues": [
+      "Upper arms flat on the pad",
+      "Elbows lined up with the pivot",
+      "Slow on the way down"
+    ],
+    "steps": [
+      "Adjust the seat so the backs of your upper arms rest flat on the pad.",
+      "Grip the handles underhand with your arms nearly straight.",
+      "Curl the handles up toward your shoulders.",
+      "Lower them slowly until your arms are nearly straight again."
+    ],
+    "mistakes": [
+      "Lifting the elbows off the pad",
+      "Letting the weight drop at the bottom"
     ]
   },
   {
@@ -18924,6 +19778,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine press overhead that trains the delts and triceps on a guided path.",
     "formCues": [
       "Handles start at shoulder height",
@@ -18989,6 +19845,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-machine-triceps-extension",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine extension of the elbows that isolates the triceps.",
     "formCues": [
       "Elbows lined up with the pivot",
@@ -19288,6 +20146,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-mountain-climbers",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A plank with the knees driven toward the chest in turn that trains the abs and hip flexors.",
     "formCues": [
       "Hands under the shoulders",
@@ -19402,12 +20262,78 @@
       "Muscle_Up/1.jpg"
     ],
     "id": "Muscle_Up",
+    "aliases": [
+      "Muscle Ups",
+      "Bar Muscle-Up",
+      "Ring Muscle-Up"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Muscle_Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Muscle_Up/1.jpg"
+    ],
+    "displayName": "Muscle-Up",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "suspension",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A pull-up that turns over the bar or rings into a dip, which trains the lats, chest and triceps.",
+    "formCues": [
+      "Pull high and fast",
+      "Turn the wrists over the bar",
+      "Press out to straight arms"
+    ],
+    "steps": [
+      "Hang from a bar or rings with a grip that lets your wrists sit on top.",
+      "Pull explosively, bringing the bar toward your lower chest.",
+      "Lean your chest over the bar and turn your elbows up and back.",
+      "Press down until your arms are straight above the bar.",
+      "Lower yourself under control back to a hang."
+    ],
+    "mistakes": [
+      "Pulling too low to get over the bar",
+      "One arm turning over well before the other"
     ]
   },
   {
@@ -19579,6 +20505,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-glute-ham-raise",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A kneeling lean forward with the ankles held down, a Nordic curl, that trains the hamstrings.",
     "formCues": [
       "Ankles firmly anchored",
@@ -19884,6 +20812,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A one-arm dumbbell row with a hand and knee on a bench that trains the lats and upper back.",
     "formCues": [
       "Back flat and level",
@@ -20425,6 +21355,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-kettlebell-swing",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A kettlebell swing with one hand that trains the glutes and hamstrings and challenges the core against rotation.",
     "formCues": [
       "Hinge at the hips",
@@ -20706,6 +21638,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-glute-kickback",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing kickback of one leg against a low cable that trains the glutes.",
     "formCues": [
       "Hips square to the machine",
@@ -21313,6 +22247,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-slam",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A medicine ball lifted overhead and slammed into the floor that trains power through the lats and core.",
     "formCues": [
       "Reach tall",
@@ -21362,12 +22298,69 @@
       "Overhead_Squat/1.jpg"
     ],
     "id": "Overhead_Squat",
+    "aliases": [
+      "OHS",
+      "Barbell Overhead Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Overhead_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Overhead_Squat/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A squat with the barbell locked out overhead in a wide grip that trains the legs, shoulders and core.",
+    "formCues": [
+      "Arms locked, bar over the mid foot",
+      "Push up into the bar",
+      "Chest tall all the way down"
+    ],
+    "steps": [
+      "Take a wide grip and press or jerk the bar overhead until your arms lock.",
+      "Set your feet about shoulder width apart with your toes slightly out.",
+      "Keep pushing up into the bar and sit down into a squat.",
+      "Go as deep as you can with the bar staying over your feet.",
+      "Drive back up to standing."
+    ],
+    "mistakes": [
+      "Bar drifts forward as you descend",
+      "Elbows bend under the load"
     ]
   },
   {
@@ -21492,6 +22485,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-pallof-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A press of a cable straight out from the chest while resisting its pull to one side, training the obliques and abs.",
     "formCues": [
       "Stand side-on, feet planted",
@@ -21950,6 +22945,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-plank",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An isometric hold on the forearms and toes that trains the abs and the whole trunk to stay straight.",
     "formCues": [
       "Elbows under the shoulders",
@@ -22090,12 +23087,63 @@
       "Plie_Dumbbell_Squat/1.jpg"
     ],
     "id": "Plie_Dumbbell_Squat",
+    "aliases": [
+      "Sumo Squat",
+      "Plie Squat",
+      "Sumo Goblet Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plie_Dumbbell_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plie_Dumbbell_Squat/1.jpg"
+    ],
+    "displayName": "Dumbbell Sumo Squat",
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "dumbbell",
+      "kettlebell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A wide-stance squat holding one dumbbell between the legs that trains the quads, glutes and inner thighs.",
+    "formCues": [
+      "Wide stance, toes out",
+      "Knees track over the toes",
+      "Chest tall"
+    ],
+    "steps": [
+      "Stand with your feet wide and toes turned out, holding a dumbbell by one end between your legs.",
+      "Sit straight down between your heels, pushing your knees out.",
+      "Go as deep as you can with a tall chest.",
+      "Drive up through your heels to stand."
+    ],
+    "mistakes": [
+      "Knees cave inward",
+      "Leaning forward and letting the weight swing"
     ]
   },
   {
@@ -22294,6 +23342,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-clean",
+    "staple": true,
+    "difficulty": "advanced",
     "description": "An explosive barbell lift from the floor to the front of the shoulders that trains the whole posterior chain.",
     "formCues": [
       "Bar close to the body",
@@ -22586,6 +23636,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-preacher-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A curl with the upper arms resting on an angled preacher pad that trains the biceps.",
     "formCues": [
       "Armpits against the top of the pad",
@@ -22786,6 +23838,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pull-through",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hip hinge pulling a low cable rope through the legs that trains the glutes and hamstrings.",
     "formCues": [
       "Hips back, not down",
@@ -22830,7 +23884,8 @@
     ],
     "id": "Pullups",
     "aliases": [
-      "Pull-Ups"
+      "Pull-Ups",
+      "Wide Grip Pull-Up"
     ],
     "muscleGroups": [
       "Back"
@@ -22863,6 +23918,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pull-up",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A hang from a bar with an overhand grip, pulling up until the chin clears it, that trains the lats and biceps.",
     "formCues": [
       "Start from a full hang",
@@ -22973,6 +24030,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-push-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A push-up with the hands close together under the chest that puts more of the work on the triceps.",
     "formCues": [
       "Hands close under the chest",
@@ -23114,6 +24173,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell press overhead started with a short dip and drive of the legs, training the delts and triceps.",
     "formCues": [
       "Dip straight down, torso upright",
@@ -23263,6 +24324,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-push-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A bodyweight press from the floor that trains the chest, triceps and front delts, with the core holding you straight.",
     "formCues": [
       "Body in one line from head to heels",
@@ -23568,6 +24631,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-deadlift",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A partial deadlift from pins or blocks at about knee height that trains the lower back, glutes and traps.",
     "formCues": [
       "Bar starts just at or below the knees",
@@ -23672,6 +24737,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-stationary-bike",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Pedalling a reclined bike with back support, a low-impact cardio effort for the legs.",
     "formCues": [
       "Back against the seat",
@@ -23970,6 +25037,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-reverse-barbell-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell curl with the palms facing down, working the brachialis and forearms.",
     "formCues": [
       "Palms face down",
@@ -24103,6 +25172,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-crunch",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A crunch on your back that rolls the hips up off the floor, working the abs from the bottom up.",
     "formCues": [
       "Curl the hips up",
@@ -24341,6 +25412,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-rear-delt-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A reverse fly on the pec deck that trains the rear delts and upper back.",
     "formCues": [
       "Chest against the pad",
@@ -24728,6 +25801,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-romanian-deadlift",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell hinge from standing with soft knees that trains the hamstrings and glutes.",
     "formCues": [
       "Push the hips back",
@@ -24906,6 +25981,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-rope-jumping",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Jumping over a turning rope, a cardio effort that works the calves and coordination.",
     "formCues": [
       "Small jumps, light landings",
@@ -25062,6 +26139,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-rowing-stationary",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A rowing machine stroke driven by the legs, then the back and arms, that works the whole body.",
     "formCues": [
       "Legs, body, arms on the drive",
@@ -25173,6 +26252,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-treadmill",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Running on a treadmill, a steady cardio effort that works the legs and heart.",
     "formCues": [
       "Run tall, eyes forward",
@@ -25245,6 +26326,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-russian-twist",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated twist from side to side with the torso leaned back that trains the obliques.",
     "formCues": [
       "Chest up, back straight",
@@ -25454,12 +26537,56 @@
       "Seated_Barbell_Military_Press/1.jpg"
     ],
     "id": "Seated_Barbell_Military_Press",
+    "aliases": [
+      "Seated Military Press",
+      "Seated Barbell Shoulder Press",
+      "Seated OHP"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Barbell_Military_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Barbell_Military_Press/1.jpg"
+    ],
+    "displayName": "Seated Barbell Overhead Press",
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "intermediate",
+    "description": "A barbell press from the shoulders to overhead while seated, which trains the delts and triceps.",
+    "formCues": [
+      "Back against the pad",
+      "Bar path in front of the face",
+      "Lock out overhead"
+    ],
+    "steps": [
+      "Set an upright bench in a rack with the bar at about shoulder height when seated.",
+      "Sit with your back against the pad and grip the bar just outside your shoulders.",
+      "Unrack the bar and lower it to your upper chest.",
+      "Press it straight up until your arms are locked.",
+      "Lower it under control back to your upper chest."
+    ],
+    "mistakes": [
+      "Arching the back off the pad",
+      "Pressing the bar forward away from the body"
     ]
   },
   {
@@ -25555,7 +26682,8 @@
       "Rear Delt Raise",
       "Bent-Over Rear Delt Raise",
       "Rear Delt Fly",
-      "Bent-Over Reverse Fly"
+      "Bent-Over Reverse Fly",
+      "Dumbbell Reverse Fly"
     ],
     "muscleGroups": [
       "Shoulders"
@@ -25588,6 +26716,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-rear-delt-fly",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell raise while bent forward that trains the rear delts and upper back.",
     "formCues": [
       "Chest close to the thighs",
@@ -25735,6 +26865,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated cable row to the stomach that trains the lats and upper back.",
     "formCues": [
       "Sit tall with a slight knee bend",
@@ -25833,6 +26965,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-calf-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine calf raise with pads on the knees that trains the lower calf.",
     "formCues": [
       "Pads snug on the lower thighs",
@@ -26377,6 +27511,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine curl of the knees that isolates the hamstrings.",
     "formCues": [
       "Knees lined up with the pivot",
@@ -26604,6 +27740,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-wrist-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated curl of the wrists with the palms up that trains the forearm flexors.",
     "formCues": [
       "Forearms flat on the thighs",
@@ -26671,6 +27809,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-wrist-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated curl of the wrists with the palms down that trains the forearm extensors.",
     "formCues": [
       "Forearms flat on the thighs",
@@ -27047,6 +28187,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-plank",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An isometric side plank on one forearm that trains the obliques and the side of the hips.",
     "formCues": [
       "Elbow under the shoulder",
@@ -27179,6 +28321,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lateral-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell raise out to the sides that trains the side delts.",
     "formCues": [
       "Lead with the elbows",
@@ -27869,6 +29013,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-hip-thrust",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hip bridge driven through one foot that trains the glutes and hamstrings of that leg.",
     "formCues": [
       "Hips stay level",
@@ -27971,6 +29117,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-sit-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A sit-up from lying to sitting that trains the abs and hip flexors.",
     "formCues": [
       "Feet anchored or flat",
@@ -28213,6 +29361,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-sled-push",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A loaded sled pushed across the floor with a forward lean that trains the quads, glutes and calves.",
     "formCues": [
       "Arms locked or bent, body leaned in",
@@ -28456,6 +29606,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-bench-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A flat bench press on the Smith machine, where the bar runs on fixed rails.",
     "formCues": [
       "Bench placed so the bar meets mid chest",
@@ -28533,12 +29685,48 @@
       "Smith_Machine_Calf_Raise/1.jpg"
     ],
     "id": "Smith_Machine_Calf_Raise",
+    "aliases": [
+      "Smith Calf Raise"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Calf_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Calf_Raise/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "calf-raise",
+    "equipmentList": [
+      "smith-machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-calf-raise",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A standing calf raise with the Smith bar across the upper back, which trains the calves.",
+    "formCues": [
+      "Balls of the feet on a plate or step",
+      "Knees straight",
+      "Full stretch at the bottom"
+    ],
+    "steps": [
+      "Set a step or plate under the Smith bar and stand on it with the balls of your feet.",
+      "Put the bar across your upper back and unhook it.",
+      "Lower your heels until you feel a stretch in your calves.",
+      "Rise onto your toes as high as you can.",
+      "Hold briefly at the top, then lower slowly."
+    ],
+    "mistakes": [
+      "Bouncing through short reps",
+      "Bending the knees to push the bar up"
     ]
   },
   {
@@ -28703,12 +29891,59 @@
       "Smith_Machine_Incline_Bench_Press/1.jpg"
     ],
     "id": "Smith_Machine_Incline_Bench_Press",
+    "aliases": [
+      "Smith Incline Press",
+      "Smith Machine Incline Bench"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Incline_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Incline_Bench_Press/1.jpg"
+    ],
+    "displayName": "Smith Machine Incline Press",
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "smith-machine",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-incline-press",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "An incline bench press on the Smith machine that trains the upper chest on a fixed bar path.",
+    "formCues": [
+      "Bench set to a low incline",
+      "Bar lands on the upper chest",
+      "Shoulder blades pinned back"
+    ],
+    "steps": [
+      "Set an incline bench under the Smith bar so the bar lines up with your upper chest.",
+      "Lie back, grip the bar a little wider than your shoulders and set your shoulder blades.",
+      "Rotate the bar to unhook it and hold it over your chest with straight arms.",
+      "Lower the bar under control to your upper chest.",
+      "Press it back up and rotate the hooks closed to rack it."
+    ],
+    "mistakes": [
+      "Bench placed so the bar comes down on the neck",
+      "Leaving the safety stops unset"
     ]
   },
   {
@@ -28803,12 +30038,55 @@
       "Smith_Machine_Overhead_Shoulder_Press/1.jpg"
     ],
     "id": "Smith_Machine_Overhead_Shoulder_Press",
+    "aliases": [
+      "Smith Shoulder Press",
+      "Smith Overhead Press"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Overhead_Shoulder_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Overhead_Shoulder_Press/1.jpg"
+    ],
+    "displayName": "Smith Machine Shoulder Press",
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "smith-machine",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A seated overhead press on the Smith machine that trains the delts and triceps on a fixed path.",
+    "formCues": [
+      "Bench upright under the bar",
+      "Bar travels just in front of the face",
+      "Back stays on the pad"
+    ],
+    "steps": [
+      "Set an upright bench under the Smith bar so the bar sits just in front of your face.",
+      "Sit with your back against the pad and grip the bar a little wider than your shoulders.",
+      "Unhook the bar and lower it to about chin height.",
+      "Press it up until your arms are straight.",
+      "Rack the bar by rotating the hooks closed at the top."
+    ],
+    "mistakes": [
+      "Bench so far back the bar hits the head",
+      "Hips slide forward and the back arches"
     ]
   },
   {
@@ -28944,6 +30222,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A squat on the Smith machine with the bar on fixed rails that trains the quads and glutes.",
     "formCues": [
       "Feet slightly in front of the bar",
@@ -29143,6 +30423,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-snatch",
+    "staple": true,
+    "difficulty": "advanced",
     "description": "An explosive barbell lift from the floor to overhead in one movement, training the whole body.",
     "formCues": [
       "Wide grip, bar close",
@@ -29533,12 +30815,54 @@
       "Spider_Curl/1.jpg"
     ],
     "id": "Spider_Curl",
+    "aliases": [
+      "EZ-Bar Spider Curl",
+      "Dumbbell Spider Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Spider_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Spider_Curl/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "ez-bar",
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A curl lying chest down on an incline bench with the arms hanging straight, which trains the biceps.",
+    "formCues": [
+      "Chest on the pad",
+      "Upper arms hang straight down",
+      "Squeeze at the top"
+    ],
+    "steps": [
+      "Lie face down on an incline bench with your arms hanging straight below you.",
+      "Hold an EZ bar or a pair of dumbbells with an underhand grip.",
+      "Curl the weight up without moving your upper arms.",
+      "Lower it slowly until your arms are straight again."
+    ],
+    "mistakes": [
+      "Swinging the elbows forward",
+      "Lifting the chest off the pad"
     ]
   },
   {
@@ -29795,6 +31119,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A split squat with the rear foot on a bench, a Bulgarian split squat, that trains the quads and glutes.",
     "formCues": [
       "Most weight on the front foot",
@@ -30092,6 +31418,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-stairmaster",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Climbing a moving staircase, a cardio effort that works the quads, glutes and calves.",
     "formCues": [
       "Stand tall",
@@ -30328,6 +31656,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing curl of a straight bar on a low cable that trains the biceps with steady tension.",
     "formCues": [
       "Stand close to the pulley",
@@ -30538,6 +31868,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-standing-cable-wood-chop",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A diagonal chop of a cable across the body from high to low that trains the obliques.",
     "formCues": [
       "Rotate through the trunk",
@@ -30583,7 +31915,8 @@
       "Calf Raise",
       "Calf Raises",
       "Standing Calf Raise Machine",
-      "Calf Raise Machine"
+      "Calf Raise Machine",
+      "Machine Calf Raise"
     ],
     "muscleGroups": [
       "Legs"
@@ -30607,6 +31940,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-calf-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing machine calf raise with pads on the shoulders that trains the calves.",
     "formCues": [
       "Balls of the feet on the edge",
@@ -30704,6 +32039,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-calf-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A calf raise holding dumbbells, on the floor or a step, that trains the calves.",
     "formCues": [
       "Rise straight up",
@@ -30776,12 +32113,56 @@
       "Standing_Dumbbell_Reverse_Curl/1.jpg"
     ],
     "id": "Standing_Dumbbell_Reverse_Curl",
+    "aliases": [
+      "DB Reverse Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Reverse_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Reverse_Curl/1.jpg"
+    ],
+    "displayName": "Dumbbell Reverse Curl",
+    "muscles": [
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-reverse-barbell-curl",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A dumbbell curl with the palms facing down that trains the brachialis and forearms.",
+    "formCues": [
+      "Palms down the whole way",
+      "Wrists straight",
+      "Elbows at your sides"
+    ],
+    "steps": [
+      "Stand holding a dumbbell at each side with your palms facing behind you.",
+      "Curl the dumbbells up, keeping your palms facing down.",
+      "Stop when your forearms are close to vertical.",
+      "Lower them slowly to straight arms."
+    ],
+    "mistakes": [
+      "Wrists bend back under the weight",
+      "Swinging the body to lift"
     ]
   },
   {
@@ -30842,7 +32223,8 @@
       "Overhead Tricep Extension",
       "Dumbbell Overhead Extension",
       "Overhead Dumbbell Triceps Extension",
-      "DB Overhead Tricep Extension"
+      "DB Overhead Tricep Extension",
+      "Dumbbell Tricep Extension"
     ],
     "muscleGroups": [
       "Arms"
@@ -30866,6 +32248,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-triceps-extension",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell lowered behind the head and pressed back overhead that trains the triceps.",
     "formCues": [
       "Elbows point up and stay close",
@@ -30908,12 +32292,61 @@
       "Standing_Dumbbell_Upright_Row/1.jpg"
     ],
     "id": "Standing_Dumbbell_Upright_Row",
+    "aliases": [
+      "DB Upright Row"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Upright_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Upright_Row/1.jpg"
+    ],
+    "displayName": "Dumbbell Upright Row",
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-upright-barbell-row",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A dumbbell pulled up the front of the body that trains the side delts and traps.",
+    "formCues": [
+      "Lead with the elbows",
+      "Dumbbells stay close",
+      "Hands stop at lower chest height"
+    ],
+    "steps": [
+      "Stand holding a dumbbell in each hand in front of your thighs, palms facing you.",
+      "Raise the dumbbells close to your torso, elbows travelling up and out ahead of the hands.",
+      "Stop when your elbows reach about shoulder height.",
+      "Lower the dumbbells slowly to your thighs."
+    ],
+    "mistakes": [
+      "Pulling the weights up to the chin",
+      "Shrugging instead of lifting the elbows"
     ]
   },
   {
@@ -31211,6 +32644,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-leg-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing machine curl of one leg at a time that isolates the hamstrings.",
     "formCues": [
       "Hips against the pad",
@@ -31319,6 +32754,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-lateral-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A one-arm lateral raise from a low cable that keeps tension on the side delt through the whole lift.",
     "formCues": [
       "Cable crosses in front of the body",
@@ -31433,6 +32870,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A standing barbell press from the shoulders to overhead that trains the delts and triceps.",
     "formCues": [
       "Glutes and abs tight",
@@ -32055,6 +33494,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-romanian-deadlift",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell hinge with the knees nearly straight that trains the hamstrings, glutes and lower back.",
     "formCues": [
       "Knees almost locked",
@@ -32133,6 +33574,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-romanian-deadlift",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A hip hinge with a dumbbell in each hand that trains the hamstrings and glutes.",
     "formCues": [
       "Soft knees, hips back",
@@ -32279,6 +33722,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pullover",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell lowered behind the head and pulled back over the chest, lying on a bench, training the lats and chest.",
     "formCues": [
       "Hips stay level",
@@ -32352,6 +33797,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pullover",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A standing cable pull with straight arms from overhead to the thighs that trains the lats.",
     "formCues": [
       "Arms stay straight",
@@ -32547,6 +33994,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-deadlift",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A deadlift with a wide stance and hands inside the knees that trains the glutes, hamstrings and inner thighs.",
     "formCues": [
       "Knees push out over the toes",
@@ -32669,12 +34118,57 @@
       "Superman/1.jpg"
     ],
     "id": "Superman",
+    "aliases": [
+      "Supermans",
+      "Superman Hold"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Superman/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Superman/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-extension",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hyperextensions-back-extensions",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A face-down lift of the arms and legs off the floor that trains the lower back and glutes.",
+    "formCues": [
+      "Reach long, not high",
+      "Squeeze the glutes",
+      "Neck in line with the spine"
+    ],
+    "steps": [
+      "Lie face down with your arms straight overhead and your legs straight.",
+      "Lift your arms, chest and legs off the floor at the same time.",
+      "Hold briefly at the top.",
+      "Lower back to the floor with control."
+    ],
+    "mistakes": [
+      "Cranking the head up to look forward",
+      "Jerking up with momentum"
     ]
   },
   {
@@ -32938,6 +34432,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-inverted-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A bodyweight row on suspension straps or rings that trains the upper back and lats.",
     "formCues": [
       "Body in one straight line",
@@ -33093,6 +34589,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A row of a landmine barbell with a close handle, hinged forward, that trains the lats and upper back.",
     "formCues": [
       "Straddle the bar, hinge at the hips",
@@ -33204,7 +34702,8 @@
       "Abduction",
       "Hip Abduction",
       "Abductor Machine",
-      "Outer Thigh Machine"
+      "Outer Thigh Machine",
+      "Machine Hip Abduction"
     ],
     "muscleGroups": [
       "Legs"
@@ -33232,6 +34731,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-thigh-abductor",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine push of the knees outward that trains the outer hip and glute med.",
     "formCues": [
       "Back against the pad",
@@ -33302,6 +34803,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-thigh-adductor",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine squeeze of the knees together that trains the inner thighs.",
     "formCues": [
       "Sit tall, back supported",
@@ -33521,6 +35024,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-deadlift",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A deadlift standing inside a hex-shaped bar that trains the quads, glutes and hamstrings.",
     "formCues": [
       "Stand in the middle of the bar",
@@ -33564,7 +35069,8 @@
     "aliases": [
       "Tricep Kickback",
       "Dumbbell Kickback",
-      "DB Kickback"
+      "DB Kickback",
+      "Dumbbell Tricep Kickback"
     ],
     "muscleGroups": [
       "Arms"
@@ -33588,6 +35094,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-tricep-dumbbell-kickback",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dumbbell extended back from a bent elbow while hinged forward that trains the triceps.",
     "formCues": [
       "Upper arm level with the torso",
@@ -33693,7 +35201,8 @@
       "Cable Pushdown",
       "Bar Pushdown",
       "Straight Bar Pushdown",
-      "Tricep Pressdown"
+      "Tricep Pressdown",
+      "Cable Tricep Pushdown"
     ],
     "muscleGroups": [
       "Arms"
@@ -33716,6 +35225,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-triceps-pushdown",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A push of a bar down from a high cable that trains the triceps.",
     "formCues": [
       "Elbows pinned to your sides",
@@ -33785,6 +35296,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-triceps-pushdown",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A triceps pushdown with a rope that lets the hands spread at the bottom.",
     "formCues": [
       "Elbows fixed at your sides",
@@ -34079,12 +35592,59 @@
       "Underhand_Cable_Pulldowns/1.jpg"
     ],
     "id": "Underhand_Cable_Pulldowns",
+    "aliases": [
+      "Underhand Lat Pulldown",
+      "Supinated Lat Pulldown",
+      "Reverse Grip Pulldown"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Underhand_Cable_Pulldowns/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Underhand_Cable_Pulldowns/1.jpg"
+    ],
+    "displayName": "Reverse-Grip Lat Pulldown",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lat-pulldown",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A lat pulldown with an underhand grip that trains the lats and puts more work on the biceps.",
+    "formCues": [
+      "Palms facing you, shoulder width",
+      "Pull to the upper chest",
+      "Elbows drive down to your sides"
+    ],
+    "steps": [
+      "Sit with your thighs under the pad and grip the bar underhand at about shoulder width.",
+      "Start with your arms straight overhead.",
+      "Pull the bar down to your upper chest, driving your elbows down and back.",
+      "Let the bar rise slowly until your arms are straight."
+    ],
+    "mistakes": [
+      "Leaning far back to heave the bar down",
+      "Stopping the bar at the chin"
     ]
   },
   {
@@ -34210,6 +35770,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-upright-barbell-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell pulled straight up the front of the body that trains the side delts and traps.",
     "formCues": [
       "Lead with the elbows",
@@ -34353,7 +35915,8 @@
     "aliases": [
       "Close-Grip Pulldown",
       "V-Grip Pulldown",
-      "Neutral-Grip Pulldown"
+      "Neutral-Grip Pulldown",
+      "V-Bar Lat Pulldown"
     ],
     "muscleGroups": [
       "Back"
@@ -34385,6 +35948,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lat-pulldown",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A lat pulldown with a close, neutral-grip handle that trains the lats and biceps.",
     "formCues": [
       "Palms facing each other",
@@ -34534,6 +36099,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-treadmill",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "Walking on a treadmill, flat or on an incline, a low-impact cardio effort for the legs.",
     "formCues": [
       "Stand tall",
@@ -34775,6 +36342,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pull-up",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A pull-up with added weight from a belt or vest that trains the lats and biceps.",
     "formCues": [
       "Weight hangs still",
@@ -35054,6 +36623,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lat-pulldown",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated cable pull of a wide bar down to the upper chest that trains the lats.",
     "formCues": [
       "Thighs locked under the pad",
@@ -35530,12 +37101,55 @@
       "Zottman_Curl/1.jpg"
     ],
     "id": "Zottman_Curl",
+    "aliases": [
+      "Zottman Curls"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Zottman_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Zottman_Curl/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A dumbbell curl that turns the palms down at the top and lowers overhand, training the biceps and forearms.",
+    "formCues": [
+      "Curl palms up",
+      "Turn palms down at the top",
+      "Lower slowly overhand"
+    ],
+    "steps": [
+      "Stand holding a dumbbell at each side with your palms facing forward.",
+      "Curl the dumbbells up toward your shoulders.",
+      "At the top, turn your palms to face down.",
+      "Lower the dumbbells slowly with your palms down, then turn them back up."
+    ],
+    "mistakes": [
+      "Rushing the lowering half",
+      "Turning the wrists before the top"
     ]
   },
   {
@@ -35683,6 +37297,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-leg-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A raise of bent knees toward the chest while hanging from a bar that trains the abs and hip flexors.",
     "formCues": [
       "Still hang first",
@@ -35753,6 +37369,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A dip on a machine that counterweights part of your bodyweight, for building up to full dips.",
     "formCues": [
       "Shoulders down before you press",
@@ -35816,6 +37434,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lateral-raise",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A seated machine version of the lateral raise that trains the side delts on a fixed arc.",
     "formCues": [
       "Shoulders lined up with the pivots",
@@ -35885,6 +37505,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-pull-up",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A pull-up on a machine that counterweights part of your bodyweight, for building up to full pull-ups.",
     "formCues": [
       "Shoulders down before you pull",
@@ -35965,6 +37587,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-kettlebell-swing",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A kettlebell swung from between the legs to chest height by a snap of the hips, training the glutes and hamstrings.",
     "formCues": [
       "Hinge, not squat",
@@ -36050,6 +37674,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-own-burpee",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A squat, kick back to a push-up position, and jump up in one sequence, a full-body conditioning move.",
     "formCues": [
       "Hands down under the shoulders",
@@ -36125,6 +37751,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-stationary-bike",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An air bike with moving handles, where harder effort meets more fan resistance, working the whole body.",
     "formCues": [
       "Push and pull the handles",
@@ -36189,6 +37817,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-crunch",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A crunch that twists an elbow toward the opposite knee in a pedalling motion, training the abs and obliques.",
     "formCues": [
       "Rotate the shoulder, not just the elbow",
@@ -36258,6 +37888,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A parallel-bar dip with added weight from a belt or vest that trains the triceps and chest.",
     "formCues": [
       "Weight hangs still between the legs",
@@ -36328,6 +37960,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A press of one end of a barbell anchored in a landmine that trains the shoulders and upper chest.",
     "formCues": [
       "Ribs down, glutes tight",
@@ -36397,6 +38031,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell press overhead while sitting on the floor, legs straight, with no back support, training the delts and core.",
     "formCues": [
       "Sit tall, legs long",
@@ -36475,6 +38111,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A barbell row pulled from the floor with the torso level, each rep starting from a dead stop.",
     "formCues": [
       "Torso level with the floor",
@@ -36549,6 +38187,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A one-arm row of the end of a landmine barbell, standing side-on, that trains the lats and upper back.",
     "formCues": [
       "Staggered stance, hips hinged",
@@ -36592,7 +38232,8 @@
     "aliases": [
       "Seal Rows",
       "Bench Seal Row",
-      "Prone Bench Row"
+      "Prone Bench Row",
+      "Bench Pull"
     ],
     "muscleGroups": [
       "Back"
@@ -36625,6 +38266,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A barbell row lying face down on a raised bench, so only the arms and back can move the weight.",
     "formCues": [
       "Chest stays on the bench",
@@ -36700,6 +38343,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-romanian-deadlift",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A one-leg hip hinge with a dumbbell that trains the hamstrings and glutes and challenges balance.",
     "formCues": [
       "Hips stay square to the floor",
@@ -36769,6 +38414,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A machine squat on a swinging arm that keeps the torso upright and puts most of the work on the quads.",
     "formCues": [
       "Back flat against the pad",
@@ -36844,6 +38491,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A squat with the load hung from a belt at the hips, training the legs without loading the spine.",
     "formCues": [
       "Belt snug at the hips",
@@ -36908,6 +38557,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-own-wall-sit",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An isometric hold with your back against a wall and knees bent, which trains the quads.",
     "formCues": [
       "Back flat against the wall",
@@ -36981,6 +38632,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A wide side-to-side squat that trains the quads and inner thighs while stretching the straight leg.",
     "formCues": [
       "Wide stance, toes slightly out",
@@ -37050,6 +38703,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-own-copenhagen-plank",
+    "staple": true,
+    "difficulty": "intermediate",
     "description": "A side plank with the top leg on a bench and the bottom leg off the floor that trains the inner thigh and obliques.",
     "formCues": [
       "Top leg presses into the bench",
@@ -37119,6 +38774,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-curl",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A one-arm curl facing away from a low cable, with the arm behind the body, that trains the biceps in a long stretch.",
     "formCues": [
       "Arm stays behind the body",
@@ -37195,6 +38852,8 @@
     "unilateral": true,
     "common": true,
     "family": "fam-farmers-walk",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A walk carrying a weight in one hand that trains the obliques and grip as you resist leaning.",
     "formCues": [
       "Stay level, no lean",
@@ -37269,6 +38928,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dead-bug",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "A reach of the opposite arm and leg on all fours that trains the abs and lower back to stay steady.",
     "formCues": [
       "Back flat as a table",
@@ -37331,6 +38992,8 @@
     "unilateral": false,
     "common": true,
     "family": "fam-own-hollow-body-hold",
+    "staple": true,
+    "difficulty": "beginner",
     "description": "An isometric hold lying on your back with the arms and legs lifted that trains the abs.",
     "formCues": [
       "Lower back pressed into the floor",
@@ -37347,6 +39010,998 @@
     "mistakes": [
       "Lower back lifts off the floor",
       "Chin juts forward"
+    ]
+  },
+  {
+    "name": "Split Squat",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "secondaryMuscles": [
+      "hamstrings",
+      "adductors"
+    ],
+    "instructions": [
+      "Stand in a long split stance with your feet hip width apart, holding dumbbells if you use them.",
+      "Lower your back knee toward the floor until your front thigh is about parallel.",
+      "Push through the front foot to rise back up, keeping your feet in place.",
+      "Finish the set, then switch sides."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-split-squat",
+    "aliases": [
+      "Dumbbell Split Squat",
+      "Static Lunge",
+      "Stationary Lunge"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "dumbbell",
+      "bodyweight"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A lunge with the feet kept in place, stepping neither forward nor back, that trains the quads and glutes.",
+    "formCues": [
+      "Long stance, feet hip width",
+      "Back knee drops straight down",
+      "Torso upright"
+    ],
+    "steps": [
+      "Stand in a long split stance with your feet hip width apart, holding dumbbells if you use them.",
+      "Lower your back knee toward the floor until your front thigh is about parallel.",
+      "Push through the front foot to rise back up, keeping your feet in place.",
+      "Finish the set, then switch sides."
+    ],
+    "mistakes": [
+      "Stance so short the front heel lifts",
+      "Feet on one line, so you wobble"
+    ]
+  },
+  {
+    "name": "Lateral Lunge",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes",
+      "adductors"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "instructions": [
+      "Stand with your feet together.",
+      "Take a wide step to one side and sit your hips back over that foot.",
+      "Keep the other leg straight and both feet flat.",
+      "Push off the bent leg to return to standing.",
+      "Alternate sides, or finish one side before the other."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-lateral-lunge",
+    "aliases": [
+      "Side Lunge",
+      "Side Lunges",
+      "Lateral Lunges"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A step out to the side into a one-leg squat that trains the quads, glutes and inner thighs.",
+    "formCues": [
+      "Step wide, toes forward",
+      "Sit back into the bent leg",
+      "Other leg stays straight"
+    ],
+    "steps": [
+      "Stand with your feet together.",
+      "Take a wide step to one side and sit your hips back over that foot.",
+      "Keep the other leg straight and both feet flat.",
+      "Push off the bent leg to return to standing.",
+      "Alternate sides, or finish one side before the other."
+    ],
+    "mistakes": [
+      "Knee drifts past the toes and the heel lifts",
+      "Chest folds down toward the knee"
+    ]
+  },
+  {
+    "name": "Knee Push-Up",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "instructions": [
+      "Kneel on a mat and place your hands a little wider than your shoulders.",
+      "Walk your hands forward until your body is straight from knees to head.",
+      "Lower your chest toward the floor by bending your elbows.",
+      "Push back up until your arms are straight."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-knee-push-up",
+    "aliases": [
+      "Kneeling Push-Up",
+      "Knee Push-Ups",
+      "Modified Push-Up"
+    ],
+    "muscleGroups": [
+      "Chest"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A push-up from the knees instead of the toes, an easier version that trains the chest and triceps.",
+    "formCues": [
+      "Body straight from knees to head",
+      "Hands just outside the shoulders",
+      "Chest to the floor"
+    ],
+    "steps": [
+      "Kneel on a mat and place your hands a little wider than your shoulders.",
+      "Walk your hands forward until your body is straight from knees to head.",
+      "Lower your chest toward the floor by bending your elbows.",
+      "Push back up until your arms are straight."
+    ],
+    "mistakes": [
+      "Hips stay back so it becomes a bow",
+      "Head dips before the chest"
+    ]
+  },
+  {
+    "name": "Outdoor Run",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "instructions": [
+      "Start with easy walking or jogging to warm up.",
+      "Settle into a pace you can hold while breathing steadily.",
+      "Keep your stride short and your arms swinging forward and back.",
+      "Slow to a walk to cool down at the end."
+    ],
+    "category": "cardio",
+    "images": [],
+    "id": "own-outdoor-run",
+    "aliases": [
+      "Running",
+      "Run",
+      "Jogging",
+      "Road Run"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-outdoor",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "Running outdoors on roads, paths or a track, a cardio effort that works the legs and heart.",
+    "formCues": [
+      "Run tall, relaxed shoulders",
+      "Short, quick steps",
+      "Land under your hips"
+    ],
+    "steps": [
+      "Start with easy walking or jogging to warm up.",
+      "Settle into a pace you can hold while breathing steadily.",
+      "Keep your stride short and your arms swinging forward and back.",
+      "Slow to a walk to cool down at the end."
+    ],
+    "mistakes": [
+      "Starting too fast and fading early",
+      "Overstriding with the heel far in front"
+    ]
+  },
+  {
+    "name": "Outdoor Walk",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes",
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "hamstrings"
+    ],
+    "instructions": [
+      "Start at an easy pace to warm up.",
+      "Pick up to a brisk pace where talking takes a little effort.",
+      "Keep your head up and your arms swinging.",
+      "Ease back to a slow pace to finish."
+    ],
+    "category": "cardio",
+    "images": [],
+    "id": "own-outdoor-walk",
+    "aliases": [
+      "Walking",
+      "Walk",
+      "Brisk Walk"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-outdoor",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "Walking outdoors at a brisk pace, a low-impact cardio effort for the legs and heart.",
+    "formCues": [
+      "Stand tall",
+      "Swing the arms naturally",
+      "Roll from heel to toe"
+    ],
+    "steps": [
+      "Start at an easy pace to warm up.",
+      "Pick up to a brisk pace where talking takes a little effort.",
+      "Keep your head up and your arms swinging.",
+      "Ease back to a slow pace to finish."
+    ],
+    "mistakes": [
+      "Looking down at the feet",
+      "Shuffling with short, flat steps"
+    ]
+  },
+  {
+    "name": "Cable Triceps Kickback",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "cable",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [],
+    "instructions": [
+      "Set a single handle on a low pulley, face the machine and hinge forward with a flat back.",
+      "Hold the handle and bring your upper arm up beside your torso, elbow bent.",
+      "Straighten your arm back until it is fully extended.",
+      "Let the handle come forward slowly by bending the elbow.",
+      "Finish the set, then switch sides."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-cable-triceps-kickback",
+    "aliases": [
+      "Cable Tricep Kickback",
+      "Cable Triceps Kickbacks"
+    ],
+    "muscleGroups": [
+      "Arms"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-tricep-dumbbell-kickback",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A one-arm kickback on a low cable while hinged forward that trains the triceps with steady tension.",
+    "formCues": [
+      "Upper arm pinned by your side",
+      "Only the forearm moves",
+      "Straighten fully"
+    ],
+    "steps": [
+      "Set a single handle on a low pulley, face the machine and hinge forward with a flat back.",
+      "Hold the handle and bring your upper arm up beside your torso, elbow bent.",
+      "Straighten your arm back until it is fully extended.",
+      "Let the handle come forward slowly by bending the elbow.",
+      "Finish the set, then switch sides."
+    ],
+    "mistakes": [
+      "Upper arm swings to help the lift",
+      "Standing up tall as the arm straightens"
+    ]
+  },
+  {
+    "name": "Pistol Squat",
+    "force": "push",
+    "level": "advanced",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "secondaryMuscles": [
+      "adductors",
+      "hamstrings",
+      "abdominals"
+    ],
+    "instructions": [
+      "Stand on one leg with the other leg lifted slightly in front of you.",
+      "Reach your arms forward and sit down on the standing leg.",
+      "Lower as far as you can control, keeping the free leg off the floor.",
+      "Drive up through the standing foot to stand.",
+      "Finish the set, then switch sides."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-pistol-squat",
+    "aliases": [
+      "Pistol",
+      "One-Leg Squat"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-own-pistol-squat",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A full squat on one leg with the other held out in front, which trains the quads and glutes and balance.",
+    "formCues": [
+      "Free leg reaches forward",
+      "Heel of the standing foot stays down",
+      "Arms forward for balance"
+    ],
+    "steps": [
+      "Stand on one leg with the other leg lifted slightly in front of you.",
+      "Reach your arms forward and sit down on the standing leg.",
+      "Lower as far as you can control, keeping the free leg off the floor.",
+      "Drive up through the standing foot to stand.",
+      "Finish the set, then switch sides."
+    ],
+    "mistakes": [
+      "Heel lifts and the weight shifts to the toes",
+      "Dropping into the bottom without control"
+    ]
+  },
+  {
+    "name": "Pike Push-Up",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "chest"
+    ],
+    "instructions": [
+      "Start in a push-up position, then walk your feet in and lift your hips high.",
+      "Set your hands a little wider than your shoulders.",
+      "Bend your elbows and lower the top of your head toward the floor in front of your hands.",
+      "Press back up until your arms are straight."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-pike-push-up",
+    "aliases": [
+      "Pike Push-Ups",
+      "Pike Press"
+    ],
+    "muscleGroups": [
+      "Shoulders"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-handstand-push-up",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A push-up with the hips high in an upside-down V, which trains the shoulders and triceps.",
+    "formCues": [
+      "Hips high, legs long",
+      "Head goes forward of the hands",
+      "Elbows angled back"
+    ],
+    "steps": [
+      "Start in a push-up position, then walk your feet in and lift your hips high.",
+      "Set your hands a little wider than your shoulders.",
+      "Bend your elbows and lower the top of your head toward the floor in front of your hands.",
+      "Press back up until your arms are straight."
+    ],
+    "mistakes": [
+      "Hips sink so it becomes a normal push-up",
+      "Elbows flare straight out"
+    ]
+  },
+  {
+    "name": "Thruster",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes",
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "abdominals"
+    ],
+    "instructions": [
+      "Hold a barbell or dumbbells at your shoulders with your feet about shoulder width apart.",
+      "Squat down with your elbows up and chest tall.",
+      "Drive up hard out of the squat and use that push to press the weight overhead.",
+      "Lock your arms at the top, then lower the weight back to your shoulders as you sink into the next squat."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-thruster",
+    "aliases": [
+      "Barbell Thruster",
+      "Dumbbell Thruster",
+      "Thrusters"
+    ],
+    "muscleGroups": [
+      "Shoulders",
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "barbell",
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-thruster",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A front squat that drives straight into an overhead press, with a barbell or dumbbells, training legs and shoulders.",
+    "formCues": [
+      "Elbows up in the squat",
+      "Drive with the legs, finish with the arms",
+      "One smooth movement"
+    ],
+    "steps": [
+      "Hold a barbell or dumbbells at your shoulders with your feet about shoulder width apart.",
+      "Squat down with your elbows up and chest tall.",
+      "Drive up hard out of the squat and use that push to press the weight overhead.",
+      "Lock your arms at the top, then lower the weight back to your shoulders as you sink into the next squat."
+    ],
+    "mistakes": [
+      "Pausing between the squat and the press",
+      "Elbows drop and the chest folds in the squat"
+    ]
+  },
+  {
+    "name": "Dead Hang",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "forearms"
+    ],
+    "secondaryMuscles": [
+      "lats"
+    ],
+    "instructions": [
+      "Grip a pull-up bar overhand at about shoulder width.",
+      "Lift your feet and hang with your arms straight.",
+      "Hold the position until the timer ends.",
+      "Step down under control."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-dead-hang",
+    "aliases": [
+      "Bar Hang",
+      "Passive Hang"
+    ],
+    "muscleGroups": [
+      "Arms"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "forearms",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-dead-hang",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Hanging still from a bar with straight arms, which trains grip and lets the shoulders stretch.",
+    "formCues": [
+      "Full grip around the bar",
+      "Arms straight",
+      "Legs still"
+    ],
+    "steps": [
+      "Grip a pull-up bar overhand at about shoulder width.",
+      "Lift your feet and hang with your arms straight.",
+      "Hold the position until the timer ends.",
+      "Step down under control."
+    ],
+    "mistakes": [
+      "Swinging the legs",
+      "Holding the bar with only the fingers"
+    ]
+  },
+  {
+    "name": "Dumbbell Snatch",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "quadriceps",
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "traps",
+      "abdominals"
+    ],
+    "instructions": [
+      "Stand with a dumbbell on the floor between your feet.",
+      "Hinge down and grip it with one hand, back flat.",
+      "Drive your hips forward explosively and pull the dumbbell up close to your body.",
+      "Punch your arm straight up and finish standing with the dumbbell overhead.",
+      "Lower it to your shoulder, then to the floor, and switch sides."
+    ],
+    "category": "olympic weightlifting",
+    "images": [],
+    "id": "own-dumbbell-snatch",
+    "aliases": [
+      "DB Snatch",
+      "One-Arm Dumbbell Snatch",
+      "Single-Arm Dumbbell Snatch"
+    ],
+    "muscleGroups": [
+      "Shoulders",
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-snatch",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A one-arm dumbbell lift from the floor to overhead in one explosive movement, training full-body power.",
+    "formCues": [
+      "Hinge to the dumbbell",
+      "Drive with the hips",
+      "Punch the arm straight up"
+    ],
+    "steps": [
+      "Stand with a dumbbell on the floor between your feet.",
+      "Hinge down and grip it with one hand, back flat.",
+      "Drive your hips forward explosively and pull the dumbbell up close to your body.",
+      "Punch your arm straight up and finish standing with the dumbbell overhead.",
+      "Lower it to your shoulder, then to the floor, and switch sides."
+    ],
+    "mistakes": [
+      "Pressing the dumbbell up with the arm",
+      "Rounding the back to reach the floor"
+    ]
+  },
+  {
+    "name": "Jumping Jacks",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "calves"
+    ],
+    "secondaryMuscles": [
+      "quadriceps",
+      "glutes",
+      "shoulders"
+    ],
+    "instructions": [
+      "Stand tall with your feet together and your arms at your sides.",
+      "Jump your feet out wide as you swing your arms up overhead.",
+      "Jump your feet back together as your arms come down.",
+      "Keep a steady rhythm until the timer ends."
+    ],
+    "category": "plyometrics",
+    "images": [],
+    "id": "own-jumping-jacks",
+    "aliases": [
+      "Jumping Jack"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-med",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "plyometric",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-jumping-jacks",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A jump that opens the legs and swings the arms overhead, then closes, a light cardio warm-up.",
+    "formCues": [
+      "Land softly on the balls of the feet",
+      "Arms go all the way overhead",
+      "Steady rhythm"
+    ],
+    "steps": [
+      "Stand tall with your feet together and your arms at your sides.",
+      "Jump your feet out wide as you swing your arms up overhead.",
+      "Jump your feet back together as your arms come down.",
+      "Keep a steady rhythm until the timer ends."
+    ],
+    "mistakes": [
+      "Landing flat-footed and heavy",
+      "Arms stop at shoulder height"
+    ]
+  },
+  {
+    "name": "High Knees",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "secondaryMuscles": [
+      "calves",
+      "abdominals"
+    ],
+    "instructions": [
+      "Stand tall with your feet about hip width apart.",
+      "Run on the spot, driving one knee up toward hip height, then the other.",
+      "Pump your arms in time with your legs.",
+      "Keep a quick pace until the timer ends."
+    ],
+    "category": "plyometrics",
+    "images": [],
+    "id": "own-high-knees",
+    "aliases": [
+      "High Knee Run",
+      "High Knee Sprints"
+    ],
+    "muscleGroups": [
+      "Legs",
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "plyometric",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-high-knees",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Running on the spot driving the knees up high, a cardio drill for the hip flexors and legs.",
+    "formCues": [
+      "Knees up to hip height",
+      "Stay on the balls of the feet",
+      "Pump the arms"
+    ],
+    "steps": [
+      "Stand tall with your feet about hip width apart.",
+      "Run on the spot, driving one knee up toward hip height, then the other.",
+      "Pump your arms in time with your legs.",
+      "Keep a quick pace until the timer ends."
+    ],
+    "mistakes": [
+      "Leaning back as the knees rise",
+      "Knees barely lifting"
     ]
   }
 ]
