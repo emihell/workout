@@ -1698,3 +1698,14 @@ coach QA (independent subagent): nothing wrong; 9 refinements applied (bench/hip
 `# tests 779 # pass 779 # fail 0`, build ✓ (main 340.97 kB, L-026/L-029; library 1,368 kB); `grep -ci repdb` → 0; vendor-cache
 not in git. Test edits: sanctioned + 2 accepted (OWN_EXERCISES count; req-139 parts read `staple`). Reviewer (code): none.
 
+## req-143 — library triage: all 697 rough entries finished-queued, merged or hidden (DEC-070/072)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `6acb9eb`…`8b79a4e`). `src/library/triage.js` classifies every rough entry: 124
+finish (queued), 119 merge, 57 merge-later, 397 hide. `hidden` + `mergedInto` in OWN_FIELDS only; `listable()` filters in
+`rankedHits`; hidden entries the user owns still show (Already added / Restore); resolver unchanged. Exact merged-name
+redirect at score 0.5 (DEC-072 §2). Merge rule validator (DEC-072 §1). 25 typed aliases. "Show more" now 124 rough entries
+(the batch queue). Spec review (9 findings); coach QA (independent subagent): ~12 wrong merges across load type / equipment
+fixed + 12 debatable resolved. Gate: Planner's own run in an archive copy → `# tests 801 # pass 801 # fail 0`, build ✓ (main
+341.24 kB); spot-searched car deadlift/front cone hops (none), barbell full squat → Back Squat, air bike → Fan Bike, stretch →
+9. Test edits: sanctioned req-139 only. Reviewer (code): none (no store/model/storage).
+
