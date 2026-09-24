@@ -31,6 +31,7 @@ import {
   setTargetFor,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
+import { activeSetPatch, liveSetWeight } from '../set-values.js'
 import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath, MissingItem, NotInWorkout } from './helpers'
@@ -193,6 +194,10 @@ function WorkoutItemLive({ routineId, item }) {
   }
 
   function completeSet({ weight, reps, rpe, note, durationSec }) {
+    // req-154 — `22,5` → 22.5. A kg that can't be read logs nothing: SetLogForm already
+    // refuses Complete with an inline error, this is the backstop (never 0 or NaN).
+    const loggedWeight = liveSetWeight(weight, isWeightedType(ex.type))
+    if (loggedWeight == null) return
     recordButton('complete-set')
     // req-31 — completing a set is the gesture that arms the rest; use it to
     // unlock/resume the AudioContext (iOS only lets a gesture start audio) so the
@@ -213,14 +218,15 @@ function WorkoutItemLive({ routineId, item }) {
       setType: currentType,
       weighted,
       seed,
-      logged: { weight, reps },
+      // req-154 — the parsed kg, not the typed text: `22,5` must compare (and carry) as 22.5.
+      logged: { weight: loggedWeight, reps },
     })
     store.completeSet(
       {
         routineItemId: itemKey(item),
         exerciseId: item.exerciseId,
         setType: currentType,
-        weight: isWeightedType(ex.type) ? Number(weight) || 0 : 0,
+        weight: loggedWeight,
         reps: reps || '',
         // req-85 — a timed work set logs seconds in place of reps; only set when present.
         ...(durationSec != null ? { durationSec: Number(durationSec) || 0 } : {}),
@@ -580,13 +586,11 @@ export function WorkoutSetEdit({ routineId, index }) {
         showLoad={usesLoad}
         showEffort={usesRpe}
         cancelTo={itemPath}
-        onSave={({ weight, reps, rpe, note }) => {
-          store.updateActiveSet(index, {
-            weight: weight === '' ? 0 : Number(weight),
-            reps,
-            rpe: rpe === '' ? null : Number(rpe),
-            note,
-          })
+        onSave={(values) => {
+          // req-154 — `22,5` → 22.5; unreadable kg → null (the form already shows why).
+          const patch = activeSetPatch(values, { showLoad: usesLoad })
+          if (!patch) return
+          store.updateActiveSet(index, patch)
           go(itemPath)
         }}
       />

@@ -14,7 +14,8 @@
 // - An empty field is "not set": `[]`, so the exercise default / history applies —
 //   never `[0]` (a 0 s duration target beat the exercise default, workout-log.js:406).
 
-const KG_NUMBER = /^(?:\d+(?:\.\d+)?|\.\d+)$/
+import { KG_NUMBER, normalizeKgText } from './kg-input.js'
+
 const WHOLE = /^\d+$/
 const NEGATIVE = /^-\s*\d/
 
@@ -47,7 +48,7 @@ function parseNumbers(parts, { suffix, pattern, decimalComma }) {
   const list = []
   for (let i = 0; i < parts.length; i++) {
     const token = parts[i].replace(suffix, '').trim()
-    const normal = decimalComma ? token.replace(',', '.') : token
+    const normal = decimalComma ? normalizeKgText(token) : token
     if (!token) return { list: [], error: { position: i + 1, message: `Set ${i + 1} is empty.` } }
     if (NEGATIVE.test(token)) {
       return { list: [], error: { position: i + 1, message: `Set ${i + 1} can't be negative.` } }
