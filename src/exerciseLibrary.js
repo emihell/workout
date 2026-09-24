@@ -17,6 +17,7 @@ import { EXTRA_EXERCISES } from './exerciseExtras.js'
 import { commonExercises, EQUIPMENT_EXCEPTIONS, GROUP_EXCEPTIONS } from './library/common.js'
 import { OWN_EXERCISES } from './library/own-exercises.js'
 import { commonText } from './library/text.js'
+import { PENDING_ADDS, TRIAGE_CLASSES, triageRows } from './library/triage.js'
 
 export { OWN_EXERCISES }
 
@@ -46,6 +47,9 @@ export const OWN_FIELDS = [
   'description', 'formCues', 'steps', 'mistakes',
   // req-140 / DEC-066 — Search's first tier (staple ⇒ common) and our own difficulty.
   'staple', 'difficulty',
+  // req-143 — from the triage (src/library/triage.js), on non-common entries only; emitted
+  // only when set. Never in NEW_FIELDS, which rejects its fields on non-common entries.
+  'hidden', 'mergedInto',
 ]
 
 // primaryMuscles → coarse group. Every primary muscle in the library must be here.
@@ -325,9 +329,24 @@ export function textProblems(entry) {
 export function libraryProblems(list, {
   equipmentExceptions = EQUIPMENT_EXCEPTIONS,
   groupExceptions = GROUP_EXCEPTIONS,
+  pendingTargets = PENDING_ADDS,
 } = {}) {
   const problems = []
   const bad = (entry, message) => problems.push(`${entry.id}: ${message}`)
+  // req-143 — hidden is true or absent, never on a common entry (so never on a staple:
+  // staple ⇒ common is checked below); mergedInto needs hidden and a target that exists
+  // (or is a queued add) and isn't hidden.
+  const byId = new Map(list.map((entry) => [entry.id, entry]))
+  for (const entry of list) {
+    if ('hidden' in entry && entry.hidden !== true) bad(entry, `hidden is ${JSON.stringify(entry.hidden)}, not true`)
+    if (entry.hidden && entry.common) bad(entry, 'hidden on a common entry')
+    if (!('mergedInto' in entry)) continue
+    const target = byId.get(entry.mergedInto)
+    if (entry.hidden !== true) bad(entry, 'mergedInto without hidden')
+    if (entry.mergedInto === entry.id) bad(entry, 'mergedInto itself')
+    else if (!target && !pendingTargets.includes(entry.mergedInto)) bad(entry, `mergedInto "${entry.mergedInto}" is not in the library`)
+    else if (target?.hidden) bad(entry, `mergedInto "${entry.mergedInto}", which is hidden`)
+  }
   const families = new Map()
   for (const entry of list) {
     if (entry.common) families.set(entry.family, (families.get(entry.family) || 0) + 1)
@@ -416,7 +435,34 @@ export function libraryProblems(list, {
   return problems
 }
 
-function withOwnFields(entry, { aliases = [], photos = [], tags }) {
+// req-143 — the triage against the list: every non-common entry has exactly one row, every
+// row is a library entry, classes are known, a merge target is common, a merge-later target
+// is a finish row or a queued add, and each row has a reason ([] = clean).
+export function triageProblems(list, rows = triageRows(), { pendingTargets = PENDING_ADDS } = {}) {
+  const problems = []
+  const byId = new Map(list.map((entry) => [entry.id, entry]))
+  const count = new Map()
+  for (const row of rows) count.set(row.id, (count.get(row.id) || 0) + 1)
+  const finish = new Set(rows.filter((row) => row.class === 'finish').map((row) => row.id))
+  for (const entry of list) {
+    if (!entry.common && count.get(entry.id) !== 1) problems.push(`${entry.id}: ${count.get(entry.id) || 0} triage rows, not 1`)
+  }
+  for (const row of rows) {
+    const bad = (message) => problems.push(`triage ${row.id}: ${message}`)
+    if (!byId.has(row.id)) bad('not in the library')
+    if (!TRIAGE_CLASSES.includes(row.class)) bad(`class "${row.class}"`)
+    if (!String(row.reason || '').trim()) bad('no reason')
+    const merging = row.class === 'merge' || row.class === 'merge-later'
+    if (merging !== ('target' in row)) bad(merging ? 'no target' : 'a target on a non-merge row')
+    if (row.class === 'merge' && !byId.get(row.target)?.common) bad(`merge target "${row.target}" is not a common entry`)
+    if (row.class === 'merge-later' && !finish.has(row.target) && !pendingTargets.includes(row.target)) {
+      bad(`merge-later target "${row.target}" is neither a finish row nor a queued add`)
+    }
+  }
+  return problems
+}
+
+function withOwnFields(entry, { aliases = [], photos = [], tags, triage }) {
   const out = { ...entry }
   for (const field of OWN_FIELDS) delete out[field]
   const allAliases = [...aliases, ...(tags?.aliases || [])]
@@ -437,6 +483,11 @@ function withOwnFields(entry, { aliases = [], photos = [], tags }) {
     out.difficulty = tags.difficulty
     for (const field of TEXT_FIELDS) if (tags[field] !== undefined) out[field] = tags[field]
   }
+  // req-143 — only set, never `hidden: false`; a common entry's row (a promoted finish) adds nothing.
+  if (!tags && triage && triage.class !== 'finish') {
+    out.hidden = true
+    if (triage.target) out.mergedInto = triage.target
+  }
   return out
 }
 
@@ -448,21 +499,24 @@ export function deriveLibrary(freeDb) {
   for (const id of Object.keys(text)) {
     if (!common.has(id)) throw new Error(`Text for "${id}", which is not a common entry.`)
   }
+  const triageRowsList = triageRows()
+  const triage = new Map(triageRowsList.map((row) => [row.id, row]))
   const list = [
     ...freeDb.map((entry) =>
       withOwnFields(entry, {
         photos: (entry.images || []).map((path) => FREE_DB_PHOTO_BASE + path),
         tags: common.get(entry.id),
+        triage: triage.get(entry.id),
       }),
     ),
-    ...EXTRA_EXERCISES.map((entry) => withOwnFields(entry, { aliases: entry.aliases || [], tags: common.get(entry.id) })),
-    ...OWN_EXERCISES.map((entry) => withOwnFields(entry, { tags: common.get(entry.id) })),
+    ...EXTRA_EXERCISES.map((entry) => withOwnFields(entry, { aliases: entry.aliases || [], tags: common.get(entry.id), triage: triage.get(entry.id) })),
+    ...OWN_EXERCISES.map((entry) => withOwnFields(entry, { tags: common.get(entry.id), triage: triage.get(entry.id) })),
   ]
   const known = new Set(list.map((entry) => entry.id))
   for (const id of common.keys()) {
     if (!known.has(id)) throw new Error(`Common entry "${id}" is not in the library.`)
   }
-  const problems = [...muscleTreeProblems(), ...libraryProblems(list)]
+  const problems = [...muscleTreeProblems(), ...libraryProblems(list), ...triageProblems(list, triageRowsList)]
   if (problems.length) throw new Error(`Library problems:\n${problems.join('\n')}`)
   return list
 }

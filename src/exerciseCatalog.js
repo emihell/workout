@@ -1,3 +1,4 @@
+import { libraryItemMatch } from './exercise-names.js'
 import { catalogNameKey, loadExerciseLibrary, shownName } from './exerciseLibrary.js'
 
 // req-139 / DEC-064 §2 — search reads our library only (exerciseLibrary.js: the pinned
@@ -50,17 +51,25 @@ function aliasWordStartMatch(alias, qCompact) {
   return words.some((_, i) => words.slice(i).join('').startsWith(qCompact))
 }
 
+// req-143 — hidden = never offered anywhere (merged or triaged out; src/library/triage.js).
+// It stays in the library so libraryEntryFor still resolves a stored exercise pointing at it.
+export function listable(entry) {
+  return !entry?.hidden
+}
+
 // Every item matching `query`, ranked: exact name or alias (0), name prefix (1), name
 // contains (2), alias contains (2.5), muscle/equipment (3); ties alphabetical by the
 // shown name. req-139 — the shown name (displayName ?? name) is the name; when a display
-// name exists, free-db's name counts as an alias.
-function rankedHits(list, query) {
+// name exists, free-db's name counts as an alias. req-143: hidden entries are skipped
+// unless `keep(item)` (Search: the ones the user already has).
+function rankedHits(list, query, keep = null) {
   const q = String(query || '').trim().toLowerCase()
   if (q.length < 2) return []
   const qCompact = compactText(q)
   const qKey = catalogNameKey(q)
   const scored = []
   for (const item of list || []) {
+    if (!listable(item) && !keep?.(item)) continue
     const name = shownName(item).toLowerCase()
     const aliasList = item.displayName !== undefined ? [item.name, ...(item.aliases || [])] : item.aliases || []
     const muscles = [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].join(' ').toLowerCase()
@@ -94,8 +103,11 @@ export function searchExerciseCatalog(list, query, limit = 25) {
 // the untruncated count ("Show N more"). With no staple hit, Search shows `rest` directly.
 // req-140 / DEC-066 §1 — the split reads `staple`, not `common` (a fully written niche
 // entry sits behind "Show more"). The `common` key name is kept for the callers.
-export function searchCommonFirst(list, query, limit = 25) {
-  const hits = rankedHits(list, query)
+// req-143 — a hidden entry matching one of `exercises` (live or archived, libraryItemMatch)
+// still shows, so owning one never turns into "No matches" (unconfirmed).
+export function searchCommonFirst(list, query, limit = 25, { exercises = [] } = {}) {
+  const owned = exercises.length ? (item) => libraryItemMatch(exercises, item) !== null : null
+  const hits = rankedHits(list, query, owned)
   const common = hits.filter((item) => item.staple)
   const rest = hits.filter((item) => !item.staple)
   return { common: common.slice(0, limit), rest: rest.slice(0, limit), restCount: rest.length }

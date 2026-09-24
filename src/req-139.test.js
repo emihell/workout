@@ -106,30 +106,40 @@ describe('missing staples', () => {
 })
 
 describe('common first, the rest on request', () => {
-  it('"shoulder press": a common entry first; Shoulder Press - With Bands only in the rest', () => {
-    const { common: hits, rest } = searchCommonFirst(library, 'shoulder press')
+  // req-143 (sanctioned edit) — was "shoulder press" / Shoulder Press - With Bands, now
+  // hidden (a band variant); same intent on a non-hidden rough entry.
+  it('"lateral raise": a common entry first; Seated Side Lateral Raise only in the rest', () => {
+    const { common: hits, rest } = searchCommonFirst(library, 'lateral raise')
     assert.ok(hits.length > 0 && hits.every((item) => item.common))
-    assert.ok(!hits.some((item) => item.id === 'Shoulder_Press_-_With_Bands'))
-    assert.ok(rest.some((item) => item.id === 'Shoulder_Press_-_With_Bands'))
+    assert.ok(!hits.some((item) => item.id === 'Seated_Side_Lateral_Raise'))
+    assert.ok(rest.some((item) => item.id === 'Seated_Side_Lateral_Raise'))
     assert.ok(rest.every((item) => !item.common))
   })
 
-  it('"air bike" → Fan Bike first (free-db\'s crunch is in the rest)', () => {
+  // req-143 (sanctioned edit) — was `rest[0].id === 'Air_Bike'`; free-db's crunch is now
+  // merged into Bicycle Crunch (hidden), so it is offered only to someone who has it.
+  it('"air bike" → Fan Bike first (free-db\'s crunch only when already added)', () => {
     const { common: hits, rest } = searchCommonFirst(library, 'air bike')
     assert.equal(hits[0].id, 'own-fan-bike')
-    assert.equal(rest[0].id, 'Air_Bike')
+    assert.ok(!rest.some((item) => item.id === 'Air_Bike'))
+    const owned = searchCommonFirst(library, 'air bike', 25, { exercises: [{ id: 'x', name: 'Air Bike', libraryId: 'Air_Bike' }] })
+    assert.equal(owned.common[0].id, 'own-fan-bike')
+    assert.equal(owned.rest[0].id, 'Air_Bike')
   })
 
-  it('only non-common hits ("car deadlift") → no common part; the rest shows directly', () => {
-    const { common: hits, rest } = searchCommonFirst(library, 'car deadlift')
+  // req-143 (sanctioned edit: the car-deadlift receipt) — Car Deadlift is hidden now.
+  it('only non-common hits ("zercher") → no common part; the rest shows directly', () => {
+    const { common: hits, rest } = searchCommonFirst(library, 'zercher')
     assert.deepEqual(hits, [])
-    assert.equal(rest[0].id, 'Car_Deadlift')
-    assert.equal(firstShown('car deadlift'), 'Car_Deadlift')
+    assert.equal(rest[0].id, 'Zercher_Squats')
+    assert.equal(firstShown('zercher'), 'Zercher_Squats')
   })
 
+  // req-143 (sanctioned edit) — "press" has 15 rough hits left after the triage; "shoulders"
+  // (a muscle query) still has > 25. restCount vs the flat search, which skips hidden too.
   it('each part is capped at 25; restCount is the untruncated count', () => {
-    const { common: hits, rest, restCount } = searchCommonFirst(library, 'press')
-    const all = searchExerciseCatalog(library, 'press', Infinity)
+    const { common: hits, rest, restCount } = searchCommonFirst(library, 'shoulders')
+    const all = searchExerciseCatalog(library, 'shoulders', Infinity)
     assert.ok(hits.length <= 25 && rest.length === 25)
     // req-140 (edit NOT on the spec's sanctioned list; flagged in reports/req-140.md) —
     // the split reads `staple` since DEC-066 §1, so the expected parts do too.
