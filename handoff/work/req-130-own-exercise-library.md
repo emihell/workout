@@ -1,6 +1,6 @@
 # req-130 — our own exercise library (a copy of free-exercise-db, extended) + the RepDB credit
 
-**Status: READY** — Phase 1 (pulled forward from Phase 3 "own exercise DB", Emilio 2026-09-24, DEC-060). Data +
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-130` (`ff3dc9e`…`5485bc0`, 2 commits).** — Phase 1 (pulled forward from Phase 3 "own exercise DB", Emilio 2026-09-24, DEC-060). Data +
 catalog plumbing; the only UI is the credit line. **Gate: persisted-data (additive).** Adds one optional field to
 stored exercises (`libraryId`, new adds only). **Not an ask-gate #2 case:** Emilio approved this spec 2026-09-24
 ("sounds good"), and it is an additive optional field written only through the normal add path, with no schema

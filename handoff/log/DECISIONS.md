@@ -1170,3 +1170,11 @@ Built as req-114..120 (BACKLOG §Flow audit Tier 1).
 5. **Manual add suggests the library entry while typing** (one Add screen) so unlinked duplicates stop at source.
 Rejected: pixelating the photos (tested — the gym background swamps the figure); fuzzy auto-match (wrong picture).
 Built as req-130..133 (BACKLOG §Exercise library).
+
+## DEC-061 — the exercise library file is generated, never hand-edited  (planning, from Builder's req-130 flag, 2026-09-24)
+
+`src/library/exercises.json` is built by `scripts/build-library.mjs` from the sha-pinned free-db source plus our tables in
+`src/exerciseLibrary.js` (aliases, groups, own entries); a drift test fails on hand edits. Content work (req-133) edits the
+tables and re-runs the script. Library ids are permanent once stored (`libraryId`, req-130 §2). Implementation rule, no user
+effect.
+
