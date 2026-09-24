@@ -18,7 +18,7 @@ export const TRIAGE_CLASSES = ['finish', 'merge', 'merge-later', 'hide']
 export const PENDING_ADDS = [
   'own-archer-pull-up', 'own-archer-push-up', 'own-back-lever', 'own-dragon-flag', 'own-dumbbell-front-squat',
   'own-front-lever', 'own-jefferson-curl', 'own-l-sit', 'own-overhead-carry', 'own-reverse-nordic', 'own-reverse-plank',
-  'own-spoto-press', 'own-stability-ball-pike', 'own-standing-hip-abduction', 'own-suspension-curl',
+  'own-spoto-press', 'own-stability-ball-pike', 'own-suspension-curl',
   'own-suspension-leg-curl', 'own-terminal-knee-extension', 'own-windshield-wipers',
 ]
 
@@ -151,7 +151,7 @@ export function triageRows() {
     ['Chest_Push_with_Run_Release', 'hide', null, 'athletic throw drill'],
     ['Chest_Stretch_on_Stability_Ball', 'hide', null, 'niche setup'],
     ['Childs_Pose', 'finish', null, 'queued (req-140 promote list)'],
-    ['Chin_To_Chest_Stretch', 'merge', 'Side_Neck_Stretch', 'another neck stretch'],
+    ['Chin_To_Chest_Stretch', 'hide', null, 'neck flexion stretch; a different movement from the side neck stretch'],
     ['Circus_Bell', 'hide', null, 'strongman'],
     ['Clean_Deadlift', 'hide', null, 'weightlifting accessory'],
     ['Clean_Pull', 'finish', null, 'clean pull: a standard weightlifting pull'],
@@ -686,7 +686,7 @@ export function triageRows() {
     ['Two-Arm_Kettlebell_Clean', 'merge-later', 'One-Arm_Kettlebell_Clean', 'the kettlebell clean, both hands'],
     ['Two-Arm_Kettlebell_Jerk', 'hide', null, 'kettlebell sport lift'],
     ['Two-Arm_Kettlebell_Military_Press', 'finish', null, 'queued (req-140 promote list)'],
-    ['Two-Arm_Kettlebell_Row', 'merge', 'One-Arm_Kettlebell_Row', 'the kettlebell row, both hands'],
+    ['Two-Arm_Kettlebell_Row', 'hide', null, 'both bells at once; a different load scale from the one-arm row'],
     ['Upper_Back-Leg_Grab', 'hide', null, 'minor stretch'],
     ['Upper_Back_Stretch', 'hide', null, 'minor stretch'],
     ['Upright_Cable_Row', 'finish', null, 'queued (req-140 promote list)'],

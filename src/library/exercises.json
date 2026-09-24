@@ -1568,14 +1568,14 @@
     "family": "fam-good-morning",
     "staple": false,
     "difficulty": "beginner",
-    "description": "A hip hinge against a band looped under the feet and behind the neck, for the hamstrings and glutes.",
+    "description": "A hip hinge against a band looped under the feet and across the upper back, for the hamstrings and glutes.",
     "formCues": [
       "Soft knees, hips move back",
       "Back flat",
       "Stand tall and squeeze the glutes"
     ],
     "steps": [
-      "Stand on a long band with your feet hip width apart and loop the other end behind your neck.",
+      "Stand on a long band with your feet hip width apart and loop the other end across the back of your shoulders.",
       "Keep a slight bend in your knees and brace your trunk.",
       "Push your hips back and hinge forward until you feel your hamstrings stretch.",
       "Drive your hips forward to stand back up against the band."
@@ -1583,7 +1583,7 @@
     "mistakes": [
       "Rounding the back",
       "Bending the knees into a squat",
-      "Band pulling the head forward"
+      "Band riding up onto the neck"
     ]
   },
   {
@@ -7373,8 +7373,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Chin_To_Chest_Stretch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Chin_To_Chest_Stretch/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Side_Neck_Stretch"
+    "hidden": true
   },
   {
     "name": "Circus Bell",
@@ -12994,7 +12993,7 @@
     "family": "fam-leg-raise",
     "staple": false,
     "difficulty": "beginner",
-    "description": "Lying or sitting on a bench and pulling the knees in toward the chest, for the lower abs.",
+    "description": "Lying on a bench and pulling the knees in toward the chest, for the lower abs.",
     "formCues": [
       "Low back stays down",
       "Pull the knees to the chest",
@@ -25055,7 +25054,7 @@
     "id": "Physioball_Hip_Bridge",
     "aliases": [
       "Swiss Ball Hip Thrust",
-      "Ball Hip Bridge"
+      "Ball Hip Thrust"
     ],
     "muscleGroups": [
       "Legs"
@@ -39032,8 +39031,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Two-Arm_Kettlebell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Two-Arm_Kettlebell_Row/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "One-Arm_Kettlebell_Row"
+    "hidden": true
   },
   {
     "name": "Underhand Cable Pulldowns",
@@ -40484,7 +40482,7 @@
     "equipmentList": [
       "bodyweight"
     ],
-    "logAs": "time",
+    "logAs": "bodyweight-reps",
     "unilateral": true,
     "common": true,
     "family": "fam-worlds-greatest-stretch",
@@ -40498,7 +40496,7 @@
     ],
     "steps": [
       "Step into a long lunge with one foot forward and both hands on the floor inside the front foot.",
-      "Drop your inside elbow toward the front instep.",
+      "Drop the elbow on the front-leg side toward your instep.",
       "Rotate and reach the same arm up toward the ceiling.",
       "Straighten the front leg to stretch the hamstring, then return.",
       "Repeat on the other side."
@@ -44490,7 +44488,7 @@
       "quadriceps"
     ],
     "instructions": [
-      "From hands and knees, bring one knee forward behind the wrist on the same side.",
+      "From hands and knees, bring one knee forward behind the wrist on the same side, front heel toward the opposite hip.",
       "Extend the other leg straight back along the floor.",
       "Square your hips and lower your chest over the front leg as far as is comfortable.",
       "Hold, then switch sides."
@@ -44533,7 +44531,7 @@
       "Lower the chest gradually"
     ],
     "steps": [
-      "From hands and knees, bring one knee forward behind the wrist on the same side.",
+      "From hands and knees, bring one knee forward behind the wrist on the same side, front heel toward the opposite hip.",
       "Extend the other leg straight back along the floor.",
       "Square your hips and lower your chest over the front leg as far as is comfortable.",
       "Hold, then switch sides."
@@ -44555,7 +44553,7 @@
     ],
     "secondaryMuscles": [],
     "instructions": [
-      "Kneel with your back to a wall or couch and slide one knee back so the shin rests up against it.",
+      "Kneel on a pad with your back to a wall or couch and slide one knee back so the shin rests up against it.",
       "Step the other foot forward into a half-kneeling position.",
       "Squeeze the glute of the back leg and lift your torso upright until you feel the stretch.",
       "Hold, then switch sides."
@@ -44599,7 +44597,7 @@
       "Ribs down"
     ],
     "steps": [
-      "Kneel with your back to a wall or couch and slide one knee back so the shin rests up against it.",
+      "Kneel on a pad with your back to a wall or couch and slide one knee back so the shin rests up against it.",
       "Step the other foot forward into a half-kneeling position.",
       "Squeeze the glute of the back leg and lift your torso upright until you feel the stretch.",
       "Hold, then switch sides."

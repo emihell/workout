@@ -861,7 +861,7 @@ export const OWN_EXERCISES = [
     primaryMuscles: ['glutes'],
     secondaryMuscles: ['quadriceps'],
     instructions: [
-      'From hands and knees, bring one knee forward behind the wrist on the same side.',
+      'From hands and knees, bring one knee forward behind the wrist on the same side, front heel toward the opposite hip.',
       'Extend the other leg straight back along the floor.',
       'Square your hips and lower your chest over the front leg as far as is comfortable.',
       'Hold, then switch sides.',
@@ -879,7 +879,7 @@ export const OWN_EXERCISES = [
     primaryMuscles: ['quadriceps'],
     secondaryMuscles: [],
     instructions: [
-      'Kneel with your back to a wall or couch and slide one knee back so the shin rests up against it.',
+      'Kneel on a pad with your back to a wall or couch and slide one knee back so the shin rests up against it.',
       'Step the other foot forward into a half-kneeling position.',
       'Squeeze the glute of the back leg and lift your torso upright until you feel the stretch.',
       'Hold, then switch sides.',

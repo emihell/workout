@@ -3143,15 +3143,15 @@ const TEXT = {
     ['Elbow lifting off the side', 'Rolling the body back', 'Using a heavy dumbbell'],
   ],
   Band_Good_Morning: [
-    'A hip hinge against a band looped under the feet and behind the neck, for the hamstrings and glutes.',
+    'A hip hinge against a band looped under the feet and across the upper back, for the hamstrings and glutes.',
     ['Soft knees, hips move back', 'Back flat', 'Stand tall and squeeze the glutes'],
     [
-      'Stand on a long band with your feet hip width apart and loop the other end behind your neck.',
+      'Stand on a long band with your feet hip width apart and loop the other end across the back of your shoulders.',
       'Keep a slight bend in your knees and brace your trunk.',
       'Push your hips back and hinge forward until you feel your hamstrings stretch.',
       'Drive your hips forward to stand back up against the band.',
     ],
-    ['Rounding the back', 'Bending the knees into a squat', 'Band pulling the head forward'],
+    ['Rounding the back', 'Bending the knees into a squat', 'Band riding up onto the neck'],
   ],
   Band_Hip_Adductions: [
     'Sweeping one leg in across the body against a band, for the inner thigh.',
@@ -3187,7 +3187,7 @@ const TEXT = {
     ['Ball rolling away from under the back', 'Arching the lower back at the top', 'Pushing through the toes'],
   ],
   'Flat_Bench_Leg_Pull-In': [
-    'Lying or sitting on a bench and pulling the knees in toward the chest, for the lower abs.',
+    'Lying on a bench and pulling the knees in toward the chest, for the lower abs.',
     ['Low back stays down', 'Pull the knees to the chest', 'Legs extend without touching down'],
     [
       'Lie on a flat bench with your legs off the end and hold the sides of the bench behind your head.',
@@ -3289,7 +3289,7 @@ const TEXT = {
     ['Back knee off the floor', 'Rotate through the upper back', 'Move slowly between positions'],
     [
       'Step into a long lunge with one foot forward and both hands on the floor inside the front foot.',
-      'Drop your inside elbow toward the front instep.',
+      'Drop the elbow on the front-leg side toward your instep.',
       'Rotate and reach the same arm up toward the ceiling.',
       'Straighten the front leg to stretch the hamstring, then return.',
       'Repeat on the other side.',
@@ -3355,7 +3355,7 @@ const TEXT = {
     'A floor stretch with one shin across the front and the other leg straight back, for the glutes and hips.',
     ['Hips square to the floor', 'Back leg straight', 'Lower the chest gradually'],
     [
-      'From hands and knees, bring one knee forward behind the wrist on the same side.',
+      'From hands and knees, bring one knee forward behind the wrist on the same side, front heel toward the opposite hip.',
       'Extend the other leg straight back along the floor.',
       'Square your hips and lower your chest over the front leg as far as is comfortable.',
       'Hold, then switch sides.',
@@ -3366,7 +3366,7 @@ const TEXT = {
     'A kneeling stretch with the back shin up against a wall or couch, for the hip flexors and quads.',
     ['Squeeze the back glute', 'Torso upright', 'Ribs down'],
     [
-      'Kneel with your back to a wall or couch and slide one knee back so the shin rests up against it.',
+      'Kneel on a pad with your back to a wall or couch and slide one knee back so the shin rests up against it.',
       'Step the other foot forward into a half-kneeling position.',
       'Squeeze the glute of the back leg and lift your torso upright until you feel the stretch.',
       'Hold, then switch sides.',

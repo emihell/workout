@@ -56,11 +56,11 @@ describe('the triage', () => {
   })
 
   // req-145 (sanctioned count pin) — batch 2 wrote 27 merge-later targets: those rows are merges now.
-  // req-147 (DEC-074 §1) — batch 3 wrote 16 more merge-later targets.
-  it('697 rows: 124 finish, 162 merge, 14 merge-later, 397 hide', () => {
+  // req-147 (DEC-074 §1) — batch 3 wrote 16 more merge-later targets (2 of them hidden in coach review).
+  it('697 rows: 124 finish, 160 merge, 14 merge-later, 399 hide', () => {
     const count = (triage) => rows.filter((row) => row.class === triage).length
     assert.equal(rows.length, 697)
-    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 162, 14, 397])
+    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 160, 14, 399])
   })
 
   it('every non-common entry that isn\'t hidden is finish; no finish row is hidden', () => {

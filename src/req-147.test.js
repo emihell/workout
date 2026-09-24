@@ -73,7 +73,7 @@ describe('batch 3', () => {
 
   it('merged names now find the written entry, and there are no merge-later rows to a queued add left', () => {
     assert.equal(firstShown('groin and back stretch'), 'own-butterfly-stretch')
-    assert.equal(firstShown('two-arm kettlebell row'), 'One-Arm_Kettlebell_Row')
+    assert.equal(firstShown('alternating kettlebell row'), 'One-Arm_Kettlebell_Row')
     assert.equal(firstShown('overhead cable curl'), 'High_Cable_Curls')
     assert.deepEqual(triageRows().filter((row) => row.class === 'merge-later' && PENDING_ADDS.includes(row.target)), [])
   })
