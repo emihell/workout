@@ -1,49 +1,31 @@
-// req-153 — Back-button and guard leftovers from req-24 / req-152. Items 1 + 2 (and the
-// req-152 QA-1 exits, moved here from req-152.test.js as behaviour tests) run against a
-// fake browser session history: entries with state, an index, hashchange fired async
-// like a real fragment navigation, and Back that keeps forward entries (history.length
-// never shrinks). Item 3 lives in req-24.test.js (the guard), item 5 is this file + the
-// req-152 edits listed in reports/req-153.md.
-import { describe, it, beforeEach, afterEach, mock } from 'node:test'
+// req-153 — leftovers from req-24 / req-152. Item 2 (and the req-152 QA-1 exits, moved
+// here from req-152.test.js as behaviour tests) run against a fake browser session
+// history: entries, an index, hashchange fired async like a real fragment navigation,
+// location.replace rewriting the current entry, and Back that keeps forward entries.
+// Item 1 (the dead first Back) was dropped (DEC-084): route.js is req-152's go().
+// Item 3 lives in req-24.test.js (the guard); item 5 is this file + the req-152 edits.
+import { describe, it, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { BACK_TIMEOUT_MS, go, installEntryStamps, resetEntryStampsForTest } from './route.js'
+import { go } from './route.js'
 import { leaveWorkoutToToday } from './workout-actions.js'
 import { inWorkoutFallback } from './workout-paths.js'
 import { historyGroupRowMeta } from './views/history/helpers.js'
 
 const BASE = 'http://localhost:5173/workout/'
 
-// `start`: the session's entries before the app loads (state null = never stamped, e.g.
-// entries from before req-153 shipped) and the index the page is (re)loaded on.
-function fakeBrowser(start = ['#/'], startIndex = start.length - 1) {
-  const entries = start.map((hash) => ({ url: BASE + hash, state: null }))
-  let index = startIndex
+function fakeBrowser(startHash = '#/') {
+  const entries = [BASE + startHash]
+  let index = 0
   const listeners = new Map()
-  const docListeners = []
   const queue = []
-  let holdBacks = false
-  const heldBacks = []
   const hashOf = (url) => url.slice(url.indexOf('#'))
   const fire = (event) => (listeners.get(event.type) || []).slice().forEach((fn) => fn(event))
   const hashchanged = (oldURL) => {
-    const newURL = entries[index].url
+    const newURL = entries[index]
     if (hashOf(oldURL) !== hashOf(newURL)) queue.push(() => fire({ type: 'hashchange', oldURL, newURL }))
   }
-  // A traversal (Back/Forward): popstate, then hashchange if the fragment differs.
-  const traverse = (delta) => {
-    const to = index + delta
-    if (to < 0 || to >= entries.length) return
-    const oldURL = entries[index].url
-    index = to
-    queue.push(() => fire({ type: 'popstate', state: entries[index].state }))
-    hashchanged(oldURL)
-  }
+  let reloads = 0
   const win = {
-    HashChangeEvent: class {
-      constructor(type, init) {
-        Object.assign(this, { type }, init)
-      }
-    },
     addEventListener(type, fn) {
       if (!listeners.has(type)) listeners.set(type, [])
       listeners.get(type).push(fn)
@@ -53,62 +35,45 @@ function fakeBrowser(start = ['#/'], startIndex = start.length - 1) {
       const at = list.indexOf(fn)
       if (at >= 0) list.splice(at, 1)
     },
-    dispatchEvent(event) {
-      fire(event)
-    },
-    document: {
-      addEventListener(type, fn) {
-        if (type === 'click') docListeners.push(fn)
-      },
-    },
     history: {
       get length() {
         return entries.length
       },
-      get state() {
-        return entries[index].state
-      },
-      replaceState(state, _title, url) {
-        entries[index] = { url: url ? BASE + url : entries[index].url, state }
-      },
-      // A held back (a slow traversal) applies its -1 from wherever the index is when
-      // it finally runs, like a real queued traversal.
       back() {
-        if (holdBacks) heldBacks.push(-1)
-        else traverse(-1)
-      },
-      forward() {
-        traverse(1)
+        if (index === 0) return
+        const oldURL = entries[index]
+        index -= 1
+        hashchanged(oldURL)
       },
     },
     location: {
       get hash() {
-        return hashOf(entries[index].url)
+        return hashOf(entries[index])
       },
-      // Like Chrome (measured in req-153): a fragment push fires popstate (state null)
-      // before its hashchange.
       set hash(value) {
-        const oldURL = entries[index].url
+        const oldURL = entries[index]
         entries.splice(index + 1)
-        entries.push({ url: BASE + value, state: null })
+        entries.push(BASE + value)
         index += 1
-        queue.push(() => fire({ type: 'popstate', state: null }))
         hashchanged(oldURL)
       },
       get href() {
-        return entries[index].url
+        return entries[index]
+      },
+      // Same document + a new fragment → a fragment navigation (no reload); anything
+      // else would reload the page.
+      replace(url) {
+        const oldURL = entries[index]
+        if (url.slice(0, url.indexOf('#')) !== oldURL.slice(0, oldURL.indexOf('#'))) reloads += 1
+        entries[index] = url
+        hashchanged(oldURL)
       },
     },
   }
   const flush = () => {
     while (queue.length) queue.shift()()
   }
-  // A user tapping a plain <a href="#/…"> link: the click (capture listeners see it
-  // first), then the browser's native push.
   const tapLink = (hash) => {
-    const link = { getAttribute: () => hash, target: '' }
-    const event = { button: 0, defaultPrevented: false, target: { closest: () => link } }
-    docListeners.forEach((fn) => fn(event))
     win.location.hash = hash
     flush()
   }
@@ -116,70 +81,29 @@ function fakeBrowser(start = ['#/'], startIndex = start.length - 1) {
     win.history.back()
     flush()
   }
-  const slowBacks = (on) => {
-    holdBacks = on
-  }
-  const releaseBacks = () => {
-    while (heldBacks.length) traverse(heldBacks.shift())
-    flush()
-  }
-  return {
-    win, flush, tapLink, back, slowBacks, releaseBacks,
-    hash: () => win.location.hash,
-    length: () => entries.length,
-    stateAt: (i) => entries[i].state,
-    index: () => index,
-  }
+  return { win, flush, tapLink, back, hash: () => win.location.hash, length: () => entries.length, reloads: () => reloads }
 }
 
 let browser
 const previousWindow = globalThis.window
-const load = (start, startIndex) => {
-  browser = fakeBrowser(start, startIndex)
+beforeEach(() => {
+  browser = fakeBrowser('#/')
   globalThis.window = browser.win
-  resetEntryStampsForTest()
-  installEntryStamps()
-}
-beforeEach(() => load(['#/']))
+})
 afterEach(() => {
-  mock.timers.reset()
   globalThis.window = previousWindow
 })
 
-describe('item 1 — no duplicate entry when a replace targets the entry beneath', () => {
-  it('overview → item (link) → last set → replace to the overview: length did not grow, one Back leaves', () => {
-    go('/workout/x') // Start (push)
+describe("go() — req-152's replace (moved here from req-152.test.js)", () => {
+  it('replace rewrites the current entry in place: length unchanged, the replaced route is gone', () => {
+    go('/workout/x')
     browser.flush()
-    browser.tapLink('#/workout/x/item/a/log') // the overview row is a link
+    browser.tapLink('#/workout/x/finish')
     const before = browser.length()
-    go('/workout/x', { replace: true }) // markDoneAndGoToOverview
+    go('/', { replace: true })
     browser.flush()
-    assert.equal(browser.hash(), '#/workout/x')
-    assert.equal(browser.length(), before) // no new entry
-    browser.back()
-    assert.equal(browser.hash(), '#/') // one Back leaves the workout
-  })
-
-  it('two replaces to the overview in one tick (Skip + the marked-done effect) step back ONCE', () => {
-    go('/workout/x')
-    browser.flush()
-    browser.tapLink('#/workout/x/item/a/log')
-    go('/workout/x', { replace: true })
-    go('/workout/x', { replace: true }) // before the first back has arrived
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x')
-    browser.back()
-    assert.equal(browser.hash(), '#/') // still in the app, one Back from the overview
-  })
-
-  it('a replace whose target is NOT beneath replaces in place and keeps what is beneath', () => {
-    go('/workout/x')
-    browser.flush()
-    browser.tapLink('#/workout/x/item/a/log')
-    go('/workout/x/item/b/log', { replace: true }) // e.g. Replace exercise → the new item
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x/item/b/log')
-    assert.equal(browser.length(), 3)
+    assert.equal(browser.hash(), '#/')
+    assert.equal(browser.length(), before)
     browser.back()
     assert.equal(browser.hash(), '#/workout/x')
   })
@@ -201,107 +125,7 @@ describe('item 1 — no duplicate entry when a replace targets the entry beneath
     go('/workout/x/finish', { replace: true })
     browser.flush()
     assert.equal(fired, 1)
-  })
-
-  it('safety net: an entry whose stamp is wrong (e.g. from before req-153) still lands on the target', () => {
-    go('/a')
-    browser.flush()
-    go('/b')
-    browser.flush()
-    browser.win.history.replaceState({ below: '/target' }, '') // wrong: /a is beneath
-    go('/target', { replace: true })
-    browser.flush()
-    assert.equal(browser.hash(), '#/target')
-  })
-})
-
-// ---- req-153 review — should-fixes (each fails on 10c1a99) ----
-describe('review fix 1 — only real pushes are stamped', () => {
-  it('reload on an old (unstamped) log entry, Back, then Continue: stays in the app', () => {
-    // Entries from before req-153 shipped: [ext, overview, log]; the page reloads on log.
-    load(['#/__external', '#/workout/r1', '#/workout/r1/item/i/log'])
-    browser.back() // → the overview, an unstamped entry reached by TRAVERSAL
-    assert.equal(browser.hash(), '#/workout/r1')
-    assert.equal(browser.stateAt(1), null) // not stamped (was: below = the log above it)
-    go('/workout/r1/item/i/log', { replace: true }) // Continue → startOrContinue's replace
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/r1/item/i/log') // a plain in-place replace
-    assert.notEqual(browser.hash(), '#/__external')
-  })
-
-  it('a go() push and a link tap are stamped with the path they left', () => {
-    go('/workout/x')
-    browser.flush()
-    assert.deepEqual(browser.win.history.state, { below: '/' })
-    browser.tapLink('#/workout/x/item/a/log')
-    assert.deepEqual(browser.win.history.state, { below: '/workout/x' })
-  })
-
-  it('a stamped entry reached by Back keeps its own stamp', () => {
-    go('/a')
-    browser.flush()
-    go('/b')
-    browser.flush()
-    browser.back()
-    assert.deepEqual(browser.win.history.state, { below: '/' })
-  })
-})
-
-describe('review fix 2 — a slow back never undoes a tap', () => {
-  const toOverviewSlowly = () => {
-    go('/workout/x')
-    browser.flush()
-    browser.tapLink('#/workout/x/item/a/log')
-    mock.timers.enable({ apis: ['setTimeout'] })
-    browser.slowBacks(true)
-    go('/workout/x', { replace: true }) // steps back — but the back is slow
-  }
-
-  it('a push requested while the back is in flight is not applied, so a late back has nothing to undo', () => {
-    toOverviewSlowly()
-    go('/workout/x/item/b/log') // queued on 10c1a99 and applied by the timer
-    mock.timers.tick(BACK_TIMEOUT_MS + 1)
-    browser.flush()
-    const shown = browser.hash()
-    browser.releaseBacks() // the late back finally lands
-    assert.equal(browser.hash(), shown) // the screen on show did not flip
-    assert.equal(shown, '#/workout/x')
-  })
-
-  it('the user pushes a screen after the timeout, then the late back lands: their screen is put back', () => {
-    toOverviewSlowly()
-    mock.timers.tick(BACK_TIMEOUT_MS + 1)
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x') // replaced in place on the timer
-    browser.slowBacks(false)
-    browser.tapLink('#/workout/x/item/b/log') // the user taps another exercise
-    browser.releaseBacks() // the late back pops it…
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x/item/b/log') // …and it is put back
-  })
-
-  it('a back that never arrives: navigation unlocks and the target is replaced in', () => {
-    toOverviewSlowly()
-    mock.timers.tick(BACK_TIMEOUT_MS + 1)
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x')
-    browser.slowBacks(false)
-    go('/history')
-    browser.flush()
-    assert.equal(browser.hash(), '#/history')
-  })
-})
-
-describe('review fix 3 — a leaving screen cannot navigate after the step-back', () => {
-  it("a go() from the screen being left (queued on 10c1a99) is not run on arrival", () => {
-    go('/workout/x')
-    browser.flush()
-    browser.tapLink('#/workout/x/item/a/log')
-    go('/workout/x', { replace: true })
-    go('/workout/x/item/a/done', { replace: true }) // the unmounting log screen's effect
-    browser.flush()
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x')
+    assert.equal(browser.reloads(), 0)
   })
 })
 
@@ -319,13 +143,14 @@ describe('req-152 QA-1 exits — leaveWorkoutToToday (moved here as behaviour te
     assert.equal(browser.hash(), '#/workout/x')
   })
 
-  it('Abandon from the overview (Today beneath): steps back onto Today, no duplicate', () => {
+  it('Abandon from the overview: the overview entry is replaced by Today (no new entry)', () => {
     go('/workout/x')
     browser.flush()
+    const before = browser.length()
     leaveWorkoutToToday()
     browser.flush()
     assert.equal(browser.hash(), '#/')
-    assert.equal(browser.length(), 2) // [#/, #/workout/x (forward)] — not a third entry
+    assert.equal(browser.length(), before)
   })
 })
 
@@ -364,19 +189,23 @@ describe('item 2 — an in-workout route with no active workout', () => {
     assert.equal(inWorkoutFallback({ active: { routineId: 'r1' }, routineId: 'r1', routineKnown: true }), 'missing')
     assert.equal(inWorkoutFallback({ active: { sessionId: 'r1' }, routineId: 'r1', routineKnown: true }), 'missing')
   })
-  it('the redirect is a replace: Save → Back → Back never stops on the dead item page', () => {
-    // [#/, overview, item log] → Save (finish replaced with #/ as in the Finish test above)
+  it('the redirect is a replace: Save → Back reaches the dead item page, which becomes the overview in place', () => {
+    // [#/, overview, item log, finish] → Save (finish replaced with #/)
     go('/workout/x')
     browser.flush()
     browser.tapLink('#/workout/x/item/a/log')
     browser.tapLink('#/workout/x/finish')
     leaveWorkoutToToday()
     browser.flush()
-    browser.back() // → the dead item log page
+    browser.back() // → the old item log page (no active workout now)
     assert.equal(browser.hash(), '#/workout/x/item/a/log')
+    const before = browser.length()
     go('/workout/x', { replace: true }) // what NotInWorkout does on mount
     browser.flush()
-    assert.equal(browser.hash(), '#/workout/x') // stepped back onto the overview entry
+    assert.equal(browser.hash(), '#/workout/x') // the overview's preview / Done view
+    assert.equal(browser.length(), before) // in place, no new entry
+    browser.back()
+    assert.equal(browser.hash(), '#/workout/x') // the entry beneath (a duplicate — item 1, parked)
     browser.back()
     assert.equal(browser.hash(), '#/')
   })

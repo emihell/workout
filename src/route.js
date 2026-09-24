@@ -57,75 +57,10 @@ function remember(hash) {
   if (changed) recordScreen(parseRoute(path).name)
 }
 
-// req-153 — every browser history entry remembers the path BENEATH it, in
-// `history.state.below`, so a replace can tell when its target is the entry right
-// under it (overview → item → last set → replace to the overview) and step back onto
-// it instead of leaving two identical entries (a device Back that does nothing).
-// The in-app visit stack can't say this: a device Back pushes onto it, not pops.
-//
-// Only a real PUSH is stamped: a go() push or a tap on an in-app `#` link sets
-// `expectPush` (the path it leaves), and the next hashchange consumes it. An entry
-// reached by Back/Forward is never stamped — a missing stamp is safe (a replace from it
-// is a plain in-place replace), a wrong one isn't (stamping on traversal once recorded
-// the entry ABOVE as `below`, so a later replace stepped back out of the app). The first
-// entry of a fresh page is stamped `below: null`; after a reload the entry keeps its state.
-function entryState() {
-  const state = window.history?.state
-  return state && typeof state === 'object' && 'below' in state ? state : null
-}
-
-function stampEntry(below) {
-  if (!window.history?.replaceState || entryState()) return
-  window.history.replaceState({ ...(window.history.state || {}), below }, '')
-}
-
-// A push flag older than this is stale (a link whose navigation never happened).
-const PUSH_FLAG_MS = 1000
-let expectPush = null
-
-function flagPush(below) {
-  expectPush = { below, at: Date.now() }
-  pushCount += 1
-}
-
-function onHashStamp() {
-  const flag = expectPush
-  expectPush = null
-  if (flag && Date.now() - flag.at <= PUSH_FLAG_MS) stampEntry(flag.below)
-}
-
-// Capture phase, so it runs before the browser follows the link. Only a plain primary
-// click on an in-app `#` link to a DIFFERENT path is a push.
-function onLinkClick(event) {
-  if (event.defaultPrevented || event.button !== 0) return
-  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-  const link = event.target?.closest?.('a[href^="#"]')
-  if (!link || (link.target && link.target !== '_self')) return
-  const here = hashPath(window.location.hash)
-  if (hashPath(link.getAttribute('href')) !== here) flagPush(here)
-}
-
-let stampsInstalled = false
-export function installEntryStamps() {
-  if (typeof window === 'undefined' || stampsInstalled) return
-  stampsInstalled = true
-  stampEntry(null)
-  window.addEventListener('hashchange', onHashStamp)
-  window.document?.addEventListener?.('click', onLinkClick, true)
-}
-
-// Test-only: forget the installed listeners' state (tests swap in a fresh fake window).
-export function resetEntryStampsForTest() {
-  stampsInstalled = false
-  pendingBack = null
-  expectPush = null
-}
-
 export function useHashRoute() {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
 
   useEffect(() => {
-    installEntryStamps()
     remember(window.location.hash || '#/')
     const onHash = () => {
       const next = window.location.hash || '#/'
@@ -134,7 +69,6 @@ export function useHashRoute() {
     }
     window.addEventListener('hashchange', onHash)
     if (!window.location.hash) {
-      flagPush(null)
       window.location.hash = '#/'
     }
     return () => window.removeEventListener('hashchange', onHash)
@@ -144,107 +78,22 @@ export function useHashRoute() {
   return parseRoute(path)
 }
 
-// Replace the current entry's URL, keeping what's beneath it, and announce it the way a
-// real fragment navigation would (replaceState itself fires no hashchange).
-function replaceEntry(next) {
-  const oldURL = window.location.href
-  const below = entryState()?.below ?? null
-  window.history.replaceState({ ...(window.history.state || {}), below }, '', toHash(next))
-  window.dispatchEvent(new window.HashChangeEvent('hashchange', { oldURL, newURL: window.location.href }))
-}
-
-// The target is the entry beneath: step back onto it. history.back() is async, and more
-// go() calls often follow before it lands — Skip's go plus the log screen's "marked done
-// → overview" effect, or effects of the screen that is leaving. Every go() while a step
-// back is in flight is DROPPED: a second back would walk off the app, and anything
-// queued would run after the new screen is up (a leaving screen's navigation, or a push
-// a late back then undoes). A user tap can't land in that window in practice; the
-// arriving screen's own effects run after arrival, so they aren't affected.
-//
-// It settles on popstate or hashchange (whichever comes first). If the landing isn't
-// the target (a wrong stamp), the target is replaced in. A back that hasn't arrived
-// within BACK_TIMEOUT_MS (a frozen or locked phone can delay it) unlocks navigation and
-// replaces the target in place. The late back may still land afterwards; for
-// LATE_BACK_MS we watch for it: landing with no push since, it lands on the entry
-// beneath — the same screen — and nothing is lost; if the user pushed a screen in the
-// meantime, the late back popped it, so history.forward() puts it back.
-let pendingBack = null
-let pushCount = 0
-
-export const BACK_TIMEOUT_MS = 1000
-export const LATE_BACK_MS = 10000
-
-function backOnto(next) {
-  const pending = { target: next }
-  pendingBack = pending
-  let timer = null
-  const off = (fn) => {
-    window.removeEventListener('popstate', fn)
-    window.removeEventListener('hashchange', fn)
-  }
-  const on = (fn) => {
-    window.addEventListener('popstate', fn)
-    window.addEventListener('hashchange', fn)
-  }
-  // Chrome fires popstate on a fragment PUSH too (a link tap) — measured. The entry a
-  // push creates is still unstamped when its popstate fires (it is stamped on its
-  // hashchange), while every entry we step back onto is stamped, so an unstamped
-  // popstate is not our back. (A pending back onto an unstamped entry still settles on
-  // its hashchange.)
-  const isOurBack = (event) => event?.type !== 'popstate' || Boolean(entryState())
-  const settle = (event) => {
-    if (pendingBack !== pending || !isOurBack(event)) return
-    off(settle)
-    if (timer) clearTimeout(timer)
-    pendingBack = null
-    if (hashPath(window.location.hash) !== pending.target) replaceEntry(pending.target)
-  }
-  const timedOut = () => {
-    if (pendingBack !== pending) return
-    settle({ type: 'timeout' })
-    const pushesAtTimeout = pushCount
-    // popstate only: a real traversal. replaceEntry's own dispatched hashchange (a later
-    // in-place replace) must not read as the late back.
-    const late = (event) => {
-      if (!isOurBack(event)) return
-      window.removeEventListener('popstate', late)
-      clearTimeout(giveUp)
-      if (pushCount !== pushesAtTimeout) window.history.forward()
-    }
-    const giveUp = setTimeout(() => window.removeEventListener('popstate', late), LATE_BACK_MS)
-    window.addEventListener('popstate', late)
-  }
-  on(settle)
-  timer = setTimeout(timedOut, BACK_TIMEOUT_MS)
-  window.history.back()
-}
-
 // req-152 / DEC-081 — `replace` replaces the BROWSER history entry too (it used to only
 // rewrite the in-app visit stack, so device Back still stopped on the replaced screen —
-// e.g. a dead `/workout/<id>/finish` after Save). req-153 — and when the entry beneath
-// already is the target, it steps back onto it instead, so no duplicate entry is left.
-// Same document throughout: no reload, hashchange fires (natively or dispatched).
+// e.g. a dead `/workout/<id>/finish` after Save). location.replace with the same URL and a
+// new hash is a same-document fragment navigation: no reload, hashchange still fires.
 export function go(path, { replace = false } = {}) {
   const next = hashPath(path)
-  if (pendingBack) return // see backOnto: dropped while stepping back
-  if (typeof window === 'undefined' || hashPath(window.location.hash) === next) {
-    applyVisit(visits, next, { replace })
-    persistVisits()
-    return
-  }
-  if (replace && entryState()?.below === next) {
-    if (visits[visits.length - 2] === next) visits.pop()
-    persistVisits()
-    backOnto(next)
-    return
-  }
   applyVisit(visits, next, { replace })
   persistVisits()
-  if (replace) {
-    replaceEntry(next)
-  } else {
-    flagPush(hashPath(window.location.hash))
-    window.location.hash = toHash(next)
+  if (typeof window !== 'undefined' && hashPath(window.location.hash) !== next) {
+    if (replace) {
+      const { href } = window.location
+      const hashAt = href.indexOf('#')
+      window.location.replace(`${hashAt === -1 ? href : href.slice(0, hashAt)}${toHash(next)}`)
+    } else {
+      window.location.hash = toHash(next)
+    }
   }
 }
 
