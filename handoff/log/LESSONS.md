@@ -414,3 +414,9 @@ req-154 fixed the comma kg at the four saves, but the carry (`nextSeedOverrides`
 carried); req-155 found the DurationTimer readout showing "0s" for "30,5" while the save read 31. **How to apply:** when a
 typed value gets a parser, grep every consumer of that field's raw string (compare, carry, readout, save) and route all of
 them through the one parsed value.
+
+## L-038 — a hidden control must not submit its default  (Builder, req-156, 2026-09-24)
+
+`SetLogForm` hid Effort on warm-up/cardio sets but still submitted its seeded value (rpe 3), so History showed "Moderate"
+for sets the user never rated — it existed since 2026-09-12 and only a rendered form test would have caught it. **How to
+apply:** the form owns "not shown → no value"; a render test per hidden-field case (the req-156 harness makes it cheap).

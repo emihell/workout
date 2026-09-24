@@ -1843,3 +1843,14 @@ passed.` (930/930; req-155 12/12); one test edit (req-154's SetLogForm regex wid
 check still first, not weakened). Reviewer: none (DEC-057 §1 doesn't fire — no store/model/storage/workout-log change).
 Planner's browser run: "22," → 22 kg, no error; exercise default "abc" → "Can't read 'abc' as seconds — use a number like
 30.", nothing saved; "30,5" → `durationSec: 31`; Plank log "abc" → error, 0 sets; "30,5" → readout 31s, stored 31.
+
+## req-156 — warm-up/cardio sets stop saving a hidden effort; a render-test harness for views (DEC-085 §1, §10)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `6cccc57`…`b1d0b41`, 3 commits). `SetLogForm` submits `effort: null` and
+`SetEditForm` `rpe ''` when Effort is hidden, so warm-up/cardio sets store `rpe: null`; History edit/add unchanged (it
+shows Effort). Old rows untouched. New `src/test-support/` (Node module hooks compiling .jsx with Vite's rolldown +
+happy-dom@20.14.5 + react-dom/client) — `node --test` now renders components; 4 of req-156's 10 tests fail on main.
+Gate: Builder `check: green — lint, 60 test file(s), and the build all passed.` (940/940), no test edited. Reviewer: none
+(DEC-057 §1 doesn't fire — forms only). Planner's browser run: WU no Effort, stored `rpe=null`; work set Hard → `rpe=4`;
+Stairs `rpe=null`; History "WU set · 9 kg · 12" | "18 kg · 12 · Hard". Open for Emilio: hide "Moderate" on OLD warm-ups
+(display-only; Builder recommends yes), and whether History's set edit should hide Effort for warm-ups.
