@@ -1408,3 +1408,14 @@ a guard test keeps native `confirm`/`alert`/`prompt` out of `src/`. Import valid
 The spec left the label open. The destructive button reads **Delete** (exercise, routine, workout), **Remove** (routine
 exercise, loop weeks, slot, set), **Abandon** (×4), **Replace** (import) — never the native "OK". Messages unchanged.
 Cancel is left and focused (a stray Enter never destroys); backdrop, Escape and navigation cancel. On Emilio's list.
+
+## DEC-081 — `go(…, { replace: true })` replaces the browser entry too  (planning, from req-152 QA-1, 2026-09-24; unconfirmed)
+
+Builder measured that `replace` only swaps the app's own visit stack (`route.js:81-88`, `applyVisit`); the browser entry
+is always pushed (`location.hash = …`). So the in-app ‹ Back already skips replaced screens while device/browser Back stops
+on them, and on a dead finish route ("Not found."). **Chosen (A):** `replace` is real in the browser too
+(`location.replace` of the same URL with the new hash) at every site — ~15 existing ones (item.jsx ×5, overview.jsx:212,
+replace.jsx ×2, setup.jsx:59, Exercises.jsx ×4, workout-actions.js) plus the 3 req-152 exits. Why: it makes device Back
+match in-app Back and what those sites already say ("replace rather than stacking history"); the stacked entries are the
+same dead-Back class as QA-1. Rejected (B, only the 3 exits): leaves two Backs that disagree. User-visible: swipe-back
+skips the replaced intermediate screen. On Emilio's list.
