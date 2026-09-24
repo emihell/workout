@@ -469,6 +469,11 @@ week structure that owns routines and their placement. The code still carries le
 `programs`/`programName` remnants (`model.js`, `storage.js`) — a program layer existed
 once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
+- **Progression bugs found by the req-144 prep** [measured, `work/req-144-prep.md` §A]: a rep-range target ("8-12")
+  parses to NaN, so a set can never count as missed (5 reps on 8–12 holds the load); AMRAP progresses on effort only;
+  assisted machines progress backwards (a miss lowers assistance = harder). Load recommendations the user sees, so
+  these are bugs (CLAUDE.md "reasoning made visible"). Small fix req, independent of the design; the proper model
+  (real ranges, assisted flag) comes from req-144.
 - **`req-144` creation design** (NEEDS DECISIONS — a design req, no code; planning + Emilio live) — personas, the
   simplicity rule, the parameter table, flows, model + library asks. Absorbs req-10 and the DEC-056 review step.
 - **Define the model first** — program vs routine vs schedule; what a program owns, how
