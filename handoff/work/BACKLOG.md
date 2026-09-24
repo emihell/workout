@@ -292,7 +292,7 @@ routines under "Thu, Sep 24" · 9 two taps (3 s arm) → "· skipped" · 10 Leg 
 own history · 11 after the skip Leg Extension prefills 9/18/22/25 (last real) · 12 routine unchanged by Finish; History
 edit → Update? → Apply → routine [65,70,70].
 
-**QA findings, Planner's browser run 2026-09-24** (none blocks; each a small fix req when picked):
+**QA findings, Planner's browser run 2026-09-24** → **`req-152`** (READY, after req-24):
 - **QA-1 Back after Finish lands on "Not found."** — after Save, browser Back goes to `#/workout/<id>/finish` → bare
   "Not found.", one more Back → the done workout. The finish route stays in history after save.
 - **QA-2 rest pill's tap area overlaps Back at 375 px** — pill `[103,8,272,54]` vs "‹ Exercises" `[24,40,115,84]`

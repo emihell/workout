@@ -18,7 +18,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **`req-24` confirm sheet** for all 14 native popups (DEC-079) + import validates first. Builder-ready.
+- **`req-24` confirm sheet** for all 14 native popups (DEC-079) + import validates first. **Sent to Builder 2026-09-24.**
+- **`req-152` QA-1..4** (Back→Not found, pill/Back overlap, Add-set kg, History "skipped") — READY, after req-24.
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
   search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
 - **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
