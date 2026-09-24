@@ -71,16 +71,21 @@ that fits two levels goes on one, and choosing a level includes everything under
    `leg-curl` for Seated/Lying/Standing Leg Curl) · `description` (one line) · `cues` (2–3 short in-gym lines) ·
    `steps` (clear instructions) · `mistakes` (1–3).
 2. **Which ~150 are "common":** the exercises a normal commercial gym uses (barbell/dumbbell/cable/machine staples,
-   common bodyweight and core moves, the common cardio machines). **Must include the 22 seed targets** (req-130
-   table) and `own-hanging-knee-raise`. The builder proposes the list; it lands in the report as a table for review.
+   common bodyweight and core moves, the common cardio machines). Chosen on merit, not from Emilio's exercises
+   (DEC-063); `own-hanging-knee-raise` stays as a real exercise. The builder proposes the list; it lands in the report as a table for review.
    Target 130–170; no padding with near-duplicates — one entry per real variant.
 3. **Fill it well** (Emilio's licence): fix obvious equipment/level/category errors, add aliases that are really
    used (RDL, OHP, DB/BB forms, "skull crusher", "face pull"…), rewrite text clearer and shorter. A common gym
    exercise missing from free-db may be added as `own-*` (same fields, no photos).
 4. **Text is ours.** Written from free-db's (public-domain) instructions + general training knowledge. **Never from
    RepDB** — don't open RepDB text while writing (DEC-060 §3).
-5. **Existing aliases keep working:** the 22 seed aliases stay on their entries; alias keys stay unique across
-   entries and never equal another entry's name key (req-130 test, extended to the new aliases).
+5. **Seed aliases lose their special status (DEC-063 — the library isn't bent to Emilio's data).** req-130's
+   `SEED_ALIASES` (Emilio's 22 names, verbatim) are re-judged on merit like every other alias: keep one only if gym-goers
+   really use that name for **that exact entry**. Drop the rest — at least the tagged/parenthesised forms ("Pull-Ups
+   (BW)", "Dips (BW)", "Calf Raises (Leg Press)") and the misleading ones (Triceps Press → Dip Machine, Biceps Curl →
+   Machine Bicep Curl, Shoulder Press → Machine Shoulder Press: the plain name means a free-weight movement to most
+   people). The report lists each seed alias kept/dropped with a one-line reason. Alias keys stay unique across entries
+   and never equal another entry's name key.
 6. **Non-common entries are untouched** (no new fields beyond req-130's). A later pass may extend.
 
 ## Scope
@@ -102,7 +107,7 @@ that fits two levels goes on one, and choosing a level includes everything under
 1. Constants: the tree (with aliases), patterns, equipment, logAs; validators; derive groups from the tree.
 2. Propose the common list (report table); author entries in batches; validators green per batch.
 3. Regenerate `exercises.json`; drift + provenance tests still pass.
-4. Report: the common list, 20 random entries in full + all 22 seed targets in full, counts per group/pattern.
+4. Report: the common list, 20 random entries in full, the seed-alias kept/dropped table, counts per group/pattern.
 
 ## Acceptance criteria (written before implementation)
 
@@ -112,11 +117,13 @@ that fits two levels goes on one, and choosing a level includes everything under
   `muscleGroups` of a tagged entry = the groups of its primary muscles.
 - **Complete common entries:** each `common` entry has ≥1 primary muscle, exactly one pattern, ≥1 equipment,
   `logAs`, `unilateral`, `family`, a description, 2–3 cues, ≥3 steps, ≥1 mistake. Test. Count 130–170.
-- **Seeds:** all 22 seed targets + `own-hanging-knee-raise` are `common`; `libraryEntryFor` still resolves the 22
-  names to the same ids (req-130 test unchanged).
+- **Seed aliases re-judged:** the req-130 tests that pin the 22 seed names (resolver table, the "ab machine" /
+  "stairs" / "biceps curl" / "triceps press" / "leg curl" / "hanging knee raises" queries) are **replaced, not
+  weakened**: each dropped alias's test is removed with its reason in the report; each kept alias keeps its test. This
+  test edit is sanctioned by DEC-063. `libraryEntryFor`'s order (id → name → alias → null) is unchanged and still tested.
 - **Aliases:** unique across entries, never another entry's name key; test. Searches (test): "rdl" → Romanian
   Deadlift first; "ohp" → Standing Military Press first; "skull crusher" → EZ-Bar Skullcrusher first (today Band
-  Skull Crusher can win); "db row" → a one-arm dumbbell row first. (Targets exist on `main` [measured].) req-130's six alias queries still pass.
+  Skull Crusher can win); "db row" → a one-arm dumbbell row first. (Targets exist on `main` [measured].) The kept seed aliases' queries still pass.
 - **free-db untouched:** stripping our fields gives the pinned source entry byte-identical (req-130 test, extended
   to the new field names).
 - **No RepDB:** `grep -ci repdb src/library/exercises.json` → 0.
@@ -127,6 +134,7 @@ that fits two levels goes on one, and choosing a level includes everything under
 
 - behaviour, confirmed 2026-09-24 ("sounds good"): the three-level tree, muscle aliases, "either" as the later
   filter's default, the ~150 common scope, the field set.
+- confirmed 2026-09-24 ("ok"): seed aliases re-judged on merit (DEC-063).
 - **(unconfirmed)**: the exact pattern and equipment lists; hip flexors under Core; neck under Shoulders; the
   150-ish target; non-common entries left as they are.
 - implementation: content file format, batching, validator shape — builder's call.

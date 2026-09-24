@@ -1195,3 +1195,18 @@ effect.
 Rejected: keeping the 17 free-db muscles (too coarse for alternatives/programs); tagging all 879 now (cost, and
 rough tags on obscure entries are worse than none). Built as req-133.
 
+## DEC-063 — clean start: the library is built for the app, not around Emilio's data  (Emilio, 2026-09-24)
+
+1. **Don't skew decisions on Emilio's own exercises** ("the app in its whole is the main priority and a clean and good
+   database is also important"). req-130's verbatim seed aliases are re-judged on merit in req-133; tests that pinned
+   them are replaced, with reasons.
+2. **His backup is converted later, by a one-off script**: match his exercises to library entries, show him the full
+   mapping, write only after his OK — its own req under CLAUDE.md ask-gate #2.
+3. **A user exercise = a library link + only what the user changed** (no copied cues/muscles/equipment that go stale);
+   edits win, untouched fields follow the library. Designed in the Add-screen req (req-132). [measured: today
+   `catalogItemToExercise`, `exerciseCatalog.js:124`, copies them.]
+4. **Order** (planning's recommendation, accepted "ok"): req-133 content → req-134 browse + muscle filter (doubles as
+   the review tool) → req-136 "something's wrong" tap into the feedback JSON → req-132 Add screen (+§3) → req-137
+   offline library/images → req-131 "How to" → req-135 alternatives → own images, **pattern-based** (one base
+   animation per movement pattern + equipment variants), with a 5-exercise style pilot in parallel from req-134.
+
