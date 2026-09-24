@@ -399,3 +399,11 @@ first); never `checkout` a dirty file to undo one line.
 DEC-081 said "the in-app ‹ Back already uses the visit stack" — inferred from `applyVisit`'s name, never read; the Back is
 a fixed link (`shared.jsx:43`). Builder caught it; the decision survived on its other reason, by luck. **How to apply:**
 the "why" in a DEC gets the same receipt as a number — a file:line read in this session — or it is marked `[inferred]`.
+
+## L-036 — a scope revert is a change too: re-run the browser, not only the tests  (2026-09-24)
+
+req-153's revert of the step-back code (DEC-084) passed `./check` and every unit test, and Builder didn't re-run the
+browser ("covered by the unit test"). Planner's browser run then found Finish → Save / Abandon landing on the overview, not
+Today: finish.jsx's new redirect fires after the exit's `go('/')`, and the dropped code had been silently swallowing it (the
+reviewer had flagged it as "latent"). **How to apply:** after removing code, re-run the flows that code sat on in a real
+browser; and a reviewer's "latent" finding is re-checked whenever the code that made it latent goes away.
