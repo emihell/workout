@@ -21,7 +21,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 - **Next: `req-134` browse + muscle filter** — to spec (library tagging LIVE 2026-09-24: 163 common). Then 134 browse/filter → 136 → 132 → 137 → 138 → 131 → 135 → own
   images (DEC-063 §4, BACKLOG §Exercise library). Clean start: not bent to Emilio's data (DEC-063). Own library LIVE 2026-09-24.
   Unconfirmed calls (library req) for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename;
-  whole-library aliases → req-133; RepDB pictures joined at runtime.
+  whole-library aliases → the tagging pass; RepDB pictures joined at runtime.
 - `req-10` **first-time-exercise setup flow** — waiting (Emilio 2026-09-24: "core still needs improvement");
   spec predates ~100 reqs, rescan before building. **[ux-feel]**
 
