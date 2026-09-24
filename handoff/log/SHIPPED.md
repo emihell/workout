@@ -1803,3 +1803,18 @@ run of the branch build: Save → Back = done overview; Abandon → Back = Routi
 30/60/70/70 → 70 kg, 10 reps; History "Leg Extension — WU set · skipped"; pill `[x,8,x,54]` vs top links from y 70 at
 320/375/430 px on log, overview and finish → 0 overlaps; native dialogs 0. Not browser-run: bodyweight Add set (unit test),
 the 2-of-4-skipped label (unit test); auto-complete Back seen once, in a timer-throttled background tab.
+
+## req-153 — old workout pages redirect, stricter popup guard, import error clears (item 1 dropped, DEC-084)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `10c1a99`…`2df61b5`, 4 commits). Shipped: an in-workout route (item
+log/done/replace/exercise, set edit, finish) with no active workout for a known routine **redirects** (replace) to
+`/workout/<id>` instead of "Not found." — only while the browser is still on that sub-route, so Finish → Save/Abandon still
+lands on Today (`inWorkoutFallback` `'left'`); the native-dialog guard catches bracket/optional/destructured access and
+.mjs/.cjs/.ts, with a real comment stripper; a new import pick clears the last error (Today + Settings); req-152's regex
+tests → behaviour tests, two pins restored. **Dropped (DEC-084):** the dead-Back step-back machinery — `route.js` identical
+to main. Rounds: reviewer (896/896, no blockers, 2 should-fixes) → fixed → dropped by Emilio → the revert exposed a Finish-
+exit regression (Planner's browser run, L-036) → fixed with tests failing on `1b5e3bd`. Gate: Builder `check: green — lint,
+57 test file(s), and the build all passed.` (req-24 21/21, req-152 10/10, req-153 18/18); Planner's browser run of `2df61b5`:
+Finish → Save / Save anyway / Abandon → `#/`; overview Abandon → `#/`; old finish + item URL → `#/workout/sess-lower`; bogus
+→ "Not found."; import errors clear on Today + Settings; 0 native dialogs. Reviewer: the first round's (DEC-057 §1 didn't
+fire — no store/model/storage/workout-log change); the final diff is route-free.
