@@ -138,7 +138,9 @@ describe('site 4 — History add set (history/add-set.js withHistorySet)', () =>
 describe('the forms refuse Complete / Save with an inline error', () => {
   it('SetLogForm checks kgError before onComplete and shows it', () => {
     const ui = src('./ui/index.jsx')
-    assert.match(ui, /const error = weighted \? kgError\(weight\) : null\n\s*if \(error\) \{\n\s*setWeightError\(error\)\n\s*return\n\s*\}\n\s*onComplete\?\.\(/)
+    // req-155 — the same gate now also checks the Duration (`|| seconds?.error`); the kg
+    // check still runs first and still returns before onComplete.
+    assert.match(ui, /const error = weighted \? kgError\(weight\) : null\n(?:\s*\/\/.*\n)?\s*const seconds = [^\n]*\n\s*if \(error \|\| seconds\?\.error\) \{\n\s*setWeightError\(error\)\n[^}]*return\n\s*\}\n\s*onComplete\?\.\(/)
     assert.match(ui, /\{weightError \? \(\n\s*<p className="ui-field-error" role="alert">/)
   })
   it('SetEditForm checks kgError before onSave and shows it', () => {

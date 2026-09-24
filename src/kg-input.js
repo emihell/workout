@@ -6,9 +6,12 @@
 // weight-step.js (its own deliberately looser pattern) and the logged-set saves
 // (views/set-values.js) all normalise through here.
 
-// A non-negative decimal: `20`, `22.5`, `.5`. Not `22.`, `+5`, `1e1`, `0x5`, `-5`.
-export const KG_NUMBER = /^(?:\d+(?:\.\d+)?|\.\d+)$/
-const NEGATIVE = /^-\s*\d/
+// A non-negative decimal: `20`, `22.5`, `.5`, and `22.` (req-155: a trailing separator is
+// the whole number — `22,` / `22.` meant 22, as weight-step.js already reads it). Not `.`,
+// `+5`, `1e1`, `0x5`, `-5`. seconds-input.js reads durations with the same shape.
+export const DECIMAL_NUMBER = /^(?:\d+(?:\.\d*)?|\.\d+)$/
+export const KG_NUMBER = DECIMAL_NUMBER
+export const NEGATIVE = /^-\s*\d/
 
 // Trim, drop an optional `kg` suffix, and read the first `,` as the decimal point.
 // Only the first: `2,5,5` stays unreadable instead of becoming 2.5.

@@ -8,6 +8,7 @@ import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } 
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
+import { defaultDurationToSave } from '../seconds-input.js'
 import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
 import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } from '../exercise-names.js'
 import { askConfirm } from '../ui/confirm.js'
@@ -376,6 +377,10 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const [durationSec, setDurationSec] = useState(
     ex?.durationSec != null ? String(ex.durationSec) : String(DEFAULT_DURATION_SEC),
   )
+  // req-155 — `30,5` → 31 s; unreadable text blocks Save with an inline error (shown after
+  // the first Save attempt, like the name) instead of silently keeping the default.
+  const duration = defaultDurationToSave(durationSec, DEFAULT_DURATION_SEC)
+  const durationError = tried && hasDuration ? duration.error ?? null : null
 
   if (!ex) {
     return <Missing>Not found.</Missing>
@@ -397,7 +402,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
           // req-127 — an empty name is an inline error that blocks Save (was: kept the old name).
           setTried(true)
           const saved = step.save()
-          if (saved.error || nameError(name)) return
+          if (saved.error || nameError(name) || (hasDuration && duration.error)) return
           store.updateExercise(ex.id, {
             name: name.trim(),
             type,
@@ -407,9 +412,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
             muscles: muscles.trim(),
             cues: cues.trim(),
             hasDuration,
-            durationSec: hasDuration
-              ? Math.max(1, Number(durationSec) || DEFAULT_DURATION_SEC)
-              : ex.durationSec ?? DEFAULT_DURATION_SEC,
+            durationSec: hasDuration ? duration.value : ex.durationSec ?? DEFAULT_DURATION_SEC,
           })
           go(back)
         }}
@@ -427,6 +430,11 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
             value={durationSec}
             onChange={(e) => setDurationSec(e.target.value)}
           />
+        ) : null}
+        {durationError ? (
+          <p className="ui-field-error" role="alert">
+            {durationError}
+          </p>
         ) : null}
         <Field label="Muscles" value={muscles} onChange={(e) => setMuscles(e.target.value)} />
         <Textarea label="Form cues" value={cues} onChange={(e) => setCues(e.target.value)} rows={3} />
