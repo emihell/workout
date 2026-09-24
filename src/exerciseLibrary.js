@@ -8,7 +8,7 @@
 // script (exerciseLibrary.test.js fails on drift).
 //
 // Nothing from RepDB goes in the library, links included. Since req-139 (DEC-064 §2)
-// search reads this library only; RepDB returns for pictures only (req-131).
+// search reads this library only. History: RepDB was used until req-142; nothing of it remains.
 //
 // Ids are stored data (exercise.libraryId) and permanent: free-db ids unchanged,
 // `extra-*` for the extras, `own-*` for entries of ours. Never rename or reuse one.

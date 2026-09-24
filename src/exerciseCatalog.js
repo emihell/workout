@@ -2,8 +2,8 @@ import { libraryItemMatch } from './exercise-names.js'
 import { catalogNameKey, loadExerciseLibrary, shownName } from './exerciseLibrary.js'
 
 // req-139 / DEC-064 §2 — search reads our library only (exerciseLibrary.js: the pinned
-// free-db copy, the extras, our own entries). RepDB is no longer fetched here; it comes
-// back for pictures only (req-131). Exercises already added from RepDB are untouched.
+// free-db copy, the extras, our own entries). History: RepDB was used until req-142; nothing
+// of it remains. Exercises added from it earlier (repdb-* ids) are untouched and resolve by name.
 
 const MACHINE_EQUIPMENT = new Set(['machine', 'cable'])
 const BODYWEIGHT_EQUIPMENT = new Set(['body only', 'foam roll', 'bodyweight', 'body weight', 'none', ''])
