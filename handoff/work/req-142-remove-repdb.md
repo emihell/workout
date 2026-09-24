@@ -1,6 +1,6 @@
 # req-142 — remove RepDB completely
 
-**Status: READY** — Phase 1, small and mechanical. **Gate: functional**. DEC-069 + DEC-070 §1: RepDB goes once the library is
+**Status: BUILT, NOT merged — branch `req-142`** — Phase 1, small and mechanical. **Gate: functional**. DEC-069 + DEC-070 §1: RepDB goes once the library is
 up to par, and req-151 measured it (all 601 pinned RepDB names are covered, skipped or hidden; 0 unclassified; Show-more
 holds 0 rough entries). There's no spec review (it's mechanical). Planning reads the diff at the gate.
 
