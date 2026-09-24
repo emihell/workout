@@ -229,7 +229,8 @@ function WorkoutItemLive({ routineId, item }) {
         weight: loggedWeight,
         reps: reps || '',
         // req-85 — a timed work set logs seconds in place of reps; only set when present.
-        ...(durationSec != null ? { durationSec: Number(durationSec) || 0 } : {}),
+        // req-155 — already whole seconds from SetLogForm (seconds-input.js).
+        ...(durationSec != null ? { durationSec } : {}),
         rpe: rpe ? Number(rpe) : null,
         note,
         targetReps: target || '',

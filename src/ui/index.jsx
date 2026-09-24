@@ -12,6 +12,7 @@ import { lookClass } from '../views/nav-look.js'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
 import { kgError } from '../kg-input.js'
+import { readSeconds, secondsToSave } from '../seconds-input.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -361,11 +362,13 @@ function DurationTimer({ seconds, onSecondsChange }) {
   }, [deadline])
 
   const running = deadline != null
-  const remaining = running ? Math.max(0, Math.ceil((deadline - now) / 1000)) : Number(seconds) || 0
+  // req-155 — the typed seconds read like the saved value (`30,5` → 31); unreadable shows 0.
+  const typed = readSeconds(seconds).value ?? 0
+  const remaining = running ? Math.max(0, Math.ceil((deadline - now) / 1000)) : typed
   const start = () => {
     unlockAudio()
     firedRef.current = false
-    const secs = Math.max(1, Number(seconds) || 0)
+    const secs = Math.max(1, typed)
     setNow(Date.now())
     setDeadline(Date.now() + secs * 1000)
   }
@@ -415,6 +418,8 @@ export function SetLogForm({
   // req-154 — set by Complete when the kg can't be read (`abc`, `2,5,5`); cleared by the
   // next kg edit. `22,5` is a number (DEC-058 §1) and never lands here.
   const [weightError, setWeightError] = useState(null)
+  // req-155 — the same for a timed set's Duration (`30,5` is 31 s; `abc` is refused).
+  const [durationError, setDurationError] = useState(null)
   // req-125 — `onChange` (optional) hears every user edit with the form's full current
   // values, so the caller can keep a draft of the un-logged set. It fires from the edit
   // itself (not an effect), so mounting or remounting writes nothing. `durationSec` is the
@@ -426,7 +431,10 @@ export function SetLogForm({
       setWeightError(null)
     } else if (field === 'reps') setReps(value)
     else if (field === 'effort') setEffort(value)
-    else setDuration(value)
+    else {
+      setDuration(value)
+      setDurationError(null)
+    }
     onChange?.({
       weight: next.weight,
       reps: next.reps,
@@ -440,15 +448,18 @@ export function SetLogForm({
       onSubmit={(e) => {
         e.preventDefault()
         const error = weighted ? kgError(weight) : null
-        if (error) {
+        // req-155 — a blank Duration logs 0 s, as before; unreadable text logs nothing.
+        const seconds = timed ? secondsToSave(duration, 0) : null
+        if (error || seconds?.error) {
           setWeightError(error)
+          setDurationError(seconds?.error ?? null)
           return
         }
         onComplete?.({
           weight,
           reps: timed ? '' : reps,
           effort,
-          durationSec: timed ? Math.max(0, Number(duration) || 0) : undefined,
+          durationSec: timed ? seconds.value : undefined,
         })
       }}
     >
@@ -471,6 +482,11 @@ export function SetLogForm({
       {weightError ? (
         <p className="ui-field-error" role="alert">
           {weightError}
+        </p>
+      ) : null}
+      {durationError ? (
+        <p className="ui-field-error" role="alert">
+          {durationError}
         </p>
       ) : null}
       {showEffort ? (
