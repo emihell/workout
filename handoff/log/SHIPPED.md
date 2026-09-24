@@ -1745,3 +1745,13 @@ L-Sit). Coach QA (independent subagent): 3 wrong fixed (archer sidedness, dragon
 timing) + 6 safety/clarity refinements. Gate: Planner's own run in an archive copy → `# tests 829 # pass 829 # fail 0`,
 build ✓ (main 341.46 kB, search code only). Test edits: DEC-074. Reviewer (code): none.
 
+## req-150 — progression safe-hold: three (four) wrong load answers now hold (DEC-075/076)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `9c75c7e`). Sets whose target isn't a whole number (range, AMRAP, duration,
+text) and assisted exercises hold (same kg/target) with a reason; everything else is byte-identical to main (5,000-case
+property test vs a frozen copy; the independent reviewer's own 20,000-case run → 0 diffs). Also fixed: "8–12" was read as
+812, so every set dropped the load. Reviewer (independent code subagent, DEC-057): **MERGE**; no stored record changed,
+`workout.progression` shape unchanged, one caller path (`progressionForItem`). Gate: Planner's own run in an archive copy
+→ `# tests 839 # pass 839 # fail 0`, build ✓ (main 341.94 kB). progress.test.js unedited. No backup needed (no stored-data
+change).
+
