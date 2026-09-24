@@ -1645,3 +1645,18 @@ in an archive copy → `# tests 638 # pass 638 # fail 0`, build ✓ (library chu
 accepted; main 340.16 → 340.83 kB); spot-searched press/row/machine + the 22 aliases. Backup: Emilio confirmed export ("yes").
 No existing test edited. Follow-up: `exercises.json` is generated — edit the tables in `exerciseLibrary.js` and re-run (DEC-061).
 
+## req-133 — library tagging pass: 163 common exercises on the DEC-062 structure  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `e87d2a4`…`bbdb6f6`). Muscle tree (group → muscle → part, with search
+aliases), fixed pattern/equipment/logAs lists enforced by `libraryProblems`/`muscleTreeProblems` inside `deriveLibrary`
+(the build refuses bad data); 163 common entries tagged (muscles, pattern, equipmentList, logAs, unilateral, family), 516
+aliases, 9 own-* entries with legacy fields (`src/library/common.js`, `own-exercises.js`). free-db fields untouched
+(provenance sha test green); no reader change. Seed aliases re-judged (DEC-063): 8 dropped, "Biceps Curl" → Dumbbell Bicep
+Curl. Spec review (10 findings, text split to req-138). Tag QA (independent coach-eye subagent): no wrong tag in 162; 7 fixes
+(Air_Bike not common + own Bicycle Crunch, calf raise/lunge aliases, captain's-chair alias dropped, 2 chest tags, own Weighted
+Dip); bare "Bike" alias removed on planning's call. Gate: Planner's own run in an archive copy → `# tests 698 # pass 698 # fail
+0`, build ✓ (main 340.93 kB unchanged; library 1,196.53 kB), `grep -ci repdb` → 0; spot-searched rdl/ohp/bench press/squat/
+calf raise/lunge/hip thrust + press/row/machine. Test edits: only the DEC-063-sanctioned seed/count ones. Reviewer (code):
+none (no store/model/storage trigger files). Known: "air bike" and "shoulder press" rank a non-staple first → req-134
+common-first ranking. L-026.
+

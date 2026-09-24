@@ -1,6 +1,6 @@
 # req-133 — library tagging pass: the ~150 common exercises on the new structure (DEC-062)
 
-**Status: READY** — Phase 1, **data only**. **Gate: functional** (library data + generator + tests; no stored-data
+**Status: BUILT, NOT merged — branch `req-133`** — Phase 1, **data only**. **Gate: functional** (library data + generator + tests; no stored-data
 change, no store/model touch). Builds on req-130 (live). Spec reviewed independently 2026-09-24 (10 findings folded
 in; split: the **text** — description/cues/steps/mistakes — moved to **req-138**, which feeds req-131). Emilio
 2026-09-24: "fill in info that is obvious to you, improve text if needed, add aliases that you know are used a lot";
