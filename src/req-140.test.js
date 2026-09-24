@@ -36,6 +36,18 @@ const ADD = {
   'own-high-knees': false,
 }
 const BATCH = { ...PROMOTE, ...ADD }
+// req-145 — batch 2's 40 ids (req-145.test.js pins their staple marks).
+const BATCH_2 = [
+  'Dumbbell_Squat', 'Step-up_with_Knee_Raise', 'own-dumbbell-deadlift', 'own-machine-back-extension', 'Leverage_High_Row',
+  'Lying_T-Bar_Row', 'Decline_Dumbbell_Bench_Press', 'Close-Grip_Dumbbell_Press', 'Cross_Body_Hammer_Curl',
+  'One_Arm_Dumbbell_Preacher_Curl', 'Standing_One-Arm_Dumbbell_Triceps_Extension', 'One_Arm_Lat_Pulldown',
+  'Smith_Machine_Stiff-Legged_Deadlift', 'Standing_Barbell_Calf_Raise', 'Single-Leg_Leg_Extension', 'Front_Cable_Raise',
+  'Front_Plate_Raise', 'Upright_Cable_Row', 'Cable_Hip_Adduction', 'External_Rotation_with_Band', 'Lateral_Raise_-_With_Bands',
+  'Triceps_Stretch', 'Monster_Walk', 'own-lateral-band-walk', 'own-clamshell', 'own-fire-hydrant', 'own-wall-push-up',
+  'Oblique_Crunches', 'Alternate_Heel_Touchers', 'Exercise_Ball_Crunch', 'Scissor_Kick', 'Plate_Twist', 'Hamstring_Stretch',
+  'Quad_Stretch', 'Childs_Pose', 'Cat_Stretch', 'Kneeling_Hip_Flexor', 'Standing_Gastrocnemius_Calf_Stretch',
+  'own-cross-body-shoulder-stretch', 'own-doorway-chest-stretch',
+]
 const ALIASES = [
   ['Bench Pull', 'own-seal-row'], ['Cable Tricep Pushdown', 'Triceps_Pushdown'],
   ['Dumbbell Reverse Fly', 'Seated_Bent-Over_Rear_Delt_Raise'], ['Dumbbell Tricep Extension', 'Standing_Dumbbell_Triceps_Extension'],
@@ -59,7 +71,7 @@ describe('batch 1', () => {
       assert.equal(entry.staple, staple, id)
     }
     for (const id of Object.keys(PROMOTE)) assert.ok(!id.startsWith('own-') && !id.startsWith('extra-'), id)
-    assert.equal(common.length, 218)
+    assert.equal(common.length, 258) // req-145 (sanctioned count pin): + batch 2's 40
   })
 
   it('no own add shares a name key with any free-db entry (promote before add)', () => {
@@ -89,10 +101,12 @@ describe('batch 1', () => {
 describe('staple', () => {
   it('is an own field; every prior common entry is a staple', () => {
     assert.ok(OWN_FIELDS.includes('staple'))
-    const prior = common.filter((entry) => !(entry.id in BATCH))
+    // req-145 (edit NOT a count pin; flagged in reports/req-145.md) — batch 2's entries aren't
+    // "prior" either (some are non-staples), so they're excluded like BATCH is.
+    const prior = common.filter((entry) => !(entry.id in BATCH) && !BATCH_2.includes(entry.id))
     assert.equal(prior.length, 178)
     for (const entry of prior) assert.equal(entry.staple, true, entry.id)
-    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15)
+    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15 + 6) // req-145 (sanctioned count pin): + 6 batch-2 staples
   })
 
   it('staple ⇒ common: a non-common entry with staple is rejected (fixture)', () => {

@@ -434,12 +434,55 @@
       "Alternate_Heel_Touchers/1.jpg"
     ],
     "id": "Alternate_Heel_Touchers",
+    "aliases": [
+      "Heel Touches",
+      "Heel Taps",
+      "Alternating Heel Touch"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Alternate_Heel_Touchers/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Alternate_Heel_Touchers/1.jpg"
+    ],
+    "displayName": "Heel Touch",
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Lying crunched up and reaching side to side to touch each heel, for the obliques.",
+    "formCues": [
+      "Shoulders stay lifted",
+      "Reach, don't twist the neck",
+      "Feet stay planted"
+    ],
+    "steps": [
+      "Lie on your back with your knees bent and your feet flat, a little wider than hip width.",
+      "Lift your head and shoulders slightly off the floor, arms by your sides.",
+      "Reach one hand toward the heel on the same side by bending sideways at the waist.",
+      "Return to the middle and reach to the other side, alternating."
+    ],
+    "mistakes": [
+      "Head and shoulders dropping between reps",
+      "Pulling the chin to the chest",
+      "Rocking instead of reaching"
     ]
   },
   {
@@ -5270,12 +5313,49 @@
       "Cable_Hip_Adduction/1.jpg"
     ],
     "id": "Cable_Hip_Adduction",
+    "aliases": [
+      "Standing Cable Adduction",
+      "Cable Adduction"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Hip_Adduction/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Hip_Adduction/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "adductors",
+        "role": "primary"
+      }
+    ],
+    "pattern": "hip-adduction",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-thigh-adductor",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A standing cable move that sweeps one leg in across the body, working the inner thigh.",
+    "formCues": [
+      "Stand tall, hips square",
+      "Move from the hip",
+      "Slow return"
+    ],
+    "steps": [
+      "Attach an ankle cuff to a low pulley and fasten it around the ankle nearest the stack.",
+      "Stand side-on to the stack and step out until the cable pulls your leg out to the side.",
+      "Hold something for balance and sweep the working leg in across the front of the other.",
+      "Let it return slowly, finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Leaning the trunk to move the leg",
+      "Swinging the leg fast",
+      "Letting the stack pull the leg out quickly"
     ]
   },
   {
@@ -6369,12 +6449,58 @@
       "Cat_Stretch/1.jpg"
     ],
     "id": "Cat_Stretch",
+    "aliases": [
+      "Cat-Cow Stretch",
+      "Cat and Cow"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cat_Stretch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cat_Stretch/1.jpg"
+    ],
+    "displayName": "Cat-Cow",
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-cat-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "On hands and knees, slowly rounding and then arching the back to loosen the spine.",
+    "formCues": [
+      "Move one segment at a time",
+      "Hands under shoulders",
+      "Slow and smooth"
+    ],
+    "steps": [
+      "Start on your hands and knees, hands under your shoulders and knees under your hips.",
+      "Round your back up toward the ceiling and let your head drop.",
+      "Slowly reverse, letting your belly sink and lifting your chest and gaze.",
+      "Keep moving between the two positions at an easy pace."
+    ],
+    "mistakes": [
+      "Rushing the movement",
+      "Bending the elbows",
+      "Forcing the arch"
     ]
   },
   {
@@ -6833,12 +6959,56 @@
       "Childs_Pose/1.jpg"
     ],
     "id": "Childs_Pose",
+    "aliases": [
+      "Child Pose",
+      "Kneeling Back Stretch"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Childs_Pose/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Childs_Pose/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-childs-pose",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Kneeling and sitting back onto the heels with the arms reaching forward, a gentle back and hip stretch.",
+    "formCues": [
+      "Hips sink toward the heels",
+      "Arms reach long",
+      "Forehead rests down"
+    ],
+    "steps": [
+      "Kneel on the floor with your big toes together and your knees about hip width apart.",
+      "Sit your hips back toward your heels.",
+      "Walk your hands forward and lower your chest toward the floor.",
+      "Rest your forehead down and hold, breathing slowly."
+    ],
+    "mistakes": [
+      "Hips lifting off the heels",
+      "Shoulders hunched up by the ears"
     ]
   },
   {
@@ -7524,12 +7694,60 @@
       "Close-Grip_Dumbbell_Press/1.jpg"
     ],
     "id": "Close-Grip_Dumbbell_Press",
+    "aliases": [
+      "Dumbbell Squeeze Press",
+      "Squeeze Press",
+      "Close-Grip DB Press"
+    ],
     "muscleGroups": [
+      "Chest",
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Dumbbell_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Dumbbell_Press/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A flat-bench press with the dumbbells pressed together, working the triceps and inner chest.",
+    "formCues": [
+      "Dumbbells touch the whole time",
+      "Elbows close to the body",
+      "Squeeze the dumbbells together"
+    ],
+    "steps": [
+      "Lie on a flat bench holding the dumbbells over your chest, palms facing each other.",
+      "Press the dumbbells firmly together.",
+      "Lower them to your mid chest, keeping your elbows tucked.",
+      "Press them back up while keeping them touching."
+    ],
+    "mistakes": [
+      "Dumbbells separate on the way down",
+      "Elbows flare out wide",
+      "Bouncing off the chest"
     ]
   },
   {
@@ -7944,12 +8162,58 @@
       "Cross_Body_Hammer_Curl/1.jpg"
     ],
     "id": "Cross_Body_Hammer_Curl",
+    "aliases": [
+      "Cross-Body Curl",
+      "Pinwheel Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cross_Body_Hammer_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cross_Body_Hammer_Curl/1.jpg"
+    ],
+    "displayName": "Cross-Body Hammer Curl",
+    "muscles": [
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hammer-curl",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A hammer curl that brings the dumbbell across the body toward the opposite shoulder, for the brachialis and forearms.",
+    "formCues": [
+      "Thumb stays on top",
+      "Upper arm stays still",
+      "Alternate arms"
+    ],
+    "steps": [
+      "Stand with a dumbbell in each hand, palms facing your thighs.",
+      "Curl one dumbbell up and across your body toward the opposite shoulder, thumb up.",
+      "Lower it slowly back to your side.",
+      "Repeat with the other arm and keep alternating."
+    ],
+    "mistakes": [
+      "Swinging the body to lift",
+      "Elbow flares out to the side",
+      "Wrist turns palm up"
     ]
   },
   {
@@ -8621,12 +8885,59 @@
       "Decline_Dumbbell_Bench_Press/1.jpg"
     ],
     "id": "Decline_Dumbbell_Bench_Press",
+    "aliases": [
+      "Decline DB Press",
+      "Decline DB Bench"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Dumbbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Dumbbell_Bench_Press/1.jpg"
+    ],
+    "displayName": "Decline Dumbbell Press",
+    "muscles": [
+      {
+        "id": "mid-lower-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A dumbbell press on a decline bench that shifts the work toward the lower chest.",
+    "formCues": [
+      "Legs hooked under the pads",
+      "Forearms vertical at the bottom",
+      "Press up and slightly in"
+    ],
+    "steps": [
+      "Hook your legs under the pads of a decline bench and sit with the dumbbells on your thighs.",
+      "Lie back carefully and bring the dumbbells to the sides of your lower chest.",
+      "Press them up until your arms are straight over your chest.",
+      "Lower them slowly back to the sides of your chest."
+    ],
+    "mistakes": [
+      "Dumbbells drift toward the face",
+      "Elbows flare straight out",
+      "Rushing the lie-back with heavy weights"
     ]
   },
   {
@@ -10994,12 +11305,61 @@
       "Dumbbell_Squat/1.jpg"
     ],
     "id": "Dumbbell_Squat",
+    "aliases": [
+      "DB Squat",
+      "Dumbbell Squats"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Squat/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A squat holding a dumbbell at each side, a simple loaded squat for the quads and glutes.",
+    "formCues": [
+      "Chest up, arms hang long",
+      "Knees track over the toes",
+      "Whole foot stays down"
+    ],
+    "steps": [
+      "Stand with your feet about shoulder width apart and a dumbbell hanging at each side.",
+      "Brace your trunk and sit your hips down and back, bending your knees.",
+      "Lower until your thighs are about level with the floor or as deep as you can keep your back flat.",
+      "Drive through your whole foot to stand back up."
+    ],
+    "mistakes": [
+      "Heels lift off the floor",
+      "Knees cave inward on the way up",
+      "Chest folds toward the thighs"
     ]
   },
   {
@@ -11640,12 +12000,51 @@
       "Exercise_Ball_Crunch/1.jpg"
     ],
     "id": "Exercise_Ball_Crunch",
+    "aliases": [
+      "Swiss Ball Crunch",
+      "Exercise Ball Crunches",
+      "Ball Crunch"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Exercise_Ball_Crunch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Exercise_Ball_Crunch/1.jpg"
+    ],
+    "displayName": "Stability Ball Crunch",
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "exercise-ball"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A crunch lying back over a stability ball, which lets the abs work through a longer range.",
+    "formCues": [
+      "Ball under the lower back",
+      "Curl the ribs to the hips",
+      "Feet wide for balance"
+    ],
+    "steps": [
+      "Sit on a stability ball and walk your feet forward until the ball sits under your lower back.",
+      "Lean back over the ball with your hands lightly behind your head or across your chest.",
+      "Curl your upper body up, bringing your ribs toward your hips.",
+      "Lower back over the ball slowly."
+    ],
+    "mistakes": [
+      "Rolling the ball instead of curling",
+      "Pulling on the neck",
+      "Feet too close together"
     ]
   },
   {
@@ -11766,12 +12165,54 @@
       "External_Rotation_with_Band/1.jpg"
     ],
     "id": "External_Rotation_with_Band",
+    "aliases": [
+      "Band External Rotations",
+      "Banded External Rotation"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/External_Rotation_with_Band/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/External_Rotation_with_Band/1.jpg"
+    ],
+    "displayName": "Band External Rotation",
+    "muscles": [
+      {
+        "id": "rotator-cuff",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "bands"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-external-rotation-with-band",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Rotating the forearm outward against a band with the elbow at the side, for the rotator cuff.",
+    "formCues": [
+      "Elbow pinned to the side",
+      "Forearm moves like a gate",
+      "Light band, smooth reps"
+    ],
+    "steps": [
+      "Anchor a band at elbow height and stand side-on with the band in the hand farthest from the anchor.",
+      "Bend that elbow and keep it tucked against your side, forearm across your stomach.",
+      "Rotate your forearm out away from your body as far as you can without moving the elbow.",
+      "Return slowly, finish the reps, then turn around to work the other side."
+    ],
+    "mistakes": [
+      "Elbow drifts away from the body",
+      "Twisting the trunk instead of the arm",
+      "Band so heavy the reps get jerky"
     ]
   },
   {
@@ -12926,12 +13367,58 @@
       "Front_Cable_Raise/1.jpg"
     ],
     "id": "Front_Cable_Raise",
+    "aliases": [
+      "Cable Front Raises",
+      "Low Cable Front Raise"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Cable_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Cable_Raise/1.jpg"
+    ],
+    "displayName": "Cable Front Raise",
+    "muscles": [
+      {
+        "id": "front-delt",
+        "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-front-dumbbell-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A front raise with a low cable, which keeps tension on the front delts all the way up.",
+    "formCues": [
+      "Arm nearly straight",
+      "Raise to eye level",
+      "Stand tall, no lean"
+    ],
+    "steps": [
+      "Attach a handle or straight bar to the low pulley and stand facing away from the stack.",
+      "Hold the handle in front of your thighs with your arms nearly straight.",
+      "Raise it forward and up to about eye level.",
+      "Lower it slowly back to your thighs."
+    ],
+    "mistakes": [
+      "Swinging the body to start",
+      "Lifting far above the head",
+      "Shrugging as the arm rises"
     ]
   },
   {
@@ -13129,12 +13616,57 @@
       "Front_Plate_Raise/1.jpg"
     ],
     "id": "Front_Plate_Raise",
+    "aliases": [
+      "Plate Raise",
+      "Plate Front Raises"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Plate_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Plate_Raise/1.jpg"
+    ],
+    "displayName": "Plate Front Raise",
+    "muscles": [
+      {
+        "id": "front-delt",
+        "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "plate"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-front-dumbbell-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A front raise holding a weight plate with both hands, for the front delts.",
+    "formCues": [
+      "Arms nearly straight",
+      "Grip the plate at the sides",
+      "Control it down"
+    ],
+    "steps": [
+      "Stand tall and hold a plate with both hands at the sides, arms hanging in front of your thighs.",
+      "Brace your trunk and raise the plate forward to about eye level.",
+      "Pause, then lower it slowly back down."
+    ],
+    "mistakes": [
+      "Leaning back to lift the plate",
+      "Bending the elbows a lot",
+      "Letting the plate drop"
     ]
   },
   {
@@ -14037,12 +14569,53 @@
       "Hamstring_Stretch/1.jpg"
     ],
     "id": "Hamstring_Stretch",
+    "aliases": [
+      "Lying Hamstring Stretch",
+      "Hamstring Stretches"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hamstring_Stretch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hamstring_Stretch/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-hamstring-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Lying on your back and raising one straight leg to stretch the back of the thigh.",
+    "formCues": [
+      "Knee straight but not locked",
+      "Other leg flat on the floor",
+      "Hips stay down"
+    ],
+    "steps": [
+      "Lie on your back with both legs straight.",
+      "Loop a towel or strap around one foot, or hold behind the thigh.",
+      "Raise that leg until you feel a stretch along the back of the thigh.",
+      "Hold the position and breathe slowly, then switch sides."
+    ],
+    "mistakes": [
+      "Bending the knee a lot to pull higher",
+      "Lifting the hips off the floor",
+      "Bouncing into the stretch"
     ]
   },
   {
@@ -17675,12 +18248,56 @@
       "Kneeling_Hip_Flexor/1.jpg"
     ],
     "id": "Kneeling_Hip_Flexor",
+    "aliases": [
+      "Hip Flexor Stretch",
+      "Half-Kneeling Hip Flexor Stretch",
+      "Lunge Stretch"
+    ],
     "muscleGroups": [
-      "Legs"
+      "Legs",
+      "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kneeling_Hip_Flexor/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kneeling_Hip_Flexor/1.jpg"
+    ],
+    "displayName": "Kneeling Hip Flexor Stretch",
+    "muscles": [
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-kneeling-hip-flexor",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A half-kneeling stretch that pushes the hips forward to open the front of the back hip.",
+    "formCues": [
+      "Tuck the pelvis under",
+      "Squeeze the back glute",
+      "Torso upright"
+    ],
+    "steps": [
+      "Kneel on one knee with the other foot flat in front of you, both knees bent.",
+      "Tuck your pelvis under and squeeze the glute of the back leg.",
+      "Shift your hips forward until you feel a stretch at the front of the back hip.",
+      "Hold, then switch sides."
+    ],
+    "mistakes": [
+      "Arching the lower back",
+      "Front knee collapsing inward",
+      "Leaning the torso forward"
     ]
   },
   {
@@ -17994,12 +18611,54 @@
       "Lateral_Raise_-_With_Bands/1.jpg"
     ],
     "id": "Lateral_Raise_-_With_Bands",
+    "aliases": [
+      "Banded Lateral Raise",
+      "Resistance Band Lateral Raise"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lateral_Raise_-_With_Bands/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lateral_Raise_-_With_Bands/1.jpg"
+    ],
+    "displayName": "Band Lateral Raise",
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "bands"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lateral-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A lateral raise against a resistance band, a home-friendly way to train the side delts.",
+    "formCues": [
+      "Soft bend in the elbows",
+      "Lift to shoulder height",
+      "Lead with the elbows"
+    ],
+    "steps": [
+      "Stand on the middle of a band with your feet about hip width apart.",
+      "Hold an end in each hand at your sides.",
+      "Raise your arms out to the sides until your hands are level with your shoulders.",
+      "Lower them slowly against the band."
+    ],
+    "mistakes": [
+      "Shrugging as the arms rise",
+      "Letting the band snap the arms down",
+      "Swinging to start the lift"
     ]
   },
   {
@@ -18483,12 +19142,62 @@
       "Leverage_High_Row/1.jpg"
     ],
     "id": "Leverage_High_Row",
+    "aliases": [
+      "High Row Machine",
+      "Plate-Loaded High Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_High_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_High_Row/1.jpg"
+    ],
+    "displayName": "Machine High Row",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A machine row pulling handles down and back from above, working the lats and upper back.",
+    "formCues": [
+      "Chest against the pad",
+      "Lead with the elbows",
+      "Squeeze the shoulder blades together"
+    ],
+    "steps": [
+      "Adjust the seat so the handles are just above head height when your arms are straight.",
+      "Sit with your chest against the pad and grip the handles.",
+      "Pull the handles down and back toward your ribs, driving your elbows behind you.",
+      "Pause, then let the handles rise slowly until your arms are straight."
+    ],
+    "mistakes": [
+      "Shrugging the shoulders up",
+      "Leaning back off the pad",
+      "Short, choppy reps"
     ]
   },
   {
@@ -19914,12 +20623,62 @@
       "Lying_T-Bar_Row/1.jpg"
     ],
     "id": "Lying_T-Bar_Row",
+    "aliases": [
+      "T-Bar Row Machine",
+      "Prone T-Bar Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_T-Bar_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_T-Bar_Row/1.jpg"
+    ],
+    "displayName": "Chest-Supported T-Bar Row",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A T-bar row lying chest-down on an angled pad, which trains the back without loading the lower back.",
+    "formCues": [
+      "Chest stays on the pad",
+      "Pull toward the lower ribs",
+      "Pause at the top"
+    ],
+    "steps": [
+      "Load the machine and set the pad so your upper chest sits at its top edge.",
+      "Lie on the pad, feet on the platform, and grip the handles with straight arms.",
+      "Row the handles up toward your lower ribs, squeezing your shoulder blades together.",
+      "Lower the weight slowly until your arms are straight again."
+    ],
+    "mistakes": [
+      "Chest lifting off the pad",
+      "Jerking the weight up with the legs",
+      "Dropping the weight fast"
     ]
   },
   {
@@ -20499,12 +21258,53 @@
       "Monster_Walk/1.jpg"
     ],
     "id": "Monster_Walk",
+    "aliases": [
+      "Monster Walks",
+      "Band Monster Walk"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Monster_Walk/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Monster_Walk/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "glute-med",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-abduction",
+    "equipmentList": [
+      "bands"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-band-walk",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Walking forward with wide, diagonal steps against a band around the legs, for the glutes and hips.",
+    "formCues": [
+      "Stay low in a half squat",
+      "Keep the band taut",
+      "Knees push out"
+    ],
+    "steps": [
+      "Loop a mini band around your legs above the knees or around the ankles.",
+      "Stand with your feet hip width apart and sink into a half squat.",
+      "Step forward and out on a diagonal with one foot, then the other.",
+      "Keep stepping for the set distance, then walk backward the same way."
+    ],
+    "mistakes": [
+      "Standing up tall between steps",
+      "Knees caving toward each other",
+      "Feet coming together"
     ]
   },
   {
@@ -21042,12 +21842,55 @@
       "Oblique_Crunches/1.jpg"
     ],
     "id": "Oblique_Crunches",
+    "aliases": [
+      "Side Crunch",
+      "Side Crunches"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Oblique_Crunches/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Oblique_Crunches/1.jpg"
+    ],
+    "displayName": "Oblique Crunch",
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-crunch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A crunch that brings the shoulder toward the opposite knee, working the obliques.",
+    "formCues": [
+      "Lift the shoulder, not the neck",
+      "Rotate through the ribs",
+      "Low back stays down"
+    ],
+    "steps": [
+      "Lie on your back with your knees bent and your feet flat.",
+      "Rest your hands lightly behind your head.",
+      "Curl up and rotate, bringing one shoulder toward the opposite knee.",
+      "Lower back down slowly.",
+      "Finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Pulling on the head",
+      "Only the elbow moving across",
+      "Dropping down fast"
     ]
   },
   {
@@ -22242,12 +23085,56 @@
       "One_Arm_Dumbbell_Preacher_Curl/1.jpg"
     ],
     "id": "One_Arm_Dumbbell_Preacher_Curl",
+    "aliases": [
+      "Single-Arm Dumbbell Preacher Curl",
+      "One-Arm Preacher Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One_Arm_Dumbbell_Preacher_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One_Arm_Dumbbell_Preacher_Curl/1.jpg"
+    ],
+    "displayName": "Dumbbell Preacher Curl",
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-preacher-curl",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A one-arm curl with the upper arm resting on a preacher pad, which keeps the biceps working through the full range.",
+    "formCues": [
+      "Armpit snug to the pad",
+      "Full stretch at the bottom",
+      "No lift from the shoulder"
+    ],
+    "steps": [
+      "Sit or stand at a preacher bench and rest the back of one upper arm on the pad.",
+      "Hold a dumbbell with your palm up and your arm almost straight.",
+      "Curl the dumbbell up toward your shoulder.",
+      "Lower it slowly until your arm is nearly straight again.",
+      "Finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Dropping fast out of the top",
+      "Upper arm lifts off the pad",
+      "Cutting the bottom short"
     ]
   },
   {
@@ -22312,12 +23199,59 @@
       "One_Arm_Lat_Pulldown/1.jpg"
     ],
     "id": "One_Arm_Lat_Pulldown",
+    "aliases": [
+      "Single-Arm Pulldown",
+      "One-Arm Pulldown"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One_Arm_Lat_Pulldown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One_Arm_Lat_Pulldown/1.jpg"
+    ],
+    "displayName": "Single-Arm Lat Pulldown",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-lat-pulldown",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A lat pulldown with one handle and one arm, which lets each side of the back work on its own.",
+    "formCues": [
+      "Pull the elbow to the hip",
+      "Stay tall in the seat",
+      "Let the arm reach up fully"
+    ],
+    "steps": [
+      "Attach a single handle to the high pulley and sit with your thighs under the pad.",
+      "Grip the handle with one hand, arm straight overhead.",
+      "Pull the handle down to your shoulder, driving your elbow toward your hip.",
+      "Let the handle rise slowly until your arm is straight.",
+      "Finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Twisting the trunk to pull",
+      "Shrugging at the top",
+      "Stopping short of a full reach"
     ]
   },
   {
@@ -23511,12 +24445,54 @@
       "Plate_Twist/1.jpg"
     ],
     "id": "Plate_Twist",
+    "aliases": [
+      "Plate Russian Twist",
+      "Weighted Russian Twists"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plate_Twist/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plate_Twist/1.jpg"
+    ],
+    "displayName": "Weighted Russian Twist",
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-rotation",
+    "equipmentList": [
+      "plate"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-russian-twist",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A Russian twist holding a weight plate, turning the torso side to side for the obliques.",
+    "formCues": [
+      "Chest tall, back straight",
+      "Turn the ribs, not just the arms",
+      "Plate close to the body"
+    ],
+    "steps": [
+      "Sit on the floor with your knees bent and hold a plate in front of your chest.",
+      "Lean back a little with a straight back, feet on the floor or lifted.",
+      "Rotate your torso to bring the plate beside one hip.",
+      "Rotate through the middle to the other side and keep alternating."
+    ],
+    "mistakes": [
+      "Rounding the back",
+      "Moving only the arms",
+      "Swinging the plate fast"
     ]
   },
   {
@@ -24938,12 +25914,53 @@
       "Quad_Stretch/1.jpg"
     ],
     "id": "Quad_Stretch",
+    "aliases": [
+      "Standing Quad Stretch",
+      "Quadriceps Stretch"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Quad_Stretch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Quad_Stretch/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-quad-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Standing on one leg and pulling the other heel toward the glutes to stretch the front of the thigh.",
+    "formCues": [
+      "Knees side by side",
+      "Hips pushed slightly forward",
+      "Stand tall"
+    ],
+    "steps": [
+      "Stand tall next to a wall or rail for balance.",
+      "Bend one knee and hold that ankle behind you.",
+      "Draw the heel toward your glutes, keeping your knees together.",
+      "Hold the stretch, then switch sides."
+    ],
+    "mistakes": [
+      "Knee drifting out to the side",
+      "Arching the lower back",
+      "Leaning forward"
     ]
   },
   {
@@ -26991,12 +28008,57 @@
       "Scissor_Kick/1.jpg"
     ],
     "id": "Scissor_Kick",
+    "aliases": [
+      "Scissor Kicks",
+      "Lying Scissor Kick"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Scissor_Kick/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Scissor_Kick/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Lying on your back and crossing the straight legs over and under each other, for the lower abs.",
+    "formCues": [
+      "Low back pressed down",
+      "Legs long and straight",
+      "Small, steady crosses"
+    ],
+    "steps": [
+      "Lie on your back with your legs straight and your hands under your hips or by your sides.",
+      "Press your lower back into the floor and lift both heels a little off the ground.",
+      "Cross one leg over the other, then switch, moving them like scissors.",
+      "Keep crossing at a steady pace until the timer ends."
+    ],
+    "mistakes": [
+      "Lower back arching off the floor",
+      "Legs lifted too high to make it easy",
+      "Holding the breath"
     ]
   },
   {
@@ -29466,12 +30528,49 @@
       "Single-Leg_Leg_Extension/1.jpg"
     ],
     "id": "Single-Leg_Leg_Extension",
+    "aliases": [
+      "Single-Leg Extension",
+      "One-Leg Leg Extension"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Single-Leg_Leg_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Single-Leg_Leg_Extension/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      }
+    ],
+    "pattern": "leg-extension",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-leg-extensions",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A leg extension done one leg at a time, so each quad does its own share.",
+    "formCues": [
+      "Back against the pad",
+      "Straighten fully",
+      "Slow on the way down"
+    ],
+    "steps": [
+      "Sit in the leg extension machine with the pad just above your ankles.",
+      "Hook one leg under the pad and rest the other foot to the side.",
+      "Straighten the working leg until the knee is locked out.",
+      "Lower slowly, finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Kicking the weight up",
+      "Hips lifting off the seat",
+      "Using a load the weaker leg cannot control"
     ]
   },
   {
@@ -30903,12 +32002,58 @@
       "Smith_Machine_Stiff-Legged_Deadlift/1.jpg"
     ],
     "id": "Smith_Machine_Stiff-Legged_Deadlift",
+    "aliases": [
+      "Smith Machine RDL",
+      "Smith RDL"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Stiff-Legged_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Stiff-Legged_Deadlift/1.jpg"
+    ],
+    "displayName": "Smith Machine Romanian Deadlift",
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "smith-machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-romanian-deadlift",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A Romanian deadlift in a Smith machine, where the fixed bar path lets you focus on the hip hinge.",
+    "formCues": [
+      "Soft knees, hips move back",
+      "Bar stays against the legs",
+      "Flat back throughout"
+    ],
+    "steps": [
+      "Set the bar at mid thigh and stand under it with your feet hip width apart.",
+      "Grip the bar just outside your legs and unhook it by standing tall.",
+      "Push your hips back and slide the bar down your thighs until you feel your hamstrings stretch.",
+      "Drive your hips forward to stand back up."
+    ],
+    "mistakes": [
+      "Bending the knees into a squat",
+      "Rounding the back at the bottom",
+      "Leaning back at the top"
     ]
   },
   {
@@ -32150,12 +33295,50 @@
       "Standing_Barbell_Calf_Raise/1.jpg"
     ],
     "id": "Standing_Barbell_Calf_Raise",
+    "aliases": [
+      "Barbell Calf Raises",
+      "BB Calf Raise"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Barbell_Calf_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Barbell_Calf_Raise/1.jpg"
+    ],
+    "displayName": "Barbell Calf Raise",
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "calf-raise",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-calf-raise",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A calf raise with a barbell across the upper back, standing on the floor or a low plate.",
+    "formCues": [
+      "Rise straight up",
+      "Pause high on the toes",
+      "Lower all the way"
+    ],
+    "steps": [
+      "Set a barbell in a rack at shoulder height and step under it so it rests across your upper back.",
+      "Stand with your feet hip width apart, balls of the feet on a plate if you use one.",
+      "Rise onto your toes as high as you can.",
+      "Pause, then lower your heels slowly."
+    ],
+    "mistakes": [
+      "Bouncing at the bottom",
+      "Bar tipping as you rise",
+      "Bending the knees to help"
     ]
   },
   {
@@ -33106,12 +34289,50 @@
       "Standing_Gastrocnemius_Calf_Stretch/1.jpg"
     ],
     "id": "Standing_Gastrocnemius_Calf_Stretch",
+    "aliases": [
+      "Standing Calf Stretch",
+      "Wall Calf Stretch"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Gastrocnemius_Calf_Stretch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Gastrocnemius_Calf_Stretch/1.jpg"
+    ],
+    "displayName": "Calf Stretch",
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-standing-gastrocnemius-calf-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Leaning into a wall with one leg back to stretch the calf of the back leg.",
+    "formCues": [
+      "Back heel stays down",
+      "Back knee straight",
+      "Toes point forward"
+    ],
+    "steps": [
+      "Stand facing a wall and place your hands on it at shoulder height.",
+      "Step one foot back and press that heel into the floor.",
+      "Bend the front knee and lean toward the wall until you feel the stretch in the back calf.",
+      "Hold, then switch sides."
+    ],
+    "mistakes": [
+      "Back heel lifting",
+      "Back foot turned out",
+      "Bending the back knee"
     ]
   },
   {
@@ -33701,12 +34922,50 @@
       "Standing_One-Arm_Dumbbell_Triceps_Extension/1.jpg"
     ],
     "id": "Standing_One-Arm_Dumbbell_Triceps_Extension",
+    "aliases": [
+      "Single-Arm Overhead Triceps Extension",
+      "One-Arm Overhead Extension"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_One-Arm_Dumbbell_Triceps_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_One-Arm_Dumbbell_Triceps_Extension/1.jpg"
+    ],
+    "displayName": "One-Arm Dumbbell Overhead Extension",
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-overhead-triceps-extension",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "An overhead triceps extension with one dumbbell in one hand, for the long head of the triceps.",
+    "formCues": [
+      "Elbow points up",
+      "Upper arm stays by the head",
+      "Trunk braced, ribs down"
+    ],
+    "steps": [
+      "Stand tall and press one dumbbell overhead with your arm straight.",
+      "Keep the upper arm still and bend the elbow to lower the dumbbell behind your head.",
+      "Straighten the arm to lift the dumbbell back overhead.",
+      "Finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Elbow drifts out wide",
+      "Arching the lower back",
+      "Lowering too fast behind the head"
     ]
   },
   {
@@ -34094,12 +35353,64 @@
       "Step-up_with_Knee_Raise/1.jpg"
     ],
     "id": "Step-up_with_Knee_Raise",
+    "aliases": [
+      "Step-Up with Knee Drive",
+      "Box Step-Up"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Step-up_with_Knee_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Step-up_with_Knee_Raise/1.jpg"
+    ],
+    "displayName": "Bodyweight Step-Up",
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "bodyweight",
+      "box"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-lunge",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "Stepping onto a box or bench with no weight and driving the free knee up, a basic leg and balance exercise.",
+    "formCues": [
+      "Whole foot on the box",
+      "Push through the front heel",
+      "Stand tall at the top"
+    ],
+    "steps": [
+      "Stand facing a sturdy box or bench about knee height.",
+      "Place one foot fully on top of the box.",
+      "Press through that foot to stand up, lifting the other knee toward hip height.",
+      "Lower the free foot back to the floor under control, then step down.",
+      "Finish the reps on one leg, then switch sides."
+    ],
+    "mistakes": [
+      "Pushing off hard with the back foot",
+      "Front knee drifts inward",
+      "Box too high to control"
     ]
   },
   {
@@ -36097,12 +37408,53 @@
       "Triceps_Stretch/1.jpg"
     ],
     "id": "Triceps_Stretch",
+    "aliases": [
+      "Overhead Triceps Stretch",
+      "Tricep Stretch"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Stretch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Stretch/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-triceps-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Reaching one hand down behind the head and easing the elbow back to stretch the back of the upper arm.",
+    "formCues": [
+      "Elbow points up",
+      "Head stays tall",
+      "Gentle pull on the elbow"
+    ],
+    "steps": [
+      "Stand or sit tall and raise one arm overhead.",
+      "Bend that elbow so your hand drops behind your head toward your upper back.",
+      "Hold the elbow with your other hand and ease it back until you feel the stretch.",
+      "Hold, then switch sides."
+    ],
+    "mistakes": [
+      "Pushing the head forward",
+      "Arching the lower back",
+      "Yanking on the elbow"
     ]
   },
   {
@@ -36554,12 +37906,63 @@
       "Upright_Cable_Row/1.jpg"
     ],
     "id": "Upright_Cable_Row",
+    "aliases": [
+      "Cable Upright Rows",
+      "Rope Upright Row"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Upright_Cable_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Upright_Cable_Row/1.jpg"
+    ],
+    "displayName": "Cable Upright Row",
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-upright-barbell-row",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "An upright row with a low cable and a bar or rope, working the side delts and traps.",
+    "formCues": [
+      "Lead with the elbows",
+      "Bar close to the body",
+      "Stop at chest height"
+    ],
+    "steps": [
+      "Attach a straight bar or rope to the low pulley and stand close to the stack.",
+      "Hold the bar in front of your thighs with a grip about shoulder width.",
+      "Pull it straight up along your body, elbows higher than your hands.",
+      "Stop at lower chest height, then lower it slowly."
+    ],
+    "mistakes": [
+      "Pulling above chest height",
+      "Grip too narrow",
+      "Leaning back to finish the rep"
     ]
   },
   {
@@ -40775,6 +42178,565 @@
     "mistakes": [
       "Leaning back as the knees rise",
       "Knees barely lifting"
+    ]
+  },
+  {
+    "name": "Dumbbell Deadlift",
+    "force": "pull",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
+    "secondaryMuscles": [
+      "lower back",
+      "quadriceps",
+      "forearms"
+    ],
+    "instructions": [
+      "Stand with your feet hip width apart and a dumbbell in each hand at the sides of your thighs.",
+      "Push your hips back and bend your knees until the dumbbells reach your shins, back flat.",
+      "Drive through your feet and stand up tall, squeezing your glutes at the top.",
+      "Lower the dumbbells the same way, keeping them close to your legs."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-dumbbell-deadlift",
+    "aliases": [
+      "DB Deadlift",
+      "Dumbbell Deadlifts"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-deadlift",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A hip hinge lifting a dumbbell in each hand from shin height, a beginner-friendly deadlift.",
+    "formCues": [
+      "Back flat from hips to head",
+      "Dumbbells slide along the legs",
+      "Squeeze the glutes to finish"
+    ],
+    "steps": [
+      "Stand with your feet hip width apart and a dumbbell in each hand at the sides of your thighs.",
+      "Push your hips back and bend your knees until the dumbbells reach your shins.",
+      "Brace your trunk, then drive through your feet and stand up tall.",
+      "Lower the dumbbells the same way, keeping them close to your legs."
+    ],
+    "mistakes": [
+      "Rounding the back to reach lower",
+      "Dumbbells drift out in front",
+      "Leaning back at the top"
+    ]
+  },
+  {
+    "name": "Machine Back Extension",
+    "force": "pull",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "lower back"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "instructions": [
+      "Sit in the machine with the pad across your upper back and your feet on the platform.",
+      "Fold your arms across your chest and brace your trunk.",
+      "Press back against the pad until your body is upright, then pause.",
+      "Let the pad bring you forward slowly to the start."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-machine-back-extension",
+    "aliases": [
+      "Back Extension Machine",
+      "Seated Back Extension",
+      "Lower Back Machine"
+    ],
+    "muscleGroups": [
+      "Back"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hyperextensions-back-extensions",
+    "staple": true,
+    "difficulty": "beginner",
+    "description": "A seated machine that trains the lower back by extending the trunk against a padded lever.",
+    "formCues": [
+      "Hinge from the hips",
+      "Move slowly both ways",
+      "Stop when upright"
+    ],
+    "steps": [
+      "Set the seat so the back pad sits across your upper back and your feet rest on the platform.",
+      "Fold your arms across your chest and brace your trunk.",
+      "Press back against the pad until your body is upright.",
+      "Pause, then let the pad bring you forward slowly."
+    ],
+    "mistakes": [
+      "Jerking back to move the weight",
+      "Arching far past upright",
+      "Letting the stack slam down"
+    ]
+  },
+  {
+    "name": "Lateral Band Walk",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "bands",
+    "primaryMuscles": [
+      "abductors"
+    ],
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "instructions": [
+      "Loop a mini band around your legs just above the knees or around the ankles.",
+      "Stand in a quarter squat with your feet hip width apart so the band is taut.",
+      "Step sideways with one foot, then follow with the other without letting the band go slack.",
+      "Take the set number of steps, then walk back the other way."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-lateral-band-walk",
+    "aliases": [
+      "Lateral Band Walks",
+      "Banded Side Step",
+      "Band Side Walk"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "glute-med",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-abduction",
+    "equipmentList": [
+      "bands"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-band-walk",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Side steps in a half squat against a band around the legs, a staple warm-up for the glutes.",
+    "formCues": [
+      "Hips stay level",
+      "Toes point forward",
+      "Band never goes slack"
+    ],
+    "steps": [
+      "Loop a mini band around your legs above the knees or around the ankles.",
+      "Stand in a quarter squat with your feet hip width apart so the band is taut.",
+      "Step sideways with one foot, then follow with the other without letting the feet meet.",
+      "Take your steps in one direction, then walk back the other way."
+    ],
+    "mistakes": [
+      "Bouncing up and down",
+      "Leaning the trunk to step",
+      "Dragging the trailing foot in"
+    ]
+  },
+  {
+    "name": "Clamshell",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abductors"
+    ],
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "instructions": [
+      "Lie on your side with your hips and knees bent and your feet together.",
+      "Rest your head on your lower arm and keep your hips stacked.",
+      "Keeping your feet touching, lift your top knee as far as you can without rolling back.",
+      "Lower the knee slowly, finish the set, then switch sides."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-clamshell",
+    "aliases": [
+      "Clamshells",
+      "Side-Lying Clamshell"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "glute-med",
+        "role": "primary"
+      }
+    ],
+    "pattern": "hip-abduction",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-own-clamshell",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Lying on your side and opening the top knee like a clamshell, for the side of the hip.",
+    "formCues": [
+      "Feet stay together",
+      "Hips stacked, no rolling back",
+      "Slow on the way down"
+    ],
+    "steps": [
+      "Lie on your side with your hips and knees bent and your feet together.",
+      "Rest your head on your lower arm and keep your top hip directly over the bottom one.",
+      "Lift your top knee as high as you can without your pelvis rolling back.",
+      "Lower the knee slowly, finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Rolling the hips back to lift higher",
+      "Feet separating",
+      "Rushing the reps"
+    ]
+  },
+  {
+    "name": "Fire Hydrant",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abductors"
+    ],
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "instructions": [
+      "Start on your hands and knees with your hands under your shoulders and knees under your hips.",
+      "Keeping the knee bent, lift one leg out to the side until the thigh is near hip height.",
+      "Pause, then lower the knee back under your hip.",
+      "Finish the set on one side, then switch to the other."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-fire-hydrant",
+    "aliases": [
+      "Fire Hydrants",
+      "Quadruped Hip Abduction"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "glute-med",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-abduction",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-own-fire-hydrant",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "On hands and knees, lifting one bent leg out to the side, for the glutes and outer hip.",
+    "formCues": [
+      "Back flat like a table",
+      "Hips stay level",
+      "Knee stays bent"
+    ],
+    "steps": [
+      "Start on your hands and knees, hands under shoulders and knees under hips.",
+      "Keeping the knee bent, lift one leg out to the side until the thigh is near hip height.",
+      "Pause, then lower the knee back under your hip.",
+      "Finish the reps, then switch to the other side."
+    ],
+    "mistakes": [
+      "Shifting weight far onto the other side",
+      "Arching the lower back",
+      "Swinging the leg up"
+    ]
+  },
+  {
+    "name": "Wall Push-Up",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "instructions": [
+      "Stand an arm's length from a wall and place your hands on it at chest height, a little wider than your shoulders.",
+      "Step your feet back slightly so your body leans in a straight line.",
+      "Bend your elbows and bring your chest toward the wall.",
+      "Push back until your arms are straight."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-wall-push-up",
+    "aliases": [
+      "Wall Push-Ups",
+      "Wall Press-Up"
+    ],
+    "muscleGroups": [
+      "Chest"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A push-up with the hands on a wall, the easiest starting point for building up to floor push-ups.",
+    "formCues": [
+      "Body straight from head to heels",
+      "Hands at chest height",
+      "Elbows angled back"
+    ],
+    "steps": [
+      "Stand facing a wall and place your hands on it at chest height, a little wider than your shoulders.",
+      "Walk your feet back until your body leans in a straight line.",
+      "Bend your elbows to bring your chest toward the wall.",
+      "Push back until your arms are straight.",
+      "Step your feet farther back to make it harder."
+    ],
+    "mistakes": [
+      "Hips sagging or sticking out",
+      "Only the head moving toward the wall",
+      "Elbows flaring straight out"
+    ]
+  },
+  {
+    "name": "Cross-Body Shoulder Stretch",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "rear delts"
+    ],
+    "secondaryMuscles": [
+      "rhomboids"
+    ],
+    "instructions": [
+      "Stand or sit tall and bring one arm straight across the front of your chest.",
+      "Hold it just above the elbow with your other hand and ease it closer to your body.",
+      "Keep the stretched shoulder down, hold, then switch arms."
+    ],
+    "category": "stretching",
+    "images": [],
+    "id": "own-cross-body-shoulder-stretch",
+    "aliases": [
+      "Cross-Body Arm Stretch",
+      "Across-Body Shoulder Stretch"
+    ],
+    "muscleGroups": [
+      "Shoulders"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-own-cross-body-shoulder-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Pulling one straight arm across the chest to stretch the back of the shoulder.",
+    "formCues": [
+      "Shoulder stays down",
+      "Pull above the elbow",
+      "Chest faces forward"
+    ],
+    "steps": [
+      "Stand or sit tall and bring one arm straight across the front of your chest.",
+      "Hold it just above the elbow with your other hand.",
+      "Ease the arm closer to your body until you feel a stretch at the back of the shoulder.",
+      "Hold, then switch sides."
+    ],
+    "mistakes": [
+      "Shrugging the stretched shoulder",
+      "Twisting the torso to follow the arm",
+      "Pulling on the elbow joint"
+    ]
+  },
+  {
+    "name": "Doorway Chest Stretch",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "shoulders"
+    ],
+    "instructions": [
+      "Stand in a doorway and place your forearms on the frame, elbows at about shoulder height.",
+      "Step one foot forward and lean gently through the doorway until you feel the stretch across your chest.",
+      "Keep your ribs down and hold the position."
+    ],
+    "category": "stretching",
+    "images": [],
+    "id": "own-doorway-chest-stretch",
+    "aliases": [
+      "Doorway Stretch",
+      "Door Frame Chest Stretch",
+      "Pec Stretch"
+    ],
+    "muscleGroups": [
+      "Chest"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-doorway-chest-stretch",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Leaning through a doorway with the forearms on the frame to stretch the chest and front shoulders.",
+    "formCues": [
+      "Elbows at shoulder height",
+      "Ribs down",
+      "Lean gently"
+    ],
+    "steps": [
+      "Stand in a doorway and place your forearms on the frame, elbows at about shoulder height.",
+      "Step one foot forward.",
+      "Lean gently through the doorway until you feel the stretch across your chest.",
+      "Hold the position and breathe slowly."
+    ],
+    "mistakes": [
+      "Arching the lower back to lean farther",
+      "Elbows set far above the shoulders",
+      "Pushing into a sharp stretch"
     ]
   }
 ]

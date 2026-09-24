@@ -26,7 +26,7 @@ const withCue = (text) => ({ formCues: [base.formCues[0], text] })
 
 describe('coverage', () => {
   it('every common entry has all four fields and passes every text rule', () => {
-    assert.equal(common.length, 218) // req-140 (sanctioned): 178 + batch 1's 40
+    assert.equal(common.length, 258) // req-140 (sanctioned): 178 + batch 1's 40; req-145 (sanctioned): + batch 2's 40
     for (const entry of common) {
       for (const field of TEXT_FIELDS) assert.ok(field in entry, `${entry.id} lacks ${field}`)
       assert.deepEqual(textProblems(entry), [], entry.id)
@@ -165,7 +165,7 @@ describe('unilateral and duplicates', () => {
       assert.deepEqual(problems({ unilateral: true, ...withStep(text) }), [], text)
     }
     const oneSided = common.filter((entry) => entry.unilateral)
-    assert.equal(oneSided.length, 23) // req-140 (sanctioned): + split squat, cable kickback, pistol, DB snatch
+    assert.equal(oneSided.length, 39) // req-140 (sanctioned): + split squat, cable kickback, pistol, DB snatch; req-145 (sanctioned): + 16 of batch 2
   })
 
   it('the same line twice in an entry is rejected, across fields too', () => {
