@@ -387,3 +387,9 @@ page (log + auto-answer), and re-stub after every reload — until req-24 remove
 the worktrees isolated: `git archive main` into the scratchpad, symlink `node_modules`, `vite build`, `vite preview` on a
 `127.0.0.1` port (its own origin: no real data), seed from `src/db.json` (v8 → migrates), a 375 px iframe for phone-width
 geometry. A countdown screen (Finish, 10 s) outruns screenshot-paced clicks — act on it inside one script.
+
+## L-034 — `git checkout -- file` to undo a probe also wipes the file's uncommitted work  (Builder, req-24, 2026-09-24)
+
+Builder reverted its deliberate-fail guard probe with `git checkout -- edit.jsx`, which also discarded that file's
+uncommitted req-24 edit; it restored it from a copy. **How to apply:** remove a probe line by editing it out (or commit
+first); never `checkout` a dirty file to undo one line.

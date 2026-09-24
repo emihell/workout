@@ -292,7 +292,7 @@ routines under "Thu, Sep 24" · 9 two taps (3 s arm) → "· skipped" · 10 Leg 
 own history · 11 after the skip Leg Extension prefills 9/18/22/25 (last real) · 12 routine unchanged by Finish; History
 edit → Update? → Apply → routine [65,70,70].
 
-**QA findings, Planner's browser run 2026-09-24** (none blocks; each a small fix req when picked):
+**QA findings, Planner's browser run 2026-09-24** → **`req-152`** (READY, after req-24):
 - **QA-1 Back after Finish lands on "Not found."** — after Save, browser Back goes to `#/workout/<id>/finish` → bare
   "Not found.", one more Back → the done workout. The finish route stays in history after save.
 - **QA-2 rest pill's tap area overlaps Back at 375 px** — pill `[103,8,272,54]` vs "‹ Exercises" `[24,40,115,84]`
@@ -303,7 +303,10 @@ edit → Update? → Apply → routine [65,70,70].
 - **QA-4 History detail doesn't say skipped** — a fully skipped exercise reads "WU set · 4 sets" (the overview says
   "· skipped").
 - Minor: Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown anywhere today).
-- Import asks "Replace all data?" before validating → folded into **req-24** (READY).
+- Import asks "Replace all data?" before validating → fixed in **req-24** (merged).
+- **req-24 reviewer nits** (small, fold into the next touch): the no-native-dialog guard misses `window['confirm']`,
+  `const { confirm } = window`, `.mjs` files, and skips lines starting `*` (`req-24.test.js:17,30`); Today's first-run
+  import error (`Today.jsx:269,330`) isn't cleared on a later cancel/new pick.
 
 **Batch-3 feel list — CLOSED 2026-09-24** (Planner, same run): pill overlap → **QA-2** · iPhone no-zoom: every input/textarea/
 select ≥17 px on log, routine editor, exercise edit, history add set, finish, replace [measured]; the zoom itself is

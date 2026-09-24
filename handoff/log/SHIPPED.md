@@ -1773,3 +1773,18 @@ more — overhead presses front-delt consistent, high rows vertical-pull, 6 nich
 hidden, American spelling, 2 wording fixes. Gate: Planner's own run in an archive copy → `# tests 844 # pass 844 # fail 0`,
 build ✓ (main 341.64 kB); own-name scan 366/366. Test edits: sanctioned staple/row pins + DEC-074 counts only.
 
+
+## req-24 — the in-app confirm sheet replaces every native popup (DEC-079/080)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `135dc18`). One primitive, `ui/confirm.js` `askConfirm()` + `<ConfirmSheet/>`
+(bottom sheet, [Cancel] focused left, the named action right: Delete/Remove/Abandon/Replace); all 12 native confirms use
+it with their exact messages; the Today import alert → a Banner; the dead `Pick effort.` alert deleted (effort never empty,
+12-combination test). Import now **validates before asking** — a non-backup file shows its error, no question, no download.
+A guard test (`req-24.test.js`) fails on any native dialog in `src/` (shown failing on a probe). Gate: Builder
+`check: green — lint, 55 test file(s), and the build all passed.`; independent reviewer (DEC-057 §1, import path) in an
+archive copy → `# tests 864 # pass 864 # fail 0`, **no blockers**; Planner's browser run of the branch build (native
+dialogs stubbed to *record*, `[]` throughout): Builder's 10 test items 10/10 — every site's message + [Cancel|action],
+Cancel byte-for-byte unchanged, confirm acts (slot 3→2, workout 13→12, abandon → `#/`), backdrop/Escape/Back cancel,
+loop 2→1 "Remove 1 scheduled routine?", import analytics → error + no sheet, backup → sheet, Cancel unchanged, Replace
+replaces + the safety download fires first. Not run: the Today first-run import banner (needs empty data). Test edits:
+import-backup (bad file: no ask, no download — the intended change), workout-actions (stub → sheet subscriber, same 25).
