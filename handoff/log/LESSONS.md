@@ -357,3 +357,10 @@ side-effect-free, so the tables rode into the main chunk (340.97 → 345.31 kB).
 receipt and moved them inside `commonExercises()`. **How to apply:** data modules export plain literals or functions
 only; anything constructed runs inside a function. The L-026 main-chunk receipt is what catches a slip.
 
+## L-030 — compacted-substring matching hides short exact names behind longer ones  (2026-09-24)
+
+"l-sit" compacts to "lsit", a substring of "wallsit", so the staple Wall Sit filled Search's first tier and L-Sit sat
+behind Show more (req-151). L-027's class of bug, in names. Fixed: an exact hit on a listed non-staple's own name is
+pulled into the first tier whenever a staple hit exists. **How to apply:** every search tier change runs the "search
+each entry by its own shown name — is it first?" scan over the whole listed library; it found exactly the 2 cases here.
+
