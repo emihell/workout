@@ -38,16 +38,6 @@ export function NavLink({ look = 'link', ...rest }) {
   return <BaseNavLink look={look} {...rest} />
 }
 
-// ExternalLink (req-130) — a link off the app (new tab), with the text-link look.
-// Not NavLink: that one is a hash route inside the app.
-export function ExternalLink({ href, children }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={lookClass('link')}>
-      {children}
-    </a>
-  )
-}
-
 // Actions (req-122) — a screen's row of actions (`.ui-actions`). DESIGN §4 order is
 // owned here, not by each call site: `retreat` first (left), `lateral` between,
 // `forward` last (right). Markup order = visual and focus order — never row-reverse.

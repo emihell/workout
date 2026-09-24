@@ -218,11 +218,12 @@ describe('Search row: Already added / Restore', () => {
 })
 
 describe('library only on screen', () => {
-  it('Search shows no RepDB credit and offers "Show N more"; Settings keeps the credit', () => {
+  // req-142 (sanctioned edit: the credit is removed) — was "Settings keeps the credit".
+  it('Search shows no RepDB credit and offers "Show N more"; Settings has no credit either', () => {
     const exercises = source('./views/Exercises.jsx')
     assert.doesNotMatch(exercises, /RepdbCredit/)
     assert.match(exercises, /more from the full library/)
-    assert.match(source('./views/Settings.jsx'), /<RepdbCredit \/>/)
+    assert.doesNotMatch(source('./views/Settings.jsx'), /RepdbCredit|repdb/i)
   })
 
   it('the catalog module has no RepDB fetch or merge left', () => {
