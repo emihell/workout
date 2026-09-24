@@ -1326,3 +1326,13 @@ Answers req-144 Q1 (persona) and the core of Q2 (the rule's wording is refined i
 3. Warm-up drills (arm/shoulder/hip circles) aren't logged → hidden. Band variants are their own exercises (home
    trainees). Content calls under DEC-067, unconfirmed.
 
+## DEC-073 — toward a real product: other users soon, and training together  (Emilio, 2026-09-24)
+
+Emilio's reason for a server and multiple users: "to get closer to a real product and to allow other users to enter
+soon, i also want users to be able to collaborate and to workout together, as i often do with my coworkers - so we all
+can have the same routine, but have our own values saved in them, and when one of us start an exercise, its start for all
+of us". This opens the **backend fork** (BACKLOG Phase 3) as a design req, **req-146** (no code), deciding: hosting (his own
+computer vs a managed service), accounts, the data model with sharing (a shared routine, each user's own values), live
+group workouts, moving existing phone data over, offline use in the gym, and privacy (real users' health data, GDPR).
+The creation design (req-144) waits until Emilio starts it. Library batches continue (req-145).
+

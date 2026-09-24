@@ -18,7 +18,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **Next with Emilio:** `req-144` creation design (design req; prep underway).
+- **Building:** `req-145` library batch 2. **Next with Emilio:** `req-146` backend design (DEC-073); `req-144` creation design
+  when Emilio starts it (prep done).
   Library batches continue alongside it on stable fields only; no new fields until req-144 says (2026-09-24). Then
   up to par → `req-142` remove RepDB → `req-141` fresh scan (DEC-070). Then `req-134` browse + muscle
   filter (+ libraryId in the feedback note) → 132 → 137 → 131 → 135 → avatars + own
