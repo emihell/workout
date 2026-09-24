@@ -288,39 +288,13 @@
       "Air_Bike/1.jpg"
     ],
     "id": "Air_Bike",
-    "aliases": [
-      "Bicycle Crunch",
-      "Bicycle Crunches"
-    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Air_Bike/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Air_Bike/1.jpg"
-    ],
-    "muscles": [
-      {
-        "id": "abs",
-        "role": "primary"
-      },
-      {
-        "id": "obliques",
-        "role": "primary"
-      },
-      {
-        "id": "hip-flexors",
-        "role": "secondary"
-      }
-    ],
-    "pattern": "core-rotation",
-    "equipmentList": [
-      "bodyweight"
-    ],
-    "logAs": "bodyweight-reps",
-    "unilateral": false,
-    "common": true,
-    "family": "fam-crunch"
+    ]
   },
   {
     "name": "All Fours Quad Stretch",
@@ -4411,7 +4385,7 @@
     ],
     "muscles": [
       {
-        "id": "mid-lower-chest",
+        "id": "pecs",
         "role": "primary"
       },
       {
@@ -8884,6 +8858,8 @@
     ],
     "id": "Dumbbell_Lunges",
     "aliases": [
+      "Lunge",
+      "Lunges",
       "Dumbbell Lunge",
       "DB Lunge",
       "DB Lunges",
@@ -13441,7 +13417,7 @@
     ],
     "muscles": [
       {
-        "id": "pecs",
+        "id": "mid-lower-chest",
         "role": "primary"
       },
       {
@@ -15052,7 +15028,6 @@
     "id": "Knee_Hip_Raise_On_Parallel_Bars",
     "aliases": [
       "Captain's Chair Knee Raise",
-      "Captain's Chair Leg Raise",
       "Vertical Knee Raise",
       "Roman Chair Knee Raise"
     ],
@@ -28479,6 +28454,8 @@
     ],
     "id": "Standing_Calf_Raises",
     "aliases": [
+      "Calf Raise",
+      "Calf Raises",
       "Standing Calf Raise",
       "Standing Calf Raise Machine",
       "Calf Raise Machine"
@@ -33499,6 +33476,7 @@
     "images": [],
     "id": "own-fan-bike",
     "aliases": [
+      "Bike",
       "Assault Bike",
       "Echo Bike"
     ],
@@ -33532,5 +33510,106 @@
     "unilateral": false,
     "common": true,
     "family": "fam-stationary-bike"
+  },
+  {
+    "name": "Bicycle Crunch",
+    "force": "pull",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abdominals"
+    ],
+    "secondaryMuscles": [],
+    "instructions": [
+      "Lie on your back with your hands lightly behind your head, lower back pressed to the floor, and knees lifted so your shins are level with the floor.",
+      "Curl your shoulders up and turn your torso to bring one elbow toward the opposite knee while the other leg straightens out low.",
+      "Switch sides in a slow pedalling motion. Turn from the ribs, not by pulling on your neck."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-bicycle-crunch",
+    "aliases": [
+      "Bicycle Crunches"
+    ],
+    "muscleGroups": [
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-rotation",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch"
+  },
+  {
+    "name": "Weighted Dip",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "other",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "instructions": [
+      "Hang a plate or dumbbell from a dip belt, then support yourself on the parallel bars with your arms straight.",
+      "Keep your torso fairly upright and lower yourself until your upper arms are about level with the bars.",
+      "Press back up to straight arms, then repeat. Log the added weight."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-weighted-dip",
+    "aliases": [
+      "Weighted Dips",
+      "Weighted Parallel Bar Dip"
+    ],
+    "muscleGroups": [
+      "Arms"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "mid-lower-chest",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "dip-bars",
+      "plate"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
   }
 ]

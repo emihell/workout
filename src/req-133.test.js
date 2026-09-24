@@ -87,6 +87,20 @@ describe('common entries', () => {
     assert.ok(common.some((entry) => entry.id === 'own-hanging-knee-raise'))
   })
 
+  // Tag review — free-db's "Air Bike" is a crunch, not the bike: not common, no aliases;
+  // the bicycle crunch is our own entry.
+  it('Air_Bike is not common; own-bicycle-crunch is', () => {
+    const airBike = library.find((entry) => entry.id === 'Air_Bike')
+    assert.equal(airBike.common, undefined)
+    assert.equal(airBike.aliases, undefined)
+    assert.ok(common.some((entry) => entry.id === 'own-bicycle-crunch'))
+  })
+
+  it('the captain\'s chair knee raise does not carry the straight-leg name', () => {
+    const chair = library.find((entry) => entry.id === 'Knee_Hip_Raise_On_Parallel_Bars')
+    assert.ok(!chair.aliases.includes("Captain's Chair Leg Raise"))
+  })
+
   it('a non-common entry carries none of the new fields', () => {
     assert.match(problemsFor('3_4_Sit-Up', { pattern: 'core-flexion' }).join('\n'), /pattern on a non-common entry/)
   })
@@ -205,7 +219,7 @@ describe('muscleGroups', () => {
 
 describe('own-* entries carry the legacy fields', () => {
   it('equipment, category, instructions, and muscles today\'s readers accept', () => {
-    assert.equal(OWN_EXERCISES.length, 7)
+    assert.equal(OWN_EXERCISES.length, 9)
     for (const own of OWN_EXERCISES) {
       assert.ok(own.id.startsWith('own-'))
       assert.ok(own.equipment && own.category && own.instructions.length >= 3, own.id)
@@ -222,6 +236,8 @@ describe('own-* entries carry the legacy fields', () => {
     assert.equal(typeOf('own-kettlebell-swing'), 'free')
     assert.equal(typeOf('own-burpee'), 'bodyweight')
     assert.equal(typeOf('own-fan-bike'), 'cardio')
+    assert.equal(typeOf('own-bicycle-crunch'), 'bodyweight')
+    assert.equal(typeOf('own-weighted-dip'), 'free')
   })
 })
 
@@ -253,6 +269,12 @@ describe('search receipts (top-1)', () => {
     ['farmer walk', "Farmer's Walk"],
     ['treadmill', 'Running, Treadmill'],
     ['rowing', 'Rowing, Stationary'],
+    // Tag review additions.
+    ['calf raise', 'Standing Calf Raises'],
+    ['lunge', 'Dumbbell Lunges'],
+    ['bike', 'Fan Bike'],
+    ['bicycle crunch', 'Bicycle Crunch'],
+    ['weighted dip', 'Weighted Dip'],
   ]) {
     it(`"${query}" → ${first}`, () => {
       assert.equal(searchExerciseCatalog(library, query)[0]?.name, first)

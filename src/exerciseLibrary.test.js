@@ -85,9 +85,9 @@ describe('own copy of free-exercise-db', () => {
     assert.equal(`${JSON.stringify(deriveLibrary(source), null, 2)}\n`, LIBRARY_TEXT)
   })
 
-  it('count = 876 free-db + extras + 7 of ours', () => {
+  it('count = 876 free-db + extras + 9 of ours', () => {
     assert.equal(library.filter(isFreeDb).length, 876)
-    assert.equal(library.length, 876 + EXTRA_EXERCISES.length + 7)
+    assert.equal(library.length, 876 + EXTRA_EXERCISES.length + 9)
   })
 
   it('provenance and the Unlicense are recorded beside it', () => {
