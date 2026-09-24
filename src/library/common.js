@@ -19,7 +19,7 @@ const ROWS = [
   ['Leverage_Incline_Chest_Press', 'horizontal-push', 'machine', 'upper-chest', 'triceps front-delt', 'weight-reps', 'fam-incline-press', ['Incline Chest Press', 'Incline Machine Press']],
   ['Dumbbell_Flyes', 'fly', 'dumbbell bench', 'pecs', 'front-delt', 'weight-reps', 'fam-fly', ['DB Fly', 'Flat Dumbbell Fly']],
   ['Incline_Dumbbell_Flyes', 'fly', 'dumbbell bench', 'upper-chest', 'front-delt', 'weight-reps', 'fam-fly', ['Incline DB Fly', 'Incline Fly']],
-  ['Cable_Crossover', 'fly', 'cable', 'pecs', 'front-delt', 'weight-reps', 'fam-fly', ['Cable Flye', 'Cable Chest Fly', 'Cable Crossovers', 'High-to-Low Cable Fly', 'Single-Arm Cable Crossover']],
+  ['Cable_Crossover', 'fly', 'cable', 'pecs', 'front-delt', 'weight-reps', 'fam-fly', ['Cable Flye', 'Cable Chest Fly', 'Cable Crossovers', 'High-to-Low Cable Fly']],
   ['Low_Cable_Crossover', 'fly', 'cable', 'upper-chest', 'front-delt', 'weight-reps', 'fam-fly', ['Low Cable Fly']],
   ['Butterfly', 'fly', 'machine', 'pecs', 'front-delt', 'weight-reps', 'fam-fly', ['Pec Deck Fly', 'Pec Fly', 'Machine Fly', 'Machine Chest Fly']],
   ['Pushups', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Press-Up', 'Press-Ups']],
@@ -35,8 +35,8 @@ const ROWS = [
 
   // Shoulders
   ['Standing_Military_Press', 'vertical-push', 'barbell', 'deltoids', 'triceps upper-chest', 'weight-reps', 'fam-overhead-press', ['OHP', 'Military Press', 'Barbell Overhead Press', 'Strict Press']],
-  ['Dumbbell_Shoulder_Press', 'vertical-push', 'dumbbell bench', 'deltoids', 'triceps', 'weight-reps', 'fam-overhead-press', ['Overhead DB Press', 'DB Shoulder Press', 'Dumbbell Overhead Press', 'Seated DB Shoulder Press', 'Seated Dumbbell Shoulder Press', 'Seated Dumbbell Press', 'Standing Dumbbell Press']],
-  ['Arnold_Dumbbell_Press', 'vertical-push', 'dumbbell bench', 'deltoids', 'triceps', 'weight-reps', 'fam-overhead-press', ['DB Arnold Press']],
+  ['Dumbbell_Shoulder_Press', 'vertical-push', 'dumbbell bench', 'front-delt', 'side-delt triceps', 'weight-reps', 'fam-overhead-press', ['Overhead DB Press', 'DB Shoulder Press', 'Dumbbell Overhead Press', 'Seated DB Shoulder Press', 'Seated Dumbbell Shoulder Press', 'Seated Dumbbell Press', 'Standing Dumbbell Press']],
+  ['Arnold_Dumbbell_Press', 'vertical-push', 'dumbbell bench', 'front-delt', 'side-delt triceps', 'weight-reps', 'fam-overhead-press', ['DB Arnold Press']],
   ['Machine_Shoulder_Military_Press', 'vertical-push', 'machine', 'deltoids', 'triceps', 'weight-reps', 'fam-overhead-press', ['Shoulder Press Machine', 'Seated Shoulder Press Machine']],
   ['Push_Press', 'vertical-push', 'barbell', 'deltoids', 'triceps quads glute-max', 'weight-reps', 'fam-overhead-press', ['Barbell Push Press']],
   ['own-landmine-press', 'vertical-push', 'barbell landmine', 'deltoids', 'upper-chest triceps', 'weight-reps', 'fam-overhead-press', ['Landmine Shoulder Press', 'Half-Kneeling Landmine Press', 'Landmine Presses']],
@@ -57,7 +57,7 @@ const ROWS = [
   // Back
   ['Pullups', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Pull-Ups', 'Wide Grip Pull-Up']],
   ['Chin-Up', 'vertical-pull', 'pull-up-bar bodyweight', 'lats biceps', 'rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Chin Up', 'Chin-Ups', 'Chinups', 'Underhand Pull-Up']],
-  ['Weighted_Pull_Ups', 'vertical-pull', 'pull-up-bar plate', 'lats', 'biceps rhomboids', 'weight-reps', 'fam-pull-up', []],
+  ['Weighted_Pull_Ups', 'vertical-pull', 'pull-up-bar plate', 'lats', 'biceps rhomboids', 'weight-reps', 'fam-pull-up', ['Weighted Pull-Ups']],
   ['Band_Assisted_Pull-Up', 'vertical-pull', 'pull-up-bar bands', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Band Pull-Up', 'Banded Pull-Up']],
   ['own-assisted-pull-up', 'vertical-pull', 'machine', 'lats', 'biceps rhomboids', 'weight-reps', 'fam-pull-up', ['Assisted Pull-Ups', 'Machine Assisted Pull-Up', 'Assisted Pull-Up Machine']],
   ['Wide-Grip_Lat_Pulldown', 'vertical-pull', 'cable', 'lats', 'biceps rhomboids', 'weight-reps', 'fam-lat-pulldown', ['Lat Pulldowns', 'Wide-Grip Pulldown']],
@@ -75,15 +75,15 @@ const ROWS = [
   ['Seated_Cable_Rows', 'horizontal-pull', 'cable', 'lats rhomboids', 'rear-delt biceps', 'weight-reps', 'fam-row', ['Cable Row', 'Seated Row', 'Cable Rows']],
   ['Leverage_Iso_Row', 'horizontal-pull', 'machine', 'lats rhomboids', 'rear-delt biceps', 'weight-reps', 'fam-row', ['Seated Machine Row', 'Chest-Supported Machine Row']],
   ['Inverted_Row', 'horizontal-pull', 'bodyweight', 'rhomboids lats', 'rear-delt biceps', 'bodyweight-reps', 'fam-inverted-row', ['Australian Pull-Up', 'Bodyweight Row', 'Body Row', 'Inverted Rows']],
-  ['Suspended_Row', 'horizontal-pull', 'suspension bodyweight', 'rhomboids lats', 'rear-delt biceps', 'bodyweight-reps', 'fam-inverted-row', ['TRX Row', 'Ring Row', 'Suspension Row']],
+  ['Suspended_Row', 'horizontal-pull', 'suspension bodyweight', 'rhomboids lats', 'rear-delt biceps', 'bodyweight-reps', 'fam-inverted-row', ['TRX Row', 'Ring Row', 'Suspended Row']],
   ['Barbell_Deadlift', 'hinge', 'barbell', 'glute-max hamstrings lower-back', 'quads traps forearms', 'weight-reps', 'fam-deadlift', ['Deadlifts', 'Conventional Deadlift', 'BB Deadlift']],
   ['Sumo_Deadlift', 'hinge', 'barbell', 'glute-max hamstrings adductors', 'quads lower-back traps forearms', 'weight-reps', 'fam-deadlift', ['Sumo Deadlifts', 'Sumo DL']],
   ['Trap_Bar_Deadlift', 'hinge', 'trap-bar', 'quads glute-max hamstrings', 'lower-back traps forearms', 'weight-reps', 'fam-deadlift', ['Hex Bar Deadlift', 'Trap Bar DL', 'Hex Bar DL']],
-  ['Rack_Pulls', 'hinge', 'barbell', 'lower-back glute-max', 'hamstrings traps forearms', 'weight-reps', 'fam-deadlift', ['Block Pull']],
+  ['Rack_Pulls', 'hinge', 'barbell', 'lower-back glute-max', 'hamstrings traps forearms', 'weight-reps', 'fam-deadlift', ['Rack Pulls', 'Block Pull']],
   ['Romanian_Deadlift', 'hinge', 'barbell', 'hamstrings glute-max', 'lower-back forearms', 'weight-reps', 'fam-romanian-deadlift', ['RDL', 'RDLs', 'Romanian Deadlifts', 'Barbell RDL', 'Barbell Romanian Deadlift']],
   ['Stiff-Legged_Barbell_Deadlift', 'hinge', 'barbell', 'hamstrings glute-max', 'lower-back', 'weight-reps', 'fam-romanian-deadlift', ['Stiff-Legged Deadlift', 'Straight-Leg Deadlift', 'SLDL']],
   ['Stiff-Legged_Dumbbell_Deadlift', 'hinge', 'dumbbell', 'hamstrings glute-max', 'lower-back', 'weight-reps', 'fam-romanian-deadlift', ['Dumbbell RDL', 'DB RDL', 'Dumbbell Stiff-Leg Deadlift']],
-  ['own-single-leg-rdl', 'hinge', 'dumbbell', 'hamstrings glute-max', 'lower-back glute-med', 'weight-reps', 'fam-romanian-deadlift', ['Single-Leg RDL', 'SL RDL', 'Single-Leg Dumbbell RDL', 'One-Leg Romanian Deadlift'], true],
+  ['own-single-leg-rdl', 'hinge', 'dumbbell', 'hamstrings glute-max', 'lower-back glute-med', 'weight-reps', 'fam-romanian-deadlift', ['Single-Leg RDL', 'SL RDL', 'Single-Leg Dumbbell RDL', 'One-Leg Romanian Deadlift', 'Single-Leg Deadlift'], true],
   ['Good_Morning', 'hinge', 'barbell', 'hamstrings lower-back', 'glute-max', 'weight-reps', 'fam-good-morning', ['Good Mornings', 'Barbell Good Morning']],
   ['Hyperextensions_Back_Extensions', 'hinge', 'roman-chair bodyweight', 'lower-back glute-max', 'hamstrings', 'bodyweight-reps', 'fam-hyperextensions-back-extensions', ['Back Extensions', 'Hyperextension', '45-Degree Back Extension', 'Roman Chair Back Extension']],
 
@@ -118,7 +118,7 @@ const ROWS = [
   ['Single_Leg_Glute_Bridge', 'bridge', 'bodyweight', 'glute-max', 'hamstrings', 'bodyweight-reps', 'fam-hip-thrust', ['Single-Leg Hip Bridge', 'One-Leg Glute Bridge'], true],
   ['One-Legged_Cable_Kickback', 'hip-extension', 'cable', 'glute-max', 'hamstrings', 'weight-reps', 'fam-glute-kickback', ['Glute Cable Kickback'], true],
   ['Glute_Kickback', 'hip-extension', 'bodyweight', 'glute-max', 'hamstrings', 'bodyweight-reps', 'fam-glute-kickback', ['Donkey Kick', 'Donkey Kicks', 'Quadruped Hip Extension'], true],
-  ['Pull_Through', 'hinge', 'cable', 'glute-max hamstrings', 'lower-back', 'weight-reps', 'fam-pull-through', []],
+  ['Pull_Through', 'hinge', 'cable', 'glute-max hamstrings', 'lower-back', 'weight-reps', 'fam-pull-through', ['Pull-Through', 'Rope Pull-Through', 'Glute Pull-Through']],
   ['Thigh_Abductor', 'hip-abduction', 'machine', 'glute-med abductors', '', 'weight-reps', 'fam-thigh-abductor', ['Abduction', 'Hip Abduction', 'Abductor Machine', 'Outer Thigh Machine', 'Machine Hip Abduction']],
   ['Thigh_Adductor', 'hip-adduction', 'machine', 'adductors', '', 'weight-reps', 'fam-thigh-adductor', ['Adduction', 'Hip Adduction', 'Adductor Machine', 'Inner Thigh Machine']],
   ['own-copenhagen-plank', 'hip-adduction', 'bench bodyweight', 'adductors', 'obliques abs', 'time', 'fam-own-copenhagen-plank', ['Copenhagen Side Plank', 'Copenhagen Adductor Plank', 'Copenhagen Plank Hold'], true],
@@ -157,7 +157,7 @@ const ROWS = [
   ['Plank', 'core-stability', 'bodyweight', 'abs', 'obliques front-delt', 'time', 'fam-plank', ['Front Plank', 'Forearm Plank', 'Planks']],
   ['own-hollow-body-hold', 'core-stability', 'bodyweight', 'abs', 'hip-flexors', 'time', 'fam-own-hollow-body-hold', ['Hollow Hold', 'Hollow Body', 'Hollow Body Holds']],
   ['Side_Bridge', 'core-stability', 'bodyweight', 'obliques', 'abs glute-med', 'time', 'fam-plank', ['Side Planks'], true],
-  ['Crunches', 'core-flexion', 'bodyweight', 'abs', '', 'bodyweight-reps', 'fam-crunch', ['Floor Crunch', 'Tuck Crunch']],
+  ['Crunches', 'core-flexion', 'bodyweight', 'abs', '', 'bodyweight-reps', 'fam-crunch', ['Floor Crunch']],
   ['Cable_Crunch', 'core-flexion', 'cable', 'abs', '', 'weight-reps', 'fam-crunch', ['Kneeling Cable Crunch', 'Cable Crunches', 'Rope Crunch']],
   ['Ab_Crunch_Machine', 'core-flexion', 'machine', 'abs', '', 'weight-reps', 'fam-crunch', ['Ab Machine', 'Crunch Machine', 'Abdominal Crunch Machine']],
   ['own-bicycle-crunch', 'core-rotation', 'bodyweight', 'abs obliques', 'hip-flexors', 'bodyweight-reps', 'fam-crunch', ['Bicycle Crunches', 'Cross-Body Crunch']],
@@ -174,7 +174,7 @@ const ROWS = [
   ['Dead_Bug', 'core-stability', 'bodyweight', 'abs', 'hip-flexors', 'bodyweight-reps', 'fam-dead-bug', ['Dead Bugs', 'Deadbug']],
   ['own-bird-dog', 'core-stability', 'bodyweight', 'abs lower-back', 'glute-max deltoids', 'bodyweight-reps', 'fam-dead-bug', ['Bird Dogs', 'Quadruped Arm and Leg Raise']],
   ['Ab_Roller', 'core-stability', 'ab-wheel', 'abs', 'lats front-delt', 'bodyweight-reps', 'fam-ab-roller', ['Ab Wheel', 'Ab Wheel Rollouts', 'Ab Rollout']],
-  ['Mountain_Climbers', 'core-stability', 'bodyweight', 'abs hip-flexors', 'quads front-delt', 'time', 'fam-mountain-climbers', []],
+  ['Mountain_Climbers', 'core-stability', 'bodyweight', 'abs hip-flexors', 'quads front-delt', 'time', 'fam-mountain-climbers', ['Mountain Climbers']],
   ['Dumbbell_Side_Bend', 'core-flexion', 'dumbbell', 'obliques', 'abs', 'weight-reps', 'fam-dumbbell-side-bend', ['DB Side Bend', 'Side Bends'], true],
 
   // Cardio
@@ -269,7 +269,7 @@ const ROWS = [
   ['own-clamshell', 'hip-abduction', 'bodyweight', 'glute-med', '', 'bodyweight-reps', 'fam-own-clamshell', ['Clamshells', 'Side-Lying Clamshell'], true],
   ['own-fire-hydrant', 'hip-abduction', 'bodyweight', 'glute-med', 'glute-max', 'bodyweight-reps', 'fam-own-fire-hydrant', ['Fire Hydrants', 'Quadruped Hip Abduction'], true],
   ['own-wall-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt', 'bodyweight-reps', 'fam-push-up', ['Wall Push-Ups', 'Wall Press-Up']],
-  ['Oblique_Crunches', 'core-flexion', 'bodyweight', 'obliques', 'abs', 'bodyweight-reps', 'fam-crunch', [], true],
+  ['Oblique_Crunches', 'core-flexion', 'bodyweight', 'obliques', 'abs', 'bodyweight-reps', 'fam-crunch', ['Oblique Crunches'], true],
   ['Alternate_Heel_Touchers', 'core-flexion', 'bodyweight', 'obliques', 'abs', 'bodyweight-reps', 'fam-crunch', ['Heel Touches', 'Heel Taps', 'Alternating Heel Touch']],
   ['Exercise_Ball_Crunch', 'core-flexion', 'exercise-ball', 'abs', '', 'bodyweight-reps', 'fam-crunch', ['Swiss Ball Crunch', 'Exercise Ball Crunches', 'Ball Crunch']],
   ['Scissor_Kick', 'core-stability', 'bodyweight', 'abs hip-flexors', 'quads', 'time', 'fam-leg-raise', ['Scissor Kicks', 'Lying Scissor Kick']],
@@ -330,7 +330,7 @@ const ROWS = [
   ['Round_The_World_Shoulder_Stretch', 'mobility', 'bodyweight', 'deltoids', 'pecs', 'bodyweight-reps', 'fam-round-the-world-shoulder-stretch', ['Shoulder Dislocates', 'Stick Pass-Through', 'Band Pass-Through']],
   ['Plate_Pinch', 'carry', 'plate', 'forearms', '', 'weight-time', 'fam-plate-pinch', ['Plate Pinch Hold', 'Pinch Grip Hold'], true],
   ['Wrist_Roller', 'curl', 'plate', 'forearms', 'deltoids', 'weight-reps', 'fam-wrist-roller', ['Wrist Roller Curl', 'Forearm Roller']],
-  ['Svend_Press', 'horizontal-push', 'plate', 'pecs', 'front-delt triceps', 'weight-reps', 'fam-svend-press', ['Plate Squeeze Press', 'Plate Press']],
+  ['Svend_Press', 'horizontal-push', 'plate', 'pecs', 'front-delt triceps', 'weight-reps', 'fam-svend-press', ['Plate Squeeze Press']],
   ['Drag_Curl', 'curl', 'barbell', 'biceps', 'brachialis', 'weight-reps', 'fam-curl', ['Barbell Drag Curl', 'Drag Curls']],
   ['Seated_Triceps_Press', 'elbow-extension', 'dumbbell bench', 'triceps', '', 'weight-reps', 'fam-overhead-triceps-extension', ['Seated Overhead Dumbbell Extension', 'Seated Two-Hand Triceps Extension']],
   ['Kneeling_High_Pulley_Row', 'vertical-pull', 'cable', 'lats', 'rhomboids biceps', 'weight-reps', 'fam-row', ['Kneeling Rope Row', 'Kneeling Cable Pulldown']],
@@ -342,7 +342,7 @@ const ROWS = [
   ['Alternating_Renegade_Row', 'horizontal-pull', 'dumbbell', 'lats rhomboids', 'abs biceps', 'weight-reps', 'fam-row', ['Renegade Rows', 'Dumbbell Renegade Row', 'Plank Row']],
   ['Weighted_Sissy_Squat', 'squat', 'bodyweight', 'quads', '', 'bodyweight-reps', 'fam-squat', ['Sissy Squats']],
   ['Barbell_Step_Ups', 'lunge', 'barbell box', 'quads glute-max', 'hamstrings adductors', 'weight-reps', 'fam-lunge', ['Barbell Step-Ups', 'BB Step-Up'], true],
-  ['Reverse_Grip_Bent-Over_Rows', 'horizontal-pull', 'barbell', 'lats rhomboids', 'biceps rear-delt lower-back', 'weight-reps', 'fam-row', ['Underhand Barbell Row', 'Supinated Barbell Row']],
+  ['Reverse_Grip_Bent-Over_Rows', 'horizontal-pull', 'barbell', 'lats rhomboids', 'biceps rear-delt lower-back', 'weight-reps', 'fam-row', ['Underhand Barbell Row', 'Supinated Barbell Row', 'Yates Row']],
   ['Reverse_Hyperextension', 'hip-extension', 'machine', 'glute-max hamstrings', 'lower-back', 'weight-reps', 'fam-reverse-hyperextension', ['Reverse Hyper Machine', 'Reverse Hypers']],
   ['Sled_Drag_-_Harness', 'carry', 'sled', 'quads glute-max', 'hamstrings calves', 'weight-time', 'fam-sled-drag-harness', ['Sled Pull', 'Harness Sled Drag']],
   ['Landmine_180s', 'core-rotation', 'barbell landmine', 'obliques', 'abs deltoids', 'weight-reps', 'fam-landmine-180s', ['Landmine Twist', 'Landmine 180', 'Landmine Rainbow']],
@@ -376,7 +376,7 @@ const ROWS = [
   ['One-Arm_Kettlebell_Military_Press_To_The_Side', 'vertical-push', 'kettlebell', 'deltoids', 'triceps abs', 'weight-reps', 'fam-overhead-press', ['Single-Arm Kettlebell Press', 'KB Press', 'Kettlebell Overhead Press'], true],
   ['V-Bar_Pullup', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['V-Bar Pull-Ups', 'V-Handle Pull-Up']],
   ['JM_Press', 'elbow-extension', 'barbell bench', 'triceps', 'pecs front-delt', 'weight-reps', 'fam-skull-crusher', ['JM Presses']],
-  ['Zercher_Squats', 'squat', 'barbell', 'quads glute-max', 'abs rhomboids adductors', 'weight-reps', 'fam-squat', ['Zercher Squat Barbell', 'Elbow Squat']],
+  ['Zercher_Squats', 'squat', 'barbell', 'quads glute-max', 'abs rhomboids adductors', 'weight-reps', 'fam-squat', ['Zercher Squats', 'Barbell Zercher Squat']],
   ['Tire_Flip', 'hinge', 'bodyweight', 'quads glute-max hamstrings', 'lower-back pecs triceps traps', 'bodyweight-reps', 'fam-tire-flip', ['Tire Flips', 'Tyre Flip']],
   ['Clean_Pull', 'olympic', 'barbell', 'quads glute-max hamstrings traps', 'lower-back forearms', 'weight-reps', 'fam-clean', ['Clean Pulls', 'Barbell Clean Pull']],
   ['Snatch_Pull', 'olympic', 'barbell', 'hamstrings glute-max quads traps', 'lower-back', 'weight-reps', 'fam-snatch', ['Snatch Pulls', 'Barbell Snatch Pull']],
@@ -393,7 +393,7 @@ const ROWS = [
   ['own-front-lever', 'vertical-pull', 'pull-up-bar bodyweight', 'lats abs', 'rear-delt rhomboids', 'time', 'fam-own-front-lever', ['Front Lever Hold']],
   ['own-back-lever', 'core-stability', 'pull-up-bar bodyweight', 'lower-back front-delt', 'pecs biceps abs', 'time', 'fam-own-back-lever', ['Back Lever Hold']],
   ['own-reverse-nordic', 'leg-extension', 'bodyweight', 'quads', 'hip-flexors abs', 'bodyweight-reps', 'fam-own-reverse-nordic', ['Reverse Nordic Curl', 'Reverse Nordics']],
-  ['own-spoto-press', 'horizontal-push', 'barbell bench', 'pecs', 'triceps front-delt', 'weight-reps', 'fam-bench-press', ['Spoto Bench Press', 'Paused-Above-Chest Bench Press']],
+  ['own-spoto-press', 'horizontal-push', 'barbell bench', 'pecs', 'triceps front-delt', 'weight-reps', 'fam-bench-press', ['Spoto Bench Press']],
 ]
 
 // req-139 / DEC-064 §1 — our display names: the standard gym name, chosen per entry on
@@ -609,6 +609,7 @@ export const DISPLAY_NAMES = {
   'V-Bar_Pullup': 'V-Bar Pull-Up',
   Zercher_Squats: 'Zercher Squat',
   Ring_Dips: 'Ring Dip',
+  Suspended_Row: 'Suspension Row', // req-141
 }
 
 // req-140 / DEC-066 §1 — common entries that are NOT staples (fully written, but behind
