@@ -1,6 +1,6 @@
 # req-156 — warm-up/cardio sets stop saving a hidden effort; a render-test harness for views
 
-**Status: BUILT — branch `req-156` (`b1d0b41`), NOT merged.** (2026-09-24) — Phase 1 bug + test infra. DEC-085 §1, §10. Gate: functional + reviewer (DEC-057 §1 if
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-156` (`6cccc57`…`b1d0b41`, 3 commits).** (2026-09-24) — Phase 1 bug + test infra. DEC-085 §1, §10. Gate: functional + reviewer (DEC-057 §1 if
 `workout-log`/`store` is touched). **No bulk write:** rows already saved with `rpe: 3` stay as they are.
 
 Source: `audits/2026-09-24.md` **F-TRUST-2** and **F-TEST-1** (read both sections; the audit rendered `SetLogForm` with
