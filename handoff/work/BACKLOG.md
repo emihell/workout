@@ -383,10 +383,9 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 ### Exercise library + "how to do it" — Emilio 2026-09-24 (DEC-060)
 
 - **`req-130` our own library** (READY) — free-db copy + aliases + muscle groups + picture links + RepDB credit.
-- **`req-131` "How to" button** — log screen + exercise page; opens RepDB drawing if linked, else free-db
-  start/end photos auto-flipping (~0.7 s), else the exercise's video link; hidden when none. **No RepDB pictures (DEC-069)** — the old plan was: RepDB pictures **joined at runtime** from the live
-  fetch (exact name key + a small curated pair list; nothing RepDB committed — req-130 review finding 8). Mind: a
-  renamed exercise keeps its `libraryId` (req-130), so the picture follows the id. New optional
+- **`req-131` "How to" button** — log screen + exercise page; opens free-db start/end photos
+  auto-flipping (~0.7 s), else the exercise's video link; hidden when none. **No RepDB pictures (DEC-069).** Shows our
+  text (req-138). Mind: a renamed exercise keeps its `libraryId` (req-130), so the picture follows the id. New optional
   per-exercise **video link** field (edit form). Uses `libraryEntryFor` (req-130). Offline → cues only, no broken
   image. After req-130.
 - **`req-132` one Add screen** — replaces Add manually / Search: typing shows your exercises first (req-127 match),
