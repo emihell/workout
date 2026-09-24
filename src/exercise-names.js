@@ -33,6 +33,31 @@ export function exerciseNameMatch(exercises, name) {
   return archived.length ? { kind: 'archived', exercise: archived[0] } : null
 }
 
+// req-139 — the stored exercise a library Search row stands for, in exerciseNameMatch's
+// shape: one with libraryId === item.id first, else a name match on the display name,
+// else on free-db's name. Live beats archived across all three (req-127); among archived,
+// the first tier that has one, newest archivedAt.
+export function libraryItemMatch(exercises, item) {
+  const list = exercises || []
+  const tiers = [
+    item?.id ? list.filter((ex) => ex.libraryId === item.id) : [],
+    item?.displayName ? list.filter((ex) => normalName(ex.name) === normalName(item.displayName)) : [],
+    list.filter((ex) => normalName(item?.name) && normalName(ex.name) === normalName(item.name)),
+  ]
+  for (const tier of tiers) {
+    const live = tier.find((ex) => !ex.archivedAt)
+    if (live) return { kind: 'live', exercise: live }
+  }
+  for (const tier of tiers) {
+    const archived = tier.filter((ex) => ex.archivedAt)
+    if (archived.length) {
+      archived.sort((x, y) => String(y.archivedAt).localeCompare(String(x.archivedAt)))
+      return { kind: 'archived', exercise: archived[0] }
+    }
+  }
+  return null
+}
+
 // req-127 — Start needs something to start: an empty routine would create an empty
 // active workout (and could abandon a real one). The preview already hides it.
 export function routineStartable(routine) {

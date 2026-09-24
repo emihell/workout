@@ -137,7 +137,6 @@
     "id": "Ab_Roller",
     "aliases": [
       "Ab Wheel",
-      "Ab Wheel Rollout",
       "Ab Wheel Rollouts",
       "Ab Rollout"
     ],
@@ -148,6 +147,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ab_Roller/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ab_Roller/1.jpg"
     ],
+    "displayName": "Ab Wheel Rollout",
     "muscles": [
       {
         "id": "abs",
@@ -869,7 +869,6 @@
     ],
     "id": "Arnold_Dumbbell_Press",
     "aliases": [
-      "Arnold Press",
       "DB Arnold Press"
     ],
     "muscleGroups": [
@@ -879,6 +878,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Arnold_Dumbbell_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Arnold_Dumbbell_Press/1.jpg"
     ],
+    "displayName": "Arnold Press",
     "muscles": [
       {
         "id": "deltoids",
@@ -1202,7 +1202,6 @@
     ],
     "id": "Ball_Leg_Curl",
     "aliases": [
-      "Stability Ball Leg Curl",
       "Stability Ball Hamstring Curl",
       "Swiss Ball Hamstring Curl"
     ],
@@ -1213,6 +1212,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ball_Leg_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ball_Leg_Curl/1.jpg"
     ],
+    "displayName": "Stability Ball Leg Curl",
     "muscles": [
       {
         "id": "hamstrings",
@@ -1274,6 +1274,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Assisted_Pull-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Assisted_Pull-Up/1.jpg"
     ],
+    "displayName": "Band-Assisted Pull-Up",
     "muscles": [
       {
         "id": "lats",
@@ -1420,7 +1421,6 @@
     ],
     "id": "Band_Pull_Apart",
     "aliases": [
-      "Band Pull-Apart",
       "Band Pull-Aparts",
       "Pull-Aparts"
     ],
@@ -1431,6 +1431,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Pull_Apart/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Pull_Apart/1.jpg"
     ],
+    "displayName": "Band Pull-Apart",
     "muscles": [
       {
         "id": "rear-delt",
@@ -1576,7 +1577,6 @@
     ],
     "id": "Barbell_Bench_Press_-_Medium_Grip",
     "aliases": [
-      "Bench Press",
       "Flat Bench Press",
       "Barbell Bench Press",
       "BB Bench Press",
@@ -1589,6 +1589,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg"
     ],
+    "displayName": "Bench Press",
     "muscles": [
       {
         "id": "pecs",
@@ -1737,7 +1738,6 @@
     ],
     "id": "Barbell_Deadlift",
     "aliases": [
-      "Deadlift",
       "Deadlifts",
       "Conventional Deadlift",
       "BB Deadlift"
@@ -1750,6 +1750,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Deadlift/1.jpg"
     ],
+    "displayName": "Deadlift",
     "muscles": [
       {
         "id": "glute-max",
@@ -1969,7 +1970,6 @@
     ],
     "id": "Barbell_Hip_Thrust",
     "aliases": [
-      "Hip Thrust",
       "Hip Thrusts",
       "Barbell Hip Thrusts",
       "BB Hip Thrust"
@@ -1981,6 +1981,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Hip_Thrust/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Hip_Thrust/1.jpg"
     ],
+    "displayName": "Hip Thrust",
     "muscles": [
       {
         "id": "glute-max",
@@ -2032,7 +2033,6 @@
     ],
     "id": "Barbell_Incline_Bench_Press_-_Medium_Grip",
     "aliases": [
-      "Incline Bench Press",
       "Incline Barbell Press",
       "Incline Bench",
       "BB Incline Press"
@@ -2044,6 +2044,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Incline_Bench_Press_-_Medium_Grip/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Incline_Bench_Press_-_Medium_Grip/1.jpg"
     ],
+    "displayName": "Incline Bench Press",
     "muscles": [
       {
         "id": "upper-chest",
@@ -2483,7 +2484,6 @@
     "aliases": [
       "Squat",
       "Squats",
-      "Back Squat",
       "Barbell Back Squat",
       "BB Squat"
     ],
@@ -2494,6 +2494,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Squat/1.jpg"
     ],
+    "displayName": "Back Squat",
     "muscles": [
       {
         "id": "quads",
@@ -2659,7 +2660,6 @@
     ],
     "id": "Battling_Ropes",
     "aliases": [
-      "Battle Ropes",
       "Battle Rope",
       "Rope Waves"
     ],
@@ -2670,6 +2670,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Battling_Ropes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Battling_Ropes/1.jpg"
     ],
+    "displayName": "Battle Ropes",
     "muscles": [
       {
         "id": "deltoids",
@@ -2783,7 +2784,6 @@
     ],
     "id": "Bench_Dips",
     "aliases": [
-      "Bench Dip",
       "Chair Dips"
     ],
     "muscleGroups": [
@@ -2793,6 +2793,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bench_Dips/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bench_Dips/1.jpg"
     ],
+    "displayName": "Bench Dip",
     "muscles": [
       {
         "id": "triceps",
@@ -3121,7 +3122,6 @@
     ],
     "id": "Bent_Over_Barbell_Row",
     "aliases": [
-      "Barbell Row",
       "Bent-Over Row",
       "Barbell Bent-Over Row",
       "BB Row"
@@ -3133,6 +3133,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Barbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Barbell_Row/1.jpg"
     ],
+    "displayName": "Barbell Row",
     "muscles": [
       {
         "id": "lats",
@@ -3330,7 +3331,6 @@
     "id": "Bent_Over_Two-Dumbbell_Row",
     "aliases": [
       "Dumbbell Bent-Over Row",
-      "Bent-Over Dumbbell Row",
       "Two-Arm Dumbbell Row",
       "DB Bent-Over Row"
     ],
@@ -3341,6 +3341,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Two-Dumbbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Two-Dumbbell_Row/1.jpg"
     ],
+    "displayName": "Bent-Over Dumbbell Row",
     "muscles": [
       {
         "id": "lats",
@@ -3497,7 +3498,6 @@
     ],
     "id": "Bicycling_Stationary",
     "aliases": [
-      "Stationary Bike",
       "Exercise Bike",
       "Spin Bike",
       "Indoor Cycling"
@@ -3509,6 +3509,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bicycling_Stationary/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bicycling_Stationary/1.jpg"
     ],
+    "displayName": "Stationary Bike",
     "muscles": [
       {
         "id": "quads",
@@ -3792,7 +3793,6 @@
     ],
     "id": "Bodyweight_Walking_Lunge",
     "aliases": [
-      "Walking Lunge",
       "Walking Lunges"
     ],
     "muscleGroups": [
@@ -3802,6 +3802,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Walking_Lunge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Walking_Lunge/1.jpg"
     ],
+    "displayName": "Walking Lunge",
     "muscles": [
       {
         "id": "quads",
@@ -4225,7 +4226,6 @@
     ],
     "id": "Butt_Lift_Bridge",
     "aliases": [
-      "Glute Bridge",
       "Glute Bridges",
       "Hip Bridge"
     ],
@@ -4236,6 +4236,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butt_Lift_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butt_Lift_Bridge/1.jpg"
     ],
+    "displayName": "Glute Bridge",
     "muscles": [
       {
         "id": "glute-max",
@@ -4279,7 +4280,6 @@
     ],
     "id": "Butterfly",
     "aliases": [
-      "Pec Deck",
       "Pec Deck Fly",
       "Pec Fly",
       "Machine Fly",
@@ -4292,6 +4292,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butterfly/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butterfly/1.jpg"
     ],
+    "displayName": "Pec Deck",
     "muscles": [
       {
         "id": "pecs",
@@ -4370,7 +4371,6 @@
     ],
     "id": "Cable_Crossover",
     "aliases": [
-      "Cable Fly",
       "Cable Flye",
       "Cable Chest Fly",
       "Cable Crossovers",
@@ -4383,6 +4383,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Crossover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Crossover/1.jpg"
     ],
+    "displayName": "Cable Fly",
     "muscles": [
       {
         "id": "pecs",
@@ -4512,7 +4513,6 @@
     ],
     "id": "Cable_Hammer_Curls_-_Rope_Attachment",
     "aliases": [
-      "Rope Hammer Curl",
       "Cable Hammer Curl",
       "Cable Rope Hammer Curl"
     ],
@@ -4523,6 +4523,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Hammer_Curls_-_Rope_Attachment/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Hammer_Curls_-_Rope_Attachment/1.jpg"
     ],
+    "displayName": "Rope Hammer Curl",
     "muscles": [
       {
         "id": "brachialis",
@@ -4955,6 +4956,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rope_Overhead_Triceps_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rope_Overhead_Triceps_Extension/1.jpg"
     ],
+    "displayName": "Cable Overhead Triceps Extension",
     "muscles": [
       {
         "id": "triceps",
@@ -5284,7 +5286,6 @@
     ],
     "id": "Calf_Press_On_The_Leg_Press_Machine",
     "aliases": [
-      "Leg Press Calf Raise",
       "Leg Press Calf Raises",
       "Calf Press on Leg Press"
     ],
@@ -5295,6 +5296,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Calf_Press_On_The_Leg_Press_Machine/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Calf_Press_On_The_Leg_Press_Machine/1.jpg"
     ],
+    "displayName": "Leg Press Calf Raise",
     "muscles": [
       {
         "id": "calves",
@@ -6539,7 +6541,6 @@
     ],
     "id": "Close-Grip_Barbell_Bench_Press",
     "aliases": [
-      "Close-Grip Bench Press",
       "Close Grip Bench",
       "CGBP"
     ],
@@ -6551,6 +6552,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Barbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Barbell_Bench_Press/1.jpg"
     ],
+    "displayName": "Close-Grip Bench Press",
     "muscles": [
       {
         "id": "triceps",
@@ -6903,7 +6905,6 @@
     ],
     "id": "Concentration_Curls",
     "aliases": [
-      "Concentration Curl",
       "Seated Concentration Curl",
       "DB Concentration Curl"
     ],
@@ -6914,6 +6915,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Concentration_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Concentration_Curls/1.jpg"
     ],
+    "displayName": "Concentration Curl",
     "muscles": [
       {
         "id": "biceps",
@@ -7185,7 +7187,6 @@
     ],
     "id": "Crunches",
     "aliases": [
-      "Crunch",
       "Floor Crunch"
     ],
     "muscleGroups": [
@@ -7195,6 +7196,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Crunches/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Crunches/1.jpg"
     ],
+    "displayName": "Crunch",
     "muscles": [
       {
         "id": "abs",
@@ -7432,7 +7434,6 @@
     ],
     "id": "Decline_Barbell_Bench_Press",
     "aliases": [
-      "Decline Bench Press",
       "Decline Bench"
     ],
     "muscleGroups": [
@@ -7442,6 +7443,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Barbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Barbell_Bench_Press/1.jpg"
     ],
+    "displayName": "Decline Bench Press",
     "muscles": [
       {
         "id": "mid-lower-chest",
@@ -7978,8 +7980,7 @@
     ],
     "id": "Dips_-_Chest_Version",
     "aliases": [
-      "Chest Dips",
-      "Chest Dip"
+      "Chest Dips"
     ],
     "muscleGroups": [
       "Chest",
@@ -7989,6 +7990,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Chest_Version/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Chest_Version/1.jpg"
     ],
+    "displayName": "Chest Dip",
     "muscles": [
       {
         "id": "mid-lower-chest",
@@ -8051,6 +8053,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Triceps_Version/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Triceps_Version/1.jpg"
     ],
+    "displayName": "Triceps Dip",
     "muscles": [
       {
         "id": "triceps",
@@ -8569,7 +8572,6 @@
       "Bicep Curl",
       "Biceps Curl",
       "Bicep Curls",
-      "Dumbbell Curl",
       "Dumbbell Curls",
       "DB Curl",
       "Dumbbell Biceps Curl"
@@ -8581,6 +8583,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Bicep_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Bicep_Curl/1.jpg"
     ],
+    "displayName": "Dumbbell Curl",
     "muscles": [
       {
         "id": "biceps",
@@ -8699,7 +8702,6 @@
     ],
     "id": "Dumbbell_Flyes",
     "aliases": [
-      "Dumbbell Fly",
       "DB Fly",
       "Flat Dumbbell Fly"
     ],
@@ -8710,6 +8712,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Flyes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Flyes/1.jpg"
     ],
+    "displayName": "Dumbbell Fly",
     "muscles": [
       {
         "id": "pecs",
@@ -8758,7 +8761,6 @@
     ],
     "id": "Dumbbell_Incline_Row",
     "aliases": [
-      "Chest-Supported Dumbbell Row",
       "Chest-Supported Row",
       "Incline Dumbbell Row",
       "Incline DB Row"
@@ -8770,6 +8772,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Incline_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Incline_Row/1.jpg"
     ],
+    "displayName": "Chest-Supported Dumbbell Row",
     "muscles": [
       {
         "id": "lats",
@@ -8860,7 +8863,6 @@
     "aliases": [
       "Lunge",
       "Lunges",
-      "Dumbbell Lunge",
       "DB Lunge",
       "DB Lunges",
       "Dumbbell Forward Lunge"
@@ -8872,6 +8874,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Lunges/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Lunges/1.jpg"
     ],
+    "displayName": "Dumbbell Lunge",
     "muscles": [
       {
         "id": "quads",
@@ -9218,7 +9221,6 @@
     ],
     "id": "Dumbbell_Rear_Lunge",
     "aliases": [
-      "Reverse Lunge",
       "Reverse Lunges",
       "Dumbbell Reverse Lunge",
       "DB Reverse Lunge"
@@ -9230,6 +9232,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Rear_Lunge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Rear_Lunge/1.jpg"
     ],
+    "displayName": "Reverse Lunge",
     "muscles": [
       {
         "id": "quads",
@@ -9619,7 +9622,6 @@
     "aliases": [
       "Step-Ups",
       "Step-Up",
-      "Dumbbell Step-Up",
       "DB Step-Up"
     ],
     "muscleGroups": [
@@ -9629,6 +9631,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Step_Ups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Step_Ups/1.jpg"
     ],
+    "displayName": "Dumbbell Step-Up",
     "muscles": [
       {
         "id": "quads",
@@ -9829,9 +9832,7 @@
     ],
     "id": "EZ-Bar_Skullcrusher",
     "aliases": [
-      "Skull Crusher",
       "Skull Crushers",
-      "Skullcrusher",
       "Skullcrushers",
       "EZ Bar Skull Crusher"
     ],
@@ -9842,6 +9843,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/EZ-Bar_Skullcrusher/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/EZ-Bar_Skullcrusher/1.jpg"
     ],
+    "displayName": "Skull Crusher",
     "muscles": [
       {
         "id": "triceps",
@@ -10043,7 +10045,6 @@
     ],
     "id": "Elliptical_Trainer",
     "aliases": [
-      "Elliptical",
       "Elliptical Machine",
       "Cross Trainer"
     ],
@@ -10054,6 +10055,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Elliptical_Trainer/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Elliptical_Trainer/1.jpg"
     ],
+    "displayName": "Elliptical",
     "muscles": [
       {
         "id": "quads",
@@ -10555,7 +10557,6 @@
     ],
     "id": "Flat_Bench_Lying_Leg_Raise",
     "aliases": [
-      "Lying Leg Raise",
       "Lying Leg Raises",
       "Bench Leg Raise"
     ],
@@ -10566,6 +10567,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Flat_Bench_Lying_Leg_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Flat_Bench_Lying_Leg_Raise/1.jpg"
     ],
+    "displayName": "Lying Leg Raise",
     "muscles": [
       {
         "id": "abs",
@@ -10977,7 +10979,6 @@
     ],
     "id": "Front_Barbell_Squat",
     "aliases": [
-      "Front Squat",
       "Front Squats",
       "Barbell Front Squat"
     ],
@@ -10988,6 +10989,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Barbell_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Barbell_Squat/1.jpg"
     ],
+    "displayName": "Front Squat",
     "muscles": [
       {
         "id": "quads",
@@ -11080,7 +11082,6 @@
     ],
     "id": "Front_Box_Jump",
     "aliases": [
-      "Box Jump",
       "Box Jumps"
     ],
     "muscleGroups": [
@@ -11090,6 +11091,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Box_Jump/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Box_Jump/1.jpg"
     ],
+    "displayName": "Box Jump",
     "muscles": [
       {
         "id": "quads",
@@ -11210,7 +11212,6 @@
     "id": "Front_Dumbbell_Raise",
     "aliases": [
       "Front Raise",
-      "Dumbbell Front Raise",
       "DB Front Raise"
     ],
     "muscleGroups": [
@@ -11220,6 +11221,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Dumbbell_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Dumbbell_Raise/1.jpg"
     ],
+    "displayName": "Dumbbell Front Raise",
     "muscles": [
       {
         "id": "front-delt",
@@ -11556,7 +11558,6 @@
     "id": "Glute_Ham_Raise",
     "aliases": [
       "GHR",
-      "Glute-Ham Raise",
       "GHD Raise"
     ],
     "muscleGroups": [
@@ -11566,6 +11567,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Glute_Ham_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Glute_Ham_Raise/1.jpg"
     ],
+    "displayName": "Glute-Ham Raise",
     "muscles": [
       {
         "id": "hamstrings",
@@ -11982,7 +11984,6 @@
     ],
     "id": "Hammer_Curls",
     "aliases": [
-      "Hammer Curl",
       "Dumbbell Hammer Curl",
       "DB Hammer Curl"
     ],
@@ -11993,6 +11994,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hammer_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hammer_Curls/1.jpg"
     ],
+    "displayName": "Hammer Curl",
     "muscles": [
       {
         "id": "brachialis",
@@ -12774,7 +12776,6 @@
     ],
     "id": "Hyperextensions_Back_Extensions",
     "aliases": [
-      "Back Extension",
       "Back Extensions",
       "Hyperextension",
       "45-Degree Back Extension",
@@ -12788,6 +12789,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hyperextensions_Back_Extensions/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hyperextensions_Back_Extensions/1.jpg"
     ],
+    "displayName": "Back Extension",
     "muscles": [
       {
         "id": "lower-back",
@@ -13191,7 +13193,6 @@
     ],
     "id": "Incline_Dumbbell_Flyes",
     "aliases": [
-      "Incline Dumbbell Fly",
       "Incline DB Fly",
       "Incline Fly"
     ],
@@ -13202,6 +13203,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Flyes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Flyes/1.jpg"
     ],
+    "displayName": "Incline Dumbbell Fly",
     "muscles": [
       {
         "id": "upper-chest",
@@ -14789,8 +14791,6 @@
     ],
     "id": "Kettlebell_Turkish_Get-Up_Lunge_style",
     "aliases": [
-      "Turkish Get-Up",
-      "Turkish Getup",
       "TGU"
     ],
     "muscleGroups": [
@@ -14801,6 +14801,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Turkish_Get-Up_Lunge_style/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Turkish_Get-Up_Lunge_style/1.jpg"
     ],
+    "displayName": "Turkish Get-Up",
     "muscles": [
       {
         "id": "deltoids",
@@ -15027,7 +15028,6 @@
     ],
     "id": "Knee_Hip_Raise_On_Parallel_Bars",
     "aliases": [
-      "Captain's Chair Knee Raise",
       "Vertical Knee Raise",
       "Roman Chair Knee Raise"
     ],
@@ -15038,6 +15038,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Knee_Hip_Raise_On_Parallel_Bars/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Knee_Hip_Raise_On_Parallel_Bars/1.jpg"
     ],
+    "displayName": "Captain's Chair Knee Raise",
     "muscles": [
       {
         "id": "abs",
@@ -15708,7 +15709,6 @@
     ],
     "id": "Leg_Extensions",
     "aliases": [
-      "Leg Extension",
       "Leg Extension Machine",
       "Quad Extension",
       "Knee Extension"
@@ -15720,6 +15720,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leg_Extensions/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leg_Extensions/1.jpg"
     ],
+    "displayName": "Leg Extension",
     "muscles": [
       {
         "id": "quads",
@@ -15890,7 +15891,6 @@
     "id": "Leverage_Chest_Press",
     "aliases": [
       "Chest Press",
-      "Machine Chest Press",
       "Chest Press Machine",
       "Seated Chest Press"
     ],
@@ -15901,6 +15901,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Chest_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Chest_Press/1.jpg"
     ],
+    "displayName": "Machine Chest Press",
     "muscles": [
       {
         "id": "pecs",
@@ -16045,7 +16046,6 @@
     "id": "Leverage_Incline_Chest_Press",
     "aliases": [
       "Incline Chest Press",
-      "Machine Incline Press",
       "Incline Machine Press"
     ],
     "muscleGroups": [
@@ -16055,6 +16055,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Incline_Chest_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Incline_Chest_Press/1.jpg"
     ],
+    "displayName": "Machine Incline Press",
     "muscles": [
       {
         "id": "upper-chest",
@@ -16103,7 +16104,6 @@
     ],
     "id": "Leverage_Iso_Row",
     "aliases": [
-      "Machine Row",
       "Seated Machine Row",
       "Chest-Supported Machine Row"
     ],
@@ -16114,6 +16114,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Iso_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Iso_Row/1.jpg"
     ],
+    "displayName": "Machine Row",
     "muscles": [
       {
         "id": "lats",
@@ -16432,7 +16433,6 @@
     ],
     "id": "Low_Cable_Crossover",
     "aliases": [
-      "Low-to-High Cable Fly",
       "Low Cable Fly"
     ],
     "muscleGroups": [
@@ -16442,6 +16442,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Low_Cable_Crossover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Low_Cable_Crossover/1.jpg"
     ],
+    "displayName": "Low-to-High Cable Fly",
     "muscles": [
       {
         "id": "upper-chest",
@@ -16899,9 +16900,7 @@
     ],
     "id": "Lying_Dumbbell_Tricep_Extension",
     "aliases": [
-      "Dumbbell Skull Crusher",
-      "DB Skull Crusher",
-      "Dumbbell Skullcrusher"
+      "DB Skull Crusher"
     ],
     "muscleGroups": [
       "Arms"
@@ -16910,6 +16909,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Dumbbell_Tricep_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Dumbbell_Tricep_Extension/1.jpg"
     ],
+    "displayName": "Dumbbell Skull Crusher",
     "muscles": [
       {
         "id": "triceps",
@@ -17102,7 +17102,6 @@
     ],
     "id": "Lying_Leg_Curls",
     "aliases": [
-      "Lying Leg Curl",
       "Prone Leg Curl",
       "Lying Hamstring Curl"
     ],
@@ -17113,6 +17112,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Leg_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Leg_Curls/1.jpg"
     ],
+    "displayName": "Lying Leg Curl",
     "muscles": [
       {
         "id": "hamstrings",
@@ -17504,7 +17504,6 @@
     ],
     "id": "Machine_Shoulder_Military_Press",
     "aliases": [
-      "Machine Shoulder Press",
       "Shoulder Press Machine",
       "Seated Shoulder Press Machine"
     ],
@@ -17515,6 +17514,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Shoulder_Military_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Shoulder_Military_Press/1.jpg"
     ],
+    "displayName": "Machine Shoulder Press",
     "muscles": [
       {
         "id": "deltoids",
@@ -17831,9 +17831,6 @@
       "Mountain_Climbers/1.jpg"
     ],
     "id": "Mountain_Climbers",
-    "aliases": [
-      "Mountain Climber"
-    ],
     "muscleGroups": [
       "Core"
     ],
@@ -17841,6 +17838,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Mountain_Climbers/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Mountain_Climbers/1.jpg"
     ],
+    "displayName": "Mountain Climber",
     "muscles": [
       {
         "id": "abs",
@@ -18109,7 +18107,6 @@
     ],
     "id": "Natural_Glute_Ham_Raise",
     "aliases": [
-      "Nordic Curl",
       "Nordic Curls",
       "Nordic Hamstring Curl"
     ],
@@ -18120,6 +18117,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Natural_Glute_Ham_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Natural_Glute_Ham_Raise/1.jpg"
     ],
+    "displayName": "Nordic Curl",
     "muscles": [
       {
         "id": "hamstrings",
@@ -18923,6 +18921,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Swings/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Swings/1.jpg"
     ],
+    "displayName": "One-Arm Kettlebell Swing",
     "muscles": [
       {
         "id": "glute-max",
@@ -19189,7 +19188,6 @@
     ],
     "id": "One-Legged_Cable_Kickback",
     "aliases": [
-      "Cable Glute Kickback",
       "Glute Cable Kickback"
     ],
     "muscleGroups": [
@@ -19199,6 +19197,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Legged_Cable_Kickback/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Legged_Cable_Kickback/1.jpg"
     ],
+    "displayName": "Cable Glute Kickback",
     "muscles": [
       {
         "id": "glute-max",
@@ -19771,7 +19770,6 @@
     ],
     "id": "Overhead_Slam",
     "aliases": [
-      "Ball Slam",
       "Ball Slams",
       "Medicine Ball Slam",
       "Med Ball Slam",
@@ -19785,6 +19783,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Overhead_Slam/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Overhead_Slam/1.jpg"
     ],
+    "displayName": "Ball Slam",
     "muscles": [
       {
         "id": "lats",
@@ -21166,10 +21165,6 @@
       "Pull_Through/1.jpg"
     ],
     "id": "Pull_Through",
-    "aliases": [
-      "Cable Pull-Through",
-      "Cable Pull Through"
-    ],
     "muscleGroups": [
       "Legs"
     ],
@@ -21177,6 +21172,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pull_Through/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pull_Through/1.jpg"
     ],
+    "displayName": "Cable Pull-Through",
     "muscles": [
       {
         "id": "glute-max",
@@ -21227,9 +21223,7 @@
     ],
     "id": "Pullups",
     "aliases": [
-      "Pull-Up",
-      "Pull-Ups",
-      "Pull Up"
+      "Pull-Ups"
     ],
     "muscleGroups": [
       "Back"
@@ -21238,6 +21232,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pullups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pullups/1.jpg"
     ],
+    "displayName": "Pull-Up",
     "muscles": [
       {
         "id": "lats",
@@ -21322,8 +21317,6 @@
     ],
     "id": "Push-Ups_-_Close_Triceps_Position",
     "aliases": [
-      "Diamond Push-Up",
-      "Diamond Push-Ups",
       "Close-Grip Push-Up",
       "Triangle Push-Up"
     ],
@@ -21334,6 +21327,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push-Ups_-_Close_Triceps_Position/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push-Ups_-_Close_Triceps_Position/1.jpg"
     ],
+    "displayName": "Diamond Push-Up",
     "muscles": [
       {
         "id": "triceps",
@@ -21576,8 +21570,6 @@
     ],
     "id": "Pushups",
     "aliases": [
-      "Push-Ups",
-      "Push Up",
       "Press-Up",
       "Press-Ups"
     ],
@@ -21588,6 +21580,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pushups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pushups/1.jpg"
     ],
+    "displayName": "Push-Up",
     "muscles": [
       {
         "id": "pecs",
@@ -21861,7 +21854,6 @@
     ],
     "id": "Rack_Pulls",
     "aliases": [
-      "Rack Pull",
       "Block Pull"
     ],
     "muscleGroups": [
@@ -21872,6 +21864,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rack_Pulls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rack_Pulls/1.jpg"
     ],
+    "displayName": "Rack Pull",
     "muscles": [
       {
         "id": "lower-back",
@@ -22576,7 +22569,6 @@
     ],
     "id": "Reverse_Machine_Flyes",
     "aliases": [
-      "Reverse Pec Deck",
       "Rear Delt Machine",
       "Reverse Machine Fly",
       "Rear Delt Fly Machine"
@@ -22588,6 +22580,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Machine_Flyes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Machine_Flyes/1.jpg"
     ],
+    "displayName": "Reverse Pec Deck",
     "muscles": [
       {
         "id": "rear-delt",
@@ -23107,7 +23100,6 @@
     ],
     "id": "Rope_Jumping",
     "aliases": [
-      "Jump Rope",
       "Jumping Rope",
       "Skipping Rope",
       "Skipping"
@@ -23119,6 +23111,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rope_Jumping/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rope_Jumping/1.jpg"
     ],
+    "displayName": "Jump Rope",
     "muscles": [
       {
         "id": "calves",
@@ -23234,7 +23227,6 @@
     "id": "Rowing_Stationary",
     "aliases": [
       "Rowing",
-      "Rowing Machine",
       "Rower",
       "Indoor Rowing",
       "Erg"
@@ -23247,6 +23239,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rowing_Stationary/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rowing_Stationary/1.jpg"
     ],
+    "displayName": "Rowing Machine",
     "muscles": [
       {
         "id": "quads",
@@ -23339,7 +23332,6 @@
     "id": "Running_Treadmill",
     "aliases": [
       "Treadmill",
-      "Treadmill Run",
       "Treadmill Running"
     ],
     "muscleGroups": [
@@ -23349,6 +23341,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Running_Treadmill/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Running_Treadmill/1.jpg"
     ],
+    "displayName": "Treadmill Run",
     "muscles": [
       {
         "id": "quads",
@@ -23724,7 +23717,6 @@
       "Rear Delt Raise",
       "Bent-Over Rear Delt Raise",
       "Rear Delt Fly",
-      "Dumbbell Rear Delt Fly",
       "Bent-Over Reverse Fly"
     ],
     "muscleGroups": [
@@ -23734,6 +23726,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Bent-Over_Rear_Delt_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Bent-Over_Rear_Delt_Raise/1.jpg"
     ],
+    "displayName": "Dumbbell Rear Delt Fly",
     "muscles": [
       {
         "id": "rear-delt",
@@ -23850,7 +23843,6 @@
     ],
     "id": "Seated_Cable_Rows",
     "aliases": [
-      "Seated Cable Row",
       "Cable Row",
       "Seated Row",
       "Cable Rows"
@@ -23862,6 +23854,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Cable_Rows/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Cable_Rows/1.jpg"
     ],
+    "displayName": "Seated Cable Row",
     "muscles": [
       {
         "id": "lats",
@@ -24683,7 +24676,6 @@
     ],
     "id": "Seated_Palm-Up_Barbell_Wrist_Curl",
     "aliases": [
-      "Wrist Curl",
       "Wrist Curls",
       "Barbell Wrist Curl"
     ],
@@ -24694,6 +24686,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palm-Up_Barbell_Wrist_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palm-Up_Barbell_Wrist_Curl/1.jpg"
     ],
+    "displayName": "Wrist Curl",
     "muscles": [
       {
         "id": "forearms",
@@ -24734,7 +24727,6 @@
     ],
     "id": "Seated_Palms-Down_Barbell_Wrist_Curl",
     "aliases": [
-      "Reverse Wrist Curl",
       "Reverse Wrist Curls",
       "Barbell Reverse Wrist Curl"
     ],
@@ -24745,6 +24737,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palms-Down_Barbell_Wrist_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palms-Down_Barbell_Wrist_Curl/1.jpg"
     ],
+    "displayName": "Reverse Wrist Curl",
     "muscles": [
       {
         "id": "forearms",
@@ -25088,7 +25081,6 @@
     ],
     "id": "Side_Bridge",
     "aliases": [
-      "Side Plank",
       "Side Planks"
     ],
     "muscleGroups": [
@@ -25098,6 +25090,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Bridge/1.jpg"
     ],
+    "displayName": "Side Plank",
     "muscles": [
       {
         "id": "obliques",
@@ -25205,7 +25198,6 @@
     "aliases": [
       "Lateral Raise",
       "Lateral Raises",
-      "Dumbbell Lateral Raise",
       "DB Lateral Raise",
       "Side Raise",
       "Side Laterals"
@@ -25217,6 +25209,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Lateral_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Lateral_Raise/1.jpg"
     ],
+    "displayName": "Dumbbell Lateral Raise",
     "muscles": [
       {
         "id": "side-delt",
@@ -25890,6 +25883,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Single_Leg_Glute_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Single_Leg_Glute_Bridge/1.jpg"
     ],
+    "displayName": "Single-Leg Glute Bridge",
     "muscles": [
       {
         "id": "glute-max",
@@ -27693,7 +27687,6 @@
     ],
     "id": "Split_Squat_with_Dumbbells",
     "aliases": [
-      "Bulgarian Split Squat",
       "Bulgarian Split Squats",
       "Dumbbell Bulgarian Split Squat",
       "Rear-Foot-Elevated Split Squat",
@@ -27707,6 +27700,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Squat_with_Dumbbells/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Squat_with_Dumbbells/1.jpg"
     ],
+    "displayName": "Bulgarian Split Squat",
     "muscles": [
       {
         "id": "quads",
@@ -27977,7 +27971,6 @@
     "id": "Stairmaster",
     "aliases": [
       "Stairs",
-      "Stair Climber",
       "Stair Machine",
       "Stair Stepper"
     ],
@@ -27988,6 +27981,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stairmaster/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stairmaster/1.jpg"
     ],
+    "displayName": "Stair Climber",
     "muscles": [
       {
         "id": "quads",
@@ -28200,7 +28194,6 @@
     ],
     "id": "Standing_Biceps_Cable_Curl",
     "aliases": [
-      "Cable Curl",
       "Cable Curls",
       "Cable Bicep Curl",
       "Cable Biceps Curl"
@@ -28212,6 +28205,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Biceps_Cable_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Biceps_Cable_Curl/1.jpg"
     ],
+    "displayName": "Cable Curl",
     "muscles": [
       {
         "id": "biceps",
@@ -28398,8 +28392,6 @@
     ],
     "id": "Standing_Cable_Wood_Chop",
     "aliases": [
-      "Cable Woodchop",
-      "Cable Wood Chop",
       "Wood Chop",
       "Woodchop",
       "Woodchopper"
@@ -28411,6 +28403,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Cable_Wood_Chop/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Cable_Wood_Chop/1.jpg"
     ],
+    "displayName": "Cable Woodchop",
     "muscles": [
       {
         "id": "obliques",
@@ -28456,7 +28449,6 @@
     "aliases": [
       "Calf Raise",
       "Calf Raises",
-      "Standing Calf Raise",
       "Standing Calf Raise Machine",
       "Calf Raise Machine"
     ],
@@ -28467,6 +28459,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Calf_Raises/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Calf_Raises/1.jpg"
     ],
+    "displayName": "Standing Calf Raise",
     "muscles": [
       {
         "id": "calves",
@@ -28537,7 +28530,6 @@
     ],
     "id": "Standing_Dumbbell_Calf_Raise",
     "aliases": [
-      "Dumbbell Calf Raise",
       "DB Calf Raise"
     ],
     "muscleGroups": [
@@ -28547,6 +28539,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Calf_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Calf_Raise/1.jpg"
     ],
+    "displayName": "Dumbbell Calf Raise",
     "muscles": [
       {
         "id": "calves",
@@ -28692,6 +28685,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Triceps_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Triceps_Extension/1.jpg"
     ],
+    "displayName": "Dumbbell Overhead Triceps Extension",
     "muscles": [
       {
         "id": "triceps",
@@ -29097,7 +29091,6 @@
     ],
     "id": "Standing_Low-Pulley_Deltoid_Raise",
     "aliases": [
-      "Cable Lateral Raise",
       "One-Arm Cable Lateral Raise",
       "Single-Arm Cable Lateral Raise"
     ],
@@ -29108,6 +29101,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Low-Pulley_Deltoid_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Low-Pulley_Deltoid_Raise/1.jpg"
     ],
+    "displayName": "Cable Lateral Raise",
     "muscles": [
       {
         "id": "side-delt",
@@ -29188,7 +29182,6 @@
     ],
     "id": "Standing_Military_Press",
     "aliases": [
-      "Overhead Press",
       "OHP",
       "Military Press",
       "Barbell Overhead Press",
@@ -29201,6 +29194,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Military_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Military_Press/1.jpg"
     ],
+    "displayName": "Overhead Press",
     "muscles": [
       {
         "id": "deltoids",
@@ -29793,7 +29787,6 @@
     ],
     "id": "Stiff-Legged_Barbell_Deadlift",
     "aliases": [
-      "Stiff-Leg Deadlift",
       "Stiff-Legged Deadlift",
       "Straight-Leg Deadlift",
       "SLDL"
@@ -29805,6 +29798,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Barbell_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Barbell_Deadlift/1.jpg"
     ],
+    "displayName": "Stiff-Leg Deadlift",
     "muscles": [
       {
         "id": "hamstrings",
@@ -29857,7 +29851,6 @@
     "aliases": [
       "Dumbbell RDL",
       "DB RDL",
-      "Dumbbell Romanian Deadlift",
       "Dumbbell Stiff-Leg Deadlift"
     ],
     "muscleGroups": [
@@ -29867,6 +29860,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Dumbbell_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Dumbbell_Deadlift/1.jpg"
     ],
+    "displayName": "Dumbbell Romanian Deadlift",
     "muscles": [
       {
         "id": "hamstrings",
@@ -29985,7 +29979,6 @@
     ],
     "id": "Straight-Arm_Dumbbell_Pullover",
     "aliases": [
-      "Dumbbell Pullover",
       "DB Pullover"
     ],
     "muscleGroups": [
@@ -29996,6 +29989,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Straight-Arm_Dumbbell_Pullover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Straight-Arm_Dumbbell_Pullover/1.jpg"
     ],
+    "displayName": "Dumbbell Pullover",
     "muscles": [
       {
         "id": "lats",
@@ -30727,7 +30721,6 @@
     ],
     "id": "T-Bar_Row_with_Handle",
     "aliases": [
-      "T-Bar Row",
       "T-Bar Rows",
       "Landmine Row"
     ],
@@ -30738,6 +30731,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/T-Bar_Row_with_Handle/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/T-Bar_Row_with_Handle/1.jpg"
     ],
+    "displayName": "T-Bar Row",
     "muscles": [
       {
         "id": "lats",
@@ -30862,7 +30856,6 @@
     "aliases": [
       "Abduction",
       "Hip Abduction",
-      "Hip Abduction Machine",
       "Abductor Machine",
       "Outer Thigh Machine"
     ],
@@ -30873,6 +30866,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Abductor/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Abductor/1.jpg"
     ],
+    "displayName": "Hip Abduction Machine",
     "muscles": [
       {
         "id": "glute-med",
@@ -30920,7 +30914,6 @@
     "aliases": [
       "Adduction",
       "Hip Adduction",
-      "Hip Adduction Machine",
       "Adductor Machine",
       "Inner Thigh Machine"
     ],
@@ -30931,6 +30924,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Adductor/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Adductor/1.jpg"
     ],
+    "displayName": "Hip Adduction Machine",
     "muscles": [
       {
         "id": "adductors",
@@ -31172,7 +31166,6 @@
     ],
     "id": "Tricep_Dumbbell_Kickback",
     "aliases": [
-      "Triceps Kickback",
       "Tricep Kickback",
       "Dumbbell Kickback",
       "DB Kickback"
@@ -31184,6 +31177,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tricep_Dumbbell_Kickback/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tricep_Dumbbell_Kickback/1.jpg"
     ],
+    "displayName": "Triceps Kickback",
     "muscles": [
       {
         "id": "triceps",
@@ -31348,6 +31342,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Pushdown_-_Rope_Attachment/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Pushdown_-_Rope_Attachment/1.jpg"
     ],
+    "displayName": "Triceps Pushdown (Rope)",
     "muscles": [
       {
         "id": "triceps",
@@ -31733,7 +31728,6 @@
     ],
     "id": "Upright_Barbell_Row",
     "aliases": [
-      "Upright Row",
       "Barbell Upright Row",
       "BB Upright Row"
     ],
@@ -31745,6 +31739,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Upright_Barbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Upright_Barbell_Row/1.jpg"
     ],
+    "displayName": "Upright Row",
     "muscles": [
       {
         "id": "side-delt",
@@ -31896,7 +31891,6 @@
     ],
     "id": "V-Bar_Pulldown",
     "aliases": [
-      "Close-Grip Lat Pulldown",
       "Close-Grip Pulldown",
       "V-Grip Pulldown",
       "Neutral-Grip Pulldown"
@@ -31908,6 +31902,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/V-Bar_Pulldown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/V-Bar_Pulldown/1.jpg"
     ],
+    "displayName": "Close-Grip Lat Pulldown",
     "muscles": [
       {
         "id": "lats",
@@ -32025,7 +32020,6 @@
     ],
     "id": "Walking_Treadmill",
     "aliases": [
-      "Treadmill Walk",
       "Treadmill Walking",
       "Incline Walk",
       "Incline Treadmill Walk"
@@ -32037,6 +32031,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Walking_Treadmill/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Walking_Treadmill/1.jpg"
     ],
+    "displayName": "Treadmill Walk",
     "muscles": [
       {
         "id": "quads",
@@ -32256,10 +32251,6 @@
       "Weighted_Pull_Ups/1.jpg"
     ],
     "id": "Weighted_Pull_Ups",
-    "aliases": [
-      "Weighted Pull-Up",
-      "Weighted Pullup"
-    ],
     "muscleGroups": [
       "Back"
     ],
@@ -32267,6 +32258,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Weighted_Pull_Ups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Weighted_Pull_Ups/1.jpg"
     ],
+    "displayName": "Weighted Pull-Up",
     "muscles": [
       {
         "id": "lats",
@@ -32520,8 +32512,6 @@
     ],
     "id": "Wide-Grip_Lat_Pulldown",
     "aliases": [
-      "Lat Pulldown",
-      "Lat Pull-Down",
       "Lat Pulldowns",
       "Wide-Grip Pulldown"
     ],
@@ -32532,6 +32522,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Lat_Pulldown/1.jpg"
     ],
+    "displayName": "Lat Pulldown",
     "muscles": [
       {
         "id": "lats",
@@ -33477,7 +33468,8 @@
     "id": "own-fan-bike",
     "aliases": [
       "Assault Bike",
-      "Echo Bike"
+      "Echo Bike",
+      "Air Bike"
     ],
     "muscleGroups": [
       "Legs"
@@ -33610,5 +33602,830 @@
     "unilateral": false,
     "common": true,
     "family": "fam-dip"
+  },
+  {
+    "name": "Landmine Press",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "chest",
+      "triceps"
+    ],
+    "instructions": [
+      "Wedge one end of a barbell into a landmine or a corner and load the other end. Stand facing it and hold the loaded end at your shoulder.",
+      "Brace your abs and press the bar up and forward until your arm is straight, letting your shoulder blade move with it.",
+      "Lower the bar back to your shoulder under control, then repeat. Press with one hand or both."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-landmine-press",
+    "aliases": [
+      "Landmine Shoulder Press",
+      "Half-Kneeling Landmine Press",
+      "Landmine Presses"
+    ],
+    "muscleGroups": [
+      "Shoulders"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "barbell",
+      "landmine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
+  },
+  {
+    "name": "Z Press",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "abdominals"
+    ],
+    "instructions": [
+      "Sit on the floor with your legs straight out in front of you, a barbell racked at shoulder height or cleaned to your front shoulders.",
+      "Sit tall without leaning back and press the bar straight overhead until your arms are locked out.",
+      "Lower the bar to your upper chest under control, then repeat. The floor takes your legs out, so your trunk has to hold you upright."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-z-press",
+    "aliases": [
+      "Barbell Z Press",
+      "Seated Barbell Z Press"
+    ],
+    "muscleGroups": [
+      "Shoulders"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
+  },
+  {
+    "name": "Pendlay Row",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "lats",
+      "middle back"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "shoulders",
+      "lower back"
+    ],
+    "instructions": [
+      "Stand over a barbell on the floor, feet hip-width apart. Hinge until your torso is close to parallel with the floor and grip the bar just outside your knees.",
+      "Keeping your back flat, pull the bar explosively to your lower chest.",
+      "Lower it all the way back to the floor and let it settle before the next rep."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-pendlay-row",
+    "aliases": [
+      "Pendlay Rows",
+      "Dead-Stop Barbell Row"
+    ],
+    "muscleGroups": [
+      "Back"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
+  },
+  {
+    "name": "Meadows Row",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "lats",
+      "middle back"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "shoulders"
+    ],
+    "instructions": [
+      "Load one end of a barbell in a landmine or corner. Stand side-on to the loaded end in a staggered stance and hinge forward.",
+      "Grip the end of the bar overhand with the hand farther from the landmine, and rest your other forearm on your front knee.",
+      "Pull the bar up and back toward your hip, then lower it until your arm is straight. Finish the set, then switch sides."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-meadows-row",
+    "aliases": [
+      "Meadows Rows",
+      "Landmine Meadows Row"
+    ],
+    "muscleGroups": [
+      "Back"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "barbell",
+      "landmine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-row"
+  },
+  {
+    "name": "Seal Row",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "lats",
+      "middle back"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "shoulders"
+    ],
+    "instructions": [
+      "Set a flat bench high enough that your arms hang straight without the weight touching the floor. Lie face down on it with a barbell or dumbbells below you.",
+      "Keeping your chest on the bench, pull the weight up toward the underside of the bench, driving your elbows back.",
+      "Lower slowly until your arms are straight, then repeat. The bench takes your lower back out of the lift."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-seal-row",
+    "aliases": [
+      "Seal Rows",
+      "Bench Seal Row",
+      "Prone Bench Row"
+    ],
+    "muscleGroups": [
+      "Back"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
+  },
+  {
+    "name": "Single-Leg Romanian Deadlift",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "hamstrings",
+      "glutes"
+    ],
+    "secondaryMuscles": [
+      "lower back"
+    ],
+    "instructions": [
+      "Stand on one leg holding a dumbbell in the opposite hand, standing knee slightly bent.",
+      "Hinge at the hip, reaching the dumbbell toward the floor while your free leg rises behind you in line with your torso. Keep your hips square.",
+      "Stop when you feel a stretch in the standing hamstring, then drive your hip forward to stand tall. Finish the set, then switch legs."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-single-leg-rdl",
+    "aliases": [
+      "Single-Leg RDL",
+      "SL RDL",
+      "Single-Leg Dumbbell RDL",
+      "One-Leg Romanian Deadlift"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-med",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-romanian-deadlift"
+  },
+  {
+    "name": "Pendulum Squat",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "adductors"
+    ],
+    "instructions": [
+      "Step onto the platform with your back against the pad and your shoulders under the shoulder pads. Release the safety.",
+      "Bend your knees and sink as deep as you can control, letting the machine swing you back along its arc.",
+      "Drive through the whole foot to straighten your legs without locking out hard, then repeat. Set the safety when you finish."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-pendulum-squat",
+    "aliases": [
+      "Pendulum Squat Machine",
+      "Pendulum Squats"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
+  },
+  {
+    "name": "Belt Squat",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "quadriceps",
+      "glutes"
+    ],
+    "secondaryMuscles": [
+      "adductors",
+      "hamstrings"
+    ],
+    "instructions": [
+      "Put on the hip belt and clip it to the machine, standing on the platform with your feet about shoulder-width apart.",
+      "Stand up to take the weight and release the stops. Hold the handles for balance, not to pull.",
+      "Squat down as deep as you can with a tall chest, then stand back up. The load hangs from your hips, so your back carries none of it."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-belt-squat",
+    "aliases": [
+      "Belt Squat Machine",
+      "Hip Belt Squat",
+      "Belt Squats"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
+  },
+  {
+    "name": "Wall Sit",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "secondaryMuscles": [
+      "glutes"
+    ],
+    "instructions": [
+      "Stand with your back flat against a wall and walk your feet about two feet out in front of you.",
+      "Slide down the wall until your thighs are parallel to the floor and your knees are over your ankles.",
+      "Hold that position for the target time, breathing steadily, then slide back up."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-wall-sit",
+    "aliases": [
+      "Wall Sits",
+      "Wall Squat Hold"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-wall-sit"
+  },
+  {
+    "name": "Cossack Squat",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps",
+      "adductors"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "instructions": [
+      "Stand with your feet about twice shoulder-width apart, toes turned slightly out.",
+      "Shift your weight to one side and squat down over that leg, keeping the other leg straight with its toes pointing up.",
+      "Go as deep as you can with your heel down, push back up to the middle, then repeat to the other side."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-cossack-squat",
+    "aliases": [
+      "Cossack Squats",
+      "Side-to-Side Squat"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge"
+  },
+  {
+    "name": "Copenhagen Plank",
+    "force": "static",
+    "level": "intermediate",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "adductors"
+    ],
+    "secondaryMuscles": [
+      "abdominals"
+    ],
+    "instructions": [
+      "Lie on your side next to a bench and place your top leg on it, the bench under your inner knee or ankle. Prop yourself up on your forearm.",
+      "Lift your hips until your body is in a straight line, holding yourself up with the top leg; the bottom leg can hang free or lift toward the bench.",
+      "Hold for the target time, lower your hips under control, then switch sides."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-copenhagen-plank",
+    "aliases": [
+      "Copenhagen Side Plank",
+      "Copenhagen Adductor Plank",
+      "Copenhagen Plank Hold"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "adductors",
+        "role": "primary"
+      },
+      {
+        "id": "obliques",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-adduction",
+    "equipmentList": [
+      "bench",
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-own-copenhagen-plank"
+  },
+  {
+    "name": "Bayesian Curl",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "isolation",
+    "equipment": "cable",
+    "primaryMuscles": [
+      "biceps"
+    ],
+    "secondaryMuscles": [
+      "forearms"
+    ],
+    "instructions": [
+      "Set a cable to the lowest position with a single handle. Face away from the machine and take a step forward so your arm is pulled behind your body.",
+      "Keeping your elbow pointing down and slightly behind you, curl the handle up toward your shoulder.",
+      "Lower it slowly until your arm is straight behind you, then repeat. Finish the set, then switch arms."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-bayesian-curl",
+    "aliases": [
+      "Bayesian Cable Curl",
+      "Behind-the-Body Cable Curl",
+      "Bayesian Curls"
+    ],
+    "muscleGroups": [
+      "Arms"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-curl"
+  },
+  {
+    "name": "Suitcase Carry",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "dumbbell",
+    "primaryMuscles": [
+      "abdominals",
+      "forearms"
+    ],
+    "secondaryMuscles": [
+      "traps"
+    ],
+    "instructions": [
+      "Pick up a heavy dumbbell or kettlebell in one hand, holding it at your side like a suitcase.",
+      "Stand tall without leaning toward or away from the weight and walk with short, even steps for the target time or distance.",
+      "Set the weight down under control, then carry it in the other hand."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-suitcase-carry",
+    "aliases": [
+      "Suitcase Walk",
+      "One-Arm Farmer Carry",
+      "Single-Arm Farmers Walk"
+    ],
+    "muscleGroups": [
+      "Arms",
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "carry",
+    "equipmentList": [
+      "dumbbell",
+      "kettlebell"
+    ],
+    "logAs": "weight-time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-farmers-walk"
+  },
+  {
+    "name": "Bird Dog",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abdominals",
+      "lower back"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "shoulders"
+    ],
+    "instructions": [
+      "Kneel on all fours with your hands under your shoulders and your knees under your hips, back flat.",
+      "Reach one arm forward and the opposite leg back until both are in line with your torso, without letting your hips rotate or your back sag.",
+      "Pause, bring them back under you, then repeat with the other arm and leg."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-bird-dog",
+    "aliases": [
+      "Bird Dogs",
+      "Quadruped Arm and Leg Raise"
+    ],
+    "muscleGroups": [
+      "Back",
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dead-bug"
+  },
+  {
+    "name": "Hollow Body Hold",
+    "force": "static",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abdominals"
+    ],
+    "secondaryMuscles": [],
+    "instructions": [
+      "Lie on your back with your arms overhead and your legs straight.",
+      "Press your lower back into the floor, then lift your shoulders, arms and legs a few inches off it so your body forms a shallow curve.",
+      "Hold for the target time without letting your lower back lift. Bend your knees or bring your arms forward to make it easier."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-hollow-body-hold",
+    "aliases": [
+      "Hollow Hold",
+      "Hollow Body",
+      "Hollow Body Holds"
+    ],
+    "muscleGroups": [
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-hollow-body-hold"
   }
 ]

@@ -30,5 +30,6 @@ drifts from what the script would write.
 
 ## What is not here
 
-Nothing from RepDB: no ids, links, images or text. RepDB is fetched live in the app and
-used unmodified, with the credit its licence requires.
+Nothing from RepDB: no ids, links, images or text. Since req-139 (DEC-064) search reads
+this library only; RepDB comes back for pictures only (req-131), fetched live and used
+unmodified, with the credit its licence requires (Settings).

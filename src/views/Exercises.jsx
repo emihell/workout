@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
-import { catalogItemToExercise, loadExerciseCatalog, searchExerciseCatalog } from '../exerciseCatalog'
+import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog'
 import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
-import { RepdbCredit } from './credits'
 import { Back, Missing } from './shared'
 import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
 import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
-import { exerciseNameMatch, nameError, pickedExercisePath } from '../exercise-names.js'
+import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } from '../exercise-names.js'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -268,6 +267,8 @@ export function ExerciseNewSearch({ returnBase = null }) {
   const [catalog, setCatalog] = useState(null)
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState('')
+  // req-139 — "Show N more from the full library"; reset on every query change.
+  const [showRest, setShowRest] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -283,7 +284,11 @@ export function ExerciseNewSearch({ returnBase = null }) {
     }
   }, [])
 
-  const hits = catalog ? searchExerciseCatalog(catalog, query) : []
+  // req-139 / DEC-064 §3 — common hits first, the rest of the library on request; with
+  // no common hit the rest shows directly (never a dead end).
+  const found = catalog ? searchCommonFirst(catalog, query) : { common: [], rest: [], restCount: 0 }
+  const restDirect = found.common.length === 0
+  const hits = restDirect || showRest ? [...found.common, ...found.rest] : found.common
 
   return (
     <Screen>
@@ -293,13 +298,21 @@ export function ExerciseNewSearch({ returnBase = null }) {
       {catalog === null && !error ? <p className="ui-sub">Loading…</p> : null}
       {catalog ? (
         <>
-          <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <Field
+            label="Search"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setShowRest(false)
+            }}
+          />
           {query.trim().length >= 2 && hits.length === 0 ? <p className="ui-sub">No matches.</p> : null}
           <List>
             {hits.map((item) => {
-              // req-127 — the shared name match (trimmed, case-insensitive): live wins,
-              // else the newest archived one is offered for Restore (same id, DEC-059 §3).
-              const match = exerciseNameMatch(store.exercises, item.name)
+              // req-127 — live wins, else the newest archived one is offered for Restore
+              // (same id, DEC-059 §3). req-139 — matched by libraryId, then display name,
+              // then free-db name.
+              const match = libraryItemMatch(store.exercises, item)
               const action = match?.kind === 'live' ? (
                 <NavLink to={pickedExercisePath(paths, returnBase, match.exercise.id)} look="secondary">
                   {returnBase ? 'Add to routine' : 'Already added'}
@@ -327,15 +340,18 @@ export function ExerciseNewSearch({ returnBase = null }) {
               )
               return (
                 <Row key={item.id || item.name} action={action}>
-                  {item.name} — {item.equipment || 'bodyweight'}
+                  {shownName(item)} — {item.equipment || 'bodyweight'}
                 </Row>
               )
             })}
           </List>
+          {!restDirect && !showRest && found.restCount > 0 ? (
+            <Button variant="quiet" block onClick={() => setShowRest(true)}>
+              Show {found.restCount} more from the full library
+            </Button>
+          ) : null}
         </>
       ) : null}
-      {/* req-130 — Search shows RepDB data: its licence asks for a visible credit. */}
-      <RepdbCredit />
     </Screen>
   )
 }

@@ -24,6 +24,9 @@
 //                      contains it). Repeatable, applied in order, so a state
 //                      behind two taps is `--click "Start" --click "Complete"`.
 //                      Exits non-zero, with no PNG, when the text isn't found.
+//   --type "<text>"    req-139: type <text> into the first visible text field.
+//                      --type and --click run in the order given, so a state
+//                      behind a search is `--type "press" --click "more from"`.
 //   --scroll-bottom    req-129: scroll the page and every scrollable container to
 //                      the bottom before the shot (content below the fold)
 //
@@ -41,7 +44,7 @@ const DIST = join(ROOT, 'dist')
 const STORAGE_KEY = 'workout-mvp-v9' // must match src/storage.js
 
 function parseArgs(argv) {
-  const opts = { route: '/', viewport: '390x844', wait: 250, full: false, build: false, clicks: [], scrollBottom: false }
+  const opts = { route: '/', viewport: '390x844', wait: 250, full: false, build: false, actions: [], scrollBottom: false }
   const rest = []
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -54,7 +57,11 @@ function parseArgs(argv) {
     else if (a === '--click') {
       const text = argv[++i]
       if (text == null || text.trim() === '') throw new Error('--click needs the text to click')
-      opts.clicks.push(text)
+      opts.actions.push({ kind: 'click', text })
+    } else if (a === '--type') {
+      const text = argv[++i]
+      if (text == null || text === '') throw new Error('--type needs the text to type')
+      opts.actions.push({ kind: 'type', text })
     } else if (a === '--scroll-bottom') opts.scrollBottom = true
     else if (a.startsWith('--')) throw new Error(`unknown flag: ${a}`)
     else rest.push(a)
@@ -124,6 +131,18 @@ async function clickByText(page, text) {
   return result
 }
 
+// req-139: type into the first visible, enabled text field (input or textarea).
+async function typeText(page, text) {
+  const handle = await page.evaluateHandle(() =>
+    [...document.querySelectorAll('input, textarea')].find((el) =>
+      !el.disabled && el.getClientRects().length > 0 && !['checkbox', 'radio', 'button', 'submit', 'hidden'].includes(el.type)),
+  )
+  const field = handle.asElement()
+  if (!field) throw new Error('--type: no visible text field')
+  await field.click()
+  await field.type(text)
+}
+
 async function scrollToBottom(page) {
   await page.evaluate(() => {
     window.scrollTo(0, document.scrollingElement.scrollHeight)
@@ -175,8 +194,14 @@ async function main() {
     await page.waitForSelector('#root > *', { timeout: 10000 })
     const settle = () => (opts.wait > 0 ? new Promise((r) => setTimeout(r, opts.wait)) : null)
     await settle()
-    for (const text of opts.clicks) {
-      const { clicked, tag } = await clickByText(page, text)
+    for (const action of opts.actions) {
+      if (action.kind === 'type') {
+        await typeText(page, action.text)
+        await settle()
+        console.log(`Typed "${action.text}"`)
+        continue
+      }
+      const { clicked, tag } = await clickByText(page, action.text)
       await settle()
       console.log(`Clicked <${tag}> "${clicked}"  → now at ${new URL(page.url()).hash || '#/'}`)
     }
@@ -185,7 +210,7 @@ async function main() {
       await settle()
     }
     await page.screenshot({ path: outPath, fullPage: opts.full })
-    const extras = [seedValue ? 'seeded' : '', opts.clicks.length ? `${opts.clicks.length} click(s)` : '', opts.scrollBottom ? 'scrolled to bottom' : '']
+    const extras = [seedValue ? 'seeded' : '', opts.actions.length ? `${opts.actions.length} action(s)` : '', opts.scrollBottom ? 'scrolled to bottom' : '']
       .filter(Boolean)
     console.log(`Wrote ${outPath}  (route ${route}, ${w}x${h}${extras.map((e) => `, ${e}`).join('')})`)
   } finally {
