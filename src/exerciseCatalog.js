@@ -1,6 +1,7 @@
-import { EXTRA_EXERCISES } from './exerciseExtras.js'
+import { catalogNameKey, loadExerciseLibrary } from './exerciseLibrary.js'
 
-const FREE_EXERCISE_DB_URL = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/dist/exercises.json'
+// req-130 — free-exercise-db is no longer fetched: our library (exerciseLibrary.js) is a
+// pinned copy of it with the extras folded in. RepDB stays a live, unmodified fetch.
 const REPDB_URL = 'https://cdn.jsdelivr.net/gh/RepDB/exercise-dataset@main/exercises.json'
 
 const MACHINE_EQUIPMENT = new Set(['machine', 'cable'])
@@ -16,12 +17,7 @@ function fetchJson(url) {
   })
 }
 
-export function catalogNameKey(name) {
-  return String(name || '')
-    .toLowerCase()
-    .replace(/push[\s-]*ups?/g, 'pushup')
-    .replace(/[^a-z0-9]+/g, '')
-}
+export { catalogNameKey }
 
 export function fromRepdbItem(item) {
   const equipmentRaw = String(item.equipment || '').toLowerCase().replace(/_/g, ' ')
@@ -58,12 +54,13 @@ export function mergeCatalogs(primary, extra) {
 
 export function loadExerciseCatalog() {
   if (!catalogPromise) {
-    catalogPromise = Promise.allSettled([fetchJson(FREE_EXERCISE_DB_URL), fetchJson(REPDB_URL)]).then(
+    catalogPromise = Promise.allSettled([loadExerciseLibrary(), fetchJson(REPDB_URL)]).then(
       (results) => {
-        const freeDb = results[0].status === 'fulfilled' && Array.isArray(results[0].value) ? results[0].value : []
+        const library = results[0].status === 'fulfilled' && Array.isArray(results[0].value) ? results[0].value : []
         const repdbPayload = results[1].status === 'fulfilled' ? results[1].value : null
         const repdb = Array.isArray(repdbPayload?.exercises) ? repdbPayload.exercises.map(fromRepdbItem) : []
-        const merged = mergeCatalogs(freeDb, [...repdb, ...EXTRA_EXERCISES])
+        // Dedupe stays name-only (never on aliases): RepDB's "Lat Pulldown" etc. still appear.
+        const merged = mergeCatalogs(library, repdb)
         if (!merged.length) throw new Error('Could not load.')
         return merged
       },
@@ -85,6 +82,7 @@ export function searchExerciseCatalog(list, query, limit = 25) {
   const q = String(query || '').trim().toLowerCase()
   if (q.length < 2) return []
   const qCompact = compactText(q)
+  const qKey = catalogNameKey(q)
   const scored = []
   for (const item of list || []) {
     const name = String(item.name || '').toLowerCase()
@@ -93,7 +91,9 @@ export function searchExerciseCatalog(list, query, limit = 25) {
     const equipment = String(item.equipment || '').toLowerCase()
     const compactName = compactText(`${name} ${aliases}`)
     let score = -1
-    if (name === q) score = 0
+    // req-130 — a whole alias equal to the query scores like an exact name (the word
+    // split below never matched a multi-word alias).
+    if (name === q || (qKey && (item.aliases || []).some((alias) => catalogNameKey(alias) === qKey))) score = 0
     else if (name.startsWith(q) || aliases.split(/\s+/).some((alias) => alias === q)) score = 1
     else if (name.includes(q) || aliases.includes(q)) score = 2
     else if (qCompact.length >= 3 && compactName.includes(qCompact)) score = 2
@@ -121,6 +121,11 @@ export function inferExerciseType(equipment, category) {
   return 'free'
 }
 
+// req-130 — only entries of our library link back to it; RepDB hits are live-only.
+export function isLibraryItem(item) {
+  return Boolean(item?.id) && !String(item.id).startsWith('repdb-')
+}
+
 export function catalogItemToExercise(item) {
   const type = inferExerciseType(item.equipment, item.category)
   const equipmentLabel = item.equipment ? titleCase(item.equipment) : type === 'bodyweight' ? 'Bodyweight' : 'Unknown'
@@ -133,5 +138,6 @@ export function catalogItemToExercise(item) {
     weightStep: 'n/a',
     muscles: [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].map(titleCase).join(', '),
     cues: (item.instructions || []).join('\n').trim(),
+    ...(isLibraryItem(item) ? { libraryId: item.id } : {}),
   }
 }

@@ -53,6 +53,8 @@ export function exerciseFromData(data, id) {
     // req-85 — orthogonal timer flag + default target seconds.
     hasDuration: Boolean(data.hasDuration),
     durationSec: data.durationSec != null ? Number(data.durationSec) : DEFAULT_DURATION_SEC,
+    // req-130 — the library entry it was added from; absent (never null/'') otherwise.
+    ...(data.libraryId ? { libraryId: String(data.libraryId) } : {}),
   }
 }
 

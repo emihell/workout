@@ -8,6 +8,7 @@
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
 import { useEffect, useRef, useState } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
+import { lookClass } from '../views/nav-look.js'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
@@ -35,6 +36,16 @@ export function Button({ variant = 'secondary', block = false, type = 'button', 
 // | 'plain' (no library class: an in-text link). `block` = full width (button looks).
 export function NavLink({ look = 'link', ...rest }) {
   return <BaseNavLink look={look} {...rest} />
+}
+
+// ExternalLink (req-130) — a link off the app (new tab), with the text-link look.
+// Not NavLink: that one is a hash route inside the app.
+export function ExternalLink({ href, children }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={lookClass('link')}>
+      {children}
+    </a>
+  )
 }
 
 // Actions (req-122) — a screen's row of actions (`.ui-actions`). DESIGN §4 order is
