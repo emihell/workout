@@ -430,10 +430,13 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
 - **`req-140` library parity, batch 1** (READY) — gap table checkpoint, then ≤40 promote/add + aliases + `difficulty`
   + the `staple` flag (DEC-065/066). **Later batches** (req-140b…) work through the queue from the gap table, ≤40 each.
-- **`req-142` remove RepDB completely** (DEC-069) — after req-140: drop the Settings credit, RepDB comments,
+- **`req-143` library triage** (READY) — every rough entry → finish (queue) / merge (alias + hide) / hide (DEC-070).
+- **Parity batches `req-140b`…** — ≤40 each from `work/req-140-parity-queue.md` (+ req-143's finish list) until up to par.
+- **`req-142` remove RepDB completely** (DEC-069/070) — **only when up to par** (every RepDB exercise covered or
+  deliberately skipped; no rough entry shown): drop the Settings credit, RepDB comments,
   `scripts/library-gap.mjs`, the originality script's RepDB comparison, `.vendor-cache/`; req-131 uses free-db photos +
   video link only. Small.
-- **`req-141` fresh-eyes library audit** — after req-140. A fresh agent with **no RepDB context** audits every common
+- **`req-141` fresh-eyes library audit** — **after req-142** (DEC-070 §3), over **all** our exercises. A fresh agent with **no RepDB context** audits every common
   entry: displayName, aliases, tags, difficulty, text, the common list; restores natural wording in the 19 entries
   req-138 rewrote for originality (list in `reports/req-138.md`); fixes in place. Final safety net: the ≥12-token run
   check only. A coach-eye QA subagent reviews the diff.

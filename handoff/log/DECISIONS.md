@@ -1291,3 +1291,14 @@ calls stay Emilio's.
    input, reference or conditioning** (RepDB licence term 5), and nothing is traced from them.
 Supersedes DEC-065 §1 ("kept only for its pictures").
 
+## DEC-070 — library order: triage → finish batches → remove RepDB when up to par → fresh scan  (Emilio, 2026-09-24)
+
+1. **RepDB removal is its own req (req-142), and only once our database is up to par.** "Up to par" means: every RepDB
+   exercise is either covered by a written entry of ours or deliberately skipped, and no rough entry is shown.
+2. **Before that:** req-143 triages the 697 rough entries (finish / merge / hide), then parity batches (req-140b…, ≤40
+   each) finish the queue.
+3. **After removal:** req-141, a fresh agent scans **all** our exercises (naming, text, aliases…), knowing nothing of
+   RepDB. (This reorders DEC-065 §4: the scan now comes after removal.)
+4. **Images/animations are a completely separate req** (the avatar work).
+Planning's call: "ship only our schema" moves to req-132, where the readers switch to our fields.
+
