@@ -1378,3 +1378,19 @@ workout but no screen shows it since req-96; surfacing it belongs to req-149.
 5. **Process lesson (L-031):** a fresh reviewer with no history proposes undoing earlier coach and seed decisions; keep the
    applicator's before-check and a planning filter on every future scan.
 
+
+## DEC-078 — the open library/progression calls closed  (Emilio, 2026-09-24)
+
+Emilio: "1. you choose on data you have - i dont know enough to answer 2. yes 3. yes 4. yes 5. yes".
+
+1. **Rhomboids → Back, rear delts → Shoulders** — planning's call, delegated by Emilio. Data: free-db, our seed, files
+   rhomboid work as "middle back", which we map to `rhomboids` (`exerciseLibrary.js:127`, group Back `:59`); the rear
+   delt is a head of the deltoid, and our tree already has `rear-delt` under deltoids (`:95`), group Shoulders (`:60`).
+   Rear-delt flies carry rhomboids/traps as secondaries (`library/common.js:49-51`), so the back link isn't lost.
+2. **A renamed exercise keeps its `libraryId`** (req-130); relinking is req-132's "Link to library". Confirmed.
+3. **DEC-072** (merge rule; merged names redirect in search) — confirmed.
+4. **DEC-076** (only a whole-number target is judged; the rest hold until req-149) — confirmed.
+5. **DEC-077** (fresh-eyes content calls, incl. the six non-staples) — confirmed.
+
+Stale after this: the "(unconfirmed, req-130 spec)" comment at `exerciseLibrary.js:56` — Builder drops it with the next
+library req; not worth a req alone.

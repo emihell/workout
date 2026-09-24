@@ -23,7 +23,6 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 - **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
 - **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter (+ libraryId in the feedback note) → 132 → 137 →
   131 → 135 → avatars + own figures.
-- Unconfirmed calls for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename; DEC-072/076.
 - `req-10` **first-time-exercise setup flow** — waiting (Emilio 2026-09-24: "core still needs improvement");
   spec predates ~100 reqs, rescan before building. **[ux-feel]**
 
