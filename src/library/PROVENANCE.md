@@ -25,6 +25,9 @@ drifts from what the script would write.
 - On the common entries only (req-133, DEC-062; tags in `common.js`): `muscles` (tree
   nodes, primary/secondary), `pattern`, `equipmentList`, `logAs`, `unilateral`,
   `common`, `family`. free-db's own fields are never corrected in place.
+- On the common entries only (req-138; text in `text.js`): `description`, `formCues`,
+  `steps`, `mistakes` — our own writing, from free-db's instructions and general
+  training knowledge, never RepDB's.
 - `extra-*` entries (from `src/exerciseExtras.js`) and `own-*` entries (from
   `own-exercises.js`) — our text.
 
