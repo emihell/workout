@@ -40,7 +40,7 @@ Emilio writes the code — in Claude Code, not here.
   Code's checkout. `rules/WORKFLOW.md` explains why.
 - **You own the planning worktree's git (DEC-005). The worktrees stay isolated:
   planning never touches code, code never touches planning.** Yours to run — all
-  planning-branch only: `commit`, `./plan save`, `git push origin planning`. Git
+  planning-branch only: `./plan save` (the only way to commit `handoff/`, L-032), `git push origin planning`. Git
   writes work from the planning worktree (proven 2026-09-08); use `--no-optional-locks`
   for read-only queries.
 - **`plan publish` (DEC-008) and `plan closeout` (DEC-035) are yours too** — the

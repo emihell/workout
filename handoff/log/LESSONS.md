@@ -371,3 +371,10 @@ aliases stored exercises resolve through, or broke validators and pinned receipt
 current" check plus Builder's and planning's filter caught all six. **How to apply:** a fresh-eyes pass gets no history
 by design, so it always needs a gate that knows the history: a mechanical before-check, then a reviewer holding the DECs.
 
+
+## L-032 — a raw `git commit` of handoff/ skips the planning tool and trips the guards  (2026-09-24)
+
+Planner committed DEC-078 with a bare `git commit`; `.githooks/pre-commit` refused it, then auto mode denied the
+`HANDOFF=1` retry as a guard bypass, and Emilio had to authorise it by hand. `./plan save` already commits with
+`HANDOFF=1` (`plan:177`), refuses anything outside `handoff/`, and runs the drift check. **How to apply:** planning
+commits go through `./plan save "msg"` only — never a raw `git commit`, never a hand-set `HANDOFF=1`.
