@@ -407,3 +407,10 @@ browser ("covered by the unit test"). Planner's browser run then found Finish â†
 Today: finish.jsx's new redirect fires after the exit's `go('/')`, and the dropped code had been silently swallowing it (the
 reviewer had flagged it as "latent"). **How to apply:** after removing code, re-run the flows that code sat on in a real
 browser; and a reviewer's "latent" finding is re-checked whenever the code that made it latent goes away.
+
+## L-037 â€” fix a parse where every reader of the raw text sees it, not only at the save  (Builder, req-154/155, 2026-09-24)
+
+req-154 fixed the comma kg at the four saves, but the carry (`nextSeedOverrides`) still got the raw text ("22,5" never
+carried); req-155 found the DurationTimer readout showing "0s" for "30,5" while the save read 31. **How to apply:** when a
+typed value gets a parser, grep every consumer of that field's raw string (compare, carry, readout, save) and route all of
+them through the one parsed value.

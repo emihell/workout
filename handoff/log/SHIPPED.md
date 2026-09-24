@@ -1832,3 +1832,14 @@ blockers**, 1 should-fix (a trailing "22," / "22." is refused — was saved as 2
 as kg — use a number like 22,5.", no set; "62,5" → 62.5 and carries; set edit "2,5,5" → error, stays, "20,5" → 20.5;
 History edit "17,5" → 17.5; History add "abc" → error, 28 sets kept; "12,5" → 12.5. Not verified: a real Swedish iPhone
 keypad.
+
+## req-155 — decimal leftovers: "22," reads as 22; a comma duration rounds to whole seconds  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `b3851e6`…`198fbd3`, 2 commits). `kg-input.js` accepts a trailing `,`/`.`
+("22," → 22; "2,5,5", "abc", negatives still refused); new `seconds-input.js` (comma = decimal point, round half up —
+Planner's call, unconfirmed) for a timed set's Duration and the exercise default duration, inline error if unreadable;
+the DurationTimer readout/Start read the same value. Gate: Builder `check: green — lint, 59 test file(s), and the build all
+passed.` (930/930; req-155 12/12); one test edit (req-154's SetLogForm regex widened for the added duration check — kg
+check still first, not weakened). Reviewer: none (DEC-057 §1 doesn't fire — no store/model/storage/workout-log change).
+Planner's browser run: "22," → 22 kg, no error; exercise default "abc" → "Can't read 'abc' as seconds — use a number like
+30.", nothing saved; "30,5" → `durationSec: 31`; Plank log "abc" → error, 0 sets; "30,5" → readout 31s, stored 31.

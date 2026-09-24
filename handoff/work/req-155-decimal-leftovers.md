@@ -1,6 +1,6 @@
 # req-155 — decimal leftovers from req-154's review
 
-**Status: READY** (2026-09-24) — Phase 1, small bug. Gate: functional (unit + browser). No persisted-data change.
+**Status: BUILT — branch `req-155` (`198fbd3`), NOT merged.** (2026-09-24) — Phase 1, small bug. Gate: functional (unit + browser). No persisted-data change.
 Source: req-154's independent reviewer (SHIPPED req-154). DEC-058 §1 (a comma is a decimal point).
 
 1. **A trailing separator is refused** — `kg-input.js:10` `KG_NUMBER` rejects "22," and "22."; on main before req-154 "22."
