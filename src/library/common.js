@@ -157,7 +157,7 @@ const ROWS = [
   ['Plank', 'core-stability', 'bodyweight', 'abs', 'obliques front-delt', 'time', 'fam-plank', ['Front Plank', 'Forearm Plank', 'Planks']],
   ['own-hollow-body-hold', 'core-stability', 'bodyweight', 'abs', 'hip-flexors', 'time', 'fam-own-hollow-body-hold', ['Hollow Hold', 'Hollow Body', 'Hollow Body Holds']],
   ['Side_Bridge', 'core-stability', 'bodyweight', 'obliques', 'abs glute-med', 'time', 'fam-plank', ['Side Planks'], true],
-  ['Crunches', 'core-flexion', 'bodyweight', 'abs', '', 'bodyweight-reps', 'fam-crunch', ['Floor Crunch', 'Weighted Crunches', 'Tuck Crunch']],
+  ['Crunches', 'core-flexion', 'bodyweight', 'abs', '', 'bodyweight-reps', 'fam-crunch', ['Floor Crunch', 'Tuck Crunch']],
   ['Cable_Crunch', 'core-flexion', 'cable', 'abs', '', 'weight-reps', 'fam-crunch', ['Kneeling Cable Crunch', 'Cable Crunches', 'Rope Crunch']],
   ['Ab_Crunch_Machine', 'core-flexion', 'machine', 'abs', '', 'weight-reps', 'fam-crunch', ['Ab Machine', 'Crunch Machine', 'Abdominal Crunch Machine']],
   ['own-bicycle-crunch', 'core-rotation', 'bodyweight', 'abs obliques', 'hip-flexors', 'bodyweight-reps', 'fam-crunch', ['Bicycle Crunches', 'Cross-Body Crunch']],

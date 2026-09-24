@@ -24,8 +24,10 @@ const firstShown = (query) => {
   return (common.length ? common : rest)[0]?.id
 }
 
-// The req-140 parity queue's promote list (79 free-db ids), copied here so the test
-// reads nothing from handoff/.
+// The req-140 parity queue's promote list, copied here so the test reads nothing from
+// handoff/: 79 ids, minus the 7 the coach review moved out (Push-Up_Wide,
+// Wide-Grip_Barbell_Bench_Press, Seated_Side_Lateral_Raise → merge; Split_Squats,
+// Two-Arm_Kettlebell_Row, Two-Arm_Kettlebell_Clean → merge-later; Windmills → hide).
 const QUEUED = [
   'Band_Good_Morning', 'Band_Hip_Adductions', 'Barbell_Ab_Rollout', 'Barbell_Rear_Delt_Row', 'Barbell_Shrug_Behind_The_Back',
   'Bent-Arm_Barbell_Pullover', 'Body_Tricep_Press', 'Cable_Wrist_Curl', 'Cat_Stretch', 'Childs_Pose', 'Close-Grip_Dumbbell_Press',
@@ -34,16 +36,15 @@ const QUEUED = [
   'Isometric_Neck_Exercise_-_Sides', 'Kettlebell_Halo', 'Kettlebell_Sumo_High_Pull', 'Kettlebell_Windmill',
   'Kneeling_Forearm_Stretch', 'Kneeling_High_Pulley_Row', 'Kneeling_Hip_Flexor', 'Leverage_Shrug', 'Lying_One-Arm_Lateral_Raise',
   'Monster_Walk', 'One-Arm_Kettlebell_Military_Press_To_The_Side', 'One_Arm_Lat_Pulldown', 'Physioball_Hip_Bridge', 'Plate_Pinch',
-  'Plyo_Push-up', 'Power_Jerk', 'Preacher_Hammer_Dumbbell_Curl', 'Push-Up_Wide', 'Push-Ups_With_Feet_On_An_Exercise_Ball',
+  'Plyo_Push-up', 'Power_Jerk', 'Preacher_Hammer_Dumbbell_Curl', 'Push-Ups_With_Feet_On_An_Exercise_Ball',
   'Quad_Stretch', 'Reverse_Grip_Bent-Over_Rows', 'Ring_Dips', 'Rope_Climb', 'Scapular_Pull-Up', 'Scissor_Kick',
-  'Seated_Side_Lateral_Raise', 'Seated_Triceps_Press', 'Side_Leg_Raises', 'Side_Neck_Stretch', 'Single-Leg_Leg_Extension',
+  'Seated_Triceps_Press', 'Side_Leg_Raises', 'Side_Neck_Stretch', 'Single-Leg_Leg_Extension',
   'Smith_Machine_Bent_Over_Row', 'Smith_Machine_Decline_Press', 'Smith_Machine_Hip_Raise', 'Smith_Machine_Stiff-Legged_Deadlift',
-  'Smith_Machine_Upright_Row', 'Smith_Single-Leg_Split_Squat', 'Split_Jerk', 'Split_Squats', 'Standing_Barbell_Calf_Raise',
+  'Smith_Machine_Upright_Row', 'Smith_Single-Leg_Split_Squat', 'Split_Jerk', 'Standing_Barbell_Calf_Raise',
   'Standing_Barbell_Press_Behind_Neck', 'Standing_Front_Barbell_Raise_Over_Head', 'Standing_Gastrocnemius_Calf_Stretch',
   'Standing_One-Arm_Dumbbell_Triceps_Extension', 'Standing_Overhead_Barbell_Triceps_Extension', 'Suspended_Push-Up',
-  'Suspended_Split_Squat', 'Svend_Press', 'The_Straddle', 'Triceps_Stretch', 'Two-Arm_Kettlebell_Clean',
-  'Two-Arm_Kettlebell_Military_Press', 'Two-Arm_Kettlebell_Row', 'Upright_Cable_Row', 'V-Bar_Pullup',
-  'Wide-Grip_Barbell_Bench_Press', 'Wide-Grip_Pulldown_Behind_The_Neck', 'Windmills', 'Wrist_Roller',
+  'Suspended_Split_Squat', 'Svend_Press', 'The_Straddle', 'Triceps_Stretch', 'Two-Arm_Kettlebell_Military_Press', 'Upright_Cable_Row', 'V-Bar_Pullup',
+  'Wide-Grip_Pulldown_Behind_The_Neck', 'Wrist_Roller',
 ]
 
 describe('the triage', () => {
@@ -54,10 +55,10 @@ describe('the triage', () => {
     }
   })
 
-  it('697 rows: 121 finish, 133 merge, 53 merge-later, 390 hide', () => {
+  it('697 rows: 124 finish, 119 merge, 57 merge-later, 397 hide', () => {
     const count = (triage) => rows.filter((row) => row.class === triage).length
     assert.equal(rows.length, 697)
-    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [121, 133, 53, 390])
+    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 119, 57, 397])
   })
 
   it('every non-common entry that isn\'t hidden is finish; no finish row is hidden', () => {
@@ -67,8 +68,8 @@ describe('the triage', () => {
     for (const row of rows) if (row.class === 'finish') assert.ok(!byId.get(row.id).hidden, row.id)
   })
 
-  it('the 79 queued promote ids are finish', () => {
-    assert.equal(new Set(QUEUED).size, 79)
+  it('the 72 still-queued promote ids are finish', () => {
+    assert.equal(new Set(QUEUED).size, 72)
     for (const id of QUEUED) assert.equal(rowOf.get(id)?.class, 'finish', id)
   })
 
@@ -78,7 +79,7 @@ describe('the triage', () => {
       assert.equal(entry.hidden, row.class === 'finish' ? undefined : true, row.id)
       assert.equal(entry.mergedInto, row.target, row.id)
     }
-    assert.equal(hidden.length, 697 - 121)
+    assert.equal(hidden.length, 697 - 124)
     for (const entry of library) if (!rowOf.has(entry.id)) assert.ok(!('hidden' in entry) && !('mergedInto' in entry), entry.id)
   })
 
@@ -125,6 +126,19 @@ describe('hidden and mergedInto fields', () => {
     assert.deepEqual(triageProblems(library, edit('90_90_Hamstring', { target: 'Plank' })),
       ['triage 90_90_Hamstring: merge-later target "Plank" is neither a finish row nor a queued add'])
   })
+
+  // Coach review — a merge must not cross logAs or the load scale (equipment).
+  it('a merge may not cross logAs or equipment; an EZ bar counts as a barbell (fixtures)', () => {
+    const merge = (id, target) => rows.map((row) => (row.id === id ? { ...row, class: 'merge', target } : row))
+    assert.deepEqual(triageProblems(library, merge('Weighted_Crunches', 'Crunches')),
+      ['triage Weighted_Crunches: merge crosses logAs (weighted → Crunches bodyweight-reps)',
+        'triage Weighted_Crunches: merge crosses equipment (medicine ball → Crunches bodyweight)'])
+    assert.deepEqual(triageProblems(library, merge('Kettlebell_Thruster', 'own-thruster')),
+      ['triage Kettlebell_Thruster: merge crosses equipment (kettlebells → own-thruster barbell/dumbbell)'])
+    assert.deepEqual(triageProblems(library, merge('Incline_Bench_Pull', 'Dumbbell_Incline_Row')),
+      ['triage Incline_Bench_Pull: merge crosses equipment (barbell → Dumbbell_Incline_Row dumbbell/bench)'])
+    assert.equal(rowOf.get('Close-Grip_EZ_Bar_Curl').target, 'EZ-Bar_Curl') // barbell → ez-bar: allowed
+  })
 })
 
 describe('Search skips hidden entries', () => {
@@ -134,7 +148,7 @@ describe('Search skips hidden entries', () => {
     assert.equal(listable(byId.get('Plank')), true)
   })
 
-  it(`none of the ${697 - 121} hidden entries appears in common or rest, searched by its own name`, () => {
+  it(`none of the ${697 - 124} hidden entries appears in common or rest, searched by its own name`, () => {
     for (const entry of hidden) {
       const { common, rest } = searchCommonFirst(library, entry.name, Infinity)
       assert.ok(![...common, ...rest].some((item) => item.id === entry.id), entry.id)
@@ -150,7 +164,7 @@ describe('Search skips hidden entries', () => {
   it('"Show more" holds only written non-staples and finish rows', () => {
     const shown = library.filter((entry) => listable(entry) && !entry.staple)
     for (const entry of shown) assert.ok(entry.common || rowOf.get(entry.id)?.class === 'finish', entry.id)
-    assert.equal(shown.filter((entry) => !entry.common).length, 121)
+    assert.equal(shown.filter((entry) => !entry.common).length, 124)
   })
 
   it('a hidden entry the user already has still shows: Already added (live), Restore (archived)', () => {
@@ -176,28 +190,36 @@ describe('resolver unchanged', () => {
   })
 })
 
-describe('merge aliases', () => {
-  // 20 merged entries whose free-db name people type: it now finds the written target first.
-  const SAMPLES = [
-    ['Barbell Shoulder Press', 'Seated_Barbell_Military_Press'], ['Barbell Walking Lunge', 'Barbell_Lunge'],
-    ['Calf Press', 'Calf_Press_On_The_Leg_Press_Machine'], ['Close-Grip EZ Bar Curl', 'EZ-Bar_Curl'],
-    ['Cross-Body Crunch', 'own-bicycle-crunch'], ['Decline Reverse Crunch', 'Reverse_Crunch'],
-    ['Kipping Muscle Up', 'Muscle_Up'], ['Standing Cable Chest Press', 'Cable_Chest_Press'],
-    ['Lying Triceps Press', 'EZ-Bar_Skullcrusher'], ['Machine Bench Press', 'Leverage_Chest_Press'],
-    ['Parallel Bar Dip', 'Dips_-_Triceps_Version'], ['Rope Crunch', 'Cable_Crunch'],
-    ['Rope Straight-Arm Pulldown', 'Straight-Arm_Pulldown'], ['Seated Dumbbell Curl', 'Dumbbell_Bicep_Curl'],
-    ['Seated Dumbbell Press', 'Dumbbell_Shoulder_Press'], ['Single-Arm Cable Crossover', 'Cable_Crossover'],
-    ['Standing Dumbbell Press', 'Dumbbell_Shoulder_Press'], ['Step Mill', 'Stairmaster'],
-    ['Tuck Crunch', 'Crunches'], ['Weighted Crunches', 'Crunches'],
-  ]
-  for (const [name, target] of SAMPLES) {
-    it(`"${name}" → ${target} first`, () => {
-      const merged = library.find((entry) => entry.name === name)
-      assert.equal(merged.mergedInto, target)
-      assert.equal(rowOf.get(merged.id).class, 'merge')
-      assert.equal(firstShown(name), target)
-    })
-  }
+describe('merged names find their target', () => {
+  it('"barbell full squat" → Back Squat first', () => {
+    assert.equal(byId.get('Barbell_Full_Squat').mergedInto, 'Barbell_Squat')
+    assert.equal(firstShown('barbell full squat'), 'Barbell_Squat')
+    assert.equal(searchCommonFirst(library, 'Barbell Full-Squat').common[0].id, 'Barbell_Squat')
+  })
+
+  it('every merge row\'s free-db name shows its target first (Air Bike: Fan Bike, then Bicycle Crunch)', () => {
+    for (const row of rows.filter((r) => r.class === 'merge')) {
+      const name = byId.get(row.id).name
+      if (row.id === 'Air_Bike') continue
+      assert.equal(firstShown(name), row.target, name)
+    }
+    assert.deepEqual(searchCommonFirst(library, 'Air Bike').common.slice(0, 2).map((item) => item.id), ['own-fan-bike', 'own-bicycle-crunch'])
+  })
+
+  it('merge-later: a finish target shows in its own tier (the rest); a queued own-* target shows nothing', () => {
+    assert.equal(rowOf.get('Two-Arm_Kettlebell_Row').target, 'One-Arm_Kettlebell_Row')
+    assert.deepEqual(searchCommonFirst(library, 'two-arm kettlebell row'), { common: [], rest: [byId.get('One-Arm_Kettlebell_Row')], restCount: 1 })
+    assert.equal(byId.get('Groin_and_Back_Stretch').mergedInto, 'own-butterfly-stretch')
+    assert.deepEqual(searchCommonFirst(library, 'groin and back stretch'), { common: [], rest: [], restCount: 0 })
+  })
+
+  it('a redirect never adds a hidden entry, and a partial name doesn\'t redirect', () => {
+    assert.deepEqual(searchCommonFirst(library, 'barbell full').common.map((item) => item.id).filter((id) => id === 'Barbell_Squat'), [])
+    for (const entry of hidden) {
+      const { common, rest } = searchCommonFirst(library, entry.name, Infinity)
+      assert.ok([...common, ...rest].every(listable), entry.id)
+    }
+  })
 
   // Captured before the triage (same code over the pre-triage exercises.json).
   it('press / row / machine: the first-tier top 10 is unchanged', () => {

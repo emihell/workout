@@ -650,7 +650,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Alternating_Hang_Clean/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Clean"
+    "mergedInto": "One-Arm_Kettlebell_Clean"
   },
   {
     "name": "Alternating Kettlebell Press",
@@ -717,7 +717,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Alternating_Kettlebell_Row/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Row"
+    "mergedInto": "One-Arm_Kettlebell_Row"
   },
   {
     "name": "Alternating Renegade Row",
@@ -906,7 +906,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Arm_Circles/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Arm_Circles/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "Arnold Dumbbell Press",
@@ -4161,8 +4162,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Mid_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Mid_Row/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Inverted_Row"
+    "hidden": true
   },
   {
     "name": "Bodyweight Squat",
@@ -5502,8 +5502,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_One_Arm_Tricep_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_One_Arm_Tricep_Extension/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Triceps_Pushdown"
+    "hidden": true
   },
   {
     "name": "Cable Preacher Curl",
@@ -5750,8 +5749,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rope_Rear-Delt_Rows/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rope_Rear-Delt_Rows/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Face_Pull"
+    "hidden": true
   },
   {
     "name": "Cable Russian Twists",
@@ -7169,8 +7167,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean_Pull/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean_Pull/1.jpg"
-    ],
-    "hidden": true
+    ]
   },
   {
     "name": "Clean Shrug",
@@ -8152,7 +8149,6 @@
     "id": "Crunches",
     "aliases": [
       "Floor Crunch",
-      "Weighted Crunches",
       "Tuck Crunch"
     ],
     "muscleGroups": [
@@ -9348,7 +9344,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Double_Kettlebell_Alternating_Hang_Clean/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Clean"
+    "mergedInto": "One-Arm_Kettlebell_Clean"
   },
   {
     "name": "Double Kettlebell Jerk",
@@ -11745,8 +11741,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/External_Rotation/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/External_Rotation/1.jpg"
-    ],
-    "hidden": true
+    ]
   },
   {
     "name": "External Rotation with Band",
@@ -16690,7 +16685,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Dead_Clean/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Clean"
+    "mergedInto": "One-Arm_Kettlebell_Clean"
   },
   {
     "name": "Kettlebell Figure 8",
@@ -16823,7 +16818,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Hang_Clean/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Clean"
+    "mergedInto": "One-Arm_Kettlebell_Clean"
   },
   {
     "name": "Kettlebell One-Legged Deadlift",
@@ -16856,8 +16851,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_One-Legged_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_One-Legged_Deadlift/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "own-single-leg-rdl"
+    "hidden": true
   },
   {
     "id": "Kettlebell_Overhead_Triceps_Extension",
@@ -16886,8 +16880,7 @@
       "Arms"
     ],
     "photos": [],
-    "hidden": true,
-    "mergedInto": "Standing_Dumbbell_Triceps_Extension"
+    "hidden": true
   },
   {
     "name": "Kettlebell Pass Between The Legs",
@@ -16989,8 +16982,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Pistol_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Pistol_Squat/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "own-pistol-squat"
+    "hidden": true
   },
   {
     "name": "Kettlebell Seated Press",
@@ -17122,8 +17114,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Thruster/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Thruster/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "own-thruster"
+    "hidden": true
   },
   {
     "name": "Kettlebell Turkish Get-Up (Lunge style)",
@@ -17759,8 +17750,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kneeling_Single-Arm_High_Pulley_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kneeling_Single-Arm_High_Pulley_Row/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Kneeling_High_Pulley_Row"
+    "hidden": true
   },
   {
     "name": "Kneeling Squat",
@@ -18010,8 +18000,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lateral_Raise_-_With_Bands/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lateral_Raise_-_With_Bands/1.jpg"
-    ],
-    "hidden": true
+    ]
   },
   {
     "name": "Latissimus Dorsi-SMR",
@@ -21414,9 +21403,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Clean/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Clean/1.jpg"
-    ],
-    "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Clean"
+    ]
   },
   {
     "name": "One-Arm Kettlebell Clean and Jerk",
@@ -21643,9 +21630,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Row/1.jpg"
-    ],
-    "hidden": true,
-    "mergedInto": "Two-Arm_Kettlebell_Row"
+    ]
   },
   {
     "name": "One-Arm Kettlebell Snatch",
@@ -23034,8 +23019,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pallof_Press_With_Rotation/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pallof_Press_With_Rotation/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Pallof_Press"
+    "hidden": true
   },
   {
     "name": "Palms-Down Dumbbell Wrist Curl Over A Bench",
@@ -23070,7 +23054,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Seated_Palms-Down_Barbell_Wrist_Curl"
+    "mergedInto": "Seated_Dumbbell_Palms-Down_Wrist_Curl"
   },
   {
     "name": "Palms-Down Wrist Curl Over A Bench",
@@ -23175,7 +23159,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Palms-Up_Dumbbell_Wrist_Curl_Over_A_Bench/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Seated_Palm-Up_Barbell_Wrist_Curl"
+    "mergedInto": "Seated_Dumbbell_Palms-Up_Wrist_Curl"
   },
   {
     "name": "Parallel Bar Dip",
@@ -23533,9 +23517,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plate_Twist/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plate_Twist/1.jpg"
-    ],
-    "hidden": true,
-    "mergedInto": "Russian_Twist"
+    ]
   },
   {
     "name": "Platform Hamstring Slides",
@@ -24490,7 +24472,9 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push-Up_Wide/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push-Up_Wide/1.jpg"
-    ]
+    ],
+    "hidden": true,
+    "mergedInto": "Pushups"
   },
   {
     "name": "Push-Ups - Close Triceps Position",
@@ -27724,9 +27708,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Dumbbell_Palms-Down_Wrist_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Dumbbell_Palms-Down_Wrist_Curl/1.jpg"
-    ],
-    "hidden": true,
-    "mergedInto": "Seated_Palms-Down_Barbell_Wrist_Curl"
+    ]
   },
   {
     "name": "Seated Dumbbell Palms-Up Wrist Curl",
@@ -27759,9 +27741,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Dumbbell_Palms-Up_Wrist_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Dumbbell_Palms-Up_Wrist_Curl/1.jpg"
-    ],
-    "hidden": true,
-    "mergedInto": "Seated_Palm-Up_Barbell_Wrist_Curl"
+    ]
   },
   {
     "name": "Seated Dumbbell Press",
@@ -28193,7 +28173,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Seated_Palms-Down_Barbell_Wrist_Curl"
+    "mergedInto": "Seated_Dumbbell_Palms-Down_Wrist_Curl"
   },
   {
     "name": "Seated One-Arm Dumbbell Palms-Up Wrist Curl",
@@ -28227,7 +28207,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Seated_Palm-Up_Barbell_Wrist_Curl"
+    "mergedInto": "Seated_Dumbbell_Palms-Up_Wrist_Curl"
   },
   {
     "name": "Seated One-arm Cable Pulley Rows",
@@ -28264,8 +28244,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_One-arm_Cable_Pulley_Rows/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_One-arm_Cable_Pulley_Rows/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Seated_Cable_Rows"
+    "hidden": true
   },
   {
     "name": "Seated Overhead Stretch",
@@ -28464,7 +28443,9 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Side_Lateral_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Side_Lateral_Raise/1.jpg"
-    ]
+    ],
+    "hidden": true,
+    "mergedInto": "Side_Lateral_Raise"
   },
   {
     "name": "Seated Triceps Press",
@@ -28662,8 +28643,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Shoulder_Press_-_With_Bands/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Shoulder_Press_-_With_Bands/1.jpg"
-    ],
-    "hidden": true
+    ]
   },
   {
     "name": "Shoulder Raise",
@@ -30411,7 +30391,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Close-Grip_Bench_Press/1.jpg"
     ],
     "hidden": true,
-    "mergedInto": "Close-Grip_Barbell_Bench_Press"
+    "mergedInto": "Smith_Machine_Bench_Press"
   },
   {
     "name": "Smith Machine Decline Press",
@@ -31206,8 +31186,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Snatch_Pull/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Snatch_Pull/1.jpg"
-    ],
-    "hidden": true
+    ]
   },
   {
     "name": "Snatch Shrug",
@@ -31837,7 +31816,9 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Squats/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Squats/1.jpg"
-    ]
+    ],
+    "hidden": true,
+    "mergedInto": "Split_Jump"
   },
   {
     "name": "Squat Jerk",
@@ -33658,8 +33639,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_One-Arm_Cable_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_One-Arm_Cable_Curl/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Standing_Biceps_Cable_Curl"
+    "hidden": true
   },
   {
     "name": "Standing One-Arm Dumbbell Curl Over Incline Bench",
@@ -35103,8 +35083,7 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Suspended_Reverse_Crunch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Suspended_Reverse_Crunch/1.jpg"
-    ],
-    "hidden": true
+    ]
   },
   {
     "name": "Suspended Row",
@@ -36225,7 +36204,9 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Two-Arm_Kettlebell_Clean/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Two-Arm_Kettlebell_Clean/1.jpg"
-    ]
+    ],
+    "hidden": true,
+    "mergedInto": "One-Arm_Kettlebell_Clean"
   },
   {
     "name": "Two-Arm Kettlebell Jerk",
@@ -36318,7 +36299,9 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Two-Arm_Kettlebell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Two-Arm_Kettlebell_Row/1.jpg"
-    ]
+    ],
+    "hidden": true,
+    "mergedInto": "One-Arm_Kettlebell_Row"
   },
   {
     "name": "Underhand Cable Pulldowns",
@@ -37014,8 +36997,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Weighted_Crunches/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Weighted_Crunches/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Crunches"
+    "hidden": true
   },
   {
     "name": "Weighted Jump Squat",
@@ -37261,7 +37243,9 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Barbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Barbell_Bench_Press/1.jpg"
-    ]
+    ],
+    "hidden": true,
+    "mergedInto": "Barbell_Bench_Press_-_Medium_Grip"
   },
   {
     "name": "Wide-Grip Decline Barbell Bench Press",
@@ -37621,7 +37605,8 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wind_Sprints/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wind_Sprints/1.jpg"
     ],
-    "hidden": true
+    "hidden": true,
+    "mergedInto": "own-hanging-knee-raise"
   },
   {
     "name": "Windmills",
@@ -37654,7 +37639,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Windmills/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Windmills/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "World's Greatest Stretch",

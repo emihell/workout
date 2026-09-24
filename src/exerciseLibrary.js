@@ -435,6 +435,25 @@ export function libraryProblems(list, {
   return problems
 }
 
+// req-143 coach review — a merge must not cross logAs (bodyweight vs weighted) or the load
+// scale (different equipment). A rough entry's side is inferred from free-db's equipment
+// ('body only' → bodyweight, a loading implement → weighted, anything else unknown); the
+// target's from its logAs and equipmentList. Checked only when both sides are known. (One-arm
+// cable/stack vs two-arm isn't visible in the data: that part is judged in the rows.)
+const FREE_DB_LOADED = ['barbell', 'dumbbell', 'cable', 'machine', 'kettlebells', 'e-z curl bar', 'medicine ball']
+function mergeCrossings(entry, target) {
+  const problems = []
+  const side = entry.equipment === 'body only' ? 'bodyweight' : FREE_DB_LOADED.includes(entry.equipment) ? 'weighted' : null
+  const targetSide = /^weight-/.test(target.logAs) ? 'weighted' : ['bodyweight-reps', 'time'].includes(target.logAs) ? 'bodyweight' : null
+  if (side && targetSide && side !== targetSide) problems.push(`merge crosses logAs (${side} → ${target.id} ${target.logAs})`)
+  // An EZ bar is a barbell for load scale.
+  const expected = (FREE_DB_EQUIPMENT_TO_LIST[entry.equipment] || []).flatMap((item) => (item === 'barbell' || item === 'ez-bar' ? ['barbell', 'ez-bar'] : [item]))
+  if (expected.length && target.equipmentList && !expected.some((item) => target.equipmentList.includes(item))) {
+    problems.push(`merge crosses equipment (${entry.equipment} → ${target.id} ${target.equipmentList.join('/')})`)
+  }
+  return problems
+}
+
 // req-143 — the triage against the list: every non-common entry has exactly one row, every
 // row is a library entry, classes are known, a merge target is common, a merge-later target
 // is a finish row or a queued add, and each row has a reason ([] = clean).
@@ -455,6 +474,7 @@ export function triageProblems(list, rows = triageRows(), { pendingTargets = PEN
     const merging = row.class === 'merge' || row.class === 'merge-later'
     if (merging !== ('target' in row)) bad(merging ? 'no target' : 'a target on a non-merge row')
     if (row.class === 'merge' && !byId.get(row.target)?.common) bad(`merge target "${row.target}" is not a common entry`)
+    else if (row.class === 'merge' && byId.has(row.id)) for (const message of mergeCrossings(byId.get(row.id), byId.get(row.target))) bad(message)
     if (row.class === 'merge-later' && !finish.has(row.target) && !pendingTargets.includes(row.target)) {
       bad(`merge-later target "${row.target}" is neither a finish row nor a queued add`)
     }

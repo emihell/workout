@@ -106,13 +106,11 @@ describe('missing staples', () => {
 })
 
 describe('common first, the rest on request', () => {
-  // req-143 (sanctioned edit) — was "shoulder press" / Shoulder Press - With Bands, now
-  // hidden (a band variant); same intent on a non-hidden rough entry.
-  it('"lateral raise": a common entry first; Seated Side Lateral Raise only in the rest', () => {
-    const { common: hits, rest } = searchCommonFirst(library, 'lateral raise')
+  it('"shoulder press": a common entry first; Shoulder Press - With Bands only in the rest', () => {
+    const { common: hits, rest } = searchCommonFirst(library, 'shoulder press')
     assert.ok(hits.length > 0 && hits.every((item) => item.common))
-    assert.ok(!hits.some((item) => item.id === 'Seated_Side_Lateral_Raise'))
-    assert.ok(rest.some((item) => item.id === 'Seated_Side_Lateral_Raise'))
+    assert.ok(!hits.some((item) => item.id === 'Shoulder_Press_-_With_Bands'))
+    assert.ok(rest.some((item) => item.id === 'Shoulder_Press_-_With_Bands'))
     assert.ok(rest.every((item) => !item.common))
   })
 

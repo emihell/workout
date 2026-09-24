@@ -67,6 +67,14 @@ function rankedHits(list, query, keep = null) {
   if (q.length < 2) return []
   const qCompact = compactText(q)
   const qKey = catalogNameKey(q)
+  // req-143 — a query that is exactly a merged entry's name (by key) finds its mergedInto
+  // target, in the target's own tier; an unwritten target (a queued own-*) isn't in the
+  // list, so nothing shows. Scored 0.5: just after direct exact hits, so an alias still
+  // wins its own query ("air bike" → Fan Bike before Bicycle Crunch, req-139).
+  const redirects = new Set()
+  for (const item of list || []) {
+    if (item.mergedInto && catalogNameKey(item.name) === qKey) redirects.add(item.mergedInto)
+  }
   const scored = []
   for (const item of list || []) {
     if (!listable(item) && !keep?.(item)) continue
@@ -88,6 +96,7 @@ function rankedHits(list, query, keep = null) {
     else if (name.includes(q) || (qCompact.length >= 3 && compactName.includes(qCompact))) score = 2
     else if (qCompact && aliasList.some((alias) => aliasWordStartMatch(alias, qCompact))) score = 2.5
     else if (muscles.includes(q) || equipment.includes(q)) score = 3
+    if (redirects.has(item.id) && (score < 0 || score > 0.5)) score = 0.5
     if (score >= 0) scored.push({ item, score, name })
   }
   scored.sort((a, b) => a.score - b.score || a.name.localeCompare(b.name))
