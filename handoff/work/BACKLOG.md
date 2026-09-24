@@ -401,12 +401,15 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   Custom exercises need a muscle pick from the same tree (stored field → persisted-data). After req-133.
 - **`req-135` alternatives button** — same pattern + same primary muscle, family first, your equipment first;
   linked exercises only until custom ones have muscles. After req-133 (+req-134 for custom).
+- **`req-138` library text pass** (split from req-133 by its spec review) — for the common entries: `description`
+  (≤120 chars), `cues` (2–3, ≤70 chars each), `steps` (≥3, clear), `mistakes` (1–3). Ours, from free-db's
+  instructions + general knowledge, never RepDB (DEC-060 §3). Feeds req-131; runs before it.
 - **`req-136` "something's wrong" tap** on an exercise → a note (wrong muscle / bad cue / …) into the in-app
   feedback JSON, so the library improves from real use. Small.
 - **`req-137` offline library + images** — keep the library chunk (and later pictures) available with no signal
   (service worker / cache). Infra; before own images.
 - **Emilio's backup conversion** — one-off script: match → show mapping → write on his OK (DEC-063 §2, ask-gate #2).
-- **Order (DEC-063 §4):** 133 → 134 → 136 → 132 (+ live library link) → 137 → 131 → 135 → own images (pilot early).
+- **Order (DEC-063 §4):** 133 → 134 → 136 → 132 (+ live library link) → 137 → 138 → 131 → 135 → own images (pilot early).
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
 - **Our own styled exercise figures** (after req-131) — **one base animation per movement pattern** + equipment
   variants (DEC-063 §4), 5-exercise style pilot early; pose keyframes + a shared renderer, animated,

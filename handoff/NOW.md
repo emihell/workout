@@ -18,8 +18,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- `req-133` **library content pass** (READY) — ~150 common exercises on the DEC-062 structure (muscle tree,
-  patterns, equipment, logAs, aliases, our text). Then 134 browse/filter → 136 → 132 → 137 → 131 → 135 → own
+- `req-133` **library tagging pass** (READY, spec-reviewed) — ~150 common exercises on the DEC-062 structure
+  (muscle tree, patterns, equipment, logAs, aliases; text split to req-138). Then 134 browse/filter → 136 → 132 → 137 → 138 → 131 → 135 → own
   images (DEC-063 §4, BACKLOG §Exercise library). Clean start: not bent to Emilio's data (DEC-063). Own library LIVE 2026-09-24.
   Unconfirmed calls (library req) for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename;
   whole-library aliases → req-133; RepDB pictures joined at runtime.
