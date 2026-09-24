@@ -32,7 +32,15 @@ export function itemCurrentPath(routineId, item, done) {
 // routine's overview (/workout/<id>, its preview or Done view), replacing the entry.
 // An active workout for this routine whose item/set isn't there, or a routine that
 // doesn't exist, is a genuinely wrong route: 'missing' ("Not found.").
-export function inWorkoutFallback({ active, routineId, routineKnown }) {
+//
+// `currentPath` (the browser's path when the redirect would run): the redirect is only
+// for a page the browser is still ON. Finish → Save/Abandon clears the workout AND moves
+// the browser to Today in the same tap (leaveWorkoutToToday); the finish screen then
+// re-renders once more before the router hears of it — it must not pull the user back
+// to the overview ('left': render nothing, the router is about to show Today).
+export function inWorkoutFallback({ active, routineId, routineKnown, currentPath }) {
   const activeHere = Boolean(active && (active.routineId || active.sessionId) === routineId)
-  return !activeHere && routineKnown ? 'redirect' : 'missing'
+  if (activeHere || !routineKnown) return 'missing'
+  if (currentPath != null && !String(currentPath).startsWith(`/workout/${routineId}/`)) return 'left'
+  return 'redirect'
 }

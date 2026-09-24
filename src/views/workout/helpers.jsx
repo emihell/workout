@@ -2,7 +2,7 @@ import { itemKey, itemLoggingState } from '../../workout-log'
 import { inWorkoutFallback, itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
 import { recordButton } from '../../analytics'
 import { useEffect } from 'react'
-import { go } from '../../route'
+import { go, hashPath } from '../../route'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
@@ -36,18 +36,22 @@ export function MissingItem() {
 
 // req-153 — the render for an in-workout route that can't show: with no active workout
 // for this (known) routine it redirects, replacing, to the routine's overview; otherwise
-// "Not found." (inWorkoutFallback decides).
+// "Not found." (inWorkoutFallback decides). The redirect re-checks the browser's CURRENT
+// path when it runs, so a Finish exit that already moved to Today isn't pulled back.
 export function NotInWorkout({ routineId }) {
   const store = useStore()
-  const outcome = inWorkoutFallback({
+  const args = {
     active: store.activeWorkout,
     routineId,
     routineKnown: Boolean(findRoutine(store.routines, routineId).routine),
-  })
+  }
+  const outcome = inWorkoutFallback({ ...args, currentPath: hashPath(window.location.hash) })
   useEffect(() => {
-    if (outcome === 'redirect') go(`/workout/${routineId}`, { replace: true })
-  }, [outcome, routineId])
-  return outcome === 'redirect' ? null : <MissingItem />
+    if (inWorkoutFallback({ ...args, currentPath: hashPath(window.location.hash) }) === 'redirect') {
+      go(`/workout/${routineId}`, { replace: true })
+    }
+  })
+  return outcome === 'missing' ? <MissingItem /> : null
 }
 
 export function itemSetsPath(routineId, item, workout) {

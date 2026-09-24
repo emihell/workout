@@ -211,6 +211,61 @@ describe('item 2 — an in-workout route with no active workout', () => {
   })
 })
 
+// ---- req-153 re-review — the Finish exits land on Today (regression on 1b5e3bd) ----
+// NotInWorkout's effect, as it runs: redirect only if the decision, taken with the
+// browser's path at that moment, is 'redirect'.
+const notInWorkoutEffect = (routineId, active = null) => {
+  const currentPath = browser.hash().replace(/^#/, '')
+  if (inWorkoutFallback({ active, routineId, routineKnown: true, currentPath }) === 'redirect') {
+    go(`/workout/${routineId}`, { replace: true })
+  }
+}
+
+describe('Finish → Save / Abandon lands on Today (the finish screen re-renders once more)', () => {
+  it('Save: finishWorkout clears the workout, leaveWorkoutToToday moves to Today, the re-render must not pull back', () => {
+    go('/workout/x')
+    browser.flush()
+    browser.tapLink('#/workout/x/finish')
+    leaveWorkoutToToday() // after store.finishWorkout(…)
+    notInWorkoutEffect('x') // the still-mounted finish screen, now with no active workout
+    browser.flush()
+    assert.equal(browser.hash(), '#/')
+  })
+
+  it('Abandon on Finish: same', () => {
+    go('/workout/x')
+    browser.flush()
+    browser.tapLink('#/workout/x/finish')
+    leaveWorkoutToToday() // abandonWorkout(store): store.abandonWorkout() then this
+    notInWorkoutEffect('x')
+    browser.flush()
+    assert.equal(browser.hash(), '#/')
+  })
+
+  it('an OLD finish page reached by Back (no active workout) still redirects to the overview', () => {
+    go('/workout/x')
+    browser.flush()
+    browser.tapLink('#/workout/x/finish')
+    leaveWorkoutToToday()
+    browser.flush()
+    browser.back() // [#/, overview, #/] → the overview; one more old page for the test:
+    browser.tapLink('#/workout/x/finish') // stands in for an old finish entry
+    notInWorkoutEffect('x')
+    browser.flush()
+    assert.equal(browser.hash(), '#/workout/x')
+  })
+
+  it('the decision: on a sub-route of this routine → redirect; anywhere else → left', () => {
+    const base = { active: null, routineId: 'x', routineKnown: true }
+    assert.equal(inWorkoutFallback({ ...base, currentPath: '/workout/x/finish' }), 'redirect')
+    assert.equal(inWorkoutFallback({ ...base, currentPath: '/workout/x/item/a/log' }), 'redirect')
+    assert.equal(inWorkoutFallback({ ...base, currentPath: '/' }), 'left')
+    assert.equal(inWorkoutFallback({ ...base, currentPath: '/workout/x' }), 'left')
+    assert.equal(inWorkoutFallback({ ...base, currentPath: '/workout/xy/finish' }), 'left')
+    assert.equal(inWorkoutFallback({ ...base, routineKnown: false, currentPath: '/workout/x/finish' }), 'missing')
+  })
+})
+
 // ---- item 5 — req-152 QA-4's source regex, now a behaviour test ----
 describe('History detail row meta from its sets (was a detail.jsx source regex)', () => {
   const set = (skipped) => ({ s: { setType: 'work', weight: skipped ? null : 40, reps: skipped ? 'skipped' : '8' } })
