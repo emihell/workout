@@ -1,22 +1,21 @@
 // req-140 — the library gap list (a one-off, not a test). Reads ONLY `name_en` from a
-// pinned RepDB copy cached outside the repo, and lists every name that matches none of
+// pinned RepDB copy (in the gitignored .vendor-cache/), and lists every name that matches none of
 // our name / displayName / alias keys (catalogNameKey). Names that match only a
 // non-common entry are listed too, marked, since those are promotion candidates.
 //
-//   node scripts/library-gap.mjs <cached repdb exercises.json> [out.txt]
+//   node scripts/library-gap.mjs [cached repdb exercises.json] [out.txt]
 //
-// The output is RepDB's name list, so it never goes in git (licence term 3): write it to
-// a path outside the repo.
+// Defaults: .vendor-cache/repdb-<pinned sha>.json in, .vendor-cache/req-140-gap-raw.txt out.
+// The output is RepDB's name list, so it never goes in git (licence term 3):
+// .vendor-cache/ is gitignored (DEC-066).
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { catalogNameKey, shownName } from '../src/exerciseLibrary.js'
 
-const [repdbPath, outPath] = process.argv.slice(2)
-if (!repdbPath) {
-  console.error('usage: node scripts/library-gap.mjs <cached repdb exercises.json> [out.txt]')
-  process.exit(1)
-}
+export const REPDB_SHA = '9ed9357f09c7566ea0256c57ebd6374ebb8b575e'
+const cache = (name) => fileURLToPath(new URL(`../.vendor-cache/${name}`, import.meta.url))
+const [repdbPath = cache(`repdb-${REPDB_SHA}.json`), outPath = cache('req-140-gap-raw.txt')] = process.argv.slice(2)
 const file = JSON.parse(readFileSync(repdbPath, 'utf8'))
 const names = (Array.isArray(file) ? file : file.exercises).map((entry) => String(entry.name_en || ''))
 const library = JSON.parse(readFileSync(fileURLToPath(new URL('../src/library/exercises.json', import.meta.url)), 'utf8'))

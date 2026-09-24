@@ -131,9 +131,11 @@ describe('common first, the rest on request', () => {
     const { common: hits, rest, restCount } = searchCommonFirst(library, 'press')
     const all = searchExerciseCatalog(library, 'press', Infinity)
     assert.ok(hits.length <= 25 && rest.length === 25)
-    assert.equal(restCount, all.filter((item) => !item.common).length)
+    // req-140 (edit NOT on the spec's sanctioned list; flagged in reports/req-140.md) —
+    // the split reads `staple` since DEC-066 §1, so the expected parts do too.
+    assert.equal(restCount, all.filter((item) => !item.staple).length)
     assert.ok(restCount > 25)
-    assert.deepEqual(hits.map((item) => item.id), all.filter((item) => item.common).slice(0, 25).map((item) => item.id))
+    assert.deepEqual(hits.map((item) => item.id), all.filter((item) => item.staple).slice(0, 25).map((item) => item.id))
   })
 
   // Planner review — a partial alias hit is per alias and from a word start: no match

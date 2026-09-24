@@ -89,13 +89,15 @@ export function searchExerciseCatalog(list, query, limit = 25) {
   return rankedHits(list, query).slice(0, limit)
 }
 
-// req-139 / DEC-064 §3 — what Search shows: the common hits, and the rest of the
+// req-139 / DEC-064 §3 — what Search shows: the staple hits, and the rest of the
 // library on request. Each part ranked as above and capped at `limit`; `restCount` is
-// the untruncated count ("Show N more"). With no common hit, Search shows `rest` directly.
+// the untruncated count ("Show N more"). With no staple hit, Search shows `rest` directly.
+// req-140 / DEC-066 §1 — the split reads `staple`, not `common` (a fully written niche
+// entry sits behind "Show more"). The `common` key name is kept for the callers.
 export function searchCommonFirst(list, query, limit = 25) {
   const hits = rankedHits(list, query)
-  const common = hits.filter((item) => item.common)
-  const rest = hits.filter((item) => !item.common)
+  const common = hits.filter((item) => item.staple)
+  const rest = hits.filter((item) => !item.staple)
   return { common: common.slice(0, limit), rest: rest.slice(0, limit), restCount: rest.length }
 }
 

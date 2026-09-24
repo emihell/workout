@@ -30,3 +30,6 @@ screenshots/
 .claude/settings.local.json
 # ephemeral build-agent git worktrees (isolation: worktree)
 .claude/worktrees/
+
+# req-140 / DEC-066 — licensed third-party data (RepDB cache, gap table): in the folder, never in git.
+.vendor-cache/

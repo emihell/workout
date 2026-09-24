@@ -220,7 +220,9 @@ describe('muscleGroups', () => {
 describe('own-* entries carry the legacy fields', () => {
   it('equipment, category, instructions, and muscles today\'s readers accept', () => {
     // req-139 (sanctioned edit) — was 9: + the 10 missing staples + 5 more (DEC-064).
-    assert.equal(OWN_EXERCISES.length, 24)
+    // req-140 (edit NOT on the spec's sanctioned list; flagged in reports/req-140.md) —
+    // + the 13 batch-1 adds (DEC-066/067).
+    assert.equal(OWN_EXERCISES.length, 37)
     for (const own of OWN_EXERCISES) {
       assert.ok(own.id.startsWith('own-'))
       assert.ok(own.equipment && own.category && own.instructions.length >= 3, own.id)

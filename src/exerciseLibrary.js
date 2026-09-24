@@ -44,6 +44,8 @@ export const OWN_FIELDS = [
   'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family',
   // req-138 — our text, on common entries only (no reader until req-134/131).
   'description', 'formCues', 'steps', 'mistakes',
+  // req-140 / DEC-066 — Search's first tier (staple ⇒ common) and our own difficulty.
+  'staple', 'difficulty',
 ]
 
 // primaryMuscles → coarse group. Every primary muscle in the library must be here.
@@ -155,6 +157,9 @@ export const LOAD_EQUIPMENT = [
   'landmine', 'sled', 'plate', 'sandbag', 'medicine-ball',
 ]
 
+// req-140 / DEC-065 §2 — our difficulty: skill, coordination and setup, not strength.
+export const DIFFICULTY = ['beginner', 'intermediate', 'advanced']
+
 // How it's logged (applied to the app's model later, by req-132).
 export const LOG_AS = ['weight-reps', 'bodyweight-reps', 'weight-time', 'time', 'cardio']
 
@@ -189,7 +194,7 @@ export const FREE_DB_EQUIPMENT_TO_LIST = {
 // Aliases never allowed on their own (req-130 review: they reorder single-word search).
 const BARE_ALIAS_KEYS = new Set(['press', 'row', 'machine'])
 
-export const COMMON_COUNT_RANGE = [170, 200]
+export const COMMON_COUNT_RANGE = [200, 240]
 
 // req-139 / DEC-064 §1 — the name the app shows: our display name, else free-db's.
 export function shownName(entry) {
@@ -248,6 +253,7 @@ export function muscleTreeProblems(tree = MUSCLE_TREE) {
 const NEW_FIELDS = [
   'displayName', 'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family',
   'description', 'formCues', 'steps', 'mistakes',
+  'staple', 'difficulty',
 ]
 
 // req-138 — the text rules. Each is one exact check; textProblems() names the rule that fails.
@@ -383,6 +389,8 @@ export function libraryProblems(list, {
     if (new Set(equipment).size !== equipment.length) bad(entry, 'equipment listed twice')
     if (!LOG_AS.includes(entry.logAs)) bad(entry, `logAs "${entry.logAs}" is off the list`)
     if (typeof entry.unilateral !== 'boolean') bad(entry, 'unilateral is not a boolean')
+    if (typeof entry.staple !== 'boolean') bad(entry, 'staple is not a boolean')
+    if (!DIFFICULTY.includes(entry.difficulty)) bad(entry, `difficulty "${entry.difficulty}" is off the list`)
     if (!/^fam-[a-z0-9]+(-[a-z0-9]+)*$/.test(String(entry.family))) bad(entry, `family "${entry.family}" is not fam-kebab-case`)
     else if (families.get(entry.family) < 2 && entry.family !== ownFamilyId(entry.id)) {
       bad(entry, `family "${entry.family}" has one member; a family of one is ${ownFamilyId(entry.id)}`)
@@ -425,6 +433,8 @@ function withOwnFields(entry, { aliases = [], photos = [], tags }) {
     out.unilateral = tags.unilateral
     out.common = true
     out.family = tags.family
+    out.staple = tags.staple
+    out.difficulty = tags.difficulty
     for (const field of TEXT_FIELDS) if (tags[field] !== undefined) out[field] = tags[field]
   }
   return out
