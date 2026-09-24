@@ -759,13 +759,13 @@ const TEXT = {
     'A deadlift standing inside a hex-shaped bar that trains the quads, glutes and hamstrings.',
     ['Stand in the middle of the bar', 'Chest up, back flat', 'Drive through the whole foot'],
     [
-      'Step into the centre of the trap bar with your feet about hip width apart.',
+      'Step into the center of the trap bar with your feet about hip width apart.',
       'Squat down and grip the handles at your sides.',
       'Flatten your back and brace.',
       'Stand up by pushing the floor away until your hips and knees are straight.',
       'Lower the bar under control back to the floor.',
     ],
-    ['Standing off-centre so the bar tips', 'Rounding the back at the bottom'],
+    ['Standing off-center so the bar tips', 'Rounding the back at the bottom'],
   ],
   Rack_Pulls: [
     'A partial deadlift from pins or blocks at about knee height that trains the lower back, glutes and traps.',
@@ -818,7 +818,7 @@ const TEXT = {
     ['Hips stay square to the floor', 'Back leg in line with your torso', 'Soft bend in the standing knee'],
     [
       'Stand on one leg with a dumbbell in the opposite hand.',
-      'Hinge at the hips and let your free leg swing straight back behind you.',
+      'Hinge at the hips and reach your free leg straight back behind you.',
       'Lower the dumbbell toward the floor until your torso is nearly level or you feel a hamstring stretch.',
       'Squeeze your glute and push your hips forward to stand back up.',
       'Finish the set, then switch sides.',
@@ -1032,7 +1032,7 @@ const TEXT = {
       'Stand with your feet wide apart.',
       'Shift your weight onto one leg and squat down over it.',
       'Let the other leg stay straight with its toes pointing up.',
-      'Push back up to the centre and shift to the other side.',
+      'Push back up to the center and shift to the other side.',
     ],
     ['Heel of the bent leg lifts off the floor', 'Folding forward instead of sitting down'],
   ],
@@ -1627,13 +1627,13 @@ const TEXT = {
     ['Pulling the handles with the arms', 'Letting the stack slam back'],
   ],
   'own-bicycle-crunch': [
-    'A crunch that twists an elbow toward the opposite knee in a pedalling motion, training the abs and obliques.',
+    'A crunch that twists an elbow toward the opposite knee in a pedaling motion, training the abs and obliques.',
     ['Rotate the shoulder, not just the elbow', 'Lower back stays down', 'Slow, steady pedal'],
     [
       'Lie on your back with your hands lightly behind your head and your legs lifted, knees bent.',
       'Curl your shoulders off the floor.',
       'Bring one knee in as you rotate the opposite shoulder toward it and straighten the other leg.',
-      'Switch sides in a steady pedalling motion.',
+      'Switch sides in a steady pedaling motion.',
     ],
     ['Pulling the head forward with the hands', 'Flapping the elbows without rotating'],
   ],
@@ -1676,7 +1676,7 @@ const TEXT = {
     [
       'Grab the bar with an overhand grip and hang with your legs together.',
       'Keeping your legs straight, raise them in front of you until your feet reach hip height or higher.',
-      'At the top, roll your hips up slightly to fully work your abs.',
+      'At the top, roll your hips up slightly.',
       'Lower your legs slowly without swinging.',
     ],
     ['Swinging to get the legs up', 'Dropping the legs on the way down'],
@@ -1831,24 +1831,24 @@ const TEXT = {
     ['Leaning on the rails on a steep incline', 'Looking down at the feet'],
   ],
   Bicycling_Stationary: [
-    'Pedalling a stationary bike, a low-impact cardio effort that works the quads and glutes.',
+    'Pedaling a stationary bike, a low-impact cardio effort that works the quads and glutes.',
     ['Slight knee bend at the bottom', 'Hips steady on the saddle', 'Push and pull through the pedal'],
     [
       'Set the saddle so your knee is slightly bent when the pedal is at the bottom.',
       'Adjust the handlebars so you can reach them with a flat back.',
-      'Start pedalling at an easy resistance to warm up.',
+      'Start pedaling at an easy resistance to warm up.',
       'Raise the resistance or pace to the effort you want.',
       'Ease off to cool down before you stop.',
     ],
     ['Saddle so low the knees rise above the hips', 'Hips rock side to side on the saddle'],
   ],
   Recumbent_Bike: [
-    'Pedalling a reclined bike with back support, a low-impact cardio effort for the legs.',
-    ['Back against the seat', 'Slight knee bend at full reach', 'Smooth, even pedalling'],
+    'Pedaling a reclined bike with back support, a low-impact cardio effort for the legs.',
+    ['Back against the seat', 'Slight knee bend at full reach', 'Smooth, even pedaling'],
     [
       'Slide the seat so your knee is slightly bent when the pedal is farthest away.',
       'Sit back against the backrest and strap your feet in.',
-      'Start pedalling at an easy resistance.',
+      'Start pedaling at an easy resistance.',
       'Raise the resistance or pace to the effort you want.',
       'Ease off to cool down before you stop.',
     ],
@@ -1859,7 +1859,7 @@ const TEXT = {
     ['Push and pull the handles', 'Drive through the pedals', 'Sit tall'],
     [
       'Set the seat so your knee is slightly bent at the bottom of the pedal stroke.',
-      'Grip the handles and start pedalling easily.',
+      'Grip the handles and start pedaling easily.',
       'Push and pull the handles in time with your legs.',
       'Raise the effort to the pace you want, then ease off to recover.',
     ],
@@ -2266,7 +2266,7 @@ const TEXT = {
     ['Lead with the elbows', 'Dumbbells stay close', 'Hands stop at lower chest height'],
     [
       'Stand holding a dumbbell in each hand in front of your thighs, palms facing you.',
-      'Raise the dumbbells close to your torso, elbows travelling up and out ahead of the hands.',
+      'Raise the dumbbells close to your torso, elbows traveling up and out ahead of the hands.',
       'Stop when your elbows reach about shoulder height.',
       'Lower the dumbbells slowly to your thighs.',
     ],
@@ -2947,11 +2947,11 @@ const TEXT = {
   // req-147 — library batch 3
   Bicycling: [
     'Riding a bike outdoors on roads or paths, steady cardio for the legs.',
-    ['Seat high enough for a slight knee bend', 'Relaxed grip and shoulders', 'Smooth, even pedalling'],
+    ['Seat high enough for a slight knee bend', 'Relaxed grip and shoulders', 'Smooth, even pedaling'],
     [
       'Set the saddle so your leg is almost straight at the bottom of each pedal stroke.',
-      'Check your brakes and tyres before you set off.',
-      'Ride at a pace you can hold, shifting gears to keep your pedalling smooth.',
+      'Check your brakes and tires before you set off.',
+      'Ride at a pace you can hold, shifting gears to keep your pedaling smooth.',
       'Ease off toward the end of the ride to cool down.',
     ],
     ['Saddle so low the knees stay deeply bent', 'Gripping the bars tightly', 'Starting too fast to keep going'],

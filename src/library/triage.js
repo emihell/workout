@@ -676,7 +676,7 @@ export function triageRows() {
     ['Triceps_Overhead_Extension_with_Rope', 'merge', 'Cable_Rope_Overhead_Triceps_Extension', 'the overhead rope extension'],
     ['Triceps_Pushdown_-_V-Bar_Attachment', 'merge', 'Triceps_Pushdown', 'the pushdown with a V-bar'],
     ['Triceps_Stretch', 'finish', null, 'queued (req-140 promote list)'],
-    ['Tuck_Crunch', 'merge', 'Crunches', 'a crunch with knees tucked'],
+    ['Tuck_Crunch', 'hide', null, 'a different move from the floor crunch (knees drawn in, feet up); req-141 coach call'],
     ['Two-Arm_Dumbbell_Preacher_Curl', 'merge', 'One_Arm_Dumbbell_Preacher_Curl', 'the dumbbell preacher curl'],
     ['Two-Arm_Kettlebell_Clean', 'hide', null, 'both bells at once; a different load scale from the one-arm clean'],
     ['Two-Arm_Kettlebell_Jerk', 'hide', null, 'kettlebell sport lift'],

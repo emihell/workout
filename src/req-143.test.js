@@ -58,10 +58,10 @@ describe('the triage', () => {
   // req-145 (sanctioned count pin) — batch 2 wrote 27 merge-later targets: those rows are merges now.
   // req-147/148/151 (DEC-074 §1) — batches wrote the merge-later targets; req-151 resolved the last ones and
   // re-triaged 5 finish rows to hide (the spec's "written or hidden").
-  it('697 rows: 119 finish, 170 merge, 0 merge-later, 408 hide', () => {
+  it('697 rows: 119 finish, 169 merge, 0 merge-later, 409 hide', () => { // req-141 (DEC-074 §1): Tuck_Crunch merge → hide
     const count = (triage) => rows.filter((row) => row.class === triage).length
     assert.equal(rows.length, 697)
-    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [119, 170, 0, 408])
+    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [119, 169, 0, 409])
   })
 
   it('every non-common entry that isn\'t hidden is finish; no finish row is hidden', () => {
@@ -250,9 +250,11 @@ describe('merged names find their target', () => {
     // req-145 (edit NOT a count pin; flagged) — batch 2's new staples Chest-Supported T-Bar Row,
     // Machine High Row and Machine Back Extension enter row/machine alphabetically; the order of
     // every prior entry is unchanged.
+    // req-141 (sanctioned by planning) — Meadows Row is no longer a staple and leaves the first tier; the
+    // prior relative order of the rest holds, and Pendlay Row (11th before) moves up into the top 10.
     assert.deepEqual(top('row'), ['Rowing_Stationary', 'Bent_Over_Barbell_Row', 'Bent_Over_Two-Dumbbell_Row',
-      'Dumbbell_Incline_Row', 'Lying_T-Bar_Row', 'Inverted_Row', 'Leverage_High_Row', 'Leverage_Iso_Row', 'own-meadows-row',
-      'One-Arm_Dumbbell_Row'])
+      'Dumbbell_Incline_Row', 'Lying_T-Bar_Row', 'Inverted_Row', 'Leverage_High_Row', 'Leverage_Iso_Row',
+      'One-Arm_Dumbbell_Row', 'own-pendlay-row'])
     assert.deepEqual(top('machine'), ['own-machine-back-extension', 'Machine_Bicep_Curl', 'Leverage_Chest_Press',
       'Leverage_High_Row', 'Leverage_Incline_Chest_Press', 'own-machine-lateral-raise', 'Machine_Preacher_Curls',
       'Leverage_Iso_Row', 'Machine_Shoulder_Military_Press', 'Machine_Triceps_Extension'])

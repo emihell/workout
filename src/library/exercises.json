@@ -4363,12 +4363,12 @@
     "formCues": [
       "Seat high enough for a slight knee bend",
       "Relaxed grip and shoulders",
-      "Smooth, even pedalling"
+      "Smooth, even pedaling"
     ],
     "steps": [
       "Set the saddle so your leg is almost straight at the bottom of each pedal stroke.",
-      "Check your brakes and tyres before you set off.",
-      "Ride at a pace you can hold, shifting gears to keep your pedalling smooth.",
+      "Check your brakes and tires before you set off.",
+      "Ride at a pace you can hold, shifting gears to keep your pedaling smooth.",
       "Ease off toward the end of the ride to cool down."
     ],
     "mistakes": [
@@ -4442,7 +4442,7 @@
     "family": "fam-stationary-bike",
     "staple": true,
     "difficulty": "beginner",
-    "description": "Pedalling a stationary bike, a low-impact cardio effort that works the quads and glutes.",
+    "description": "Pedaling a stationary bike, a low-impact cardio effort that works the quads and glutes.",
     "formCues": [
       "Slight knee bend at the bottom",
       "Hips steady on the saddle",
@@ -4451,7 +4451,7 @@
     "steps": [
       "Set the saddle so your knee is slightly bent when the pedal is at the bottom.",
       "Adjust the handlebars so you can reach them with a flat back.",
-      "Start pedalling at an easy resistance to warm up.",
+      "Start pedaling at an easy resistance to warm up.",
       "Raise the resistance or pace to the effort you want.",
       "Ease off to cool down before you stop."
     ],
@@ -15669,8 +15669,12 @@
     "displayName": "Handstand Push-Up",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -16094,7 +16098,7 @@
     "steps": [
       "Grab the bar with an overhand grip and hang with your legs together.",
       "Keeping your legs straight, raise them in front of you until your feet reach hip height or higher.",
-      "At the top, roll your hips up slightly to fully work your abs.",
+      "At the top, roll your hips up slightly.",
       "Lower your legs slowly without swinging."
     ],
     "mistakes": [
@@ -20883,7 +20887,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "horizontal-pull",
+    "pattern": "vertical-pull",
     "equipmentList": [
       "machine"
     ],
@@ -22729,8 +22733,12 @@
     "displayName": "Machine Shoulder Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -24238,8 +24246,12 @@
     "displayName": "One-Arm Kettlebell Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -27977,8 +27989,12 @@
     ],
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -28619,16 +28635,16 @@
     "family": "fam-stationary-bike",
     "staple": true,
     "difficulty": "beginner",
-    "description": "Pedalling a reclined bike with back support, a low-impact cardio effort for the legs.",
+    "description": "Pedaling a reclined bike with back support, a low-impact cardio effort for the legs.",
     "formCues": [
       "Back against the seat",
       "Slight knee bend at full reach",
-      "Smooth, even pedalling"
+      "Smooth, even pedaling"
     ],
     "steps": [
       "Slide the seat so your knee is slightly bent when the pedal is farthest away.",
       "Sit back against the backrest and strap your feet in.",
-      "Start pedalling at an easy resistance.",
+      "Start pedaling at an easy resistance.",
       "Raise the resistance or pace to the effort you want.",
       "Ease off to cool down before you stop."
     ],
@@ -29177,8 +29193,7 @@
     "id": "Reverse_Grip_Bent-Over_Rows",
     "aliases": [
       "Underhand Barbell Row",
-      "Supinated Barbell Row",
-      "Yates Row"
+      "Supinated Barbell Row"
     ],
     "muscleGroups": [
       "Back"
@@ -30800,8 +30815,12 @@
     "displayName": "Seated Barbell Overhead Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -32464,8 +32483,12 @@
     "displayName": "Band Shoulder Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -34802,8 +34825,12 @@
     "displayName": "Smith Machine Shoulder Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -37471,7 +37498,7 @@
     ],
     "steps": [
       "Stand holding a dumbbell in each hand in front of your thighs, palms facing you.",
-      "Raise the dumbbells close to your torso, elbows travelling up and out ahead of the hands.",
+      "Raise the dumbbells close to your torso, elbows traveling up and out ahead of the hands.",
       "Stop when your elbows reach about shoulder height.",
       "Lower the dumbbells slowly to your thighs."
     ],
@@ -38130,8 +38157,12 @@
     "displayName": "Overhead Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -40774,14 +40805,14 @@
       "Drive through the whole foot"
     ],
     "steps": [
-      "Step into the centre of the trap bar with your feet about hip width apart.",
+      "Step into the center of the trap bar with your feet about hip width apart.",
       "Squat down and grip the handles at your sides.",
       "Flatten your back and brace.",
       "Stand up by pushing the floor away until your hips and knees are straight.",
       "Lower the bar under control back to the floor."
     ],
     "mistakes": [
-      "Standing off-centre so the bar tips",
+      "Standing off-center so the bar tips",
       "Rounding the back at the bottom"
     ]
   },
@@ -41196,8 +41227,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tuck_Crunch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tuck_Crunch/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Crunches"
+    "hidden": true
   },
   {
     "name": "Two-Arm Dumbbell Preacher Curl",
@@ -41335,8 +41365,12 @@
     "displayName": "Double Kettlebell Press",
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -44011,7 +44045,7 @@
     ],
     "steps": [
       "Set the seat so your knee is slightly bent at the bottom of the pedal stroke.",
-      "Grip the handles and start pedalling easily.",
+      "Grip the handles and start pedaling easily.",
       "Push and pull the handles in time with your legs.",
       "Raise the effort to the pace you want, then ease off to recover."
     ],
@@ -44033,7 +44067,7 @@
     "instructions": [
       "Lie on your back with your hands lightly behind your head, lower back pressed to the floor, and knees lifted so your shins are level with the floor.",
       "Curl your shoulders up and turn your torso to bring one elbow toward the opposite knee while the other leg straightens out low.",
-      "Switch sides in a slow pedalling motion. Turn from the ribs, not by pulling on your neck."
+      "Switch sides in a slow pedaling motion. Turn from the ribs, not by pulling on your neck."
     ],
     "category": "strength",
     "images": [],
@@ -44070,7 +44104,7 @@
     "family": "fam-crunch",
     "staple": true,
     "difficulty": "beginner",
-    "description": "A crunch that twists an elbow toward the opposite knee in a pedalling motion, training the abs and obliques.",
+    "description": "A crunch that twists an elbow toward the opposite knee in a pedaling motion, training the abs and obliques.",
     "formCues": [
       "Rotate the shoulder, not just the elbow",
       "Lower back stays down",
@@ -44080,7 +44114,7 @@
       "Lie on your back with your hands lightly behind your head and your legs lifted, knees bent.",
       "Curl your shoulders off the floor.",
       "Bring one knee in as you rotate the opposite shoulder toward it and straighten the other leg.",
-      "Switch sides in a steady pedalling motion."
+      "Switch sides in a steady pedaling motion."
     ],
     "mistakes": [
       "Pulling the head forward with the hands",
@@ -44190,7 +44224,7 @@
     "photos": [],
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
       },
       {
@@ -44262,8 +44296,12 @@
     "photos": [],
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
@@ -44282,7 +44320,7 @@
     "unilateral": false,
     "common": true,
     "family": "fam-overhead-press",
-    "staple": true,
+    "staple": false,
     "difficulty": "intermediate",
     "description": "A barbell overhead press sitting on the floor with the legs straight, which trains the shoulders and core.",
     "formCues": [
@@ -44438,7 +44476,7 @@
     "unilateral": true,
     "common": true,
     "family": "fam-row",
-    "staple": true,
+    "staple": false,
     "difficulty": "intermediate",
     "description": "A one-arm row with a landmine barbell, standing side-on to it, for the lats and upper back.",
     "formCues": [
@@ -44605,7 +44643,7 @@
     ],
     "steps": [
       "Stand on one leg with a dumbbell in the opposite hand.",
-      "Hinge at the hips and let your free leg swing straight back behind you.",
+      "Hinge at the hips and reach your free leg straight back behind you.",
       "Lower the dumbbell toward the floor until your torso is nearly level or you feel a hamstring stretch.",
       "Squeeze your glute and push your hips forward to stand back up.",
       "Finish the set, then switch sides."
@@ -44667,7 +44705,7 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
-    "staple": true,
+    "staple": false,
     "difficulty": "beginner",
     "description": "A machine squat on a swinging arm that keeps the torso upright and puts most of the work on the quads.",
     "formCues": [
@@ -44744,7 +44782,7 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
-    "staple": true,
+    "staple": false,
     "difficulty": "beginner",
     "description": "A squat with the load hung from a belt at the hips, training the legs without loading the spine.",
     "formCues": [
@@ -44846,7 +44884,7 @@
     "instructions": [
       "Take a very wide stance with your toes angled a little outward.",
       "Sink sideways onto one bent leg while the opposite leg stays long, its heel planted and toes lifted.",
-      "Reach the lowest point you can with the working heel flat, rise back through the centre and sink to the other side."
+      "Reach the lowest point you can with the working heel flat, rise back through the center and sink to the other side."
     ],
     "category": "strength",
     "images": [],
@@ -44897,7 +44935,7 @@
       "Stand with your feet wide apart.",
       "Shift your weight onto one leg and squat down over it.",
       "Let the other leg stay straight with its toes pointing up.",
-      "Push back up to the centre and shift to the other side."
+      "Push back up to the center and shift to the other side."
     ],
     "mistakes": [
       "Heel of the bent leg lifts off the floor",
@@ -44956,7 +44994,7 @@
     "unilateral": true,
     "common": true,
     "family": "fam-own-copenhagen-plank",
-    "staple": true,
+    "staple": false,
     "difficulty": "intermediate",
     "description": "A side plank with the top leg on a bench and the bottom leg off the floor that trains the inner thigh and obliques.",
     "formCues": [
@@ -45027,7 +45065,7 @@
     "unilateral": true,
     "common": true,
     "family": "fam-curl",
-    "staple": true,
+    "staple": false,
     "difficulty": "beginner",
     "description": "A one-arm curl facing away from a low cable, with the arm behind the body, that trains the biceps in a long stretch.",
     "formCues": [
@@ -45829,8 +45867,12 @@
     "photos": [],
     "muscles": [
       {
-        "id": "deltoids",
+        "id": "front-delt",
         "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
       },
       {
         "id": "triceps",
