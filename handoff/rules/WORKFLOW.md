@@ -72,6 +72,28 @@ however complete the rest is. The open questions go **at the top**, phrased as
 questions with options, so the requirement doubles as the thing that gets the
 answer.
 
+## Requirement lanes — each type gets its own bar and gate (DEC-085 §6)
+
+Every requirement names its **`Lane:`** (replaces the old `Gate:` tag, which DEC-057 had emptied — safety now follows the
+files touched). Who builds it (Builder session / throwaway agent / live with Emilio, DEC-055) is separate from its lane.
+Source: `audits/workflow-2026-09-24.md` §A.
+
+| Lane | Ready when | Gate before merge | Report | Emilio |
+|---|---|---|---|---|
+| **ui** | intent + constraints settled; behaviour calls marked `(unconfirmed)` | unit for logic + Planner's browser run of the branch build on an isolated origin (`plan qa`, L-033) + the smoke test; device feel after, non-blocking | test list ≤10 items | behaviour calls; feel after |
+| **bug** | a reproduction (steps + output) | a test that **fails on main and passes on the branch** (both receipts) + a browser re-run of the flow, **also after any revert** (L-036) | brief | only if the fix picks a behaviour |
+| **data** (persisted schema / migration / bulk write) | fully specified; record counts stated | round-trip + legacy-key tests, independent reviewer, a dry run on his latest Export (kept outside git), backup reminder (DEC-046) | full, counts before/after | **eyes before merge** (DEC-035 carve-out) |
+| **content** (the library) | rules + validators + standing sanctions (DEC-074); calls delegated (DEC-067) | validators + counts + main-chunk size + a spec review; ≤10 real searches in the browser | table + counts only | end-of-batch unconfirmed list |
+| **design** (no code) | questions phrased with options | each answer → a `DEC-`; gaps → numbered reqs; ends `DECIDED <date> → DEC-a..b, req-x..y` | none (no branch) | always, live |
+| **backend** | the backend rules exist (DEC-085 §7) — not before | integration tests against a local server; a staging origin ≠ prod; a restore drill | full | hosting, cost, security, privacy |
+| **tooling** | the failure it fixes, observed | a self-test proving the guard **fires**; Planner uses the tool at once | brief | only if his steps change |
+| **audit** | brief + scope | none (read-only); findings → backlog | the report | reads it, triages |
+
+The **independent reviewer** still fires on the files touched (DEC-057 §1) in every lane. **(unconfirmed)** refinements
+from the audit: the *backup reminder* fires only when stored records are written, not on every trigger file (req-150
+already read it that way); SHIPPED entries stay ≤3 lines per req (what, gate receipt, report path). `check_handoff` needs
+the `DECIDED` status and a `Lane:` tag before this is enforced — tooling follow-up.
+
 ## Requirements
 
 One file per requirement: `work/req-NN-name.md`. Split into a folder only when it
