@@ -1280,3 +1280,14 @@ calls stay Emilio's.
 3. **The parity queue** (the promote/add candidates left after batch 1) is **ours**: free-db ids + our own names. It is
    committed in `handoff/work/req-140-parity-queue.md`, so later batches don't depend on a scratchpad.
 
+## DEC-069 — aim: RepDB removed completely  (Emilio, 2026-09-24)
+
+1. **RepDB goes entirely** once req-140 lands. The parity queue is already ours (`work/req-140-parity-queue.md`), so later
+   batches don't need it. req-131 "How to" drops RepDB pictures and uses free-db photos + the video link until our own
+   images exist. Built as **req-142**: remove the Settings credit, the RepDB comments, `scripts/library-gap.mjs`, the
+   originality script's RepDB comparison, and `.vendor-cache/`. The never-copy principle (DEC-060 §3) stays as history.
+2. **For the image/avatar req:** Emilio wants to look at RepDB's images for inspiration when that work starts. Planning's
+   licence note stays attached to it: **Emilio may browse them himself; they are never given to the pixel-art agent as
+   input, reference or conditioning** (RepDB licence term 5), and nothing is traced from them.
+Supersedes DEC-065 §1 ("kept only for its pictures").
+

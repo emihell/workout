@@ -384,7 +384,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 
 - **`req-130` our own library** (READY) — free-db copy + aliases + muscle groups + picture links + RepDB credit.
 - **`req-131` "How to" button** — log screen + exercise page; opens RepDB drawing if linked, else free-db
-  start/end photos auto-flipping (~0.7 s), else the exercise's video link; hidden when none. RepDB pictures are **joined at runtime** from the live
+  start/end photos auto-flipping (~0.7 s), else the exercise's video link; hidden when none. **No RepDB pictures (DEC-069)** — the old plan was: RepDB pictures **joined at runtime** from the live
   fetch (exact name key + a small curated pair list; nothing RepDB committed — req-130 review finding 8). Mind: a
   renamed exercise keeps its `libraryId` (req-130), so the picture follows the id. New optional
   per-exercise **video link** field (edit form). Uses `libraryEntryFor` (req-130). Offline → cues only, no broken
@@ -431,6 +431,9 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
 - **`req-140` library parity, batch 1** (READY) — gap table checkpoint, then ≤40 promote/add + aliases + `difficulty`
   + the `staple` flag (DEC-065/066). **Later batches** (req-140b…) work through the queue from the gap table, ≤40 each.
+- **`req-142` remove RepDB completely** (DEC-069) — after req-140: drop the Settings credit, RepDB comments,
+  `scripts/library-gap.mjs`, the originality script's RepDB comparison, `.vendor-cache/`; req-131 uses free-db photos +
+  video link only. Small.
 - **`req-141` fresh-eyes library audit** — after req-140. A fresh agent with **no RepDB context** audits every common
   entry: displayName, aliases, tags, difficulty, text, the common list; restores natural wording in the 19 entries
   req-138 rewrote for originality (list in `reports/req-138.md`); fixes in place. Final safety net: the ≥12-token run
@@ -442,7 +445,9 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   separate style pilot); build as **skeleton + layers** (body, hair, clothes…) from day 1 so every exercise animation
   works with any avatar; a **dedicated pixel-art agent** (its own definition: grid size, palette, outline and frame
   rules, Emilio's references) plus a **deterministic renderer + validator** (palette-only, on-grid), so consistency
-  comes from constraints rather than taste. References: Emilio's own and free-db photos; never RepDB images (term 5).
+  comes from constraints rather than taste. References: Emilio's own and free-db photos. **RepDB images (DEC-069 §2):
+  Emilio wants to browse them for inspiration himself when this starts; they are never given to the pixel-art agent as
+  input, reference or conditioning, and nothing is traced from them (RepDB licence term 5).**
   No prior req exists [measured: grep of handoff + git log for "avatar"]. Before own figures.
 - **Our own styled exercise figures** (now under Avatars above) (after req-131) — **one base animation per movement pattern** + equipment
   variants (DEC-063 §4), 5-exercise style pilot early; pose keyframes + a shared renderer, animated,
