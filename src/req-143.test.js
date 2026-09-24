@@ -55,10 +55,11 @@ describe('the triage', () => {
     }
   })
 
-  it('697 rows: 124 finish, 119 merge, 57 merge-later, 397 hide', () => {
+  // req-145 (sanctioned count pin) — batch 2 wrote 27 merge-later targets: those rows are merges now.
+  it('697 rows: 124 finish, 146 merge, 30 merge-later, 397 hide', () => {
     const count = (triage) => rows.filter((row) => row.class === triage).length
     assert.equal(rows.length, 697)
-    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 119, 57, 397])
+    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 146, 30, 397])
   })
 
   it('every non-common entry that isn\'t hidden is finish; no finish row is hidden', () => {
@@ -121,10 +122,12 @@ describe('hidden and mergedInto fields', () => {
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { class: 'drop' })), ['triage Car_Deadlift: class "drop"'])
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { reason: ' ' })), ['triage Car_Deadlift: no reason'])
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { target: 'Plank' })), ['triage Car_Deadlift: a target on a non-merge row'])
-    assert.deepEqual(triageProblems(library, edit('Air_Bike', { target: 'Hamstring_Stretch' })),
-      ['triage Air_Bike: merge target "Hamstring_Stretch" is not a common entry'])
-    assert.deepEqual(triageProblems(library, edit('90_90_Hamstring', { target: 'Plank' })),
-      ['triage 90_90_Hamstring: merge-later target "Plank" is neither a finish row nor a queued add'])
+    // req-145 (edit NOT a count pin; flagged) — was Hamstring_Stretch, which batch 2 wrote; same intent.
+    assert.deepEqual(triageProblems(library, edit('Air_Bike', { target: 'Inchworm' })),
+      ['triage Air_Bike: merge target "Inchworm" is not a common entry'])
+    // req-145 (edit NOT a count pin; flagged) — was 90_90_Hamstring, a merge since batch 2; same intent.
+    assert.deepEqual(triageProblems(library, edit('Two-Arm_Kettlebell_Row', { target: 'Plank' })),
+      ['triage Two-Arm_Kettlebell_Row: merge-later target "Plank" is neither a finish row nor a queued add'])
   })
 
   // Coach review — a merge must not cross logAs or the load scale (equipment).
@@ -164,7 +167,7 @@ describe('Search skips hidden entries', () => {
   it('"Show more" holds only written non-staples and finish rows', () => {
     const shown = library.filter((entry) => listable(entry) && !entry.staple)
     for (const entry of shown) assert.ok(entry.common || rowOf.get(entry.id)?.class === 'finish', entry.id)
-    assert.equal(shown.filter((entry) => !entry.common).length, 124)
+    assert.equal(shown.filter((entry) => !entry.common).length, 92) // req-145 (sanctioned count pin): 124 − batch 2's 32 promotions
   })
 
   it('a hidden entry the user already has still shows: Already added (live), Restore (archived)', () => {
@@ -227,11 +230,14 @@ describe('merged names find their target', () => {
     assert.deepEqual(top('press'), ['Arnold_Dumbbell_Press', 'Barbell_Bench_Press_-_Medium_Grip', 'Cable_Chest_Press',
       'Close-Grip_Barbell_Bench_Press', 'Decline_Barbell_Bench_Press', 'Dumbbell_Bench_Press', 'Dumbbell_Shoulder_Press',
       'Barbell_Incline_Bench_Press_-_Medium_Grip', 'Incline_Dumbbell_Press', 'own-landmine-press'])
+    // req-145 (edit NOT a count pin; flagged) — batch 2's new staples Chest-Supported T-Bar Row,
+    // Machine High Row and Machine Back Extension enter row/machine alphabetically; the order of
+    // every prior entry is unchanged.
     assert.deepEqual(top('row'), ['Rowing_Stationary', 'Bent_Over_Barbell_Row', 'Bent_Over_Two-Dumbbell_Row',
-      'Dumbbell_Incline_Row', 'Inverted_Row', 'Leverage_Iso_Row', 'own-meadows-row', 'One-Arm_Dumbbell_Row',
-      'own-pendlay-row', 'own-seal-row'])
-    assert.deepEqual(top('machine'), ['Machine_Bicep_Curl', 'Leverage_Chest_Press', 'Leverage_Incline_Chest_Press',
-      'own-machine-lateral-raise', 'Machine_Preacher_Curls', 'Leverage_Iso_Row', 'Machine_Shoulder_Military_Press',
-      'Machine_Triceps_Extension', 'Ab_Crunch_Machine', 'Dip_Machine'])
+      'Dumbbell_Incline_Row', 'Lying_T-Bar_Row', 'Inverted_Row', 'Leverage_High_Row', 'Leverage_Iso_Row', 'own-meadows-row',
+      'One-Arm_Dumbbell_Row'])
+    assert.deepEqual(top('machine'), ['own-machine-back-extension', 'Machine_Bicep_Curl', 'Leverage_Chest_Press',
+      'Leverage_High_Row', 'Leverage_Incline_Chest_Press', 'own-machine-lateral-raise', 'Machine_Preacher_Curls',
+      'Leverage_Iso_Row', 'Machine_Shoulder_Military_Press', 'Machine_Triceps_Extension'])
   })
 })
