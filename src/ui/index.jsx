@@ -458,7 +458,9 @@ export function SetLogForm({
         onComplete?.({
           weight,
           reps: timed ? '' : reps,
-          effort,
+          // req-156 (audit F-TRUST-2) — a hidden Effort (warm-up / cardio) is not an answer:
+          // null, never the seeded default the user never saw ("Moderate", rpe 3).
+          effort: showEffort ? effort : null,
           durationSec: timed ? seconds.value : undefined,
         })
       }}
