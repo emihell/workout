@@ -469,7 +469,10 @@ week structure that owns routines and their placement. The code still carries le
 `programs`/`programName` remnants (`model.js`, `storage.js`) — a program layer existed
 once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
-- **Progression bugs found by the req-144 prep** [measured, `work/req-144-prep.md` §A]: a rep-range target ("8-12")
+- **`req-150` progression safe-hold** (READY) — the three wrong cases hold instead of guessing (DEC-075).
+- **`req-149` progression rules** (later, a design req; DEC-075) — the rules and code for how the app upgrades routines:
+  rep ranges, AMRAP, an assisted flag, when to suggest vs apply. Inputs: DEC-056, req-144 prep §A.
+- **Progression bugs found by the req-144 prep** (→ req-150 now, req-149 properly) [measured, `work/req-144-prep.md` §A]: a rep-range target ("8-12")
   parses to NaN, so a set can never count as missed (5 reps on 8–12 holds the load); AMRAP progresses on effort only;
   assisted machines progress backwards (a miss lowers assistance = harder). Load recommendations the user sees, so
   these are bugs (CLAUDE.md "reasoning made visible"). Small fix req, independent of the design; the proper model
