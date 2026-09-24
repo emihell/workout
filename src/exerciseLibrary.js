@@ -16,6 +16,7 @@
 import { EXTRA_EXERCISES } from './exerciseExtras.js'
 import { commonExercises, EQUIPMENT_EXCEPTIONS, GROUP_EXCEPTIONS } from './library/common.js'
 import { OWN_EXERCISES } from './library/own-exercises.js'
+import { commonText } from './library/text.js'
 
 export { OWN_EXERCISES }
 
@@ -41,6 +42,8 @@ export const OWN_FIELDS = [
   'displayName',
   // req-133 — the DEC-062 fields, on common entries only (no reader until req-134/135/132).
   'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family',
+  // req-138 — our text, on common entries only (no reader until req-134/131).
+  'description', 'formCues', 'steps', 'mistakes',
 ]
 
 // primaryMuscles → coarse group. Every primary muscle in the library must be here.
@@ -242,7 +245,74 @@ export function muscleTreeProblems(tree = MUSCLE_TREE) {
   return problems
 }
 
-const NEW_FIELDS = ['displayName', 'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family']
+const NEW_FIELDS = [
+  'displayName', 'muscles', 'pattern', 'equipmentList', 'logAs', 'unilateral', 'common', 'family',
+  'description', 'formCues', 'steps', 'mistakes',
+]
+
+// req-138 — the text rules. Each is one exact check; textProblems() names the rule that fails.
+export const TEXT_FIELDS = ['description', 'formCues', 'steps', 'mistakes']
+export const TEXT_SHAPE = {
+  formCues: { min: 2, max: 3, chars: 70, period: false },
+  steps: { min: 3, max: 6, chars: 140, period: true },
+  mistakes: { min: 1, max: 3, chars: 90, period: false },
+}
+export const DESCRIPTION_CHARS = 120
+const BOILERPLATE = /starting position|recommended amount|prescribed amount|this portion of the movement|as you perform this|^(tip|caution|variations?):/i
+const BREATH = /\b(inhal|exhal|breathe (in|out))/i
+const ANGLE = /\b\d{2,3}(-| )?degrees?\b|\d{2,3}°/g
+const COUNT_WORDS = /\b(one|two|three|four|five|six|seven|eight|nine|ten|a few|several)\s+(seconds?|secs?|minutes?|mins?|reps?|repetitions?|sets?|times|counts?|breaths?)\b/i
+const SETS_REPS = /\d+\s*[x×]\s*\d+/
+const LOAD_UNITS = /\b(kg|lbs?|%|rpe)\b/i
+const HYPE = /\b(great|best|ultimate|amazing|excellent|perfect|effective)\b/i
+const MEDICAL = /\b(injur\w*|pain|prevent\w*|rehab\w*|heal\w*|therap\w*)\b/i
+const NUMBERED = /^\s*\d+[.)]/
+export const UNILATERAL_WORDS = /\b(each (side|arm|leg|hand)|other side|switch sides)\b/i
+
+// Everything the text rules reject on one entry, one line each ([] = clean).
+export function textProblems(entry) {
+  const problems = []
+  const bad = (message) => problems.push(message)
+  const line = (field, text, { chars, period }) => {
+    if (typeof text !== 'string' || !text) return bad(`${field}: not a non-empty string`)
+    if (text !== text.trim()) bad(`${field}: leading or trailing whitespace in "${text}"`)
+    if (!/^[A-Z]/.test(text)) bad(`${field}: "${text}" does not start with a capital`)
+    if (text.length > chars) bad(`${field}: ${text.length} > ${chars} characters in "${text}"`)
+    if (period && !text.endsWith('.')) bad(`${field}: "${text}" does not end with a period`)
+    if (!period && /[.]$/.test(text)) bad(`${field}: "${text}" ends with a period`)
+    if (BOILERPLATE.test(text)) bad(`${field}: boilerplate in "${text}"`)
+    if (field !== 'steps' && BREATH.test(text)) bad(`${field}: breathing cue outside steps in "${text}"`)
+    if (/\d/.test(text.replace(ANGLE, ''))) bad(`${field}: a number in "${text}"`)
+    if (COUNT_WORDS.test(text)) bad(`${field}: a counted number in "${text}"`)
+    if (SETS_REPS.test(text) || LOAD_UNITS.test(text)) bad(`${field}: sets, load or effort units in "${text}"`)
+    if (HYPE.test(text)) bad(`${field}: hype word in "${text}"`)
+    if (MEDICAL.test(text)) bad(`${field}: medical word in "${text}"`)
+  }
+  const description = entry.description
+  line('description', description, { chars: DESCRIPTION_CHARS, period: true })
+  if (typeof description === 'string' && description.slice(0, -1).includes('. ')) bad(`description: more than one sentence in "${description}"`)
+  const seen = new Map()
+  if (typeof description === 'string') seen.set(description.toLowerCase(), 'description')
+  for (const [field, shape] of Object.entries(TEXT_SHAPE)) {
+    const lines = entry[field]
+    if (!Array.isArray(lines)) {
+      bad(`${field}: not a list`)
+      continue
+    }
+    if (lines.length < shape.min || lines.length > shape.max) bad(`${field}: ${lines.length} lines, not ${shape.min}–${shape.max}`)
+    for (const text of lines) {
+      line(field, text, shape)
+      if (field === 'steps' && NUMBERED.test(String(text))) bad(`steps: numbered step "${text}"`)
+      const key = String(text).toLowerCase()
+      if (seen.has(key)) bad(`${field}: "${text}" repeats ${seen.get(key)}`)
+      else seen.set(key, field)
+    }
+  }
+  if (entry.unilateral === true && !(entry.steps || []).some((text) => UNILATERAL_WORDS.test(text))) {
+    bad('steps: a unilateral entry never says each side, other side or switch sides')
+  }
+  return problems
+}
 
 // Everything the fixed structure rejects, one line each ([] = clean). Run by
 // deriveLibrary (the build refuses) and by the tests (against failing fixtures too).
@@ -325,6 +395,7 @@ export function libraryProblems(list, {
     if ((entry.logAs === 'bodyweight-reps' || entry.logAs === 'time') && loaded) bad(entry, `${entry.logAs} with load equipment`)
     if ((entry.logAs === 'weight-reps' || entry.logAs === 'weight-time') && !loaded) bad(entry, `${entry.logAs} without load equipment`)
     if ((entry.pattern === 'cardio') !== (entry.logAs === 'cardio')) bad(entry, 'cardio pattern and cardio logAs must go together')
+    for (const message of textProblems(entry)) bad(entry, message)
     const expected = FREE_DB_EQUIPMENT_TO_LIST[entry.equipment]
     if (expected && !expected.some((item) => equipment.includes(item)) && !equipmentExceptions[entry.id]) {
       bad(entry, `free-db equipment "${entry.equipment}" → none of ${expected.join('/')} listed`)
@@ -354,6 +425,7 @@ function withOwnFields(entry, { aliases = [], photos = [], tags }) {
     out.unilateral = tags.unilateral
     out.common = true
     out.family = tags.family
+    for (const field of TEXT_FIELDS) if (tags[field] !== undefined) out[field] = tags[field]
   }
   return out
 }
@@ -361,7 +433,11 @@ function withOwnFields(entry, { aliases = [], photos = [], tags }) {
 // The pinned free-db list → our library: free-db entries (order and fields unchanged,
 // our fields appended), then the extras, then our own entries. Refuses on any problem.
 export function deriveLibrary(freeDb) {
-  const common = new Map(commonExercises().map((tags) => [tags.id, tags]))
+  const text = commonText()
+  const common = new Map(commonExercises().map((tags) => [tags.id, { ...tags, ...text[tags.id] }]))
+  for (const id of Object.keys(text)) {
+    if (!common.has(id)) throw new Error(`Text for "${id}", which is not a common entry.`)
+  }
   const list = [
     ...freeDb.map((entry) =>
       withOwnFields(entry, {
