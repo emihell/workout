@@ -1763,3 +1763,13 @@ exercises still load, back up, and resolve (fall through to name) — pinned by 
 the library; no RepDB fetch). Gate: Planner's own run in an archive copy → `# tests` all pass, build ✓ (main 341.94 → 341.64
 kB). Test edit: req-139 "keeps the credit" → "no credit" (sanctioned). CLAUDE.md carve-out example reworded.
 
+## req-141 — fresh-eyes scan of the whole library (DEC-065 §4 / DEC-070 §3 / DEC-077)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `428d83f`…`bdfb1da`). Four RepDB-blind agents (scratch export only; brief pasted
+in the report) reviewed all 366 entries → 121 changes (105 text restored to plain gym English, incl. 23 of req-138's
+originality rewrites; 13 aliases; 1 name; safety fixes: calf-press safeties, close-grip elbows), applied via a
+before-checked applicator; 6 proposals rejected (reverted coach/seed decisions — L-031). Round 2 (coach QA + DEC-077): 37
+more — overhead presses front-delt consistent, high rows vertical-pull, 6 niche staples off (194 staples), Tuck Crunch
+hidden, American spelling, 2 wording fixes. Gate: Planner's own run in an archive copy → `# tests 844 # pass 844 # fail 0`,
+build ✓ (main 341.64 kB); own-name scan 366/366. Test edits: sanctioned staple/row pins + DEC-074 counts only.
+
