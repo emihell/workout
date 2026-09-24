@@ -2261,7 +2261,7 @@ const TEXT = {
   ],
   Standing_Dumbbell_Upright_Row: [
     'A dumbbell pulled up the front of the body that trains the side delts and traps.',
-    ['Lead with the elbows', 'Dumbbells stay close', 'Stop at lower chest height'],
+    ['Lead with the elbows', 'Dumbbells stay close', 'Hands stop at lower chest height'],
     [
       'Stand holding a dumbbell in each hand in front of your thighs, palms facing you.',
       'Raise the dumbbells close to your torso, elbows travelling up and out ahead of the hands.',

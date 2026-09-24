@@ -1722,7 +1722,7 @@
     "common": true,
     "family": "fam-bench-press",
     "staple": true,
-    "difficulty": "intermediate",
+    "difficulty": "beginner",
     "description": "A barbell press lying on a flat bench that trains the chest, triceps and front delts.",
     "formCues": [
       "Shoulder blades pinched and down",
@@ -2191,7 +2191,7 @@
     "common": true,
     "family": "fam-hip-thrust",
     "staple": true,
-    "difficulty": "intermediate",
+    "difficulty": "beginner",
     "description": "A barbell hip thrust with the upper back on a bench that trains the glutes.",
     "formCues": [
       "Chin tucked, ribs down",
@@ -2274,7 +2274,7 @@
     "common": true,
     "family": "fam-incline-press",
     "staple": true,
-    "difficulty": "intermediate",
+    "difficulty": "beginner",
     "description": "A barbell press on an incline bench that shifts the work toward the upper chest and front delts.",
     "formCues": [
       "Bench at a low incline",
@@ -7325,7 +7325,7 @@
     "common": true,
     "family": "fam-bench-press",
     "staple": true,
-    "difficulty": "intermediate",
+    "difficulty": "beginner",
     "description": "A flat bench press with a shoulder-width grip that puts more of the work on the triceps.",
     "formCues": [
       "Hands about shoulder width",
@@ -8369,8 +8369,7 @@
     ],
     "id": "Decline_Crunch",
     "aliases": [
-      "Decline Bench Crunch",
-      "Decline Sit-Up"
+      "Decline Bench Crunch"
     ],
     "muscleGroups": [
       "Core"
@@ -20299,6 +20298,10 @@
         "role": "secondary"
       },
       {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
         "id": "abs",
         "role": "secondary"
       }
@@ -20503,7 +20506,7 @@
     "common": true,
     "family": "fam-glute-ham-raise",
     "staple": true,
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "description": "A kneeling lean forward with the ankles held down, a Nordic curl, that trains the hamstrings.",
     "formCues": [
       "Ankles firmly anchored",
@@ -23124,7 +23127,7 @@
     "unilateral": false,
     "common": true,
     "family": "fam-squat",
-    "staple": false,
+    "staple": true,
     "difficulty": "beginner",
     "description": "A wide-stance squat holding one dumbbell between the legs that trains the quads, glutes and inner thighs.",
     "formCues": [
@@ -24028,7 +24031,7 @@
     "common": true,
     "family": "fam-push-up",
     "staple": true,
-    "difficulty": "intermediate",
+    "difficulty": "beginner",
     "description": "A push-up with the hands close together under the chest that puts more of the work on the triceps.",
     "formCues": [
       "Hands close under the chest",
@@ -32333,7 +32336,7 @@
     "formCues": [
       "Lead with the elbows",
       "Dumbbells stay close",
-      "Stop at lower chest height"
+      "Hands stop at lower chest height"
     ],
     "steps": [
       "Stand holding a dumbbell in each hand in front of your thighs, palms facing you.",
@@ -39482,7 +39485,6 @@
     "id": "own-pistol-squat",
     "aliases": [
       "Pistol",
-      "Single-Leg Squat",
       "One-Leg Squat"
     ],
     "muscleGroups": [

@@ -25,7 +25,8 @@ const PROMOTE = {
   Seated_Barbell_Military_Press: true, Box_Squat: false, Floor_Press: false, Dumbbell_Floor_Press: false, Hang_Clean: false,
   Clean: false, Overhead_Squat: false, Deficit_Deadlift: false, Spider_Curl: false, Zottman_Curl: false,
   Incline_Hammer_Curls: false, Standing_Dumbbell_Reverse_Curl: false, Standing_Dumbbell_Upright_Row: false,
-  Plie_Dumbbell_Squat: false, Freehand_Jump_Squat: false, Superman: false, Flutter_Kicks: false, Muscle_Up: false,
+  // planner coach review (sanctioned edit): Dumbbell Sumo Squat is a staple.
+  Plie_Dumbbell_Squat: true, Freehand_Jump_Squat: false, Superman: false, Flutter_Kicks: false, Muscle_Up: false,
   'Handstand_Push-Ups': false, Hanging_Pike: false,
 }
 const ADD = {
@@ -91,7 +92,7 @@ describe('staple', () => {
     const prior = common.filter((entry) => !(entry.id in BATCH))
     assert.equal(prior.length, 178)
     for (const entry of prior) assert.equal(entry.staple, true, entry.id)
-    assert.equal(common.filter((entry) => entry.staple).length, 178 + 14)
+    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15)
   })
 
   it('staple ⇒ common: a non-common entry with staple is rejected (fixture)', () => {
