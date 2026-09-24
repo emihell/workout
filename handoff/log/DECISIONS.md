@@ -1225,3 +1225,16 @@ From planning's critical comparison of our library vs free-db and RepDB, Emilio'
 7. **Real-use corrections** come via the browse screen (req-134) and the "something's wrong" tap (req-136).
 New order: 139 → 138 → 134 → 136 → 132 → 137 → 131 → 135 → own images. Built as req-139.
 
+## DEC-065 — RepDB for pictures only; our library covers everything it does, better; a RepDB-blind audit  (Emilio, 2026-09-24)
+
+1. **RepDB is kept only for its pictures** (req-131's "How to", with the Settings credit). Nothing else is taken from it.
+   "Our database has to have everything it has but better" → req-140 closes the coverage gap with our own entries.
+2. **Fields matched:** our own `difficulty` (beginner/intermediate/advanced) **yes**; training goals **no** (they say
+   little); German/Spanish **no** (English only; Swedish would come first if ever).
+3. **Originality gate relaxed:** only long word-for-word runs (≥12 tokens) count. The 4-gram-share gate is dropped,
+   because it pushed normal gym English away from its natural wording (19 entries in req-138). Emilio: "I am a bit afraid
+   that we might have made choices based only on not being similar to repdb."
+4. **req-141: a fresh-eyes audit** of names, aliases, tags, text and the common list by an agent given nothing about
+   RepDB, including restoring natural wording in the entries rewritten for originality.
+Supersedes DEC-060 §3's measurement (not its principle: never copy RepDB's text or use its images as reference).
+

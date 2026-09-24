@@ -429,6 +429,12 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   browser-only; a **shared** gym library that users contribute to needs the backend (Phase 3 fork). Feeds
   req-135 (alternatives with what's here) and Phase 2 programs.
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
+- **`req-140` library parity** (READY) — the RepDB gap table (checkpoint), then our own entries + aliases + `difficulty`
+  on every common entry; long-run-only originality (DEC-065).
+- **`req-141` fresh-eyes library audit** — after req-140. A fresh agent with **no RepDB context** audits every common
+  entry: displayName, aliases, tags, difficulty, text, the common list; restores natural wording in the 19 entries
+  req-138 rewrote for originality (list in `reports/req-138.md`); fixes in place. Final safety net: the ≥12-token run
+  check only. A coach-eye QA subagent reviews the diff.
 - **Avatars + the app's pixel-art style (Emilio-led, 2026-09-24)** — Emilio wants avatars in the app and calls them
   "crucial to the style of the app"; he'll supply reference pictures and wants to be closely involved (live lane,
   DEC-055: Emilio + session, not a batch). Planning's notes for the spec: **the avatar is the figure that does the
