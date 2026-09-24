@@ -138,7 +138,7 @@ export const OWN_EXERCISES = [
     instructions: [
       'Lie on your back with your hands lightly behind your head, lower back pressed to the floor, and knees lifted so your shins are level with the floor.',
       'Curl your shoulders up and turn your torso to bring one elbow toward the opposite knee while the other leg straightens out low.',
-      'Switch sides in a slow pedalling motion. Turn from the ribs, not by pulling on your neck.',
+      'Switch sides in a slow pedaling motion. Turn from the ribs, not by pulling on your neck.',
     ],
     category: 'strength',
     images: [],
@@ -325,7 +325,7 @@ export const OWN_EXERCISES = [
     instructions: [
       'Take a very wide stance with your toes angled a little outward.',
       'Sink sideways onto one bent leg while the opposite leg stays long, its heel planted and toes lifted.',
-      'Reach the lowest point you can with the working heel flat, rise back through the centre and sink to the other side.',
+      'Reach the lowest point you can with the working heel flat, rise back through the center and sink to the other side.',
     ],
     category: 'strength',
     images: [],

@@ -47,12 +47,12 @@ const TEXT = {
   ],
   'Close-Grip_Barbell_Bench_Press': [
     'A flat bench press with a shoulder-width grip that puts more of the work on the triceps.',
-    ['Hands about shoulder width', 'Elbows tucked close to your sides', 'Wrists straight over the bar'],
+    ['Hands about shoulder width', 'Elbows tucked close to your sides', 'Wrists stacked over the elbows'],
     [
-      'Lie back on a flat bench and take the bar with a grip about as wide as your shoulders.',
+      'Lie on a flat bench and grip the bar with your hands about shoulder width apart.',
       'Unrack the bar and hold it over your shoulders with straight arms.',
-      'Bring the bar down to the bottom of your chest with the elbows brushing your ribs.',
-      'Press back up by straightening your elbows until the arms are locked.',
+      'Lower the bar to your lower chest, keeping your elbows close to your sides.',
+      'Press the bar back up until your arms are straight.',
     ],
     ['Grip so narrow the wrists bend inward', 'Elbows flare out as the bar comes down'],
   ],
@@ -72,12 +72,12 @@ const TEXT = {
     'A seated machine press that trains the chest, triceps and front delts on a fixed path.',
     ['Handles level with mid chest', 'Back and head against the pad', 'Shoulders stay down'],
     [
-      'Raise or lower the seat until the handles sit level with the middle of your chest.',
+      'Adjust the seat so the handles are level with the middle of your chest.',
       'Sit with your back against the pad and grip the handles.',
-      'Push the handles away until your elbows are nearly straight.',
-      'Let the handles come back slowly until you feel a stretch across the chest.',
+      'Press the handles forward until your arms are nearly straight.',
+      'Bring the handles back slowly until you feel a stretch across your chest.',
     ],
-    ['Seat so low the handles sit at the shoulders', 'Shoulders shrug up toward the ears'],
+    ['Seat set too low, so the handles are at shoulder height', 'Shrugging the shoulders up'],
   ],
   'Barbell_Incline_Bench_Press_-_Medium_Grip': [
     'A barbell press on an incline bench that shifts the work toward the upper chest and front delts.',
@@ -103,7 +103,7 @@ const TEXT = {
   ],
   Leverage_Incline_Chest_Press: [
     'A machine press on an upward angle that targets the upper chest with a guided path.',
-    ['Handles start at upper chest height', 'Chest up, back on the pad', 'Smooth turn at the bottom'],
+    ['Handles start at upper chest height', 'Chest up, back on the pad', 'Control the weight back'],
     [
       'Set the seat so the handles line up with your upper chest.',
       'Sit back against the pad and grip the handles.',
@@ -338,7 +338,7 @@ const TEXT = {
     ['Knees drift forward and the torso tips in the dip', 'Pressing before the legs finish their drive'],
   ],
   'own-landmine-press': [
-    'A press of one end of a barbell anchored in a landmine that trains the shoulders and upper chest.',
+    'Pressing the end of a landmine barbell up and forward, for the shoulders and upper chest.',
     ['Ribs down, glutes tight', 'Press up and forward along the arc', 'Finish with the arm long'],
     [
       'Set one end of a barbell in a landmine and load the other end.',
@@ -350,7 +350,7 @@ const TEXT = {
     ['Leaning back to press more upward', 'Twisting the torso to move the bar'],
   ],
   'own-z-press': [
-    'A barbell press overhead while sitting on the floor, legs straight, with no back support, training the delts and core.',
+    'A barbell overhead press sitting on the floor with the legs straight, which trains the shoulders and core.',
     ['Sit tall, legs long', 'Brace your core before each rep', 'Bar goes straight over your head'],
     [
       'Sit on the floor inside a rack with your legs straight in front of you.',
@@ -527,7 +527,7 @@ const TEXT = {
       'Pull your elbows down and back until your chin clears the bar.',
       'Lower yourself under control to a full hang.',
     ],
-    ['Half reps as the load goes up', 'Weight swings and sets the body rocking'],
+    ['Half reps as the load goes up', 'Letting the weight swing and rock the body'],
   ],
   'Band_Assisted_Pull-Up': [
     'A pull-up with a resistance band under the feet or knees that takes some of your bodyweight.',
@@ -549,7 +549,7 @@ const TEXT = {
       'Pull yourself up until your chin clears the handles.',
       'Lower yourself under control until your arms are straight again.',
     ],
-    ['Bouncing off the platform at the bottom', 'Setting so much help the reps take no effort'],
+    ['Bouncing off the platform at the bottom', 'Using so much assistance the reps feel easy'],
   ],
   'Wide-Grip_Lat_Pulldown': [
     'A seated cable pull of a wide bar down to the upper chest that trains the lats.',
@@ -641,7 +641,7 @@ const TEXT = {
     ['Torso rises as the bar comes up', 'Bouncing the bar off the floor'],
   ],
   'own-meadows-row': [
-    'A one-arm row of the end of a landmine barbell, standing side-on, that trains the lats and upper back.',
+    'A one-arm row with a landmine barbell, standing side-on to it, for the lats and upper back.',
     ['Staggered stance, hips hinged', 'Grip the fat end of the bar', 'Elbow drives up and back'],
     [
       'Stand side-on to the loaded end of a landmine barbell in a staggered stance.',
@@ -656,7 +656,7 @@ const TEXT = {
     'A barbell row lying face down on a raised bench, so only the arms and back can move the weight.',
     ['Chest stays on the bench', 'Full hang at the bottom', 'Pull the bar up to the bench'],
     [
-      'Set a flat bench high enough that your arms can hang straight without the bar touching the floor.',
+      'Raise a flat bench on blocks or plates so your arms can hang straight without the bar touching the floor.',
       'Lie face down on it with your chin just past the end.',
       'Grip the bar below you a little wider than your shoulders.',
       'Pull the bar up until it touches the underside of the bench.',
@@ -759,13 +759,13 @@ const TEXT = {
     'A deadlift standing inside a hex-shaped bar that trains the quads, glutes and hamstrings.',
     ['Stand in the middle of the bar', 'Chest up, back flat', 'Drive through the whole foot'],
     [
-      'Step into the centre of the trap bar with your feet about hip width apart.',
+      'Step into the center of the trap bar with your feet about hip width apart.',
       'Squat down and grip the handles at your sides.',
       'Flatten your back and brace.',
       'Stand up by pushing the floor away until your hips and knees are straight.',
       'Lower the bar under control back to the floor.',
     ],
-    ['Standing off-centre so the bar tips', 'Rounding the back at the bottom'],
+    ['Standing off-center so the bar tips', 'Rounding the back at the bottom'],
   ],
   Rack_Pulls: [
     'A partial deadlift from pins or blocks at about knee height that trains the lower back, glutes and traps.',
@@ -803,27 +803,27 @@ const TEXT = {
     ['Rounding the back to touch the floor', 'Knees locked hard and the hips stop moving'],
   ],
   'Stiff-Legged_Dumbbell_Deadlift': [
-    'A hip hinge with a dumbbell in each hand that trains the hamstrings and glutes.',
+    'A Romanian deadlift with a dumbbell in each hand that trains the hamstrings and glutes.',
     ['Soft knees, hips back', 'Dumbbells close to the legs', 'Flat back all the way'],
     [
-      'Stand tall with the dumbbells resting against the fronts of your thighs.',
-      'Unlock your knees and push your hips back.',
-      'Slide the weights down close to your legs until the backs of your thighs are stretched.',
-      'Bring your hips through to return to tall standing.',
+      'Stand holding a dumbbell in each hand in front of your thighs, feet about hip width apart.',
+      'Keep a slight bend in your knees and push your hips back.',
+      'Lower the dumbbells along your legs until you feel a stretch in your hamstrings.',
+      'Drive your hips forward to stand back up.',
     ],
-    ['Dumbbells swing out in front of the legs', 'Rounding the back at the bottom'],
+    ['Letting the dumbbells drift away from your legs', 'Rounding your back at the bottom'],
   ],
   'own-single-leg-rdl': [
-    'A one-leg hip hinge with a dumbbell that trains the hamstrings and glutes and challenges balance.',
-    ['Hips stay square to the floor', 'Back leg reaches straight behind', 'Soft knee on the standing leg'],
+    'A Romanian deadlift on one leg that trains the hamstrings and glutes and challenges your balance.',
+    ['Hips stay square to the floor', 'Back leg in line with your torso', 'Soft bend in the standing knee'],
     [
-      'Balance on your left leg with a dumbbell in your right hand.',
-      'Hinge forward from the hip while your free leg reaches straight back.',
-      'Lower the dumbbell until your torso is close to level or you feel a hamstring stretch.',
-      'Drive the standing hip forward to return to upright.',
-      'Complete the set, then repeat on the other side.',
+      'Stand on one leg with a dumbbell in the opposite hand.',
+      'Hinge at the hips and reach your free leg straight back behind you.',
+      'Lower the dumbbell toward the floor until your torso is nearly level or you feel a hamstring stretch.',
+      'Squeeze your glute and push your hips forward to stand back up.',
+      'Finish the set, then switch sides.',
     ],
-    ['Hips twist open toward the ceiling', 'Rounding the back to reach the floor'],
+    ['Hips twisting open toward the ceiling', 'Rounding the back to reach the floor', 'Locking the standing knee'],
   ],
   Good_Morning: [
     'A hip hinge with a barbell on the upper back that trains the hamstrings and lower back.',
@@ -957,8 +957,8 @@ const TEXT = {
     ['Pushing the hands on the thighs', 'Feet too close so the knees pass the toes'],
   ],
   Leg_Press: [
-    'A seated machine press of a sled with the legs that trains the quads and glutes.',
-    ['Lower back stays on the seat', 'Knees track over the toes', 'Stop short of hard lockout'],
+    'A seated machine where you push a weighted platform away with your legs, training the quads and glutes.',
+    ['Lower back stays on the seat', 'Knees track over the toes', "Don't lock out the knees"],
     [
       'Sit in the machine with your back flat against the pad and your feet about shoulder width on the platform.',
       'Press the platform up and release the safety handles.',
@@ -969,26 +969,26 @@ const TEXT = {
     ['Lower back rolls off the seat at the bottom', 'Knees slam into lockout', 'Knees cave inward'],
   ],
   Barbell_Lunge: [
-    'A forward lunge with the bar on your back, working the quads and glutes one leg at a time.',
-    ['Long enough step for both knees to bend', 'Torso upright', 'Front knee over the mid foot'],
+    'A forward lunge with a barbell on your back that trains the quads and glutes.',
+    ['Take a big enough step', 'Stay tall through the torso', 'Front knee tracks over the toes'],
     [
-      'Unrack the bar onto your upper back and walk clear of the rack.',
-      'Take a long stride forward and sink until the rear knee nearly brushes the floor.',
-      'Drive off the front heel to bring the feet back together.',
-      'Alternate legs, or finish one side before the other.',
+      'Set the bar across your upper back and step back from the rack.',
+      'Step forward with one leg and lower until your back knee almost touches the floor.',
+      'Push through your front foot to step back to standing.',
+      'Alternate legs, or do all your reps on one leg before switching.',
     ],
     ['Front heel lifts off the floor', 'Front knee caves inward', 'Torso tips forward'],
   ],
   Dumbbell_Lunges: [
     'A lunge holding a dumbbell in each hand that trains the quads and glutes.',
-    ['Torso tall, dumbbells at your sides', 'Front knee over the mid foot', 'Push through the front heel'],
+    ['Torso tall, dumbbells at your sides', 'Front knee tracks over the toes', 'Push through the front heel'],
     [
-      'Stand holding a dumbbell at each side.',
-      'Stride forward and bend both knees, dropping the rear knee close to the floor.',
-      'Press through the front foot and step back to where you began.',
-      'Alternate legs, or finish one side before the other.',
+      'Stand tall holding a dumbbell at each side.',
+      'Step forward with one leg and lower until your back knee almost touches the floor.',
+      'Push through your front foot to step back to standing.',
+      'Alternate legs, or do all your reps on one leg before switching.',
     ],
-    ['Stepping too short so the front knee shoots forward', 'Front knee caves inward'],
+    ['Steps too short, so the front knee shoots forward', 'Front knee caves inward'],
   ],
   Bodyweight_Walking_Lunge: [
     'A lunge that steps forward continuously across the floor, training the quads and glutes.',
@@ -1009,12 +1009,12 @@ const TEXT = {
       'Step one foot back and lower your back knee toward the floor.',
       'Keep most of your weight on the front foot.',
       'Push through the front foot to bring the back foot forward to standing.',
-      'Alternate legs, or finish one side before the other.',
+      'Alternate legs, or do all your reps on one leg before switching.',
     ],
     ['Stepping back too narrow, so you wobble', 'Pushing off the back foot to stand'],
   ],
   Split_Squat_with_Dumbbells: [
-    'A split squat with the rear foot on a bench, a Bulgarian split squat, that trains the quads and glutes.',
+    'A split squat with your back foot up on a bench that trains the quads and glutes.',
     ['Most weight on the front foot', 'Back knee drops straight down', 'Hips stay square'],
     [
       'Stand a stride in front of a bench holding a dumbbell at each side.',
@@ -1032,7 +1032,7 @@ const TEXT = {
       'Stand with your feet wide apart.',
       'Shift your weight onto one leg and squat down over it.',
       'Let the other leg stay straight with its toes pointing up.',
-      'Push back up to the centre and shift to the other side.',
+      'Push back up to the center and shift to the other side.',
     ],
     ['Heel of the bent leg lifts off the floor', 'Folding forward instead of sitting down'],
   ],
@@ -1049,12 +1049,12 @@ const TEXT = {
     ['Pushing off the floor foot to jump up', 'Box so high the hips tuck under'],
   ],
   Leg_Extensions: [
-    'A seated machine extension of the knees that isolates the quads.',
+    'Straightening the legs against a padded lever on a machine, to isolate the quads.',
     ['Knees lined up with the pivot', 'Pad just above the ankles', 'Squeeze at the top'],
     [
-      'Move the backrest until the joint of your knee sits level with the pivot.',
+      "Adjust the backrest so your knees line up with the machine's pivot point.",
       'Set the pad just above your ankles and hold the handles.',
-      'Extend your knees to lift the pad until the legs are almost fully straight.',
+      'Lift the pad by straightening your legs until your knees are nearly locked.',
       'Pause briefly, then lower the weight slowly.',
     ],
     ['Swinging the pad up fast and letting it drop', 'Hips lift off the seat'],
@@ -1116,7 +1116,7 @@ const TEXT = {
     ['Bending at the hips to cheat the rep up', 'Knees sitting on top of the pad'],
   ],
   Natural_Glute_Ham_Raise: [
-    'A kneeling lean forward with the ankles held down, a Nordic curl, that trains the hamstrings.',
+    'Lowering your body forward from a kneel with the ankles held down, to train the hamstrings.',
     ['Ankles firmly anchored', 'Hips stay straight', 'Resist the fall as long as you can'],
     [
       'Kneel on a pad with your ankles held down by a partner or a fixed bar.',
@@ -1162,16 +1162,16 @@ const TEXT = {
     ['Arching the back instead of lifting the hips', 'Knees fall outward'],
   ],
   Single_Leg_Glute_Bridge: [
-    'A hip bridge driven through one foot that trains the glutes and hamstrings of that leg.',
-    ['Hips stay level', 'Drive through the planted heel', 'Free leg stays still'],
+    'A glute bridge on one leg that works the glutes and hamstrings harder than the regular version.',
+    ['Hips stay level', 'Drive through the heel', 'Keep the other leg still'],
     [
-      'Lie face up, plant one foot near your glutes and keep that knee bent.',
-      'Lift the other leg so it is straight or bent in the air.',
-      'Drive through the planted heel and lift your hips until they are level with your knee.',
-      'Lower your hips back down slowly.',
+      'Lie on your back with your knees bent and your feet flat on the floor.',
+      'Lift one foot off the floor and straighten that leg, or keep it bent.',
+      'Push through the heel of the planted foot and lift your hips until your body is straight from shoulders to knee.',
+      'Lower your hips slowly back to the floor.',
       'Finish the set, then switch sides.',
     ],
-    ['One hip drops lower than the other', 'Pushing up through the toes'],
+    ['Letting one hip drop', 'Pushing up through the toes'],
   ],
   'One-Legged_Cable_Kickback': [
     'A standing kickback of one leg against a low cable that trains the glutes.',
@@ -1186,11 +1186,11 @@ const TEXT = {
     ['Arching the lower back to lift the leg higher', 'Swinging the leg with momentum'],
   ],
   Glute_Kickback: [
-    'A kickback of one leg on all fours that trains the glutes with bodyweight.',
+    'Kicking one leg back and up on all fours to train the glutes.',
     ['Back flat, core tight', 'Push the heel toward the ceiling', 'Hips stay level'],
     [
-      'Get on your hands and knees, wrists below the shoulders and knees below the hips.',
-      'Keep one knee bent and lift that leg until your thigh is level with your back.',
+      'Get on your hands and knees, wrists under your shoulders and knees under your hips.',
+      'Keeping the knee bent, lift one leg back and up until your thigh is in line with your back.',
       'Squeeze your glute at the top.',
       'Lower the knee back toward the floor without touching it.',
       'Finish the set, then switch sides.',
@@ -1209,7 +1209,7 @@ const TEXT = {
     ['Squatting down instead of hinging', 'Pulling the rope with the arms'],
   ],
   Thigh_Abductor: [
-    'A seated machine push of the knees outward that trains the outer hip and glute med.',
+    'A seated machine exercise that pushes the knees apart to train the outer hips and glutes.',
     ['Back against the pad', 'Push out with the knees', 'Slow return'],
     [
       'Sit in the machine with your back against the pad and the pads on the outside of your knees.',
@@ -1220,13 +1220,13 @@ const TEXT = {
     ['Leaning forward to use the upper body', 'Letting the stack bang together'],
   ],
   Thigh_Adductor: [
-    'A seated machine squeeze of the knees together that trains the inner thighs.',
-    ['Sit tall, back supported', 'Squeeze with the inner thighs', 'Control the opening'],
+    'A seated machine exercise that squeezes the knees together to train the inner thighs.',
+    ['Back against the pad', 'Squeeze with the inner thighs', 'Slow on the way out'],
     [
-      'Sit tall in the machine and set the inner thigh pads against the insides of your knees.',
+      'Sit in the machine with your back against the pad and the pads on the inside of your knees.',
       'Set the starting width to a stretch you can control.',
-      'Draw your knees in until the pads touch.',
-      'Let your legs open slowly.',
+      'Squeeze your knees together until the pads meet.',
+      'Let your legs open back out slowly.',
     ],
     ['Setting the stretch wider than you can control', 'Jerking the pads together'],
   ],
@@ -1267,12 +1267,13 @@ const TEXT = {
   ],
   Calf_Press_On_The_Leg_Press_Machine: [
     'A calf press on the leg press machine, pushing the platform with the balls of the feet.',
-    ['Only the balls of the feet on the platform', 'Knees straight, not locked', 'Keep the safety handles on'],
+    ['Only the balls of the feet on the platform', 'Knees straight, not locked', 'Slow stretch at the bottom'],
     [
       'Sit in the leg press and place the balls of your feet on the bottom edge of the platform.',
-      'Press the platform up with straight legs, keeping the safety handles locked.',
+      'Press the platform up with straight legs and release the safety handles.',
       'Let the platform bend your ankles back until you feel a stretch in your calves.',
       'Press through the balls of your feet as far as you can.',
+      'Lock the safety handles again before you take your feet off.',
     ],
     ['Feet slipping off the platform edge', 'Bending the knees to move the weight'],
   ],
@@ -1301,7 +1302,7 @@ const TEXT = {
     ['Swinging the hips to heave the bar up', 'Elbows drift forward at the top'],
   ],
   'EZ-Bar_Curl': [
-    'A standing curl of an EZ bar, whose angled grip sits easier on the wrists, that trains the biceps.',
+    'A standing biceps curl with an EZ bar, whose angled grip is easier on the wrists.',
     ['Hands on the angled grips', 'Upper arms stay still', 'Squeeze at the top'],
     [
       'Stand holding an EZ bar on the inner angled grips, palms facing forward.',
@@ -1390,12 +1391,12 @@ const TEXT = {
     ['Leaning back to finish the rep', 'Elbows drift forward'],
   ],
   Preacher_Curl: [
-    'A curl with the upper arms resting on an angled preacher pad that trains the biceps.',
+    'A barbell curl with your upper arms resting on an angled preacher pad, to isolate the biceps.',
     ['Armpits against the top of the pad', 'Upper arms flat on the pad', 'Lower all the way'],
     [
-      'Sit at the bench and drape the backs of your upper arms over the pad.',
+      'Sit at the preacher bench and rest the backs of your upper arms flat on the pad.',
       'Grip the bar underhand at about shoulder width.',
-      'Bend your elbows to bring the bar up near your chin.',
+      'Curl the bar up toward your shoulders.',
       'Lower it slowly until your arms are nearly straight.',
     ],
     ['Lifting the elbows off the pad', 'Dropping the bar fast at the bottom'],
@@ -1413,18 +1414,18 @@ const TEXT = {
     ['Using the leg to push the arm up', 'Rocking the torso back as you curl'],
   ],
   Reverse_Barbell_Curl: [
-    'A barbell curl with the palms facing down, working the brachialis and forearms.',
+    'A barbell curl with an overhand grip that works the brachialis and forearms.',
     ['Palms face down', 'Wrists stay straight', 'Elbows stay at your sides'],
     [
-      'Take the bar palms down, hands about as wide as your shoulders.',
-      'Let the bar hang at your thighs with your arms straight.',
-      'Bend your elbows to lift the bar high, wrists in line with your forearms.',
+      'Hold a barbell with an overhand grip, hands about shoulder width apart.',
+      'Stand tall with the bar at your thighs and your arms straight.',
+      'Curl the bar up toward your shoulders, keeping your wrists straight.',
       'Lower it slowly until your arms are straight.',
     ],
-    ['Wrists bend back under the load', 'Swinging the hips to lift the bar'],
+    ['Letting the wrists bend back', 'Swinging the hips to lift the bar'],
   ],
   Triceps_Pushdown: [
-    'A push of a bar down from a high cable that trains the triceps.',
+    'Pushing a bar down on a high cable until the arms are straight, for the triceps.',
     ['Elbows pinned to your sides', 'Only the forearms move', 'Lock out at the bottom'],
     [
       'Attach a straight or angled bar to a high pulley and grip it overhand at shoulder width.',
@@ -1468,18 +1469,18 @@ const TEXT = {
     ['Elbows flare out to the sides', 'Arching the back as the arms extend'],
   ],
   'EZ-Bar_Skullcrusher': [
-    'An EZ bar lowered toward the head while lying on a bench, then pressed back up, training the triceps.',
+    'A lying triceps extension, lowering an EZ bar toward your forehead and pressing it back up.',
     ['Upper arms stay still', 'Lower toward the forehead', 'Elbows point to the ceiling'],
     [
       'Lie back on a flat bench and press an EZ bar up over your chest, palms facing away.',
       'Tilt your arms slightly back toward your head.',
       'Bend your elbows to lower the bar toward your forehead.',
-      'Straighten your arms to press the bar back up.',
+      'Straighten your elbows to bring the bar back up.',
     ],
     ['Elbows flare wide as the bar lowers', 'Upper arms swing so it becomes a pullover'],
   ],
   Lying_Dumbbell_Tricep_Extension: [
-    'A lying triceps extension with a dumbbell in each hand, lowered beside the head, that trains the triceps.',
+    'A lying triceps extension with a dumbbell in each hand, lowered beside the head.',
     ['Palms face each other', 'Upper arms stay vertical', 'Lower beside the ears'],
     [
       'Lie on a flat bench with a dumbbell in each hand, arms straight over your chest.',
@@ -1490,7 +1491,7 @@ const TEXT = {
     ['Elbows drift apart', 'Dumbbells drop too fast near the head'],
   ],
   Tricep_Dumbbell_Kickback: [
-    'A dumbbell extended back from a bent elbow while hinged forward that trains the triceps.',
+    'A bent-over dumbbell exercise that straightens the arm back behind you to train the triceps.',
     ['Upper arm level with the torso', 'Only the forearm moves', 'Lock out fully'],
     [
       'Hold a dumbbell in each hand and hinge forward with a flat back and soft knees.',
@@ -1558,13 +1559,13 @@ const TEXT = {
 
   // Core
   Plank: [
-    'An isometric hold on the forearms and toes that trains the abs and the whole trunk to stay straight.',
+    'Holding your body straight on your forearms and toes, to build core strength.',
     ['Elbows under the shoulders', 'Squeeze the glutes', 'Head, hips and heels in line'],
     [
-      'Rest on your forearms with the elbows stacked below the shoulders.',
-      'Step your feet back so you are on your toes with your body straight.',
+      'Get down on your forearms with your elbows directly under your shoulders.',
+      'Step your feet back and lift onto your toes so your body forms a straight line.',
       'Brace your abs and squeeze your glutes.',
-      'Hold the position, breathing steadily, then lower your knees to finish.',
+      'Hold, breathing steadily, then lower your knees to the floor to finish.',
     ],
     ['Hips sag toward the floor', 'Hips pike up toward the ceiling', 'Head hangs down'],
   ],
@@ -1581,19 +1582,19 @@ const TEXT = {
     ['Lower back lifts off the floor', 'Chin juts forward'],
   ],
   Side_Bridge: [
-    'An isometric side plank on one forearm that trains the obliques and the side of the hips.',
+    'A side plank held on one forearm that works the obliques and the side of the hips.',
     ['Elbow under the shoulder', 'Hips lifted in line', 'Top hip stacked over the bottom'],
     [
-      'Lie on one side, propped on the forearm, with the elbow directly below the shoulder.',
-      'Stack your feet or stagger them for balance.',
+      'Lie on your side with your elbow directly under your shoulder and your legs straight.',
+      'Stack your feet on top of each other, or stagger them for more balance.',
       'Lift your hips until your body is straight from head to feet.',
-      'Hold the position, then lower your hips to the floor.',
+      'Hold, then lower your hips back to the floor.',
       'Switch sides and repeat.',
     ],
-    ['Hips sag toward the floor', 'Chest rolls toward the floor'],
+    ['Letting the hips sag', 'Rolling the chest forward toward the floor'],
   ],
   Crunches: [
-    'A curl of the shoulders off the floor, lying on your back, that trains the abs.',
+    'Lying on your back and curling your shoulders off the floor to train the abs.',
     ['Curl the ribs toward the hips', 'Lower back stays down', 'Hands light behind the head'],
     [
       'Lie on your back with your knees bent and your feet flat on the floor.',
@@ -1626,36 +1627,37 @@ const TEXT = {
     ['Pulling the handles with the arms', 'Letting the stack slam back'],
   ],
   'own-bicycle-crunch': [
-    'A crunch that twists an elbow toward the opposite knee in a pedalling motion, training the abs and obliques.',
+    'A crunch that twists an elbow toward the opposite knee in a pedaling motion, training the abs and obliques.',
     ['Rotate the shoulder, not just the elbow', 'Lower back stays down', 'Slow, steady pedal'],
     [
       'Lie on your back with your hands lightly behind your head and your legs lifted, knees bent.',
       'Curl your shoulders off the floor.',
       'Bring one knee in as you rotate the opposite shoulder toward it and straighten the other leg.',
-      'Switch sides in a steady pedalling motion.',
+      'Switch sides in a steady pedaling motion.',
     ],
     ['Pulling the head forward with the hands', 'Flapping the elbows without rotating'],
   ],
   Reverse_Crunch: [
-    'A crunch on your back that rolls the hips up off the floor, working the abs from the bottom up.',
-    ['Curl the hips up', 'Knees stay bent', 'Lower slowly'],
+    'A crunch where you curl your hips off the floor and bring your knees toward your chest.',
+    ['Curl the hips off the floor', 'Keep the knees bent', 'Lower slowly'],
     [
-      'Lie flat, palms down by your hips, and lift your bent legs until the knees are above the hips.',
-      'Roll your pelvis up so your hips peel off the floor and the knees travel toward your face.',
-      'Lower your hips back down slowly.',
+      'Lie on your back with your arms by your sides, palms down.',
+      'Lift your legs with your knees bent until your thighs are vertical.',
+      'Curl your hips off the floor and bring your knees toward your chest.',
+      'Lower your hips back down slowly, keeping your knees bent.',
     ],
-    ['Swinging the legs to get the hips up', 'Pushing hard into the floor with the arms'],
+    ['Swinging the legs for momentum', 'Pushing off the floor with the hands'],
   ],
   'Sit-Up': [
-    'A sit-up from lying to sitting that trains the abs and hip flexors.',
-    ['Feet anchored or flat', 'Curl up one segment at a time', 'Lower under control'],
+    'Curling up from lying on your back to sitting, which works the abs and hip flexors.',
+    ['Keep your feet flat or anchored', "Curl up smoothly, don't jerk", 'Lower back down with control'],
     [
-      'Lie down with bent knees and your feet flat or hooked under a pad.',
-      'Fold your arms across your chest or rest your fingertips at your temples.',
-      'Roll up off the floor until you are sitting tall.',
-      'Lower back down slowly.',
+      'Lie on your back with your knees bent and your feet flat on the floor or hooked under a pad.',
+      'Cross your arms over your chest or put your fingertips behind your ears.',
+      'Curl your upper body off the floor until you are sitting upright.',
+      'Lower yourself back down slowly.',
     ],
-    ['Yanking the neck forward with the hands', 'Dropping back to the floor'],
+    ['Pulling on your neck with your hands', 'Flopping back down to the floor'],
   ],
   'Jackknife_Sit-Up': [
     'A V-shaped crunch that brings straight arms and legs up to meet over the hips, training the abs and hip flexors.',
@@ -1669,19 +1671,19 @@ const TEXT = {
     ['Bending the knees to finish every rep', 'Thumping the legs back to the floor'],
   ],
   Hanging_Leg_Raise: [
-    'A straight-leg lift from a dead hang on a bar that works the abs and hip flexors.',
-    ['Start from a still hang', 'Tuck the pelvis at the top', 'Lower without swinging'],
+    'Hanging from a bar and raising straight legs to hip height or higher, for the abs and hip flexors.',
+    ['Start from a still hang', 'Roll the hips up at the top', 'Lower slowly, no swinging'],
     [
-      'Take an overhand grip on the bar and hang still with your legs together.',
-      'Lift your straight legs up and forward until your feet reach hip height or higher.',
-      'Tilt your pelvis back toward you as the legs peak.',
-      'Lower your legs slowly back down.',
+      'Grab the bar with an overhand grip and hang with your legs together.',
+      'Keeping your legs straight, raise them in front of you until your feet reach hip height or higher.',
+      'At the top, roll your hips up slightly.',
+      'Lower your legs slowly without swinging.',
     ],
-    ['Swinging the body for momentum', 'Legs drop fast on the way down'],
+    ['Swinging to get the legs up', 'Dropping the legs on the way down'],
   ],
   'own-hanging-knee-raise': [
-    'A raise of bent knees toward the chest while hanging from a bar that trains the abs and hip flexors.',
-    ['Still hang first', 'Knees up toward the chest', 'Tilt the pelvis up at the top'],
+    'Hanging from a bar and raising bent knees toward the chest, for the abs and hip flexors.',
+    ['Start from a still hang', 'Knees up toward the chest', 'Tilt the pelvis up at the top'],
     [
       'Hang from a pull-up bar with your arms straight.',
       'Bend your knees and raise them toward your chest.',
@@ -1691,18 +1693,18 @@ const TEXT = {
     ['Swinging to lift the knees', 'Stopping with the knees at hip height'],
   ],
   Knee_Hip_Raise_On_Parallel_Bars: [
-    "A knee raise in a captain's chair, propped on the forearms, that works the abs and hip flexors.",
-    ['Lower back glued to the backrest', 'Knees up toward the chest', 'Lower slowly'],
+    "Raising the knees toward the chest in a captain's chair, for the abs and hip flexors.",
+    ['Back pressed against the pad', 'Bring the knees up to the chest', 'Lower slowly'],
     [
-      "Set your forearms on the pads of the captain's chair and rest your back on the backrest.",
-      'Let your legs dangle below you.',
+      "Step up into the captain's chair, rest your forearms on the pads and grip the handles.",
+      'Press your back against the backrest and let your legs hang straight down.',
       'Bend your knees and raise them toward your chest.',
-      'Lower them under control until they dangle again.',
+      'Lower your legs slowly until they hang straight again.',
     ],
-    ['Swinging the legs up', 'Lower back peels off the pad'],
+    ['Swinging the legs up', 'Lower back coming off the pad'],
   ],
   Flat_Bench_Lying_Leg_Raise: [
-    'A raise of straight legs lying on a bench or the floor that trains the abs and hip flexors.',
+    'Raising straight legs while lying on a bench or the floor, for the abs and hip flexors.',
     ['Lower back pressed down', 'Legs as straight as you can', 'Slow on the way down'],
     [
       'Lie on a flat bench with your hands holding the edge behind your head or under your hips.',
@@ -1713,15 +1715,15 @@ const TEXT = {
     ['Lower back arches as the legs drop', 'Legs fall to the bench'],
   ],
   Russian_Twist: [
-    'A seated twist from side to side with the torso leaned back that trains the obliques.',
-    ['Chest up, back straight', 'Rotate from the ribs', 'Feet down to make it easier'],
+    'A seated core exercise where you lean back and twist from side to side, working the obliques.',
+    ['Chest up, back straight', 'Turn your shoulders, not just your arms', 'Keep your feet down to make it easier'],
     [
-      'Sit with bent knees and tip your torso back until your abs switch on.',
-      'Clasp your hands or grip a plate close to your chest.',
-      'Turn your shoulders to face one hip, then the opposite hip.',
+      'Sit on the floor with your knees bent and lean back slightly, keeping your back straight.',
+      'Hold your hands together or a weight plate in front of your chest.',
+      'Twist your torso to one side, then to the other.',
       'Lift your feet off the floor to make it harder.',
     ],
-    ['Only the arms move while the torso stays still', 'Rounding the back and slumping'],
+    ['Moving only the arms instead of twisting the torso', 'Rounding the back and slumping'],
   ],
   Standing_Cable_Wood_Chop: [
     'A diagonal chop of a cable across the body from high to low that trains the obliques.',
@@ -1736,16 +1738,16 @@ const TEXT = {
     ['Pulling with the arms instead of rotating', 'Bending at the waist to chop lower'],
   ],
   Pallof_Press: [
-    'A press of a cable straight out from the chest while resisting its pull to one side, training the obliques and abs.',
-    ['Stand side-on, feet planted', 'Hands stay on the midline', 'No twist toward the machine'],
+    'Pressing a cable handle straight out from the chest without letting it twist you, for the obliques and abs.',
+    ['Feet planted, glutes tight', 'Press straight out from the chest', 'Hips and shoulders stay square'],
     [
-      'Fix a single handle at chest height and stand with the machine beside you.',
-      'Hold the handle with both hands against the middle of your chest.',
-      'Push your hands out from your chest along the midline until the elbows lock.',
-      'Hold briefly, then bring it back to your chest.',
+      'Set a handle on a cable at chest height and stand side-on to the machine.',
+      'Hold the handle with both hands at your chest and step out until the cable is tight.',
+      'Press the handle straight out in front of you until your arms are straight.',
+      'Hold for a moment, then bring it back to your chest.',
       'Finish the set, then turn around and work the other side.',
     ],
-    ['Torso rotates toward the machine', 'Standing so close there is no pull'],
+    ['Twisting toward the machine', 'Standing too close, so the cable has no pull'],
   ],
   Dead_Bug: [
     'A slow reach of the opposite arm and leg while lying on your back that trains the abs.',
@@ -1759,18 +1761,18 @@ const TEXT = {
     ['Lower back arches off the floor', 'Rushing the movement'],
   ],
   'own-bird-dog': [
-    'A reach of the opposite arm and leg on all fours that trains the abs and lower back to stay steady.',
+    'On all fours, reaching out the opposite arm and leg while keeping the back still, for the core.',
     ['Back flat as a table', 'Reach long, not high', 'Hips stay level'],
     [
-      'Set up on hands and knees with a flat back, hands below the shoulders.',
-      'Reach one arm forward and the opposite leg back until both are straight.',
-      'Hold briefly, then bring them back under you.',
-      'Repeat with the other arm and leg.',
+      'Get on your hands and knees, hands under your shoulders and knees under your hips.',
+      'Reach one arm forward and the opposite leg back until both are straight and in line with your body.',
+      'Pause, then bring your elbow and knee back under you.',
+      'Switch to the other arm and leg and keep alternating.',
     ],
-    ['Arching the back to lift the leg higher', 'Hips tilt toward the lifting leg'],
+    ['Arching the back to lift the leg higher', 'Hips rotating as the leg lifts', 'Rushing from side to side'],
   ],
   Ab_Roller: [
-    'A roll of an ab wheel forward from the knees and back that trains the abs to resist arching.',
+    'Rolling an ab wheel out from your knees and back, training the abs to keep the lower back from arching.',
     ['Ribs down, glutes tight', 'Roll only as far as you can hold', 'Pull back with the abs'],
     [
       'Kneel on a mat and hold the ab wheel under your shoulders.',
@@ -1781,7 +1783,7 @@ const TEXT = {
     ['Lower back sags at the far point', 'Hips pike up first on the way back'],
   ],
   Mountain_Climbers: [
-    'A plank with the knees driven toward the chest in turn that trains the abs and hip flexors.',
+    'Driving the knees toward the chest one at a time from a plank, for the abs and hip flexors.',
     ['Hands under the shoulders', 'Hips level with the shoulders', 'Quick, light feet'],
     [
       'Start in a high plank with your hands under your shoulders.',
@@ -1829,35 +1831,35 @@ const TEXT = {
     ['Leaning on the rails on a steep incline', 'Looking down at the feet'],
   ],
   Bicycling_Stationary: [
-    'Pedalling a stationary bike, a low-impact cardio effort that works the quads and glutes.',
+    'Pedaling a stationary bike, a low-impact cardio effort that works the quads and glutes.',
     ['Slight knee bend at the bottom', 'Hips steady on the saddle', 'Push and pull through the pedal'],
     [
       'Set the saddle so your knee is slightly bent when the pedal is at the bottom.',
       'Adjust the handlebars so you can reach them with a flat back.',
-      'Start pedalling at an easy resistance to warm up.',
+      'Start pedaling at an easy resistance to warm up.',
       'Raise the resistance or pace to the effort you want.',
       'Ease off to cool down before you stop.',
     ],
     ['Saddle so low the knees rise above the hips', 'Hips rock side to side on the saddle'],
   ],
   Recumbent_Bike: [
-    'Pedalling a reclined bike with back support, a low-impact cardio effort for the legs.',
-    ['Back against the seat', 'Slight knee bend at full reach', 'Smooth, even pedalling'],
+    'Pedaling a reclined bike with back support, a low-impact cardio effort for the legs.',
+    ['Back against the seat', 'Slight knee bend at full reach', 'Smooth, even pedaling'],
     [
       'Slide the seat so your knee is slightly bent when the pedal is farthest away.',
       'Sit back against the backrest and strap your feet in.',
-      'Start pedalling at an easy resistance.',
+      'Start pedaling at an easy resistance.',
       'Raise the resistance or pace to the effort you want.',
       'Ease off to cool down before you stop.',
     ],
     ['Seat so far back the legs lock out', 'Slouching down in the seat'],
   ],
   'own-fan-bike': [
-    'An air bike with moving handles, where harder effort meets more fan resistance, working the whole body.',
+    'A stationary bike with moving handles and a fan, where the harder you pedal the more resistance you get.',
     ['Push and pull the handles', 'Drive through the pedals', 'Sit tall'],
     [
       'Set the seat so your knee is slightly bent at the bottom of the pedal stroke.',
-      'Grip the handles and start pedalling easily.',
+      'Grip the handles and start pedaling easily.',
       'Push and pull the handles in time with your legs.',
       'Raise the effort to the pace you want, then ease off to recover.',
     ],
@@ -1870,7 +1872,7 @@ const TEXT = {
       'Step onto the pedals and hold the moving handles.',
       'Start striding at an easy resistance.',
       'Raise the resistance or incline to the effort you want.',
-      'Push and pull the handles to bring the arms in.',
+      'Push and pull the handles to work your arms as well.',
       'Ease off to cool down before you step off.',
     ],
     ['Leaning heavily on the handles', 'Rising onto the toes'],
@@ -1899,13 +1901,13 @@ const TEXT = {
     ['Leaning on the rails to take the weight off', 'Stepping only on the toes'],
   ],
   Rope_Jumping: [
-    'Jumping over a turning rope, a cardio effort that works the calves and coordination.',
-    ['Small jumps, light landings', 'Turn from the wrists', 'Elbows close to your sides'],
+    'Jumping over a turning rope, a simple cardio exercise that also works the calves and coordination.',
+    ['Small jumps, soft landings', 'Turn the rope with your wrists', 'Elbows close to your sides'],
     [
-      'Take the handles with the rope resting on the floor behind you.',
-      'Swing the rope over your head with your wrists.',
-      'Hop only as high as the rope needs to clear.',
-      'Stay on your forefoot with quiet landings and an even beat.',
+      'Hold a handle in each hand with the rope behind your heels.',
+      'Turn the rope over your head using your wrists.',
+      'Jump just high enough for the rope to pass under your feet.',
+      'Land softly on the balls of your feet and keep a steady rhythm.',
     ],
     ['Jumping too high', 'Swinging the whole arm instead of the wrists'],
   ],
@@ -2158,7 +2160,7 @@ const TEXT = {
   ],
   Dumbbell_Floor_Press: [
     'A dumbbell press lying on the floor that trains the chest and triceps with a built-in stop.',
-    ['Elbows at an angle to the body', 'Pause at the floor', 'Press the dumbbells together up'],
+    ['Elbows at about 45 degrees to the body', 'Pause with the upper arms on the floor', 'Press straight up over the chest'],
     [
       'Sit on the floor with a dumbbell on each thigh, then lie back and bring them to your chest.',
       'Bend your knees and set your feet flat.',
@@ -2264,7 +2266,7 @@ const TEXT = {
     ['Lead with the elbows', 'Dumbbells stay close', 'Hands stop at lower chest height'],
     [
       'Stand holding a dumbbell in each hand in front of your thighs, palms facing you.',
-      'Raise the dumbbells close to your torso, elbows travelling up and out ahead of the hands.',
+      'Raise the dumbbells close to your torso, elbows traveling up and out ahead of the hands.',
       'Stop when your elbows reach about shoulder height.',
       'Lower the dumbbells slowly to your thighs.',
     ],
@@ -2382,7 +2384,7 @@ const TEXT = {
       'Lower your chest toward the floor by bending your elbows.',
       'Push back up until your arms are straight.',
     ],
-    ['Hips stay back so it becomes a bow', 'Head dips before the chest'],
+    ['Hips pushed back instead of in line with the body', 'Dropping the head toward the floor'],
   ],
   'own-outdoor-run': [
     'Running outdoors on roads, paths or a track, a cardio effort that works the legs and heart.',
@@ -2533,7 +2535,7 @@ const TEXT = {
     ['Rounding the back to reach lower', 'Dumbbells drift out in front', 'Leaning back at the top'],
   ],
   'own-machine-back-extension': [
-    'A seated machine that trains the lower back by extending the trunk against a padded lever.',
+    'A seated machine exercise that trains the lower back by leaning back against a padded lever.',
     ['Hinge from the hips', 'Move slowly both ways', 'Stop when upright'],
     [
       'Set the seat so the back pad sits across your upper back and your feet rest on the platform.',
@@ -2675,7 +2677,7 @@ const TEXT = {
       'Raise it forward and up to about eye level.',
       'Lower it slowly back to your thighs.',
     ],
-    ['Swinging the body to start', 'Lifting far above the head', 'Shrugging as the arm rises'],
+    ['Swinging the body to start', 'Lifting far above the head', 'Shrugging as the bar rises'],
   ],
   Front_Plate_Raise: [
     'A front raise holding a weight plate with both hands, for the front delts.',
@@ -2749,7 +2751,7 @@ const TEXT = {
       'Loop a mini band around your legs above the knees or around the ankles.',
       'Stand with your feet hip width apart and sink into a half squat.',
       'Step forward and out on a diagonal with one foot, then the other.',
-      'Take your steps forward, then walk backward the same way.',
+      'Keep walking forward for the set, then walk backward the same way.',
     ],
     ['Standing up tall between steps', 'Knees caving toward each other', 'Feet coming together'],
   ],
@@ -2945,12 +2947,12 @@ const TEXT = {
   // req-147 — library batch 3
   Bicycling: [
     'Riding a bike outdoors on roads or paths, steady cardio for the legs.',
-    ['Seat high enough for a slight knee bend', 'Relaxed grip and shoulders', 'Smooth, even pedalling'],
+    ['Seat high enough for a slight knee bend', 'Relaxed grip and shoulders', 'Smooth, even pedaling'],
     [
       'Set the saddle so your leg is almost straight at the bottom of each pedal stroke.',
-      'Check your brakes and tyres before you set off.',
-      'Ride at a pace you can hold, shifting gears to keep your pedalling smooth.',
-      'Ease off for the last few minutes to cool down.',
+      'Check your brakes and tires before you set off.',
+      'Ride at a pace you can hold, shifting gears to keep your pedaling smooth.',
+      'Ease off toward the end of the ride to cool down.',
     ],
     ['Saddle so low the knees stay deeply bent', 'Gripping the bars tightly', 'Starting too fast to keep going'],
   ],
@@ -3441,10 +3443,10 @@ const TEXT = {
     ['Letting the arms drop', 'Unwinding by letting the plate fall', 'Using a plate too heavy to finish'],
   ],
   Svend_Press: [
-    'Squeezing plates together at the chest and pressing them straight out, for the inner chest.',
+    'Squeezing plates together at the chest and pressing them straight out, which works the chest.',
     ['Squeeze the plates hard', 'Press straight out', 'Shoulders down'],
     [
-      'Stand tall and press two light plates together between your palms at chest height.',
+      'Stand tall and press a pair of light plates together between your palms at chest height.',
       'Squeeze them firmly so they stay together.',
       'Press them straight out in front of you until your arms are straight.',
       'Bring them back to your chest, still squeezing.',

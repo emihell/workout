@@ -133,8 +133,10 @@ describe('staple', () => {
     // "prior" either (some are non-staples), so they're excluded like BATCH is.
     const prior = common.filter((entry) => !(entry.id in BATCH) && !BATCH_2.includes(entry.id))
     assert.equal(prior.length, 178)
-    for (const entry of prior) assert.equal(entry.staple, true, entry.id)
-    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15 + 6 + 1) // req-145/147 (DEC-074 §1): + 6 batch-2 staples, + 1 batch-3
+    // req-141 (sanctioned by planning, DEC-067 coach call) — these 6 prior entries are no longer staples.
+    const DEMOTED = ['own-copenhagen-plank', 'own-bayesian-curl', 'own-pendulum-squat', 'own-belt-squat', 'own-z-press', 'own-meadows-row']
+    for (const entry of prior) assert.equal(entry.staple, !DEMOTED.includes(entry.id), entry.id)
+    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15 + 6 + 1 - 6) // req-145/147 (DEC-074 §1): + 6 batch-2 staples, + 1 batch-3; req-141: − 6
   })
 
   it('staple ⇒ common: a non-common entry with staple is rejected (fixture)', () => {
