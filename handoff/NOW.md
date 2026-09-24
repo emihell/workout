@@ -20,8 +20,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **READY, held:**
 - **Building:** `req-141` fresh-eyes library scan (last of the library follow-ups). RepDB removed (req-142). **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149
   progression rules — after current follow-ups.
-  Library batches continue alongside it on stable fields only; no new fields until req-144 says (2026-09-24). Then
-  up to par → `req-142` remove RepDB → `req-141` fresh scan (DEC-070). Then `req-134` browse + muscle
+  No new library fields until req-144 says (2026-09-24). After the fresh scan: `req-134` browse + muscle
   filter (+ libraryId in the feedback note) → 132 → 137 → 131 → 135 → avatars + own
   figures (BACKLOG §Exercise library). Library LIVE 2026-09-24: 218 fully written (193 staples), names + text + difficulty, own-only search.
   Unconfirmed calls (library req) for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename;
