@@ -22,7 +22,11 @@ drifts from what the script would write.
 
 - Per free-db entry, appended after its unchanged fields: `aliases` (only where set),
   `muscleGroups` (derived from `primaryMuscles` by one table), `photos`.
-- `extra-*` entries (from `src/exerciseExtras.js`) and `own-*` entries — our text.
+- On the common entries only (req-133, DEC-062; tags in `common.js`): `muscles` (tree
+  nodes, primary/secondary), `pattern`, `equipmentList`, `logAs`, `unilateral`,
+  `common`, `family`. free-db's own fields are never corrected in place.
+- `extra-*` entries (from `src/exerciseExtras.js`) and `own-*` entries (from
+  `own-exercises.js`) — our text.
 
 ## What is not here
 
