@@ -303,7 +303,10 @@ edit → Update? → Apply → routine [65,70,70].
 - **QA-4 History detail doesn't say skipped** — a fully skipped exercise reads "WU set · 4 sets" (the overview says
   "· skipped").
 - Minor: Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown anywhere today).
-- Import asks "Replace all data?" before validating → folded into **req-24** (READY).
+- Import asks "Replace all data?" before validating → fixed in **req-24** (merged).
+- **req-24 reviewer nits** (small, fold into the next touch): the no-native-dialog guard misses `window['confirm']`,
+  `const { confirm } = window`, `.mjs` files, and skips lines starting `*` (`req-24.test.js:17,30`); Today's first-run
+  import error (`Today.jsx:269,330`) isn't cleared on a later cancel/new pick.
 
 **Batch-3 feel list — CLOSED 2026-09-24** (Planner, same run): pill overlap → **QA-2** · iPhone no-zoom: every input/textarea/
 select ≥17 px on log, routine editor, exercise edit, history add set, finish, replace [measured]; the zoom itself is

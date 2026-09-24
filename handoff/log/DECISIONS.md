@@ -1402,3 +1402,9 @@ in app - do not get stuck like this and to cover all prompts with our own code".
 sheet** ([Cancel] + a distinct destructive button); errors become in-page notices. Rejected: tap-twice (misfires on a real
 delete), undo-instead (every action must be reversible — riskier in a history app). All 14 sites (req-24, re-measured);
 a guard test keeps native `confirm`/`alert`/`prompt` out of `src/`. Import validates the file before asking.
+
+## DEC-080 — the confirm sheet's action button is named for the action  (Builder, from req-24, 2026-09-24; unconfirmed)
+
+The spec left the label open. The destructive button reads **Delete** (exercise, routine, workout), **Remove** (routine
+exercise, loop weeks, slot, set), **Abandon** (×4), **Replace** (import) — never the native "OK". Messages unchanged.
+Cancel is left and focused (a stray Enter never destroys); backdrop, Escape and navigation cancel. On Emilio's list.

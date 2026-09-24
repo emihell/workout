@@ -1,6 +1,6 @@
 # req-24 — replace native `confirm`/`alert` with inline UI
 
-**Status: READY** (2026-09-24) — pattern chosen by Emilio: **(a) confirm sheet** (DEC-079). Sourced from
+**Status: BUILT — branch `req-24` (`135dc18`), NOT merged.** Pattern chosen by Emilio: **(a) confirm sheet** (DEC-079). Sourced from
 `reports/req-15-findings.md` #11, and the standing backlog item "Replace native alert/confirm with
 inline UI" (`work/BACKLOG.md`, Phase 1). Not part of the autoloop refactor batch.
 
