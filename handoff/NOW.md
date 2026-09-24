@@ -33,7 +33,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Needs decisions — parked until their phase
 
-- **Backend fork** (gates Phase 3): browser-only vs database/server (+users, AI key). Decide first.
+- **Backend** (Phase 3): decided — Emilio's own server, other users soon (DEC-073); design in req-146; its rules are
+  written first (DEC-085 §7).
 - **History recalc from a non-latest workout** (Phase 1) — see BACKLOG. **Program model** (Phase 2).
 
 ## Where to read

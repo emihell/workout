@@ -24,34 +24,68 @@ what was rejected. Cross-ref the req if there is one.
 
 The live operational rules, each pointing at its current DEC. The entries below are the
 append-only **archive**; this digest is where to find what is *currently* true. Any entry a
-later DEC replaced carries a `> SUPERSEDED` marker at its top.
+later DEC replaced carries a `> SUPERSEDED` marker at its top. Refreshed 2026-09-24 through DEC-085.
 
-- **Merge gate** — planning tests everything it can reach by its own hand and merges on that,
-  incl. ux-feel + persisted-data; the only carve-outs are a real migration/bulk-rewrite (Emilio's
-  eyes) and shared-code (independent reviewer subagent). → **DEC-035**
-- **Build lanes** — settled/mechanical → ephemeral build agents in a batch; unsettled design/feel →
-  Emilio + code CC live; functional-coordination → the planning-driven code-CC loop. No `/clear`.
-  → **DEC-037** (refines **DEC-009**)
-- **Isolation boundary** — planning never touches code, code never touches planning; planning owns
-  planning-worktree git, `closeout`, and `publish`; push scoped to two forms. → **DEC-005**, **DEC-008**, **DEC-026**
-- **Persisted-data safety** — never overwrite an unreadable `workout-mvp-v8` key; announce a migration
-  + record count and add a survives-upgrade test; back up (Export) before a persisted-data merge. →
-  **DEC-032**, **DEC-046** + CLAUDE.md ask-gate
-- **History is the source of truth** — the app never invents data: carry entered kg+reps for a
-  no-history exercise, never invent warmup reps, hold a recommendation with no valid increment.
-  → **DEC-002**, **DEC-022**, **DEC-030**
-- **One in-progress workout** — starting a new one abandons the old; it replaces today's Start hero.
-  → **DEC-038**
-- **Nav vocabulary** — navigation wears link treatment + §4 verbs, actions wear Button; navigate-only
-  controls are links even when button-styled; Back = logical parent. → **DEC-042**, **DEC-040**, **DEC-039**
+**Process**
+- **Merge gate** — planning tests everything it can reach (unit receipts + its own browser run on an isolated origin) and
+  merges on that; carve-outs: a real migration/bulk rewrite (Emilio's eyes + a fresh Export first) and the independent
+  reviewer. → **DEC-035**, **DEC-046**
+- **Reviewer trigger** — follows the files a req touches (store, model, storage, progress, workout-log, migration/load),
+  not its Gate tag; a gate line in SHIPPED quotes `./check`'s output and names the reviewer. → **DEC-057** §1, §4
+- **A question isn't a decision**; calls made on Emilio's behalf that a user would see are marked `(unconfirmed)` and go
+  on his list. → **DEC-057** §2–3
+- **Build lanes** — Emilio away + design settled → one throwaway build agent per req; live design/feel → Emilio + the
+  Builder session; a single req he wants to watch, or quick fixes → the Builder session. Per-type lanes are being drafted
+  (DEC-085 §6). → **DEC-055** (supersedes DEC-054; restores DEC-037), batch mode **DEC-047**
+- **Isolation boundary** — planning never touches code, code never touches planning; planning owns planning-worktree git
+  (via `./plan save` only, L-032), `publish` and `closeout`. → **DEC-005**, **DEC-008**, **DEC-026**
+- **Merge shape** — every req reaches `main` via `--no-ff` (pre-push guard). → **DEC-045**
+- **No auto-memory** for either session; licensed third-party data only in a gitignored dir. → **DEC-068**
+- **Session boot** — planning reads `handoff/PLANNING.md` directly. → **DEC-044**
+- **Audits 2026-09-24** — all recommendations taken (req-156..160, planning docs, Emilio's actions). → **DEC-085**
+
+**Data & trust**
+- **History is the source of truth** — never invent data: prefills come from finished-workout data for that field; a
+  no-history exercise carries the kg just entered; never invent warm-up reps; hold with no valid increment. → **DEC-002**,
+  **DEC-022**, **DEC-030**
+- **Carry** — a changed weight carries to the remaining sets, reps never do; an added set with nothing logged stays blank,
+  never the routine's number. → **DEC-052**, **DEC-082** §2
+- **"Last time"** skips a workout where the exercise was entirely skipped (working sets decide). → **DEC-053**
+- **The routine is never updated automatically at Finish**; updating it is a deliberate step. → **DEC-056**
+- **Progression** — no new rules until req-149; an unreadable target (range, AMRAP, text) or an assisted exercise holds.
+  → **DEC-075**, **DEC-076**
+- **Persisted-data safety** — never overwrite an unreadable key (`workout-mvp-v9`; older keys read for migration);
+  announce a migration + record count, add a survives-upgrade test; Export before a persisted-data merge. → **DEC-032**,
+  **DEC-046** + CLAUDE.md ask-gate #2 (req-157 refines the unreadable-state Import, DEC-085 §2)
+- **Numbers** — a comma is a decimal point everywhere a number is typed; "current" workout = started today or within 6 h;
+  the Today hero keeps the day's other routines; an empty Finish warns. → **DEC-058**, **DEC-059**
+
+**UI**
+- **No native dialogs** — every confirm is the in-app sheet, its action button named for the action; errors are in-page.
+  → **DEC-079**, **DEC-080**, **DEC-083**
+- **Back** — `go(…, {replace:true})` replaces the browser entry too; an old in-workout page with no active workout
+  redirects to its overview; the dead first Back after finishing an exercise is parked. → **DEC-081**/**DEC-082** §1,
+  **DEC-084**
+- **Rest** is informational, never a control surface; the next set is live during rest. → **DEC-048**
+- **One in-progress workout** — starting a new one abandons the old (with the confirm). → **DEC-038**
+- **"You beat last time"** — per exercise, any axis. → **DEC-050**
+- **Nav vocabulary** — navigation wears link treatment + §4 verbs, actions wear Button; Back = logical parent; routes may
+  carry `?from=`. → **DEC-042**, **DEC-040**, **DEC-039**, **DEC-051**
 - **Nav structure** — floating bottom menu (Workout oval + icon-only circles). → **DEC-036**
 - **Platform** — mobile is primary; the live workout is mobile-only. → **DEC-010**
-- **Phone-test gate** — local `vite preview` over Tailscale, not a cloud preview deploy. → **DEC-041**
-- **Styling foundation** — minimal, colorless, Apple-inspired component library + a fixed named type
-  scale. → **DEC-017**, **DEC-020**
-- **Session boot** — planning reads `handoff/PLANNING.md` directly; no START-HERE. → **DEC-044**
-- **Merge shape** — every req reaches `main` via `--no-ff` (a `.githooks/pre-push` guard refuses a
-  fast-forward of a `req-*` branch; override `WORKOUT_ALLOW_FF=1`). → **DEC-045**
+- **Styling foundation** — minimal, colorless, Apple-inspired component library + a fixed type scale. → **DEC-017**,
+  **DEC-020**
+- **Phone-test gate** — local `vite preview` over Tailscale; per-branch previews move to the server setup (req-146).
+  → **DEC-041**
+
+**Exercise library**
+- Our own library, generated (never hand-edited), a three-level muscle tree, one movement pattern, "common" first; RepDB
+  removed; content calls delegated (beginner-first). → **DEC-060**..**DEC-070**, **DEC-072**, **DEC-077**, **DEC-078**
+
+**Product direction**
+- **Design for the complete beginner first**; the simple routine is the core. → **DEC-071**
+- **Toward a real product** — other users soon, training together; backend on Emilio's own server (req-146, waiting). →
+  **DEC-073**, **DEC-075** §2
 
 ---
 
@@ -1056,6 +1090,8 @@ excluded, never reinterpreted. Built as req-111, before req-109.
 
 ## DEC-054 — batches go to the Builder session, not ephemeral agents  (Emilio, 2026-09-23)
 
+> **SUPERSEDED by DEC-055** (same day) — batches go to throwaway agents again.
+
 Supersedes DEC-037's "batches use fresh ephemeral agents". Planner spawned a subagent to build req-103 in
 batch 4; Emilio: *"usually you send you the builder - not an external bot?"* The practice since DEC-047 (batch
 mode keeps Builder's session alive) is: Planner pings the **Builder session** (`SendMessage`) one req at a
@@ -1410,6 +1446,8 @@ exercise, loop weeks, slot, set), **Abandon** (×4), **Replace** (import) — ne
 Cancel is left and focused (a stray Enter never destroys); backdrop, Escape and navigation cancel. On Emilio's list.
 
 ## DEC-081 — `go(…, { replace: true })` replaces the browser entry too  (planning, from req-152 QA-1, 2026-09-24; unconfirmed)
+
+> **Reason corrected by DEC-082 §1**; confirmed by DEC-083. The decision stands.
 
 Builder measured that `replace` only swaps the app's own visit stack (`route.js:81-88`, `applyVisit`); the browser entry
 is always pushed (`location.hash = …`). So the in-app ‹ Back already skips replaced screens while device/browser Back stops
