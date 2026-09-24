@@ -1,6 +1,6 @@
 # req-153 — Back-button and guard leftovers from req-24 / req-152
 
-**Status: BUILT — branch `req-153`, NOT merged; item 1 dropped (DEC-084), being reverted.** (2026-09-24) — Phase 1, small. **Gate: functional**; planning browser-tests and merges (DEC-035). No
+**Status: BUILT — branch `req-153`, NOT merged; item 1 dropped (DEC-084); `1b5e3bd` sent back — Finish exits land on the overview (L-036).** (2026-09-24) — Phase 1, small. **Gate: functional**; planning browser-tests and merges (DEC-035). No
 persisted-data change. Emilio: "complete them" (the leftovers in BACKLOG "req-152 follow-ups" + "req-24 reviewer nits").
 
 ## The five [measured / reported]
