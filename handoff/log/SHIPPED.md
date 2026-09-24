@@ -1660,3 +1660,17 @@ calf raise/lunge/hip thrust + press/row/machine. Test edits: only the DEC-063-sa
 none (no store/model/storage trigger files). Known: "air bike" and "shoulder press" rank a non-staple first → req-134
 common-first ranking. L-026.
 
+## req-139 — library polish: our display names, 15 staples, search = our library only, common first (DEC-064)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `4f3d488`…`a6100cf`). 97 common entries get our `displayName` (Bench Press, Back
+Squat, Hip Thrust, Pec Deck, Skull Crusher, Nordic Curl…); free-db name stays as an alias. 15 own staples (landmine press,
+belt/pendulum squat, seal/Meadows/Pendlay row, Bayesian curl, Z press, Copenhagen plank, bird dog, single-leg RDL, hollow
+body, suitcase carry, wall sit, Cossack squat) → 178 common. Search reads our library only (no RepDB fetch; credit left
+Search, stays in Settings); `searchCommonFirst` → common hits, then "Show N more from the full library"; no common hit →
+rest directly. Already-added matches libraryId → displayName → name. Spec review (13 findings). Gate fix: alias partial
+matching leaked across words/aliases ("rdl" → Dumbbell Lunge, "row" → Sled Push) → per alias, word-start only (L-027); 1,047-
+query before/after diff in the report. Gate: Planner's own run in an archive copy → `# tests 747 # pass 747 # fail 0`, build ✓
+(main 340.93 → 340.97 kB; library 1,212 kB); spot-searched 12 queries; viewed the Show-more shot. Test edits: the sanctioned
+list only. Reviewer (code): none (no store/model/storage). Known: "fly machine" → Reverse Pec Deck first (alias gap, req-136
+feedback will catch such).
+
