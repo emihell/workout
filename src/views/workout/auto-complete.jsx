@@ -53,7 +53,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
     defaultBeep()
     const progression = buildFinishProgression(store.exercises, active)
     store.finishWorkout(autoFinishArgs(active, progression))
-    go('/')
+    go('/', { replace: true })
   }
 
   useEffect(() => {

@@ -404,6 +404,17 @@ export function carriedWorkingSet(workLogged) {
   return null
 }
 
+// req-02 / DEC-002 — the kg carried onto the next working set: the most recent
+// non-skipped working set logged this session. Null for a warm-up or when nothing is
+// logged yet. Kg only (req-108: reps don't carry). setLogSeed decides whether it is used
+// (no history, or no history set at this index — req-152); moved here from item.jsx.
+export function carryForSet(currentType, workLogged) {
+  if (currentType !== 'work') return null
+  const src = carriedWorkingSet(workLogged)
+  if (!src) return null
+  return { weight: src.weight != null && Number(src.weight) !== 0 ? String(src.weight) : '' }
+}
+
 // req-117 — the log form's values for a set being un-logged by "Previous" (moved here
 // from item.jsx so it is testable). A timed set also restores its logged seconds
 // (`durationSec`), so Previous on a timed set shows the time just logged, not the
@@ -452,12 +463,18 @@ export function initialDurationFor({ fromRestore, restore, target }) {
 // index, else empty ("each set is separate from each other"). A `reps` still stored on
 // an active workout's override (saved before req-108) is ignored here, not migrated;
 // likewise a carry's `reps`. The no-history kg carry (DEC-002) is unchanged.
-export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target, override }) {
+//
+// req-152 (QA-3) — `historyHasSet: false` says the history has no set at THIS index (an
+// "Add set" beyond last time's count, or a routine that grew): there is no history kg for
+// it, so the in-session carry applies, as for a no-history exercise — the kg just
+// logged carries (weight carries, reps per set). Absent = unchanged (history wins).
+export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override }) {
   if (fromRestore) {
     return { weight: weighted ? restore.weight : '', reps: restore.reps }
   }
   const ov = override || {}
-  const baseWeight = !hasHistory && carry ? carry.weight : history.weight
+  const useCarry = (!hasHistory || historyHasSet === false) && carry
+  const baseWeight = useCarry ? carry.weight : history.weight
   return {
     weight: weighted ? (ov.weight != null ? ov.weight : baseWeight) : '',
     reps: target || '',
@@ -514,8 +531,8 @@ export function nextSeedOverrides(overrides, { exerciseId, setType, weighted, se
 // req-78 — the req-27 upcoming-weight override was removed: the next set's form is now
 // the editable surface during rest, so the weight seed comes from restore/carry/history
 // alone. (The pure pendingWeightFor helper went with it.)
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, history, carry, target, override }) {
-  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, history, carry, target, override })
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override }) {
+  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override })
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe

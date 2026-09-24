@@ -78,12 +78,22 @@ export function useHashRoute() {
   return parseRoute(path)
 }
 
+// req-152 / DEC-081 — `replace` replaces the BROWSER history entry too (it used to only
+// rewrite the in-app visit stack, so device Back still stopped on the replaced screen —
+// e.g. a dead `/workout/<id>/finish` after Save). location.replace with the same URL and a
+// new hash is a same-document fragment navigation: no reload, hashchange still fires.
 export function go(path, { replace = false } = {}) {
   const next = hashPath(path)
   applyVisit(visits, next, { replace })
   persistVisits()
   if (typeof window !== 'undefined' && hashPath(window.location.hash) !== next) {
-    window.location.hash = toHash(next)
+    if (replace) {
+      const { href } = window.location
+      const hashAt = href.indexOf('#')
+      window.location.replace(`${hashAt === -1 ? href : href.slice(0, hashAt)}${toHash(next)}`)
+    } else {
+      window.location.hash = toHash(next)
+    }
   }
 }
 

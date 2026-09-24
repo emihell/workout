@@ -143,7 +143,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   }
 
   return (
-    <Screen>
+    <Screen className="ui-screen--rest">
       {/* req-49 — Back steps out of the in-workout hub to Today; the workout stays
           active (resume via Continue). Abandon (below) is the explicit discard. */}
       <Back to="/" />

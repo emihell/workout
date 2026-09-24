@@ -52,6 +52,9 @@
   /* req-123 — the rest-pill countdown: read at a glance mid-rest, between section
    * and title. Was a raw 28px on .ui-restpill__time. */
   --ui-text-emphasis: 28px;
+  /* req-152 (QA-2) — the rest pill's box height: its 28px line + s2 padding top and
+   * bottom + the 1px border twice. Screens that host the pill reserve it (.ui-screen--rest). */
+  --ui-restpill-h: calc(var(--ui-text-emphasis) + 2 * var(--ui-s2) + 2px);
 }
 
 /* Base link treatment (req-15): the app is fully migrated onto the library, so
@@ -577,10 +580,20 @@ a.ui-btn--quiet:active {
 /* ---- RestPill (molecule, req-78) ---- */
 /* The rest countdown as a small floating pill (replaces the full-width RestBar).
  * position: fixed so it floats over whichever in-workout screen is showing and the
- * countdown persists across navigation. Top-centre keeps it clear of the top-left
- * Exercises link, the top-right "Add note" control, and the bottom set-log action bar.
+ * countdown persists across navigation. Top-centre, above the host screen's top row
+ * (see .ui-screen--rest below) and clear of the bottom set-log action bar.
  * Solid, no shadow (matches the dock, DEC-036). The whole pill is a tap-target that
- * skips the rest. */
+ * skips the rest.
+ * req-152 (QA-2) — req-92's bigger pill reached down into the top row ("‹ Exercises"
+ * at 375px), so a tap on the link could skip the rest instead. Top-centre and size
+ * are kept; the screens that host the pill reserve its footprint above their first
+ * row (.ui-screen--rest), always — not only while resting, so nothing jumps per set. */
+.ui-screen--rest {
+  padding-top: calc(var(--ui-s2) + var(--ui-restpill-h) + var(--ui-s2));
+}
+.ui-screen--rest > :first-child {
+  margin-top: 0;
+}
 .ui-restpill {
   position: fixed;
   top: calc(env(safe-area-inset-top, 0px) + var(--ui-s2));
@@ -591,10 +604,14 @@ a.ui-btn--quiet:active {
   align-items: baseline;
   gap: var(--ui-s2);
   min-height: auto;
+  /* req-152 — one line at every width: `left: 50%` caps a fixed box's shrink-to-fit
+   * width at half the viewport, so at 320px "rest · skip" wrapped and the pill grew
+   * to 60px tall, past the reserved --ui-restpill-h. */
+  white-space: nowrap;
   /* req-92 — bigger so the remaining time reads at arm's length mid-set. Roomier
    * padding than the original s1/s3, sized to the larger time below. Still a single
-   * floating tap-to-skip target, top-centre, clear of the top links and bottom
-   * action bar (req-78 positioning unchanged). */
+   * floating tap-to-skip target, top-centre; req-152 — the top links clear it via
+   * .ui-screen--rest (req-78 positioning unchanged). */
   padding: var(--ui-s2) var(--ui-s4);
   border: 1px solid var(--ui-ink);
   border-radius: 999px;
