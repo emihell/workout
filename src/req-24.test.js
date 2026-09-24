@@ -4,7 +4,8 @@
 // confirm store's semantics; (3) the dead "Pick effort." guard really was unreachable.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { readdirSync, readFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { answerConfirm, askConfirm, getPendingConfirm } from './ui/confirm.js'
@@ -12,9 +13,73 @@ import { formFieldsWithDraft, initialSetFields, setDraftFromLoggedSet } from './
 
 const SRC = fileURLToPath(new URL('.', import.meta.url))
 
-// `window.confirm(`, `globalThis.alert`, `self.prompt` … or a bare global `confirm(` /
+// `window.confirm(`, `globalThis.alert`, `self.prompt` …; `window['confirm']`; a
+// destructure off the global (`const { alert } = window`); or a bare global `confirm(` /
 // `alert(` / `prompt(` (not a method like `store.confirm(` or a name like `askConfirm(`).
-export const NATIVE_DIALOG = /\b(?:window|globalThis|self)\.(?:confirm|alert|prompt)\b|(?<![.\w$])(?:confirm|alert|prompt)\s*\(/
+const DIALOG = '(?:confirm|alert|prompt)'
+const GLOBAL = '(?:window|globalThis|self)'
+export const NATIVE_DIALOG = new RegExp(
+  [
+    `\\b${GLOBAL}\\s*(?:\\?\\.|\\.)\\s*${DIALOG}\\b`,
+    `\\b${GLOBAL}\\s*\\[\\s*['"\`]${DIALOG}['"\`]\\s*\\]`,
+    `\\{[^}]*\\b${DIALOG}\\b[^}]*\\}\\s*=\\s*${GLOBAL}\\b`,
+    `(?<![.\\w$])${DIALOG}\\s*\\(`,
+  ].join('|'),
+)
+
+// req-153 — comments are blanked (newlines kept, so line numbers hold) by a small
+// tokenizer instead of skipping every line that starts with `//`, `/*` or `*`: a code
+// line such as `  * confirm(x)` (a continued expression) is no longer exempt. Strings
+// and template literals are tracked only so a `//` inside one isn't read as a comment;
+// their contents, and `${…}` code, are still scanned.
+export function stripComments(src) {
+  let out = ''
+  let i = 0
+  const stack = [] // open quotes: "'", '"', '`', or '{' for a `${…}` inside a template
+  while (i < src.length) {
+    const c = src[i]
+    const top = stack.at(-1)
+    if (top === "'" || top === '"') {
+      if (c === '\\') { out += src.slice(i, i + 2); i += 2; continue }
+      if (c === top || c === '\n') stack.pop()
+      out += c; i += 1; continue
+    }
+    if (top === '`') {
+      if (c === '\\') { out += src.slice(i, i + 2); i += 2; continue }
+      if (c === '`') stack.pop()
+      else if (c === '$' && src[i + 1] === '{') { stack.push('{'); out += '${'; i += 2; continue }
+      out += c; i += 1; continue
+    }
+    if (c === '/' && src[i + 1] === '/') {
+      while (i < src.length && src[i] !== '\n') { out += ' '; i += 1 }
+      continue
+    }
+    if (c === '/' && src[i + 1] === '*') {
+      const close = src.indexOf('*/', i + 2)
+      const stop = close === -1 ? src.length : close + 2
+      out += src.slice(i, stop).replace(/[^\n]/g, ' ')
+      i = stop
+      continue
+    }
+    if (c === '"' || c === "'" || c === '`') stack.push(c)
+    else if (c === '{' && top === '{') stack.push('{')
+    else if (c === '}' && top === '{') stack.pop()
+    out += c
+    i += 1
+  }
+  return out
+}
+
+export function nativeDialogHitsIn(source, name = '') {
+  const code = stripComments(source).split('\n')
+  const raw = source.split('\n')
+  return code.flatMap((line, i) => (NATIVE_DIALOG.test(line) ? [`${name}:${i + 1}: ${raw[i].trim()}`] : []))
+}
+
+// Every source file under src/ except tests: .js .mjs .cjs .jsx (and .ts/.tsx, should
+// they ever appear).
+export const SOURCE_FILE = /\.(?:[mc]?js|jsx|tsx?)$/
+export const TEST_FILE = /\.test\.[mc]?[jt]sx?$/
 
 export function nativeDialogHits(dir = SRC) {
   const hits = []
@@ -22,14 +87,8 @@ export function nativeDialogHits(dir = SRC) {
     for (const entry of readdirSync(d, { withFileTypes: true })) {
       const path = join(d, entry.name)
       if (entry.isDirectory()) walk(path)
-      else if (/\.(js|jsx)$/.test(entry.name) && !entry.name.endsWith('.test.js')) {
-        readFileSync(path, 'utf8')
-          .split('\n')
-          .forEach((line, i) => {
-            // Code only: a comment line may say "the delete confirm (…)" in prose.
-            if (/^\s*(\/\/|\/\*|\*)/.test(line)) return
-            if (NATIVE_DIALOG.test(line)) hits.push(`${relative(SRC, path)}:${i + 1}: ${line.trim()}`)
-          })
+      else if (SOURCE_FILE.test(entry.name) && !TEST_FILE.test(entry.name)) {
+        hits.push(...nativeDialogHitsIn(readFileSync(path, 'utf8'), relative(dir, path)))
       }
     }
   }
@@ -48,9 +107,56 @@ describe('no native dialogs in src/ (req-24 guard)', () => {
       assert.ok(NATIVE_DIALOG.test(bad), bad)
     }
     for (const ok of ['askConfirm(m)', 'answerConfirm(true)', 'store.confirm(x)', 'role="alert"',
-      "await ask('Replace?')", 'confirmLabel: "Delete"']) {
+      "await ask('Replace?')", 'confirmLabel: "Delete"', "const { confirmLabel } = opts", 'window.confirmed']) {
       assert.ok(!NATIVE_DIALOG.test(ok), ok)
     }
+  })
+
+  // req-153 — the forms the req-24 guard missed, one test each.
+  it("catches window['confirm'] / globalThis[\"alert\"] / self[`prompt`]", () => {
+    for (const bad of ["window['confirm']('x')", 'globalThis["alert"](e)', 'const p = self[`prompt`]', 'window?.confirm(m)']) {
+      assert.equal(nativeDialogHitsIn(bad).length, 1, bad)
+    }
+  })
+
+  it('catches a destructure off the global: const { alert } = window', () => {
+    for (const bad of ['const { alert } = window', 'const { confirm: ask } = globalThis', 'let { prompt, x } = self']) {
+      assert.equal(nativeDialogHitsIn(bad).length, 1, bad)
+    }
+  })
+
+  it('scans .mjs / .cjs files (and still skips *.test.* files)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'req153-guard-'))
+    try {
+      mkdirSync(join(dir, 'lib'))
+      writeFileSync(join(dir, 'lib', 'util.mjs'), "export const ask = (m) => window.confirm(m)\n")
+      writeFileSync(join(dir, 'old.cjs'), "module.exports = () => alert('x')\n")
+      writeFileSync(join(dir, 'fine.test.mjs'), "window.confirm('in a test')\n")
+      assert.deepEqual(nativeDialogHits(dir).sort(), [
+        "lib/util.mjs:1: export const ask = (m) => window.confirm(m)",
+        "old.cjs:1: module.exports = () => alert('x')",
+      ])
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('a code line starting with `*` is scanned; real comments are not', () => {
+    const src = [
+      'const n = 2',
+      '  * confirm(x) // a continued expression, not a comment',
+      '/* the delete confirm (prose)',
+      ' * alert( in a block comment',
+      ' */',
+      '// window.confirm in a line comment',
+      "const url = 'http://example.com' ; alert(1)",
+      'const t = `${window.prompt()}`',
+    ].join('\n')
+    assert.deepEqual(nativeDialogHitsIn(src, 'f.js'), [
+      'f.js:2: * confirm(x) // a continued expression, not a comment',
+      "f.js:7: const url = 'http://example.com' ; alert(1)",
+      'f.js:8: const t = `${window.prompt()}`',
+    ])
   })
 })
 

@@ -11,7 +11,7 @@ import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
 import { weekdayDate } from '../history/helpers'
-import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem } from './helpers'
+import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem, NotInWorkout } from './helpers'
 import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
 
@@ -212,6 +212,7 @@ export function WorkoutItem({ routineId, itemId }) {
     go(itemCurrentPath(routineId, item, completed), { replace: true })
   }, [completed, routineId, item])
 
-  if (!mine || !item) return <MissingItem />
+  if (!mine) return <NotInWorkout routineId={routineId} />
+  if (!item) return <MissingItem />
   return null
 }

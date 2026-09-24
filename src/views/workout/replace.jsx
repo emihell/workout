@@ -5,7 +5,7 @@ import { useStore } from '../../store-context'
 import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemLogPath, MissingItem } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemLogPath, MissingItem, NotInWorkout } from './helpers'
 import { RestPill } from './rest'
 
 // req-109 — the Replace exercise picker (reached from the item's log screen). Lists the
@@ -31,7 +31,8 @@ export function WorkoutItemReplace({ routineId, itemId }) {
     if (done && !picked.current) go(`/workout/${routineId}`, { replace: true })
   }, [done, routineId])
 
-  if (!mine || !item || done) return <MissingItem />
+  if (!mine) return <NotInWorkout routineId={routineId} />
+  if (!item || done) return <MissingItem />
 
   const backTo = itemLogPath(routineId, item)
   const q = query.trim().toLowerCase()

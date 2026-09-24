@@ -1,7 +1,11 @@
 import { itemKey, itemLoggingState } from '../../workout-log'
-import { itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
+import { inWorkoutFallback, itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
 import { recordButton } from '../../analytics'
-import { go } from '../../route'
+import { useEffect } from 'react'
+import { go, hashPath } from '../../route'
+import { leaveWorkoutToToday } from '../../workout-actions'
+import { findRoutine } from '../../storage'
+import { useStore } from '../../store-context'
 import { Missing } from '../shared'
 import { askConfirm } from '../../ui/confirm.js'
 
@@ -30,6 +34,26 @@ export function MissingItem() {
   return <Missing>Not found.</Missing>
 }
 
+// req-153 — the render for an in-workout route that can't show: with no active workout
+// for this (known) routine it redirects, replacing, to the routine's overview; otherwise
+// "Not found." (inWorkoutFallback decides). The redirect re-checks the browser's CURRENT
+// path when it runs, so a Finish exit that already moved to Today isn't pulled back.
+export function NotInWorkout({ routineId }) {
+  const store = useStore()
+  const args = {
+    active: store.activeWorkout,
+    routineId,
+    routineKnown: Boolean(findRoutine(store.routines, routineId).routine),
+  }
+  const outcome = inWorkoutFallback({ ...args, currentPath: hashPath(window.location.hash) })
+  useEffect(() => {
+    if (inWorkoutFallback({ ...args, currentPath: hashPath(window.location.hash) }) === 'redirect') {
+      go(`/workout/${routineId}`, { replace: true })
+    }
+  })
+  return outcome === 'missing' ? <MissingItem /> : null
+}
+
 export function itemSetsPath(routineId, item, workout) {
   if (!item) return `/workout/${routineId}`
   return itemCurrentPath(routineId, item, itemLoggingState(workout, item).plannedDone)
@@ -41,5 +65,5 @@ export async function abandonWorkout(store) {
   if (!(await askConfirm('Abandon?', { confirmLabel: 'Abandon' }))) return
   recordButton('abandon-workout')
   store.abandonWorkout()
-  go('/', { replace: true })
+  leaveWorkoutToToday()
 }

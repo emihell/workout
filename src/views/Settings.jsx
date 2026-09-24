@@ -60,6 +60,9 @@ export function Settings() {
               label="Import"
               accept="application/json,.json"
               onFiles={(files) => {
+                // req-153 — a new pick clears the last outcome (as on Today).
+                setError('')
+                setMessage('')
                 const file = files?.[0]
                 if (!file) return
                 file.text().then(async (text) => {

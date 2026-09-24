@@ -319,6 +319,9 @@ export function Today() {
           label="Import"
           accept="application/json,.json"
           onFiles={(files) => {
+            // req-153 — a new pick starts clean: the last file's error never lingers
+            // over this one's outcome (a success, a cancel, or its own error).
+            setImportError('')
             const file = files?.[0]
             if (!file) return
             file.text().then(async (text) => {
@@ -326,7 +329,6 @@ export function Today() {
                 const payload = JSON.parse(text)
                 const result = await importWithBackup({ store, payload })
                 if (!result) return // cancelled at the confirm
-                setImportError('')
                 recordButton('import')
               } catch (err) {
                 setImportError(err instanceof Error ? err.message : 'Could not import.')

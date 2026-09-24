@@ -2,12 +2,12 @@ import { formatSetLine, roleTag } from '../../ids'
 import { go } from '../../route'
 import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
-import { isSkippedSet, loggedSetCount } from '../../workout-log'
+import { loggedSetCount } from '../../workout-log'
 import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { historyAddSetPath } from './add-set'
 import {
-  historyGroupMeta,
+  historyGroupRowMeta,
   itemIdOf,
   routineTitle,
   whenLabel,
@@ -65,13 +65,10 @@ export function HistoryDetail({ workoutId }) {
           const ex = exerciseById(store.exercises, group.exerciseId)
           // req-109 — id first, exerciseId only as the fallback (snapshot-item.js).
           const snapshotItem = snapshotItemFor(snapshot?.items, group.routineItemId, group.exerciseId)
-          // req-152 — skipped sets aren't counted (as in the header); all skipped reads "skipped".
-          const logged = group.items.filter(({ s }) => !isSkippedSet(s)).length
-          const skipped = group.items.length > 0 && logged === 0
           return (
             <Row key={group.routineItemId} to={`/history/${workout.id}/exercise/${group.routineItemId}`}>
               {snapshotItem?.exerciseName || ex?.name || group.exerciseId}
-              {` — ${historyGroupMeta(snapshotItem, logged, { skipped })}`}
+              {` — ${historyGroupRowMeta(snapshotItem, group.items)}`}
             </Row>
           )
         })}
