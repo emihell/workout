@@ -384,13 +384,16 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 
 - **`req-130` our own library** (READY) — free-db copy + aliases + muscle groups + picture links + RepDB credit.
 - **`req-131` "How to" button** — log screen + exercise page; opens RepDB drawing if linked, else free-db
-  start/end photos auto-flipping (~0.7 s), else the exercise's video link; hidden when none. New optional
+  start/end photos auto-flipping (~0.7 s), else the exercise's video link; hidden when none. RepDB pictures are **joined at runtime** from the live
+  fetch (exact name key + a small curated pair list; nothing RepDB committed — req-130 review finding 8). Mind: a
+  renamed exercise keeps its `libraryId` (req-130), so the picture follows the id. New optional
   per-exercise **video link** field (edit form). Uses `libraryEntryFor` (req-130). Offline → cues only, no broken
   image. After req-130.
 - **`req-132` one Add screen** — replaces Add manually / Search: typing shows your exercises first (req-127 match),
   then library hits (tap = add, linked), then "Create '<name>' as my own". Offline: no library hits, never blocks.
   Plus **"Link to library"** on an unlinked exercise's page (best alias matches; optional). After req-130.
-- **`req-133` text pass** — per entry: a one-line description, tips, instructions rewritten clearer. Written from
+- **`req-133` content pass** — per entry: **aliases for the whole library** (moved from req-130), a one-line
+  description, tips, instructions rewritten clearer. Written from
   free-db's instructions + general knowledge; **never from RepDB text** (DEC-060 §3). Content job for agents in
   batches, sample-reviewed. After req-130.
 - **Our own styled exercise figures** (after req-131) — pose keyframes per exercise + a shared renderer, animated,
