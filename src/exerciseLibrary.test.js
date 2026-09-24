@@ -10,6 +10,7 @@ import {
   fromRepdbItem,
   loadExerciseCatalog,
   mergeCatalogs,
+  resetExerciseCatalog,
   searchExerciseCatalog,
 } from './exerciseCatalog.js'
 import {
@@ -22,7 +23,7 @@ import {
   OWN_FIELDS,
 } from './exerciseLibrary.js'
 import { EXTRA_EXERCISES } from './exerciseExtras.js'
-import { exerciseFromData } from './exercise-names.js'
+import { exerciseFromData, patchExercise } from './exercise-names.js'
 import { migrateState } from './model.js'
 import { applyBackup, buildBackup } from './exchange.js'
 
@@ -199,6 +200,25 @@ describe('search via aliases', () => {
     assert.ok(merged.some((item) => item.id === 'repdb-leg-extension'))
   })
 
+  // req-130 review — the seed aliases must not reorder single-word queries: a word
+  // inside a multi-word alias ranks below every name hit (was: tier 1 via a word split,
+  // which put Dip Machine first for "press").
+  const noAliases = mergeCatalogs(
+    library.map(({ aliases, ...entry }) => entry),
+    repdb,
+  )
+  for (const [query, notFirst] of [
+    ['press', 'Dip Machine'],
+    ['row', 'One-Arm Dumbbell Row'],
+    ['machine', 'Ab Crunch Machine'],
+  ]) {
+    it(`"${query}": top 10 identical with and without aliases; ${notFirst} not first`, () => {
+      const names = (list) => searchExerciseCatalog(list, query, 10).map((item) => item.name)
+      assert.deepEqual(names(merged), names(noAliases))
+      assert.notEqual(names(merged)[0], notFirst)
+    })
+  }
+
   it('our Hanging Knee Raise (with instructions) is the one kept', () => {
     const hits = merged.filter((item) => catalogNameKey(item.name) === 'hangingkneeraise')
     assert.equal(hits.length, 1)
@@ -230,6 +250,7 @@ describe('loading', () => {
   })
   afterEach(() => {
     globalThis.fetch = realFetch
+    resetExerciseCatalog()
   })
 
   it('loadExerciseCatalog reads our file and never fetches the free-db CDN JSON', async () => {
@@ -239,6 +260,20 @@ describe('loading', () => {
     assert.ok(list.some((item) => item.id === '3_4_Sit-Up'))
     assert.ok(list.some((item) => item.id === 'repdb-x'))
     assert.deepEqual(await loadExerciseLibrary(), library)
+  })
+
+  // req-130 review — a failed library chunk must not leave a RepDB-only catalog cached.
+  it('a failed library load returns RepDB only, uncached; the next open retries', async () => {
+    let calls = 0
+    const failing = () => {
+      calls += 1
+      return Promise.reject(new Error('chunk failed'))
+    }
+    const first = await loadExerciseCatalog({ loadLibrary: failing })
+    assert.deepEqual(first.map((item) => item.id), ['repdb-x'])
+    const second = await loadExerciseCatalog({ loadLibrary: loadExerciseLibrary })
+    assert.equal(calls, 1)
+    assert.ok(second.some((item) => item.id === '3_4_Sit-Up'))
   })
 })
 
@@ -276,8 +311,20 @@ describe('stored data: libraryId', () => {
     assert.equal('libraryId' in restored.exercises[1], false)
   })
 
-  it('a rename keeps libraryId (updateExercise merges the patch over the record)', () => {
-    const source = readFileSync(new URL('./store.jsx', import.meta.url), 'utf8')
-    assert.match(source, /ex\.id === exerciseId \? \{ \.\.\.ex, \.\.\.patch \} : ex/)
+  // req-130 review — behavioural (was a source regex): store.updateExercise writes
+  // patchExercise(ex, patch); ExerciseEdit's rename patch carries no libraryId.
+  it('a rename keeps libraryId', () => {
+    const record = exerciseFromData(catalogItemToExercise(byId('Stairmaster')), 'ex-1')
+    const renamed = patchExercise(record, {
+      name: 'Stairs (gym 2)',
+      type: record.type,
+      equipment: record.equipment,
+      muscles: record.muscles,
+      cues: record.cues,
+      hasDuration: false,
+      durationSec: 30,
+    })
+    assert.equal(renamed.name, 'Stairs (gym 2)')
+    assert.equal(renamed.libraryId, 'Stairmaster')
   })
 })

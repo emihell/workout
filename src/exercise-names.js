@@ -58,6 +58,12 @@ export function exerciseFromData(data, id) {
   }
 }
 
+// req-130 — the record store.updateExercise writes: the patch merged over the stored
+// record, so fields an edit doesn't send (libraryId, archivedAt) are kept.
+export function patchExercise(exercise, patch) {
+  return { ...exercise, ...patch }
+}
+
 // req-127 — where picking an existing exercise (Use it / Restore) continues to: in a
 // routine flow the add-to-routine screen for THAT id (Search's "Add to routine" path);
 // in the library, its detail screen. `paths` is Exercises.jsx createPaths().

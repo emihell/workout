@@ -52,15 +52,25 @@ export function mergeCatalogs(primary, extra) {
   return merged
 }
 
-export function loadExerciseCatalog() {
+// Test hook: forget the cached catalog so the next load starts over.
+export function resetExerciseCatalog() {
+  catalogPromise = null
+}
+
+// `loadLibrary` is injectable for tests only; the app always uses our library chunk.
+export function loadExerciseCatalog({ loadLibrary = loadExerciseLibrary } = {}) {
   if (!catalogPromise) {
-    catalogPromise = Promise.allSettled([loadExerciseLibrary(), fetchJson(REPDB_URL)]).then(
+    catalogPromise = Promise.allSettled([loadLibrary(), fetchJson(REPDB_URL)]).then(
       (results) => {
-        const library = results[0].status === 'fulfilled' && Array.isArray(results[0].value) ? results[0].value : []
+        const libraryOk = results[0].status === 'fulfilled' && Array.isArray(results[0].value)
+        const library = libraryOk ? results[0].value : []
         const repdbPayload = results[1].status === 'fulfilled' ? results[1].value : null
         const repdb = Array.isArray(repdbPayload?.exercises) ? repdbPayload.exercises.map(fromRepdbItem) : []
         // Dedupe stays name-only (never on aliases): RepDB's "Lat Pulldown" etc. still appear.
         const merged = mergeCatalogs(library, repdb)
+        // req-130 review — a RepDB-only list is shown but never cached: the next open
+        // retries the library chunk instead of keeping a partial catalog all session.
+        if (!libraryOk) catalogPromise = null
         if (!merged.length) throw new Error('Could not load.')
         return merged
       },
@@ -89,14 +99,18 @@ export function searchExerciseCatalog(list, query, limit = 25) {
     const aliases = (item.aliases || []).join(' ').toLowerCase()
     const muscles = [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].join(' ').toLowerCase()
     const equipment = String(item.equipment || '').toLowerCase()
-    const compactName = compactText(`${name} ${aliases}`)
+    const compactName = compactText(name)
+    const compactAliases = compactText(aliases)
     let score = -1
     // req-130 — a whole alias equal to the query scores like an exact name (the word
     // split below never matched a multi-word alias).
     if (name === q || (qKey && (item.aliases || []).some((alias) => catalogNameKey(alias) === qKey))) score = 0
-    else if (name.startsWith(q) || aliases.split(/\s+/).some((alias) => alias === q)) score = 1
-    else if (name.includes(q) || aliases.includes(q)) score = 2
-    else if (qCompact.length >= 3 && compactName.includes(qCompact)) score = 2
+    // req-130 review — no alias word-split here: a single word inside a multi-word
+    // alias ("press" in "Triceps Press") would outrank real name hits. A partial alias
+    // hit ranks just below a partial name hit, so aliases never reorder name matches.
+    else if (name.startsWith(q)) score = 1
+    else if (name.includes(q) || (qCompact.length >= 3 && compactName.includes(qCompact))) score = 2
+    else if (aliases.includes(q) || (qCompact.length >= 3 && compactAliases.includes(qCompact))) score = 2.5
     else if (muscles.includes(q) || equipment.includes(q)) score = 3
     if (score >= 0) scored.push({ item, score, name })
   }
