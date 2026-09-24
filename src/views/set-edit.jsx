@@ -42,12 +42,14 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
     <form
       onSubmit={(event) => {
         event.preventDefault()
+        // req-156 — a hidden Effort saves no effort ('' → rpe null), not the stored value
+        // the user can't see (an old warm-up's rpe 3).
         const error = showLoad ? kgError(weight) : null
         if (error) {
           setWeightError(error)
           return
         }
-        onSave({ weight, reps, rpe, note, setType })
+        onSave({ weight, reps, rpe: showEffort ? rpe : '', note, setType })
       }}
     >
       {setTypeOptions ? (
