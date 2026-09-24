@@ -1755,3 +1755,11 @@ property test vs a frozen copy; the independent reviewer's own 20,000-case run �
 → `# tests 839 # pass 839 # fail 0`, build ✓ (main 341.94 kB). progress.test.js unedited. No backup needed (no stored-data
 change).
 
+## req-142 — RepDB removed completely (DEC-069/070)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `a523f2d`). The Settings credit + `ExternalLink` (unused), `scripts/library-gap.mjs`,
+`scripts/originality.mjs`, `.vendor-cache/` and its ignore line are gone; comments reworded as history. Stored `repdb-*`
+exercises still load, back up, and resolve (fall through to name) — pinned by `req-142.test.js`. Guards kept (no RepDB in
+the library; no RepDB fetch). Gate: Planner's own run in an archive copy → `# tests` all pass, build ✓ (main 341.94 → 341.64
+kB). Test edit: req-139 "keeps the credit" → "no credit" (sanctioned). CLAUDE.md carve-out example reworded.
+

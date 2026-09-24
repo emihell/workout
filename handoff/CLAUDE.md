@@ -78,8 +78,8 @@ in no git history, and nobody reviews it. If the harness offers a memory tool, d
 decision, a gotcha, a habit that worked, a correction about your own output. Planning records it in `handoff/` (a `DEC-`,
 an `L-`, a req, or this file). A fact held in two places is worse than a fact held in neither.
 
-**The one carve-out is licensed third-party data that must not enter git** (e.g. a RepDB cache, DEC-066 §3). It lives in
-the repo folder under a **gitignored** directory, never in git history (DEC-068).
+**The one carve-out is licensed third-party data that must not enter git** (none today; RepDB was removed in req-142). If
+it's ever needed again, it lives in the repo folder under a **gitignored** directory, never in git history (DEC-068).
 
 ## Start here
 
