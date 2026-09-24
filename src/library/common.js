@@ -167,7 +167,7 @@ const ROWS = [
   ['Walking_Treadmill', 'cardio', 'cardio-machine', 'quads glute-max calves', 'hamstrings', 'cardio', 'fam-treadmill', ['Treadmill Walk', 'Treadmill Walking', 'Incline Walk', 'Incline Treadmill Walk']],
   ['Bicycling_Stationary', 'cardio', 'cardio-machine', 'quads', 'glute-max hamstrings calves', 'cardio', 'fam-stationary-bike', ['Stationary Bike', 'Exercise Bike', 'Spin Bike', 'Indoor Cycling']],
   ['Recumbent_Bike', 'cardio', 'cardio-machine', 'quads', 'glute-max hamstrings', 'cardio', 'fam-stationary-bike', ['Recumbent Cycle', 'Recumbent Exercise Bike']],
-  ['own-fan-bike', 'cardio', 'cardio-machine', 'quads', 'glute-max hamstrings deltoids', 'cardio', 'fam-stationary-bike', ['Bike', 'Assault Bike', 'Echo Bike']],
+  ['own-fan-bike', 'cardio', 'cardio-machine', 'quads', 'glute-max hamstrings deltoids', 'cardio', 'fam-stationary-bike', ['Assault Bike', 'Echo Bike']],
   ['Elliptical_Trainer', 'cardio', 'cardio-machine', 'quads glute-max', 'hamstrings calves', 'cardio', 'fam-elliptical-trainer', ['Elliptical', 'Elliptical Machine', 'Cross Trainer']],
   ['Rowing_Stationary', 'cardio', 'cardio-machine', 'quads lats', 'glute-max hamstrings rhomboids biceps', 'cardio', 'fam-rowing-stationary', ['Rowing', 'Rowing Machine', 'Rower', 'Indoor Rowing', 'Erg']],
   ['Stairmaster', 'cardio', 'cardio-machine', 'quads glute-max', 'hamstrings calves', 'cardio', 'fam-stairmaster', ['Stairs', 'Stair Climber', 'Stair Machine', 'Stair Stepper']],

@@ -272,7 +272,6 @@ describe('search receipts (top-1)', () => {
     // Tag review additions.
     ['calf raise', 'Standing Calf Raises'],
     ['lunge', 'Dumbbell Lunges'],
-    ['bike', 'Fan Bike'],
     ['bicycle crunch', 'Bicycle Crunch'],
     ['weighted dip', 'Weighted Dip'],
   ]) {
