@@ -393,3 +393,9 @@ geometry. A countdown screen (Finish, 10 s) outruns screenshot-paced clicks — 
 Builder reverted its deliberate-fail guard probe with `git checkout -- edit.jsx`, which also discarded that file's
 uncommitted req-24 edit; it restored it from a copy. **How to apply:** remove a probe line by editing it out (or commit
 first); never `checkout` a dirty file to undo one line.
+
+## L-035 — a DEC's reason is a claim too; Planner recorded an unread one  (2026-09-24)
+
+DEC-081 said "the in-app ‹ Back already uses the visit stack" — inferred from `applyVisit`'s name, never read; the Back is
+a fixed link (`shared.jsx:43`). Builder caught it; the decision survived on its other reason, by luck. **How to apply:**
+the "why" in a DEC gets the same receipt as a number — a file:line read in this session — or it is marked `[inferred]`.

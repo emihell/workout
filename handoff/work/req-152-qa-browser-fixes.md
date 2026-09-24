@@ -1,6 +1,6 @@
 # req-152 — four small fixes from Planner's browser run (QA-1..4)
 
-**Status: READY** (2026-09-24) — Phase 1, small. **Gate: functional**; planning browser-tests and merges (DEC-035). No
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-152` (`f0d8ea7`…`f0d8ea7`, 1 commit).** (2026-09-24) — Phase 1, small. **Gate: functional**; planning browser-tests and merges (DEC-035). No
 persisted-data change. Build **after req-24** (both touch workout views; avoids a conflict). Source: Planner's browser run
 of the owed test lists, 2026-09-24 (`work/BACKLOG.md` §batch 4 "QA findings"; method L-033). Emilio: "sounds good" to one
 bundled req after req-24.

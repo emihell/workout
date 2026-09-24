@@ -1408,3 +1408,24 @@ a guard test keeps native `confirm`/`alert`/`prompt` out of `src/`. Import valid
 The spec left the label open. The destructive button reads **Delete** (exercise, routine, workout), **Remove** (routine
 exercise, loop weeks, slot, set), **Abandon** (×4), **Replace** (import) — never the native "OK". Messages unchanged.
 Cancel is left and focused (a stray Enter never destroys); backdrop, Escape and navigation cancel. On Emilio's list.
+
+## DEC-081 — `go(…, { replace: true })` replaces the browser entry too  (planning, from req-152 QA-1, 2026-09-24; unconfirmed)
+
+Builder measured that `replace` only swaps the app's own visit stack (`route.js:81-88`, `applyVisit`); the browser entry
+is always pushed (`location.hash = …`). So the in-app ‹ Back already skips replaced screens while device/browser Back stops
+on them, and on a dead finish route ("Not found."). **Chosen (A):** `replace` is real in the browser too
+(`location.replace` of the same URL with the new hash) at every site — ~15 existing ones (item.jsx ×5, overview.jsx:212,
+replace.jsx ×2, setup.jsx:59, Exercises.jsx ×4, workout-actions.js) plus the 3 req-152 exits. Why: it makes device Back
+match in-app Back and what those sites already say ("replace rather than stacking history"); the stacked entries are the
+same dead-Back class as QA-1. Rejected (B, only the 3 exits): leaves two Backs that disagree. User-visible: swipe-back
+skips the replaced intermediate screen. On Emilio's list.
+
+## DEC-082 — DEC-081's reason corrected; an added set with nothing logged stays blank  (planning, from req-152, 2026-09-24; unconfirmed)
+
+1. **Correction to DEC-081's "why".** Planner wrote that the in-app ‹ Back follows the visit stack; it doesn't — it is a
+   fixed link (`<Back to=…>`, `shared.jsx:43`; Builder, req-152). The decision (A) stands on the rest: after it, every
+   device Back from those sites lands on a live screen instead of a replaced or dead one. (L-035.)
+2. **QA-3's fallback dropped.** req-152 said an added set with no in-session kg falls back to "the appended suggested
+   weight". Builder measured that the live seed never reads `suggestedWeights`, so that would be a new prefill source. Not
+   built: the added set carries the kg just logged this session, else stays blank — history and this session only, never
+   the routine's number (the core rule).
