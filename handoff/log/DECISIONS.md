@@ -1360,3 +1360,11 @@ row may stand in (same intent).
 2. **Server:** it runs on a computer Emilio uses as a server (details when req-146 starts). req-146 (backend) and req-144
    (creation design) **wait**; current follow-ups are finished first.
 
+## DEC-076 — what "a plain number" means for the progression hold  (planning, from req-150, 2026-09-24; unconfirmed)
+
+Holding never gives a wrong answer, so the conservative reading stands: only a whole number (`"10"`, `" 10 "`, `10`)
+is judged. Ranges (incl. "8–12", which main misread as 812), AMRAP, durations, "10 reps", "12+" and "10.0" **hold**.
+Blank or missing targets are judged as before. In mixed items each set is judged on its own. "Assisted" = the 3 library
+ids or /assisted/i in the name (interim; req-149 brings a real flag). **Known gap:** the hold reason is saved on the
+workout but no screen shows it since req-96; surfacing it belongs to req-149.
+

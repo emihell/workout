@@ -1,6 +1,6 @@
 # req-150 — stop the three wrong load recommendations: hold instead of guessing
 
-**Status: READY** — Phase 1, a small fix. **Gate: functional**; it touches `src/progress.js`, so DEC-057 §1 **fires**: an
+**Status: BUILT, NOT merged — branch `req-150`** — Phase 1, a small fix. **Gate: functional**; it touches `src/progress.js`, so DEC-057 §1 **fires**: an
 independent reviewer before merge, no backup needed (no stored-data change). Emilio 2026-09-24 (DEC-075): "i dont want the
 app to change anything yet… a separate req where we set the rules… for now do not touch them — but if there is an issue
 fix it." So this req **adds no new progression rules**. It only stops three known-wrong answers by **holding** (no change)
