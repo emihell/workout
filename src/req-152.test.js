@@ -17,10 +17,11 @@ const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)),
 // screens call, and `node --test` can't load .jsx to exercise them; what the function
 // does is behaviour-tested there.
 describe('the three ways out of a workout to Today use leaveWorkoutToToday (QA-1)', () => {
-  it('finish Save, auto-complete commit and abandon call it', () => {
-    for (const rel of ['./views/workout/finish.jsx', './views/workout/auto-complete.jsx', './views/workout/helpers.jsx']) {
-      assert.match(read(rel), /^\s*leaveWorkoutToToday\(\)$/m, rel)
-    }
+  it('finish Save, auto-complete commit and abandon call it right after the store write', () => {
+    // req-153 review — pin the ORDER too: the exit follows finishWorkout / abandonWorkout.
+    assert.match(read('./views/workout/finish.jsx'), /store\.finishWorkout\([^)]*\)\s*\n\s*leaveWorkoutToToday\(\)/)
+    assert.match(read('./views/workout/auto-complete.jsx'), /store\.finishWorkout\(autoFinishArgs[^\n]*\n\s*leaveWorkoutToToday\(\)/)
+    assert.match(read('./views/workout/helpers.jsx'), /store\.abandonWorkout\(\)\n\s*leaveWorkoutToToday\(\)/)
   })
 })
 
@@ -82,6 +83,11 @@ describe('Add set prefill (QA-3)', () => {
 
 // ---- QA-4 — History detail says "skipped" ----
 describe('History detail exercise meta (QA-4)', () => {
+  // req-153 review — a source pin that stays: detail.jsx is .jsx (node can't load it), and
+  // this is the only link between the screen and the behaviour-tested historyGroupRowMeta.
+  it('detail.jsx renders each row through historyGroupRowMeta', () => {
+    assert.match(read('./views/history/detail.jsx'), /historyGroupRowMeta\(snapshotItem, group\.items\)/)
+  })
   it('all sets skipped → "· skipped" (the overview word), no count', () => {
     assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 0, { skipped: true }), 'WU set · skipped')
   })

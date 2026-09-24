@@ -4,7 +4,7 @@
 // like a real fragment navigation, and Back that keeps forward entries (history.length
 // never shrinks). Item 3 lives in req-24.test.js (the guard), item 5 is this file + the
 // req-152 edits listed in reports/req-153.md.
-import { describe, it, beforeEach, afterEach } from 'node:test'
+import { describe, it, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { BACK_TIMEOUT_MS, go, installEntryStamps, resetEntryStampsForTest } from './route.js'
 import { leaveWorkoutToToday } from './workout-actions.js'
@@ -13,16 +13,30 @@ import { historyGroupRowMeta } from './views/history/helpers.js'
 
 const BASE = 'http://localhost:5173/workout/'
 
-function fakeBrowser(startHash = '#/') {
-  const entries = [{ url: BASE + startHash, state: null }]
-  let index = 0
+// `start`: the session's entries before the app loads (state null = never stamped, e.g.
+// entries from before req-153 shipped) and the index the page is (re)loaded on.
+function fakeBrowser(start = ['#/'], startIndex = start.length - 1) {
+  const entries = start.map((hash) => ({ url: BASE + hash, state: null }))
+  let index = startIndex
   const listeners = new Map()
+  const docListeners = []
   const queue = []
+  let holdBacks = false
+  const heldBacks = []
   const hashOf = (url) => url.slice(url.indexOf('#'))
   const fire = (event) => (listeners.get(event.type) || []).slice().forEach((fn) => fn(event))
-  const navigated = (oldURL) => {
+  const hashchanged = (oldURL) => {
     const newURL = entries[index].url
     if (hashOf(oldURL) !== hashOf(newURL)) queue.push(() => fire({ type: 'hashchange', oldURL, newURL }))
+  }
+  // A traversal (Back/Forward): popstate, then hashchange if the fragment differs.
+  const traverse = (delta) => {
+    const to = index + delta
+    if (to < 0 || to >= entries.length) return
+    const oldURL = entries[index].url
+    index = to
+    queue.push(() => fire({ type: 'popstate', state: entries[index].state }))
+    hashchanged(oldURL)
   }
   const win = {
     HashChangeEvent: class {
@@ -42,6 +56,11 @@ function fakeBrowser(startHash = '#/') {
     dispatchEvent(event) {
       fire(event)
     },
+    document: {
+      addEventListener(type, fn) {
+        if (type === 'click') docListeners.push(fn)
+      },
+    },
     history: {
       get length() {
         return entries.length
@@ -52,23 +71,29 @@ function fakeBrowser(startHash = '#/') {
       replaceState(state, _title, url) {
         entries[index] = { url: url ? BASE + url : entries[index].url, state }
       },
+      // A held back (a slow traversal) applies its -1 from wherever the index is when
+      // it finally runs, like a real queued traversal.
       back() {
-        if (index === 0) return
-        const oldURL = entries[index].url
-        index -= 1
-        navigated(oldURL)
+        if (holdBacks) heldBacks.push(-1)
+        else traverse(-1)
+      },
+      forward() {
+        traverse(1)
       },
     },
     location: {
       get hash() {
         return hashOf(entries[index].url)
       },
+      // Like Chrome (measured in req-153): a fragment push fires popstate (state null)
+      // before its hashchange.
       set hash(value) {
         const oldURL = entries[index].url
         entries.splice(index + 1)
         entries.push({ url: BASE + value, state: null })
         index += 1
-        navigated(oldURL)
+        queue.push(() => fire({ type: 'popstate', state: null }))
+        hashchanged(oldURL)
       },
       get href() {
         return entries[index].url
@@ -78,8 +103,12 @@ function fakeBrowser(startHash = '#/') {
   const flush = () => {
     while (queue.length) queue.shift()()
   }
-  // A user tapping a plain <a href="#/…"> link: a native push, no go().
+  // A user tapping a plain <a href="#/…"> link: the click (capture listeners see it
+  // first), then the browser's native push.
   const tapLink = (hash) => {
+    const link = { getAttribute: () => hash, target: '' }
+    const event = { button: 0, defaultPrevented: false, target: { closest: () => link } }
+    docListeners.forEach((fn) => fn(event))
     win.location.hash = hash
     flush()
   }
@@ -87,18 +116,33 @@ function fakeBrowser(startHash = '#/') {
     win.history.back()
     flush()
   }
-  return { win, flush, tapLink, back, hash: () => win.location.hash, length: () => entries.length }
+  const slowBacks = (on) => {
+    holdBacks = on
+  }
+  const releaseBacks = () => {
+    while (heldBacks.length) traverse(heldBacks.shift())
+    flush()
+  }
+  return {
+    win, flush, tapLink, back, slowBacks, releaseBacks,
+    hash: () => win.location.hash,
+    length: () => entries.length,
+    stateAt: (i) => entries[i].state,
+    index: () => index,
+  }
 }
 
 let browser
 const previousWindow = globalThis.window
-beforeEach(() => {
-  browser = fakeBrowser('#/')
+const load = (start, startIndex) => {
+  browser = fakeBrowser(start, startIndex)
   globalThis.window = browser.win
   resetEntryStampsForTest()
   installEntryStamps()
-})
+}
+beforeEach(() => load(['#/']))
 afterEach(() => {
+  mock.timers.reset()
   globalThis.window = previousWindow
 })
 
@@ -126,33 +170,6 @@ describe('item 1 — no duplicate entry when a replace targets the entry beneath
     assert.equal(browser.hash(), '#/workout/x')
     browser.back()
     assert.equal(browser.hash(), '#/') // still in the app, one Back from the overview
-  })
-
-  it('a different go() while stepping back is applied on arrival', () => {
-    go('/workout/x')
-    browser.flush()
-    browser.tapLink('#/workout/x/item/a/log')
-    go('/workout/x', { replace: true })
-    go('/workout/x/finish') // a push requested mid-step-back
-    browser.flush()
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x/finish')
-    browser.back()
-    assert.equal(browser.hash(), '#/workout/x')
-  })
-
-  it('a back that never arrives settles on the timer (navigation is not stuck)', async () => {
-    go('/workout/x')
-    browser.flush()
-    browser.tapLink('#/workout/x/item/a/log')
-    browser.win.history.back = () => {} // swallowed
-    go('/workout/x', { replace: true })
-    await new Promise((r) => setTimeout(r, BACK_TIMEOUT_MS + 50))
-    browser.flush()
-    assert.equal(browser.hash(), '#/workout/x') // replaced in place instead
-    go('/history')
-    browser.flush()
-    assert.equal(browser.hash(), '#/history')
   })
 
   it('a replace whose target is NOT beneath replaces in place and keeps what is beneath', () => {
@@ -195,6 +212,96 @@ describe('item 1 — no duplicate entry when a replace targets the entry beneath
     go('/target', { replace: true })
     browser.flush()
     assert.equal(browser.hash(), '#/target')
+  })
+})
+
+// ---- req-153 review — should-fixes (each fails on 10c1a99) ----
+describe('review fix 1 — only real pushes are stamped', () => {
+  it('reload on an old (unstamped) log entry, Back, then Continue: stays in the app', () => {
+    // Entries from before req-153 shipped: [ext, overview, log]; the page reloads on log.
+    load(['#/__external', '#/workout/r1', '#/workout/r1/item/i/log'])
+    browser.back() // → the overview, an unstamped entry reached by TRAVERSAL
+    assert.equal(browser.hash(), '#/workout/r1')
+    assert.equal(browser.stateAt(1), null) // not stamped (was: below = the log above it)
+    go('/workout/r1/item/i/log', { replace: true }) // Continue → startOrContinue's replace
+    browser.flush()
+    assert.equal(browser.hash(), '#/workout/r1/item/i/log') // a plain in-place replace
+    assert.notEqual(browser.hash(), '#/__external')
+  })
+
+  it('a go() push and a link tap are stamped with the path they left', () => {
+    go('/workout/x')
+    browser.flush()
+    assert.deepEqual(browser.win.history.state, { below: '/' })
+    browser.tapLink('#/workout/x/item/a/log')
+    assert.deepEqual(browser.win.history.state, { below: '/workout/x' })
+  })
+
+  it('a stamped entry reached by Back keeps its own stamp', () => {
+    go('/a')
+    browser.flush()
+    go('/b')
+    browser.flush()
+    browser.back()
+    assert.deepEqual(browser.win.history.state, { below: '/' })
+  })
+})
+
+describe('review fix 2 — a slow back never undoes a tap', () => {
+  const toOverviewSlowly = () => {
+    go('/workout/x')
+    browser.flush()
+    browser.tapLink('#/workout/x/item/a/log')
+    mock.timers.enable({ apis: ['setTimeout'] })
+    browser.slowBacks(true)
+    go('/workout/x', { replace: true }) // steps back — but the back is slow
+  }
+
+  it('a push requested while the back is in flight is not applied, so a late back has nothing to undo', () => {
+    toOverviewSlowly()
+    go('/workout/x/item/b/log') // queued on 10c1a99 and applied by the timer
+    mock.timers.tick(BACK_TIMEOUT_MS + 1)
+    browser.flush()
+    const shown = browser.hash()
+    browser.releaseBacks() // the late back finally lands
+    assert.equal(browser.hash(), shown) // the screen on show did not flip
+    assert.equal(shown, '#/workout/x')
+  })
+
+  it('the user pushes a screen after the timeout, then the late back lands: their screen is put back', () => {
+    toOverviewSlowly()
+    mock.timers.tick(BACK_TIMEOUT_MS + 1)
+    browser.flush()
+    assert.equal(browser.hash(), '#/workout/x') // replaced in place on the timer
+    browser.slowBacks(false)
+    browser.tapLink('#/workout/x/item/b/log') // the user taps another exercise
+    browser.releaseBacks() // the late back pops it…
+    browser.flush()
+    assert.equal(browser.hash(), '#/workout/x/item/b/log') // …and it is put back
+  })
+
+  it('a back that never arrives: navigation unlocks and the target is replaced in', () => {
+    toOverviewSlowly()
+    mock.timers.tick(BACK_TIMEOUT_MS + 1)
+    browser.flush()
+    assert.equal(browser.hash(), '#/workout/x')
+    browser.slowBacks(false)
+    go('/history')
+    browser.flush()
+    assert.equal(browser.hash(), '#/history')
+  })
+})
+
+describe('review fix 3 — a leaving screen cannot navigate after the step-back', () => {
+  it("a go() from the screen being left (queued on 10c1a99) is not run on arrival", () => {
+    go('/workout/x')
+    browser.flush()
+    browser.tapLink('#/workout/x/item/a/log')
+    go('/workout/x', { replace: true })
+    go('/workout/x/item/a/done', { replace: true }) // the unmounting log screen's effect
+    browser.flush()
+    browser.flush()
+    assert.equal(browser.hash(), '#/workout/x')
   })
 })
 
