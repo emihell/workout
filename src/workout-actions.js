@@ -1,6 +1,7 @@
 import { isCurrentWorkout } from './current-workout.js'
 import { go, hashPath } from './route.js'
 import { dateKey } from './schedule.js'
+import { askConfirm } from './ui/confirm.js'
 import { itemIsMarkedDone, itemLoggingState } from './workout-log.js'
 import { itemCurrentPath } from './workout-paths.js'
 
@@ -30,7 +31,7 @@ export function resumeTarget(workout) {
   return current ? itemCurrentPath(routineId, current, false) : overview
 }
 
-export function startOrContinue(store, routineId, options = {}) {
+export async function startOrContinue(store, routineId, options = {}) {
   const config = typeof options === 'string' ? { scheduledFor: options } : options
   const scheduledFor = config.scheduledFor || dateKey(new Date())
   const scheduleSlotId = config.scheduleSlotId || null
@@ -48,7 +49,7 @@ export function startOrContinue(store, routineId, options = {}) {
   // req-55 / DEC-038 — start-while-active abandons the current, with a warning
   // (replaces the old "Save draft?" path). Cancel: do nothing, keep the active one.
   if (active && !continuingSame) {
-    if (!window.confirm(ABANDON_ON_NEW_WARNING)) return
+    if (!(await askConfirm(ABANDON_ON_NEW_WARNING, { confirmLabel: 'Abandon' }))) return
     store.abandonWorkout()
   }
   if (!continuingSame) {
@@ -69,7 +70,7 @@ export function startOrContinue(store, routineId, options = {}) {
 // recent peek. Two kinds: (1) the single stale `activeWorkout` (started a prior
 // day) — already active, so just navigate; (2) a legacy `draftWorkout` — promote it
 // to the single active, discarding any current active (with the warning).
-export function continueInProgress(store, workout) {
+export async function continueInProgress(store, workout) {
   const routineId = workoutRoutineId(workout)
   const active = store.activeWorkout
   if (active && active.id === workout.id) {
@@ -78,7 +79,7 @@ export function continueInProgress(store, workout) {
     return
   }
   if (active) {
-    if (!window.confirm(ABANDON_ON_NEW_WARNING)) return
+    if (!(await askConfirm(ABANDON_ON_NEW_WARNING, { confirmLabel: 'Abandon' }))) return
   }
   store.continueDraft(workout.id)
   go(resumeTarget(workout))
@@ -87,8 +88,8 @@ export function continueInProgress(store, workout) {
 // req-55 — Abandon an unfinished in-progress workout from History. Discards
 // entirely: no finished-history record (DESIGN §1). The stale active workout goes
 // through abandonWorkout(); a legacy draft through abandonDraft().
-export function abandonInProgress(store, workout) {
-  if (!window.confirm('Abandon this workout? It will not be saved.')) return
+export async function abandonInProgress(store, workout) {
+  if (!(await askConfirm('Abandon this workout? It will not be saved.', { confirmLabel: 'Abandon' }))) return
   const active = store.activeWorkout
   if (active && active.id === workout.id) {
     store.abandonWorkout()

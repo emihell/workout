@@ -207,10 +207,6 @@ function WorkoutItemLive({ routineId, item }) {
   }
 
   function completeSet({ weight, reps, rpe, note, durationSec }) {
-    if (currentType === 'work' && ex?.type !== 'cardio' && !rpe) {
-      window.alert('Pick effort.')
-      return
-    }
     recordButton('complete-set')
     // req-31 — completing a set is the gesture that arms the rest; use it to
     // unlock/resume the AudioContext (iOS only lets a gesture start audio) so the

@@ -15,6 +15,7 @@ import {
   workoutRoutineName,
 } from './helpers'
 import { snapshotItemFor } from './snapshot-item.js'
+import { askConfirm } from '../../ui/confirm.js'
 
 export function HistoryDetail({ workoutId }) {
   const store = useStore()
@@ -82,8 +83,8 @@ export function HistoryDetail({ workoutId }) {
           this only drops its display. History detail gets no "beat last time" line — it's
           a past record, not a forward celebration (decided). */}
       <Button
-        onClick={() => {
-          if (!window.confirm(`Delete ${workoutRoutineName(workout, routine)}?`)) return
+        onClick={async () => {
+          if (!(await askConfirm(`Delete ${workoutRoutineName(workout, routine)}?`, { confirmLabel: 'Delete' }))) return
           store.removeWorkout(workout.id)
           go('/history')
         }}

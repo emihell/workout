@@ -6,6 +6,7 @@ import { WakeLock } from './wake-lock'
 import { RestEndCue } from './rest-cue'
 import { useHashRoute } from './route'
 import { Banner, Button } from './ui/index.jsx'
+import { ConfirmSheet } from './ui/index.jsx'
 import { Today } from './views/Today'
 import {
   RoutineNew,
@@ -259,6 +260,7 @@ export default function App() {
         </main>
         <BottomMenu />
         <FeedbackNotesGate />
+        <ConfirmSheet />
       </StoreProvider>
     </ErrorBoundary>
   )

@@ -62,10 +62,10 @@ export function Settings() {
               onFiles={(files) => {
                 const file = files?.[0]
                 if (!file) return
-                file.text().then((text) => {
+                file.text().then(async (text) => {
                   try {
                     const payload = JSON.parse(text)
-                    const result = importWithBackup({ store, payload })
+                    const result = await importWithBackup({ store, payload })
                     if (!result) return // cancelled at the confirm
                     recordButton('import')
                     setError('')

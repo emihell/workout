@@ -5,6 +5,7 @@ import { useStore } from '../store-context'
 import { RoutineNewForm, RoutineScreens, navForBase } from './Routine'
 import { Back, Missing } from './shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, Select, Title } from '../ui/index.jsx'
+import { askConfirm } from '../ui/confirm.js'
 
 function dayPathOf(week, weekday, extra = '') {
   return `/schedule/${week}/${weekday}${extra}`
@@ -79,11 +80,11 @@ export function ScheduleLoop() {
       <Back to="/schedule" />
       <Title>Loop</Title>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
           const value = Number(new FormData(e.target).get('loop'))
           const removed = (store.schedule?.slots || []).filter((slot) => Number(slot.week) >= value).length
-          if (removed && !window.confirm(`Remove ${removed} scheduled routine${removed === 1 ? '' : 's'}?`)) {
+          if (removed && !(await askConfirm(`Remove ${removed} scheduled routine${removed === 1 ? '' : 's'}?`, { confirmLabel: 'Remove' }))) {
             return
           }
           store.setLoopWeeks(value)
@@ -125,8 +126,8 @@ export function ScheduleDay({ week, weekday }) {
             key={slot.id}
             action={
               <Button
-                onClick={() => {
-                  if (!window.confirm(`Remove ${slotLabel(routines, slot)}?`)) return
+                onClick={async () => {
+                  if (!(await askConfirm(`Remove ${slotLabel(routines, slot)}?`, { confirmLabel: 'Remove' }))) return
                   store.removeSlot(slot.id)
                 }}
               >

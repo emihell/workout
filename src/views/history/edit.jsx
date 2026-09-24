@@ -7,6 +7,7 @@ import { Back, Missing } from '../shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
 import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
+import { askConfirm } from '../../ui/confirm.js'
 
 export function HistoryEdit({ workoutId }) {
   const store = useStore()
@@ -197,8 +198,8 @@ export function HistorySet({ workoutId, index }) {
         }}
       />
       <Button
-        onClick={() => {
-          if (!window.confirm('Remove set?')) return
+        onClick={async () => {
+          if (!(await askConfirm('Remove set?', { confirmLabel: 'Remove' }))) return
           store.updateWorkout(workout.id, { sets: (workout.sets || []).filter((_, i) => i !== index) })
           go(`/history/${workout.id}/recalculate`)
         }}
