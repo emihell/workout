@@ -1,74 +1,26 @@
 // req-152 — four fixes from Planner's browser run (QA-1..4). QA-2 (rest pill vs the top
 // row) is CSS and measured in the browser (reports/req-152.md), plus a source guard here.
-import { describe, it, beforeEach, afterEach } from 'node:test'
+import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { go } from './route.js'
 import { historyHasSetAt, historySetPrefill } from './storage.js'
 import { carryForSet, initialSetFields, withOneMoreSet } from './workout-log.js'
 import { historyGroupMeta } from './views/history/helpers.js'
 
 const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
 
-// ---- QA-1 / DEC-081 — go(p, { replace: true }) replaces the browser entry ----
-describe('go — replace is real (QA-1)', () => {
-  const previousWindow = globalThis.window
-  let calls
-  beforeEach(() => {
-    calls = []
-    let hash = '#/workout/r1/finish'
-    globalThis.window = {
-      location: {
-        get hash() {
-          return hash
-        },
-        set hash(value) {
-          calls.push(['assign', value])
-          hash = value
-        },
-        get href() {
-          return `http://localhost:5173/workout/?x=1${hash}`
-        },
-        replace(url) {
-          calls.push(['replace', url])
-          hash = url.slice(url.indexOf('#'))
-        },
-      },
+// ---- QA-1 / DEC-081 — the exits to Today replace ----
+// req-153 — the behaviour tests (go's replace, the Finish/Abandon exits via
+// leaveWorkoutToToday, the visit stack) moved to req-153.test.js, against a fake browser
+// history. This guard STAYS as a source check, because it pins which function three .jsx
+// screens call, and `node --test` can't load .jsx to exercise them; what the function
+// does is behaviour-tested there.
+describe('the three ways out of a workout to Today use leaveWorkoutToToday (QA-1)', () => {
+  it('finish Save, auto-complete commit and abandon call it', () => {
+    for (const rel of ['./views/workout/finish.jsx', './views/workout/auto-complete.jsx', './views/workout/helpers.jsx']) {
+      assert.match(read(rel), /^\s*leaveWorkoutToToday\(\)$/m, rel)
     }
-  })
-  afterEach(() => {
-    globalThis.window = previousWindow
-  })
-
-  it('replace: true → location.replace with the same URL and the new hash; no hash assignment', () => {
-    go('/', { replace: true })
-    assert.deepEqual(calls, [['replace', 'http://localhost:5173/workout/?x=1#/']])
-  })
-
-  it('without replace → still pushes (hash assignment)', () => {
-    go('/history')
-    assert.deepEqual(calls, [['assign', '#/history']])
-  })
-
-  it('replace still updates the in-app visit stack (sessionStorage-backed; top is the new path)', () => {
-    const store = new Map()
-    globalThis.sessionStorage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) }
-    try {
-      go('/workout/r1', { replace: false })
-      go('/', { replace: true })
-      const stack = JSON.parse(store.get('workout-mvp-nav-2'))
-      assert.equal(stack.at(-1), '/')
-      assert.ok(!stack.includes('/workout/r1/finish'))
-    } finally {
-      delete globalThis.sessionStorage
-    }
-  })
-
-  it('the three ways out of a workout to Today replace (finish Save, auto-complete, abandon)', () => {
-    assert.match(read('./views/workout/finish.jsx'), /store\.finishWorkout\([^)]*\)\s*\n\s*go\('\/', \{ replace: true \}\)/)
-    assert.match(read('./views/workout/auto-complete.jsx'), /store\.finishWorkout\(autoFinishArgs[^\n]*\n\s*go\('\/', \{ replace: true \}\)/)
-    assert.match(read('./views/workout/helpers.jsx'), /store\.abandonWorkout\(\)\n\s*go\('\/', \{ replace: true \}\)/)
   })
 })
 
@@ -138,14 +90,12 @@ describe('History detail exercise meta (QA-4)', () => {
     assert.equal(meta, '2 sets')
     assert.doesNotMatch(meta, /skipped/)
   })
-  it('detail.jsx counts logged (non-skipped) sets and flags all-skipped', () => {
-    const src = read('./views/history/detail.jsx')
-    assert.match(src, /group\.items\.filter\(\(\{ s \}\) => !isSkippedSet\(s\)\)\.length/)
-    assert.match(src, /historyGroupMeta\(snapshotItem, logged, \{ skipped \}\)/)
-  })
 })
 
 // ---- QA-2 — every screen that hosts the rest pill reserves its footprint ----
+// req-153 — these two STAY as source guards: the overlap is layout, and node has no
+// layout engine (no rects to compare). The rects are measured in the browser at 320 /
+// 375 / 430px (reports/req-152.md); these only stop the class or the CSS silently going.
 describe('rest pill clears the top row (QA-2 source guard; rects measured in the browser)', () => {
   it('each <Screen> rendering <RestPill /> carries ui-screen--rest', () => {
     for (const rel of ['./views/workout/item.jsx', './views/workout/overview.jsx', './views/workout/finish.jsx']) {

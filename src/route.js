@@ -57,10 +57,47 @@ function remember(hash) {
   if (changed) recordScreen(parseRoute(path).name)
 }
 
+// req-153 — every browser history entry remembers the path BENEATH it, in
+// `history.state.below`, so a replace can tell when its target is the entry right
+// under it (overview → item → last set → replace to the overview) and step back onto
+// it instead of leaving two identical entries (a device Back that does nothing).
+// The in-app visit stack can't say this: a device Back pushes onto it, not pops.
+// A new entry (a go() push or a plain link) is stamped when its hashchange arrives,
+// from the event's oldURL; the first entry of the page is stamped `below: null`.
+function entryState() {
+  const state = window.history?.state
+  return state && typeof state === 'object' && 'below' in state ? state : null
+}
+
+function stampEntry(below) {
+  if (!window.history?.replaceState || entryState()) return
+  window.history.replaceState({ ...(window.history.state || {}), below }, '')
+}
+
+function onHashStamp(event) {
+  const old = event?.oldURL
+  stampEntry(old ? hashPath(old.slice(old.indexOf('#') === -1 ? old.length : old.indexOf('#'))) : null)
+}
+
+let stampsInstalled = false
+export function installEntryStamps() {
+  if (typeof window === 'undefined' || stampsInstalled) return
+  stampsInstalled = true
+  stampEntry(null)
+  window.addEventListener('hashchange', onHashStamp)
+}
+
+// Test-only: forget the installed listener (tests swap in a fresh fake window).
+export function resetEntryStampsForTest() {
+  stampsInstalled = false
+  pendingBack = null
+}
+
 export function useHashRoute() {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
 
   useEffect(() => {
+    installEntryStamps()
     remember(window.location.hash || '#/')
     const onHash = () => {
       const next = window.location.hash || '#/'
@@ -78,23 +115,71 @@ export function useHashRoute() {
   return parseRoute(path)
 }
 
+// Replace the current entry's URL, keeping what's beneath it, and announce it the way a
+// real fragment navigation would (replaceState itself fires no hashchange).
+function replaceEntry(next) {
+  const oldURL = window.location.href
+  const below = entryState()?.below ?? null
+  window.history.replaceState({ ...(window.history.state || {}), below }, '', toHash(next))
+  window.dispatchEvent(new window.HashChangeEvent('hashchange', { oldURL, newURL: window.location.href }))
+}
+
+// The target is the entry beneath: step back onto it. history.back() is async, and a
+// second go() often follows in the same tick (Skip's go + the log screen's "marked done →
+// overview" effect), which would step back AGAIN and walk off the app. So while a step
+// back is in flight, later go() calls only record what they want (`after`), applied on
+// arrival. If the landing isn't the target after all (an entry stamped before req-153
+// shipped, say), replace to it.
+let pendingBack = null
+
+// A back that never arrives (no hashchange within BACK_TIMEOUT_MS) must not leave
+// navigation stuck: the timer settles it the same way.
+export const BACK_TIMEOUT_MS = 400
+
+function backOnto(next) {
+  const pending = { target: next, after: null }
+  pendingBack = pending
+  let timer = null
+  const settle = () => {
+    if (pendingBack !== pending) return
+    window.removeEventListener('hashchange', settle)
+    if (timer) clearTimeout(timer)
+    pendingBack = null
+    if (hashPath(window.location.hash) !== pending.target) replaceEntry(pending.target)
+    if (pending.after) go(pending.after.path, { replace: pending.after.replace })
+  }
+  window.addEventListener('hashchange', settle)
+  timer = setTimeout(settle, BACK_TIMEOUT_MS)
+  window.history.back()
+}
+
 // req-152 / DEC-081 — `replace` replaces the BROWSER history entry too (it used to only
 // rewrite the in-app visit stack, so device Back still stopped on the replaced screen —
-// e.g. a dead `/workout/<id>/finish` after Save). location.replace with the same URL and a
-// new hash is a same-document fragment navigation: no reload, hashchange still fires.
+// e.g. a dead `/workout/<id>/finish` after Save). req-153 — and when the entry beneath
+// already is the target, it steps back onto it instead, so no duplicate entry is left.
+// Same document throughout: no reload, hashchange fires (natively or dispatched).
 export function go(path, { replace = false } = {}) {
   const next = hashPath(path)
+  if (pendingBack) {
+    // A replace to where we're already stepping back is a no-op; anything else waits.
+    if (!(replace && next === pendingBack.target)) pendingBack.after = { path: next, replace }
+    return
+  }
+  if (typeof window === 'undefined' || hashPath(window.location.hash) === next) {
+    applyVisit(visits, next, { replace })
+    persistVisits()
+    return
+  }
+  if (replace && entryState()?.below === next) {
+    if (visits[visits.length - 2] === next) visits.pop()
+    persistVisits()
+    backOnto(next)
+    return
+  }
   applyVisit(visits, next, { replace })
   persistVisits()
-  if (typeof window !== 'undefined' && hashPath(window.location.hash) !== next) {
-    if (replace) {
-      const { href } = window.location
-      const hashAt = href.indexOf('#')
-      window.location.replace(`${hashAt === -1 ? href : href.slice(0, hashAt)}${toHash(next)}`)
-    } else {
-      window.location.hash = toHash(next)
-    }
-  }
+  if (replace) replaceEntry(next)
+  else window.location.hash = toHash(next)
 }
 
 // req-14 / DEC-024 — the bottom tab bar has three tabs (Workouts / Library /

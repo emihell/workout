@@ -1,22 +1,20 @@
 import { useState } from 'react'
-import { go } from '../../route'
+import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { buildFinishProgression } from '../../model'
 import { beatLastTimeLine, beatLastTimeWins } from '../../beat-last-time'
 import { previousSameRoutineWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
-import { Back, Missing } from '../shared'
+import { Back } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { anythingLogged, loggedSetCount } from '../../workout-log'
 import { activeFeel, activeNote } from '../../workout-note.js'
-import { abandonWorkout, isActiveFor } from './helpers'
+import { abandonWorkout, isActiveFor, NotInWorkout } from './helpers'
 import { RestPill } from './rest'
 
 export function WorkoutFinish({ routineId }) {
   const store = useStore()
-  if (!isActiveFor(store.activeWorkout, routineId)) {
-    return <Missing>Not found.</Missing>
-  }
+  if (!isActiveFor(store.activeWorkout, routineId)) return <NotInWorkout routineId={routineId} />
   return <FinishScreen routineId={routineId} />
 }
 
@@ -95,7 +93,7 @@ function FinishScreen({ routineId }) {
         onClick={() => {
           recordButton('finish-workout')
           store.finishWorkout({ overallNote, overallFeel, progression })
-          go('/', { replace: true })
+          leaveWorkoutToToday()
         }}
       >
         {empty ? 'Save anyway' : 'Save'}

@@ -66,6 +66,13 @@ export async function startOrContinue(store, routineId, options = {}) {
   go(target, { replace })
 }
 
+// req-152 / req-153 — the one way out of a workout to Today (finish Save, auto-complete,
+// abandon): REPLACE the entry, so device Back never lands on the dead finish/overview
+// route of a workout that no longer exists.
+export function leaveWorkoutToToday() {
+  go('/', { replace: true })
+}
+
 // req-55 — Continue an unfinished in-progress workout surfaced in History / the
 // recent peek. Two kinds: (1) the single stale `activeWorkout` (started a prior
 // day) — already active, so just navigate; (2) a legacy `draftWorkout` — promote it

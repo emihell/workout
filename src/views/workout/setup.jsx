@@ -6,7 +6,7 @@ import { itemLoggingState } from '../../workout-log'
 import { navForBase, RoutineScreens } from '../Routine'
 import { Back, Missing } from '../shared'
 import { Actions, Button, NavLink, Screen, Textarea, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemCurrentPath, NotInWorkout } from './helpers'
 import { RestPill } from './rest'
 import { useWeightStep, WeightStepField } from '../weight-step-field.jsx'
 
@@ -19,7 +19,8 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   const step = useWeightStep(ex?.weightStep)
   const [cues, setCues] = useState(ex?.cues || '')
 
-  if (!mine || !item) {
+  if (!mine) return <NotInWorkout routineId={routineId} />
+  if (!item) {
     return <Missing>Not found.</Missing>
   }
 

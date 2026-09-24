@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { go } from '../../route'
+import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { buildFinishProgression } from '../../model'
 import { defaultBeep } from '../../rest-cue.js'
@@ -53,7 +54,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
     defaultBeep()
     const progression = buildFinishProgression(store.exercises, active)
     store.finishWorkout(autoFinishArgs(active, progression))
-    go('/', { replace: true })
+    leaveWorkoutToToday()
   }
 
   useEffect(() => {

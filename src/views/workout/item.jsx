@@ -33,7 +33,7 @@ import {
 import { SetEditForm } from '../set-edit'
 import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath, MissingItem } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath, MissingItem, NotInWorkout } from './helpers'
 import { RestPill, useRestCountdown } from './rest'
 import { unlockAudio } from '../../rest-cue'
 
@@ -110,7 +110,8 @@ export function WorkoutItemLog({ routineId, itemId }) {
     if (markedDone) go(`/workout/${routineId}`, { replace: true })
   }, [markedDone, routineId])
 
-  if (!mine || !item) return <MissingItem />
+  if (!mine) return <NotInWorkout routineId={routineId} />
+  if (!item) return <MissingItem />
   if (markedDone) return <MissingItem />
 
   return <WorkoutItemLive routineId={routineId} item={item} />
@@ -504,7 +505,8 @@ export function WorkoutItemDone({ routineId, itemId }) {
   const mine = isActiveFor(active, routineId)
   const item = mine ? findItem(active.snapshot?.items, itemId) : null
 
-  if (!mine || !item) return <MissingItem />
+  if (!mine) return <NotInWorkout routineId={routineId} />
+  if (!item) return <MissingItem />
 
   // req-104 — no "Previous" section here (Emilio: "Don't need to show previous");
   // the log screen still reads the last finished sets for its prefills.
@@ -562,7 +564,8 @@ export function WorkoutSetEdit({ routineId, index }) {
   const usesRpe = set?.setType !== 'wu' && item?.exerciseType !== 'cardio'
   const itemPath = itemSetsPath(routineId, item, workout)
 
-  if (!workout || !set) {
+  if (workout?.routineId !== routineId) return <NotInWorkout routineId={routineId} />
+  if (!set) {
     return <Missing>Not found.</Missing>
   }
 

@@ -25,3 +25,14 @@ export function itemReplacePath(routineId, item) {
 export function itemCurrentPath(routineId, item, done) {
   return done ? itemDonePath(routineId, item) : itemLogPath(routineId, item)
 }
+
+// req-153 — what an in-workout route (item log/done/replace/exercise, set edit, finish)
+// shows when there is NO active workout for its routine — typically an old history
+// entry reached by Back after the workout was saved or abandoned: 'redirect' to the
+// routine's overview (/workout/<id>, its preview or Done view), replacing the entry.
+// An active workout for this routine whose item/set isn't there, or a routine that
+// doesn't exist, is a genuinely wrong route: 'missing' ("Not found.").
+export function inWorkoutFallback({ active, routineId, routineKnown }) {
+  const activeHere = Boolean(active && (active.routineId || active.sessionId) === routineId)
+  return !activeHere && routineKnown ? 'redirect' : 'missing'
+}
