@@ -1709,3 +1709,12 @@ fixed + 12 debatable resolved. Gate: Planner's own run in an archive copy → `#
 341.24 kB); spot-searched car deadlift/front cone hops (none), barbell full squat → Back Squat, air bike → Fan Bike, stretch →
 9. Test edits: sanctioned req-139 only. Reviewer (code): none (no store/model/storage).
 
+## req-145 — library batch 2: 40 more entries, beginner-first  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `906f4f3`…`7c5eaf1`). 32 promoted + 8 own adds (6 staples: Dumbbell Squat,
+Step-Up with Knee Drive, Dumbbell Deadlift, Machine Back Extension, Machine High Row, Chest-Supported T-Bar Row; plus band
+moves, wall push-up, clamshell, fire hydrant, a basic stretch set). 27 merge-later rows became merges. Library: 258 common,
+199 staples; queue ~115 left. Coach QA (independent subagent): nothing unsafe, no wrong tags; 10 text/tag fixes applied
+(+ Dumbbell_Step_Ups unilateral). Test edits: count pins + 4 data-forced, now standing (DEC-074). Gate: Planner's own run in
+an archive copy → `# tests 808 # pass 808 # fail 0`, build ✓ (main 341.24 kB); spot-searched 8 queries. Reviewer (code): none.
+
