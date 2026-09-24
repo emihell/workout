@@ -1267,3 +1267,16 @@ its own authority, marked **(unconfirmed)** for Emilio's list:
 make, through the lens **beginner-first, with room for advanced**, and are revisited with real users. Behaviour and UX
 calls stay Emilio's.
 
+## DEC-068 — no auto-memory for either session; third-party data in a gitignored repo dir  (Emilio, 2026-09-24)
+
+1. Emilio, to Builder mid-build: "dont save anything in memory - EVERYTHING should be in the repo - nothing outside of
+   it - if you need to save anything - give it to planner". Builder deleted its one memory note (its content is DEC-067).
+   CLAUDE.md §"No auto-memory" updated to match PLANNING.md's rule (2026-09-12). Anything durable goes to planning, which
+   records it in `handoff/`.
+2. **Carve-out (planning's call, unconfirmed):** licensed third-party data that must stay out of git history (RepDB's
+   cached JSON, the full gap table with RepDB's names: DEC-066 §3, licence term 3) lives in the repo folder under a
+   **gitignored** `.vendor-cache/`, not in a session scratchpad. That keeps it in the repo folder, persistent across
+   sessions, and never committed.
+3. **The parity queue** (the promote/add candidates left after batch 1) is **ours**: free-db ids + our own names. It is
+   committed in `handoff/work/req-140-parity-queue.md`, so later batches don't depend on a scratchpad.
+

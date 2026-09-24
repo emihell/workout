@@ -119,7 +119,7 @@ memory — everything durable lives in `handoff/` (a `DEC-`, `L-`, req, or `NOW.
 the harness surfaces a memory/recall tool, ignore it and surface the fact for `handoff/`
 instead; a hard harness disable may also be set — the rule holds regardless. The reasoning
 (a fact held in both places is worse than in neither; only the repo copy is reviewed and
-travels between machines) is CLAUDE.md §"Memory is for you, not for the project" — see it.
+travels between machines) is CLAUDE.md §"No auto-memory — everything lives in the repo" — see it.
 
 **Keep `NOW.md` under 50 lines.** It's loaded every session. When it grows, move
 detail out to `SHIPPED.md` or `work/`.

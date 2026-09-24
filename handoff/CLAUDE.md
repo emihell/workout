@@ -68,20 +68,18 @@ Emilio needs to merge it before you continue. Don't work around it.
 
 Everywhere else in the repository is yours.
 
-## Memory is for you, not for the project
+## No auto-memory — everything lives in the repo
 
-Auto memory is machine-local, in no git history, and nobody reviews it. Keep
-using it for how to work here — tool-call style, shell habits, corrections about
-your own output.
+**Don't save anything to auto memory** (Emilio, 2026-09-24: "dont save anything in memory - EVERYTHING should be in
+the repo - nothing outside of it - if you need to save anything - give it to planner"). Auto memory is machine-local,
+in no git history, and nobody reviews it. If the harness offers a memory tool, don't use it.
 
-**Anything about the project goes in your reply instead:** a rule, a decision, a
-gotcha, why something is built the way it is. The test is whether it would belong
-in a requirement, a `DEC-` or an `L-`. If it would, surface it and let Emilio
-record it in `handoff/`.
+**Anything worth keeping goes to the planning session**, in your reply or a cross-session message: a rule, a
+decision, a gotcha, a habit that worked, a correction about your own output. Planning records it in `handoff/` (a `DEC-`,
+an `L-`, a req, or this file). A fact held in two places is worse than a fact held in neither.
 
-A fact held in both places is worse than a fact held in neither. `handoff/` can't
-correct what it can't see, and when the two disagree you'll follow the copy Emilio
-never read.
+**The one carve-out is licensed third-party data that must not enter git** (e.g. a RepDB cache, DEC-066 §3). It lives in
+the repo folder under a **gitignored** directory, never in git history (DEC-068).
 
 ## Start here
 
