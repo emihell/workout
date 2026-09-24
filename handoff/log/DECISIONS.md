@@ -1394,3 +1394,11 @@ Emilio: "1. you choose on data you have - i dont know enough to answer 2. yes 3.
 
 Stale after this: the "(unconfirmed, req-130 spec)" comment at `exerciseLibrary.js:56` — Builder drops it with the next
 library req; not worth a req alone.
+
+## DEC-079 — native popups are replaced by an in-app confirm sheet, all of them  (Emilio, 2026-09-24)
+
+Emilio, after a native import dialog froze planning's browser test: "i think we need to exchange those alerts to something
+in app - do not get stuck like this and to cover all prompts with our own code". Pattern chosen: **(a) a bottom confirm
+sheet** ([Cancel] + a distinct destructive button); errors become in-page notices. Rejected: tap-twice (misfires on a real
+delete), undo-instead (every action must be reversible — riskier in a history app). All 14 sites (req-24, re-measured);
+a guard test keeps native `confirm`/`alert`/`prompt` out of `src/`. Import validates the file before asking.
