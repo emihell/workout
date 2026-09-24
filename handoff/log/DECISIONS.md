@@ -1336,3 +1336,14 @@ computer vs a managed service), accounts, the data model with sharing (a shared 
 group workouts, moving existing phone data over, offline use in the gym, and privacy (real users' health data, GDPR).
 The creation design (req-144) waits until Emilio starts it. Library batches continue (req-145).
 
+## DEC-074 — standing test sanctions for library batches  (planning, from Builder's req-145 note, 2026-09-24)
+
+For every library batch under req-140's rules (req-145 onward), these test edits are sanctioned without listing them in
+the spec. Each is still called out in the report:
+1. count pins (common, unilateral, staples, OWN_EXERCISES, COMMON_COUNT_RANGE, triage class and Show-more counts);
+2. a fixture or receipt that names an entry the batch has now written moves to an equivalent unwritten one, keeping its
+   intent;
+3. new staples may enter the press/row/machine top-10 lists, as long as the prior relative order is unchanged;
+4. a test asserting "no common entry in rest" may check `staple` instead of `common` (the req-139 shoulder-press case).
+Anything else still needs an explicit sanction.
+
