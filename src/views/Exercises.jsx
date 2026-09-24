@@ -286,7 +286,8 @@ export function ExerciseNewSearch({ returnBase = null }) {
 
   // req-139 / DEC-064 §3 — common hits first, the rest of the library on request; with
   // no common hit the rest shows directly (never a dead end).
-  const found = catalog ? searchCommonFirst(catalog, query) : { common: [], rest: [], restCount: 0 }
+  // req-143 — hidden entries are skipped, except ones already in store.exercises.
+  const found = catalog ? searchCommonFirst(catalog, query, 25, { exercises: store.exercises }) : { common: [], rest: [], restCount: 0 }
   const restDirect = found.common.length === 0
   const hits = restDirect || showRest ? [...found.common, ...found.rest] : found.common
 
