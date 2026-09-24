@@ -6,10 +6,11 @@
 // the #/components showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
 import { lookClass } from '../views/nav-look.js'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
+import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -238,6 +239,54 @@ export function Banner({ children, role = 'status' }) {
   return (
     <div role={role} className="ui-banner">
       {children}
+    </div>
+  )
+}
+
+// ConfirmSheet (req-24 / DEC-079) — the one in-app confirm, mounted once in App. It
+// renders whatever askConfirm() (./confirm.js) has open: a bottom sheet over a dimmed
+// backdrop with the message, [Cancel] left and the destructive button right (DESIGN §4
+// order; ink-filled so it reads distinct, grayscale per DEC-017). Cancel is focused, so a
+// stray Enter never destroys. Backdrop tap, Escape and any navigation all cancel.
+export function ConfirmSheet() {
+  const pending = useSyncExternalStore(subscribeConfirm, getPendingConfirm, getPendingConfirm)
+  const cancelRef = useRef(null)
+  useEffect(() => {
+    if (!pending) return undefined
+    cancelRef.current?.focus()
+    const onKey = (e) => {
+      if (e.key === 'Escape') answerConfirm(false)
+    }
+    const onHash = () => answerConfirm(false)
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('hashchange', onHash)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('hashchange', onHash)
+    }
+  }, [pending])
+  if (!pending) return null
+  return (
+    <div className="ui-sheet-backdrop" onClick={() => answerConfirm(false)}>
+      <div
+        className="ui-sheet"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="ui-sheet-message"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p id="ui-sheet-message" className="ui-sheet__message">
+          {pending.message}
+        </p>
+        <div className="ui-sheet__actions">
+          <button ref={cancelRef} type="button" className="ui-btn ui-btn--secondary" onClick={() => answerConfirm(false)}>
+            Cancel
+          </button>
+          <button type="button" className="ui-btn ui-btn--primary" onClick={() => answerConfirm(true)}>
+            {pending.confirmLabel}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

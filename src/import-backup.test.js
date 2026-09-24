@@ -2,6 +2,8 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { importWithBackup } from './import-backup.js'
 import { applyBackup as applyBackupFn } from './exchange.js'
+import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
+import { applyScreen, emptyAnalytics } from './analytics.js'
 
 // A stand-in for the real store: its applyBackup mirrors store.jsx — it runs the
 // exchange applyBackup (which throws on a malformed payload) and only then
@@ -29,13 +31,13 @@ const validIncoming = {
 }
 
 describe('importWithBackup (req-07 / DEC-004)', () => {
-  it('backs up the PRE-import state before applying, then replaces state', () => {
+  it('backs up the PRE-import state before applying, then replaces state', async () => {
     const store = makeStore(oldState())
     const captured = []
-    const result = importWithBackup({
+    const result = await importWithBackup({
       store,
       payload: validIncoming,
-      confirm: () => true,
+      ask: () => true,
       download: (filename, data) => captured.push({ filename, data }),
     })
 
@@ -50,38 +52,43 @@ describe('importWithBackup (req-07 / DEC-004)', () => {
     assert.ok(result && result.summary)
   })
 
-  it('a malformed / non-backup payload does not replace state and surfaces the same error', () => {
+  // req-24 — validate BEFORE asking (was: ask, back up, then throw). A wrong file (e.g.
+  // the analytics export) surfaces its error and never shows the replace question, so
+  // no safety backup is downloaded for it either.
+  it('a malformed / non-backup payload is rejected before the question: nothing asked, downloaded or replaced', async () => {
     const store = makeStore(oldState())
     const before = store.exercises
     let downloads = 0
+    let asked = 0
 
-    assert.throws(
-      () =>
-        importWithBackup({
-          store,
-          payload: { kind: 'nope' }, // rejected by applyBackup (exchange.test.js:86-88)
-          confirm: () => true,
-          download: () => {
-            downloads += 1
-          },
-        }),
+    await assert.rejects(
+      importWithBackup({
+        store,
+        payload: { kind: 'nope' }, // rejected by applyBackup (exchange.test.js:86-88)
+        ask: () => {
+          asked += 1
+          return true
+        },
+        download: () => {
+          downloads += 1
+        },
+      }),
       /Not a workout database backup\./,
     )
 
-    // Current state is untouched by the failed import…
+    assert.equal(asked, 0)
+    assert.equal(downloads, 0)
     assert.equal(store.exercises, before)
     assert.equal(store.exercises[0].id, 'ex-old')
-    // …and the safety backup that was made is of that untouched pre-import state.
-    assert.equal(downloads, 1)
   })
 
-  it('cancelling the confirm applies nothing and downloads nothing', () => {
+  it('cancelling the confirm applies nothing and downloads nothing', async () => {
     const store = makeStore(oldState())
     let downloads = 0
-    const result = importWithBackup({
+    const result = await importWithBackup({
       store,
       payload: validIncoming,
-      confirm: () => false,
+      ask: () => false,
       download: () => {
         downloads += 1
       },
@@ -89,5 +96,37 @@ describe('importWithBackup (req-07 / DEC-004)', () => {
     assert.equal(result, null)
     assert.equal(downloads, 0)
     assert.equal(store.exercises[0].id, 'ex-old')
+  })
+
+  // req-24 — through the real in-app sheet (the default `ask`): a valid backup opens the
+  // sheet with the same question; Cancel leaves data unchanged, Replace replaces.
+  it('a valid backup opens the confirm sheet; Cancel keeps data', async () => {
+    const store = makeStore(oldState())
+    let downloads = 0
+    const done = importWithBackup({ store, payload: validIncoming, download: () => (downloads += 1) })
+    const pending = getPendingConfirm()
+    assert.equal(pending.message, 'Replace all data on this device?')
+    assert.equal(pending.confirmLabel, 'Replace')
+    answerConfirm(false)
+    assert.equal(await done, null)
+    assert.equal(downloads, 0)
+    assert.equal(store.exercises[0].id, 'ex-old')
+  })
+
+  it('a valid backup opens the confirm sheet; Replace replaces', async () => {
+    const store = makeStore(oldState())
+    let downloads = 0
+    const done = importWithBackup({ store, payload: validIncoming, download: () => (downloads += 1) })
+    answerConfirm(true)
+    const result = await done
+    assert.equal(downloads, 1)
+    assert.equal(store.exercises[0].id, 'ex-new')
+    assert.ok(result.summary)
+  })
+
+  it('a non-backup file (the analytics export) never opens the sheet', async () => {
+    const store = makeStore(oldState())
+    await assert.rejects(importWithBackup({ store, payload: applyScreen(emptyAnalytics(), 'today') }))
+    assert.equal(getPendingConfirm(), null)
   })
 })

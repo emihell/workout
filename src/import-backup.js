@@ -1,4 +1,5 @@
-import { buildBackup } from './exchange.js'
+import { applyBackup as validateBackup, buildBackup } from './exchange.js'
+import { askConfirm } from './ui/confirm.js'
 import { dateKey } from './schedule.js'
 
 // The one download implementation, shared by Settings' Export button and the
@@ -20,18 +21,24 @@ export function downloadJson(filename, data) {
 // accidental overwrite is recoverable. The download is fired, not blocked on, and
 // happens BEFORE applyBackup so the backup always captures the pre-import state.
 //
-// `confirm` and `download` are injected (defaulting to the real window.confirm /
-// downloadJson) so the flow is unit-testable without a DOM. Returns null if the
-// user cancels, otherwise the applyBackup result for the caller to render. A
-// malformed payload makes store.applyBackup throw; that throw propagates unchanged
-// (current state left untouched) so each site surfaces the same error it does today.
-export function importWithBackup({
+// req-24 — the file is validated BEFORE the question: exchange's pure applyBackup
+// runs first and throws on a non-backup file (e.g. the analytics export), so a wrong
+// file surfaces its error and never shows "Replace all data on this device?".
+//
+// `ask` and `download` are injected (defaulting to the in-app confirm sheet /
+// downloadJson) so the flow is unit-testable without a DOM. `ask` may return a
+// boolean or a Promise of one. Resolves null if the user cancels, otherwise the
+// applyBackup result for the caller to render. A malformed payload rejects with the
+// validation error (current state left untouched, nothing asked, nothing downloaded)
+// so each site surfaces the same error it does today.
+export async function importWithBackup({
   store,
   payload,
-  confirm = (message) => window.confirm(message),
+  ask = (message) => askConfirm(message, { confirmLabel: 'Replace' }),
   download = downloadJson,
 }) {
-  if (!confirm('Replace all data on this device?')) return null
+  validateBackup(payload)
+  if (!(await ask('Replace all data on this device?'))) return null
   // buildBackup(store) uses dataOnly() — the store's functions are filtered out —
   // and structuredClone, so this is a stable snapshot of state before the replace.
   download(`workout-database-${dateKey(new Date())}.json`, buildBackup(store))

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
@@ -7,7 +8,7 @@ import { completedOnDayKey, findRoutine, isFirstRun, staleInProgressWorkouts } f
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { routineStartable } from '../exercise-names.js'
-import { Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
+import { Banner, Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 // req-114 — the Start names its occurrence (slot@date), so startOrContinue only
@@ -265,6 +266,8 @@ function TodayEmpty({ date }) {
 
 export function Today() {
   const store = useStore()
+  // req-24 — a failed first-run import shows in-page (was a native alert).
+  const [importError, setImportError] = useState('')
   const now = new Date()
   const todayKey = dateKey(now)
   const schedule = store.schedule
@@ -318,18 +321,20 @@ export function Today() {
           onFiles={(files) => {
             const file = files?.[0]
             if (!file) return
-            file.text().then((text) => {
+            file.text().then(async (text) => {
               try {
                 const payload = JSON.parse(text)
-                const result = importWithBackup({ store, payload })
+                const result = await importWithBackup({ store, payload })
                 if (!result) return // cancelled at the confirm
+                setImportError('')
                 recordButton('import')
               } catch (err) {
-                window.alert(err instanceof Error ? err.message : 'Could not import.')
+                setImportError(err instanceof Error ? err.message : 'Could not import.')
               }
             })
           }}
         />
+        {importError ? <Banner role="alert">{importError}</Banner> : null}
         <List>
           <Row to="/routines">Routines</Row>
           <Row to="/schedule">Schedule</Row>

@@ -9,6 +9,7 @@ import { nameError, routineStartable } from '../exercise-names.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing } from './shared'
 import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
+import { askConfirm } from '../ui/confirm.js'
 
 function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
@@ -188,7 +189,7 @@ export function RoutineDetail({ routineId, paths }) {
       </List>
       {nav.showDelete ? (
         <Button
-          onClick={() => {
+          onClick={async () => {
             // req-43 / DEC-031 — name the blast radius (store still archives-vs-
             // deletes on history; this only describes it). Counts only when > 0.
             const impact = routineDeletionImpact(store, routine.id)
@@ -203,7 +204,7 @@ export function RoutineDetail({ routineId, paths }) {
               hasHistory: impact.hasHistory,
               inCurrentWorkout: routineInActiveWorkout(store, routine.id),
             })
-            if (!window.confirm(head + removes)) return
+            if (!(await askConfirm(head + removes, { confirmLabel: 'Delete' }))) return
             store.removeRoutine(routine.id)
             go(nav.done)
           }}
@@ -498,8 +499,8 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
         }}
       />
       <Button
-        onClick={() => {
-          if (!window.confirm(`Remove ${ex?.name || 'this exercise'}?`)) return
+        onClick={async () => {
+          if (!(await askConfirm(`Remove ${ex?.name || 'this exercise'}?`, { confirmLabel: 'Remove' }))) return
           store.removeRoutineExercise(routine.id, index)
           go(parent)
         }}

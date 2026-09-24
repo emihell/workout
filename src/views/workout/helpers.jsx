@@ -3,6 +3,7 @@ import { itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../
 import { recordButton } from '../../analytics'
 import { go } from '../../route'
 import { Missing } from '../shared'
+import { askConfirm } from '../../ui/confirm.js'
 
 // req-76 — the item log/done path builders now live in the JSX-free workout-paths
 // module (so workout-actions.js can share them); re-exported here so the workout
@@ -36,8 +37,8 @@ export function itemSetsPath(routineId, item, workout) {
 
 // Discard the active workout (confirm first). Shared by the overview's Abandon and, since
 // req-116, the Finish screen's "Nothing logged" Abandon.
-export function abandonWorkout(store) {
-  if (!window.confirm('Abandon?')) return
+export async function abandonWorkout(store) {
+  if (!(await askConfirm('Abandon?', { confirmLabel: 'Abandon' }))) return
   recordButton('abandon-workout')
   store.abandonWorkout()
   go('/')

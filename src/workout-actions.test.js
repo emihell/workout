@@ -10,13 +10,15 @@ import {
   startOrContinue,
 } from './workout-actions.js'
 import { dateKey } from './schedule.js'
+import { answerConfirm, getPendingConfirm, subscribeConfirm } from './ui/confirm.js'
 import { hashPath } from './route.js'
 
 // req-55 / DEC-038 — start-while-active abandons the one in-progress workout after a
 // warning (no draft stacking); Continue/Abandon resolve a stale in-progress or a
 // legacy draft. workout-actions.js is the orchestration layer (store.jsx is JSX and
 // can't be imported by `node --test`), so these drive it with a fake store that
-// records calls, plus a stubbed window.confirm. A source guard below locks the store
+// records calls, plus an auto-answering confirm sheet (req-24: the in-app askConfirm
+// replaced window.confirm, so these await the now-async actions). A source guard below locks the store
 // itself to the one-in-progress shape (no draftWorkouts write on start).
 
 function fakeStore(overrides = {}) {
@@ -37,28 +39,31 @@ function fakeStore(overrides = {}) {
 let confirmReturn = true
 let confirmMessages = []
 const previousWindow = globalThis.window
+let unsubscribe = () => {}
 
 beforeEach(() => {
   confirmReturn = true
   confirmMessages = []
-  globalThis.window = {
-    location: { hash: '' },
-    confirm: (message) => {
-      confirmMessages.push(message)
-      return confirmReturn
-    },
-  }
+  globalThis.window = { location: { hash: '' } }
+  // Stand in for the user at the sheet: record the question, answer with confirmReturn.
+  unsubscribe = subscribeConfirm(() => {
+    const pending = getPendingConfirm()
+    if (!pending) return
+    confirmMessages.push(pending.message)
+    answerConfirm(confirmReturn)
+  })
 })
 afterEach(() => {
+  unsubscribe()
   globalThis.window = previousWindow
 })
 
 const names = (store) => store.calls.map((c) => c.name)
 
 describe('startOrContinue — abandon-on-new (DEC-038)', () => {
-  it('no active workout → starts, no confirm, never touches drafts', () => {
+  it('no active workout → starts, no confirm, never touches drafts', async () => {
     const store = fakeStore()
-    startOrContinue(store, 'rtn-new')
+    await startOrContinue(store, 'rtn-new')
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), ['startWorkout'])
     // draftWorkouts did not grow — nothing was pushed anywhere.
@@ -66,30 +71,30 @@ describe('startOrContinue — abandon-on-new (DEC-038)', () => {
     assert.ok(!names(store).includes('abandonDraft'))
   })
 
-  it('different workout active + OK → warns, abandons, then starts (no draft kept)', () => {
+  it('different workout active + OK → warns, abandons, then starts (no draft kept)', async () => {
     const store = fakeStore({ activeWorkout: { id: 'a1', routineId: 'rtn-old' } })
     confirmReturn = true
-    startOrContinue(store, 'rtn-new')
+    await startOrContinue(store, 'rtn-new')
     assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
     // The discard happens before the new start, and no draft is created.
     assert.deepEqual(names(store), ['abandonWorkout', 'startWorkout'])
     assert.equal(store.draftWorkouts.length, 0)
   })
 
-  it('different workout active + Cancel → does nothing (keeps the active one)', () => {
+  it('different workout active + Cancel → does nothing (keeps the active one)', async () => {
     const store = fakeStore({ activeWorkout: { id: 'a1', routineId: 'rtn-old' } })
     confirmReturn = false
-    startOrContinue(store, 'rtn-new')
+    await startOrContinue(store, 'rtn-new')
     assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
     assert.deepEqual(names(store), []) // no abandon, no start
     assert.equal(store.draftWorkouts.length, 0)
   })
 
-  it('continuing the SAME active workout (started today) → no confirm, no restart, just navigates', () => {
+  it('continuing the SAME active workout (started today) → no confirm, no restart, just navigates', async () => {
     const store = fakeStore({
       activeWorkout: { id: 'a1', routineId: 'rtn-x', startedAt: new Date().toISOString() },
     })
-    startOrContinue(store, 'rtn-x')
+    await startOrContinue(store, 'rtn-x')
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), []) // neither abandonWorkout nor startWorkout
   })
@@ -98,14 +103,14 @@ describe('startOrContinue — abandon-on-new (DEC-038)', () => {
   // When the active workout for the same routine is STALE (started a prior day), that
   // is a genuinely new workout, not a continuation: it must abandon-on-new, never
   // silently resume yesterday's in-progress sets under yesterday's occurrence/date.
-  it('STALE active (same routine, started a prior day) + no occurrenceId → warns, abandons, starts fresh', () => {
+  it('STALE active (same routine, started a prior day) + no occurrenceId → warns, abandons, starts fresh', async () => {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
     const store = fakeStore({
       activeWorkout: { id: 'a1', routineId: 'rtn-x', startedAt: yesterday.toISOString() },
     })
     confirmReturn = true
-    startOrContinue(store, 'rtn-x', {
+    await startOrContinue(store, 'rtn-x', {
       scheduledFor: dateKey(new Date()),
       scheduleSlotId: 'slot-today',
     })
@@ -115,11 +120,11 @@ describe('startOrContinue — abandon-on-new (DEC-038)', () => {
     assert.equal(store.draftWorkouts.length, 0)
   })
 
-  it('resuming TODAY\'s active (same routine, started today) + no occurrenceId → no warning, no new startWorkout', () => {
+  it('resuming TODAY\'s active (same routine, started today) + no occurrenceId → no warning, no new startWorkout', async () => {
     const store = fakeStore({
       activeWorkout: { id: 'a1', routineId: 'rtn-x', startedAt: new Date().toISOString() },
     })
-    startOrContinue(store, 'rtn-x', {
+    await startOrContinue(store, 'rtn-x', {
       scheduledFor: dateKey(new Date()),
       scheduleSlotId: 'slot-today',
     })
@@ -129,36 +134,36 @@ describe('startOrContinue — abandon-on-new (DEC-038)', () => {
 })
 
 describe('continueInProgress — resolve a stale/draft workout', () => {
-  it('the stale ACTIVE workout is already active → just navigate, no confirm', () => {
+  it('the stale ACTIVE workout is already active → just navigate, no confirm', async () => {
     const active = { id: 'a1', routineId: 'rtn-x' }
     const store = fakeStore({ activeWorkout: active })
-    continueInProgress(store, active)
+    await continueInProgress(store, active)
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), []) // no continueDraft, no abandon
   })
 
-  it('a legacy draft, no current active → promotes it, no confirm', () => {
+  it('a legacy draft, no current active → promotes it, no confirm', async () => {
     const store = fakeStore({ activeWorkout: null })
     const draft = { id: 'd1', routineId: 'rtn-d' }
-    continueInProgress(store, draft)
+    await continueInProgress(store, draft)
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), ['continueDraft'])
     assert.deepEqual(store.calls[0].args, ['d1'])
   })
 
-  it('a legacy draft while a different active exists + OK → warns, then promotes', () => {
+  it('a legacy draft while a different active exists + OK → warns, then promotes', async () => {
     const store = fakeStore({ activeWorkout: { id: 'a1', routineId: 'rtn-x' } })
     const draft = { id: 'd1', routineId: 'rtn-d' }
     confirmReturn = true
-    continueInProgress(store, draft)
+    await continueInProgress(store, draft)
     assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
     assert.deepEqual(names(store), ['continueDraft'])
   })
 
-  it('a legacy draft while a different active exists + Cancel → nothing', () => {
+  it('a legacy draft while a different active exists + Cancel → nothing', async () => {
     const store = fakeStore({ activeWorkout: { id: 'a1', routineId: 'rtn-x' } })
     confirmReturn = false
-    continueInProgress(store, { id: 'd1', routineId: 'rtn-d' })
+    await continueInProgress(store, { id: 'd1', routineId: 'rtn-d' })
     assert.deepEqual(names(store), [])
   })
 })
@@ -211,7 +216,7 @@ describe('resumeTarget (req-76) — Continue lands on the current exercise', () 
     assert.equal(resumeTarget({ routineId: 'rtn-x' }), '/workout/rtn-x')
   })
 
-  it('resuming the same active workout navigates into the current exercise (no restart)', () => {
+  it('resuming the same active workout navigates into the current exercise (no restart)', async () => {
     const active = {
       id: 'a1',
       routineId: 'rtn-x',
@@ -221,35 +226,35 @@ describe('resumeTarget (req-76) — Continue lands on the current exercise', () 
       completedItemIds: [],
     }
     const store = fakeStore({ activeWorkout: active })
-    startOrContinue(store, 'rtn-x')
+    await startOrContinue(store, 'rtn-x')
     assert.deepEqual(names(store), []) // neither abandon nor restart
     assert.equal(hashPath(globalThis.window.location.hash), '/workout/rtn-x/item/i2/log')
   })
 })
 
 describe('abandonInProgress — discard entirely, no history record', () => {
-  it('the stale ACTIVE workout → abandonWorkout (never adds to workouts)', () => {
+  it('the stale ACTIVE workout → abandonWorkout (never adds to workouts)', async () => {
     const active = { id: 'a1', routineId: 'rtn-x' }
     const store = fakeStore({ activeWorkout: active })
     confirmReturn = true
-    abandonInProgress(store, active)
+    await abandonInProgress(store, active)
     assert.equal(confirmMessages.length, 1)
     assert.deepEqual(names(store), ['abandonWorkout'])
   })
 
-  it('a legacy draft → abandonDraft(id)', () => {
+  it('a legacy draft → abandonDraft(id)', async () => {
     const store = fakeStore({ activeWorkout: { id: 'a1', routineId: 'rtn-x' } })
     confirmReturn = true
-    abandonInProgress(store, { id: 'd1', routineId: 'rtn-d' })
+    await abandonInProgress(store, { id: 'd1', routineId: 'rtn-d' })
     assert.deepEqual(names(store), ['abandonDraft'])
     assert.deepEqual(store.calls[0].args, ['d1'])
   })
 
-  it('Cancel at the confirm → nothing discarded', () => {
+  it('Cancel at the confirm → nothing discarded', async () => {
     const active = { id: 'a1', routineId: 'rtn-x' }
     const store = fakeStore({ activeWorkout: active })
     confirmReturn = false
-    abandonInProgress(store, active)
+    await abandonInProgress(store, active)
     assert.deepEqual(names(store), [])
   })
 })
@@ -290,17 +295,17 @@ describe('req-114 startOrContinue across midnight', () => {
     startedAt: new Date(2026, 8, 22, 23, 50).toISOString(),
   })
 
-  it('the hero Continue (no occurrence) on a Tue 23:50 workout at Wed 00:05 → continues, no confirm', () => {
+  it('the hero Continue (no occurrence) on a Tue 23:50 workout at Wed 00:05 → continues, no confirm', async () => {
     const store = fakeStore({ activeWorkout: tuesdayR() })
-    startOrContinue(store, 'rtn-r')
+    await startOrContinue(store, 'rtn-r')
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), [])
   })
 
-  it("Wed's slot of the same routine (its own occurrence) → asks before abandoning", () => {
+  it("Wed's slot of the same routine (its own occurrence) → asks before abandoning", async () => {
     const store = fakeStore({ activeWorkout: tuesdayR() })
     confirmReturn = false
-    startOrContinue(store, 'rtn-r', {
+    await startOrContinue(store, 'rtn-r', {
       scheduledFor: '2026-09-23',
       scheduleSlotId: 'slot-wed',
       occurrenceId: 'slot-wed@2026-09-23',
@@ -309,19 +314,19 @@ describe('req-114 startOrContinue across midnight', () => {
     assert.deepEqual(names(store), []) // Cancel keeps the Tuesday workout
   })
 
-  it('the same occurrence named explicitly → continues', () => {
+  it('the same occurrence named explicitly → continues', async () => {
     const store = fakeStore({ activeWorkout: tuesdayR() })
-    startOrContinue(store, 'rtn-r', { occurrenceId: 'slot-tue@2026-09-22' })
+    await startOrContinue(store, 'rtn-r', { occurrenceId: 'slot-tue@2026-09-22' })
     assert.deepEqual(confirmMessages, [])
     assert.deepEqual(names(store), [])
   })
 
-  it('started yesterday 08:00, now 09:00 → stale: abandon-on-new', () => {
+  it('started yesterday 08:00, now 09:00 → stale: abandon-on-new', async () => {
     mock.timers.setTime(new Date(2026, 8, 23, 9, 0).getTime())
     const store = fakeStore({
       activeWorkout: { ...tuesdayR(), startedAt: new Date(2026, 8, 22, 8, 0).toISOString() },
     })
-    startOrContinue(store, 'rtn-r')
+    await startOrContinue(store, 'rtn-r')
     assert.deepEqual(confirmMessages, [ABANDON_ON_NEW_WARNING])
     assert.deepEqual(names(store), ['abandonWorkout', 'startWorkout'])
   })

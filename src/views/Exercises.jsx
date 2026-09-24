@@ -10,6 +10,7 @@ import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
 import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
 import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } from '../exercise-names.js'
+import { askConfirm } from '../ui/confirm.js'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -465,7 +466,7 @@ export function ExerciseDetail({ exerciseId }) {
         </>
       ) : null}
       <Button
-        onClick={() => {
+        onClick={async () => {
           // req-43 / DEC-031 — name the blast radius (store still archives-vs-
           // deletes on history; this only describes it). Count only when > 0.
           const impact = exerciseDeletionImpact(store, ex.id)
@@ -478,7 +479,7 @@ export function ExerciseDetail({ exerciseId }) {
             hasHistory: impact.hasHistory,
             inCurrentWorkout: exerciseInActiveWorkout(store, ex.id),
           })
-          if (!window.confirm(head + removes)) return
+          if (!(await askConfirm(head + removes, { confirmLabel: 'Delete' }))) return
           store.removeExercise(ex.id)
           go('/exercises')
         }}

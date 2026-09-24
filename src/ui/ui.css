@@ -782,3 +782,39 @@ a.ui-btn--quiet:active {
 .ui-exercise-actions .ui-btn {
   flex: 1 1 0;
 }
+
+/* req-24 / DEC-079 — the confirm sheet (ConfirmSheet). A dimmed full-screen backdrop
+ * above everything (the dock is 10, the rest pill 20), and a solid sheet pinned to the
+ * bottom — thumb reach — clearing the home-indicator safe area. Cancel and the
+ * destructive button split the row; the destructive one is ink-filled. */
+.ui-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.ui-sheet {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 560px;
+  background: var(--ui-bg);
+  border-radius: var(--ui-radius) var(--ui-radius) 0 0;
+  padding: var(--ui-s4) calc(var(--ui-s3) + env(safe-area-inset-right, 0px))
+    calc(var(--ui-s4) + env(safe-area-inset-bottom, 0px)) calc(var(--ui-s3) + env(safe-area-inset-left, 0px));
+  font-family: var(--ui-font);
+}
+.ui-sheet__message {
+  margin: 0 0 var(--ui-s4);
+  font-size: var(--ui-text-body);
+  color: var(--ui-ink);
+}
+.ui-sheet__actions {
+  display: flex;
+  gap: var(--ui-s2);
+}
+.ui-sheet__actions > .ui-btn {
+  flex: 1;
+}
