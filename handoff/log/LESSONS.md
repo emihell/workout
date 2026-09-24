@@ -333,3 +333,11 @@ unnoticed by any test. Builder caught it from the build output and moved the dat
 to 340.93 kB). **How to apply:** any req that adds data or a large table pastes the **main** chunk size before/after, not
 just the lazy chunk's, and a jump is explained or fixed before review.
 
+## L-027 — a search over a joined string matches across field boundaries  (2026-09-24)
+
+Since req-130 the alias tier matched `compactText(aliases.join(' '))`, so "rdl" hit "Dumbbell Forwa**rd L**unge", "row" hit
+"P**row**ler", "ring" hit "hamst**ring**". Nothing failed until req-139's short common-first list put the false hits on top;
+planning found it by running real queries at the gate, not from any test. Fixed: per alias, from a word start only.
+**How to apply:** match per field and per word start, never on a concatenation; any search change gets a gate run of 10+
+real queries whose top hits are read by eye, and a before/after diff over a broad query set.
+
