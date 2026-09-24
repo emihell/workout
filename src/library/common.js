@@ -365,6 +365,35 @@ const ROWS = [
   ['own-windshield-wipers', 'core-rotation', 'bodyweight', 'obliques', 'abs hip-flexors', 'bodyweight-reps', 'fam-own-windshield-wipers', ['Windshield Wiper', 'Lying Windshield Wipers']],
   ['own-terminal-knee-extension', 'leg-extension', 'bands', 'quads', '', 'bodyweight-reps', 'fam-leg-extensions', ['TKE', 'Banded Knee Extension', 'Terminal Knee Extensions'], true],
   ['Push-Ups_With_Feet_On_An_Exercise_Ball', 'horizontal-push', 'exercise-ball bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Swiss Ball Push-Up', 'Ball Decline Push-Up']],
+  // req-151 — library batch 5 (last)
+  ['Isometric_Neck_Exercise_-_Sides', 'mobility', 'bodyweight', 'neck', '', 'time', 'fam-isometric-neck-exercise-sides', ['Neck Isometrics', 'Isometric Neck Exercise', 'Manual Neck Resistance']],
+  ['Lying_One-Arm_Lateral_Raise', 'raise', 'dumbbell bench', 'side-delt rear-delt', '', 'weight-reps', 'fam-lateral-raise', ['Chest-Down One-Arm Lateral Raise', 'Prone Lateral Raise'], true],
+  ['Standing_Front_Barbell_Raise_Over_Head', 'raise', 'barbell', 'front-delt', 'side-delt upper-chest traps', 'weight-reps', 'fam-front-dumbbell-raise', ['Barbell Front Raises', 'BB Front Raise']],
+  ['Barbell_Rear_Delt_Row', 'horizontal-pull', 'barbell', 'rear-delt rhomboids', 'traps biceps', 'weight-reps', 'fam-row', ['Wide-Grip Barbell Row to Chest', 'Barbell Row to Neck']],
+  ['Barbell_Shrug_Behind_The_Back', 'shrug', 'barbell', 'traps', 'forearms rhomboids', 'weight-reps', 'fam-shrug', ['Behind-the-Back Shrug', 'Reverse Barbell Shrug']],
+  ['Bent-Arm_Barbell_Pullover', 'pullover', 'barbell bench', 'lats pecs', 'triceps', 'weight-reps', 'fam-pullover', ['Barbell Pullovers', 'Lying Barbell Pullover']],
+  ['Body_Tricep_Press', 'elbow-extension', 'bodyweight', 'triceps', 'abs', 'bodyweight-reps', 'fam-skull-crusher', ['Bodyweight Skull Crusher', 'Bar Triceps Extension']],
+  ['One-Arm_Kettlebell_Military_Press_To_The_Side', 'vertical-push', 'kettlebell', 'deltoids', 'triceps abs', 'weight-reps', 'fam-overhead-press', ['Single-Arm Kettlebell Press', 'KB Press', 'Kettlebell Overhead Press'], true],
+  ['V-Bar_Pullup', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['V-Bar Pull-Ups', 'V-Handle Pull-Up']],
+  ['JM_Press', 'elbow-extension', 'barbell bench', 'triceps', 'pecs front-delt', 'weight-reps', 'fam-skull-crusher', ['JM Presses']],
+  ['Zercher_Squats', 'squat', 'barbell', 'quads glute-max', 'abs rhomboids adductors', 'weight-reps', 'fam-squat', ['Zercher Squat Barbell', 'Elbow Squat']],
+  ['Tire_Flip', 'hinge', 'bodyweight', 'quads glute-max hamstrings', 'lower-back pecs triceps traps', 'bodyweight-reps', 'fam-tire-flip', ['Tire Flips', 'Tyre Flip']],
+  ['Clean_Pull', 'olympic', 'barbell', 'quads glute-max hamstrings traps', 'lower-back forearms', 'weight-reps', 'fam-clean', ['Clean Pulls', 'Barbell Clean Pull']],
+  ['Snatch_Pull', 'olympic', 'barbell', 'hamstrings glute-max quads traps', 'lower-back', 'weight-reps', 'fam-snatch', ['Snatch Pulls', 'Barbell Snatch Pull']],
+  ['Power_Jerk', 'olympic', 'barbell', 'deltoids quads', 'triceps glute-max abs', 'weight-reps', 'fam-jerk', ['Barbell Power Jerk']],
+  ['Split_Jerk', 'olympic', 'barbell', 'deltoids quads', 'triceps glute-max hamstrings', 'weight-reps', 'fam-jerk', ['Barbell Split Jerk']],
+  ['Hang_Snatch', 'olympic', 'barbell', 'hamstrings glute-max quads deltoids', 'traps lower-back', 'weight-reps', 'fam-snatch', ['Barbell Hang Snatch', 'Hang Power Snatch']],
+  ['Power_Snatch', 'olympic', 'barbell', 'hamstrings glute-max quads deltoids', 'traps lower-back triceps', 'weight-reps', 'fam-snatch', ['Barbell Power Snatch']],
+  ['Ring_Dips', 'vertical-push', 'suspension bodyweight', 'triceps mid-lower-chest', 'front-delt', 'bodyweight-reps', 'fam-dip', ['Gymnastic Ring Dips', 'Rings Dip']],
+  ['Rope_Climb', 'vertical-pull', 'bodyweight', 'lats', 'biceps forearms rhomboids', 'bodyweight-reps', 'fam-rope-climb', ['Rope Climbs', 'Rope Climbing']],
+  ['own-archer-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Archer Push-Ups', 'Archer Press-Up'], true],
+  ['own-archer-pull-up', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Archer Pull-Ups', 'Archer Chin-Up'], true],
+  ['own-l-sit', 'core-stability', 'bodyweight', 'abs hip-flexors', 'triceps quads', 'time', 'fam-own-l-sit', ['L-Sit Hold', 'L Sit']],
+  ['own-dragon-flag', 'core-flexion', 'bench bodyweight', 'abs', 'hip-flexors lats', 'bodyweight-reps', 'fam-leg-raise', ['Dragon Flags', 'Dragon Flag Raise']],
+  ['own-front-lever', 'vertical-pull', 'pull-up-bar bodyweight', 'lats abs', 'rear-delt rhomboids', 'time', 'fam-own-front-lever', ['Front Lever Hold']],
+  ['own-back-lever', 'core-stability', 'pull-up-bar bodyweight', 'lower-back front-delt', 'pecs biceps abs', 'time', 'fam-own-back-lever', ['Back Lever Hold']],
+  ['own-reverse-nordic', 'leg-extension', 'bodyweight', 'quads', 'hip-flexors abs', 'bodyweight-reps', 'fam-own-reverse-nordic', ['Reverse Nordic Curl', 'Reverse Nordics']],
+  ['own-spoto-press', 'horizontal-push', 'barbell bench', 'pecs', 'triceps front-delt', 'weight-reps', 'fam-bench-press', ['Spoto Bench Press', 'Paused-Above-Chest Bench Press']],
 ]
 
 // req-139 / DEC-064 §1 — our display names: the standard gym name, chosen per entry on
@@ -569,6 +598,17 @@ export const DISPLAY_NAMES = {
   'Suspended_Push-Up': 'Suspension Push-Up',
   Suspended_Split_Squat: 'Suspension Split Squat',
   'Push-Ups_With_Feet_On_An_Exercise_Ball': 'Stability Ball Push-Up',
+
+  // req-151 batch 5
+  'Isometric_Neck_Exercise_-_Sides': 'Isometric Neck Hold',
+  Standing_Front_Barbell_Raise_Over_Head: 'Barbell Front Raise',
+  Barbell_Shrug_Behind_The_Back: 'Behind-the-Back Barbell Shrug',
+  'Bent-Arm_Barbell_Pullover': 'Barbell Pullover',
+  Body_Tricep_Press: 'Bodyweight Triceps Extension',
+  'One-Arm_Kettlebell_Military_Press_To_The_Side': 'One-Arm Kettlebell Press',
+  'V-Bar_Pullup': 'V-Bar Pull-Up',
+  Zercher_Squats: 'Zercher Squat',
+  Ring_Dips: 'Ring Dip',
 }
 
 // req-140 / DEC-066 §1 — common entries that are NOT staples (fully written, but behind
@@ -610,6 +650,13 @@ export const NOT_STAPLES = [
   'own-suspension-leg-curl', 'own-dumbbell-front-squat', 'own-overhead-carry', 'own-reverse-plank',
   'own-stability-ball-pike', 'own-windshield-wipers', 'own-terminal-knee-extension',
   'Push-Ups_With_Feet_On_An_Exercise_Ball',
+  // req-151 batch 5 (no staples)
+  'Isometric_Neck_Exercise_-_Sides', 'Lying_One-Arm_Lateral_Raise', 'Standing_Front_Barbell_Raise_Over_Head',
+  'Barbell_Rear_Delt_Row', 'Barbell_Shrug_Behind_The_Back', 'Bent-Arm_Barbell_Pullover', 'Body_Tricep_Press',
+  'One-Arm_Kettlebell_Military_Press_To_The_Side', 'V-Bar_Pullup', 'JM_Press', 'Zercher_Squats', 'Tire_Flip',
+  'Clean_Pull', 'Snatch_Pull', 'Power_Jerk', 'Split_Jerk', 'Hang_Snatch', 'Power_Snatch', 'Ring_Dips', 'Rope_Climb',
+  'own-archer-push-up', 'own-archer-pull-up', 'own-l-sit', 'own-dragon-flag', 'own-front-lever', 'own-back-lever',
+  'own-reverse-nordic', 'own-spoto-press',
 ]
 
 // req-140 / DEC-065 §2 — our difficulty, judged on skill, coordination and setup, not
@@ -685,6 +732,8 @@ export const DIFFICULTY_LISTS = {
     'Kneeling_Forearm_Stretch', 'The_Straddle', 'Round_The_World_Shoulder_Stretch', 'Plate_Pinch', 'Wrist_Roller',
     'Svend_Press', 'Drag_Curl', 'Seated_Triceps_Press', 'Kneeling_High_Pulley_Row', 'Sled_Drag_-_Harness',
     'own-suspension-curl', 'own-dumbbell-front-squat', 'own-reverse-plank', 'own-terminal-knee-extension',
+    // req-151 batch 5
+    'Isometric_Neck_Exercise_-_Sides', 'Lying_One-Arm_Lateral_Raise', 'Standing_Front_Barbell_Raise_Over_Head',
   ],
   intermediate: [
     'Decline_Barbell_Bench_Press', 'Dips_-_Chest_Version',
@@ -710,12 +759,19 @@ export const DIFFICULTY_LISTS = {
     'Suspended_Reverse_Crunch', 'Suspended_Push-Up', 'Suspended_Split_Squat', 'own-suspension-leg-curl',
     'own-overhead-carry', 'own-stability-ball-pike', 'own-windshield-wipers',
     'Push-Ups_With_Feet_On_An_Exercise_Ball',
+    // req-151 batch 5
+    'Barbell_Rear_Delt_Row', 'Barbell_Shrug_Behind_The_Back', 'Bent-Arm_Barbell_Pullover', 'Body_Tricep_Press',
+    'One-Arm_Kettlebell_Military_Press_To_The_Side', 'V-Bar_Pullup', 'JM_Press', 'Zercher_Squats', 'Tire_Flip',
+    'Clean_Pull', 'Snatch_Pull', 'own-reverse-nordic', 'own-spoto-press',
   ],
   advanced: [
     'Power_Clean', 'Clean_and_Jerk', 'Snatch', 'Hang_Clean', 'Clean', 'Overhead_Squat',
     'Muscle_Up', 'Handstand_Push-Ups', 'own-pistol-squat',
     // req-148 batch 4 (coach review: matches every other barbell clean)
     'Clean_and_Press',
+    // req-151 batch 5
+    'Power_Jerk', 'Split_Jerk', 'Hang_Snatch', 'Power_Snatch', 'Rope_Climb', 'Ring_Dips', 'own-archer-pull-up',
+    'own-archer-push-up', 'own-back-lever', 'own-front-lever', 'own-dragon-flag', 'own-l-sit',
   ],
 }
 

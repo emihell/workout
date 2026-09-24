@@ -26,7 +26,7 @@ const withCue = (text) => ({ formCues: [base.formCues[0], text] })
 
 describe('coverage', () => {
   it('every common entry has all four fields and passes every text rule', () => {
-    assert.equal(common.length, 338) // req-140 (sanctioned): 178 + batch 1's 40; req-145/147/148 (DEC-074 §1): + batches 2–4
+    assert.equal(common.length, 366) // req-140 (sanctioned): 178 + batch 1's 40; req-145…151 (DEC-074 §1): + batches 2–5
     for (const entry of common) {
       for (const field of TEXT_FIELDS) assert.ok(field in entry, `${entry.id} lacks ${field}`)
       assert.deepEqual(textProblems(entry), [], entry.id)
@@ -165,7 +165,7 @@ describe('unilateral and duplicates', () => {
       assert.deepEqual(problems({ unilateral: true, ...withStep(text) }), [], text)
     }
     const oneSided = common.filter((entry) => entry.unilateral)
-    assert.equal(oneSided.length, 60) // req-148 (DEC-074 §1): + 7 of batch 4 (incl. Plate Pinch, coach review); req-147: + 13 of batch 3; req-140 (sanctioned): + split squat, cable kickback, pistol, DB snatch; req-145 (sanctioned): + 16 of batch 2, + Dumbbell Step-Up (coach review)
+    assert.equal(oneSided.length, 64) // req-151 (DEC-074 §1): + 4 of batch 5; req-148 (DEC-074 §1): + 7 of batch 4 (incl. Plate Pinch, coach review); req-147: + 13 of batch 3; req-140 (sanctioned): + split squat, cable kickback, pistol, DB snatch; req-145 (sanctioned): + 16 of batch 2, + Dumbbell Step-Up (coach review)
   })
 
   it('the same line twice in an entry is rejected, across fields too', () => {

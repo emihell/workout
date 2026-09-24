@@ -56,11 +56,12 @@ describe('the triage', () => {
   })
 
   // req-145 (sanctioned count pin) — batch 2 wrote 27 merge-later targets: those rows are merges now.
-  // req-147/148 (DEC-074 §1) — batches 3 and 4 wrote more merge-later targets; each row re-checked.
-  it('697 rows: 124 finish, 168 merge, 3 merge-later, 402 hide', () => {
+  // req-147/148/151 (DEC-074 §1) — batches wrote the merge-later targets; req-151 resolved the last ones and
+  // re-triaged 5 finish rows to hide (the spec's "written or hidden").
+  it('697 rows: 119 finish, 170 merge, 0 merge-later, 408 hide', () => {
     const count = (triage) => rows.filter((row) => row.class === triage).length
     assert.equal(rows.length, 697)
-    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [124, 168, 3, 402])
+    assert.deepEqual([count('finish'), count('merge'), count('merge-later'), count('hide')], [119, 170, 0, 408])
   })
 
   it('every non-common entry that isn\'t hidden is finish; no finish row is hidden', () => {
@@ -70,9 +71,14 @@ describe('the triage', () => {
     for (const row of rows) if (row.class === 'finish') assert.ok(!byId.get(row.id).hidden, row.id)
   })
 
-  it('the 72 still-queued promote ids are finish', () => {
+  // req-151 (DEC-074 §2, by the spec's re-triage) — 5 of these are hidden now: Standing_Barbell_Press_Behind_Neck,
+  // Wide-Grip_Pulldown_Behind_The_Neck, Donkey_Calf_Raises, Smith_Machine_Hip_Raise, Barbell_Ab_Rollout.
+  const RETRIAGED = ['Standing_Barbell_Press_Behind_Neck', 'Wide-Grip_Pulldown_Behind_The_Neck', 'Donkey_Calf_Raises',
+    'Smith_Machine_Hip_Raise', 'Barbell_Ab_Rollout']
+  it('the 72 queued promote ids are finish, except the 5 req-151 re-triaged to hide', () => {
     assert.equal(new Set(QUEUED).size, 72)
-    for (const id of QUEUED) assert.equal(rowOf.get(id)?.class, 'finish', id)
+    for (const id of RETRIAGED) assert.equal(rowOf.get(id)?.class, 'hide', id)
+    for (const id of QUEUED) if (!RETRIAGED.includes(id)) assert.equal(rowOf.get(id)?.class, 'finish', id)
   })
 
   it('hidden and mergedInto are exactly the triage: hidden on every non-finish row, target → mergedInto', () => {
@@ -81,7 +87,7 @@ describe('the triage', () => {
       assert.equal(entry.hidden, row.class === 'finish' ? undefined : true, row.id)
       assert.equal(entry.mergedInto, row.target, row.id)
     }
-    assert.equal(hidden.length, 697 - 124)
+    assert.equal(hidden.length, 697 - 119) // req-151 (DEC-074 §1)
     for (const entry of library) if (!rowOf.has(entry.id)) assert.ok(!('hidden' in entry) && !('mergedInto' in entry), entry.id)
   })
 
@@ -112,10 +118,11 @@ describe('hidden and mergedInto fields', () => {
     assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'Atlas_Stones' }), ['Car_Deadlift: mergedInto "Atlas_Stones", which is hidden'])
     // req-147 (DEC-074 §2) — was Groin_and_Back_Stretch → own-butterfly-stretch, now written; no
     // row points at a queued add any more, so a hidden entry is given a pending target.
-    assert.ok(PENDING_ADDS.includes('own-l-sit'))
-    assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'own-l-sit' }), [])
-    assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'own-l-sit' }, { pendingTargets: [] }),
-      ['Car_Deadlift: mergedInto "own-l-sit" is not in the library'])
+    // req-151 (DEC-074 §6) — PENDING_ADDS is empty now; a fixture pending id stands in.
+    assert.deepEqual(PENDING_ADDS, [])
+    assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'own-not-yet-written' }, { pendingTargets: ['own-not-yet-written'] }), [])
+    assert.deepEqual(problemsFor('Car_Deadlift', { mergedInto: 'own-not-yet-written' }),
+      ['Car_Deadlift: mergedInto "own-not-yet-written" is not in the library'])
   })
 
   it('triageProblems catches a missing, doubled, unknown or mis-targeted row (fixtures)', () => {
@@ -126,11 +133,13 @@ describe('hidden and mergedInto fields', () => {
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { reason: ' ' })), ['triage Car_Deadlift: no reason'])
     assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { target: 'Plank' })), ['triage Car_Deadlift: a target on a non-merge row'])
     // req-145/147 (DEC-074 §2) — was Hamstring_Stretch, then Inchworm, both written since; same intent.
-    assert.deepEqual(triageProblems(library, edit('Air_Bike', { target: 'Tire_Flip' })),
-      ['triage Air_Bike: merge target "Tire_Flip" is not a common entry'])
+    // req-151 (DEC-074 §2) — every finish row is written now; a hidden (non-common) entry is the target.
+    assert.deepEqual(triageProblems(library, edit('Air_Bike', { target: 'Atlas_Stones' })),
+      ['triage Air_Bike: merge target "Atlas_Stones" is not a common entry'])
     // req-145/147/148 (DEC-074 §2) — was 90_90_Hamstring, Two-Arm_Kettlebell_Row, Scissors_Jump; all merged since.
-    assert.deepEqual(triageProblems(library, edit('Hang_Snatch_-_Below_Knees', { target: 'Plank' })),
-      ['triage Hang_Snatch_-_Below_Knees: merge-later target "Plank" is neither a finish row nor a queued add'])
+    // req-151 (DEC-074 §6) — no merge-later row is left; a fixture row stands in.
+    assert.deepEqual(triageProblems(library, edit('Car_Deadlift', { class: 'merge-later', target: 'Plank' })),
+      ['triage Car_Deadlift: merge-later target "Plank" is neither a finish row nor a queued add'])
   })
 
   // Coach review — a merge must not cross logAs or the load scale (equipment).
@@ -154,7 +163,7 @@ describe('Search skips hidden entries', () => {
     assert.equal(listable(byId.get('Plank')), true)
   })
 
-  it(`none of the ${697 - 124} hidden entries appears in common or rest, searched by its own name`, () => {
+  it(`none of the ${697 - 119} hidden entries appears in common or rest, searched by its own name`, () => {
     for (const entry of hidden) {
       const { common, rest } = searchCommonFirst(library, entry.name, Infinity)
       assert.ok(![...common, ...rest].some((item) => item.id === entry.id), entry.id)
@@ -170,7 +179,7 @@ describe('Search skips hidden entries', () => {
   it('"Show more" holds only written non-staples and finish rows', () => {
     const shown = library.filter((entry) => listable(entry) && !entry.staple)
     for (const entry of shown) assert.ok(entry.common || rowOf.get(entry.id)?.class === 'finish', entry.id)
-    assert.equal(shown.filter((entry) => !entry.common).length, 25) // req-145/147/148 (DEC-074 §1): 124 − 32 − 35 − 32 promotions
+    assert.equal(shown.filter((entry) => !entry.common).length, 0) // req-145…151 (DEC-074 §1): the queue is done — no rough entry shows
   })
 
   it('a hidden entry the user already has still shows: Already added (live), Restore (archived)', () => {
@@ -216,9 +225,11 @@ describe('merged names find their target', () => {
     // req-147 (DEC-074 §2) — both subjects were written by batch 3: Scissors_Jump → Split_Jump is
     // still merge-later to a finish row; no row targets a queued add, so a hidden entry gets one.
     // req-148 (DEC-074 §2) — Scissors_Jump is a merge now (Split_Jump written); Hang_Snatch is still unwritten.
-    assert.equal(rowOf.get('Hang_Snatch_-_Below_Knees').class, 'merge-later')
+    // req-151 (DEC-074 §6) — Hang_Snatch is written (a non-staple, so still the rest tier) and its row is a merge;
+    // no queued add is left, so the pending target is a fixture id.
+    assert.equal(rowOf.get('Hang_Snatch_-_Below_Knees').class, 'merge')
     assert.deepEqual(searchCommonFirst(library, 'hang snatch - below knees'), { common: [], rest: [byId.get('Hang_Snatch')], restCount: 1 })
-    const pending = library.map((entry) => (entry.id === 'Car_Deadlift' ? { ...entry, mergedInto: 'own-l-sit' } : entry))
+    const pending = library.map((entry) => (entry.id === 'Car_Deadlift' ? { ...entry, mergedInto: 'own-not-yet-written' } : entry))
     assert.deepEqual(searchCommonFirst(pending, 'car deadlift'), { common: [], rest: [], restCount: 0 })
   })
 

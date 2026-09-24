@@ -14,11 +14,8 @@
 export const TRIAGE_CLASSES = ['finish', 'merge', 'merge-later', 'hide']
 
 // The queued own-* adds (req-140 parity queue) — valid merge-later targets before they exist.
-// A batch that writes one removes it here.
-export const PENDING_ADDS = [
-  'own-archer-pull-up', 'own-archer-push-up', 'own-back-lever', 'own-dragon-flag', 'own-front-lever', 'own-jefferson-curl',
-  'own-l-sit', 'own-reverse-nordic', 'own-spoto-press',
-]
+// A batch that writes one removes it here. Empty since req-151: the queue is done.
+export const PENDING_ADDS = []
 
 export function triageRows() {
   return [
@@ -57,8 +54,8 @@ export function triageRows() {
     ['Band_Good_Morning_Pull_Through', 'hide', null, 'niche band drill'],
     ['Band_Hip_Adductions', 'finish', null, 'queued (req-140 promote list)'],
     ['Band_Skull_Crusher', 'hide', null, 'band variant of a written lift'],
-    ['Barbell_Ab_Rollout', 'finish', null, 'queued (req-140 promote list)'],
-    ['Barbell_Ab_Rollout_-_On_Knees', 'merge-later', 'Barbell_Ab_Rollout', 'the kneeling form of the queued rollout'],
+    ['Barbell_Ab_Rollout', 'hide', null, 'the ab wheel rollout covers it; the barbell here is a wheel, not a load (req-151)'],
+    ['Barbell_Ab_Rollout_-_On_Knees', 'hide', null, 'the kneeling barbell rollout; the ab wheel rollout covers it (req-151)'],
     ['Barbell_Curls_Lying_Against_An_Incline', 'hide', null, 'obscure curl'],
     ['Barbell_Full_Squat', 'merge', 'Barbell_Squat', 'a deep back squat'],
     ['Barbell_Guillotine_Bench_Press', 'hide', null, 'risky, rare bench variant'],
@@ -186,7 +183,7 @@ export function triageRows() {
     ['Decline_Reverse_Crunch', 'merge', 'Reverse_Crunch', 'the reverse crunch on a decline'],
     ['Decline_Smith_Press', 'merge', 'Smith_Machine_Decline_Press', 'the Smith decline press'],
     ['Depth_Jump_Leap', 'hide', null, 'athletic plyometric'],
-    ['Donkey_Calf_Raises', 'finish', null, 'queued (req-140 promote list)'],
+    ['Donkey_Calf_Raises', 'hide', null, 'needs a partner on the back or a rare machine; the calf raises cover it (req-151)'],
     ['Double_Kettlebell_Alternating_Hang_Clean', 'merge', 'One-Arm_Kettlebell_Clean', 'a kettlebell clean variant'],
     ['Double_Kettlebell_Jerk', 'hide', null, 'niche kettlebell sport lift'],
     ['Double_Kettlebell_Push_Press', 'hide', null, 'niche'],
@@ -261,7 +258,7 @@ export function triageRows() {
     ['Hamstring_Stretch', 'finish', null, 'the standard hamstring stretch'],
     ['Hang_Clean_-_Below_the_Knees', 'merge', 'Hang_Clean', 'a start height of the hang clean'],
     ['Hang_Snatch', 'finish', null, 'hang snatch: a common weightlifting lift'],
-    ['Hang_Snatch_-_Below_Knees', 'merge-later', 'Hang_Snatch', 'a start height of the hang snatch'],
+    ['Hang_Snatch_-_Below_Knees', 'merge', 'Hang_Snatch', 'a start height of the hang snatch'],
     ['Hanging_Bar_Good_Morning', 'hide', null, 'powerlifting accessory'],
     ['Heaving_Snatch_Balance', 'hide', null, 'weightlifting drill'],
     ['Heavy_Bag_Thrust', 'hide', null, 'odd drill'],
@@ -296,7 +293,7 @@ export function triageRows() {
     ['Iron_Cross', 'hide', null, 'obscure'],
     ['Iron_Crosses_stretch', 'hide', null, 'niche stretch'],
     ['Isometric_Chest_Squeezes', 'hide', null, 'not logged as sets'],
-    ['Isometric_Neck_Exercise_-_Front_And_Back', 'merge-later', 'Isometric_Neck_Exercise_-_Sides', 'the queued isometric neck exercise'],
+    ['Isometric_Neck_Exercise_-_Front_And_Back', 'merge', 'Isometric_Neck_Exercise_-_Sides', 'the isometric neck hold, front and back'],
     ['Isometric_Neck_Exercise_-_Sides', 'finish', null, 'queued (req-140 promote list)'],
     ['Isometric_Wipers', 'hide', null, 'obscure'],
     ['JM_Press', 'finish', null, 'JM press: a known triceps lift'],
@@ -586,7 +583,7 @@ export function triageRows() {
     ['Smith_Machine_Close-Grip_Bench_Press', 'merge', 'Smith_Machine_Bench_Press', 'a grip width on the Smith bench press'],
     ['Smith_Machine_Decline_Press', 'finish', null, 'queued (req-140 promote list)'],
     ['Smith_Machine_Hang_Power_Clean', 'hide', null, 'misuse of the machine'],
-    ['Smith_Machine_Hip_Raise', 'finish', null, 'queued (req-140 promote list)'],
+    ['Smith_Machine_Hip_Raise', 'hide', null, 'an odd feet-on-the-bar Smith setup; the reverse crunch and leg raises cover it (req-151)'],
     ['Smith_Machine_Leg_Press', 'hide', null, 'odd setup'],
     ['Smith_Machine_One-Arm_Upright_Row', 'hide', null, 'odd setup'],
     ['Smith_Machine_Pistol_Squat', 'hide', null, 'odd setup'],
@@ -617,7 +614,7 @@ export function triageRows() {
     ['Squats_-_With_Bands', 'hide', null, 'band variant of a written lift'],
     ['Standing_Alternating_Dumbbell_Press', 'merge', 'Dumbbell_Shoulder_Press', 'the dumbbell shoulder press'],
     ['Standing_Barbell_Calf_Raise', 'finish', null, 'queued (req-140 promote list)'],
-    ['Standing_Barbell_Press_Behind_Neck', 'finish', null, 'queued (req-140 promote list)'],
+    ['Standing_Barbell_Press_Behind_Neck', 'hide', null, 'behind-the-neck press: a shoulder-risk position; the overhead presses cover it (req-151)'],
     ['Standing_Bent-Over_One-Arm_Dumbbell_Triceps_Extension', 'merge', 'Tricep_Dumbbell_Kickback', 'the triceps kickback'],
     ['Standing_Bent-Over_Two-Arm_Dumbbell_Triceps_Extension', 'merge', 'Tricep_Dumbbell_Kickback', 'the triceps kickback'],
     ['Standing_Biceps_Stretch', 'hide', null, 'minor stretch'],
@@ -703,7 +700,7 @@ export function triageRows() {
     ['Wide-Grip_Barbell_Bench_Press', 'merge', 'Barbell_Bench_Press_-_Medium_Grip', 'a grip width on the bench press'],
     ['Wide-Grip_Decline_Barbell_Bench_Press', 'merge', 'Decline_Barbell_Bench_Press', 'a grip width on the decline bench'],
     ['Wide-Grip_Decline_Barbell_Pullover', 'hide', null, 'obscure'],
-    ['Wide-Grip_Pulldown_Behind_The_Neck', 'finish', null, 'queued (req-140 promote list)'],
+    ['Wide-Grip_Pulldown_Behind_The_Neck', 'hide', null, 'behind-the-neck pulldown: a shoulder-risk position; the lat pulldowns cover it (req-151)'],
     ['Wide-Grip_Rear_Pull-Up', 'hide', null, 'behind-the-neck pull-up; rare'],
     ['Wide-Grip_Standing_Barbell_Curl', 'merge', 'Barbell_Curl', 'a grip width on the barbell curl'],
     ['Wide_Stance_Barbell_Squat', 'merge', 'Barbell_Squat', 'a stance choice on the back squat'],

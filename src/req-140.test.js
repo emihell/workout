@@ -67,6 +67,12 @@ const BATCH_2 = [
   'Plyo_Push-up', 'Suspended_Reverse_Crunch', 'Suspended_Push-Up', 'Suspended_Split_Squat', 'own-suspension-curl',
   'own-suspension-leg-curl', 'own-dumbbell-front-squat', 'own-overhead-carry', 'own-reverse-plank', 'own-stability-ball-pike',
   'own-windshield-wipers', 'own-terminal-knee-extension', 'Push-Ups_With_Feet_On_An_Exercise_Ball',
+  // req-151 batch 5 (DEC-074 §5)
+  'Isometric_Neck_Exercise_-_Sides', 'Lying_One-Arm_Lateral_Raise', 'Standing_Front_Barbell_Raise_Over_Head', 'Barbell_Rear_Delt_Row',
+  'Barbell_Shrug_Behind_The_Back', 'Bent-Arm_Barbell_Pullover', 'Body_Tricep_Press',
+  'One-Arm_Kettlebell_Military_Press_To_The_Side', 'V-Bar_Pullup', 'JM_Press', 'Zercher_Squats', 'Tire_Flip', 'Clean_Pull',
+  'Snatch_Pull', 'Power_Jerk', 'Split_Jerk', 'Hang_Snatch', 'Power_Snatch', 'Ring_Dips', 'Rope_Climb', 'own-archer-push-up',
+  'own-archer-pull-up', 'own-l-sit', 'own-dragon-flag', 'own-front-lever', 'own-back-lever', 'own-reverse-nordic', 'own-spoto-press',
 ]
 const ALIASES = [
   ['Bench Pull', 'own-seal-row'], ['Cable Tricep Pushdown', 'Triceps_Pushdown'],
@@ -91,7 +97,7 @@ describe('batch 1', () => {
       assert.equal(entry.staple, staple, id)
     }
     for (const id of Object.keys(PROMOTE)) assert.ok(!id.startsWith('own-') && !id.startsWith('extra-'), id)
-    assert.equal(common.length, 338) // req-145/147/148 (DEC-074 §1): + batches 2–4
+    assert.equal(common.length, 366) // req-145…151 (DEC-074 §1): + batches 2–5
   })
 
   it('no own add shares a name key with any free-db entry (promote before add)', () => {
