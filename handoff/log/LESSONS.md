@@ -378,3 +378,12 @@ Planner committed DEC-078 with a bare `git commit`; `.githooks/pre-commit` refus
 `HANDOFF=1` retry as a guard bypass, and Emilio had to authorise it by hand. `./plan save` already commits with
 `HANDOFF=1` (`plan:177`), refuses anything outside `handoff/`, and runs the drift check. **How to apply:** planning
 commits go through `./plan save "msg"` only — never a raw `git commit`, never a hand-set `HANDOFF=1`.
+
+## L-033 — a native dialog freezes an automated browser test; planning can browser-test without touching code  (2026-09-24)
+
+Planner's first browser run (closing the owed test lists) triggered the import `window.confirm`; the tab froze until
+Emilio clicked it by hand. **How to apply:** before any click that may confirm, stub `window.confirm/alert/prompt` in the
+page (log + auto-answer), and re-stub after every reload — until req-24 removes them. The method that worked, and keeps
+the worktrees isolated: `git archive main` into the scratchpad, symlink `node_modules`, `vite build`, `vite preview` on a
+`127.0.0.1` port (its own origin: no real data), seed from `src/db.json` (v8 → migrates), a 375 px iframe for phone-width
+geometry. A countdown screen (Finish, 10 s) outruns screenshot-paced clicks — act on it inside one script.

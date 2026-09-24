@@ -277,12 +277,38 @@ live code. All Phase 1. **All specced and LIVE 2026-09-23** (req-103..112, see t
 - **req-109 follow-ups:** (a) ~~Q: Skip exercise leaves a running rest going~~ — **keep** (Emilio, DEC-056). (b) `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
   replacement they read its rest 0. (c) routine lost per-set weights on a skipped set → **fixed in req-112** (DEC-056).
 
-**On-device test list (Emilio owes, 2026-09-23):** 1 routine-editor rows two-line, no "Main" · 2 log title smaller,
+**On-device test list — CLOSED 2026-09-24, run by Planner, not Emilio** (desktop Chrome at 500 px + a 375 px iframe,
+throwaway `main` build `9f7ebcc` on `127.0.0.1`, seeded from `src/db.json`; Emilio: touch/one-handed feel is caught in real
+use). **12/12 pass** — results below the list. Items: 1 routine-editor rows two-line, no "Main" · 2 log title smaller,
 Add note beside it · 3 done view has no Previous · 4 Finish is a bottom button, black when all done · 5 set preview
 before set 1, gone after · 6 overview note → same on Finish, survives reload · 7 push-ups set 2 shows its own target;
 weight change carries · 8 two-routine day under one date · 9 Skip exercise two-tap, row reads skipped · 10 Replace →
 original skipped, blank replacement under it · 11 after a skip, weights come back from the last real time · 12 Finish
 leaves the routine alone; History correct → Apply changes it.
+Results [measured, browser]: 1 rows "WU set · 3 sets · 25/30/30 kg", no Main · 2 title + Add note on one row · 3 done view
+has no Previous · 4 Finish `rgb(242,242,242)` → `rgb(28,28,28)` all done · 5 preview before set 1, gone after · 6 note kept
+through reload and shown on Finish · 7 pull-ups 4 reps on set 1 → set 2 shows 5; kg 18→20 on set 1 → next set 20 · 8 two
+routines under "Thu, Sep 24" · 9 two taps (3 s arm) → "· skipped" · 10 Leg Curl skipped, Lat Pulldown under it, kg from its
+own history · 11 after the skip Leg Extension prefills 9/18/22/25 (last real) · 12 routine unchanged by Finish; History
+edit → Update? → Apply → routine [65,70,70].
+
+**QA findings, Planner's browser run 2026-09-24** (none blocks; each a small fix req when picked):
+- **QA-1 Back after Finish lands on "Not found."** — after Save, browser Back goes to `#/workout/<id>/finish` → bare
+  "Not found.", one more Back → the done workout. The finish route stays in history after save.
+- **QA-2 rest pill's tap area overlaps Back at 375 px** — pill `[103,8,272,54]` vs "‹ Exercises" `[24,40,115,84]`
+  (12×14 px). Text isn't covered; a tap on the link's top-right can hit the pill (skip rest). Batch-3 "pill overlap".
+- **QA-3 Add set on a done exercise prefills reps but not kg** — Leg Press done at 70 kg → Add set shows kg blank, reps
+  10, though `withOneMoreSet` appends the last suggested weight (`workout-log.js:34-44`). Weight should carry (req-108).
+  Cause [inferred]; check the seed for an added index.
+- **QA-4 History detail doesn't say skipped** — a fully skipped exercise reads "WU set · 4 sets" (the overview says
+  "· skipped").
+- Minor: Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown anywhere today).
+- Import asks "Replace all data?" before validating → folded into **req-24** (READY).
+
+**Batch-3 feel list — CLOSED 2026-09-24** (Planner, same run): pill overlap → **QA-2** · iPhone no-zoom: every input/textarea/
+select ≥17 px on log, routine editor, exercise edit, history add set, finish, replace [measured]; the zoom itself is
+device-only, untested · beat line reads "↑Heavier on Incline DB Press" (judgement: clear) · Timed: the routine editor
+says "Not timed. Edit exercise settings to add a duration." (judgement: findable).
 
 - **Dropped report items (retro 2026-09-23), small:** Abandon falls below the fold with the overview note open on
   an 8-exercise routine (req-107); the `.ui-navlink` left inset misaligns a second line under a link (req-103 gotcha).
@@ -311,7 +337,13 @@ the top three in code (`Routine.jsx:305-309` splits kg on `,`; `store.jsx:379` r
 setState updater; `model.js:124-130` backfills empty targets/weights from logged sets). **Not yet specced.** Grouped
 into proposed reqs. **[P]** = persisted-data / shared-model (DEC-057: reviewer + backup before merge).
 
-**Tier 1 on-device test list (Emilio owes, 2026-09-23):** 1 routine editor: Kg "22,5" saves 22.5; Sets 2 + Reps 8/8/8
+**Tier 1 test list — CLOSED 2026-09-24, run by Planner** (same run as batch 4): **10 pass, 1 by unit test only** — #3
+midnight needs a faked clock; covered by `dates-tz.cases.js:82` (23:50 → 00:05 current), not browser-run. Pass [measured]:
+#1 `22,5` → `[22.5,22.5]`, `8/8/8` on 2 sets → "2 sets, 3 reps given." · #2 analytics file → "Not a workout database
+backup.", data intact (3 routines, 13 workouts) · #4 Push/Pull in progress, Upper still Start · #5 Edit → Hard → Back: no
+countdown, Hard kept · #6 Back after save shows Done, no Start · #7 "Nothing logged." · #8 Remove set → 4 sets again · #9
+Cancel → workout byte-identical · #10 archived, workout finished with its 4 sets · #11 stored `[]`, empty after reload.
+Items: 1 routine editor: Kg "22,5" saves 22.5; Sets 2 + Reps 8/8/8
 shows an error · 2 importing the analytics file shows an error, app stays up · 3 a workout past midnight stays the Today hero ·
 4 two routines today, one in progress → the other still has Start · 5 all done → Edit → pick Feel → Back → no countdown, Feel
 kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish says "Nothing logged" · 8 Add set on a done exercise
