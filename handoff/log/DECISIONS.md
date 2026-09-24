@@ -1437,3 +1437,12 @@ real in the browser at every site — swipe-back skips the replaced screen; reas
 (an added set with nothing logged this session stays blank, never the routine's number); **req-152's two calls** (the rest
 pill keeps top-centre and size; History reuses the overview's "· skipped"). Still unconfirmed: req-153's redirect of an
 in-workout route with no active workout to `/workout/<id>`.
+
+## DEC-084 — req-153's dead-Back fix dropped; the rest ships  (Emilio, 2026-09-24)
+
+req-153 item 1 (no duplicate entry after overview → item → last set) grew, over two rounds and a reviewer, into history
+stamping + `history.back()` + a 400 ms / 1 s timer + a capture-phase click listener + a 10 s popstate watch with
+`history.forward()` — timing-based navigation that neither Builder nor planning can test on an iPhone, for one Back press
+that does nothing. Emilio chose **"Drop it, ship the rest"** (over "merge as built" and "try a simpler idea now").
+`route.js` goes back to req-152's `go()` (`location.replace` on replace); items 2–5 ship. Parked in BACKLOG with the simpler
+idea to try later: on a popstate that lands on an entry identical to the one just left, step back once more.
