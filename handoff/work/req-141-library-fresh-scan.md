@@ -1,6 +1,6 @@
 # req-141 — fresh-eyes scan of the whole library
 
-**Status: READY** — Phase 1, **data only**. **Gate: functional**. DEC-065 §4 + DEC-070 §3: after RepDB's removal (req-142), a
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-141` (`428d83f`…`bdfb1da`, 2 commits).** — Phase 1, **data only**. **Gate: functional**. DEC-065 §4 + DEC-070 §3: after RepDB's removal (req-142), a
 fresh agent scans **every** written entry and improves naming, text and aliases. Emilio: "iterate over our database with a
 fresh agent that can fix/improve names and do a scan that does not think about repdb at all — i am a bit afraid that we
 might have made choices based only on not being similar to repdb."

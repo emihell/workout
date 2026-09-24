@@ -364,3 +364,10 @@ behind Show more (req-151). L-027's class of bug, in names. Fixed: an exact hit 
 pulled into the first tier whenever a staple hit exists. **How to apply:** every search tier change runs the "search
 each entry by its own shown name — is it first?" scan over the whole listed library; it found exactly the 2 cases here.
 
+## L-031 — a history-free reviewer will undo earlier decisions  (2026-09-24)
+
+req-141's fresh agents (deliberately given no history) proposed 6 changes that reverted a coach safety fix, removed seed
+aliases stored exercises resolve through, or broke validators and pinned receipts. The applicator's "before must equal
+current" check plus Builder's and planning's filter caught all six. **How to apply:** a fresh-eyes pass gets no history
+by design, so it always needs a gate that knows the history: a mechanical before-check, then a reviewer holding the DECs.
+

@@ -1368,3 +1368,13 @@ Blank or missing targets are judged as before. In mixed items each set is judged
 ids or /assisted/i in the name (interim; req-149 brings a real flag). **Known gap:** the hold reason is saved on the
 workout but no screen shows it since req-96; surfacing it belongs to req-149.
 
+## DEC-077 — library content calls from the fresh-eyes scan  (planning under DEC-067, 2026-09-24; unconfirmed)
+
+1. **Overhead presses:** front-delt primary + side-delt secondary, consistently (landmine press: + upper chest instead).
+2. **High rows** are vertical pulls. Kettlebell sumo high pull stays `olympic`.
+3. **Not staples:** Copenhagen Plank, Bayesian Curl, Pendulum Squat, Belt Squat, Z Press, Meadows Row (niche or uncommon
+   equipment for a beginner's commercial gym). Still fully written, behind "Show more".
+4. **American English** in library text. Aliases are exact (no "close enough" names).
+5. **Process lesson (L-031):** a fresh reviewer with no history proposes undoing earlier coach and seed decisions; keep the
+   applicator's before-check and a planning filter on every future scan.
+
