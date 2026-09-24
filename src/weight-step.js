@@ -3,6 +3,8 @@
 // 'n/a'); nothing on disk is rewritten. Pure (no imports): progress.js reads it and
 // both editors (Exercises.jsx, workout/setup.jsx) build their fields from it.
 
+import { normalizeKgText } from './kg-input.js'
+
 export const ALTERNATING = 'Alt 4/5'
 export const NO_STEP = 'n/a'
 
@@ -15,7 +17,7 @@ const STEP_NUMBER = /^\+?(?:\d+(?:\.\d*)?|\.\d+)$/
 // One increment in kg, or null. Comma is a decimal point (DEC-058 §1); an optional
 // `kg` suffix; must be > 0.
 export function parseWeightStep(text) {
-  const token = String(text ?? '').trim().replace(/\s*kg$/i, '').trim().replace(',', '.')
+  const token = normalizeKgText(text)
   if (!STEP_NUMBER.test(token)) return null
   const n = Number(token)
   return Number.isFinite(n) && n > 0 ? n : null

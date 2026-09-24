@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { RPE_OPTIONS, rpeOptionValue } from '../ids'
+import { kgError } from '../kg-input.js'
 import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedControl } from '../ui/index.jsx'
 
 // req-18 / DEC-021 #2 — the shared kg / reps / effort / note editor for a single
@@ -17,10 +18,13 @@ import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedC
 //     above the fields; its state is seeded from set.setType.
 //   - onSave(values) — receives the RAW field state ({ weight, reps, rpe, note,
 //     setType } as held in the inputs). Each caller does its own coercion (an
-//     empty weight becomes 0 in a live set but stays '' in history) and runs its
-//     own store mutation + routing. Keeping coercion in the caller preserves the
+//     empty weight becomes 0 in a live set but stays '' in history; set-values.js)
+//     and runs its own store mutation + routing. Keeping coercion in the caller preserves the
 //     two paths' exact, differing save behaviour.
 //   - cancelTo — the Cancel link's route.
+//   - req-154 — when the kg is shown, Save first checks it reads as a number (`22,5` does,
+//     DEC-058 §1); if not (`abc`, `2,5,5`) the form shows the error inline and does not
+//     call onSave. The callers' coercion lives in set-values.js.
 //
 // Everything around the form (Screen / Back / RestPill / header / History's
 // Remove button) stays in the caller.
@@ -32,11 +36,17 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
   )
   const [note, setNote] = useState(set?.note || '')
   const [setType, setSetType] = useState(set?.setType || 'work')
+  const [weightError, setWeightError] = useState(null)
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault()
+        const error = showLoad ? kgError(weight) : null
+        if (error) {
+          setWeightError(error)
+          return
+        }
         onSave({ weight, reps, rpe, note, setType })
       }}
     >
@@ -52,7 +62,19 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
         </>
       ) : null}
       {showLoad ? (
-        <NumberField label="kg" value={weight} onChange={(event) => setWeight(event.target.value)} />
+        <NumberField
+          label="kg"
+          value={weight}
+          onChange={(event) => {
+            setWeight(event.target.value)
+            setWeightError(null)
+          }}
+        />
+      ) : null}
+      {showLoad && weightError ? (
+        <p className="ui-field-error" role="alert">
+          {weightError}
+        </p>
       ) : null}
       <Field label="Reps" value={reps} onChange={(event) => setReps(event.target.value)} />
       {showEffort ? (

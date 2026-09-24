@@ -3,6 +3,7 @@ import { go } from '../../route'
 import { exerciseById, findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
+import { historySetFields } from '../set-values.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
@@ -147,7 +148,9 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
         cancelTo={backTo}
         onSave={(values) => {
           const exercise = exerciseById(store.exercises, exerciseId)
-          store.updateWorkout(workout.id, withHistorySet(workout, { exerciseId, itemId, exercise, values }))
+          const patch = withHistorySet(workout, { exerciseId, itemId, exercise, values })
+          if (!patch) return
+          store.updateWorkout(workout.id, patch)
           go(`/history/${workout.id}/recalculate`)
         }}
       />
@@ -180,19 +183,11 @@ export function HistorySet({ workoutId, index }) {
           { value: 'work', label: 'Work' },
         ]}
         cancelTo={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`}
-        onSave={({ weight, reps, rpe, note, setType }) => {
-          const sets = (workout.sets || []).map((s, i) =>
-            i === index
-              ? {
-                  ...s,
-                  setType,
-                  weight: weight === '' ? '' : Number(weight),
-                  reps,
-                  rpe: rpe === '' ? null : Number(rpe),
-                  note,
-                }
-              : s,
-          )
+        onSave={(values) => {
+          // req-154 — `22,5` → 22.5; unreadable kg → null (the form already shows why).
+          const fields = historySetFields(values)
+          if (!fields) return
+          const sets = (workout.sets || []).map((s, i) => (i === index ? { ...s, ...fields } : s))
           store.updateWorkout(workout.id, { sets })
           go(`/history/${workout.id}/recalculate`)
         }}

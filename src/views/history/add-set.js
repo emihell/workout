@@ -3,8 +3,10 @@
 // edit form opened, so Cancel left it behind: it counted in "N sets" and fed prefill.
 // Now the add form opens on its own route (history-set-add) with an unsaved draft, and
 // the set + snapshot item are created only by withHistorySet on Save. Pure and
-// JSX-free so `node --test` can import it; no imports on purpose (the exercise record
-// is passed in).
+// JSX-free so `node --test` can import it; its only import is the pure set-values.js
+// (the exercise record is passed in).
+
+import { historySetFields } from '../set-values.js'
 
 function idOf(obj) {
   return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''
@@ -47,19 +49,21 @@ export function historyAddSetDraft(workout, exerciseId, itemId) {
 // The workout patch Save writes: the new set appended, and — when the snapshot has no
 // item for it yet — the same "Added during history correction" item addSetToWorkout
 // added. `values` is the SetEditForm's raw state, coerced as HistorySet's Save does
-// (weight '' stays '', rpe '' → null).
+// (historySetFields: weight '' stays '', `22,5` → 22.5, rpe '' → null). req-154 — a kg
+// that isn't a number returns null: nothing to write (the form shows the error).
 export function withHistorySet(workout, { exerciseId, itemId, exercise, values }) {
-  const { weight, reps, rpe, note, setType } = values
+  const fields = historySetFields(values)
+  if (!fields) return null
   const sets = [
     ...(workout.sets || []),
     {
       exerciseId,
       routineItemId: itemId,
-      setType: setType || 'work',
-      weight: weight === '' || weight == null ? '' : Number(weight),
-      reps,
-      rpe: rpe === '' || rpe == null ? null : Number(rpe),
-      note: note || '',
+      setType: fields.setType || 'work',
+      weight: fields.weight,
+      reps: fields.reps,
+      rpe: fields.rpe,
+      note: fields.note || '',
     },
   ]
   const items = workout.snapshot?.items || []

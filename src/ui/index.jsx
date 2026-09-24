@@ -11,6 +11,7 @@ import { NavLink as BaseNavLink } from '../views/shared'
 import { lookClass } from '../views/nav-look.js'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
+import { kgError } from '../kg-input.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -411,14 +412,19 @@ export function SetLogForm({
   const [reps, setReps] = useState(initialReps)
   const [duration, setDuration] = useState(String(initialDuration || ''))
   const [effort, setEffort] = useState(initialEffort)
+  // req-154 — set by Complete when the kg can't be read (`abc`, `2,5,5`); cleared by the
+  // next kg edit. `22,5` is a number (DEC-058 §1) and never lands here.
+  const [weightError, setWeightError] = useState(null)
   // req-125 — `onChange` (optional) hears every user edit with the form's full current
   // values, so the caller can keep a draft of the un-logged set. It fires from the edit
   // itself (not an effect), so mounting or remounting writes nothing. `durationSec` is the
   // typed seconds as entered, present only on a timed form.
   function edit(field, value) {
     const next = { weight, reps, effort, duration, [field]: value }
-    if (field === 'weight') setWeight(value)
-    else if (field === 'reps') setReps(value)
+    if (field === 'weight') {
+      setWeight(value)
+      setWeightError(null)
+    } else if (field === 'reps') setReps(value)
     else if (field === 'effort') setEffort(value)
     else setDuration(value)
     onChange?.({
@@ -433,6 +439,11 @@ export function SetLogForm({
       className="ui-setlog"
       onSubmit={(e) => {
         e.preventDefault()
+        const error = weighted ? kgError(weight) : null
+        if (error) {
+          setWeightError(error)
+          return
+        }
         onComplete?.({
           weight,
           reps: timed ? '' : reps,
@@ -457,6 +468,11 @@ export function SetLogForm({
           />
         )}
       </div>
+      {weightError ? (
+        <p className="ui-field-error" role="alert">
+          {weightError}
+        </p>
+      ) : null}
       {showEffort ? (
         <>
           <SectionHeader>Effort</SectionHeader>
