@@ -1,6 +1,6 @@
 # req-140 — library parity, batch 1: our own entries for what RepDB covers and we don't, plus our own difficulty
 
-**Status: READY** — Phase 1, **data only** + one search-tier rename. **Gate: functional** (library data, validators, tests,
+**Status: BUILT, NOT merged — branch `req-140`** — Phase 1, **data only** + one search-tier rename. **Gate: functional** (library data, validators, tests,
 and one line in the search split; no screen or stored-data change). Emilio 2026-09-24 (DEC-065, DEC-066): "our database has
 to have everything it has but better", done **in batches of ≤40**, with **staples first and the rest behind "Show more"**.
 RepDB is kept only for its pictures (req-131). Spec reviewed independently 2026-09-24 (8 findings folded in). Followed by

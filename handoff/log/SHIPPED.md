@@ -1686,3 +1686,15 @@ seat reversed, curl cue vs step) + 9 clarity fixes, all applied. Gate: Planner's
 # pass 769 # fail 0`, build ✓ (main 340.97 kB unchanged, L-026; library 1,315.71 kB); read Deadlift/Leg Press/Pull-Up/Nordic/
 Curl. No existing test edited. Reviewer (code): none (no store/model/storage).
 
+## req-140 — library parity batch 1: 40 entries, `staple` + `difficulty`, 17 aliases (DEC-065/066/067)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `a65d3eb`…`1f50605`). Phase 1 gap checkpoint (RepDB `name_en` only, table in
+gitignored `.vendor-cache/`, never in git): 451 unmatched → 146 covered / 11 alias / 108 promote / 42 add / 144 skip; queue of
+the rest in `work/req-140-parity-queue.md` (ours only). Phase 2: 27 promoted (ids kept) + 13 own adds, 17 aliases; new
+`staple` (search's first tier; `searchCommonFirst` splits on it) and `difficulty` (skill/setup, anchors tested) on all 218
+common entries → 193 staples; difficulty 162/47/9. Originality: Measure 2 (≥12-token runs) only → 0. Spec review (8 findings);
+coach QA (independent subagent): nothing wrong; 9 refinements applied (bench/hip thrust/close push-up/Nordic difficulty,
+2 misleading aliases dropped, sumo squat staple, a cue, muscle-up pecs). Gate: Planner's own run in an archive copy →
+`# tests 779 # pass 779 # fail 0`, build ✓ (main 340.97 kB, L-026/L-029; library 1,368 kB); `grep -ci repdb` → 0; vendor-cache
+not in git. Test edits: sanctioned + 2 accepted (OWN_EXERCISES count; req-139 parts read `staple`). Reviewer (code): none.
+
