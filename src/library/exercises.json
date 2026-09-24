@@ -1879,7 +1879,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Ab_Rollout/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Ab_Rollout/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "Barbell Ab Rollout - On Knees",
@@ -1913,8 +1914,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Ab_Rollout_-_On_Knees/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Ab_Rollout_-_On_Knees/1.jpg"
     ],
-    "hidden": true,
-    "mergedInto": "Barbell_Ab_Rollout"
+    "hidden": true
   },
   {
     "name": "Barbell Bench Press - Medium Grip",
@@ -2700,12 +2700,62 @@
       "Barbell_Rear_Delt_Row/1.jpg"
     ],
     "id": "Barbell_Rear_Delt_Row",
+    "aliases": [
+      "Wide-Grip Barbell Row to Chest",
+      "Barbell Row to Neck"
+    ],
     "muscleGroups": [
+      "Back",
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Rear_Delt_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Rear_Delt_Row/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A bent-over barbell row with a wide grip, pulled toward the upper chest to work the rear delts.",
+    "formCues": [
+      "Wide grip",
+      "Elbows flare out",
+      "Pull to the upper chest"
+    ],
+    "steps": [
+      "Hold a barbell with a wide overhand grip.",
+      "Hinge at the hips with a slight knee bend until your torso is well forward.",
+      "Row the bar toward your upper chest, elbows flaring out to the sides.",
+      "Lower it slowly until your arms are straight."
+    ],
+    "mistakes": [
+      "Standing up as you pull",
+      "Rounding the back",
+      "Pulling to the belly instead of the chest"
     ]
   },
   {
@@ -2907,12 +2957,58 @@
       "Barbell_Shrug_Behind_The_Back/1.jpg"
     ],
     "id": "Barbell_Shrug_Behind_The_Back",
+    "aliases": [
+      "Behind-the-Back Shrug",
+      "Reverse Barbell Shrug"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Shrug_Behind_The_Back/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Shrug_Behind_The_Back/1.jpg"
+    ],
+    "displayName": "Behind-the-Back Barbell Shrug",
+    "muscles": [
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "shrug",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-shrug",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "A shrug holding the barbell behind the body, which shifts the work toward the middle traps.",
+    "formCues": [
+      "Arms stay straight",
+      "Shoulders straight up",
+      "Pause at the top"
+    ],
+    "steps": [
+      "Stand holding a barbell behind your thighs with an overhand grip about shoulder width.",
+      "Let your arms hang straight and your shoulders relax down.",
+      "Shrug your shoulders straight up toward your ears.",
+      "Pause, then lower slowly."
+    ],
+    "mistakes": [
+      "Rolling the shoulders",
+      "Bending the elbows",
+      "Bar scraping the legs hard"
     ]
   },
   {
@@ -3673,12 +3769,60 @@
       "Bent-Arm_Barbell_Pullover/1.jpg"
     ],
     "id": "Bent-Arm_Barbell_Pullover",
+    "aliases": [
+      "Barbell Pullovers",
+      "Lying Barbell Pullover"
+    ],
     "muscleGroups": [
+      "Chest",
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent-Arm_Barbell_Pullover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent-Arm_Barbell_Pullover/1.jpg"
+    ],
+    "displayName": "Barbell Pullover",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "pullover",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pullover",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "Lying on a bench and lowering a barbell behind the head with bent arms, for the lats and chest.",
+    "formCues": [
+      "Elbows stay bent the same amount",
+      "Ribs down",
+      "Stop at a comfortable stretch"
+    ],
+    "steps": [
+      "Grip a barbell at shoulder width, lie back on a flat bench and hold it above your chest, elbows softly bent.",
+      "Keeping the bend in your elbows, lower the bar back over your head.",
+      "Stop when you feel a stretch through your lats and chest.",
+      "Pull the bar back over your chest along the same arc."
+    ],
+    "mistakes": [
+      "Bending the elbows more to go deeper",
+      "Arching the lower back",
+      "Lowering past a comfortable stretch"
     ]
   },
   {
@@ -4405,12 +4549,54 @@
       "Body_Tricep_Press/1.jpg"
     ],
     "id": "Body_Tricep_Press",
+    "aliases": [
+      "Bodyweight Skull Crusher",
+      "Bar Triceps Extension"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Body_Tricep_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Body_Tricep_Press/1.jpg"
+    ],
+    "displayName": "Bodyweight Triceps Extension",
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-skull-crusher",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A skull crusher using your bodyweight on a bar set in a rack, for the triceps.",
+    "formCues": [
+      "Body straight from head to heels",
+      "Elbows point down",
+      "Upper arms stay still"
+    ],
+    "steps": [
+      "Set a bar in a rack at about chest height and grip it shoulder width.",
+      "Walk your feet back so you lean into the bar with straight arms and a straight body.",
+      "Bend your elbows to lower your head below the bar.",
+      "Straighten your arms to push back up."
+    ],
+    "mistakes": [
+      "Hips sagging",
+      "Elbows flaring out",
+      "Starting with the feet so far back it becomes too hard"
     ]
   },
   {
@@ -7683,12 +7869,70 @@
       "Clean_Pull/1.jpg"
     ],
     "id": "Clean_Pull",
+    "aliases": [
+      "Clean Pulls",
+      "Barbell Clean Pull"
+    ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean_Pull/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean_Pull/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-clean",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "The first part of a clean, pulling the barbell from the floor to a full extension of the hips.",
+    "formCues": [
+      "Bar close to the body",
+      "Flat back off the floor",
+      "Finish tall on the toes"
+    ],
+    "steps": [
+      "Stand with the bar over your mid foot, grip it just outside your legs and set a flat back.",
+      "Push the floor away to lift the bar, keeping it close to your legs.",
+      "As it passes your knees, drive your hips forward and rise onto your toes with a shrug.",
+      "Lower the bar back to the floor with control."
+    ],
+    "mistakes": [
+      "Pulling with the arms early",
+      "Bar swinging away from the body",
+      "Rounding the back off the floor"
     ]
   },
   {
@@ -10068,7 +10312,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Donkey_Calf_Raises/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Donkey_Calf_Raises/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "Double Kettlebell Alternating Hang Clean",
@@ -15629,12 +15874,70 @@
       "Hang_Snatch/1.jpg"
     ],
     "id": "Hang_Snatch",
+    "aliases": [
+      "Barbell Hang Snatch",
+      "Hang Power Snatch"
+    ],
     "muscleGroups": [
+      "Shoulders",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hang_Snatch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hang_Snatch/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-snatch",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A snatch started from the hang, pulling the bar overhead in one movement.",
+    "formCues": [
+      "Bar close to the body",
+      "Hips drive the bar",
+      "Punch up and lock out"
+    ],
+    "steps": [
+      "Stand with a wide grip on the bar and hinge until it hangs just above or just below your knees.",
+      "Drive your hips forward and shrug to send the bar up close to your body.",
+      "Pull yourself under the bar and catch it overhead with locked arms.",
+      "Stand up, then lower the bar with control."
+    ],
+    "mistakes": [
+      "Pulling with the arms early",
+      "Bar looping away from the body",
+      "Catching with soft elbows"
     ]
   },
   {
@@ -17714,12 +18017,51 @@
       "Isometric_Neck_Exercise_-_Sides/1.jpg"
     ],
     "id": "Isometric_Neck_Exercise_-_Sides",
+    "aliases": [
+      "Neck Isometrics",
+      "Isometric Neck Exercise",
+      "Manual Neck Resistance"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Isometric_Neck_Exercise_-_Sides/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Isometric_Neck_Exercise_-_Sides/1.jpg"
+    ],
+    "displayName": "Isometric Neck Hold",
+    "muscles": [
+      {
+        "id": "neck",
+        "role": "primary"
+      }
+    ],
+    "pattern": "mobility",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-isometric-neck-exercise-sides",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Pressing the head against your own hand without letting it move, to strengthen the neck in each direction.",
+    "formCues": [
+      "Head stays still",
+      "Push gently and build up",
+      "Shoulders relaxed"
+    ],
+    "steps": [
+      "Sit or stand tall with your head level.",
+      "Place one hand on the side of your head and press your head into it without letting it move.",
+      "Hold, then repeat on the other side.",
+      "Repeat with a hand on your forehead and then on the back of your head."
+    ],
+    "mistakes": [
+      "Letting the head tilt or turn",
+      "Pushing hard from the start",
+      "Shrugging the shoulders"
     ]
   },
   {
@@ -17783,12 +18125,57 @@
       "JM_Press/1.jpg"
     ],
     "id": "JM_Press",
+    "aliases": [
+      "JM Presses"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/JM_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/JM_Press/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-skull-crusher",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A barbell press that is part close-grip bench and part skull crusher, for the triceps.",
+    "formCues": [
+      "Close grip",
+      "Elbows point toward the feet",
+      "Bar lowers toward the chin"
+    ],
+    "steps": [
+      "Take a close grip on the bar, lie back on a flat bench and hold it straight above your chest.",
+      "Let your elbows travel forward as you lower the bar toward your upper chest and chin.",
+      "Stop when your forearms meet your upper arms.",
+      "Press the bar back up to straight arms."
+    ],
+    "mistakes": [
+      "Flaring the elbows out",
+      "Lowering the bar to the face fast",
+      "Turning it into a regular bench press"
     ]
   },
   {
@@ -21851,12 +22238,54 @@
       "Lying_One-Arm_Lateral_Raise/1.jpg"
     ],
     "id": "Lying_One-Arm_Lateral_Raise",
+    "aliases": [
+      "Chest-Down One-Arm Lateral Raise",
+      "Prone Lateral Raise"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_One-Arm_Lateral_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_One-Arm_Lateral_Raise/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-lateral-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Lying chest-down on a bench and raising one dumbbell out to the side, for the side and rear delts.",
+    "formCues": [
+      "Chest stays on the bench",
+      "Soft bend in the elbow",
+      "Raise to shoulder height"
+    ],
+    "steps": [
+      "Lie face down on a flat bench holding a dumbbell in one hand, arm hanging toward the floor.",
+      "Hold the bench leg with your free hand for support.",
+      "Raise the dumbbell out to the side until your arm is level with your shoulder.",
+      "Lower it slowly, finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Swinging the dumbbell up",
+      "Twisting the torso off the bench",
+      "Shrugging the shoulder"
     ]
   },
   {
@@ -23781,12 +24210,59 @@
       "One-Arm_Kettlebell_Military_Press_To_The_Side/1.jpg"
     ],
     "id": "One-Arm_Kettlebell_Military_Press_To_The_Side",
+    "aliases": [
+      "Single-Arm Kettlebell Press",
+      "KB Press",
+      "Kettlebell Overhead Press"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Military_Press_To_The_Side/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Military_Press_To_The_Side/1.jpg"
+    ],
+    "displayName": "One-Arm Kettlebell Press",
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "kettlebell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-overhead-press",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "Pressing one kettlebell overhead from the shoulder, which also trains the trunk to stay upright.",
+    "formCues": [
+      "Wrist straight, forearm vertical",
+      "Ribs down, glutes tight",
+      "Lock out overhead"
+    ],
+    "steps": [
+      "Clean a kettlebell to one shoulder, handle resting in your palm.",
+      "Brace your trunk and squeeze your glutes.",
+      "Press the kettlebell straight up until your arm is locked out.",
+      "Lower it back to your shoulder, finish the reps, then switch sides."
+    ],
+    "mistakes": [
+      "Leaning far away from the bell",
+      "Wrist bent back",
+      "Arching the lower back"
     ]
   },
   {
@@ -26537,12 +27013,65 @@
       "Power_Jerk/1.jpg"
     ],
     "id": "Power_Jerk",
+    "aliases": [
+      "Barbell Power Jerk"
+    ],
     "muscleGroups": [
+      "Shoulders",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Power_Jerk/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Power_Jerk/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-jerk",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Driving a barbell from the shoulders to overhead with a dip and drive, catching it with bent knees.",
+    "formCues": [
+      "Dip straight down",
+      "Drive hard with the legs",
+      "Lock out and stand"
+    ],
+    "steps": [
+      "Stand with the bar racked on the front of your shoulders, feet under your hips.",
+      "Dip by bending your knees with your torso upright.",
+      "Drive up hard and push yourself under the bar as it leaves your shoulders.",
+      "Catch it overhead with locked arms and bent knees, then stand up."
+    ],
+    "mistakes": [
+      "Leaning forward in the dip",
+      "Pressing the bar out slowly",
+      "Catching with soft elbows"
     ]
   },
   {
@@ -26608,12 +27137,73 @@
       "Power_Snatch/1.jpg"
     ],
     "id": "Power_Snatch",
+    "aliases": [
+      "Barbell Power Snatch"
+    ],
     "muscleGroups": [
+      "Shoulders",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Power_Snatch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Power_Snatch/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-snatch",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Pulling a barbell from the floor to overhead in one movement and catching it above a parallel squat.",
+    "formCues": [
+      "Wide grip",
+      "Bar close to the body",
+      "Catch high with locked arms"
+    ],
+    "steps": [
+      "Stand with the bar over your mid foot and take a wide grip, back flat.",
+      "Push the floor away and let the bar travel close to your legs.",
+      "Drive your hips forward and pull yourself under, catching the bar overhead in a partial squat.",
+      "Stand up, then lower the bar with control."
+    ],
+    "mistakes": [
+      "Pulling with the arms early",
+      "Rounding the back off the floor",
+      "Catching with soft elbows"
     ]
   },
   {
@@ -29014,12 +29604,60 @@
       "Ring_Dips/1.jpg"
     ],
     "id": "Ring_Dips",
+    "aliases": [
+      "Gymnastic Ring Dips",
+      "Rings Dip"
+    ],
     "muscleGroups": [
+      "Chest",
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ring_Dips/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ring_Dips/1.jpg"
+    ],
+    "displayName": "Ring Dip",
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "mid-lower-chest",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "suspension",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A dip on gymnastic rings, which adds balance work to the chest, triceps and shoulders.",
+    "formCues": [
+      "Rings close to the body",
+      "Turn the rings out at the top",
+      "Shoulders down, away from the ears"
+    ],
+    "steps": [
+      "Grip a ring in each hand and jump or step up to support yourself with straight arms.",
+      "Keep the rings close to your sides.",
+      "Lower yourself by bending your elbows until your shoulders dip below them.",
+      "Press back up to straight arms."
+    ],
+    "mistakes": [
+      "Rings drifting out wide",
+      "Dropping too deep to control",
+      "Swinging the legs"
     ]
   },
   {
@@ -29281,12 +29919,61 @@
       "Rope_Climb/1.jpg"
     ],
     "id": "Rope_Climb",
+    "aliases": [
+      "Rope Climbs",
+      "Rope Climbing"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rope_Climb/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rope_Climb/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rope-climb",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Climbing a hanging rope with the hands and a foot lock, for the back, arms and grip.",
+    "formCues": [
+      "Pull, then lock the feet",
+      "Stand up on the foot lock",
+      "Climb down hand under hand"
+    ],
+    "steps": [
+      "Grip the rope overhead and pull as you lift your knees.",
+      "Wrap the rope around one leg and pinch it with your feet.",
+      "Stand up on the foot lock and reach your hands higher.",
+      "Repeat to the top, then climb down the same way."
+    ],
+    "mistakes": [
+      "Climbing with the arms only",
+      "Sliding down the rope",
+      "Going higher than you can climb down"
     ]
   },
   {
@@ -33902,7 +34589,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Hip_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Hip_Raise/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "Smith Machine Incline Bench Press",
@@ -34735,12 +35423,66 @@
       "Snatch_Pull/1.jpg"
     ],
     "id": "Snatch_Pull",
+    "aliases": [
+      "Snatch Pulls",
+      "Barbell Snatch Pull"
+    ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Snatch_Pull/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Snatch_Pull/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-snatch",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "The first part of a snatch, pulling the barbell with a wide grip to a full extension of the hips.",
+    "formCues": [
+      "Wide grip",
+      "Bar close to the body",
+      "Finish tall on the toes"
+    ],
+    "steps": [
+      "Stand with the bar over your mid foot and take a wide grip, back flat.",
+      "Push the floor away to lift the bar, keeping it close to your legs.",
+      "As it reaches your upper thighs, drive your hips forward and rise onto your toes with a shrug.",
+      "Lower the bar back to the floor with control."
+    ],
+    "mistakes": [
+      "Bending the arms early",
+      "Hips shooting up first",
+      "Bar drifting forward"
     ]
   },
   {
@@ -35168,12 +35910,65 @@
       "Split_Jerk/1.jpg"
     ],
     "id": "Split_Jerk",
+    "aliases": [
+      "Barbell Split Jerk"
+    ],
     "muscleGroups": [
+      "Shoulders",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Jerk/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Jerk/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-jerk",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A jerk where the feet split to drop under the bar, for moving the heaviest loads overhead.",
+    "formCues": [
+      "Dip straight down",
+      "Split long, feet hip-width apart",
+      "Lock out before recovering"
+    ],
+    "steps": [
+      "Stand with the bar racked on the front of your shoulders, feet under your hips.",
+      "Dip by bending your knees with your torso upright.",
+      "Drive up hard and split your feet front and back as you push under the bar.",
+      "Catch it overhead with locked arms, then step the front foot back and the back foot forward to stand."
+    ],
+    "mistakes": [
+      "Leaning forward in the dip",
+      "Splitting too narrow to balance",
+      "Recovering before the bar is locked"
     ]
   },
   {
@@ -35832,7 +36627,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Barbell_Press_Behind_Neck/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Barbell_Press_Behind_Neck/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "Standing Bent-Over One-Arm Dumbbell Triceps Extension",
@@ -36717,12 +37513,62 @@
       "Standing_Front_Barbell_Raise_Over_Head/1.jpg"
     ],
     "id": "Standing_Front_Barbell_Raise_Over_Head",
+    "aliases": [
+      "Barbell Front Raises",
+      "BB Front Raise"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Front_Barbell_Raise_Over_Head/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Front_Barbell_Raise_Over_Head/1.jpg"
+    ],
+    "displayName": "Barbell Front Raise",
+    "muscles": [
+      {
+        "id": "front-delt",
+        "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-front-dumbbell-raise",
+    "staple": false,
+    "difficulty": "beginner",
+    "description": "Raising a barbell with straight arms from the thighs up to overhead, for the front delts.",
+    "formCues": [
+      "Arms nearly straight",
+      "Ribs down, no lean back",
+      "Smooth arc"
+    ],
+    "steps": [
+      "Stand holding a barbell in front of your thighs with an overhand grip a little narrower than your shoulders.",
+      "Brace your trunk and keep your arms nearly straight.",
+      "Raise the bar forward and up until it is overhead.",
+      "Lower it along the same arc to your thighs."
+    ],
+    "mistakes": [
+      "Leaning back to lift the bar",
+      "Bending the elbows into a press",
+      "Using a bar too heavy for the arc"
     ]
   },
   {
@@ -39661,12 +40507,73 @@
       "Tire_Flip/1.jpg"
     ],
     "id": "Tire_Flip",
+    "aliases": [
+      "Tire Flips",
+      "Tyre Flip"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tire_Flip/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tire_Flip/1.jpg"
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-tire-flip",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "Lifting and pushing a heavy tire end over end, a full-body power exercise.",
+    "formCues": [
+      "Back flat",
+      "Drive with the legs and hips",
+      "Push through at the top"
+    ],
+    "steps": [
+      "Set your hips higher than in a squat, grip the bottom of the tire and rest your chest on it.",
+      "Drive with your legs and hips to lift the tire up and forward.",
+      "As it rises, step in and switch your hands to push it over.",
+      "Reset and repeat."
+    ],
+    "mistakes": [
+      "Lifting with the back rounded",
+      "Pulling with the arms",
+      "Standing too far from the tire"
     ]
   },
   {
@@ -40960,12 +41867,59 @@
       "V-Bar_Pullup/1.jpg"
     ],
     "id": "V-Bar_Pullup",
+    "aliases": [
+      "V-Bar Pull-Ups",
+      "V-Handle Pull-Up"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/V-Bar_Pullup/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/V-Bar_Pullup/1.jpg"
+    ],
+    "displayName": "V-Bar Pull-Up",
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A pull-up holding a V-handle hooked over the bar, a close neutral grip for the lats and biceps.",
+    "formCues": [
+      "Pull the chest to the handle",
+      "Elbows drive down",
+      "Full hang at the bottom"
+    ],
+    "steps": [
+      "Hook a V-handle over the middle of a pull-up bar and grip both sides, palms facing each other.",
+      "Hang with your arms straight.",
+      "Pull your chest up toward the handle, leaning back slightly.",
+      "Lower yourself slowly to a full hang."
+    ],
+    "mistakes": [
+      "Kicking the legs to get up",
+      "Stopping short of a full hang",
+      "Handle slipping on the bar"
     ]
   },
   {
@@ -41693,7 +42647,8 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Pulldown_Behind_The_Neck/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Pulldown_Behind_The_Neck/1.jpg"
-    ]
+    ],
+    "hidden": true
   },
   {
     "name": "Wide-Grip Rear Pull-Up",
@@ -42186,12 +43141,66 @@
       "Zercher_Squats/1.jpg"
     ],
     "id": "Zercher_Squats",
+    "aliases": [
+      "Zercher Squat Barbell",
+      "Elbow Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Zercher_Squats/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Zercher_Squats/1.jpg"
+    ],
+    "displayName": "Zercher Squat",
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A squat holding the barbell in the crooks of the elbows, which loads the upper back and core.",
+    "formCues": [
+      "Bar tight in the elbows",
+      "Chest up",
+      "Knees track over the toes"
+    ],
+    "steps": [
+      "Set a bar in a rack at about waist height and hold it in the crooks of your elbows, hands together.",
+      "Lift it out of the rack and step back with your feet about shoulder width.",
+      "Squat down, keeping your chest up and the bar close.",
+      "Drive through your feet to stand back up."
+    ],
+    "mistakes": [
+      "Rounding the upper back",
+      "Letting the bar slide toward the forearms",
+      "Heels lifting"
     ]
   },
   {
@@ -46698,6 +47707,601 @@
       "Leaning the trunk to straighten the leg",
       "Band slipping down the calf",
       "Snapping the knee straight"
+    ]
+  },
+  {
+    "name": "Archer Push-Up",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "instructions": [
+      "Start in a wide push-up position with your hands well outside your shoulders.",
+      "Shift your weight to one side and lower your chest toward that hand, keeping the other arm straight.",
+      "Press back up to the middle, then lower toward the other side."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-archer-push-up",
+    "aliases": [
+      "Archer Push-Ups",
+      "Archer Press-Up"
+    ],
+    "muscleGroups": [
+      "Chest"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A wide push-up that shifts the weight toward one arm at a time, a step toward the one-arm push-up.",
+    "formCues": [
+      "Straight arm stays long",
+      "Body straight",
+      "Chest moves toward the bent arm"
+    ],
+    "steps": [
+      "Start in a wide push-up position with your hands well outside your shoulders.",
+      "Shift your weight to one side and lower your chest toward that hand, keeping the other arm straight.",
+      "Press back up to the middle.",
+      "Lower toward the other side and keep alternating."
+    ],
+    "mistakes": [
+      "Hips sagging",
+      "Bending the straight arm",
+      "Hands not wide enough to shift"
+    ]
+  },
+  {
+    "name": "Archer Pull-Up",
+    "force": "pull",
+    "level": "advanced",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "lats"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "middle back"
+    ],
+    "instructions": [
+      "Hang from a pull-up bar with a wide overhand grip.",
+      "Pull yourself up toward one hand while the other arm straightens out along the bar.",
+      "Lower under control, then pull toward the other side."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-archer-pull-up",
+    "aliases": [
+      "Archer Pull-Ups",
+      "Archer Chin-Up"
+    ],
+    "muscleGroups": [
+      "Back"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "A wide pull-up that pulls toward one hand while the other arm straightens, a step toward the one-arm pull-up.",
+    "formCues": [
+      "Pull toward one hand",
+      "Other arm slides out straight",
+      "Control the way down"
+    ],
+    "steps": [
+      "Hang from a pull-up bar with a wide overhand grip.",
+      "Pull yourself up toward one hand while the other arm straightens out along the bar.",
+      "Lower under control to a full hang.",
+      "Pull toward the other side and keep alternating."
+    ],
+    "mistakes": [
+      "Kipping to get up",
+      "Dropping into the hang",
+      "Grip too narrow to shift"
+    ]
+  },
+  {
+    "name": "L-Sit",
+    "force": "static",
+    "level": "advanced",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abdominals"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "quadriceps"
+    ],
+    "instructions": [
+      "Place your hands on the floor, parallettes or dip bars beside your hips.",
+      "Press down to lift your hips and legs off the support with your legs straight out in front.",
+      "Hold with your legs level and your shoulders pushed down."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-l-sit",
+    "aliases": [
+      "L-Sit Hold",
+      "L Sit"
+    ],
+    "muscleGroups": [
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-l-sit",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Holding the body up on the hands with straight legs out in front, for the core and hip flexors.",
+    "formCues": [
+      "Shoulders pushed down",
+      "Legs straight and level",
+      "Toes pointed"
+    ],
+    "steps": [
+      "Place your hands on the floor, parallettes or dip bars beside your hips.",
+      "Press down through your hands to lift your hips and legs off the support.",
+      "Hold your legs straight out in front, level with your hips.",
+      "Lower to finish the hold."
+    ],
+    "mistakes": [
+      "Shoulders shrugging up",
+      "Knees bending",
+      "Leaning far back"
+    ]
+  },
+  {
+    "name": "Dragon Flag",
+    "force": "pull",
+    "level": "advanced",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abdominals"
+    ],
+    "secondaryMuscles": [
+      "lats"
+    ],
+    "instructions": [
+      "Lie on a bench and grip it behind your head.",
+      "Lift your body up onto your upper back so it forms a straight line from shoulders to feet.",
+      "Lower your straight body slowly toward the bench without letting your hips bend, then raise it again."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-dragon-flag",
+    "aliases": [
+      "Dragon Flags",
+      "Dragon Flag Raise"
+    ],
+    "muscleGroups": [
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      },
+      {
+        "id": "lats",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bench",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Lowering a straight body from the upper back on a bench, for the whole front of the core.",
+    "formCues": [
+      "Body straight from shoulders to feet",
+      "Hips never bend",
+      "Lower back pressed flat"
+    ],
+    "steps": [
+      "Lie on a bench and grip it behind your head.",
+      "Lift your body up onto your upper back so it forms a straight line from shoulders to feet.",
+      "Lower your straight body slowly toward the bench.",
+      "Raise it again before your hips touch."
+    ],
+    "mistakes": [
+      "Bending at the hips",
+      "Arching the lower back",
+      "Resting weight on the neck"
+    ]
+  },
+  {
+    "name": "Front Lever",
+    "force": "static",
+    "level": "advanced",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "lats",
+      "abdominals"
+    ],
+    "secondaryMuscles": [
+      "shoulders",
+      "middle back"
+    ],
+    "instructions": [
+      "Hang from a pull-up bar with straight arms and an overhand grip.",
+      "Press the bar down toward your hips and lift your body until it is horizontal, face up.",
+      "Hold with your body straight, then lower with control."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-front-lever",
+    "aliases": [
+      "Front Lever Hold"
+    ],
+    "muscleGroups": [
+      "Back",
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-front-lever",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Hanging from a bar and holding the body horizontal, face up, for the lats and core.",
+    "formCues": [
+      "Arms straight",
+      "Press the bar toward the hips",
+      "Body straight"
+    ],
+    "steps": [
+      "Hang from a pull-up bar with straight arms and an overhand grip.",
+      "Start with the knees tucked, and straighten the legs over time as you get stronger.",
+      "Press the bar down toward your hips and lift your body up.",
+      "Hold it horizontal and face up, with your body straight.",
+      "Lower with control to a hang."
+    ],
+    "mistakes": [
+      "Bending the arms",
+      "Hips piking",
+      "Arching the back"
+    ]
+  },
+  {
+    "name": "Back Lever",
+    "force": "static",
+    "level": "advanced",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "lower back",
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "chest",
+      "biceps"
+    ],
+    "instructions": [
+      "Hang from a bar or rings and tuck your legs through your arms into an inverted hang.",
+      "Lower slowly, only as far as the shoulders allow, until your body is horizontal and face down.",
+      "Hold with your body straight, then return to the inverted hang."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-back-lever",
+    "aliases": [
+      "Back Lever Hold"
+    ],
+    "muscleGroups": [
+      "Back",
+      "Shoulders"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-back-lever",
+    "staple": false,
+    "difficulty": "advanced",
+    "description": "Holding the body horizontal, face down, from an inverted hang, for the shoulders and back.",
+    "formCues": [
+      "Arms straight",
+      "Squeeze the glutes",
+      "Body straight"
+    ],
+    "steps": [
+      "Hang from a bar or rings and tuck your legs through your arms into an inverted hang.",
+      "Start with the knees tucked, and straighten the legs over time as you get stronger.",
+      "Lower slowly, only as far as the shoulders allow, until your body is horizontal and face down.",
+      "Hold with your body straight.",
+      "Return to the inverted hang to finish."
+    ],
+    "mistakes": [
+      "Bending the arms",
+      "Hips sagging",
+      "Dropping into the position fast"
+    ]
+  },
+  {
+    "name": "Reverse Nordic",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "secondaryMuscles": [
+      "abdominals"
+    ],
+    "instructions": [
+      "Kneel on a pad with your torso upright and your feet behind you.",
+      "Keeping a straight line from knees to shoulders, lean back slowly as far as you can control.",
+      "Use your quads to pull yourself back upright."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-reverse-nordic",
+    "aliases": [
+      "Reverse Nordic Curl",
+      "Reverse Nordics"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-extension",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-reverse-nordic",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "Kneeling and leaning back with a straight body, then pulling back up with the quads.",
+    "formCues": [
+      "Straight line from knees to shoulders",
+      "Hips stay forward",
+      "Lean back slowly"
+    ],
+    "steps": [
+      "Kneel on a pad with your torso upright and your feet behind you.",
+      "Keeping a straight line from knees to shoulders, lean back slowly.",
+      "Go only as far as you can control.",
+      "Use your quads to pull yourself back upright."
+    ],
+    "mistakes": [
+      "Bending at the hips",
+      "Dropping back fast",
+      "Leaning past what you can control"
+    ]
+  },
+  {
+    "name": "Spoto Press",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "barbell",
+    "primaryMuscles": [
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "triceps",
+      "shoulders"
+    ],
+    "instructions": [
+      "Set up for a bench press and unrack the bar over your shoulders.",
+      "Lower the bar under control and stop it just above your chest without touching.",
+      "Hold the pause, then press the bar back up until your arms are straight."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-spoto-press",
+    "aliases": [
+      "Spoto Bench Press",
+      "Paused-Above-Chest Bench Press"
+    ],
+    "muscleGroups": [
+      "Chest"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press",
+    "staple": false,
+    "difficulty": "intermediate",
+    "description": "A bench press paused just above the chest without touching, for control and strength off the chest.",
+    "formCues": [
+      "Stop just above the chest",
+      "Stay tight in the pause",
+      "Press straight up"
+    ],
+    "steps": [
+      "Set up for a bench press and unrack the bar over your shoulders.",
+      "Lower the bar under control.",
+      "Stop it just above your chest without touching and hold the pause.",
+      "Press the bar back up until your arms are straight."
+    ],
+    "mistakes": [
+      "Touching the chest",
+      "Losing tightness in the pause",
+      "Pausing too high"
     ]
   }
 ]

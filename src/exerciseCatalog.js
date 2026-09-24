@@ -117,8 +117,18 @@ export function searchExerciseCatalog(list, query, limit = 25) {
 export function searchCommonFirst(list, query, limit = 25, { exercises = [] } = {}) {
   const owned = exercises.length ? (item) => libraryItemMatch(exercises, item) !== null : null
   const hits = rankedHits(list, query, owned)
-  const common = hits.filter((item) => item.staple)
-  const rest = hits.filter((item) => !item.staple)
+  // req-151 — an exact hit on a listed non-staple's own name (shown name or free-db name) leads
+  // the first tier instead of hiding behind "Show more" ("l-sit" → L-Sit, then Wall Sit). It goes
+  // after any staple exact hits, so a staple that matches exactly still wins as before. With no
+  // staple hit nothing is behind "Show more" (the rest shows directly), so nothing is pulled.
+  const qKey = catalogNameKey(String(query || '').trim())
+  const ownExact = (item) => Boolean(qKey) && [shownName(item), item.name].some((name) => catalogNameKey(name) === qKey)
+  const staples = hits.filter((item) => item.staple)
+  const pulled = staples.length ? hits.filter((item) => !item.staple && listable(item) && ownExact(item)) : []
+  const lead = staples.findIndex((item) => !ownExact(item))
+  const at = lead === -1 ? staples.length : lead
+  const common = [...staples.slice(0, at), ...pulled, ...staples.slice(at)]
+  const rest = hits.filter((item) => !item.staple && !pulled.includes(item))
   return { common: common.slice(0, limit), rest: rest.slice(0, limit), restCount: rest.length }
 }
 
