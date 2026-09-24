@@ -44,29 +44,34 @@ function pinnedSourceText() {
   return `${JSON.stringify(stripped, null, 2)}\n`
 }
 
+// req-133 / DEC-063 — the seed aliases re-judged: the kept ones still resolve as before…
 const SEED_TABLE = {
   'Rowing': 'Rowing, Stationary',
   'Chest Press': 'Leverage Chest Press',
   'Lat Pulldown': 'Wide-Grip Lat Pulldown',
-  'Shoulder Press': 'Machine Shoulder (Military) Press',
-  'Biceps Curl': 'Machine Bicep Curl',
-  'Triceps Press': 'Dip Machine',
   'Ab Machine': 'Ab Crunch Machine',
-  'Plank': 'Plank',
   'Push-Ups': 'Pushups',
   'Stairs': 'Stairmaster',
-  'Leg Press': 'Leg Press',
   'Leg Extension': 'Leg Extensions',
   'Leg Curl': 'Seated Leg Curl',
   'Abduction': 'Thigh Abductor',
   'Adduction': 'Thigh Adductor',
-  'Calf Raises (Leg Press)': 'Calf Press On The Leg Press Machine',
   'Incline DB Press': 'Incline Dumbbell Press',
   'One-Arm DB Row': 'One-Arm Dumbbell Row',
   'Overhead DB Press': 'Dumbbell Shoulder Press',
-  'Pull-Ups (BW)': 'Pullups',
-  'Dips (BW)': 'Dips - Triceps Version',
   'Hanging Knee Raises': 'Hanging Knee Raise',
+}
+
+// …and each dropped one resolves to null or its new target (reasons: reports/req-133.md).
+const DROPPED_SEED_ALIASES = {
+  'Shoulder Press': null, // misleading: barbell, dumbbell and machine all go by it
+  'Biceps Curl': 'Dumbbell Bicep Curl', // misleading on the machine; now the standard dumbbell curl's
+  'Triceps Press': null, // misleading: not the Dip Machine
+  'Plank': 'Plank', // redundant: the entry's own name key
+  'Leg Press': 'Leg Press', // redundant: the entry's own name key
+  'Calf Raises (Leg Press)': null, // tagged form
+  'Pull-Ups (BW)': null, // tagged form
+  'Dips (BW)': null, // tagged form
 }
 
 describe('own copy of free-exercise-db', () => {
@@ -80,9 +85,9 @@ describe('own copy of free-exercise-db', () => {
     assert.equal(`${JSON.stringify(deriveLibrary(source), null, 2)}\n`, LIBRARY_TEXT)
   })
 
-  it('count = 876 free-db + extras + 1 of ours', () => {
+  it('count = 876 free-db + extras + 9 of ours', () => {
     assert.equal(library.filter(isFreeDb).length, 876)
-    assert.equal(library.length, 876 + EXTRA_EXERCISES.length + 1)
+    assert.equal(library.length, 876 + EXTRA_EXERCISES.length + 9)
   })
 
   it('provenance and the Unlicense are recorded beside it', () => {
@@ -152,11 +157,13 @@ describe('alias integrity', () => {
 })
 
 describe('resolver', () => {
-  it('all 22 seed names resolve per the table', () => {
+  it('all 22 seed names resolve per the tables (kept aliases, dropped ones)', () => {
     const names = seed.exercises.map((ex) => ex.name)
     assert.equal(names.length, 22)
+    assert.deepEqual([...names].sort(), [...Object.keys(SEED_TABLE), ...Object.keys(DROPPED_SEED_ALIASES)].sort())
     for (const name of names) {
-      assert.equal(libraryEntryFor({ name }, library)?.name, SEED_TABLE[name], name)
+      const expected = name in SEED_TABLE ? SEED_TABLE[name] : DROPPED_SEED_ALIASES[name]
+      assert.equal(libraryEntryFor({ name }, library)?.name ?? null, expected, name)
     }
   })
 
@@ -185,8 +192,6 @@ describe('search via aliases', () => {
   for (const [query, first] of [
     ['ab machine', 'Ab Crunch Machine'],
     ['stairs', 'Stairmaster'],
-    ['biceps curl', 'Machine Bicep Curl'],
-    ['triceps press', 'Dip Machine'],
     ['leg curl', 'Seated Leg Curl'],
     ['hanging knee raises', 'Hanging Knee Raise'],
   ]) {

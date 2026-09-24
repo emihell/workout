@@ -85,7 +85,9 @@
     ],
     "id": "Ab_Crunch_Machine",
     "aliases": [
-      "Ab Machine"
+      "Ab Machine",
+      "Crunch Machine",
+      "Abdominal Crunch Machine"
     ],
     "muscleGroups": [
       "Core"
@@ -93,7 +95,21 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ab_Crunch_Machine/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ab_Crunch_Machine/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch"
   },
   {
     "name": "Ab Roller",
@@ -119,13 +135,41 @@
       "Ab_Roller/1.jpg"
     ],
     "id": "Ab_Roller",
+    "aliases": [
+      "Ab Wheel",
+      "Ab Wheel Rollout",
+      "Ab Wheel Rollouts",
+      "Ab Rollout"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ab_Roller/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ab_Roller/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "ab-wheel"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-ab-roller"
   },
   {
     "name": "Adductor",
@@ -824,13 +868,36 @@
       "Arnold_Dumbbell_Press/1.jpg"
     ],
     "id": "Arnold_Dumbbell_Press",
+    "aliases": [
+      "Arnold Press",
+      "DB Arnold Press"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Arnold_Dumbbell_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Arnold_Dumbbell_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
   },
   {
     "name": "Around The Worlds",
@@ -1134,13 +1201,41 @@
       "Ball_Leg_Curl/1.jpg"
     ],
     "id": "Ball_Leg_Curl",
+    "aliases": [
+      "Stability Ball Leg Curl",
+      "Stability Ball Hamstring Curl",
+      "Swiss Ball Hamstring Curl"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ball_Leg_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Ball_Leg_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-curl",
+    "equipmentList": [
+      "exercise-ball",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-curl"
   },
   {
     "name": "Band Assisted Pull-Up",
@@ -1168,13 +1263,40 @@
       "Band_Assisted_Pull-Up/1.jpg"
     ],
     "id": "Band_Assisted_Pull-Up",
+    "aliases": [
+      "Band Pull-Up",
+      "Banded Pull-Up"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Assisted_Pull-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Assisted_Pull-Up/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "bands"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up"
   },
   {
     "name": "Band Good Morning",
@@ -1297,13 +1419,40 @@
       "Band_Pull_Apart/1.jpg"
     ],
     "id": "Band_Pull_Apart",
+    "aliases": [
+      "Band Pull-Apart",
+      "Band Pull-Aparts",
+      "Pull-Aparts"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Pull_Apart/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Band_Pull_Apart/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "bands"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rear-delt-fly"
   },
   {
     "name": "Band Skull Crusher",
@@ -1426,13 +1575,43 @@
       "Barbell_Bench_Press_-_Medium_Grip/1.jpg"
     ],
     "id": "Barbell_Bench_Press_-_Medium_Grip",
+    "aliases": [
+      "Bench Press",
+      "Flat Bench Press",
+      "Barbell Bench Press",
+      "BB Bench Press",
+      "Flat Bench"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press"
   },
   {
     "name": "Barbell Curl",
@@ -1459,13 +1638,41 @@
       "Barbell_Curl/1.jpg"
     ],
     "id": "Barbell_Curl",
+    "aliases": [
+      "Barbell Curls",
+      "BB Curl",
+      "Barbell Bicep Curl",
+      "Standing Barbell Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl"
   },
   {
     "name": "Barbell Curls Lying Against An Incline",
@@ -1529,13 +1736,54 @@
       "Barbell_Deadlift/1.jpg"
     ],
     "id": "Barbell_Deadlift",
+    "aliases": [
+      "Deadlift",
+      "Deadlifts",
+      "Conventional Deadlift",
+      "BB Deadlift"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Deadlift/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-deadlift"
   },
   {
     "name": "Barbell Full Squat",
@@ -1598,13 +1846,35 @@
       "Barbell_Glute_Bridge/1.jpg"
     ],
     "id": "Barbell_Glute_Bridge",
+    "aliases": [
+      "Barbell Bridge",
+      "Barbell Glute Bridges"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Glute_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Glute_Bridge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "bridge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hip-thrust"
   },
   {
     "name": "Barbell Guillotine Bench Press",
@@ -1698,13 +1968,42 @@
       "Barbell_Hip_Thrust/1.jpg"
     ],
     "id": "Barbell_Hip_Thrust",
+    "aliases": [
+      "Hip Thrust",
+      "Hip Thrusts",
+      "Barbell Hip Thrusts",
+      "BB Hip Thrust"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Hip_Thrust/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Hip_Thrust/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "bridge",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hip-thrust"
   },
   {
     "name": "Barbell Incline Bench Press - Medium Grip",
@@ -1732,13 +2031,42 @@
       "Barbell_Incline_Bench_Press_-_Medium_Grip/1.jpg"
     ],
     "id": "Barbell_Incline_Bench_Press_-_Medium_Grip",
+    "aliases": [
+      "Incline Bench Press",
+      "Incline Barbell Press",
+      "Incline Bench",
+      "BB Incline Press"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Incline_Bench_Press_-_Medium_Grip/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Incline_Bench_Press_-_Medium_Grip/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-incline-press"
   },
   {
     "name": "Barbell Incline Shoulder Raise",
@@ -1799,13 +2127,43 @@
       "Barbell_Lunge/1.jpg"
     ],
     "id": "Barbell_Lunge",
+    "aliases": [
+      "Barbell Lunges",
+      "BB Lunge"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Lunge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Lunge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge"
   },
   {
     "name": "Barbell Rear Delt Row",
@@ -1964,13 +2322,35 @@
       "Barbell_Shrug/1.jpg"
     ],
     "id": "Barbell_Shrug",
+    "aliases": [
+      "Barbell Shrugs",
+      "BB Shrug"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Shrug/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Shrug/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "shrug",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-shrug"
   },
   {
     "name": "Barbell Shrug Behind The Back",
@@ -2100,13 +2480,50 @@
       "Barbell_Squat/1.jpg"
     ],
     "id": "Barbell_Squat",
+    "aliases": [
+      "Squat",
+      "Squats",
+      "Back Squat",
+      "Barbell Back Squat",
+      "BB Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Barbell_Squat/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
   },
   {
     "name": "Barbell Squat To A Bench",
@@ -2241,13 +2658,40 @@
       "Battling_Ropes/1.jpg"
     ],
     "id": "Battling_Ropes",
+    "aliases": [
+      "Battle Ropes",
+      "Battle Rope",
+      "Rope Waves"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Battling_Ropes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Battling_Ropes/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "battle-ropes"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-battling-ropes"
   },
   {
     "name": "Bear Crawl Sled Drags",
@@ -2338,13 +2782,40 @@
       "Bench_Dips/1.jpg"
     ],
     "id": "Bench_Dips",
+    "aliases": [
+      "Bench Dip",
+      "Chair Dips"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bench_Dips/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bench_Dips/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "bench",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
   },
   {
     "name": "Bench Jump",
@@ -2649,13 +3120,49 @@
       "Bent_Over_Barbell_Row/1.jpg"
     ],
     "id": "Bent_Over_Barbell_Row",
+    "aliases": [
+      "Barbell Row",
+      "Bent-Over Row",
+      "Barbell Bent-Over Row",
+      "BB Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Barbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Barbell_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
@@ -2821,13 +3328,49 @@
       "Bent_Over_Two-Dumbbell_Row/1.jpg"
     ],
     "id": "Bent_Over_Two-Dumbbell_Row",
+    "aliases": [
+      "Dumbbell Bent-Over Row",
+      "Bent-Over Dumbbell Row",
+      "Two-Arm Dumbbell Row",
+      "DB Bent-Over Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Two-Dumbbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bent_Over_Two-Dumbbell_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "Bent Over Two-Dumbbell Row With Palms In",
@@ -2953,13 +3496,45 @@
       "Bicycling_Stationary/1.jpg"
     ],
     "id": "Bicycling_Stationary",
+    "aliases": [
+      "Stationary Bike",
+      "Exercise Bike",
+      "Spin Bike",
+      "Indoor Cycling"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bicycling_Stationary/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bicycling_Stationary/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-stationary-bike"
   },
   {
     "name": "Board Press",
@@ -3151,13 +3726,44 @@
       "Bodyweight_Squat/1.jpg"
     ],
     "id": "Bodyweight_Squat",
+    "aliases": [
+      "Air Squat",
+      "Air Squats",
+      "Bodyweight Squats"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Squat/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
   },
   {
     "name": "Bodyweight Walking Lunge",
@@ -3185,13 +3791,43 @@
       "Bodyweight_Walking_Lunge/1.jpg"
     ],
     "id": "Bodyweight_Walking_Lunge",
+    "aliases": [
+      "Walking Lunge",
+      "Walking Lunges"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Walking_Lunge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Bodyweight_Walking_Lunge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge"
   },
   {
     "name": "Bosu Ball Cable Crunch With Side Bends",
@@ -3588,13 +4224,36 @@
       "Butt_Lift_Bridge/1.jpg"
     ],
     "id": "Butt_Lift_Bridge",
+    "aliases": [
+      "Glute Bridge",
+      "Glute Bridges",
+      "Hip Bridge"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butt_Lift_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butt_Lift_Bridge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "bridge",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hip-thrust"
   },
   {
     "name": "Butterfly",
@@ -3619,13 +4278,38 @@
       "Butterfly/1.jpg"
     ],
     "id": "Butterfly",
+    "aliases": [
+      "Pec Deck",
+      "Pec Deck Fly",
+      "Pec Fly",
+      "Machine Fly",
+      "Machine Chest Fly"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butterfly/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Butterfly/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-fly"
   },
   {
     "name": "Cable Chest Press",
@@ -3685,13 +4369,38 @@
       "Cable_Crossover/1.jpg"
     ],
     "id": "Cable_Crossover",
+    "aliases": [
+      "Cable Fly",
+      "Cable Flye",
+      "Cable Chest Fly",
+      "Cable Crossovers",
+      "High-to-Low Cable Fly"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Crossover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Crossover/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-fly"
   },
   {
     "name": "Cable Crunch",
@@ -3717,13 +4426,31 @@
       "Cable_Crunch/1.jpg"
     ],
     "id": "Cable_Crunch",
+    "aliases": [
+      "Kneeling Cable Crunch",
+      "Cable Crunches"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Crunch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Crunch/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch"
   },
   {
     "name": "Cable Deadlifts",
@@ -3784,13 +4511,40 @@
       "Cable_Hammer_Curls_-_Rope_Attachment/1.jpg"
     ],
     "id": "Cable_Hammer_Curls_-_Rope_Attachment",
+    "aliases": [
+      "Rope Hammer Curl",
+      "Cable Hammer Curl",
+      "Cable Rope Hammer Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Hammer_Curls_-_Rope_Attachment/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Hammer_Curls_-_Rope_Attachment/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hammer-curl"
   },
   {
     "name": "Cable Hip Adduction",
@@ -4100,13 +4854,39 @@
       "Cable_Rear_Delt_Fly/1.jpg"
     ],
     "id": "Cable_Rear_Delt_Fly",
+    "aliases": [
+      "Cable Reverse Fly",
+      "Cable Rear Delt Flye"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rear_Delt_Fly/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rear_Delt_Fly/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rear-delt-fly"
   },
   {
     "name": "Cable Reverse Crunch",
@@ -4163,13 +4943,32 @@
       "Cable_Rope_Overhead_Triceps_Extension/1.jpg"
     ],
     "id": "Cable_Rope_Overhead_Triceps_Extension",
+    "aliases": [
+      "Overhead Rope Extension",
+      "Overhead Cable Triceps Extension",
+      "Cable Overhead Tricep Extension"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rope_Overhead_Triceps_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Cable_Rope_Overhead_Triceps_Extension/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-triceps-extension"
   },
   {
     "name": "Cable Rope Rear-Delt Rows",
@@ -4485,7 +5284,9 @@
     ],
     "id": "Calf_Press_On_The_Leg_Press_Machine",
     "aliases": [
-      "Calf Raises (Leg Press)"
+      "Leg Press Calf Raise",
+      "Leg Press Calf Raises",
+      "Calf Press on Leg Press"
     ],
     "muscleGroups": [
       "Legs"
@@ -4493,7 +5294,21 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Calf_Press_On_The_Leg_Press_Machine/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Calf_Press_On_The_Leg_Press_Machine/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "calf-raise",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-calf-raise"
   },
   {
     "name": "Calf Raise On A Dumbbell",
@@ -5255,13 +6070,43 @@
       "Chin-Up/1.jpg"
     ],
     "id": "Chin-Up",
+    "aliases": [
+      "Chin Up",
+      "Chin-Ups",
+      "Chinups",
+      "Underhand Pull-Up"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Chin-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Chin-Up/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up"
   },
   {
     "name": "Chin To Chest Stretch",
@@ -5506,13 +6351,51 @@
       "Clean_and_Jerk/1.jpg"
     ],
     "id": "Clean_and_Jerk",
+    "aliases": [
+      "Clean & Jerk"
+    ],
     "muscleGroups": [
-      "Shoulders"
+      "Shoulders",
+      "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean_and_Jerk/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Clean_and_Jerk/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-clean"
   },
   {
     "name": "Clean and Press",
@@ -5655,13 +6538,42 @@
       "Close-Grip_Barbell_Bench_Press/1.jpg"
     ],
     "id": "Close-Grip_Barbell_Bench_Press",
+    "aliases": [
+      "Close-Grip Bench Press",
+      "Close Grip Bench",
+      "CGBP"
+    ],
     "muscleGroups": [
+      "Chest",
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Barbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Barbell_Bench_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press"
   },
   {
     "name": "Close-Grip Dumbbell Press",
@@ -5990,13 +6902,36 @@
       "Concentration_Curls/1.jpg"
     ],
     "id": "Concentration_Curls",
+    "aliases": [
+      "Concentration Curl",
+      "Seated Concentration Curl",
+      "DB Concentration Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Concentration_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Concentration_Curls/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-concentration-curls"
   },
   {
     "name": "Cross-Body Crunch",
@@ -6249,13 +7184,31 @@
       "Crunches/1.jpg"
     ],
     "id": "Crunches",
+    "aliases": [
+      "Crunch",
+      "Floor Crunch"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Crunches/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Crunches/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch"
   },
   {
     "name": "Cuban Press",
@@ -6348,13 +7301,35 @@
       "Dead_Bug/1.jpg"
     ],
     "id": "Dead_Bug",
+    "aliases": [
+      "Dead Bugs",
+      "Deadbug"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dead_Bug/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dead_Bug/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dead-bug"
   },
   {
     "name": "Deadlift with Bands",
@@ -6456,13 +7431,40 @@
       "Decline_Barbell_Bench_Press/1.jpg"
     ],
     "id": "Decline_Barbell_Bench_Press",
+    "aliases": [
+      "Decline Bench Press",
+      "Decline Bench"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Barbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Barbell_Bench_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "mid-lower-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press"
   },
   {
     "name": "Decline Close-Grip Bench To Skull Crusher",
@@ -6717,13 +7719,40 @@
       "Decline_Push-Up/1.jpg"
     ],
     "id": "Decline_Push-Up",
+    "aliases": [
+      "Feet-Elevated Push-Up",
+      "Decline Push-Ups"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Push-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Decline_Push-Up/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight",
+      "bench"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up"
   },
   {
     "name": "Decline Reverse Crunch",
@@ -6889,7 +7918,9 @@
     ],
     "id": "Dip_Machine",
     "aliases": [
-      "Triceps Press"
+      "Seated Dip Machine",
+      "Triceps Dip Machine",
+      "Seated Dip"
     ],
     "muscleGroups": [
       "Arms"
@@ -6897,7 +7928,29 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dip_Machine/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dip_Machine/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
   },
   {
     "name": "Dips - Chest Version",
@@ -6924,13 +7977,41 @@
       "Dips_-_Chest_Version/1.jpg"
     ],
     "id": "Dips_-_Chest_Version",
+    "aliases": [
+      "Chest Dips",
+      "Chest Dip"
+    ],
     "muscleGroups": [
-      "Chest"
+      "Chest",
+      "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Chest_Version/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Chest_Version/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "mid-lower-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "dip-bars",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
   },
   {
     "name": "Dips - Triceps Version",
@@ -6958,7 +8039,10 @@
     ],
     "id": "Dips_-_Triceps_Version",
     "aliases": [
-      "Dips (BW)"
+      "Dips",
+      "Dip",
+      "Triceps Dips",
+      "Tricep Dips"
     ],
     "muscleGroups": [
       "Arms"
@@ -6966,7 +8050,30 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Triceps_Version/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dips_-_Triceps_Version/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "mid-lower-chest",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "dip-bars",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
   },
   {
     "name": "Donkey Calf Raises",
@@ -7364,13 +8471,42 @@
       "Dumbbell_Bench_Press/1.jpg"
     ],
     "id": "Dumbbell_Bench_Press",
+    "aliases": [
+      "DB Bench Press",
+      "DB Bench",
+      "Flat Dumbbell Press",
+      "Dumbbell Chest Press"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Bench_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press"
   },
   {
     "name": "Dumbbell Bench Press with Neutral Grip",
@@ -7429,13 +8565,44 @@
       "Dumbbell_Bicep_Curl/1.jpg"
     ],
     "id": "Dumbbell_Bicep_Curl",
+    "aliases": [
+      "Bicep Curl",
+      "Biceps Curl",
+      "Bicep Curls",
+      "Dumbbell Curl",
+      "Dumbbell Curls",
+      "DB Curl",
+      "Dumbbell Biceps Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Bicep_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Bicep_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl"
   },
   {
     "name": "Dumbbell Clean",
@@ -7531,13 +8698,37 @@
       "Dumbbell_Flyes/1.jpg"
     ],
     "id": "Dumbbell_Flyes",
+    "aliases": [
+      "Dumbbell Fly",
+      "DB Fly",
+      "Flat Dumbbell Fly"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Flyes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Flyes/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-fly"
   },
   {
     "name": "Dumbbell Incline Row",
@@ -7566,13 +8757,46 @@
       "Dumbbell_Incline_Row/1.jpg"
     ],
     "id": "Dumbbell_Incline_Row",
+    "aliases": [
+      "Chest-Supported Dumbbell Row",
+      "Chest-Supported Row",
+      "Incline Dumbbell Row",
+      "Incline DB Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Incline_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Incline_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "Dumbbell Incline Shoulder Raise",
@@ -7633,13 +8857,47 @@
       "Dumbbell_Lunges/1.jpg"
     ],
     "id": "Dumbbell_Lunges",
+    "aliases": [
+      "Lunge",
+      "Lunges",
+      "Dumbbell Lunge",
+      "DB Lunge",
+      "DB Lunges",
+      "Dumbbell Forward Lunge"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Lunges/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Lunges/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge"
   },
   {
     "name": "Dumbbell Lying One-Arm Rear Lateral Raise",
@@ -7959,13 +9217,45 @@
       "Dumbbell_Rear_Lunge/1.jpg"
     ],
     "id": "Dumbbell_Rear_Lunge",
+    "aliases": [
+      "Reverse Lunge",
+      "Reverse Lunges",
+      "Dumbbell Reverse Lunge",
+      "DB Reverse Lunge"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Rear_Lunge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Rear_Lunge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge"
   },
   {
     "name": "Dumbbell Scaption",
@@ -8091,7 +9381,10 @@
     ],
     "id": "Dumbbell_Shoulder_Press",
     "aliases": [
-      "Overhead DB Press"
+      "Overhead DB Press",
+      "DB Shoulder Press",
+      "Dumbbell Overhead Press",
+      "Seated DB Shoulder Press"
     ],
     "muscleGroups": [
       "Shoulders"
@@ -8099,7 +9392,26 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Shoulder_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Shoulder_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
   },
   {
     "name": "Dumbbell Shrug",
@@ -8123,13 +9435,36 @@
       "Dumbbell_Shrug/1.jpg"
     ],
     "id": "Dumbbell_Shrug",
+    "aliases": [
+      "Dumbbell Shrugs",
+      "DB Shrug",
+      "DB Shrugs"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Shrug/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Shrug/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "shrug",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-shrug"
   },
   {
     "name": "Dumbbell Side Bend",
@@ -8153,13 +9488,35 @@
       "Dumbbell_Side_Bend/1.jpg"
     ],
     "id": "Dumbbell_Side_Bend",
+    "aliases": [
+      "DB Side Bend",
+      "Side Bends"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Side_Bend/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Side_Bend/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-dumbbell-side-bend"
   },
   {
     "name": "Dumbbell Squat",
@@ -8259,13 +9616,46 @@
       "Dumbbell_Step_Ups/1.jpg"
     ],
     "id": "Dumbbell_Step_Ups",
+    "aliases": [
+      "Step-Ups",
+      "Step-Up",
+      "Dumbbell Step-Up",
+      "DB Step-Up"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Step_Ups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Dumbbell_Step_Ups/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "dumbbell",
+      "box"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lunge"
   },
   {
     "name": "Dumbbell Tricep Extension -Pronated Grip",
@@ -8378,13 +9768,41 @@
       "EZ-Bar_Curl/1.jpg"
     ],
     "id": "EZ-Bar_Curl",
+    "aliases": [
+      "EZ Bar Curl",
+      "EZ Curl",
+      "EZ-Bar Curls",
+      "EZ Bar Bicep Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/EZ-Bar_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/EZ-Bar_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "ez-bar"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl"
   },
   {
     "name": "EZ-Bar Skullcrusher",
@@ -8410,13 +9828,35 @@
       "EZ-Bar_Skullcrusher/1.jpg"
     ],
     "id": "EZ-Bar_Skullcrusher",
+    "aliases": [
+      "Skull Crusher",
+      "Skull Crushers",
+      "Skullcrusher",
+      "Skullcrushers",
+      "EZ Bar Skull Crusher"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/EZ-Bar_Skullcrusher/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/EZ-Bar_Skullcrusher/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "ez-bar",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-skull-crusher"
   },
   {
     "name": "Elbow Circles",
@@ -8602,13 +10042,44 @@
       "Elliptical_Trainer/1.jpg"
     ],
     "id": "Elliptical_Trainer",
+    "aliases": [
+      "Elliptical",
+      "Elliptical Machine",
+      "Cross Trainer"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Elliptical_Trainer/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Elliptical_Trainer/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-elliptical-trainer"
   },
   {
     "name": "Exercise Ball Crunch",
@@ -8817,13 +10288,44 @@
       "Face_Pull/1.jpg"
     ],
     "id": "Face_Pull",
+    "aliases": [
+      "Face Pulls",
+      "Cable Face Pull",
+      "Rope Face Pull"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Face_Pull/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Face_Pull/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "rotator-cuff",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-face-pull"
   },
   {
     "name": "Farmer's Walk",
@@ -8853,13 +10355,53 @@
       "Farmers_Walk/1.jpg"
     ],
     "id": "Farmers_Walk",
+    "aliases": [
+      "Farmer Walk",
+      "Farmers Walk",
+      "Farmer Carry",
+      "Farmers Carry",
+      "Farmer's Carry"
+    ],
     "muscleGroups": [
+      "Back",
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Farmers_Walk/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Farmers_Walk/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "forearms",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "carry",
+    "equipmentList": [
+      "dumbbell",
+      "kettlebell",
+      "trap-bar"
+    ],
+    "logAs": "weight-time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-farmers-walk"
   },
   {
     "name": "Fast Skipping",
@@ -9012,13 +10554,37 @@
       "Flat_Bench_Lying_Leg_Raise/1.jpg"
     ],
     "id": "Flat_Bench_Lying_Leg_Raise",
+    "aliases": [
+      "Lying Leg Raise",
+      "Lying Leg Raises",
+      "Bench Leg Raise"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Flat_Bench_Lying_Leg_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Flat_Bench_Lying_Leg_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bench",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise"
   },
   {
     "name": "Flexor Incline Dumbbell Curls",
@@ -9410,13 +10976,44 @@
       "Front_Barbell_Squat/1.jpg"
     ],
     "id": "Front_Barbell_Squat",
+    "aliases": [
+      "Front Squat",
+      "Front Squats",
+      "Barbell Front Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Barbell_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Barbell_Squat/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
   },
   {
     "name": "Front Barbell Squat To A Bench",
@@ -9482,13 +11079,44 @@
       "Front_Box_Jump/1.jpg"
     ],
     "id": "Front_Box_Jump",
+    "aliases": [
+      "Box Jump",
+      "Box Jumps"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Box_Jump/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Box_Jump/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "plyometric",
+    "equipmentList": [
+      "box",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-front-box-jump"
   },
   {
     "name": "Front Cable Raise",
@@ -9580,13 +11208,40 @@
       "Front_Dumbbell_Raise/1.jpg"
     ],
     "id": "Front_Dumbbell_Raise",
+    "aliases": [
+      "Front Raise",
+      "Dumbbell Front Raise",
+      "DB Front Raise"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Dumbbell_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Front_Dumbbell_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "front-delt",
+        "role": "primary"
+      },
+      {
+        "id": "side-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-front-dumbbell-raise"
   },
   {
     "name": "Front Incline Dumbbell Raise",
@@ -9899,13 +11554,41 @@
       "Glute_Ham_Raise/1.jpg"
     ],
     "id": "Glute_Ham_Raise",
+    "aliases": [
+      "GHR",
+      "Glute-Ham Raise",
+      "GHD Raise"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Glute_Ham_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Glute_Ham_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-curl",
+    "equipmentList": [
+      "roman-chair",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-glute-ham-raise"
   },
   {
     "name": "Glute Kickback",
@@ -9931,13 +11614,36 @@
       "Glute_Kickback/1.jpg"
     ],
     "id": "Glute_Kickback",
+    "aliases": [
+      "Donkey Kick",
+      "Donkey Kicks",
+      "Quadruped Hip Extension"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Glute_Kickback/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Glute_Kickback/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-extension",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-glute-kickback"
   },
   {
     "name": "Goblet Squat",
@@ -9965,13 +11671,45 @@
       "Goblet_Squat/1.jpg"
     ],
     "id": "Goblet_Squat",
+    "aliases": [
+      "Goblet Squats",
+      "Dumbbell Goblet Squat",
+      "KB Goblet Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Goblet_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Goblet_Squat/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "kettlebell",
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
   },
   {
     "name": "Good Morning",
@@ -9998,13 +11736,40 @@
       "Good_Morning/1.jpg"
     ],
     "id": "Good_Morning",
+    "aliases": [
+      "Good Mornings",
+      "Barbell Good Morning"
+    ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Good_Morning/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Good_Morning/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-good-morning"
   },
   {
     "name": "Good Morning off Pins",
@@ -10159,13 +11924,39 @@
       "Hack_Squat/1.jpg"
     ],
     "id": "Hack_Squat",
+    "aliases": [
+      "Hack Squat Machine",
+      "Machine Hack Squat"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hack_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hack_Squat/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
   },
   {
     "name": "Hammer Curls",
@@ -10190,13 +11981,40 @@
       "Hammer_Curls/1.jpg"
     ],
     "id": "Hammer_Curls",
+    "aliases": [
+      "Hammer Curl",
+      "Dumbbell Hammer Curl",
+      "DB Hammer Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hammer_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hammer_Curls/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hammer-curl"
   },
   {
     "name": "Hammer Grip Incline DB Bench Press",
@@ -10534,13 +12352,44 @@
       "Hanging_Leg_Raise/1.jpg"
     ],
     "id": "Hanging_Leg_Raise",
+    "aliases": [
+      "Hanging Leg Raises",
+      "Hanging Straight Leg Raise"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hanging_Leg_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hanging_Leg_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "obliques",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise"
   },
   {
     "name": "Hanging Pike",
@@ -10924,13 +12773,44 @@
       "Hyperextensions_Back_Extensions/1.jpg"
     ],
     "id": "Hyperextensions_Back_Extensions",
+    "aliases": [
+      "Back Extension",
+      "Back Extensions",
+      "Hyperextension",
+      "45-Degree Back Extension",
+      "Roman Chair Back Extension"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hyperextensions_Back_Extensions/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Hyperextensions_Back_Extensions/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "roman-chair",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-hyperextensions-back-extensions"
   },
   {
     "name": "Hyperextensions With No Hyperextension Bench",
@@ -11248,13 +13128,41 @@
       "Incline_Dumbbell_Curl/1.jpg"
     ],
     "id": "Incline_Dumbbell_Curl",
+    "aliases": [
+      "Incline Curl",
+      "Incline DB Curl",
+      "Incline Dumbbell Curls"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl"
   },
   {
     "name": "Incline Dumbbell Flyes",
@@ -11282,13 +13190,37 @@
       "Incline_Dumbbell_Flyes/1.jpg"
     ],
     "id": "Incline_Dumbbell_Flyes",
+    "aliases": [
+      "Incline Dumbbell Fly",
+      "Incline DB Fly",
+      "Incline Fly"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Flyes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Flyes/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-fly"
   },
   {
     "name": "Incline Dumbbell Flyes - With A Twist",
@@ -11353,7 +13285,9 @@
     ],
     "id": "Incline_Dumbbell_Press",
     "aliases": [
-      "Incline DB Press"
+      "Incline DB Press",
+      "Incline Dumbbell Bench Press",
+      "Incline DB Bench"
     ],
     "muscleGroups": [
       "Chest"
@@ -11361,7 +13295,30 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Dumbbell_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-incline-press"
   },
   {
     "name": "Incline Hammer Curls",
@@ -11447,13 +13404,40 @@
       "Incline_Push-Up/1.jpg"
     ],
     "id": "Incline_Push-Up",
+    "aliases": [
+      "Hands-Elevated Push-Up",
+      "Incline Push-Ups"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Push-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Incline_Push-Up/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "mid-lower-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight",
+      "bench"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up"
   },
   {
     "name": "Incline Push-Up Close-Grip",
@@ -11739,13 +13723,45 @@
       "Inverted_Row/1.jpg"
     ],
     "id": "Inverted_Row",
+    "aliases": [
+      "Australian Pull-Up",
+      "Bodyweight Row",
+      "Body Row",
+      "Inverted Rows"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Inverted_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Inverted_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-inverted-row"
   },
   {
     "name": "Inverted Row with Straps",
@@ -12027,13 +14043,36 @@
       "Jackknife_Sit-Up/1.jpg"
     ],
     "id": "Jackknife_Sit-Up",
+    "aliases": [
+      "V-Up",
+      "V-Ups",
+      "Jackknife"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Jackknife_Sit-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Jackknife_Sit-Up/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-jackknife-sit-up"
   },
   {
     "name": "Janda Sit-Up",
@@ -12749,13 +14788,49 @@
       "Kettlebell_Turkish_Get-Up_Lunge_style/1.jpg"
     ],
     "id": "Kettlebell_Turkish_Get-Up_Lunge_style",
+    "aliases": [
+      "Turkish Get-Up",
+      "Turkish Getup",
+      "TGU"
+    ],
     "muscleGroups": [
-      "Shoulders"
+      "Shoulders",
+      "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Turkish_Get-Up_Lunge_style/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Kettlebell_Turkish_Get-Up_Lunge_style/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "obliques",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "kettlebell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-kettlebell-turkish-get-up-lunge-style"
   },
   {
     "name": "Kettlebell Turkish Get-Up (Squat style)",
@@ -12951,13 +15026,37 @@
       "Knee_Hip_Raise_On_Parallel_Bars/1.jpg"
     ],
     "id": "Knee_Hip_Raise_On_Parallel_Bars",
+    "aliases": [
+      "Captain's Chair Knee Raise",
+      "Vertical Knee Raise",
+      "Roman Chair Knee Raise"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Knee_Hip_Raise_On_Parallel_Bars/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Knee_Hip_Raise_On_Parallel_Bars/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "roman-chair",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise"
   },
   {
     "name": "Knee Tuck Jump",
@@ -13609,7 +15708,10 @@
     ],
     "id": "Leg_Extensions",
     "aliases": [
-      "Leg Extension"
+      "Leg Extension",
+      "Leg Extension Machine",
+      "Quad Extension",
+      "Knee Extension"
     ],
     "muscleGroups": [
       "Legs"
@@ -13617,7 +15719,21 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leg_Extensions/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leg_Extensions/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      }
+    ],
+    "pattern": "leg-extension",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-extensions"
   },
   {
     "name": "Leg Lift",
@@ -13680,7 +15796,8 @@
     ],
     "id": "Leg_Press",
     "aliases": [
-      "Leg Press"
+      "Leg Press Machine",
+      "45-Degree Leg Press"
     ],
     "muscleGroups": [
       "Legs"
@@ -13688,7 +15805,33 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leg_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leg_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-press"
   },
   {
     "name": "Leg Pull-In",
@@ -13746,7 +15889,10 @@
     ],
     "id": "Leverage_Chest_Press",
     "aliases": [
-      "Chest Press"
+      "Chest Press",
+      "Machine Chest Press",
+      "Chest Press Machine",
+      "Seated Chest Press"
     ],
     "muscleGroups": [
       "Chest"
@@ -13754,7 +15900,29 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Chest_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Chest_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press"
   },
   {
     "name": "Leverage Deadlift",
@@ -13875,13 +16043,40 @@
       "Leverage_Incline_Chest_Press/1.jpg"
     ],
     "id": "Leverage_Incline_Chest_Press",
+    "aliases": [
+      "Incline Chest Press",
+      "Machine Incline Press",
+      "Incline Machine Press"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Incline_Chest_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Incline_Chest_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-incline-press"
   },
   {
     "name": "Leverage Iso Row",
@@ -13907,13 +16102,44 @@
       "Leverage_Iso_Row/1.jpg"
     ],
     "id": "Leverage_Iso_Row",
+    "aliases": [
+      "Machine Row",
+      "Seated Machine Row",
+      "Chest-Supported Machine Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Iso_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Leverage_Iso_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "Leverage Shoulder Press",
@@ -14205,13 +16431,35 @@
       "Low_Cable_Crossover/1.jpg"
     ],
     "id": "Low_Cable_Crossover",
+    "aliases": [
+      "Low-to-High Cable Fly",
+      "Low Cable Fly"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Low_Cable_Crossover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Low_Cable_Crossover/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "upper-chest",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-fly"
   },
   {
     "name": "Low Cable Triceps Extension",
@@ -14650,13 +16898,33 @@
       "Lying_Dumbbell_Tricep_Extension/1.jpg"
     ],
     "id": "Lying_Dumbbell_Tricep_Extension",
+    "aliases": [
+      "Dumbbell Skull Crusher",
+      "DB Skull Crusher",
+      "Dumbbell Skullcrusher"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Dumbbell_Tricep_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Dumbbell_Tricep_Extension/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-skull-crusher"
   },
   {
     "name": "Lying Face Down Plate Neck Resistance",
@@ -14833,13 +17101,36 @@
       "Lying_Leg_Curls/1.jpg"
     ],
     "id": "Lying_Leg_Curls",
+    "aliases": [
+      "Lying Leg Curl",
+      "Prone Leg Curl",
+      "Lying Hamstring Curl"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Leg_Curls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Lying_Leg_Curls/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-curl",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-curl"
   },
   {
     "name": "Lying Machine Squat",
@@ -15125,7 +17416,10 @@
     ],
     "id": "Machine_Bicep_Curl",
     "aliases": [
-      "Biceps Curl"
+      "Machine Curl",
+      "Machine Biceps Curl",
+      "Bicep Curl Machine",
+      "Biceps Curl Machine"
     ],
     "muscleGroups": [
       "Arms"
@@ -15133,7 +17427,25 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Bicep_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Bicep_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl"
   },
   {
     "name": "Machine Preacher Curls",
@@ -15192,7 +17504,9 @@
     ],
     "id": "Machine_Shoulder_Military_Press",
     "aliases": [
-      "Shoulder Press"
+      "Machine Shoulder Press",
+      "Shoulder Press Machine",
+      "Seated Shoulder Press Machine"
     ],
     "muscleGroups": [
       "Shoulders"
@@ -15200,7 +17514,25 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Shoulder_Military_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Shoulder_Military_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
   },
   {
     "name": "Machine Triceps Extension",
@@ -15224,13 +17556,32 @@
       "Machine_Triceps_Extension/1.jpg"
     ],
     "id": "Machine_Triceps_Extension",
+    "aliases": [
+      "Triceps Extension Machine",
+      "Tricep Machine",
+      "Seated Triceps Extension Machine"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Triceps_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Machine_Triceps_Extension/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-machine-triceps-extension"
   },
   {
     "name": "Medicine Ball Chest Pass",
@@ -15480,13 +17831,42 @@
       "Mountain_Climbers/1.jpg"
     ],
     "id": "Mountain_Climbers",
+    "aliases": [
+      "Mountain Climber"
+    ],
     "muscleGroups": [
-      "Legs"
+      "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Mountain_Climbers/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Mountain_Climbers/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-mountain-climbers"
   },
   {
     "name": "Moving Claw Series",
@@ -15728,13 +18108,40 @@
       "Natural_Glute_Ham_Raise/1.jpg"
     ],
     "id": "Natural_Glute_Ham_Raise",
+    "aliases": [
+      "Nordic Curl",
+      "Nordic Curls",
+      "Nordic Hamstring Curl"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Natural_Glute_Ham_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Natural_Glute_Ham_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-curl",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-glute-ham-raise"
   },
   {
     "name": "Neck-SMR",
@@ -15983,7 +18390,11 @@
     ],
     "id": "One-Arm_Dumbbell_Row",
     "aliases": [
-      "One-Arm DB Row"
+      "One-Arm DB Row",
+      "DB Row",
+      "Dumbbell Row",
+      "Single-Arm Dumbbell Row",
+      "One-Arm Row"
     ],
     "muscleGroups": [
       "Back"
@@ -15991,7 +18402,34 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Dumbbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Dumbbell_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "One-Arm Flat Bench Dumbbell Flye",
@@ -16474,13 +18912,47 @@
       "One-Arm_Kettlebell_Swings/1.jpg"
     ],
     "id": "One-Arm_Kettlebell_Swings",
+    "aliases": [
+      "Single-Arm Kettlebell Swing",
+      "One-Arm KB Swing"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Swings/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Arm_Kettlebell_Swings/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "kettlebell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-kettlebell-swing"
   },
   {
     "name": "One-Arm Long Bar Row",
@@ -16716,13 +19188,35 @@
       "One-Legged_Cable_Kickback/1.jpg"
     ],
     "id": "One-Legged_Cable_Kickback",
+    "aliases": [
+      "Cable Glute Kickback",
+      "Glute Cable Kickback"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Legged_Cable_Kickback/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/One-Legged_Cable_Kickback/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hip-extension",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-glute-kickback"
   },
   {
     "name": "One Arm Against Wall",
@@ -17276,13 +19770,43 @@
       "Overhead_Slam/1.jpg"
     ],
     "id": "Overhead_Slam",
+    "aliases": [
+      "Ball Slam",
+      "Ball Slams",
+      "Medicine Ball Slam",
+      "Med Ball Slam",
+      "Slam Ball"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Overhead_Slam/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Overhead_Slam/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "plyometric",
+    "equipmentList": [
+      "medicine-ball"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-slam"
   },
   {
     "name": "Overhead Squat",
@@ -17416,13 +19940,36 @@
       "Pallof_Press/1.jpg"
     ],
     "id": "Pallof_Press",
+    "aliases": [
+      "Pallof Presses",
+      "Cable Pallof Press",
+      "Anti-Rotation Press"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pallof_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pallof_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "primary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-pallof-press"
   },
   {
     "name": "Pallof Press With Rotation",
@@ -17831,7 +20378,9 @@
     ],
     "id": "Plank",
     "aliases": [
-      "Plank"
+      "Front Plank",
+      "Forearm Plank",
+      "Planks"
     ],
     "muscleGroups": [
       "Core"
@@ -17839,7 +20388,29 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plank/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Plank/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "obliques",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-plank"
   },
   {
     "name": "Plate Pinch",
@@ -18118,13 +20689,55 @@
       "Power_Clean/1.jpg"
     ],
     "id": "Power_Clean",
+    "aliases": [
+      "Barbell Power Clean"
+    ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Power_Clean/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Power_Clean/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-clean"
   },
   {
     "name": "Power Clean from Blocks",
@@ -18368,13 +20981,37 @@
       "Preacher_Curl/1.jpg"
     ],
     "id": "Preacher_Curl",
+    "aliases": [
+      "Barbell Preacher Curl",
+      "Preacher Curls",
+      "Scott Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Preacher_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Preacher_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-preacher-curl"
   },
   {
     "name": "Preacher Hammer Dumbbell Curl",
@@ -18529,13 +21166,39 @@
       "Pull_Through/1.jpg"
     ],
     "id": "Pull_Through",
+    "aliases": [
+      "Cable Pull-Through",
+      "Cable Pull Through"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pull_Through/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pull_Through/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-through"
   },
   {
     "name": "Pullups",
@@ -18564,7 +21227,9 @@
     ],
     "id": "Pullups",
     "aliases": [
-      "Pull-Ups (BW)"
+      "Pull-Up",
+      "Pull-Ups",
+      "Pull Up"
     ],
     "muscleGroups": [
       "Back"
@@ -18572,7 +21237,30 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pullups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pullups/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up"
   },
   {
     "name": "Push-Up Wide",
@@ -18633,13 +21321,41 @@
       "Push-Ups_-_Close_Triceps_Position/1.jpg"
     ],
     "id": "Push-Ups_-_Close_Triceps_Position",
+    "aliases": [
+      "Diamond Push-Up",
+      "Diamond Push-Ups",
+      "Close-Grip Push-Up",
+      "Triangle Push-Up"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push-Ups_-_Close_Triceps_Position/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push-Ups_-_Close_Triceps_Position/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up"
   },
   {
     "name": "Push-Ups With Feet Elevated",
@@ -18729,13 +21445,42 @@
       "Push_Press/1.jpg"
     ],
     "id": "Push_Press",
+    "aliases": [
+      "Barbell Push Press"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Push_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
   },
   {
     "name": "Push Press - Behind the Neck",
@@ -18831,7 +21576,10 @@
     ],
     "id": "Pushups",
     "aliases": [
-      "Push-Ups"
+      "Push-Ups",
+      "Push Up",
+      "Press-Up",
+      "Press-Ups"
     ],
     "muscleGroups": [
       "Chest"
@@ -18839,7 +21587,33 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pushups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Pushups/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-push-up"
   },
   {
     "name": "Pushups (Close and Wide Hand Positions)",
@@ -19086,13 +21860,48 @@
       "Rack_Pulls/1.jpg"
     ],
     "id": "Rack_Pulls",
+    "aliases": [
+      "Rack Pull",
+      "Block Pull"
+    ],
     "muscleGroups": [
-      "Back"
+      "Back",
+      "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rack_Pulls/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rack_Pulls/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lower-back",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-deadlift"
   },
   {
     "name": "Rear Leg Raises",
@@ -19147,13 +21956,39 @@
       "Recumbent_Bike/1.jpg"
     ],
     "id": "Recumbent_Bike",
+    "aliases": [
+      "Recumbent Cycle",
+      "Recumbent Exercise Bike"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Recumbent_Bike/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Recumbent_Bike/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-stationary-bike"
   },
   {
     "name": "Return Push from Stance",
@@ -19401,13 +22236,40 @@
       "Reverse_Barbell_Curl/1.jpg"
     ],
     "id": "Reverse_Barbell_Curl",
+    "aliases": [
+      "Reverse Curl",
+      "Reverse Grip Curl",
+      "Reverse Barbell Curls"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Barbell_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Barbell_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "brachialis",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-reverse-barbell-curl"
   },
   {
     "name": "Reverse Barbell Preacher Curls",
@@ -19497,13 +22359,34 @@
       "Reverse_Crunch/1.jpg"
     ],
     "id": "Reverse_Crunch",
+    "aliases": [
+      "Reverse Crunches"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Crunch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Crunch/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch"
   },
   {
     "name": "Reverse Flyes",
@@ -19692,13 +22575,41 @@
       "Reverse_Machine_Flyes/1.jpg"
     ],
     "id": "Reverse_Machine_Flyes",
+    "aliases": [
+      "Reverse Pec Deck",
+      "Rear Delt Machine",
+      "Reverse Machine Fly",
+      "Rear Delt Fly Machine"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Machine_Flyes/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Reverse_Machine_Flyes/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rear-delt-fly"
   },
   {
     "name": "Reverse Plate Curls",
@@ -20030,13 +22941,46 @@
       "Romanian_Deadlift/1.jpg"
     ],
     "id": "Romanian_Deadlift",
+    "aliases": [
+      "RDL",
+      "RDLs",
+      "Romanian Deadlifts",
+      "Barbell RDL",
+      "Barbell Romanian Deadlift"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Romanian_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Romanian_Deadlift/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-romanian-deadlift"
   },
   {
     "name": "Romanian Deadlift from Deficit",
@@ -20162,13 +23106,41 @@
       "Rope_Jumping/1.jpg"
     ],
     "id": "Rope_Jumping",
+    "aliases": [
+      "Jump Rope",
+      "Jumping Rope",
+      "Skipping Rope",
+      "Skipping"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rope_Jumping/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rope_Jumping/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "jump-rope"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rope-jumping"
   },
   {
     "name": "Rope Straight-Arm Pulldown",
@@ -20261,15 +23233,54 @@
     ],
     "id": "Rowing_Stationary",
     "aliases": [
-      "Rowing"
+      "Rowing",
+      "Rowing Machine",
+      "Rower",
+      "Indoor Rowing",
+      "Erg"
     ],
     "muscleGroups": [
+      "Back",
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rowing_Stationary/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Rowing_Stationary/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rowing-stationary"
   },
   {
     "name": "Runner's Stretch",
@@ -20326,13 +23337,44 @@
       "Running_Treadmill/1.jpg"
     ],
     "id": "Running_Treadmill",
+    "aliases": [
+      "Treadmill",
+      "Treadmill Run",
+      "Treadmill Running"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Running_Treadmill/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Running_Treadmill/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-treadmill"
   },
   {
     "name": "Russian Twist",
@@ -20359,13 +23401,35 @@
       "Russian_Twist/1.jpg"
     ],
     "id": "Russian_Twist",
+    "aliases": [
+      "Russian Twists",
+      "Seated Russian Twist"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Russian_Twist/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Russian_Twist/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-rotation",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-russian-twist"
   },
   {
     "name": "Sandbag Load",
@@ -20656,13 +23720,43 @@
       "Seated_Bent-Over_Rear_Delt_Raise/1.jpg"
     ],
     "id": "Seated_Bent-Over_Rear_Delt_Raise",
+    "aliases": [
+      "Rear Delt Raise",
+      "Bent-Over Rear Delt Raise",
+      "Rear Delt Fly",
+      "Dumbbell Rear Delt Fly",
+      "Bent-Over Reverse Fly"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Bent-Over_Rear_Delt_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Bent-Over_Rear_Delt_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rear-delt",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "fly",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-rear-delt-fly"
   },
   {
     "name": "Seated Bent-Over Two-Arm Dumbbell Triceps Extension",
@@ -20755,13 +23849,45 @@
       "Seated_Cable_Rows/1.jpg"
     ],
     "id": "Seated_Cable_Rows",
+    "aliases": [
+      "Seated Cable Row",
+      "Cable Row",
+      "Seated Row",
+      "Cable Rows"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Cable_Rows/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Cable_Rows/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "Seated Cable Shoulder Press",
@@ -20819,13 +23945,31 @@
       "Seated_Calf_Raise/1.jpg"
     ],
     "id": "Seated_Calf_Raise",
+    "aliases": [
+      "Seated Calf Raises",
+      "Seated Calf Raise Machine"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Calf_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Calf_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "calf-raise",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-calf-raise"
   },
   {
     "name": "Seated Calf Stretch",
@@ -21325,7 +24469,9 @@
     ],
     "id": "Seated_Leg_Curl",
     "aliases": [
-      "Leg Curl"
+      "Leg Curl",
+      "Seated Leg Curls",
+      "Seated Hamstring Curl"
     ],
     "muscleGroups": [
       "Legs"
@@ -21333,7 +24479,25 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Leg_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Leg_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-curl",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-curl"
   },
   {
     "name": "Seated Leg Tucks",
@@ -21518,13 +24682,33 @@
       "Seated_Palm-Up_Barbell_Wrist_Curl/1.jpg"
     ],
     "id": "Seated_Palm-Up_Barbell_Wrist_Curl",
+    "aliases": [
+      "Wrist Curl",
+      "Wrist Curls",
+      "Barbell Wrist Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palm-Up_Barbell_Wrist_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palm-Up_Barbell_Wrist_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "forearms",
+        "role": "primary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-wrist-curl"
   },
   {
     "name": "Seated Palms-Down Barbell Wrist Curl",
@@ -21549,13 +24733,33 @@
       "Seated_Palms-Down_Barbell_Wrist_Curl/1.jpg"
     ],
     "id": "Seated_Palms-Down_Barbell_Wrist_Curl",
+    "aliases": [
+      "Reverse Wrist Curl",
+      "Reverse Wrist Curls",
+      "Barbell Reverse Wrist Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palms-Down_Barbell_Wrist_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Seated_Palms-Down_Barbell_Wrist_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "forearms",
+        "role": "primary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "barbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-wrist-curl"
   },
   {
     "name": "Seated Side Lateral Raise",
@@ -21883,13 +25087,39 @@
       "Side_Bridge/1.jpg"
     ],
     "id": "Side_Bridge",
+    "aliases": [
+      "Side Plank",
+      "Side Planks"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Bridge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      },
+      {
+        "id": "glute-med",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-stability",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "time",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-plank"
   },
   {
     "name": "Side Hop-Sprint",
@@ -21972,13 +25202,39 @@
       "Side_Lateral_Raise/1.jpg"
     ],
     "id": "Side_Lateral_Raise",
+    "aliases": [
+      "Lateral Raise",
+      "Lateral Raises",
+      "Dumbbell Lateral Raise",
+      "DB Lateral Raise",
+      "Side Raise",
+      "Side Laterals"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Lateral_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Side_Lateral_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lateral-raise"
   },
   {
     "name": "Side Laterals to Front Raise",
@@ -22623,13 +25879,35 @@
       "Single_Leg_Glute_Bridge/1.jpg"
     ],
     "id": "Single_Leg_Glute_Bridge",
+    "aliases": [
+      "Single-Leg Hip Bridge",
+      "One-Leg Glute Bridge"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Single_Leg_Glute_Bridge/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Single_Leg_Glute_Bridge/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "bridge",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-hip-thrust"
   },
   {
     "name": "Single Leg Push-off",
@@ -22686,13 +25964,35 @@
       "Sit-Up/1.jpg"
     ],
     "id": "Sit-Up",
+    "aliases": [
+      "Sit-Ups",
+      "Situps"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Sit-Up/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Sit-Up/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-sit-up"
   },
   {
     "name": "Sit Squats",
@@ -22882,13 +26182,43 @@
       "Sled_Push/1.jpg"
     ],
     "id": "Sled_Push",
+    "aliases": [
+      "Prowler Push",
+      "Sled Pushes"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Sled_Push/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Sled_Push/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "carry",
+    "equipmentList": [
+      "sled"
+    ],
+    "logAs": "weight-time",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-sled-push"
   },
   {
     "name": "Sled Reverse Flye",
@@ -23082,13 +26412,40 @@
       "Smith_Machine_Bench_Press/1.jpg"
     ],
     "id": "Smith_Machine_Bench_Press",
+    "aliases": [
+      "Smith Bench Press",
+      "Smith Machine Bench"
+    ],
     "muscleGroups": [
       "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Bench_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Bench_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-push",
+    "equipmentList": [
+      "smith-machine",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-bench-press"
   },
   {
     "name": "Smith Machine Bent Over Row",
@@ -23523,13 +26880,43 @@
       "Smith_Machine_Squat/1.jpg"
     ],
     "id": "Smith_Machine_Squat",
+    "aliases": [
+      "Smith Squat",
+      "Smith Machine Squats"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Squat/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Smith_Machine_Squat/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "squat",
+    "equipmentList": [
+      "smith-machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-squat"
   },
   {
     "name": "Smith Machine Stiff-Legged Deadlift",
@@ -23670,13 +27057,48 @@
       "Snatch/1.jpg"
     ],
     "id": "Snatch",
+    "aliases": [
+      "Barbell Snatch",
+      "Squat Snatch",
+      "Full Snatch"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Snatch/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Snatch/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "olympic",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-snatch"
   },
   {
     "name": "Snatch Balance",
@@ -24270,13 +27692,48 @@
       "Split_Squat_with_Dumbbells/1.jpg"
     ],
     "id": "Split_Squat_with_Dumbbells",
+    "aliases": [
+      "Bulgarian Split Squat",
+      "Bulgarian Split Squats",
+      "Dumbbell Bulgarian Split Squat",
+      "Rear-Foot-Elevated Split Squat",
+      "RFESS",
+      "BSS"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Squat_with_Dumbbells/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Split_Squat_with_Dumbbells/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "lunge",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-lunge"
   },
   {
     "name": "Split Squats",
@@ -24519,7 +27976,10 @@
     ],
     "id": "Stairmaster",
     "aliases": [
-      "Stairs"
+      "Stairs",
+      "Stair Climber",
+      "Stair Machine",
+      "Stair Stepper"
     ],
     "muscleGroups": [
       "Legs"
@@ -24527,7 +27987,33 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stairmaster/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stairmaster/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-stairmaster"
   },
   {
     "name": "Standing Alternating Dumbbell Press",
@@ -24713,13 +28199,41 @@
       "Standing_Biceps_Cable_Curl/1.jpg"
     ],
     "id": "Standing_Biceps_Cable_Curl",
+    "aliases": [
+      "Cable Curl",
+      "Cable Curls",
+      "Cable Bicep Curl",
+      "Cable Biceps Curl"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Biceps_Cable_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Biceps_Cable_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "biceps",
+        "role": "primary"
+      },
+      {
+        "id": "brachialis",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "curl",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-curl"
   },
   {
     "name": "Standing Biceps Stretch",
@@ -24883,13 +28397,38 @@
       "Standing_Cable_Wood_Chop/1.jpg"
     ],
     "id": "Standing_Cable_Wood_Chop",
+    "aliases": [
+      "Cable Woodchop",
+      "Cable Wood Chop",
+      "Wood Chop",
+      "Woodchop",
+      "Woodchopper"
+    ],
     "muscleGroups": [
       "Core"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Cable_Wood_Chop/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Cable_Wood_Chop/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-rotation",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-standing-cable-wood-chop"
   },
   {
     "name": "Standing Calf Raises",
@@ -24914,13 +28453,34 @@
       "Standing_Calf_Raises/1.jpg"
     ],
     "id": "Standing_Calf_Raises",
+    "aliases": [
+      "Calf Raise",
+      "Calf Raises",
+      "Standing Calf Raise",
+      "Standing Calf Raise Machine",
+      "Calf Raise Machine"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Calf_Raises/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Calf_Raises/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "calf-raise",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-calf-raise"
   },
   {
     "name": "Standing Concentration Curl",
@@ -24976,13 +28536,31 @@
       "Standing_Dumbbell_Calf_Raise/1.jpg"
     ],
     "id": "Standing_Dumbbell_Calf_Raise",
+    "aliases": [
+      "Dumbbell Calf Raise",
+      "DB Calf Raise"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Calf_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Calf_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "calves",
+        "role": "primary"
+      }
+    ],
+    "pattern": "calf-raise",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-calf-raise"
   },
   {
     "name": "Standing Dumbbell Press",
@@ -25101,13 +28679,33 @@
       "Standing_Dumbbell_Triceps_Extension/1.jpg"
     ],
     "id": "Standing_Dumbbell_Triceps_Extension",
+    "aliases": [
+      "Overhead Tricep Extension",
+      "Dumbbell Overhead Extension",
+      "Overhead Dumbbell Triceps Extension",
+      "DB Overhead Tricep Extension"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Triceps_Extension/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Dumbbell_Triceps_Extension/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-triceps-extension"
   },
   {
     "name": "Standing Dumbbell Upright Row",
@@ -25408,13 +29006,35 @@
       "Standing_Leg_Curl/1.jpg"
     ],
     "id": "Standing_Leg_Curl",
+    "aliases": [
+      "Standing Hamstring Curl",
+      "Single-Leg Standing Leg Curl"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Leg_Curl/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Leg_Curl/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "leg-curl",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-leg-curl"
   },
   {
     "name": "Standing Long Jump",
@@ -25476,13 +29096,36 @@
       "Standing_Low-Pulley_Deltoid_Raise/1.jpg"
     ],
     "id": "Standing_Low-Pulley_Deltoid_Raise",
+    "aliases": [
+      "Cable Lateral Raise",
+      "One-Arm Cable Lateral Raise",
+      "Single-Arm Cable Lateral Raise"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Low-Pulley_Deltoid_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Low-Pulley_Deltoid_Raise/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": true,
+    "common": true,
+    "family": "fam-lateral-raise"
   },
   {
     "name": "Standing Low-Pulley One-Arm Triceps Extension",
@@ -25544,13 +29187,42 @@
       "Standing_Military_Press/1.jpg"
     ],
     "id": "Standing_Military_Press",
+    "aliases": [
+      "Overhead Press",
+      "OHP",
+      "Military Press",
+      "Barbell Overhead Press",
+      "Strict Press"
+    ],
     "muscleGroups": [
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Military_Press/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Standing_Military_Press/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "deltoids",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "upper-chest",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-overhead-press"
   },
   {
     "name": "Standing Olympic Plate Hand Squeeze",
@@ -26120,13 +29792,41 @@
       "Stiff-Legged_Barbell_Deadlift/1.jpg"
     ],
     "id": "Stiff-Legged_Barbell_Deadlift",
+    "aliases": [
+      "Stiff-Leg Deadlift",
+      "Stiff-Legged Deadlift",
+      "Straight-Leg Deadlift",
+      "SLDL"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Barbell_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Barbell_Deadlift/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-romanian-deadlift"
   },
   {
     "name": "Stiff-Legged Dumbbell Deadlift",
@@ -26154,13 +29854,41 @@
       "Stiff-Legged_Dumbbell_Deadlift/1.jpg"
     ],
     "id": "Stiff-Legged_Dumbbell_Deadlift",
+    "aliases": [
+      "Dumbbell RDL",
+      "DB RDL",
+      "Dumbbell Romanian Deadlift",
+      "Dumbbell Stiff-Leg Deadlift"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Dumbbell_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Stiff-Legged_Dumbbell_Deadlift/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-romanian-deadlift"
   },
   {
     "name": "Stiff Leg Barbell Good Morning",
@@ -26256,13 +29984,41 @@
       "Straight-Arm_Dumbbell_Pullover/1.jpg"
     ],
     "id": "Straight-Arm_Dumbbell_Pullover",
+    "aliases": [
+      "Dumbbell Pullover",
+      "DB Pullover"
+    ],
     "muscleGroups": [
-      "Chest"
+      "Chest",
+      "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Straight-Arm_Dumbbell_Pullover/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Straight-Arm_Dumbbell_Pullover/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "pullover",
+    "equipmentList": [
+      "dumbbell",
+      "bench"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pullover"
   },
   {
     "name": "Straight-Arm Pulldown",
@@ -26287,13 +30043,39 @@
       "Straight-Arm_Pulldown/1.jpg"
     ],
     "id": "Straight-Arm_Pulldown",
+    "aliases": [
+      "Straight-Arm Lat Pulldown",
+      "Stiff-Arm Pulldown"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Straight-Arm_Pulldown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Straight-Arm_Pulldown/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "pullover",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pullover"
   },
   {
     "name": "Straight Bar Bench Mid Rows",
@@ -26424,13 +30206,55 @@
       "Sumo_Deadlift/1.jpg"
     ],
     "id": "Sumo_Deadlift",
+    "aliases": [
+      "Sumo Deadlifts",
+      "Sumo DL"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Sumo_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Sumo_Deadlift/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "adductors",
+        "role": "primary"
+      },
+      {
+        "id": "quads",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-deadlift"
   },
   {
     "name": "Sumo Deadlift with Bands",
@@ -26766,13 +30590,45 @@
       "Suspended_Row/1.jpg"
     ],
     "id": "Suspended_Row",
+    "aliases": [
+      "TRX Row",
+      "Ring Row",
+      "Suspension Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Suspended_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Suspended_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "suspension",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-inverted-row"
   },
   {
     "name": "Suspended Split Squat",
@@ -26870,13 +30726,49 @@
       "T-Bar_Row_with_Handle/1.jpg"
     ],
     "id": "T-Bar_Row_with_Handle",
+    "aliases": [
+      "T-Bar Row",
+      "T-Bar Rows",
+      "Landmine Row"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/T-Bar_Row_with_Handle/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/T-Bar_Row_with_Handle/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "primary"
+      },
+      {
+        "id": "rear-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "horizontal-pull",
+    "equipmentList": [
+      "barbell",
+      "landmine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-row"
   },
   {
     "name": "Tate Press",
@@ -26968,7 +30860,11 @@
     ],
     "id": "Thigh_Abductor",
     "aliases": [
-      "Abduction"
+      "Abduction",
+      "Hip Abduction",
+      "Hip Abduction Machine",
+      "Abductor Machine",
+      "Outer Thigh Machine"
     ],
     "muscleGroups": [
       "Legs"
@@ -26976,7 +30872,25 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Abductor/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Abductor/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "glute-med",
+        "role": "primary"
+      },
+      {
+        "id": "abductors",
+        "role": "primary"
+      }
+    ],
+    "pattern": "hip-abduction",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-thigh-abductor"
   },
   {
     "name": "Thigh Adductor",
@@ -27004,7 +30918,11 @@
     ],
     "id": "Thigh_Adductor",
     "aliases": [
-      "Adduction"
+      "Adduction",
+      "Hip Adduction",
+      "Hip Adduction Machine",
+      "Adductor Machine",
+      "Inner Thigh Machine"
     ],
     "muscleGroups": [
       "Legs"
@@ -27012,7 +30930,21 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Adductor/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Thigh_Adductor/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "adductors",
+        "role": "primary"
+      }
+    ],
+    "pattern": "hip-adduction",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-thigh-adductor"
   },
   {
     "name": "Tire Flip",
@@ -27170,13 +31102,52 @@
       "Trap_Bar_Deadlift/1.jpg"
     ],
     "id": "Trap_Bar_Deadlift",
+    "aliases": [
+      "Hex Bar Deadlift",
+      "Trap Bar DL",
+      "Hex Bar DL"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Trap_Bar_Deadlift/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Trap_Bar_Deadlift/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "trap-bar"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-deadlift"
   },
   {
     "name": "Tricep Dumbbell Kickback",
@@ -27200,13 +31171,33 @@
       "Tricep_Dumbbell_Kickback/1.jpg"
     ],
     "id": "Tricep_Dumbbell_Kickback",
+    "aliases": [
+      "Triceps Kickback",
+      "Tricep Kickback",
+      "Dumbbell Kickback",
+      "DB Kickback"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tricep_Dumbbell_Kickback/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Tricep_Dumbbell_Kickback/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "dumbbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-tricep-dumbbell-kickback"
   },
   {
     "name": "Tricep Side Stretch",
@@ -27290,13 +31281,35 @@
       "Triceps_Pushdown/1.jpg"
     ],
     "id": "Triceps_Pushdown",
+    "aliases": [
+      "Tricep Pushdown",
+      "Triceps Pushdowns",
+      "Cable Pushdown",
+      "Bar Pushdown",
+      "Straight Bar Pushdown",
+      "Tricep Pressdown"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Pushdown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Pushdown/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-triceps-pushdown"
   },
   {
     "name": "Triceps Pushdown - Rope Attachment",
@@ -27321,13 +31334,34 @@
       "Triceps_Pushdown_-_Rope_Attachment/1.jpg"
     ],
     "id": "Triceps_Pushdown_-_Rope_Attachment",
+    "aliases": [
+      "Rope Pushdown",
+      "Rope Tricep Pushdown",
+      "Tricep Rope Pushdown",
+      "Triceps Rope Pushdown",
+      "Rope Pressdown"
+    ],
     "muscleGroups": [
       "Arms"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Pushdown_-_Rope_Attachment/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Triceps_Pushdown_-_Rope_Attachment/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      }
+    ],
+    "pattern": "elbow-extension",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-triceps-pushdown"
   },
   {
     "name": "Triceps Pushdown - V-Bar Attachment",
@@ -27698,13 +31732,45 @@
       "Upright_Barbell_Row/1.jpg"
     ],
     "id": "Upright_Barbell_Row",
+    "aliases": [
+      "Upright Row",
+      "Barbell Upright Row",
+      "BB Upright Row"
+    ],
     "muscleGroups": [
+      "Back",
       "Shoulders"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Upright_Barbell_Row/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Upright_Barbell_Row/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "barbell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-upright-barbell-row"
   },
   {
     "name": "Upright Cable Row",
@@ -27829,13 +31895,41 @@
       "V-Bar_Pulldown/1.jpg"
     ],
     "id": "V-Bar_Pulldown",
+    "aliases": [
+      "Close-Grip Lat Pulldown",
+      "Close-Grip Pulldown",
+      "V-Grip Pulldown",
+      "Neutral-Grip Pulldown"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/V-Bar_Pulldown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/V-Bar_Pulldown/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lat-pulldown"
   },
   {
     "name": "V-Bar Pullup",
@@ -27930,13 +32024,45 @@
       "Walking_Treadmill/1.jpg"
     ],
     "id": "Walking_Treadmill",
+    "aliases": [
+      "Treadmill Walk",
+      "Treadmill Walking",
+      "Incline Walk",
+      "Incline Treadmill Walk"
+    ],
     "muscleGroups": [
       "Legs"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Walking_Treadmill/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Walking_Treadmill/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "calves",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-treadmill"
   },
   {
     "name": "Weighted Ball Hyperextension",
@@ -28130,13 +32256,40 @@
       "Weighted_Pull_Ups/1.jpg"
     ],
     "id": "Weighted_Pull_Ups",
+    "aliases": [
+      "Weighted Pull-Up",
+      "Weighted Pullup"
+    ],
     "muscleGroups": [
       "Back"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Weighted_Pull_Ups/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Weighted_Pull_Ups/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "pull-up-bar",
+      "plate"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up"
   },
   {
     "name": "Weighted Sissy Squat",
@@ -28367,7 +32520,10 @@
     ],
     "id": "Wide-Grip_Lat_Pulldown",
     "aliases": [
-      "Lat Pulldown"
+      "Lat Pulldown",
+      "Lat Pull-Down",
+      "Lat Pulldowns",
+      "Wide-Grip Pulldown"
     ],
     "muscleGroups": [
       "Back"
@@ -28375,7 +32531,29 @@
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Wide-Grip_Lat_Pulldown/1.jpg"
-    ]
+    ],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "cable"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lat-pulldown"
   },
   {
     "name": "Wide-Grip Pulldown Behind The Neck",
@@ -28965,6 +33143,472 @@
     "muscleGroups": [
       "Core"
     ],
-    "photos": []
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "primary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-flexion",
+    "equipmentList": [
+      "pull-up-bar",
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-leg-raise"
+  },
+  {
+    "name": "Assisted Dip",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "triceps",
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "shoulders"
+    ],
+    "instructions": [
+      "Set the assistance weight, then step or kneel onto the platform and take the dip handles with your arms straight. More weight means more help.",
+      "Keep your chest up and elbows pointing back, and lower yourself until your upper arms are about level with the floor.",
+      "Press back up to straight arms without locking out hard, then repeat."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-assisted-dip",
+    "aliases": [
+      "Assisted Dips",
+      "Machine Assisted Dip",
+      "Assisted Dip Machine"
+    ],
+    "muscleGroups": [
+      "Chest",
+      "Arms"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "mid-lower-chest",
+        "role": "primary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
+  },
+  {
+    "name": "Machine Lateral Raise",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "shoulders"
+    ],
+    "secondaryMuscles": [
+      "traps"
+    ],
+    "instructions": [
+      "Sit with your chest against the pad and set the seat so your shoulders line up with the machine's pivot. Rest your arms against the pads.",
+      "Raise your arms out to the sides until they are about level with your shoulders, leading with the elbows.",
+      "Lower slowly back to the start without letting the weight stack touch down, then repeat."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-machine-lateral-raise",
+    "aliases": [
+      "Lateral Raise Machine",
+      "Machine Side Raise"
+    ],
+    "muscleGroups": [
+      "Shoulders"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "side-delt",
+        "role": "primary"
+      },
+      {
+        "id": "traps",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "raise",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-lateral-raise"
+  },
+  {
+    "name": "Assisted Pull-Up",
+    "force": "pull",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "lats"
+    ],
+    "secondaryMuscles": [
+      "biceps",
+      "middle back"
+    ],
+    "instructions": [
+      "Set the assistance weight, then kneel or stand on the platform and grip the pull-up handles with your arms straight. More weight means more help.",
+      "Pull your chest up toward the handles, driving your elbows down and back, until your chin is above your hands.",
+      "Lower under control to straight arms, then repeat."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-assisted-pull-up",
+    "aliases": [
+      "Assisted Pull-Ups",
+      "Machine Assisted Pull-Up",
+      "Assisted Pull-Up Machine"
+    ],
+    "muscleGroups": [
+      "Back"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "lats",
+        "role": "primary"
+      },
+      {
+        "id": "biceps",
+        "role": "secondary"
+      },
+      {
+        "id": "rhomboids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-pull",
+    "equipmentList": [
+      "machine"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-pull-up"
+  },
+  {
+    "name": "Kettlebell Swing",
+    "force": "pull",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "kettlebells",
+    "primaryMuscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "secondaryMuscles": [
+      "lower back",
+      "abdominals",
+      "forearms"
+    ],
+    "instructions": [
+      "Stand with your feet a little wider than your hips, a kettlebell on the floor in front of you. Hinge at the hips and grip the handle with both hands.",
+      "Hike the bell back between your legs, then drive your hips forward hard to swing it up to about chest height with straight arms.",
+      "Let the bell fall back, hinge again as it passes between your legs, and go straight into the next swing. The power comes from the hips, not the arms."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-kettlebell-swing",
+    "aliases": [
+      "KB Swing",
+      "Kettlebell Swings",
+      "Two-Hand Kettlebell Swing",
+      "Russian Kettlebell Swing"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "glute-max",
+        "role": "primary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "primary"
+      },
+      {
+        "id": "lower-back",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      },
+      {
+        "id": "forearms",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "hinge",
+    "equipmentList": [
+      "kettlebell"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-kettlebell-swing"
+  },
+  {
+    "name": "Burpee",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "quadriceps",
+      "chest"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "triceps",
+      "shoulders",
+      "abdominals"
+    ],
+    "instructions": [
+      "Stand tall, then squat down and put your hands on the floor in front of your feet.",
+      "Jump or step your feet back into a push-up position, and lower your chest to the floor if you are doing the full version.",
+      "Bring your feet back under you and jump up with your arms overhead. Land softly and go straight into the next one."
+    ],
+    "category": "plyometrics",
+    "images": [],
+    "id": "own-burpee",
+    "aliases": [
+      "Burpees"
+    ],
+    "muscleGroups": [
+      "Chest",
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "pecs",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "triceps",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      },
+      {
+        "id": "abs",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "plyometric",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-own-burpee"
+  },
+  {
+    "name": "Fan Bike",
+    "force": "push",
+    "level": "beginner",
+    "mechanic": "compound",
+    "equipment": "machine",
+    "primaryMuscles": [
+      "quadriceps"
+    ],
+    "secondaryMuscles": [
+      "glutes",
+      "hamstrings",
+      "shoulders"
+    ],
+    "instructions": [
+      "Set the seat so your knee is only slightly bent at the bottom of the pedal stroke, and hold the moving handles.",
+      "Pedal while pushing and pulling the handles. The fan gives more resistance the harder you go.",
+      "Pace steady for longer efforts, or go all out for short intervals with easy spinning in between."
+    ],
+    "category": "cardio",
+    "images": [],
+    "id": "own-fan-bike",
+    "aliases": [
+      "Assault Bike",
+      "Echo Bike"
+    ],
+    "muscleGroups": [
+      "Legs"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "quads",
+        "role": "primary"
+      },
+      {
+        "id": "glute-max",
+        "role": "secondary"
+      },
+      {
+        "id": "hamstrings",
+        "role": "secondary"
+      },
+      {
+        "id": "deltoids",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "cardio",
+    "equipmentList": [
+      "cardio-machine"
+    ],
+    "logAs": "cardio",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-stationary-bike"
+  },
+  {
+    "name": "Bicycle Crunch",
+    "force": "pull",
+    "level": "beginner",
+    "mechanic": "isolation",
+    "equipment": "body only",
+    "primaryMuscles": [
+      "abdominals"
+    ],
+    "secondaryMuscles": [],
+    "instructions": [
+      "Lie on your back with your hands lightly behind your head, lower back pressed to the floor, and knees lifted so your shins are level with the floor.",
+      "Curl your shoulders up and turn your torso to bring one elbow toward the opposite knee while the other leg straightens out low.",
+      "Switch sides in a slow pedalling motion. Turn from the ribs, not by pulling on your neck."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-bicycle-crunch",
+    "aliases": [
+      "Bicycle Crunches"
+    ],
+    "muscleGroups": [
+      "Core"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "abs",
+        "role": "primary"
+      },
+      {
+        "id": "obliques",
+        "role": "primary"
+      },
+      {
+        "id": "hip-flexors",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "core-rotation",
+    "equipmentList": [
+      "bodyweight"
+    ],
+    "logAs": "bodyweight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-crunch"
+  },
+  {
+    "name": "Weighted Dip",
+    "force": "push",
+    "level": "intermediate",
+    "mechanic": "compound",
+    "equipment": "other",
+    "primaryMuscles": [
+      "triceps"
+    ],
+    "secondaryMuscles": [
+      "chest",
+      "shoulders"
+    ],
+    "instructions": [
+      "Hang a plate or dumbbell from a dip belt, then support yourself on the parallel bars with your arms straight.",
+      "Keep your torso fairly upright and lower yourself until your upper arms are about level with the bars.",
+      "Press back up to straight arms, then repeat. Log the added weight."
+    ],
+    "category": "strength",
+    "images": [],
+    "id": "own-weighted-dip",
+    "aliases": [
+      "Weighted Dips",
+      "Weighted Parallel Bar Dip"
+    ],
+    "muscleGroups": [
+      "Arms"
+    ],
+    "photos": [],
+    "muscles": [
+      {
+        "id": "triceps",
+        "role": "primary"
+      },
+      {
+        "id": "mid-lower-chest",
+        "role": "secondary"
+      },
+      {
+        "id": "front-delt",
+        "role": "secondary"
+      }
+    ],
+    "pattern": "vertical-push",
+    "equipmentList": [
+      "dip-bars",
+      "plate"
+    ],
+    "logAs": "weight-reps",
+    "unilateral": false,
+    "common": true,
+    "family": "fam-dip"
   }
 ]
