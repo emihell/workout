@@ -1,6 +1,6 @@
 # req-154 — a comma kg ("22,5") is saved as 0 on the live log and as null in History
 
-**Status: BUILT — branch `req-154` (`ae81620`), NOT merged.** (2026-09-24) — Phase 1, **bug, data trust**. Gate: functional + independent reviewer (DEC-057 §1
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-154` (`317f526`…`ae81620`, 3 commits).** (2026-09-24) — Phase 1, **bug, data trust**. Gate: functional + independent reviewer (DEC-057 §1
 fires if `workout-log`/`store` is touched). Decision already made: **DEC-058 §1 — a comma is a decimal point** (built so far
 only in the routine editor, `routine-item-parse.js:50`, and the weight-step field, `weight-step.js:18`). Source: code audit
 2026-09-24 **F-TRUST-1** (`audits/2026-09-24.md`), verified by Planner.
