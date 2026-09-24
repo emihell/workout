@@ -535,6 +535,9 @@ target before starting any of these; each is a milestone, not a `req`.
   server). A preview deploy per branch would let planning close UX/browser gates without touching the
   code worktree, and unblock device-API testing. Infra; sizeable (CI/hosting decision). Revisit when
   UI-heavy reqs (Phase 1 polish, Phase 2 creation flow) make the manual eyeballs a bottleneck.
+  **Emilio 2026-09-24: later, not now.** When it comes: host the previews on Emilio's own server machine (static
+  per-branch builds over Tailscale HTTPS; no Cloudflare/Netlify account), each on its **own origin** (port or subdomain,
+  never a path under `emihell.github.io`, whose `localStorage` holds his real history). Needs the machine, not req-146.
 
 ## Dependency map (why the order is what it is)
 
