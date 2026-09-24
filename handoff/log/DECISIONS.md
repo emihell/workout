@@ -1419,3 +1419,13 @@ replace.jsx ×2, setup.jsx:59, Exercises.jsx ×4, workout-actions.js) plus the 3
 match in-app Back and what those sites already say ("replace rather than stacking history"); the stacked entries are the
 same dead-Back class as QA-1. Rejected (B, only the 3 exits): leaves two Backs that disagree. User-visible: swipe-back
 skips the replaced intermediate screen. On Emilio's list.
+
+## DEC-082 — DEC-081's reason corrected; an added set with nothing logged stays blank  (planning, from req-152, 2026-09-24; unconfirmed)
+
+1. **Correction to DEC-081's "why".** Planner wrote that the in-app ‹ Back follows the visit stack; it doesn't — it is a
+   fixed link (`<Back to=…>`, `shared.jsx:43`; Builder, req-152). The decision (A) stands on the rest: after it, every
+   device Back from those sites lands on a live screen instead of a replaced or dead one. (L-035.)
+2. **QA-3's fallback dropped.** req-152 said an added set with no in-session kg falls back to "the appended suggested
+   weight". Builder measured that the live seed never reads `suggestedWeights`, so that would be a new prefill source. Not
+   built: the added set carries the kg just logged this session, else stays blank — history and this session only, never
+   the routine's number (the core rule).

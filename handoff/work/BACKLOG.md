@@ -304,6 +304,11 @@ edit → Update? → Apply → routine [65,70,70].
   "· skipped").
 - Minor: Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown anywhere today).
 - Import asks "Replace all data?" before validating → fixed in **req-24** (merged).
+- **req-152 follow-ups** (small; from the reviewer + Builder): (a) after an overview → item (push) → last set → replace
+  back, history holds `/workout/x` twice, so the first device Back visibly does nothing (`item.jsx:99,110,304,316`,
+  `replace.jsx:31`); (b) after Save, the **second** Back reaches an earlier in-workout item page → "Not found." once the
+  workout isn't active; (c) the pill's reserved top space (~30 px, always) — Emilio to judge on the phone; (d) 4 of
+  req-152's tests are source-regex guards (brittle).
 - **req-24 reviewer nits** (small, fold into the next touch): the no-native-dialog guard misses `window['confirm']`,
   `const { confirm } = window`, `.mjs` files, and skips lines starting `*` (`req-24.test.js:17,30`); Today's first-run
   import error (`Today.jsx:269,330`) isn't cleared on a later cancel/new pick.

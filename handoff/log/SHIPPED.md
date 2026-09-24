@@ -1788,3 +1788,18 @@ Cancel byte-for-byte unchanged, confirm acts (slot 3→2, workout 13→12, aband
 loop 2→1 "Remove 1 scheduled routine?", import analytics → error + no sheet, backup → sheet, Cancel unchanged, Replace
 replaces + the safety download fires first. Not run: the Today first-run import banner (needs empty data). Test edits:
 import-backup (bad file: no ask, no download — the intended change), workout-actions (stub → sheet subscriber, same 25).
+
+## req-152 — four fixes from Planner's browser run: real history replace, pill clears Back, Add-set kg, History "skipped" (DEC-081/082)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `f0d8ea7`). QA-1: `go(p,{replace:true})` now `location.replace`s the browser
+entry (it only rewrote the in-app visit stack), at the ~15 existing sites + Finish save / auto-complete / abandon — device
+Back no longer lands on a dead finish route. QA-2: the 5 rest-pill screens reserve its height; the pill keeps top-centre
+and size. QA-3: a set with no history at its index (Add set, a grown routine) carries the kg logged this session
+(`historyHasSetAt`, pure read in storage.js; no saved-data change); the spec's suggested-weight fallback dropped (DEC-082).
+QA-4: History detail says "· skipped" and counts logged sets. Gate: Builder `check: green — lint, 56 test file(s), and the
+build all passed.`, 13 new tests, none edited; independent reviewer (DEC-057 §1: workout-log/storage) in an archive copy →
+`# tests 877 # pass 877 # fail 0`, **no blockers** (1 should-fix + nits → BACKLOG "req-152 follow-ups"); Planner's browser
+run of the branch build: Save → Back = done overview; Abandon → Back = Routines; skip → Back = overview; Add set after
+30/60/70/70 → 70 kg, 10 reps; History "Leg Extension — WU set · skipped"; pill `[x,8,x,54]` vs top links from y 70 at
+320/375/430 px on log, overview and finish → 0 overlaps; native dialogs 0. Not browser-run: bodyweight Add set (unit test),
+the 2-of-4-skipped label (unit test); auto-complete Back seen once, in a timer-throttled background tab.
