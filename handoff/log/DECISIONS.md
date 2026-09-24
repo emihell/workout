@@ -1315,3 +1315,14 @@ adding complexity - but with the rule of not disturbing the simple routine - tha
    everything else builds on.
 Answers req-144 Q1 (persona) and the core of Q2 (the rule's wording is refined in session).
 
+## DEC-072 — library merge rule; merged names redirect in search  (planning, from req-143's coach review, 2026-09-24)
+
+1. **A merge never crosses how an exercise is loaded:** same `logAs` family (bodyweight vs weighted) and equipment that
+   maps into the target's `equipmentList` (an EZ bar counts as a barbell). One-arm **dumbbell** variants may merge into
+   bilateral targets (same load per hand); one-arm **cable/stack** moves don't (the load scale differs). Enforced by
+   `triageProblems` where the data shows it; the one-arm cable case is judged in the rows.
+2. **Exact merged name → its target:** typing a merged entry's exact name shows the written target, scored 0.5 (after
+   direct exact hits, before prefix hits, so "air bike" keeps Fan Bike first). No aliases are added for it.
+3. Warm-up drills (arm/shoulder/hip circles) aren't logged → hidden. Band variants are their own exercises (home
+   trainees). Content calls under DEC-067, unconfirmed.
+

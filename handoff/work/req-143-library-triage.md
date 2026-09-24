@@ -1,6 +1,6 @@
 # req-143 — library triage: every rough entry is finished, merged or hidden
 
-**Status: READY** — Phase 1, data + one search rule. **Gate: functional** (library data, validators, tests, and the search
+**Status: BUILT, NOT merged — branch `req-143`** — Phase 1, data + one search rule. **Gate: functional** (library data, validators, tests, and the search
 filter; no stored-data change). Emilio 2026-09-24 (DEC-070): the database must be **up to par** before RepDB is removed
 (req-142), then a fresh-eyes agent scans everything (req-141). This req sorts the rough tier. The parity batches
 (req-140b…) then finish what it queues. Spec reviewed independently 2026-09-24 (9 findings folded in: §Precise rules).
