@@ -7700,8 +7700,7 @@
       "Close-Grip DB Press"
     ],
     "muscleGroups": [
-      "Chest",
-      "Arms"
+      "Chest"
     ],
     "photos": [
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Close-Grip_Dumbbell_Press/0.jpg",
@@ -7709,12 +7708,12 @@
     ],
     "muscles": [
       {
-        "id": "triceps",
+        "id": "pecs",
         "role": "primary"
       },
       {
-        "id": "pecs",
-        "role": "primary"
+        "id": "triceps",
+        "role": "secondary"
       },
       {
         "id": "front-delt",
@@ -11463,7 +11462,7 @@
       "box"
     ],
     "logAs": "weight-reps",
-    "unilateral": false,
+    "unilateral": true,
     "common": true,
     "family": "fam-lunge",
     "staple": true,
@@ -11479,7 +11478,7 @@
       "Place one foot fully on the box.",
       "Drive through that foot to stand up on the box, bringing the trailing foot up beside it.",
       "Step the trailing leg back down first, keeping the working foot on the box.",
-      "Lower the working foot last, then alternate legs or finish one side before the other."
+      "Lower the working foot last, finish the reps, then switch sides."
     ],
     "mistakes": [
       "Pushing off the floor foot to jump up",
@@ -13410,8 +13409,8 @@
       "Stand tall, no lean"
     ],
     "steps": [
-      "Attach a handle or straight bar to the low pulley and stand facing away from the stack.",
-      "Hold the handle in front of your thighs with your arms nearly straight.",
+      "Attach a straight bar or rope to the low pulley and stand facing away from the stack.",
+      "Hold the bar or rope with both hands in front of your thighs, arms nearly straight.",
       "Raise it forward and up to about eye level.",
       "Lower it slowly back to your thighs."
     ],
@@ -18254,7 +18253,6 @@
       "Lunge Stretch"
     ],
     "muscleGroups": [
-      "Legs",
       "Core"
     ],
     "photos": [
@@ -18269,7 +18267,7 @@
       },
       {
         "id": "quads",
-        "role": "primary"
+        "role": "secondary"
       }
     ],
     "pattern": "mobility",
@@ -21299,7 +21297,7 @@
       "Loop a mini band around your legs above the knees or around the ankles.",
       "Stand with your feet hip width apart and sink into a half squat.",
       "Step forward and out on a diagonal with one foot, then the other.",
-      "Keep stepping for the set distance, then walk backward the same way."
+      "Take your steps forward, then walk backward the same way."
     ],
     "mistakes": [
       "Standing up tall between steps",
@@ -21842,10 +21840,6 @@
       "Oblique_Crunches/1.jpg"
     ],
     "id": "Oblique_Crunches",
-    "aliases": [
-      "Side Crunch",
-      "Side Crunches"
-    ],
     "muscleGroups": [
       "Core"
     ],
@@ -32045,7 +32039,7 @@
       "Flat back throughout"
     ],
     "steps": [
-      "Set the bar at mid thigh and stand under it with your feet hip width apart.",
+      "Set the bar at mid thigh and stand close behind it with your feet hip width apart.",
       "Grip the bar just outside your legs and unhook it by standing tall.",
       "Push your hips back and slide the bar down your thighs until you feel your hamstrings stretch.",
       "Drive your hips forward to stand back up."
@@ -35354,8 +35348,7 @@
     ],
     "id": "Step-up_with_Knee_Raise",
     "aliases": [
-      "Step-Up with Knee Drive",
-      "Box Step-Up"
+      "Bodyweight Step-Up"
     ],
     "muscleGroups": [
       "Legs"
@@ -35364,7 +35357,7 @@
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Step-up_with_Knee_Raise/0.jpg",
       "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@a859101d633a01c4a1a920d6a8ce41dabba0705f/exercises/Step-up_with_Knee_Raise/1.jpg"
     ],
-    "displayName": "Bodyweight Step-Up",
+    "displayName": "Step-Up with Knee Drive",
     "muscles": [
       {
         "id": "quads",
@@ -35404,7 +35397,7 @@
       "Stand facing a sturdy box or bench about knee height.",
       "Place one foot fully on top of the box.",
       "Press through that foot to stand up, lifting the other knee toward hip height.",
-      "Lower the free foot back to the floor under control, then step down.",
+      "Lower the raised knee, step that foot back to the floor, then step down with the other foot.",
       "Finish the reps on one leg, then switch sides."
     ],
     "mistakes": [
@@ -42385,7 +42378,7 @@
     "family": "fam-band-walk",
     "staple": false,
     "difficulty": "beginner",
-    "description": "Side steps in a half squat against a band around the legs, a staple warm-up for the glutes.",
+    "description": "Side steps in a quarter squat against a band around the legs, a staple warm-up for the glutes.",
     "formCues": [
       "Hips stay level",
       "Toes point forward",

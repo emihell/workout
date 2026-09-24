@@ -165,7 +165,7 @@ describe('unilateral and duplicates', () => {
       assert.deepEqual(problems({ unilateral: true, ...withStep(text) }), [], text)
     }
     const oneSided = common.filter((entry) => entry.unilateral)
-    assert.equal(oneSided.length, 39) // req-140 (sanctioned): + split squat, cable kickback, pistol, DB snatch; req-145 (sanctioned): + 16 of batch 2
+    assert.equal(oneSided.length, 40) // req-140 (sanctioned): + split squat, cable kickback, pistol, DB snatch; req-145 (sanctioned): + 16 of batch 2, + Dumbbell Step-Up (coach review)
   })
 
   it('the same line twice in an entry is rejected, across fields too', () => {

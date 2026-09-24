@@ -104,7 +104,7 @@ const ROWS = [
   ['Dumbbell_Rear_Lunge', 'lunge', 'dumbbell', 'quads glute-max', 'adductors hamstrings', 'weight-reps', 'fam-lunge', ['Reverse Lunges', 'Dumbbell Reverse Lunge', 'DB Reverse Lunge']],
   ['Split_Squat_with_Dumbbells', 'lunge', 'dumbbell bench', 'quads glute-max', 'adductors hamstrings', 'weight-reps', 'fam-lunge', ['Bulgarian Split Squats', 'Dumbbell Bulgarian Split Squat', 'Rear-Foot-Elevated Split Squat', 'RFESS', 'BSS'], true],
   ['own-cossack-squat', 'lunge', 'bodyweight', 'quads adductors', 'glute-max hamstrings', 'bodyweight-reps', 'fam-lunge', ['Cossack Squats', 'Side-to-Side Squat']],
-  ['Dumbbell_Step_Ups', 'lunge', 'dumbbell box', 'quads glute-max', 'hamstrings adductors', 'weight-reps', 'fam-lunge', ['Step-Ups', 'Step-Up', 'DB Step-Up']],
+  ['Dumbbell_Step_Ups', 'lunge', 'dumbbell box', 'quads glute-max', 'hamstrings adductors', 'weight-reps', 'fam-lunge', ['Step-Ups', 'Step-Up', 'DB Step-Up'], true],
   ['Leg_Extensions', 'leg-extension', 'machine', 'quads', '', 'weight-reps', 'fam-leg-extensions', ['Leg Extension Machine', 'Quad Extension', 'Knee Extension']],
   ['Seated_Leg_Curl', 'leg-curl', 'machine', 'hamstrings', 'calves', 'weight-reps', 'fam-leg-curl', ['Leg Curl', 'Seated Leg Curls', 'Seated Hamstring Curl']],
   ['Lying_Leg_Curls', 'leg-curl', 'machine', 'hamstrings', 'calves', 'weight-reps', 'fam-leg-curl', ['Prone Leg Curl', 'Lying Hamstring Curl']],
@@ -244,13 +244,13 @@ const ROWS = [
   ['own-high-knees', 'plyometric', 'bodyweight', 'hip-flexors quads', 'calves abs', 'time', 'fam-own-high-knees', ['High Knee Run', 'High Knee Sprints']],
   // req-145 — library batch 2 (DEC-066 §2, beginner-first per DEC-067/071)
   ['Dumbbell_Squat', 'squat', 'dumbbell', 'quads glute-max', 'adductors hamstrings', 'weight-reps', 'fam-squat', ['DB Squat', 'Dumbbell Squats']],
-  ['Step-up_with_Knee_Raise', 'lunge', 'bodyweight box', 'quads glute-max', 'hamstrings hip-flexors', 'bodyweight-reps', 'fam-lunge', ['Step-Up with Knee Drive', 'Box Step-Up'], true],
+  ['Step-up_with_Knee_Raise', 'lunge', 'bodyweight box', 'quads glute-max', 'hamstrings hip-flexors', 'bodyweight-reps', 'fam-lunge', ['Bodyweight Step-Up'], true],
   ['own-dumbbell-deadlift', 'hinge', 'dumbbell', 'glute-max hamstrings', 'quads lower-back forearms', 'weight-reps', 'fam-deadlift', ['DB Deadlift', 'Dumbbell Deadlifts']],
   ['own-machine-back-extension', 'hinge', 'machine', 'lower-back', 'glute-max hamstrings', 'weight-reps', 'fam-hyperextensions-back-extensions', ['Back Extension Machine', 'Seated Back Extension', 'Lower Back Machine']],
   ['Leverage_High_Row', 'horizontal-pull', 'machine', 'lats rhomboids', 'rear-delt biceps', 'weight-reps', 'fam-row', ['High Row Machine', 'Plate-Loaded High Row']],
   ['Lying_T-Bar_Row', 'horizontal-pull', 'machine', 'lats rhomboids', 'rear-delt biceps', 'weight-reps', 'fam-row', ['T-Bar Row Machine', 'Prone T-Bar Row']],
   ['Decline_Dumbbell_Bench_Press', 'horizontal-push', 'dumbbell bench', 'mid-lower-chest', 'triceps front-delt', 'weight-reps', 'fam-bench-press', ['Decline DB Press', 'Decline DB Bench']],
-  ['Close-Grip_Dumbbell_Press', 'horizontal-push', 'dumbbell bench', 'triceps pecs', 'front-delt', 'weight-reps', 'fam-bench-press', ['Dumbbell Squeeze Press', 'Squeeze Press', 'Close-Grip DB Press']],
+  ['Close-Grip_Dumbbell_Press', 'horizontal-push', 'dumbbell bench', 'pecs', 'triceps front-delt', 'weight-reps', 'fam-bench-press', ['Dumbbell Squeeze Press', 'Squeeze Press', 'Close-Grip DB Press']],
   ['Cross_Body_Hammer_Curl', 'curl', 'dumbbell', 'brachialis biceps', 'forearms', 'weight-reps', 'fam-hammer-curl', ['Cross-Body Curl', 'Pinwheel Curl']],
   ['One_Arm_Dumbbell_Preacher_Curl', 'curl', 'dumbbell bench', 'biceps', 'brachialis', 'weight-reps', 'fam-preacher-curl', ['Single-Arm Dumbbell Preacher Curl', 'One-Arm Preacher Curl'], true],
   ['Standing_One-Arm_Dumbbell_Triceps_Extension', 'elbow-extension', 'dumbbell', 'triceps', '', 'weight-reps', 'fam-overhead-triceps-extension', ['Single-Arm Overhead Triceps Extension', 'One-Arm Overhead Extension'], true],
@@ -269,7 +269,7 @@ const ROWS = [
   ['own-clamshell', 'hip-abduction', 'bodyweight', 'glute-med', '', 'bodyweight-reps', 'fam-own-clamshell', ['Clamshells', 'Side-Lying Clamshell'], true],
   ['own-fire-hydrant', 'hip-abduction', 'bodyweight', 'glute-med', 'glute-max', 'bodyweight-reps', 'fam-own-fire-hydrant', ['Fire Hydrants', 'Quadruped Hip Abduction'], true],
   ['own-wall-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt', 'bodyweight-reps', 'fam-push-up', ['Wall Push-Ups', 'Wall Press-Up']],
-  ['Oblique_Crunches', 'core-flexion', 'bodyweight', 'obliques', 'abs', 'bodyweight-reps', 'fam-crunch', ['Side Crunch', 'Side Crunches'], true],
+  ['Oblique_Crunches', 'core-flexion', 'bodyweight', 'obliques', 'abs', 'bodyweight-reps', 'fam-crunch', [], true],
   ['Alternate_Heel_Touchers', 'core-flexion', 'bodyweight', 'obliques', 'abs', 'bodyweight-reps', 'fam-crunch', ['Heel Touches', 'Heel Taps', 'Alternating Heel Touch']],
   ['Exercise_Ball_Crunch', 'core-flexion', 'exercise-ball', 'abs', '', 'bodyweight-reps', 'fam-crunch', ['Swiss Ball Crunch', 'Exercise Ball Crunches', 'Ball Crunch']],
   ['Scissor_Kick', 'core-stability', 'bodyweight', 'abs hip-flexors', 'quads', 'time', 'fam-leg-raise', ['Scissor Kicks', 'Lying Scissor Kick']],
@@ -279,7 +279,7 @@ const ROWS = [
   ['Childs_Pose', 'mobility', 'bodyweight', 'lower-back', 'lats glute-max', 'time', 'fam-childs-pose', ['Child Pose', 'Kneeling Back Stretch']],
   ['Cat_Stretch', 'mobility', 'bodyweight', 'lower-back', 'rhomboids abs', 'time', 'fam-cat-stretch', ['Cat-Cow Stretch', 'Cat and Cow']],
   ['Triceps_Stretch', 'mobility', 'bodyweight', 'triceps', 'lats', 'time', 'fam-triceps-stretch', ['Overhead Triceps Stretch', 'Tricep Stretch'], true],
-  ['Kneeling_Hip_Flexor', 'mobility', 'bodyweight', 'hip-flexors quads', '', 'time', 'fam-kneeling-hip-flexor', ['Hip Flexor Stretch', 'Half-Kneeling Hip Flexor Stretch', 'Lunge Stretch'], true],
+  ['Kneeling_Hip_Flexor', 'mobility', 'bodyweight', 'hip-flexors', 'quads', 'time', 'fam-kneeling-hip-flexor', ['Hip Flexor Stretch', 'Half-Kneeling Hip Flexor Stretch', 'Lunge Stretch'], true],
   ['Standing_Gastrocnemius_Calf_Stretch', 'mobility', 'bodyweight', 'calves', '', 'time', 'fam-standing-gastrocnemius-calf-stretch', ['Standing Calf Stretch', 'Wall Calf Stretch'], true],
   ['own-cross-body-shoulder-stretch', 'mobility', 'bodyweight', 'rear-delt', 'rhomboids', 'time', 'fam-own-cross-body-shoulder-stretch', ['Cross-Body Arm Stretch', 'Across-Body Shoulder Stretch'], true],
   ['own-doorway-chest-stretch', 'mobility', 'bodyweight', 'pecs', 'front-delt', 'time', 'fam-own-doorway-chest-stretch', ['Doorway Stretch', 'Door Frame Chest Stretch', 'Pec Stretch']],
@@ -420,7 +420,7 @@ export const DISPLAY_NAMES = {
   Hanging_Pike: 'Toes to Bar',
 
   // req-145 batch 2
-  'Step-up_with_Knee_Raise': 'Bodyweight Step-Up',
+  'Step-up_with_Knee_Raise': 'Step-Up with Knee Drive',
   Leverage_High_Row: 'Machine High Row',
   'Lying_T-Bar_Row': 'Chest-Supported T-Bar Row',
   Decline_Dumbbell_Bench_Press: 'Decline Dumbbell Press',
@@ -580,4 +580,6 @@ export const EQUIPMENT_EXCEPTIONS = {
 export const GROUP_EXCEPTIONS = {
   Mountain_Climbers: 'free-db tags quadriceps; it is a core move driven by the abs and hip flexors (quads secondary).',
   Flutter_Kicks: 'free-db tags glutes; flutter kicks are a lying abs and hip flexor hold (req-140).',
+  'Close-Grip_Dumbbell_Press': 'free-db tags triceps; the squeeze press is a chest press, triceps secondary (req-145 coach review).',
+  Kneeling_Hip_Flexor: 'free-db tags quadriceps; the stretch targets the hip flexors, quads secondary (req-145 coach review).',
 }
