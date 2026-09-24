@@ -111,7 +111,8 @@ describe('common first, the rest on request', () => {
     assert.ok(hits.length > 0 && hits.every((item) => item.common))
     assert.ok(!hits.some((item) => item.id === 'Shoulder_Press_-_With_Bands'))
     assert.ok(rest.some((item) => item.id === 'Shoulder_Press_-_With_Bands'))
-    assert.ok(rest.every((item) => !item.common))
+    // req-147 (DEC-074 §4) — Band Shoulder Press is written (common, not a staple): check staple.
+    assert.ok(rest.every((item) => !item.staple))
   })
 
   // req-143 (sanctioned edit) — was `rest[0].id === 'Air_Bike'`; free-db's crunch is now

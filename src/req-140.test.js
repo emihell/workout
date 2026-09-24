@@ -36,7 +36,8 @@ const ADD = {
   'own-high-knees': false,
 }
 const BATCH = { ...PROMOTE, ...ADD }
-// req-145 — batch 2's 40 ids (req-145.test.js pins their staple marks).
+// req-145 — batch 2's 40 ids (req-145.test.js pins their staple marks); req-147 appends batch 3's
+// (DEC-074, the accepted "prior" exclusion).
 const BATCH_2 = [
   'Dumbbell_Squat', 'Step-up_with_Knee_Raise', 'own-dumbbell-deadlift', 'own-machine-back-extension', 'Leverage_High_Row',
   'Lying_T-Bar_Row', 'Decline_Dumbbell_Bench_Press', 'Close-Grip_Dumbbell_Press', 'Cross_Body_Hammer_Curl',
@@ -47,6 +48,16 @@ const BATCH_2 = [
   'Oblique_Crunches', 'Alternate_Heel_Touchers', 'Exercise_Ball_Crunch', 'Scissor_Kick', 'Plate_Twist', 'Hamstring_Stretch',
   'Quad_Stretch', 'Childs_Pose', 'Cat_Stretch', 'Kneeling_Hip_Flexor', 'Standing_Gastrocnemius_Calf_Stretch',
   'own-cross-body-shoulder-stretch', 'own-doorway-chest-stretch',
+  // req-147 batch 3
+  'Bicycling', 'own-kettlebell-deadlift', 'Seated_Dumbbell_Palms-Up_Wrist_Curl', 'Seated_Dumbbell_Palms-Down_Wrist_Curl',
+  'Leverage_Shrug', 'Smith_Machine_Bent_Over_Row', 'Smith_Machine_Upright_Row', 'Smith_Machine_Decline_Press',
+  'Smith_Single-Leg_Split_Squat', 'Decline_Dumbbell_Flyes', 'Preacher_Hammer_Dumbbell_Curl', 'Cable_Preacher_Curl',
+  'High_Cable_Curls', 'Cable_Wrist_Curl', 'Standing_Overhead_Barbell_Triceps_Extension', 'Shoulder_Press_-_With_Bands',
+  'External_Rotation_with_Cable', 'External_Rotation', 'Band_Good_Morning', 'Band_Hip_Adductions', 'Side_Leg_Raises',
+  'Physioball_Hip_Bridge', 'Flat_Bench_Leg_Pull-In', 'Exercise_Ball_Pull-In', 'One-Arm_Kettlebell_Row', 'Kettlebell_Halo',
+  'Scapular_Pull-Up', 'own-bear-crawl', 'extra-prone-ytw', 'extra-reverse-snow-angels', 'Inchworm', 'Worlds_Greatest_Stretch',
+  'Knee_Across_The_Body', 'Ankle_On_The_Knee', 'Front_Leg_Raises', 'Hug_Knees_To_Chest', 'own-butterfly-stretch',
+  'own-pigeon-stretch', 'own-couch-stretch', 'Side_Neck_Stretch',
 ]
 const ALIASES = [
   ['Bench Pull', 'own-seal-row'], ['Cable Tricep Pushdown', 'Triceps_Pushdown'],
@@ -71,7 +82,7 @@ describe('batch 1', () => {
       assert.equal(entry.staple, staple, id)
     }
     for (const id of Object.keys(PROMOTE)) assert.ok(!id.startsWith('own-') && !id.startsWith('extra-'), id)
-    assert.equal(common.length, 258) // req-145 (sanctioned count pin): + batch 2's 40
+    assert.equal(common.length, 298) // req-145/147 (DEC-074 §1): + batches 2 and 3
   })
 
   it('no own add shares a name key with any free-db entry (promote before add)', () => {
@@ -106,7 +117,7 @@ describe('staple', () => {
     const prior = common.filter((entry) => !(entry.id in BATCH) && !BATCH_2.includes(entry.id))
     assert.equal(prior.length, 178)
     for (const entry of prior) assert.equal(entry.staple, true, entry.id)
-    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15 + 6) // req-145 (sanctioned count pin): + 6 batch-2 staples
+    assert.equal(common.filter((entry) => entry.staple).length, 178 + 15 + 6 + 1) // req-145/147 (DEC-074 §1): + 6 batch-2 staples, + 1 batch-3
   })
 
   it('staple ⇒ common: a non-common entry with staple is rejected (fixture)', () => {

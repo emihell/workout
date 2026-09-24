@@ -3,7 +3,7 @@
 // muscles from the req-130 table only (muscleGroupsFor throws on anything else). Text
 // written by us. req-133 added the common exercises free-db lacks; their tags live in
 // common.js like every other common entry. req-139 added the missing staples (DEC-064);
-// req-138 rewrites their text. req-140 adds batch 1 of parity (DEC-066), req-145 batch 2. Ids are permanent
+// req-138 rewrites their text. req-140 adds batch 1 of parity (DEC-066), req-145 batch 2, req-147 batch 3. Ids are permanent
 // once stored.
 
 export const OWN_EXERCISES = [
@@ -797,5 +797,95 @@ export const OWN_EXERCISES = [
     category: 'stretching',
     images: [],
     id: 'own-doorway-chest-stretch',
+  },
+  // req-147 — batch 3 adds (level = difficulty).
+  {
+    name: 'Kettlebell Deadlift',
+    force: 'pull',
+    level: 'beginner',
+    mechanic: 'compound',
+    equipment: 'kettlebells',
+    primaryMuscles: ['hamstrings', 'glutes'],
+    secondaryMuscles: ['lower back', 'quadriceps', 'forearms'],
+    instructions: [
+      'Stand with your feet about hip width apart and a kettlebell on the floor between your feet.',
+      'Push your hips back, bend your knees and grip the handle with both hands, back flat.',
+      'Drive through your feet and stand up tall with the kettlebell hanging in front of you.',
+      'Hinge back down the same way and set the kettlebell on the floor.',
+    ],
+    category: 'strength',
+    images: [],
+    id: 'own-kettlebell-deadlift',
+  },
+  {
+    name: 'Bear Crawl',
+    force: 'push',
+    level: 'beginner',
+    mechanic: 'compound',
+    equipment: 'body only',
+    primaryMuscles: ['abdominals', 'shoulders'],
+    secondaryMuscles: ['quadriceps'],
+    instructions: [
+      'Start on your hands and knees, then lift your knees just off the floor.',
+      'Move forward by stepping one hand and the opposite foot at the same time.',
+      'Keep your back flat and your hips low as you crawl.',
+      'Crawl for the set time, forward or back and forth.',
+    ],
+    category: 'strength',
+    images: [],
+    id: 'own-bear-crawl',
+  },
+  {
+    name: 'Butterfly Stretch',
+    force: 'static',
+    level: 'beginner',
+    mechanic: 'isolation',
+    equipment: 'body only',
+    primaryMuscles: ['adductors'],
+    secondaryMuscles: [],
+    instructions: [
+      'Sit tall on the floor and bring the soles of your feet together, knees out to the sides.',
+      'Hold your feet or ankles and draw your heels toward your body.',
+      'Let your knees sink toward the floor and hold.',
+    ],
+    category: 'stretching',
+    images: [],
+    id: 'own-butterfly-stretch',
+  },
+  {
+    name: 'Pigeon Stretch',
+    force: 'static',
+    level: 'beginner',
+    mechanic: 'isolation',
+    equipment: 'body only',
+    primaryMuscles: ['glutes'],
+    secondaryMuscles: ['quadriceps'],
+    instructions: [
+      'From hands and knees, bring one knee forward behind the wrist on the same side, front heel toward the opposite hip.',
+      'Extend the other leg straight back along the floor.',
+      'Square your hips and lower your chest over the front leg as far as is comfortable.',
+      'Hold, then switch sides.',
+    ],
+    category: 'stretching',
+    images: [],
+    id: 'own-pigeon-stretch',
+  },
+  {
+    name: 'Couch Stretch',
+    force: 'static',
+    level: 'beginner',
+    mechanic: 'isolation',
+    equipment: 'body only',
+    primaryMuscles: ['quadriceps'],
+    secondaryMuscles: [],
+    instructions: [
+      'Kneel on a pad with your back to a wall or couch and slide one knee back so the shin rests up against it.',
+      'Step the other foot forward into a half-kneeling position.',
+      'Squeeze the glute of the back leg and lift your torso upright until you feel the stretch.',
+      'Hold, then switch sides.',
+    ],
+    category: 'stretching',
+    images: [],
+    id: 'own-couch-stretch',
   },
 ]
