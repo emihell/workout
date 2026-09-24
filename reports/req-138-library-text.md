@@ -504,7 +504,7 @@ lunge · fam-lunge · weight-reps · dumbbell · **quads**, **glute-max**, adduc
 4. Push through the front foot to bring the back foot forward to standing.
 5. Alternate legs, or finish one side before the other.
 
-**Mistakes:** Stepping back on a line so balance is lost · Pushing off the back foot to stand
+**Mistakes:** Stepping back too narrow, so you wobble · Pushing off the back foot to stand
 
 #### Dumbbell Step-Up — `Dumbbell_Step_Ups`
 
@@ -518,9 +518,9 @@ lunge · fam-lunge · weight-reps · dumbbell, box · **quads**, **glute-max**, 
 
 1. Stand facing a box or bench holding a dumbbell at each side.
 2. Place one foot fully on the box.
-3. Drive through that foot to stand up on the box, bringing the other foot up.
-4. Step back down with the same leg you brought up.
-5. Alternate legs, or finish one side before the other.
+3. Drive through that foot to stand up on the box, bringing the trailing foot up beside it.
+4. Step the trailing leg back down first, keeping the working foot on the box.
+5. Lower the working foot last, then alternate legs or finish one side before the other.
 
 **Mistakes:** Pushing off the floor foot to jump up · Box so high the hips tuck under
 
@@ -668,7 +668,7 @@ hip-extension · fam-glute-kickback · weight-reps · unilateral · cable · **g
 1. Attach an ankle strap to a low pulley and fasten it around one ankle.
 2. Face the machine and hold it for balance with a slight forward lean.
 3. Kick the strapped leg back until the hip is straight.
-4. Return the leg slowly to the front.
+4. Return the leg slowly until the foot is just under the hip.
 5. Finish the set, then switch sides.
 
 **Mistakes:** Arching the lower back to lift the leg higher · Swinging the leg with momentum
@@ -844,7 +844,7 @@ horizontal-push · fam-push-up · bodyweight-reps · bodyweight, bench · **uppe
 
 > A push-up with the feet raised on a bench, a harder version that shifts work toward the upper chest.
 
-**Form cues:** Feet on the bench, hands under shoulders · Hips stay level with the body · Chest leads toward the floor
+**Form cues:** Feet on the bench, hands just outside the shoulders · Hips stay level with the body · Chest leads toward the floor
 
 **Steps:**
 
@@ -895,7 +895,7 @@ horizontal-push · fam-push-up · bodyweight-reps · bodyweight · **pecs**, tri
 
 > A bodyweight press from the floor that trains the chest, triceps and front delts, with the core holding you straight.
 
-**Form cues:** Body in one line from head to heels · Hands under the shoulders · Elbows angled back, not out
+**Form cues:** Body in one line from head to heels · Hands just outside the shoulders · Elbows angled back, not out
 
 **Steps:**
 
@@ -914,7 +914,7 @@ horizontal-push · fam-push-up · bodyweight-reps · bodyweight · **pecs**, tri
 
 vertical-push · fam-overhead-press · weight-reps · dumbbell, bench · **deltoids**, triceps
 
-> A seated dumbbell press that rotates the palms as you press, working all three heads of the delts.
+> A seated dumbbell press that rotates the palms as you press, working the front and side delts.
 
 **Form cues:** Start palms facing you · Turn the palms out as you press · Smooth rotation, no jerk
 
@@ -925,7 +925,7 @@ vertical-push · fam-overhead-press · weight-reps · dumbbell, bench · **delto
 3. Finish with your arms straight overhead.
 4. Reverse the turn as you lower, ending with your palms facing you again.
 
-**Mistakes:** Rotating fully before pressing instead of during · Letting the elbows drop below the shoulders
+**Mistakes:** Rotating fully before pressing instead of during · Arching the lower back to push the weight up
 
 #### Dumbbell Shoulder Press — `Dumbbell_Shoulder_Press`
 
@@ -959,7 +959,7 @@ vertical-push · fam-overhead-press · weight-reps · machine · **deltoids**, t
 3. Press up until your arms are straight.
 4. Lower the handles slowly back to shoulder height.
 
-**Mistakes:** Seat set so high the range is cut short · Hips slide forward and the back arches
+**Mistakes:** Seat so low the handles start above the shoulders · Hips slide forward and the back arches
 
 #### Push Press — `Push_Press`
 
@@ -1109,11 +1109,11 @@ vertical-push · fam-dip · weight-reps · machine · **triceps**, **mid-lower-c
 
 > A dip on a machine that counterweights part of your bodyweight, for building up to full dips.
 
-**Form cues:** More assistance means an easier dip · Torso upright, elbows back · Full range on every rep
+**Form cues:** Shoulders down before you press · Torso upright, elbows back · Full range on every rep
 
 **Steps:**
 
-1. Set the assistance, then kneel or stand on the platform and grip the bars.
+1. Set the assistance, more for an easier dip, then kneel or stand on the platform and grip the bars.
 2. Start with straight arms and your shoulders down.
 3. Bend your elbows and lower yourself until your upper arms are about parallel to the floor.
 4. Press back up until your arms are straight.
@@ -1368,7 +1368,7 @@ horizontal-pull · fam-inverted-row · bodyweight-reps · suspension, bodyweight
 2. Pull your chest up toward the handles, driving your elbows back.
 3. Lower yourself slowly until your arms are straight.
 
-**Mistakes:** Hips drop as you pull · Straps rub or twist against the arms
+**Mistakes:** Hips drop as you pull · Elbows flare and the shoulders shrug
 
 ## vertical-pull (7)
 
@@ -1380,11 +1380,11 @@ vertical-pull · fam-pull-up · bodyweight-reps · pull-up-bar, bands · **lats*
 
 > A pull-up with a resistance band under the feet or knees that takes some of your bodyweight.
 
-**Form cues:** Band looped securely on the bar · Thicker band means more help · Control the band on the way down
+**Form cues:** Shoulders down before you pull · Band looped securely on the bar · Control the band on the way down
 
 **Steps:**
 
-1. Loop a band over the bar and pull the end through itself so it is secure.
+1. Loop a band over the bar and pull the end through itself; a thicker band gives more help.
 2. Grip the bar and place one foot or knee in the band, then the other.
 3. Hang with straight arms and pull up until your chin clears the bar.
 4. Lower yourself slowly and let the band stretch under control.
@@ -1448,11 +1448,11 @@ vertical-pull · fam-pull-up · weight-reps · machine · **lats**, biceps, rhom
 
 > A pull-up on a machine that counterweights part of your bodyweight, for building up to full pull-ups.
 
-**Form cues:** More assistance means an easier rep · Start from straight arms · Chin over the bar
+**Form cues:** Shoulders down before you pull · Start from straight arms · Chin over the bar
 
 **Steps:**
 
-1. Set the assistance, then step or kneel on the platform and grip the handles.
+1. Set the assistance, more for an easier rep, then step or kneel on the platform and grip the handles.
 2. Let the platform lower you until your arms are straight.
 3. Pull yourself up until your chin clears the handles.
 4. Lower yourself under control until your arms are straight again.
@@ -1756,7 +1756,7 @@ raise · fam-lateral-raise · weight-reps · machine · **side-delt**, traps
 
 > A seated machine version of the lateral raise that trains the side delts on a fixed arc.
 
-**Form cues:** Shoulders lined up with the pivots · Push with the elbows, not the hands · Chest against the pad
+**Form cues:** Shoulders lined up with the pivots · Push with the elbows, not the hands · Sit tall against the pad
 
 **Steps:**
 
@@ -1817,7 +1817,7 @@ curl · fam-curl · weight-reps · dumbbell · **biceps**, brachialis, forearms
 
 **Steps:**
 
-1. Stand holding a dumbbell at each side with your palms facing forward.
+1. Stand holding a dumbbell at each side with your palms facing your sides.
 2. Curl the dumbbells toward your shoulders, keeping your elbows still.
 3. Squeeze at the top.
 4. Lower them slowly until your arms are straight.
@@ -2236,7 +2236,7 @@ leg-curl · fam-leg-curl · weight-reps · machine · **hamstrings**, calves
 
 **Steps:**
 
-1. Adjust the seat so your knees line up with the pivot and the pad sits above your ankles.
+1. Adjust the seat so your knees line up with the pivot and the pad sits behind your lower legs, just above the heels.
 2. Lower the thigh pad so it holds your legs down.
 3. Curl your heels down and back as far as you can.
 4. Let the pad rise slowly until your legs are nearly straight.
@@ -2296,7 +2296,7 @@ leg-curl · fam-glute-ham-raise · bodyweight-reps · bodyweight · **hamstrings
 4. Catch yourself with your hands when you can no longer hold it.
 5. Push off lightly with your hands and pull yourself back up with your hamstrings.
 
-**Mistakes:** Bending at the hips as you lower · Dropping fast in the top half
+**Mistakes:** Bending at the hips as you lower · Dropping fast in the bottom half near the floor
 
 ## leg-extension (1)
 
@@ -2379,7 +2379,7 @@ hip-adduction · fam-own-copenhagen-plank · time · unilateral · bench, bodywe
 4. Hold the position, then lower your hips to the floor.
 5. Switch sides and repeat.
 
-**Mistakes:** Hips sag toward the floor · Top hip rolls back toward the floor
+**Mistakes:** Hips sag toward the floor · Hips rotate back instead of staying stacked
 
 ## calf-raise (4)
 

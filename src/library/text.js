@@ -169,7 +169,7 @@ const TEXT = {
   ],
   Pushups: [
     'A bodyweight press from the floor that trains the chest, triceps and front delts, with the core holding you straight.',
-    ['Body in one line from head to heels', 'Hands under the shoulders', 'Elbows angled back, not out'],
+    ['Body in one line from head to heels', 'Hands just outside the shoulders', 'Elbows angled back, not out'],
     [
       'Place your hands on the floor a little wider than your shoulders.',
       'Step your feet back so your body forms a straight line from head to heels.',
@@ -191,7 +191,7 @@ const TEXT = {
   ],
   'Decline_Push-Up': [
     'A push-up with the feet raised on a bench, a harder version that shifts work toward the upper chest.',
-    ['Feet on the bench, hands under shoulders', 'Hips stay level with the body', 'Chest leads toward the floor'],
+    ['Feet on the bench, hands just outside the shoulders', 'Hips stay level with the body', 'Chest leads toward the floor'],
     [
       'Place your feet on a bench and your hands on the floor, a little wider than your shoulders.',
       'Set your body in a straight line from head to feet.',
@@ -268,9 +268,9 @@ const TEXT = {
   ],
   'own-assisted-dip': [
     'A dip on a machine that counterweights part of your bodyweight, for building up to full dips.',
-    ['More assistance means an easier dip', 'Torso upright, elbows back', 'Full range on every rep'],
+    ['Shoulders down before you press', 'Torso upright, elbows back', 'Full range on every rep'],
     [
-      'Set the assistance, then kneel or stand on the platform and grip the bars.',
+      'Set the assistance, more for an easier dip, then kneel or stand on the platform and grip the bars.',
       'Start with straight arms and your shoulders down.',
       'Bend your elbows and lower yourself until your upper arms are about parallel to the floor.',
       'Press back up until your arms are straight.',
@@ -304,7 +304,7 @@ const TEXT = {
     ['Arching the lower back off the pad', 'Dumbbells drift out wide at the top'],
   ],
   Arnold_Dumbbell_Press: [
-    'A seated dumbbell press that rotates the palms as you press, working all three heads of the delts.',
+    'A seated dumbbell press that rotates the palms as you press, working the front and side delts.',
     ['Start palms facing you', 'Turn the palms out as you press', 'Smooth rotation, no jerk'],
     [
       'Sit on an upright bench holding the dumbbells in front of your shoulders, palms facing you.',
@@ -312,7 +312,7 @@ const TEXT = {
       'Finish with your arms straight overhead.',
       'Reverse the turn as you lower, ending with your palms facing you again.',
     ],
-    ['Rotating fully before pressing instead of during', 'Letting the elbows drop below the shoulders'],
+    ['Rotating fully before pressing instead of during', 'Arching the lower back to push the weight up'],
   ],
   Machine_Shoulder_Military_Press: [
     'A seated machine press overhead that trains the delts and triceps on a guided path.',
@@ -323,7 +323,7 @@ const TEXT = {
       'Press up until your arms are straight.',
       'Lower the handles slowly back to shoulder height.',
     ],
-    ['Seat set so high the range is cut short', 'Hips slide forward and the back arches'],
+    ['Seat so low the handles start above the shoulders', 'Hips slide forward and the back arches'],
   ],
   Push_Press: [
     'A barbell press overhead started with a short dip and drive of the legs, training the delts and triceps.',
@@ -385,7 +385,7 @@ const TEXT = {
   ],
   'own-machine-lateral-raise': [
     'A seated machine version of the lateral raise that trains the side delts on a fixed arc.',
-    ['Shoulders lined up with the pivots', 'Push with the elbows, not the hands', 'Chest against the pad'],
+    ['Shoulders lined up with the pivots', 'Push with the elbows, not the hands', 'Sit tall against the pad'],
     [
       'Adjust the seat so your shoulders line up with the machine pivots.',
       'Sit with your arms against the pads and grip the handles lightly.',
@@ -531,9 +531,9 @@ const TEXT = {
   ],
   'Band_Assisted_Pull-Up': [
     'A pull-up with a resistance band under the feet or knees that takes some of your bodyweight.',
-    ['Band looped securely on the bar', 'Thicker band means more help', 'Control the band on the way down'],
+    ['Shoulders down before you pull', 'Band looped securely on the bar', 'Control the band on the way down'],
     [
-      'Loop a band over the bar and pull the end through itself so it is secure.',
+      'Loop a band over the bar and pull the end through itself; a thicker band gives more help.',
       'Grip the bar and place one foot or knee in the band, then the other.',
       'Hang with straight arms and pull up until your chin clears the bar.',
       'Lower yourself slowly and let the band stretch under control.',
@@ -542,9 +542,9 @@ const TEXT = {
   ],
   'own-assisted-pull-up': [
     'A pull-up on a machine that counterweights part of your bodyweight, for building up to full pull-ups.',
-    ['More assistance means an easier rep', 'Start from straight arms', 'Chin over the bar'],
+    ['Shoulders down before you pull', 'Start from straight arms', 'Chin over the bar'],
     [
-      'Set the assistance, then step or kneel on the platform and grip the handles.',
+      'Set the assistance, more for an easier rep, then step or kneel on the platform and grip the handles.',
       'Let the platform lower you until your arms are straight.',
       'Pull yourself up until your chin clears the handles.',
       'Lower yourself under control until your arms are straight again.',
@@ -728,7 +728,7 @@ const TEXT = {
       'Pull your chest up toward the handles, driving your elbows back.',
       'Lower yourself slowly until your arms are straight.',
     ],
-    ['Hips drop as you pull', 'Straps rub or twist against the arms'],
+    ['Hips drop as you pull', 'Elbows flare and the shoulders shrug'],
   ],
   Barbell_Deadlift: [
     'A barbell lifted from the floor to standing that trains the glutes, hamstrings and lower back.',
@@ -1011,7 +1011,7 @@ const TEXT = {
       'Push through the front foot to bring the back foot forward to standing.',
       'Alternate legs, or finish one side before the other.',
     ],
-    ['Stepping back on a line so balance is lost', 'Pushing off the back foot to stand'],
+    ['Stepping back too narrow, so you wobble', 'Pushing off the back foot to stand'],
   ],
   Split_Squat_with_Dumbbells: [
     'A split squat with the rear foot on a bench, a Bulgarian split squat, that trains the quads and glutes.',
@@ -1042,9 +1042,9 @@ const TEXT = {
     [
       'Stand facing a box or bench holding a dumbbell at each side.',
       'Place one foot fully on the box.',
-      'Drive through that foot to stand up on the box, bringing the other foot up.',
-      'Step back down with the same leg you brought up.',
-      'Alternate legs, or finish one side before the other.',
+      'Drive through that foot to stand up on the box, bringing the trailing foot up beside it.',
+      'Step the trailing leg back down first, keeping the working foot on the box.',
+      'Lower the working foot last, then alternate legs or finish one side before the other.',
     ],
     ['Pushing off the floor foot to jump up', 'Box so high the hips tuck under'],
   ],
@@ -1063,7 +1063,7 @@ const TEXT = {
     'A seated machine curl of the knees that isolates the hamstrings.',
     ['Knees lined up with the pivot', 'Thigh pad snug', 'Slow on the way back'],
     [
-      'Adjust the seat so your knees line up with the pivot and the pad sits above your ankles.',
+      'Adjust the seat so your knees line up with the pivot and the pad sits behind your lower legs, just above the heels.',
       'Lower the thigh pad so it holds your legs down.',
       'Curl your heels down and back as far as you can.',
       'Let the pad rise slowly until your legs are nearly straight.',
@@ -1125,7 +1125,7 @@ const TEXT = {
       'Catch yourself with your hands when you can no longer hold it.',
       'Push off lightly with your hands and pull yourself back up with your hamstrings.',
     ],
-    ['Bending at the hips as you lower', 'Dropping fast in the top half'],
+    ['Bending at the hips as you lower', 'Dropping fast in the bottom half near the floor'],
   ],
   Barbell_Hip_Thrust: [
     'A barbell hip thrust with the upper back on a bench that trains the glutes.',
@@ -1180,7 +1180,7 @@ const TEXT = {
       'Attach an ankle strap to a low pulley and fasten it around one ankle.',
       'Face the machine and hold it for balance with a slight forward lean.',
       'Kick the strapped leg back until the hip is straight.',
-      'Return the leg slowly to the front.',
+      'Return the leg slowly until the foot is just under the hip.',
       'Finish the set, then switch sides.',
     ],
     ['Arching the lower back to lift the leg higher', 'Swinging the leg with momentum'],
@@ -1240,7 +1240,7 @@ const TEXT = {
       'Hold the position, then lower your hips to the floor.',
       'Switch sides and repeat.',
     ],
-    ['Hips sag toward the floor', 'Top hip rolls back toward the floor'],
+    ['Hips sag toward the floor', 'Hips rotate back instead of staying stacked'],
   ],
   Standing_Calf_Raises: [
     'A standing machine calf raise with pads on the shoulders that trains the calves.',
@@ -1315,7 +1315,7 @@ const TEXT = {
     'A standing curl with a dumbbell in each hand that trains the biceps.',
     ['Palms turn up as you curl', 'Elbows stay at your sides', 'Control the way down'],
     [
-      'Stand holding a dumbbell at each side with your palms facing forward.',
+      'Stand holding a dumbbell at each side with your palms facing your sides.',
       'Curl the dumbbells toward your shoulders, keeping your elbows still.',
       'Squeeze at the top.',
       'Lower them slowly until your arms are straight.',
