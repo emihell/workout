@@ -407,7 +407,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   *assistance*, so a higher number is easier, but `progress.js` reads more kg as progress. The own-assisted-* entries
   are `weight-reps` for now. Needs a decision (an `assisted` logAs, or inverting progress for it) before req-132 sets
   type from `logAs`. Also note: Hyperextensions / Russian Twist are `bodyweight-reps` but are often done with a plate.
-- **`req-138` library text pass** (split from req-133 by its spec review) — for the common entries: `description`
+- **`req-138` library text pass** (READY — `work/req-138-library-text-pass.md`; split from req-133 by its spec review) — for the common entries: `description`
   (≤120 chars), `cues` (2–3, ≤70 chars each), `steps` (≥3, clear), `mistakes` (1–3). Ours, from free-db's
   instructions + general knowledge, never RepDB (DEC-060 §3). Feeds req-131; runs before it.
 - **`req-136` "something's wrong" tap** on an exercise → a note (wrong muscle / bad cue / …) into the in-app
