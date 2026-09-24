@@ -1347,3 +1347,7 @@ the spec. Each is still called out in the report:
 4. a test asserting "no common entry in rest" may check `staple` instead of `common` (the req-139 shoulder-press case).
 Anything else still needs an explicit sanction.
 
+**DEC-074 addition (planning, 2026-09-24, from req-147):** 5. the req-140 "every prior common entry is a staple" test
+gains each batch's non-staples in its exclusion list; 6. when no real row remains for a pending-target check, a fixture
+row may stand in (same intent).
+

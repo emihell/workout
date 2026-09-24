@@ -1718,3 +1718,11 @@ moves, wall push-up, clamshell, fire hydrant, a basic stretch set). 27 merge-lat
 (+ Dumbbell_Step_Ups unilateral). Test edits: count pins + 4 data-forced, now standing (DEC-074). Gate: Planner's own run in
 an archive copy → `# tests 808 # pass 808 # fail 0`, build ✓ (main 341.24 kB); spot-searched 8 queries. Reviewer (code): none.
 
+## req-147 — library batch 3: 40 more entries (stretches, bands, cable/Smith variants)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `830fb99`…`c4c7595`). 35 promoted + 5 own adds; staple: Outdoor Cycling. 16
+merge-later rows became merges. Library: 298 common, 200 staples; queue 74 left. Coach QA (independent subagent): 2 wrong
+fixed (Band Good Morning band behind the neck → across the shoulders; Chin-to-Chest wrongly merged into Side Neck Stretch
+→ hidden) + 6 refinements. Gate: Planner's own run in an archive copy → `# tests 814 # pass 814 # fail 0`, build ✓ (main
+341.24 kB). Test edits: DEC-074 only. Reviewer (code): none.
+
