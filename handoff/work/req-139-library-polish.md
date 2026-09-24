@@ -1,6 +1,6 @@
 # req-139 — library polish: our own display names, missing staples, search = our library only, common first
 
-**Status: BUILT, NOT merged — branch `req-139`** — Phase 1. **Gate: functional** (library data + `exerciseCatalog.js` + the Search screen; no stored-data
+**Status: BUILT AND MERGED, 2026-09-24 — branch `req-139` (`4f3d488`…`a6100cf`, 2 commits).** — Phase 1. **Gate: functional** (library data + `exerciseCatalog.js` + the Search screen; no stored-data
 change — exercises already saved keep what they have). Spec reviewed independently 2026-09-24 (13 findings folded in:
 §Precise rules below). Emilio 2026-09-24 (DEC-064), after planning's critical comparison
 of our library vs free-db and RepDB. Runs **before** req-138 (text) and req-134 (browse), because both put these names
