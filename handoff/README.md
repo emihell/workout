@@ -21,15 +21,15 @@ Two persistent Claude Code sessions run in separate terminals against sibling wo
 Each tags its first line so Emilio tells the two terminals apart at a glance: its **own**
 messages start with the bare tag (`[PLANNER]` / `[BUILDER]` — which window this is); a
 **cross-session** message to the other session starts with **`from [PLANNER]`** /
-**`from [BUILDER]`** (incoming, not a relabel of the receiving window). Ephemeral build
-agents Builder spawns report back to Planner, not to Emilio's terminal, and do not tag.
+**`from [BUILDER]`** (incoming, not a relabel of the receiving window). Throwaway build
+agents Planner spawns (DEC-055) report back to Planner, not to Emilio's terminal, and do not tag.
 
 ## Ownership
 
 - Only the planning session (Planner) writes here. It touches no code.
 - Claude Code (Builder) treats everything here as **read-only input**.
-- **Enforced, not merely stated:** a permission deny rule blocks the Edit tool,
-  and a pre-commit hook rejects commits that touch `handoff/` without `HANDOFF=1`.
+- **Enforced, not merely stated:** a pre-commit hook rejects commits that touch `handoff/` without `HANDOFF=1`
+  (planning commits via `./plan save`, L-032). No settings deny rule exists (audit 2026-09-24).
   Reads are deliberately unrestricted.
 - Planning edits happen in a **separate worktree** on branch `planning`, so what
   Claude Code reads is always the last version merged to `main`, never one being

@@ -34,7 +34,9 @@ the logic layer is sound — the state machine, rest timing, snapshot-on-start,
 skipped-at-finish and draft-on-switch all work. "Flawless" is mostly a **design/UX
 pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
 
-- **`req-01` guard `saveState`** (in flight, READY) — the persist path can throw and
+> Historical list (2026-09-07). All shipped since: req-01, the styling reqs, the rest cue/wake-lock, req-24.
+
+- **`req-01` guard `saveState`** (SHIPPED) — the persist path can throw and
   lose data silently; the floor under "flawless". `work/req-01-guard-savestate.md`.
 - **Style the live-workout screens — the core of "flawless".** The app currently has
   **zero CSS** (raw HTML; set-to-set navigation is small text links). One-handed in a
@@ -408,7 +410,7 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - Tap targets below 44px: `.ui-addnote` ≈ 22px on the in-gym screens (`ui.css:660`). Long unbroken names overflow
   at 390px (no `overflow-wrap`).
 
-**Tier 3 — improvements** → **SHIPPED 2026-09-23 as req-124..129** (DEC-059); Phase 2 items stay for program-creation planning
+**Tier 3 — improvements** → **SHIPPED 2026-09-23 as req-124..129** (DEC-059) — *except* its dead-code items: `plannedWorkouts` and route.js's unread visit stack are still on `main` (audit 2026-09-24); Phase 2 items stay for program-creation planning
 - A replacement starts with 1 set (a 3-set swap costs 6 extra taps); Replace should land on the new exercise.
 - Typed-but-uncompleted set values are lost on navigation/reload (`SetLogForm` local state). Keep a draft on the
   active workout.
@@ -557,7 +559,7 @@ target before starting any of these; each is a milestone, not a `req`.
   backend/CDN). Depends on the exercise DB.
 - **AI program generation.** Composes programs from *our* tagged exercises. Depends on
   the exercise DB **and** the program model **and** a backend (key + cost can't sit
-  client-side). Falls under CLAUDE.md's external-call ask-gate. `exchange.js` already
+  client-side). Falls under the backend rules' ask-gate (DEC-085 §7). `exchange.js` already
   prototypes the "AI edits the database" idea manually.
 - **Full visual-design pass.** A real design language app-wide (beyond the Phase-1
   gym-flow polish). Its own milestone.
@@ -595,6 +597,8 @@ backend (database) ─→ users ─→ (multi-device)
   only the auto-backup-before-import net (Phase 1).
 
 ## Current shape (reference, not a task list)
+
+> Stale (2026-09-12 shape). Today's module map: `audits/2026-09-24.md` F-STRUCT-6.
 
 ```
 src/

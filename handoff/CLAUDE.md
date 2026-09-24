@@ -18,7 +18,7 @@ can tell the two terminals apart at a glance (both are local Claude Code), **tag
 first line of every message**: your own messages (this terminal, to Emilio) → **`[BUILDER]`**
 (which window this is); a **cross-session message** you `SendMessage` to Planner →
 **`from [BUILDER]`** (so in Planner's window it reads as *incoming from* you). Planner
-tags `[PLANNER]` / `from [PLANNER]` the same way. Ephemeral build agents you spawn report
+tags `[PLANNER]` / `from [PLANNER]` the same way. Throwaway build agents (Planner spawns them for batches, DEC-055) report
 back to Planner, not to Emilio's terminal, and do **not** tag.
 
 ## The project
@@ -56,8 +56,8 @@ your reply; don't fix it in place.
 
 **Enforced by one thing: `.githooks/pre-commit`**, which refuses any commit
 touching `handoff/` and prints the recovery
-(`git restore --staged --worktree handoff/`). `Edit(handoff/**)` catches some of
-it earlier but not the `Write` tool, so the commit is the layer that holds.
+(`git restore --staged --worktree handoff/`). No settings rule blocks the edit earlier
+(audit 2026-09-24), so the commit is the layer that holds.
 Every read works and always will.
 
 The planning session writes from a **separate git worktree** on a `planning`
