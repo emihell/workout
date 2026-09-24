@@ -325,3 +325,11 @@ spec review caught it. req-129 instead exempts only a branch whose reflog shows 
 proves that an FF'd branch **with** commits is still refused. A narrow hole remains: `git branch req-N <unmerged sha>` followed
 by an FF. **How to apply:** every exemption to a safety check gets a self-test of the case the check exists to catch, run
 against the new code **and** failing against a copy that has the exemption but not the check.
+
+## L-026 — a data table imported by a shared module lands in the main bundle  (2026-09-24)
+
+req-133's first cut put the tagging tables + validator in modules the app imports eagerly: main bundle 340.93 → 368.86 kB,
+unnoticed by any test. Builder caught it from the build output and moved the data behind the library's lazy import (back
+to 340.93 kB). **How to apply:** any req that adds data or a large table pastes the **main** chunk size before/after, not
+just the lazy chunk's, and a jump is explained or fixed before review.
+
