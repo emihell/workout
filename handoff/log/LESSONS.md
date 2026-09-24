@@ -350,3 +350,10 @@ short cue instead. **How to apply:** for any authored content that must not deri
 entry-level n-gram share + long contiguous runs after writing (never showing the source text to the writer), rewrite the
 flagged items, and paste the distribution beside a known-independent control.
 
+## L-029 — a top-level `new Set`/`new Map` in a data module defeats tree-shaking  (2026-09-24)
+
+req-140's first cut put `new Set(...)`/`new Map(...)` at module top level in `common.js`; the bundler can't prove those
+side-effect-free, so the tables rode into the main chunk (340.97 → 345.31 kB). Builder caught it from the L-026 size
+receipt and moved them inside `commonExercises()`. **How to apply:** data modules export plain literals or functions
+only; anything constructed runs inside a function. The L-026 main-chunk receipt is what catches a slip.
+

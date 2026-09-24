@@ -1250,3 +1250,44 @@ Supersedes DEC-060 §3's measurement (not its principle: never copy RepDB's text
    never enters git (RepDB licence term 3).
 Built as req-140 (batch 1).
 
+## DEC-067 — library content calls are delegated; beginner-first, room for advanced  (2026-09-24)
+
+Emilio, relayed by Builder from its terminal (not heard directly by planning): "you can decide, its hard for me to have
+an opinion on these things as i am not a coach or a gym buff - i am an amature trying to create an app for other
+amatures/beginners - but with the support for more advanced users as well - ill have to trust your judgement - but then
+iterate over with when there are actual users". Planning's own recommendation matched, and planning adopts the calls on
+its own authority, marked **(unconfirmed)** for Emilio's list:
+1. **Variants:** when free-db has a movement only in a loaded version (barbell/kettlebell/Smith), our bodyweight or
+   dumbbell version is an **add**, not a promote (equipment is part of an exercise's identity, e.g. Bodyweight_Squat vs
+   Barbell_Squat). Promote-before-add holds for the same movement with the same equipment.
+2. **Outdoor Run / Outdoor Walk are staples** — what beginners log most.
+3. **Yoga/pilates poses and flows are skipped for now;** ordinary stretches stay queued.
+4. The difficulty anchors stay as pinned in req-140.
+**Standing rule:** exercise-content calls (tags, staples, names, text, difficulty) are the planning/build sessions' to
+make, through the lens **beginner-first, with room for advanced**, and are revisited with real users. Behaviour and UX
+calls stay Emilio's.
+
+## DEC-068 — no auto-memory for either session; third-party data in a gitignored repo dir  (Emilio, 2026-09-24)
+
+1. Emilio, to Builder mid-build: "dont save anything in memory - EVERYTHING should be in the repo - nothing outside of
+   it - if you need to save anything - give it to planner". Builder deleted its one memory note (its content is DEC-067).
+   CLAUDE.md §"No auto-memory" updated to match PLANNING.md's rule (2026-09-12). Anything durable goes to planning, which
+   records it in `handoff/`.
+2. **Carve-out (planning's call, unconfirmed):** licensed third-party data that must stay out of git history (RepDB's
+   cached JSON, the full gap table with RepDB's names: DEC-066 §3, licence term 3) lives in the repo folder under a
+   **gitignored** `.vendor-cache/`, not in a session scratchpad. That keeps it in the repo folder, persistent across
+   sessions, and never committed.
+3. **The parity queue** (the promote/add candidates left after batch 1) is **ours**: free-db ids + our own names. It is
+   committed in `handoff/work/req-140-parity-queue.md`, so later batches don't depend on a scratchpad.
+
+## DEC-069 — aim: RepDB removed completely  (Emilio, 2026-09-24)
+
+1. **RepDB goes entirely** once req-140 lands. The parity queue is already ours (`work/req-140-parity-queue.md`), so later
+   batches don't need it. req-131 "How to" drops RepDB pictures and uses free-db photos + the video link until our own
+   images exist. Built as **req-142**: remove the Settings credit, the RepDB comments, `scripts/library-gap.mjs`, the
+   originality script's RepDB comparison, and `.vendor-cache/`. The never-copy principle (DEC-060 §3) stays as history.
+2. **For the image/avatar req:** Emilio wants to look at RepDB's images for inspiration when that work starts. Planning's
+   licence note stays attached to it: **Emilio may browse them himself; they are never given to the pixel-art agent as
+   input, reference or conditioning** (RepDB licence term 5), and nothing is traced from them.
+Supersedes DEC-065 §1 ("kept only for its pictures").
+
