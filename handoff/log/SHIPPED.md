@@ -1726,3 +1726,11 @@ fixed (Band Good Morning band behind the neck → across the shoulders; Chin-to-
 → hidden) + 6 refinements. Gate: Planner's own run in an archive copy → `# tests 814 # pass 814 # fail 0`, build ✓ (main
 341.24 kB). Test edits: DEC-074 only. Reviewer (code): none.
 
+## req-148 — library batch 4: 40 more (plyometrics, kettlebell ballistics, suspension, sled)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `0f496a1`…`db71ac3`). 32 promoted + 8 own adds, no staples. Library: 338 common
+(253/75/10), 200 staples; queue 34. Coach QA (independent subagent): 5 wrong fixed (KB clean hand-over-bell fault; clean
+and press → advanced + back cue; plate pinch and overhead carry sidedness; "split squats" → Split Squat) + families/patterns.
+Gate: Planner's own run in an archive copy → `# tests 821 # pass 821 # fail 0`, build ✓ (main 341.24 kB). Test edits: DEC-074
++ the req-140 hidden-entry exclusion (sanctioned). Reviewer (code): none.
+

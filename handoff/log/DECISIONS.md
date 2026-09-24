@@ -1351,3 +1351,12 @@ Anything else still needs an explicit sanction.
 gains each batch's non-staples in its exclusion list; 6. when no real row remains for a pending-target check, a fixture
 row may stand in (same intent).
 
+## DEC-075 — progression rules get their own req; until then the app only avoids wrong answers  (Emilio, 2026-09-24)
+
+1. "i dont want the app to change anything yet - i want a separate req where we set the rules and the code for how the
+   app should upgrade the routines - for now - do not touch them - but if there is an issue fix it." → **req-149
+   progression rules** (a design req, later), where the rules for ranges, AMRAP, assisted, and how routines get upgraded
+   are set. **req-150** fixes the three known-wrong cases by **holding** (no change), adding no new rule.
+2. **Server:** it runs on a computer Emilio uses as a server (details when req-146 starts). req-146 (backend) and req-144
+   (creation design) **wait**; current follow-ups are finished first.
+

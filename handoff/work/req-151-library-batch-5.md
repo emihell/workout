@@ -1,8 +1,8 @@
-# req-148 — library batch 4: the next ≤40 from the parity queue, fully written
+# req-151 — library batch 5 (last): the rest of the parity queue, written or hidden
 
-**Status: BUILT AND MERGED, 2026-09-24 — branch `req-148` (`0f496a1`…`db71ac3`, 2 commits).** — Phase 1, **data only**. **Gate: functional**. It's a follow-on batch under req-140's spec (DEC-066 §2),
+**Status: READY** — Phase 1, **data only**. **Gate: functional**. It's a follow-on batch under req-140's spec (DEC-066 §2),
 so its rules, validators and receipts apply unchanged. Emilio 2026-09-24: "yes lets finish this". It uses the lighter
-process (planning, 2026-09-24; batches 2–3 = req-145, req-147): no separate spec review, since it reuses req-140's reviewed spec; a coach QA of the
+process (planning, 2026-09-24; batches 2–4 = req-145, req-147, req-148): no separate spec review, since it reuses req-140's reviewed spec; a coach QA of the
 written entries before merge.
 
 ## The behaviour
@@ -27,3 +27,15 @@ written entries before merge.
 - Originality `--runs-only` = 0. `grep -ci repdb exercises.json` → 0. L-026 main chunk before/after (baseline 341.24 kB).
 - Sanctioned test edits: DEC-074 standing sanctions, each called out.
 - `./check` green; paste the line.
+
+## Batch 5 specifics (the last batch)
+
+- **Empty the queue:** each of the remaining 34 is either written, or **re-triaged to hide** with a one-line reason.
+  Beginner-first (DEC-067/071): hide what adds risk or noise without serving beginners or typical intermediates. That's
+  at least the **behind-the-neck presses and pulldowns** (a known shoulder-risk position). Donkey calf raise, neck
+  harness work and rare Olympic variants are the builder's judgement. Advanced staples of real calisthenics (L-sit,
+  archer push-up/pull-up, levers) may stay, marked advanced.
+- `PENDING_ADDS` ends empty, and every merge-later row is resolved (merge or hide).
+- **Up to par check (DEC-070 §1), in the report:** re-run the gap script's counts against the pinned RepDB list. Every
+  RepDB name is now covered by a written entry, an alias, a redirect, or a recorded skip/hide. Paste the counts. Show-more
+  holds 0 rough entries.
