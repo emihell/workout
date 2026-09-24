@@ -1152,3 +1152,21 @@ Built as req-114..120 (BACKLOG §Flow audit Tier 1).
    of creating a duplicate.
 4. **A duplicate exercise name warns but allows** ("An exercise called Bench already exists": use it, or create
    anyway).
+
+## DEC-060 — our own exercise library, pictures on tap first, our own styled images later  (Emilio, 2026-09-24)
+
+1. **Pulled forward from Phase 3:** "knowing how to do an exercise" is core, not later. First, a **button** shows the
+   pictures we already have (RepDB drawing / free-db photos auto-flipping / a video link the user pastes), on the log
+   screen and the exercise page — **never shown all the time** ("they are not really made for in-app showcase").
+   Then our **own styled images**, which *can* show all the time because they'll fit the app. Its own req.
+2. **Our own copy of free-exercise-db** (Unlicense), extended with our alternative names, muscle groups and better
+   text; links to both free-db and RepDB pictures saved per entry.
+3. **RepDB is read for structure, never copied** (Emilio: "never a straight up copy"). Planning's line, accepted
+   ("sounds good"): our text is written from free-db's public-domain instructions + general knowledge, not by
+   paraphrasing RepDB entry by entry (licence term 3: no derived dataset); RepDB images are **not** a reference for
+   our own images, since the author is a generative model (term 5) — free-db photos are the reference.
+4. **Existing exercises are matched, not user-matched:** Emilio rejected a mandatory "find photo" step. A fixed
+   alias list + saved `libraryId` on new adds; an optional "Link to library" for manually added ones.
+5. **Manual add suggests the library entry while typing** (one Add screen) so unlinked duplicates stop at source.
+Rejected: pixelating the photos (tested — the gym background swamps the figure); fuzzy auto-match (wrong picture).
+Built as req-130..133 (BACKLOG §Exercise library).

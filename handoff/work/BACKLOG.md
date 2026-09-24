@@ -380,6 +380,24 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - Tests: TZ-set schedule tests; a StoreProvider render test for import; a v9 snapshot round-trip test.
 - ~~Stale backlog notes~~: native-dialog count is **14** (req-24); N1's "Start disabled" was fixed by req-82 (routine picker).
 
+### Exercise library + "how to do it" — Emilio 2026-09-24 (DEC-060)
+
+- **`req-130` our own library** (READY) — free-db copy + aliases + muscle groups + picture links + RepDB credit.
+- **`req-131` "How to" button** — log screen + exercise page; opens RepDB drawing if linked, else free-db
+  start/end photos auto-flipping (~0.7 s), else the exercise's video link; hidden when none. New optional
+  per-exercise **video link** field (edit form). Uses `libraryEntryFor` (req-130). Offline → cues only, no broken
+  image. After req-130.
+- **`req-132` one Add screen** — replaces Add manually / Search: typing shows your exercises first (req-127 match),
+  then library hits (tap = add, linked), then "Create '<name>' as my own". Offline: no library hits, never blocks.
+  Plus **"Link to library"** on an unlinked exercise's page (best alias matches; optional). After req-130.
+- **`req-133` text pass** — per entry: a one-line description, tips, instructions rewritten clearer. Written from
+  free-db's instructions + general knowledge; **never from RepDB text** (DEC-060 §3). Content job for agents in
+  batches, sample-reviewed. After req-130.
+- **Our own styled exercise figures** (after req-131) — pose keyframes per exercise + a shared renderer, animated,
+  offline, one style, can show all the time. Prototype 2026-09-24 (leg press, 48×32 pixel sprite, 2 poses
+  interpolated) reads but is crude — style needs iteration. **Reference only free-db photos / general knowledge,
+  never RepDB images** (DEC-060 §3). Cost [inferred]: ~10–15k tokens per exercise with 2–3 rounds.
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
@@ -408,11 +426,11 @@ target before starting any of these; each is a milestone, not a `req`.
 - **Database (backend).** Move off `localStorage`. Enables multi-device and users.
   Biggest architectural change; needs a migration path from existing local data.
 - **Users / accounts.** Depends on the database. Reopens deferred scope (`README.md`).
-- **Own exercise database + tagging.** Curate our own library (seed from a free open
+- **Own exercise database + tagging.** *(Browser-only part pulled forward 2026-09-24 → §Exercise library, req-130.)* Curate our own library (seed from a free open
   DB), tagged with muscles, equipment, movement pattern. **The enabler** for filters,
   recommendations, and AI generation — do it before those. Decisions: which source DB
   and **its licence** (verify each); the tag schema; bundled JSON vs backend.
-- **Animations for basic exercises.** Demos keyed to the library. Decisions: source
+- **Animations for basic exercises.** *(Pulled forward 2026-09-24 → §Exercise library, req-131 + own figures.)* Demos keyed to the library. Decisions: source
   (make / licence / generate), format (video / gif / lottie), hosting (bundle bloat vs
   backend/CDN). Depends on the exercise DB.
 - **AI program generation.** Composes programs from *our* tagged exercises. Depends on
