@@ -18,8 +18,9 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **Next: `req-134` browse + muscle filter** — to spec (library tagging LIVE 2026-09-24: 163 common). Then 134 browse/filter → 136 → 132 → 137 → 138 → 131 → 135 → own
-  images (DEC-063 §4, BACKLOG §Exercise library). Clean start: not bent to Emilio's data (DEC-063). Own library LIVE 2026-09-24.
+- `req-139` **library polish** (READY) — our display names, ~10 missing staples, search = our library only,
+  common first (DEC-064). Then 138 text → 134 browse/filter → 136 → 132 → 137 → 131 → 135 → own images
+  (BACKLOG §Exercise library). Library: own copy + 163 common tagged, LIVE 2026-09-24.
   Unconfirmed calls (library req) for Emilio's list: rhomboids→Back, rear delts→Shoulders; `libraryId` kept on rename;
   whole-library aliases → the tagging pass; RepDB pictures joined at runtime.
 - `req-10` **first-time-exercise setup flow** — waiting (Emilio 2026-09-24: "core still needs improvement");

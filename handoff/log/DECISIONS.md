@@ -1210,3 +1210,18 @@ rough tags on obscure entries are worse than none). Built as req-133.
    offline library/images → req-131 "How to" → req-135 alternatives → own images, **pattern-based** (one base
    animation per movement pattern + equipment variants), with a 5-exercise style pilot in parallel from req-134.
 
+## DEC-064 — library polish after the critical comparison  (Emilio, 2026-09-24)
+
+From planning's critical comparison of our library vs free-db and RepDB, Emilio's answers:
+1. **Our own display names** for the common entries; copying the cleanest standard name is fine ("repdb does not own
+   naming of exercises"). Chosen per entry, not a bulk import of RepDB's name list. free-db's `name` stays underneath.
+2. **Search uses only our library** — RepDB leaves search; used only for pictures later (req-131). Missing staples are
+   added as our own entries instead.
+3. **Common exercises first**, the rest on request ("Show more").
+4. **Text pass (req-138) moves earlier**: right after req-139, before the browse screen.
+5. **Own images:** made with free-db, RepDB and web searches as inspiration — discussed in that req. Planning's flag
+   stands for that discussion: RepDB's licence term 5 bans its images as reference for generative models (DEC-060 §3).
+6. **free-db's `level` and `category` are dropped from use** (kept in the file only as provenance); re-add when missing.
+7. **Real-use corrections** come via the browse screen (req-134) and the "something's wrong" tap (req-136).
+New order: 139 → 138 → 134 → 136 → 132 → 137 → 131 → 135 → own images. Built as req-139.
+

@@ -415,7 +415,10 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - **`req-137` offline library + images** — keep the library chunk (and later pictures) available with no signal
   (service worker / cache). Infra; before own images.
 - **Emilio's backup conversion** — one-off script: match → show mapping → write on his OK (DEC-063 §2, ask-gate #2).
-- **Order (DEC-063 §4):** 133 → 134 → 136 → 132 (+ live library link) → 137 → 138 → 131 → 135 → own images (pilot early).
+- **`req-139` library polish** (READY) — display names, ~10 missing staples, search = our library only, common first
+  (DEC-064).
+- **Order (DEC-064, supersedes DEC-063 §4):** 139 → 138 → 134 → 136 → 132 (+ live library link) → 137 → 131 → 135 →
+  own images (pilot early).
 - **Gyms (future, Emilio 2026-09-24)** — a user adds their own gym, or picks one from a gym library, and lists its
   equipment, so the app knows what's available and can filter alternatives / build programs within it. Notes for
   the spec: equipment uses the DEC-062 `equipmentList` vocabulary (maybe + specific machines, e.g. "Star Trac leg
