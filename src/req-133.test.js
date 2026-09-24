@@ -222,8 +222,8 @@ describe('own-* entries carry the legacy fields', () => {
     // req-139 (sanctioned edit) — was 9: + the 10 missing staples + 5 more (DEC-064).
     // req-140 (edit NOT on the spec's sanctioned list; flagged in reports/req-140.md) —
     // + the 13 batch-1 adds (DEC-066/067).
-    // req-145 (sanctioned count pin) — + the 8 batch-2 adds. req-147 (DEC-074 §1): + the 5 batch-3 adds.
-    assert.equal(OWN_EXERCISES.length, 50)
+    // req-145 (sanctioned count pin) — + the 8 batch-2 adds. req-147 (DEC-074 §1): + the 5 batch-3 adds; req-148: + 8 batch-4 adds.
+    assert.equal(OWN_EXERCISES.length, 58)
     for (const own of OWN_EXERCISES) {
       assert.ok(own.id.startsWith('own-'))
       assert.ok(own.equipment && own.category && own.instructions.length >= 3, own.id)

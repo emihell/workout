@@ -229,7 +229,7 @@ const ROWS = [
   ['Muscle_Up', 'vertical-pull', 'pull-up-bar suspension bodyweight', 'lats triceps', 'biceps rhomboids deltoids pecs abs', 'bodyweight-reps', 'fam-pull-up', ['Muscle Ups', 'Bar Muscle-Up', 'Ring Muscle-Up', 'Kipping Muscle-Up']],
   ['Handstand_Push-Ups', 'vertical-push', 'bodyweight', 'deltoids', 'triceps upper-chest', 'bodyweight-reps', 'fam-handstand-push-up', ['HSPU', 'Wall Handstand Push-Up']],
   ['Hanging_Pike', 'core-flexion', 'pull-up-bar bodyweight', 'abs hip-flexors', 'obliques forearms', 'bodyweight-reps', 'fam-leg-raise', ['T2B', 'TTB']],
-  ['own-split-squat', 'lunge', 'dumbbell bodyweight', 'quads glute-max', 'adductors hamstrings', 'weight-reps', 'fam-lunge', ['Dumbbell Split Squat', 'Static Lunge', 'Stationary Lunge'], true],
+  ['own-split-squat', 'lunge', 'dumbbell bodyweight', 'quads glute-max', 'adductors hamstrings', 'weight-reps', 'fam-lunge', ['Dumbbell Split Squat', 'Static Lunge', 'Stationary Lunge', 'Split Squats'], true],
   ['own-lateral-lunge', 'lunge', 'bodyweight', 'quads glute-max adductors', 'hamstrings', 'bodyweight-reps', 'fam-lunge', ['Side Lunge', 'Side Lunges', 'Lateral Lunges']],
   ['own-knee-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt', 'bodyweight-reps', 'fam-push-up', ['Kneeling Push-Up', 'Knee Push-Ups', 'Modified Push-Up']],
   ['own-outdoor-run', 'cardio', 'bodyweight', 'quads hamstrings calves', 'glute-max', 'cardio', 'fam-outdoor', ['Running', 'Run', 'Jogging', 'Road Run', 'Trail Running']],
@@ -324,6 +324,47 @@ const ROWS = [
   ['own-pigeon-stretch', 'mobility', 'bodyweight', 'glute-max', 'hip-flexors', 'time', 'fam-own-pigeon-stretch', ['Pigeon Pose', 'Pigeon Glute Stretch'], true],
   ['own-couch-stretch', 'mobility', 'bodyweight', 'hip-flexors quads', '', 'time', 'fam-own-couch-stretch', ['Couch Hip Flexor Stretch', 'Rear-Foot-Elevated Hip Flexor Stretch'], true],
   ['Side_Neck_Stretch', 'mobility', 'bodyweight', 'neck', 'traps', 'time', 'fam-side-neck-stretch', ['Neck Stretch', 'Lateral Neck Stretch'], true],
+  // req-148 — library batch 4
+  ['Kneeling_Forearm_Stretch', 'mobility', 'bodyweight', 'forearms', '', 'time', 'fam-kneeling-forearm-stretch', ['Wrist Flexor Stretch', 'Kneeling Wrist Stretch']],
+  ['The_Straddle', 'mobility', 'bodyweight', 'hamstrings adductors', 'lower-back', 'time', 'fam-the-straddle', ['Straddle Stretch', 'Seated Wide-Leg Stretch']],
+  ['Round_The_World_Shoulder_Stretch', 'mobility', 'bodyweight', 'deltoids', 'pecs', 'bodyweight-reps', 'fam-round-the-world-shoulder-stretch', ['Shoulder Dislocates', 'Stick Pass-Through', 'Band Pass-Through']],
+  ['Plate_Pinch', 'carry', 'plate', 'forearms', '', 'weight-time', 'fam-plate-pinch', ['Plate Pinch Hold', 'Pinch Grip Hold'], true],
+  ['Wrist_Roller', 'curl', 'plate', 'forearms', 'deltoids', 'weight-reps', 'fam-wrist-roller', ['Wrist Roller Curl', 'Forearm Roller']],
+  ['Svend_Press', 'horizontal-push', 'plate', 'pecs', 'front-delt triceps', 'weight-reps', 'fam-svend-press', ['Plate Squeeze Press', 'Plate Press']],
+  ['Drag_Curl', 'curl', 'barbell', 'biceps', 'brachialis', 'weight-reps', 'fam-curl', ['Barbell Drag Curl', 'Drag Curls']],
+  ['Seated_Triceps_Press', 'elbow-extension', 'dumbbell bench', 'triceps', '', 'weight-reps', 'fam-overhead-triceps-extension', ['Seated Overhead Dumbbell Extension', 'Seated Two-Hand Triceps Extension']],
+  ['Kneeling_High_Pulley_Row', 'vertical-pull', 'cable', 'lats', 'rhomboids biceps', 'weight-reps', 'fam-row', ['Kneeling Rope Row', 'Kneeling Cable Pulldown']],
+  ['Kettlebell_Sumo_High_Pull', 'olympic', 'kettlebell', 'traps glute-max', 'side-delt hamstrings quads', 'weight-reps', 'fam-kettlebell-sumo-high-pull', ['KB Sumo High Pull', 'Sumo High Pull']],
+  ['Two-Arm_Kettlebell_Military_Press', 'vertical-push', 'kettlebell', 'deltoids', 'triceps', 'weight-reps', 'fam-overhead-press', ['Double Kettlebell Overhead Press', 'Double KB Press']],
+  ['Kettlebell_Windmill', 'core-stability', 'kettlebell', 'obliques', 'glute-max hamstrings deltoids', 'weight-reps', 'fam-kettlebell-windmill', ['KB Windmill', 'Kettlebell Windmills'], true],
+  ['One-Arm_Kettlebell_Clean', 'olympic', 'kettlebell', 'glute-max hamstrings', 'traps deltoids lower-back', 'weight-reps', 'fam-clean', ['Kettlebell Clean', 'Single-Arm Kettlebell Clean', 'KB Clean'], true],
+  ['One-Arm_Kettlebell_Snatch', 'olympic', 'kettlebell', 'glute-max hamstrings deltoids', 'traps lower-back', 'weight-reps', 'fam-snatch', ['Kettlebell Snatch', 'Single-Arm Kettlebell Snatch', 'KB Snatch'], true],
+  ['Alternating_Renegade_Row', 'horizontal-pull', 'dumbbell', 'lats rhomboids', 'abs biceps', 'weight-reps', 'fam-row', ['Renegade Rows', 'Dumbbell Renegade Row', 'Plank Row']],
+  ['Weighted_Sissy_Squat', 'squat', 'bodyweight', 'quads', '', 'bodyweight-reps', 'fam-squat', ['Sissy Squats']],
+  ['Barbell_Step_Ups', 'lunge', 'barbell box', 'quads glute-max', 'hamstrings adductors', 'weight-reps', 'fam-lunge', ['Barbell Step-Ups', 'BB Step-Up'], true],
+  ['Reverse_Grip_Bent-Over_Rows', 'horizontal-pull', 'barbell', 'lats rhomboids', 'biceps rear-delt lower-back', 'weight-reps', 'fam-row', ['Underhand Barbell Row', 'Supinated Barbell Row']],
+  ['Reverse_Hyperextension', 'hip-extension', 'machine', 'glute-max hamstrings', 'lower-back', 'weight-reps', 'fam-reverse-hyperextension', ['Reverse Hyper Machine', 'Reverse Hypers']],
+  ['Sled_Drag_-_Harness', 'carry', 'sled', 'quads glute-max', 'hamstrings calves', 'weight-time', 'fam-sled-drag-harness', ['Sled Pull', 'Harness Sled Drag']],
+  ['Landmine_180s', 'core-rotation', 'barbell landmine', 'obliques', 'abs deltoids', 'weight-reps', 'fam-landmine-180s', ['Landmine Twist', 'Landmine 180', 'Landmine Rainbow']],
+  ['Clean_and_Press', 'olympic', 'barbell', 'deltoids glute-max quads', 'hamstrings traps triceps', 'weight-reps', 'fam-clean', ['Barbell Clean and Press', 'Clean & Press']],
+  ['Dumbbell_Clean', 'olympic', 'dumbbell', 'glute-max hamstrings quads', 'traps deltoids', 'weight-reps', 'fam-clean', ['DB Clean', 'Dumbbell Power Clean']],
+  ['Knee_Tuck_Jump', 'plyometric', 'bodyweight', 'quads glute-max', 'calves abs', 'bodyweight-reps', 'fam-knee-tuck-jump', ['Tuck Jumps', 'Knee Tuck Jumps']],
+  ['Lateral_Bound', 'plyometric', 'bodyweight', 'glute-max quads', 'glute-med adductors calves', 'bodyweight-reps', 'fam-lateral-bound', ['Skater Jumps', 'Skaters', 'Speed Skater']],
+  ['Split_Jump', 'plyometric', 'bodyweight', 'quads glute-max', 'hamstrings calves', 'bodyweight-reps', 'fam-split-jump', ['Jumping Lunge', 'Jump Lunge', 'Split Jumps']],
+  ['Standing_Long_Jump', 'plyometric', 'bodyweight', 'quads glute-max', 'hamstrings calves', 'bodyweight-reps', 'fam-standing-long-jump', ['Standing Broad Jump', 'Broad Jumps']],
+  ['Plyo_Push-up', 'plyometric', 'bodyweight', 'pecs', 'triceps front-delt', 'bodyweight-reps', 'fam-push-up', ['Clap Push-Up', 'Explosive Push-Up']],
+  ['Suspended_Reverse_Crunch', 'core-flexion', 'suspension', 'abs', 'hip-flexors', 'bodyweight-reps', 'fam-leg-raise', ['TRX Knee Tuck', 'Suspension Crunch']],
+  ['Suspended_Push-Up', 'horizontal-push', 'suspension', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['TRX Push-Up', 'Ring Push-Up']],
+  ['Suspended_Split_Squat', 'lunge', 'suspension', 'quads glute-max', 'hamstrings adductors', 'bodyweight-reps', 'fam-lunge', ['TRX Split Squat', 'Suspension Bulgarian Split Squat'], true],
+  ['own-suspension-curl', 'curl', 'suspension', 'biceps', 'forearms', 'bodyweight-reps', 'fam-own-suspension-curl', ['TRX Curl', 'TRX Bicep Curl', 'Ring Curl']],
+  ['own-suspension-leg-curl', 'leg-curl', 'suspension', 'hamstrings', 'glute-max', 'bodyweight-reps', 'fam-leg-curl', ['TRX Hamstring Curl', 'TRX Leg Curl']],
+  ['own-dumbbell-front-squat', 'squat', 'dumbbell', 'quads glute-max', 'abs adductors', 'weight-reps', 'fam-squat', ['DB Front Squat', 'Dumbbell Front Squats']],
+  ['own-overhead-carry', 'carry', 'dumbbell kettlebell', 'deltoids abs', 'traps triceps', 'weight-time', 'fam-farmers-walk', ['Overhead Walk', 'Overhead Farmer Carry']],
+  ['own-reverse-plank', 'core-stability', 'bodyweight', 'glute-max lower-back', 'hamstrings rear-delt', 'time', 'fam-plank', ['Reverse Planks', 'Back Plank']],
+  ['own-stability-ball-pike', 'core-flexion', 'exercise-ball', 'abs', 'hip-flexors deltoids', 'bodyweight-reps', 'fam-leg-raise', ['Swiss Ball Pike', 'Ball Pike', 'Stability Ball Pike-Up']],
+  ['own-windshield-wipers', 'core-rotation', 'bodyweight', 'obliques', 'abs hip-flexors', 'bodyweight-reps', 'fam-own-windshield-wipers', ['Windshield Wiper', 'Lying Windshield Wipers']],
+  ['own-terminal-knee-extension', 'leg-extension', 'bands', 'quads', '', 'bodyweight-reps', 'fam-leg-extensions', ['TKE', 'Banded Knee Extension', 'Terminal Knee Extensions'], true],
+  ['Push-Ups_With_Feet_On_An_Exercise_Ball', 'horizontal-push', 'exercise-ball bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Swiss Ball Push-Up', 'Ball Decline Push-Up']],
 ]
 
 // req-139 / DEC-064 §1 — our display names: the standard gym name, chosen per entry on
@@ -506,6 +547,28 @@ export const DISPLAY_NAMES = {
   Ankle_On_The_Knee: 'Figure-Four Stretch',
   Front_Leg_Raises: 'Leg Swing',
   Hug_Knees_To_Chest: 'Knees-to-Chest Stretch',
+
+  // req-148 batch 4
+  The_Straddle: 'Seated Straddle Stretch',
+  Round_The_World_Shoulder_Stretch: 'Shoulder Pass-Through',
+  Seated_Triceps_Press: 'Seated Dumbbell Overhead Extension',
+  Kneeling_High_Pulley_Row: 'Kneeling High Cable Row',
+  'Two-Arm_Kettlebell_Military_Press': 'Double Kettlebell Press',
+  Alternating_Renegade_Row: 'Renegade Row',
+  Weighted_Sissy_Squat: 'Sissy Squat',
+  Barbell_Step_Ups: 'Barbell Step-Up',
+  'Reverse_Grip_Bent-Over_Rows': 'Reverse-Grip Barbell Row',
+  Reverse_Hyperextension: 'Reverse Hyper',
+  'Sled_Drag_-_Harness': 'Sled Drag',
+  Landmine_180s: 'Landmine Rotation',
+  Knee_Tuck_Jump: 'Tuck Jump',
+  Lateral_Bound: 'Skater Jump',
+  Standing_Long_Jump: 'Broad Jump',
+  'Plyo_Push-up': 'Plyometric Push-Up',
+  Suspended_Reverse_Crunch: 'Suspension Knee Tuck',
+  'Suspended_Push-Up': 'Suspension Push-Up',
+  Suspended_Split_Squat: 'Suspension Split Squat',
+  'Push-Ups_With_Feet_On_An_Exercise_Ball': 'Stability Ball Push-Up',
 }
 
 // req-140 / DEC-066 §1 — common entries that are NOT staples (fully written, but behind
@@ -536,6 +599,17 @@ export const NOT_STAPLES = [
   'extra-prone-ytw', 'extra-reverse-snow-angels', 'Inchworm', 'Worlds_Greatest_Stretch', 'Knee_Across_The_Body',
   'Ankle_On_The_Knee', 'Front_Leg_Raises', 'Hug_Knees_To_Chest', 'own-butterfly-stretch', 'own-pigeon-stretch',
   'own-couch-stretch', 'Side_Neck_Stretch',
+  // req-148 batch 4 (no staples)
+  'Kneeling_Forearm_Stretch', 'The_Straddle', 'Round_The_World_Shoulder_Stretch', 'Plate_Pinch', 'Wrist_Roller',
+  'Svend_Press', 'Drag_Curl', 'Seated_Triceps_Press', 'Kneeling_High_Pulley_Row', 'Kettlebell_Sumo_High_Pull',
+  'Two-Arm_Kettlebell_Military_Press', 'Kettlebell_Windmill', 'One-Arm_Kettlebell_Clean',
+  'One-Arm_Kettlebell_Snatch', 'Alternating_Renegade_Row', 'Weighted_Sissy_Squat', 'Barbell_Step_Ups',
+  'Reverse_Grip_Bent-Over_Rows', 'Reverse_Hyperextension', 'Sled_Drag_-_Harness', 'Landmine_180s', 'Clean_and_Press',
+  'Dumbbell_Clean', 'Knee_Tuck_Jump', 'Lateral_Bound', 'Split_Jump', 'Standing_Long_Jump', 'Plyo_Push-up',
+  'Suspended_Reverse_Crunch', 'Suspended_Push-Up', 'Suspended_Split_Squat', 'own-suspension-curl',
+  'own-suspension-leg-curl', 'own-dumbbell-front-squat', 'own-overhead-carry', 'own-reverse-plank',
+  'own-stability-ball-pike', 'own-windshield-wipers', 'own-terminal-knee-extension',
+  'Push-Ups_With_Feet_On_An_Exercise_Ball',
 ]
 
 // req-140 / DEC-065 §2 — our difficulty, judged on skill, coordination and setup, not
@@ -607,6 +681,10 @@ export const DIFFICULTY_LISTS = {
     'extra-prone-ytw', 'extra-reverse-snow-angels', 'Inchworm', 'Worlds_Greatest_Stretch', 'Knee_Across_The_Body',
     'Ankle_On_The_Knee', 'Front_Leg_Raises', 'Hug_Knees_To_Chest', 'own-butterfly-stretch', 'own-pigeon-stretch',
     'own-couch-stretch', 'Side_Neck_Stretch',
+    // req-148 batch 4
+    'Kneeling_Forearm_Stretch', 'The_Straddle', 'Round_The_World_Shoulder_Stretch', 'Plate_Pinch', 'Wrist_Roller',
+    'Svend_Press', 'Drag_Curl', 'Seated_Triceps_Press', 'Kneeling_High_Pulley_Row', 'Sled_Drag_-_Harness',
+    'own-suspension-curl', 'own-dumbbell-front-squat', 'own-reverse-plank', 'own-terminal-knee-extension',
   ],
   intermediate: [
     'Decline_Barbell_Bench_Press', 'Dips_-_Chest_Version',
@@ -625,10 +703,19 @@ export const DIFFICULTY_LISTS = {
     'Standing_Barbell_Calf_Raise',
     // req-147 batch 3
     'Smith_Single-Leg_Split_Squat', 'Exercise_Ball_Pull-In',
+    // req-148 batch 4
+    'Kettlebell_Sumo_High_Pull', 'Two-Arm_Kettlebell_Military_Press', 'Kettlebell_Windmill',
+    'One-Arm_Kettlebell_Clean', 'One-Arm_Kettlebell_Snatch', 'Alternating_Renegade_Row', 'Weighted_Sissy_Squat',
+    'Barbell_Step_Ups', 'Reverse_Grip_Bent-Over_Rows', 'Reverse_Hyperextension', 'Landmine_180s',     'Dumbbell_Clean', 'Knee_Tuck_Jump', 'Lateral_Bound', 'Split_Jump', 'Standing_Long_Jump', 'Plyo_Push-up',
+    'Suspended_Reverse_Crunch', 'Suspended_Push-Up', 'Suspended_Split_Squat', 'own-suspension-leg-curl',
+    'own-overhead-carry', 'own-stability-ball-pike', 'own-windshield-wipers',
+    'Push-Ups_With_Feet_On_An_Exercise_Ball',
   ],
   advanced: [
     'Power_Clean', 'Clean_and_Jerk', 'Snatch', 'Hang_Clean', 'Clean', 'Overhead_Squat',
     'Muscle_Up', 'Handstand_Push-Ups', 'own-pistol-squat',
+    // req-148 batch 4 (coach review: matches every other barbell clean)
+    'Clean_and_Press',
   ],
 }
 
@@ -664,6 +751,8 @@ export function commonExercises() {
 // its free-db fields, each with the reason.
 export const EQUIPMENT_EXCEPTIONS = {
   Glute_Ham_Raise: 'free-db "machine" is the glute-ham developer (GHD), which is our roman-chair.',
+  Alternating_Renegade_Row: 'free-db "kettlebells"; shipped with dumbbells, the usual gym version (queue batch note, req-148).',
+  Weighted_Sissy_Squat: 'free-db "barbell"; shipped as the bodyweight sissy squat (queue batch note, req-148).',
 }
 export const GROUP_EXCEPTIONS = {
   Mountain_Climbers: 'free-db tags quadriceps; it is a core move driven by the abs and hip flexors (quads secondary).',
