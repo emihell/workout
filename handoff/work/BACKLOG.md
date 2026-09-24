@@ -429,8 +429,8 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   browser-only; a **shared** gym library that users contribute to needs the backend (Phase 3 fork). Feeds
   req-135 (alternatives with what's here) and Phase 2 programs.
 - **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
-- **`req-140` library parity** (READY) — the RepDB gap table (checkpoint), then our own entries + aliases + `difficulty`
-  on every common entry; long-run-only originality (DEC-065).
+- **`req-140` library parity, batch 1** (READY) — gap table checkpoint, then ≤40 promote/add + aliases + `difficulty`
+  + the `staple` flag (DEC-065/066). **Later batches** (req-140b…) work through the queue from the gap table, ≤40 each.
 - **`req-141` fresh-eyes library audit** — after req-140. A fresh agent with **no RepDB context** audits every common
   entry: displayName, aliases, tags, difficulty, text, the common list; restores natural wording in the 19 entries
   req-138 rewrote for originality (list in `reports/req-138.md`); fixes in place. Final safety net: the ≥12-token run

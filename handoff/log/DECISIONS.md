@@ -1238,3 +1238,15 @@ New order: 139 → 138 → 134 → 136 → 132 → 137 → 131 → 135 → own i
    RepDB, including restoring natural wording in the entries rewritten for originality.
 Supersedes DEC-060 §3's measurement (not its principle: never copy RepDB's text or use its images as reference).
 
+## DEC-066 — "fully written" and "staple" are two flags; parity comes in batches of ≤40  (Emilio, 2026-09-24)
+
+1. **`common`** = fully written by us (tags, text, difficulty); **`staple`** = a standard gym exercise that ranks in
+   Search's first tier. The 178 current common entries are staples. New fully written niche entries (Spoto Press, Couch
+   Stretch…) sit behind "Show more". Emilio chose "staples first, rest behind" over "all our entries first".
+2. **Parity comes in batches of ≤40** promote+add, each with its own gap checkpoint and coach QA. Emilio chose this over
+   "all in one go".
+3. **Promote before add:** a non-common free-db entry that is the movement becomes common, keeping its id. No `own-*`
+   duplicates. Aliases only for names people actually type, never a bulk copy of RepDB's names. The full gap table
+   never enters git (RepDB licence term 3).
+Built as req-140 (batch 1).
+
