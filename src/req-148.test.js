@@ -81,6 +81,7 @@ describe('batch 4', () => {
     assert.equal(firstShown('alternating kettlebell press'), 'Two-Arm_Kettlebell_Military_Press')
     assert.equal(firstShown('scissors jump'), 'Split_Jump')
     for (const id of ['Double_Kettlebell_Windmill', 'Two-Arm_Kettlebell_Clean', 'Split_Squats']) assert.equal(byId.get(id).mergedInto, undefined, id)
-    assert.equal(firstShown('split squats'), 'Split_Squat_with_Dumbbells')
+    // coach review: own-split-squat carries "Split Squats" (shadowing the hidden jumping entry).
+    assert.equal(firstShown('split squats'), 'own-split-squat')
   })
 })

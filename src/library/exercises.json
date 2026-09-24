@@ -7905,7 +7905,7 @@
     "common": true,
     "family": "fam-clean",
     "staple": false,
-    "difficulty": "intermediate",
+    "difficulty": "advanced",
     "description": "Cleaning a barbell from the floor to the shoulders, then pressing it overhead.",
     "formCues": [
       "Bar stays close",
@@ -7913,14 +7913,14 @@
       "Ribs down for the press"
     ],
     "steps": [
-      "Stand with the bar over your mid foot and grip it just outside your legs.",
+      "Stand with the bar over your mid foot, grip it just outside your legs, and set a flat back with your chest up.",
       "Drive through the floor and extend your hips to bring the bar up close to your body.",
       "Pull yourself under and catch the bar on the front of your shoulders.",
       "Press it overhead, then lower it back to your shoulders and down to the floor."
     ],
     "mistakes": [
+      "Rounding the back off the floor",
       "Pulling with the arms early",
-      "Bar swinging away from the body",
       "Arching the back to press"
     ]
   },
@@ -19413,7 +19413,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "horizontal-pull",
+    "pattern": "vertical-pull",
     "equipmentList": [
       "cable"
     ],
@@ -23636,7 +23636,7 @@
     "logAs": "weight-reps",
     "unilateral": true,
     "common": true,
-    "family": "fam-kettlebell-clean",
+    "family": "fam-clean",
     "staple": false,
     "difficulty": "intermediate",
     "description": "Bringing a kettlebell from between the feet to the shoulder in one smooth motion using the hips.",
@@ -23648,7 +23648,7 @@
     "steps": [
       "Stand with a kettlebell between your feet and hinge to grip it with one hand.",
       "Hike it back between your legs, then drive your hips forward.",
-      "Keep your elbow close as the bell travels up, and guide it around your hand to rest at your shoulder.",
+      "Keep your elbow close and rotate your hand around the handle as the bell rises, so it settles softly at your shoulder.",
       "Let it drop back between your legs to start the next rep.",
       "Finish the reps, then switch sides."
     ],
@@ -24004,7 +24004,7 @@
     "logAs": "weight-reps",
     "unilateral": true,
     "common": true,
-    "family": "fam-kettlebell-clean",
+    "family": "fam-snatch",
     "staple": false,
     "difficulty": "intermediate",
     "description": "Swinging a kettlebell from between the legs to overhead in one motion using the hips.",
@@ -24017,7 +24017,7 @@
       "Stand with a kettlebell in front of you and hinge to grip it with one hand.",
       "Hike it back between your legs, then drive your hips forward.",
       "Let the bell float up close to your body and punch your hand through as it reaches overhead.",
-      "Lock out overhead, then bring it back down between your legs.",
+      "Lock out overhead, then let it drop close to your body, hinging as it falls to guide it back between your legs.",
       "Finish the reps, then switch sides."
     ],
     "mistakes": [
@@ -25993,7 +25993,7 @@
       "plate"
     ],
     "logAs": "weight-time",
-    "unilateral": false,
+    "unilateral": true,
     "common": true,
     "family": "fam-plate-pinch",
     "staple": false,
@@ -26008,7 +26008,7 @@
       "Place two plates together with the smooth sides facing out.",
       "Pinch them together at the top between your fingers and thumb.",
       "Lift them and hold at your side with your arm straight.",
-      "Hold for the set time, then set them down with control."
+      "Hold for the set time, set them down with control, then switch sides."
     ],
     "mistakes": [
       "Plates too heavy to control",
@@ -33112,8 +33112,7 @@
     "id": "Sled_Drag_-_Harness",
     "aliases": [
       "Sled Pull",
-      "Harness Sled Drag",
-      "Backward Sled Drag"
+      "Harness Sled Drag"
     ],
     "muscleGroups": [
       "Legs"
@@ -33148,10 +33147,10 @@
     "logAs": "weight-time",
     "unilateral": false,
     "common": true,
-    "family": "fam-sled-push",
+    "family": "fam-sled-drag-harness",
     "staple": false,
     "difficulty": "beginner",
-    "description": "Pulling a loaded sled with a harness or strap while walking forward or backward, for the legs.",
+    "description": "Pulling a loaded sled with a harness or strap while walking forward, for the legs.",
     "formCues": [
       "Lean into the pull",
       "Short, powerful steps",
@@ -35241,7 +35240,7 @@
     "logAs": "bodyweight-reps",
     "unilateral": false,
     "common": true,
-    "family": "fam-freehand-jump-squat",
+    "family": "fam-split-jump",
     "staple": false,
     "difficulty": "intermediate",
     "description": "Jumping from a lunge and switching legs in the air, a power drill for the legs.",
@@ -37090,7 +37089,7 @@
     "logAs": "bodyweight-reps",
     "unilateral": false,
     "common": true,
-    "family": "fam-front-box-jump",
+    "family": "fam-standing-long-jump",
     "staple": false,
     "difficulty": "intermediate",
     "description": "Jumping forward as far as you can from a standing start, a power drill for the legs.",
@@ -44257,7 +44256,8 @@
     "aliases": [
       "Dumbbell Split Squat",
       "Static Lunge",
-      "Stationary Lunge"
+      "Stationary Lunge",
+      "Split Squats"
     ],
     "muscleGroups": [
       "Legs"
@@ -46356,9 +46356,9 @@
       "triceps"
     ],
     "instructions": [
-      "Press a dumbbell or kettlebell overhead in one or both hands and lock your arms out.",
+      "Press a dumbbell or kettlebell overhead in each hand and lock your arms out.",
       "Brace your trunk and keep your ribs down.",
-      "Walk forward with short, steady steps, keeping the weight stacked over your shoulder.",
+      "Walk forward with short, steady steps, keeping the weights stacked over your shoulders.",
       "Set the weight down with control at the end of the walk."
     ],
     "category": "strength",
@@ -46366,7 +46366,6 @@
     "id": "own-overhead-carry",
     "aliases": [
       "Overhead Walk",
-      "Waiter Walk",
       "Overhead Farmer Carry"
     ],
     "muscleGroups": [
@@ -46403,22 +46402,22 @@
     "family": "fam-farmers-walk",
     "staple": false,
     "difficulty": "intermediate",
-    "description": "Walking with a weight locked out overhead, for shoulder stability and core control.",
+    "description": "Walking with a weight locked out overhead in each hand, for shoulder stability and core control.",
     "formCues": [
-      "Arm locked, weight over the shoulder",
+      "Arms locked, weights over the shoulders",
       "Ribs down",
       "Short, steady steps"
     ],
     "steps": [
-      "Press a dumbbell or kettlebell overhead in one or both hands and lock your arm out.",
+      "Press a dumbbell or kettlebell overhead in each hand and lock your arms out.",
       "Brace your trunk and keep your ribs down.",
-      "Walk forward with short, steady steps, keeping the weight over your shoulder.",
+      "Walk forward with short, steady steps, keeping the weights over your shoulders.",
       "Set the weight down with control at the end."
     ],
     "mistakes": [
       "Arching the lower back",
-      "Weight drifting forward",
-      "Elbow bending"
+      "Weights drifting forward",
+      "Elbows bending"
     ]
   },
   {

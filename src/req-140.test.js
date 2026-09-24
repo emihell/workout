@@ -95,7 +95,9 @@ describe('batch 1', () => {
   })
 
   it('no own add shares a name key with any free-db entry (promote before add)', () => {
-    const freeDbKeys = new Set(library.filter((e) => !e.id.startsWith('own-') && !e.id.startsWith('extra-'))
+    // req-148 (sanctioned by planning): a hidden free-db entry may be shadowed, so it's out of the duplicate check
+    // (own-split-squat's "Split Squats" alias over the hidden jumping Split_Squats).
+    const freeDbKeys = new Set(library.filter((e) => !e.id.startsWith('own-') && !e.id.startsWith('extra-') && !e.hidden)
       .map((e) => catalogNameKey(e.name)))
     for (const id of Object.keys(ADD)) {
       const entry = byId(id)

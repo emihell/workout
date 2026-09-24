@@ -3425,7 +3425,7 @@ const TEXT = {
       'Place two plates together with the smooth sides facing out.',
       'Pinch them together at the top between your fingers and thumb.',
       'Lift them and hold at your side with your arm straight.',
-      'Hold for the set time, then set them down with control.',
+      'Hold for the set time, set them down with control, then switch sides.',
     ],
     ['Plates too heavy to control', 'Resting them against the leg'],
   ],
@@ -3524,7 +3524,7 @@ const TEXT = {
     [
       'Stand with a kettlebell between your feet and hinge to grip it with one hand.',
       'Hike it back between your legs, then drive your hips forward.',
-      'Keep your elbow close as the bell travels up, and guide it around your hand to rest at your shoulder.',
+      'Keep your elbow close and rotate your hand around the handle as the bell rises, so it settles softly at your shoulder.',
       'Let it drop back between your legs to start the next rep.',
       'Finish the reps, then switch sides.',
     ],
@@ -3537,7 +3537,7 @@ const TEXT = {
       'Stand with a kettlebell in front of you and hinge to grip it with one hand.',
       'Hike it back between your legs, then drive your hips forward.',
       'Let the bell float up close to your body and punch your hand through as it reaches overhead.',
-      'Lock out overhead, then bring it back down between your legs.',
+      'Lock out overhead, then let it drop close to your body, hinging as it falls to guide it back between your legs.',
       'Finish the reps, then switch sides.',
     ],
     ['Pulling with the arm', 'Letting the bell flip over onto the wrist', 'Leaning back at the top'],
@@ -3599,7 +3599,7 @@ const TEXT = {
     ['Swinging wildly with momentum', 'Arching far past straight', 'Letting the weight yank the legs down'],
   ],
   'Sled_Drag_-_Harness': [
-    'Pulling a loaded sled with a harness or strap while walking forward or backward, for the legs.',
+    'Pulling a loaded sled with a harness or strap while walking forward, for the legs.',
     ['Lean into the pull', 'Short, powerful steps', 'Trunk braced'],
     [
       'Load the sled and attach a harness or strap to it.',
@@ -3624,12 +3624,12 @@ const TEXT = {
     'Cleaning a barbell from the floor to the shoulders, then pressing it overhead.',
     ['Bar stays close', 'Hips drive the clean', 'Ribs down for the press'],
     [
-      'Stand with the bar over your mid foot and grip it just outside your legs.',
+      'Stand with the bar over your mid foot, grip it just outside your legs, and set a flat back with your chest up.',
       'Drive through the floor and extend your hips to bring the bar up close to your body.',
       'Pull yourself under and catch the bar on the front of your shoulders.',
       'Press it overhead, then lower it back to your shoulders and down to the floor.',
     ],
-    ['Pulling with the arms early', 'Bar swinging away from the body', 'Arching the back to press'],
+    ['Rounding the back off the floor', 'Pulling with the arms early', 'Arching the back to press'],
   ],
   Dumbbell_Clean: [
     'Bringing two dumbbells from the knees to the shoulders in one quick motion using the hips.',
@@ -3765,15 +3765,15 @@ const TEXT = {
     ['Elbows dropping so the chest folds', 'Heels lifting', 'Knees caving in'],
   ],
   'own-overhead-carry': [
-    'Walking with a weight locked out overhead, for shoulder stability and core control.',
-    ['Arm locked, weight over the shoulder', 'Ribs down', 'Short, steady steps'],
+    'Walking with a weight locked out overhead in each hand, for shoulder stability and core control.',
+    ['Arms locked, weights over the shoulders', 'Ribs down', 'Short, steady steps'],
     [
-      'Press a dumbbell or kettlebell overhead in one or both hands and lock your arm out.',
+      'Press a dumbbell or kettlebell overhead in each hand and lock your arms out.',
       'Brace your trunk and keep your ribs down.',
-      'Walk forward with short, steady steps, keeping the weight over your shoulder.',
+      'Walk forward with short, steady steps, keeping the weights over your shoulders.',
       'Set the weight down with control at the end.',
     ],
-    ['Arching the lower back', 'Weight drifting forward', 'Elbow bending'],
+    ['Arching the lower back', 'Weights drifting forward', 'Elbows bending'],
   ],
   'own-reverse-plank': [
     'Holding the body straight face up on the hands and heels, for the glutes and back of the body.',

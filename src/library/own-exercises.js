@@ -952,9 +952,9 @@ export const OWN_EXERCISES = [
     primaryMuscles: ['shoulders', 'abdominals'],
     secondaryMuscles: ['traps', 'triceps'],
     instructions: [
-      'Press a dumbbell or kettlebell overhead in one or both hands and lock your arms out.',
+      'Press a dumbbell or kettlebell overhead in each hand and lock your arms out.',
       'Brace your trunk and keep your ribs down.',
-      'Walk forward with short, steady steps, keeping the weight stacked over your shoulder.',
+      'Walk forward with short, steady steps, keeping the weights stacked over your shoulders.',
       'Set the weight down with control at the end of the walk.',
     ],
     category: 'strength',
