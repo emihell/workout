@@ -1250,3 +1250,20 @@ Supersedes DEC-060 §3's measurement (not its principle: never copy RepDB's text
    never enters git (RepDB licence term 3).
 Built as req-140 (batch 1).
 
+## DEC-067 — library content calls are delegated; beginner-first, room for advanced  (2026-09-24)
+
+Emilio, relayed by Builder from its terminal (not heard directly by planning): "you can decide, its hard for me to have
+an opinion on these things as i am not a coach or a gym buff - i am an amature trying to create an app for other
+amatures/beginners - but with the support for more advanced users as well - ill have to trust your judgement - but then
+iterate over with when there are actual users". Planning's own recommendation matched, and planning adopts the calls on
+its own authority, marked **(unconfirmed)** for Emilio's list:
+1. **Variants:** when free-db has a movement only in a loaded version (barbell/kettlebell/Smith), our bodyweight or
+   dumbbell version is an **add**, not a promote (equipment is part of an exercise's identity, e.g. Bodyweight_Squat vs
+   Barbell_Squat). Promote-before-add holds for the same movement with the same equipment.
+2. **Outdoor Run / Outdoor Walk are staples** — what beginners log most.
+3. **Yoga/pilates poses and flows are skipped for now;** ordinary stretches stay queued.
+4. The difficulty anchors stay as pinned in req-140.
+**Standing rule:** exercise-content calls (tags, staples, names, text, difficulty) are the planning/build sessions' to
+make, through the lens **beginner-first, with room for advanced**, and are revisited with real users. Behaviour and UX
+calls stay Emilio's.
+
