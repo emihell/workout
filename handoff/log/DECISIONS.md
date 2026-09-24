@@ -1429,3 +1429,11 @@ skips the replaced intermediate screen. On Emilio's list.
    weight". Builder measured that the live seed never reads `suggestedWeights`, so that would be a new prefill source. Not
    built: the added set carries the kg just logged this session, else stays blank — history and this session only, never
    the routine's number (the core rule).
+
+## DEC-083 — the open calls from req-24 / req-152 confirmed  (Emilio, 2026-09-24)
+
+Emilio: "yes to open calls". Confirmed: **DEC-080** (the confirm button is named for its action); **DEC-081** (replace is
+real in the browser at every site — swipe-back skips the replaced screen; reason as corrected in DEC-082 §1); **DEC-082 §2**
+(an added set with nothing logged this session stays blank, never the routine's number); **req-152's two calls** (the rest
+pill keeps top-centre and size; History reuses the overview's "· skipped"). Still unconfirmed: req-153's redirect of an
+in-workout route with no active workout to `/workout/<id>`.
