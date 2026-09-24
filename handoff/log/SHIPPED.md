@@ -1734,3 +1734,14 @@ and press → advanced + back cue; plate pinch and overhead carry sidedness; "sp
 Gate: Planner's own run in an archive copy → `# tests 821 # pass 821 # fail 0`, build ✓ (main 341.24 kB). Test edits: DEC-074
 + the req-140 hidden-entry exclusion (sanctioned). Reviewer (code): none.
 
+## req-151 — library batch 5 (last): the queue emptied; library up to par (DEC-070)  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `eaeafab`…`9077e19`). 28 written (Olympic lifts, calisthenics levers/L-sit/dragon
+flag/archers, rope climb, Zercher, Spoto, neck hold…), 6 re-triaged to hide (behind-the-neck press and pulldown mandated;
+Jefferson curl never created). PENDING_ADDS empty, no merge-later rows, **Show-more holds 0 rough entries**. Library: 366
+fully written (257/88/21), 200 staples. **Up to par:** all 601 pinned RepDB names are a written entry, covered by one, or
+a recorded skip/hide; 0 unclassified. Search fix (L-030): exact non-staple name pulled into the first tier ("l-sit" →
+L-Sit). Coach QA (independent subagent): 3 wrong fixed (archer sidedness, dragon-flag lumbar mistake/cue, snatch-pull
+timing) + 6 safety/clarity refinements. Gate: Planner's own run in an archive copy → `# tests 829 # pass 829 # fail 0`,
+build ✓ (main 341.46 kB, search code only). Test edits: DEC-074. Reviewer (code): none.
+
