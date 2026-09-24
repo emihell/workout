@@ -492,6 +492,9 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
   hosting (own computer vs managed), accounts, the sharing data model, live group sessions, migration from localStorage,
   offline-first in the gym, privacy/GDPR, backups. Planning's concerns to raise: a home server serving other people
   needs uptime, security and backups; live group workouts are a large feature on their own.
+  **Part of the server setup (Emilio, 2026-09-24): per-branch previews** — the server also hosts each branch's build
+  (static, over Tailscale HTTPS), each on its **own origin** (port or subdomain, never a path under `emihell.github.io`,
+  whose `localStorage` holds his real history), so planning can browser-check a branch before merge. No Cloudflare/Netlify.
 
 
 **The fork that gates most of this: browser-only (localStorage) vs a backend
@@ -525,19 +528,7 @@ target before starting any of these; each is a milestone, not a `req`.
   2026-09-14 §3). Slimming it means editing `scripts/check_handoff.py:220-248`, which validates the exact
   tags — a Builder/code change for marginal benefit. Do only if the taxonomy actually gets in the way.
 
-- **Per-branch preview deploy (a branch → its own HTTPS URL).** *(Superseded in part by DEC-041:
-  the cloud preview was replaced by Tailscale `vite preview` for Emilio's own testing; only the
-  planning-can't-browser-verify motivation below partly survives.)* Twice in the 2026-09-12 audit run
-  (req-41 cross-tab, req-44 gym-flow walk) the planning session couldn't browser-verify a UI req
-  itself — serving the branch means running the code worktree, which crosses the planning/code
-  boundary (DEC-005) — so the browser check fell to Emilio. **L-003 already floated this** for
-  secure-context device features (wake-lock/notifications need HTTPS, unreachable on the LAN dev
-  server). A preview deploy per branch would let planning close UX/browser gates without touching the
-  code worktree, and unblock device-API testing. Infra; sizeable (CI/hosting decision). Revisit when
-  UI-heavy reqs (Phase 1 polish, Phase 2 creation flow) make the manual eyeballs a bottleneck.
-  **Emilio 2026-09-24: later, not now.** When it comes: host the previews on Emilio's own server machine (static
-  per-branch builds over Tailscale HTTPS; no Cloudflare/Netlify account), each on its **own origin** (port or subdomain,
-  never a path under `emihell.github.io`, whose `localStorage` holds his real history). Needs the machine, not req-146.
+- **Per-branch preview deploy** → moved into the server setup (`req-146`, Phase 3), Emilio 2026-09-24.
 
 ## Dependency map (why the order is what it is)
 
