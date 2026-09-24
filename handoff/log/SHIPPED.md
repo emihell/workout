@@ -1674,3 +1674,15 @@ query before/after diff in the report. Gate: Planner's own run in an archive cop
 list only. Reviewer (code): none (no store/model/storage). Known: "fly machine" → Reverse Pec Deck first (alias gap, req-136
 feedback will catch such).
 
+## req-138 — library text pass: description, form cues, steps, mistakes for the 178 common entries  (merged 2026-09-24)
+
+Closeout 2026-09-24 (Builder session, branch `b3c98af`…`7a50289`). Four own fields via the tags path (`src/library/text.js`),
+in OWN_FIELDS + NEW_FIELDS; `textProblems()` enforces shape, boilerplate, numbers (angles only), hype, medical, unilateral
+and duplicate rules inside the build, each with a failing fixture (22 tests). Originality vs RepDB pinned `9ed9357`: before
+rewrite max 0.315 / 19 flagged / 7 long runs → after max 0.149 / 0 / 0 (controls reproduce; L-028); own-cossack-squat and
+own-landmine-press legacy text rewritten (new adds save it). Spec review (9 findings). Coach review (independent subagent,
+all 178 read): nothing unsafe; 4 wrong (Arnold press start as "mistake", Nordic top/bottom reversed, machine shoulder press
+seat reversed, curl cue vs step) + 9 clarity fixes, all applied. Gate: Planner's own run in an archive copy → `# tests 769
+# pass 769 # fail 0`, build ✓ (main 340.97 kB unchanged, L-026; library 1,315.71 kB); read Deadlift/Leg Press/Pull-Up/Nordic/
+Curl. No existing test edited. Reviewer (code): none (no store/model/storage).
+

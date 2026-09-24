@@ -341,3 +341,12 @@ planning found it by running real queries at the gate, not from any test. Fixed:
 **How to apply:** match per field and per word start, never on a concatenation; any search change gets a gate run of 10+
 real queries whose top hits are read by eye, and a before/after diff over a broad query set.
 
+## L-028 — writing without looking isn't enough to be original; measure it  (2026-09-24)
+
+req-138's text was written without opening RepDB, yet 19 of 178 entries scored over 0.15 on 4-gram overlap with RepDB and
+7 lines shared 12-token runs, all from stock gym English ("Lie on your back with…"). req-139's own-* text had already
+drifted the same way (median 0.08 vs free-db's 0.00). A per-sentence "≥0.8 token overlap" rule would have flagged every
+short cue instead. **How to apply:** for any authored content that must not derive from a source, pin the source, score
+entry-level n-gram share + long contiguous runs after writing (never showing the source text to the writer), rewrite the
+flagged items, and paste the distribution beside a known-independent control.
+

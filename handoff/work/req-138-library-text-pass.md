@@ -1,6 +1,6 @@
 # req-138 — library text pass: description, form cues, steps and mistakes for the common exercises
 
-**Status: READY** — Phase 1, **data only**. **Gate: functional** (library data + validators + tests; no reader, screen or
+**Status: BUILT, NOT merged — branch `req-138`** — Phase 1, **data only**. **Gate: functional** (library data + validators + tests; no reader, screen or
 stored-data change). Split from req-133 by its spec review; moved before the browse screen by DEC-064 §4. Emilio
 2026-09-24: "improve text if needed". Feeds req-134 (browse can show the description) and req-131 ("How to"). Spec
 reviewed independently 2026-09-24 (9 findings + review aids folded in).
