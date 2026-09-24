@@ -41,6 +41,15 @@ function compactText(value) {
     .replace(/[^a-z0-9]+/g, '')
 }
 
+// req-139 review — a partial alias hit is judged per alias and must start at a word start
+// inside it: the alias from word i onward, compacted, starts with the compacted query.
+// (Was: all aliases joined and compacted, so "rdl" hit "Forwa-rd L-unge" and "row"
+// hit "P-row-ler".)
+function aliasWordStartMatch(alias, qCompact) {
+  const words = String(alias || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+  return words.some((_, i) => words.slice(i).join('').startsWith(qCompact))
+}
+
 // Every item matching `query`, ranked: exact name or alias (0), name prefix (1), name
 // contains (2), alias contains (2.5), muscle/equipment (3); ties alphabetical by the
 // shown name. req-139 — the shown name (displayName ?? name) is the name; when a display
@@ -54,11 +63,9 @@ function rankedHits(list, query) {
   for (const item of list || []) {
     const name = shownName(item).toLowerCase()
     const aliasList = item.displayName !== undefined ? [item.name, ...(item.aliases || [])] : item.aliases || []
-    const aliases = aliasList.join(' ').toLowerCase()
     const muscles = [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].join(' ').toLowerCase()
     const equipment = String(item.equipment || '').toLowerCase()
     const compactName = compactText(name)
-    const compactAliases = compactText(aliases)
     let score = -1
     // req-130 — a whole alias equal to the query scores like an exact name (the word
     // split below never matched a multi-word alias).
@@ -70,7 +77,7 @@ function rankedHits(list, query) {
     // hit ranks just below a partial name hit, so aliases never reorder name matches.
     else if (name.startsWith(q)) score = 1
     else if (name.includes(q) || (qCompact.length >= 3 && compactName.includes(qCompact))) score = 2
-    else if (aliases.includes(q) || (qCompact.length >= 3 && compactAliases.includes(qCompact))) score = 2.5
+    else if (qCompact && aliasList.some((alias) => aliasWordStartMatch(alias, qCompact))) score = 2.5
     else if (muscles.includes(q) || equipment.includes(q)) score = 3
     if (score >= 0) scored.push({ item, score, name })
   }

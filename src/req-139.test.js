@@ -136,6 +136,26 @@ describe('common first, the rest on request', () => {
     assert.deepEqual(hits.map((item) => item.id), all.filter((item) => item.common).slice(0, 25).map((item) => item.id))
   })
 
+  // Planner review — a partial alias hit is per alias and from a word start: no match
+  // across two aliases ("Dumbbell Forwa-rd L-unge") or inside a word ("P-row-ler").
+  it('"rdl": no Dumbbell Lunge or Trap Bar Deadlift; "row": no Sled Push', () => {
+    const ids = (query) => searchCommonFirst(library, query).common.map((item) => item.id)
+    assert.ok(!ids('rdl').includes('Dumbbell_Lunges'))
+    assert.ok(!ids('rdl').includes('Trap_Bar_Deadlift'))
+    assert.deepEqual(ids('rdl'), ['Romanian_Deadlift', 'Stiff-Legged_Dumbbell_Deadlift', 'own-single-leg-rdl'])
+    assert.ok(!ids('row').includes('Sled_Push'))
+    assert.ok(!ids('ring').includes('Lying_Leg_Curls'))
+    assert.equal(firstShown('ring'), 'Suspended_Row')
+  })
+
+  it('a word-start hit inside one alias still counts ("prowler" → Sled Push, "pushup" → Push-Up, "ohp")', () => {
+    assert.equal(firstShown('prowler'), 'Sled_Push')
+    assert.equal(firstShown('pushup'), 'Pushups')
+    assert.equal(firstShown('pull up'), 'Pullups')
+    assert.equal(firstShown('ohp'), 'Standing_Military_Press')
+    assert.ok(searchCommonFirst(library, 'deck').common.some((item) => item.id === 'Butterfly'))
+  })
+
   it('under 2 characters: nothing', () => {
     assert.deepEqual(searchCommonFirst(library, 'p'), { common: [], rest: [], restCount: 0 })
   })
