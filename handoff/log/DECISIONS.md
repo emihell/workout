@@ -1446,3 +1446,21 @@ stamping + `history.back()` + a 400 ms / 1 s timer + a capture-phase click liste
 that does nothing. Emilio chose **"Drop it, ship the rest"** (over "merge as built" and "try a simpler idea now").
 `route.js` goes back to req-152's `go()` (`location.replace` on replace); items 2–5 ship. Parked in BACKLOG with the simpler
 idea to try later: on a popstate that lands on an entry identical to the one just left, step back once more.
+
+## DEC-085 — the 2026-09-24 audits: all of planning's recommendations taken  (Emilio, 2026-09-24)
+
+Emilio: "all your recs", on the 10-item list from `audits/2026-09-24.md` (code) + `audits/workflow-2026-09-24.md`:
+1. Warm-up/cardio sets stop saving a hidden effort; **old rows left** (no bulk write) → req-156.
+2. Unreadable stored data (DEC-032): Import first **downloads the raw stored value**, then may replace → req-157.
+3. Stop recording `workout.progression` and new `legacyRecommendations` entries; existing data kept → req-158.
+4. README / DESIGN behind DEC-056/073/req-150/152: **planning drafts, Emilio reviews**, Builder applies (README is code-side).
+5. Deploy on every merge stays, **gated by a scripted smoke test of the core flow** → req-159.
+6. **Per-type lanes** (UI, bug, data/schema, content, design, backend, tooling, audit) replace the one-size gate; planning drafts.
+7. **Backend rules written when req-146 starts:** secrets out of git (`.env` ignored), who runs the server, a third ask-gate for
+   anything that deploys to or reaches other users, a restore drill.
+8. Builder runs in the **same permission mode as Planner** (messages were held 4× on 09-24) — Emilio's action.
+9. Emilio provides a **fresh Export for migration dry runs**, kept in the scratchpad, never in git — Emilio's action.
+10. Phase-2 prep: a **render-test harness** for `.jsx` (F-TEST-1, → req-156) and the **`storage.js` split** (F-STRUCT-6, later).
+Planning's own list (no objection): `plan qa` (isolated build + serve + seed + dialog stubs), skills (qa-branch, review,
+closeout, spec), the DEC digest refresh + archive split, stale-doc fixes, and removing the raw `git commit:*` / `git
+reset:*` grants (L-032) — settings are Emilio's to edit.
