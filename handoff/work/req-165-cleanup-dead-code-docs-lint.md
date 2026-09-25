@@ -1,6 +1,6 @@
 # req-165 — cleanup: dead code, the schema doc, lint, stale comments, the README catch-up
 
-**Status: BUILT — branch `req-165` (`2725986`), NOT merged.** (2026-09-25) — **Lane: tooling** (no behaviour change) — but touches storage/model → reviewer fires.
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-165` (`715eeba`…`2725986`, 10 commits).** (2026-09-25) — **Lane: tooling** (no behaviour change) — but touches storage/model → reviewer fires.
 DEC-085, DEC-087. After req-163. Source: `audits/2026-09-24.md` (read each F- section named).
 
 1. **Dead code (F-DEAD-3, F-DEAD-5, F-DEAD-6, BACKLOG Tier-3 note):** the ~40 unreachable legacy `session*` fallbacks
