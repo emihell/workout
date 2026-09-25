@@ -1,6 +1,6 @@
 # req-175 — plain words in the workout and History
 
-**Status: BUILT — branch `req-175` (`b3a55eb`, 4 commits), NOT merged.** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.3). Emilio approved ("6. good", DEC-093).
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-175` (`a8fd40d`…`b3a55eb`, 4 commits).** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.3). Emilio approved ("6. good", DEC-093).
 
 ## Change (display text only)
 | today | becomes | where [grep 2026-09-25] |
