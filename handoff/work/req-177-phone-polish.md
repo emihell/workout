@@ -1,6 +1,6 @@
 # req-177 — phone-size polish from Planner's screenshot check
 
-**Status: READY** (2026-09-26). **Lane: ui.** Source: Planner's 390×844 screenshots of main `4008e21` (2026-09-26), asked
+**Status: BUILT — branch `req-177` (`8ed5fdb`, 2 commits), NOT merged.** (2026-09-26) **Lane: ui.** Source: Planner's 390×844 screenshots of main `4008e21` (2026-09-26), asked
 by Emilio ("these things you can check?") — Planner decides visual calls it can see (DEC-091 §4–5), listed below so
 they're reversible.
 
