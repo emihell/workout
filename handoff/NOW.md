@@ -17,7 +17,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **Audit follow-ups (DEC-085): all shipped** (req-154..162, 2026-09-24/25) + planning's docs (digest, stale lines, lanes).
+- **Audit follow-ups (DEC-085): all shipped** (nine reqs, 2026-09-24/25; see SHIPPED) + planning's docs (digest, stale lines, lanes).
   **Open for Emilio:** the README/DESIGN draft (`work/contract-drift-draft.md`); 5 calls (old-warm-up "Moderate", History
   warm-up Effort, duration rounding, old-page redirect, lane refinements); a fresh Export when stable. Later: `storage.js`
   split (F-STRUCT-6), BACKLOG nits.
