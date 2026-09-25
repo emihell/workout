@@ -85,7 +85,10 @@ function programLabelFrom(source, routineId) {
 }
 
 function workoutSnapshot(state, workout, origin = state, legacy = false) {
-  const routineId = workout.routineId || workout.sessionId
+  // req-170 (DEC-090) — a workout that names its routine only in its snapshot keeps it
+  // (was: undefined, so deleting that routine hard-deleted it). Top-level still wins.
+  const routineId =
+    workout.routineId || workout.sessionId || workout.snapshot?.routineId || workout.snapshot?.sessionId
   const foundRoutine = routineById(state.routines, routineId)
   if (workout.snapshot) {
     // req-109 — items added mid-workout (a replacement, isAddedMidWorkout) and their

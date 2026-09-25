@@ -21,9 +21,9 @@ import { historyPrescription, routinesUsingExercise } from './history-queries.js
 // archived, not deleted). req-169 (DEC-089) — reported apart from finished history as
 // `inDraft`, so the confirm can say so truthfully; the reducer archives on either. A stored
 // workout names its routine by `routineId` alone: Finish always writes it, and migrateState
-// rebuilds the snapshot from it (model.js workoutSnapshot), so a loaded workout never
-// carries only `snapshot.routineId` (req-169 measured it; that is no gap here). Schedule
-// slots are never a reference (DEC-031).
+// sets it on load, falling back to `snapshot.routineId`/`snapshot.sessionId` when the
+// top-level one is missing (req-170 / DEC-090, model.js workoutSnapshot), so a snapshot-only
+// workout still names its routine here. Schedule slots are never a reference (DEC-031).
 function workoutNamesRoutine(workout, routineId) {
   return workout?.routineId === routineId
 }
