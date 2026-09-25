@@ -2039,3 +2039,7 @@ inverted (it pinned the removed behaviour).
 without `?from=`). Gate (bug lane): agent's main vs branch scrollY 441 → 0 after Save, same-screen 120 → 120 (typing,
 Complete, rest tick); `./check --smoke` green; Planner's run: routine scrolled to 362 → exercise opens at 0, Back at 0, 0 dialogs;
 branch smoke green 12. No trigger files. `reports/req-172.md`.
+
+## req-172 — every screen opens at the top  (merged 2026-09-25)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
