@@ -425,11 +425,11 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     ],
   }
 
-  it('routineDeletionImpact counts slots + plans and flags no history', () => {
-    // r1: two slots (routineId + legacy sessionId), one plan, never finished.
+  // req-165 — `plans` is gone from the impact (stored plans are no longer read or pruned).
+  it('routineDeletionImpact counts slots and flags no history', () => {
+    // r1: two slots (routineId + legacy sessionId), never finished.
     assert.deepEqual(routineDeletionImpact(state, 'r1'), {
       slots: 2,
-      plans: 1,
       hasHistory: false,
     })
   })
@@ -438,7 +438,6 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     // r2: one slot, no plan, has a finished workout (routineId).
     assert.deepEqual(routineDeletionImpact(state, 'r2'), {
       slots: 1,
-      plans: 0,
       hasHistory: true,
     })
     // r-old referenced only by a workout's legacy sessionId still counts as history.
@@ -448,7 +447,6 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
   it('a routine with no references at all is all-zero, no history', () => {
     assert.deepEqual(routineDeletionImpact(state, 'nope'), {
       slots: 0,
-      plans: 0,
       hasHistory: false,
     })
   })

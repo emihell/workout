@@ -182,8 +182,6 @@ export function RoutineDetail({ routineId, paths }) {
             const parts = []
             if (impact.slots > 0)
               parts.push(`${impact.slots} schedule slot${impact.slots === 1 ? '' : 's'}`)
-            if (impact.plans > 0)
-              parts.push(`${impact.plans} planned workout${impact.plans === 1 ? '' : 's'}`)
             const removes = parts.length ? ` This removes ${parts.join(' and ')}.` : ''
             // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
             const head = deletionConfirmHead(routine.name, {

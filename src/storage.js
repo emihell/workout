@@ -112,7 +112,6 @@ export function emptyState() {
     routines: [],
     schedule: defaultSchedule(),
     workouts: [],
-    plannedWorkouts: [],
     draftWorkouts: [],
     activeWorkout: null,
     legacyRecommendations: {},
@@ -394,8 +393,9 @@ export function routinesUsingExercise(routines, exerciseId) {
 }
 
 // req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the
-// confirm can name it. removeRoutine (store.jsx) also drops every schedule slot and
-// planned workout that references the routine, and archives-vs-deletes on whether
+// confirm can name it. removeRoutine (store.jsx) also drops every schedule slot that
+// references the routine (req-165: stored plannedWorkouts are no longer read or pruned —
+// nothing has written one since workouts are built on Start; an old doc keeps its key), and archives-vs-deletes on whether
 // finished history references it. These are pure reads that mirror the store's own
 // reference tests exactly (routineId || sessionId) so the confirm counts match what
 // the delete removes. The logic in the store is unchanged (DEC-031) — this is only
@@ -404,13 +404,12 @@ export function routineDeletionImpact(state, routineId) {
   const refersTo = (obj) => (obj.routineId || obj.sessionId) === routineId
   return {
     slots: (state?.schedule?.slots || []).filter(refersTo).length,
-    plans: (state?.plannedWorkouts || []).filter(refersTo).length,
     hasHistory: (state?.workouts || []).some(refersTo),
   }
 }
 
 // req-43 / DEC-031 — the blast radius of deleting an exercise. removeExercise strips
-// it from every routine (and planned-workout item) and archives-vs-deletes on
+// it from every routine and archives-vs-deletes on
 // finished history (a set with this exerciseId). Reuses routinesUsingExercise for
 // the routine count; history mirrors the store's set.exerciseId test.
 export function exerciseDeletionImpact(state, exerciseId) {
@@ -445,8 +444,8 @@ export function routineInActiveWorkout(state, routineId) {
 // is unit-tested. Referenced = finished history (DEC-031) OR the in-progress workout
 // (DEC-058 §5) → archived via the existing `archivedAt` path; otherwise hard-deleted.
 // Everything else each delete did is unchanged: removeExercise strips the exercise
-// from every routine and planned-workout item; removeRoutine drops its schedule slots
-// and planned workouts. Neither touches activeWorkout — its snapshot is its own.
+// from every routine; removeRoutine drops its schedule slots (req-165: stored plans are
+// no longer touched). Neither touches activeWorkout — its snapshot is its own.
 export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().toISOString()) {
   const referenced = exerciseDeletionImpact(s, exerciseId).hasHistory || exerciseInActiveWorkout(s, exerciseId)
   return {
@@ -457,10 +456,6 @@ export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().t
     routines: (s.routines || []).map((routine) => ({
       ...routine,
       exercises: (routine.exercises || []).filter((item) => item.exerciseId !== exerciseId),
-    })),
-    plannedWorkouts: (s.plannedWorkouts || []).map((plan) => ({
-      ...plan,
-      items: (plan.items || []).filter((item) => item.exerciseId !== exerciseId),
     })),
   }
 }
@@ -510,7 +505,6 @@ export function removeRoutineFromState(s, routineId, archivedAt = new Date().toI
       ...s.schedule,
       slots: (s.schedule?.slots || []).filter((slot) => (slot.routineId || slot.sessionId) !== routineId),
     },
-    plannedWorkouts: (s.plannedWorkouts || []).filter((plan) => (plan.routineId || plan.sessionId) !== routineId),
   }
 }
 

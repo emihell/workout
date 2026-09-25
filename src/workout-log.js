@@ -198,9 +198,6 @@ export function finishedState(state, { overallNote, overallFeel } = {}, finished
   })
   return {
     ...state,
-    plannedWorkouts: (state.plannedWorkouts || []).filter(
-      (plan) => plan.occurrenceId !== state.activeWorkout.occurrenceId,
-    ),
     activeWorkout: null,
     workouts: [finished, ...(state.workouts || [])],
   }

@@ -481,7 +481,7 @@ export function ExerciseDetail({ exerciseId }) {
           const impact = exerciseDeletionImpact(store, ex.id)
           const removes =
             impact.routines > 0
-              ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'} (and any planned workouts).`
+              ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'}.`
               : ''
           // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
           const head = deletionConfirmHead(ex.name, {

@@ -105,11 +105,13 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
     assert.equal(next.workouts[0].overallNote, 'felt strong')
   })
 
-  it('everything else Finish did is unchanged: plan removed, active cleared, seedOverrides dropped, unlogged → skipped', () => {
+  // req-165 — was "plan removed": Finish no longer prunes stored plannedWorkouts (nothing
+  // writes one; an old doc's key is carried as it is).
+  it('everything else Finish did is unchanged: active cleared, seedOverrides dropped, unlogged → skipped; stored plans untouched', () => {
     const s = withSets(baseState(), [work(item(baseState(), 0), 30, 10)])
     const next = finishedState(s, {}, '2026-09-23T11:00:00.000Z')
     assert.equal(next.activeWorkout, null)
-    assert.deepEqual(next.plannedWorkouts, [])
+    assert.equal(next.plannedWorkouts, s.plannedWorkouts)
     const finished = next.workouts[0]
     assert.equal(finished.finishedAt, '2026-09-23T11:00:00.000Z')
     assert.equal('seedOverrides' in finished, false)
