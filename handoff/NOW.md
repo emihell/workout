@@ -22,8 +22,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
   lane, live with Emilio), then req-10. Emilio: Export + reimport whenever convenient (safe since req-163).
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
   search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
-- **Back fix shipped** (DEC-092). **Beginner-persona run done** 2026-09-25 — findings being
-  verified by Planner, then → req-144 prep / bugs. Next: the req-144 design session with Emilio.
+- **Beginner-run fixes (DEC-093), batch → throwaway agents in order:** req-172 → req-173 → req-174 → req-175. Then
+  the req-144 design session with Emilio.
 - **Order (DEC-091):** req-144 creation design → req-10 + in-gym flow → req-146 server later. Export stays.
 - **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
 - **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter (+ libraryId in the feedback note) → 132 → 137 →

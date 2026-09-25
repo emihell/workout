@@ -1578,3 +1578,13 @@ here, from)` so the chain unwinds one screen at a time; an exit that skips its p
 `history.back()`/timers (DEC-084). New multi-entry links follow this rule. Limits kept (BACKLOG §Phase 1, req-171
 follow-ups): the active overview is a hub (Back → Today); recalc → routine → inner editor loses the chain; a stale id
 with a valid shape is accepted.
+
+## DEC-093 — the beginner-run fixes: what ships now, what waits for req-144  (Emilio, 2026-09-25)
+
+From the persona findings (req-144 prep §E). **Now:** req-172 screens open at the top (bug); req-173 "No weight entered"
+note ("4. good"); req-174 empty home → "Create your first routine" ("5. good"); req-175 plain words ("6. good").
+**Rejected — auto-jump to the next exercise:** "when you are in a gym, you share all equipment, so doing an excercise is
+not always possible … can be annoying if its automatic". Back to the list stays. **Kept — home order** (req-60): "yes
+future on top history at bottom today in the middle". **Waits for req-144:** the routine's kg box the workout ignores, taps to
+add an exercise, routine-form jargon, the " — Machines" suffix, rest blank by default. **Open:** the Finish screen listing
+unfinished exercises (recommended, not yet answered).
