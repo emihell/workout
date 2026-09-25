@@ -1,6 +1,6 @@
 # req-158 — stop recording two persisted fields nothing reads
 
-**Status: READY** (2026-09-24) — Phase 1 debt, **persisted schema** (reviewer before merge; no schema-version bump, no
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-158` (`05bb20b`…`4f332c3`, 3 commits).** (2026-09-24) — Phase 1 debt, **persisted schema** (reviewer before merge; no schema-version bump, no
 rewrite). DEC-085 §3. Source: `audits/2026-09-24.md` **F-DEAD-4** (and F-DEAD-3 for context).
 
 1. `legacyRecommendations`: `model.js:24-42,270` adds an entry per v9 routine item on each load, which is then saved;
