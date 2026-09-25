@@ -1,13 +1,40 @@
 import { useCallback, useMemo, useState } from 'react'
 import { uid } from './ids'
 import { commitBackup } from './exchange.js'
-import { buildPlannedWorkout, planSnapshot, recalculatedState } from './model'
-import { clampLoopWeeks, dateKey } from './schedule'
+import { buildPlannedWorkout, recalculatedState } from './model'
+import { clampLoopWeeks } from './schedule'
 import { loadState, saveState } from './persistence.js'
-import { removeExerciseFromState, removeRoutineFromState, replaceItemInState, restoreExerciseInState } from './state-reducers.js'
+import {
+  activePatchedState,
+  activeSetRemovedState,
+  activeSetUpdatedState,
+  draftAbandonedState,
+  draftContinuedState,
+  exerciseAddedState,
+  exerciseUpdatedState,
+  itemSkippedState,
+  loopWeeksState,
+  removeExerciseFromState,
+  removeRoutineFromState,
+  replaceItemInState,
+  restoreExerciseInState,
+  routineAddedState,
+  routineItemAdded,
+  routineItemMoved,
+  routineItemRemoved,
+  routineItemUpdated,
+  routinePatchedState,
+  setLoggedState,
+  slotAddedState,
+  slotRemovedState,
+  startedWorkoutState,
+  workoutAbandonedState,
+  workoutRemovedState,
+  workoutUpdatedState,
+} from './state-reducers.js'
 import { StoreContext } from './store-context'
-import { exerciseFromData, patchExercise } from './exercise-names.js'
-import { addWorkingSetToState, finishedState, skipItemPatch, withLoggedSet } from './workout-log'
+import { exerciseFromData } from './exercise-names.js'
+import { addWorkingSetToState, finishedState } from './workout-log'
 
 export function StoreProvider({ children }) {
   const [state, setStateRaw] = useState(loadState)
@@ -21,11 +48,11 @@ export function StoreProvider({ children }) {
   }, [])
 
   const api = useMemo(() => {
+    // req-164 (F-STRUCT-6) — every reducer is a pure function in state-reducers.js /
+    // workout-log.js / model.js; the store only makes ids and clock readings and hands
+    // them in.
     function patchRoutine(routineId, mutator) {
-      setState((s) => ({
-        ...s,
-        routines: (s.routines || []).map((routine) => (routine.id === routineId ? mutator(routine) : routine)),
-      }))
+      setState((s) => routinePatchedState(s, routineId, mutator))
     }
 
     return {
@@ -37,85 +64,32 @@ export function StoreProvider({ children }) {
           focus: focus || 'Machines',
           exercises: [],
         }
-        setState((s) => ({ ...s, routines: [...(s.routines || []), routine] }))
+        setState((s) => routineAddedState(s, routine))
         return routine.id
       },
       updateRoutine(routineId, patch) {
         patchRoutine(routineId, (routine) => ({ ...routine, ...patch }))
       },
-      // req-119 — the reducer (archive when referenced, incl. the live workout) is in storage.js.
+      // req-119 — the reducer (archive when referenced, incl. the live workout) is in state-reducers.js.
       removeRoutine(routineId) {
         setState((s) => removeRoutineFromState(s, routineId))
       },
       addRoutineExercise(routineId, item) {
-        patchRoutine(routineId, (routine) => ({
-          ...routine,
-          exercises: [
-            ...routine.exercises,
-            {
-              id: item.id || uid('si'),
-              exerciseId: item.exerciseId,
-              role: item.role || 'main',
-              restSec: Number(item.restSec) || 0,
-              notes: item.notes || '',
-              warmup: item.warmup || null,
-              sets: Math.max(1, Number(item.sets) || (item.targets || []).length || 1),
-              targets: Array.isArray(item.targets) ? item.targets : [],
-              suggestedWeights: Array.isArray(item.suggestedWeights) ? item.suggestedWeights : [],
-              // req-85 — per-set target seconds (parallel to targets/suggestedWeights).
-              durations: Array.isArray(item.durations) ? item.durations : [],
-            },
-          ],
-        }))
+        const id = item.id || uid('si')
+        patchRoutine(routineId, (routine) => routineItemAdded(routine, item, id))
       },
       updateRoutineExercise(routineId, index, patch) {
-        patchRoutine(routineId, (routine) => ({
-          ...routine,
-          exercises: routine.exercises.map((item, i) =>
-            i === index
-              ? {
-                  ...item,
-                  role: patch.role ?? item.role,
-                  restSec: patch.restSec ?? item.restSec,
-                  notes: patch.notes ?? item.notes,
-                  warmup: patch.warmup === undefined ? item.warmup : patch.warmup,
-                  sets: patch.sets != null ? Math.max(1, Number(patch.sets) || 1) : item.sets,
-                  targets: patch.targets !== undefined ? patch.targets : item.targets,
-                  suggestedWeights:
-                    patch.suggestedWeights !== undefined ? patch.suggestedWeights : item.suggestedWeights,
-                  durations: patch.durations !== undefined ? patch.durations : item.durations,
-                }
-              : item,
-          ),
-        }))
+        patchRoutine(routineId, (routine) => routineItemUpdated(routine, index, patch))
       },
       removeRoutineExercise(routineId, index) {
-        patchRoutine(routineId, (routine) => ({
-          ...routine,
-          exercises: routine.exercises.filter((_, i) => i !== index),
-        }))
+        patchRoutine(routineId, (routine) => routineItemRemoved(routine, index))
       },
       moveRoutineExercise(routineId, index, dir) {
-        patchRoutine(routineId, (routine) => {
-          const next = [...routine.exercises]
-          const j = index + dir
-          if (j < 0 || j >= next.length) return routine
-          const tmp = next[index]
-          next[index] = next[j]
-          next[j] = tmp
-          return { ...routine, exercises: next }
-        })
+        patchRoutine(routineId, (routine) => routineItemMoved(routine, index, dir))
       },
       setLoopWeeks(n) {
         const loopWeeks = clampLoopWeeks(n)
-        setState((s) => ({
-          ...s,
-          schedule: {
-            ...s.schedule,
-            loopWeeks,
-            slots: (s.schedule?.slots || []).filter((slot) => Number(slot.week) < loopWeeks),
-          },
-        }))
+        setState((s) => loopWeeksState(s, loopWeeks))
       },
       addSlot({ week, weekday, routineId }) {
         const slot = {
@@ -124,47 +98,26 @@ export function StoreProvider({ children }) {
           weekday: Number(weekday),
           routineId,
         }
-        setState((s) => {
-          const duplicate = (s.schedule?.slots || []).some(
-            (candidate) =>
-              Number(candidate.week) === Number(week) &&
-              Number(candidate.weekday) === Number(weekday) &&
-              candidate.routineId === routineId,
-          )
-          if (duplicate) return s
-          return {
-            ...s,
-            schedule: { ...s.schedule, slots: [...(s.schedule?.slots || []), slot] },
-          }
-        })
+        setState((s) => slotAddedState(s, slot))
         return slot.id
       },
       removeSlot(slotId) {
-        setState((s) => ({
-          ...s,
-          schedule: {
-            ...s.schedule,
-            slots: (s.schedule?.slots || []).filter((slot) => slot.id !== slotId),
-          },
-        }))
+        setState((s) => slotRemovedState(s, slotId))
       },
       addExercise(data) {
         // req-127 — the record is built by exerciseFromData (exercise-names.js), unchanged.
         const exercise = exerciseFromData(data, uid('ex'))
-        setState((s) => ({ ...s, exercises: [...s.exercises, exercise] }))
+        setState((s) => exerciseAddedState(s, exercise))
         return exercise.id
       },
       updateExercise(exerciseId, patch) {
-        setState((s) => ({
-          ...s,
-          exercises: s.exercises.map((ex) => (ex.id === exerciseId ? patchExercise(ex, patch) : ex)),
-        }))
+        setState((s) => exerciseUpdatedState(s, exerciseId, patch))
       },
-      // req-119 — the reducer (archive when referenced, incl. the live workout) is in storage.js.
+      // req-119 — the reducer (archive when referenced, incl. the live workout) is in state-reducers.js.
       removeExercise(exerciseId) {
         setState((s) => removeExerciseFromState(s, exerciseId))
       },
-      // req-127 / DEC-059 §3 — un-archive ONE exercise (same id); reducer in storage.js.
+      // req-127 / DEC-059 §3 — un-archive ONE exercise (same id); reducer in state-reducers.js.
       restoreExercise(exerciseId) {
         setState((s) => restoreExerciseInState(s, exerciseId))
         return exerciseId
@@ -172,89 +125,32 @@ export function StoreProvider({ children }) {
       getPlannedWorkout(args) {
         return buildPlannedWorkout(state, args)
       },
+      // DEC-038 / req-55 — one in-progress workout; the reducer (startedWorkoutState) keeps
+      // `draftWorkouts` as legacy data and never writes it.
       startWorkout(routineId, scheduledFor = null, scheduleSlotId = null, suppliedPlan = null) {
-        setState((s) => {
-          const plan =
-            suppliedPlan ||
-            buildPlannedWorkout(s, {
-              routineId,
-              date: scheduledFor || dateKey(new Date()),
-              scheduleSlotId,
-            })
-          if (!plan) return s
-          if (s.activeWorkout?.occurrenceId === plan.occurrenceId) return s
-          // DEC-038 / req-55 — exactly one in-progress workout. Starting a new one
-          // discards whatever was active (the caller warns first, workout-actions.js);
-          // no draft stacking. The `draftWorkouts` field is kept (legacy data) but is
-          // never written to again.
-          return {
-            ...s,
-            activeWorkout: {
-              id: uid('wo'),
-              routineId,
-              scheduledFor: plan.scheduleSlotId ? plan.date : null,
-              performedOn: dateKey(new Date()),
-              scheduleSlotId: plan.scheduleSlotId || null,
-              occurrenceId: plan.occurrenceId,
-              snapshot: planSnapshot(plan),
-              startedAt: new Date().toISOString(),
-              finishedAt: null,
-              overallNote: '',
-              overallFeel: '',
-              completedItemIds: [],
-              restEndsAt: null,
-              restPausedRemaining: null,
-              sets: [],
-              // req-83 (N9) — live, session-scoped per-field seed overrides
-              // (exerciseId::setType → {weight?, reps?}). Transient: never a schema
-              // field, cleared when the workout finishes (activeWorkout → null).
-              seedOverrides: {},
-            },
-          }
-        })
+        const id = uid('wo')
+        const now = new Date()
+        setState((s) => startedWorkoutState(s, { routineId, scheduledFor, scheduleSlotId, suppliedPlan, id, now }))
       },
-      // req-55 — resolve a LEGACY stored draft (the removed multi-draft feature).
-      // Continue promotes the draft to the single active workout, discarding any
-      // current active entirely (one-in-progress invariant; the caller warns first).
-      // No new drafts are ever written — this only drains what old data left behind.
+      // req-55 — resolve / discard a LEGACY stored draft (the removed multi-draft feature).
       continueDraft(workoutId) {
-        setState((s) => {
-          const draft = (s.draftWorkouts || []).find((candidate) => candidate.id === workoutId)
-          if (!draft) return s
-          return {
-            ...s,
-            draftWorkouts: (s.draftWorkouts || []).filter((candidate) => candidate.id !== workoutId),
-            activeWorkout: draft,
-          }
-        })
+        setState((s) => draftContinuedState(s, workoutId))
       },
-      // req-55 — discard a legacy stored draft. No finished-history record (an
-      // unfinished workout is not completed history, DESIGN §1); it is simply removed
-      // from draftWorkouts.
       abandonDraft(workoutId) {
-        setState((s) => ({
-          ...s,
-          draftWorkouts: (s.draftWorkouts || []).filter((candidate) => candidate.id !== workoutId),
-        }))
+        setState((s) => draftAbandonedState(s, workoutId))
       },
       abandonWorkout() {
-        setState((s) => ({ ...s, activeWorkout: null }))
+        setState((s) => workoutAbandonedState(s))
       },
       patchActive(patch) {
-        setState((s) => {
-          if (!s.activeWorkout) return s
-          return { ...s, activeWorkout: { ...s.activeWorkout, ...patch } }
-        })
+        setState((s) => activePatchedState(s, patch))
       },
       addWorkingSet(itemId) {
         setState((s) => addWorkingSetToState(s, itemId))
       },
       // req-109 — Skip exercise: remaining sets of the item logged skipped, item done.
       skipItem(itemId) {
-        setState((s) => {
-          const patch = s.activeWorkout ? skipItemPatch(s.activeWorkout, itemId) : null
-          return patch ? { ...s, activeWorkout: { ...s.activeWorkout, ...patch } } : s
-        })
+        setState((s) => itemSkippedState(s, itemId))
       },
       // req-109 — Replace exercise: the original skipped, a blank item for `exerciseId`
       // inserted after it (this workout only; the routine is never touched). Rest comes
@@ -267,52 +163,22 @@ export function StoreProvider({ children }) {
         return id
       },
       // req-125 — `draftKey`: the set being logged; its setDraft is dropped inside this
-      // update (withLoggedSet), from the latest state.
+      // update (setLoggedState → withLoggedSet), from the latest state.
       completeSet(setRecord, activePatch = {}, { draftKey = null } = {}) {
-        setState((s) => {
-          if (!s.activeWorkout) return s
-          return { ...s, activeWorkout: withLoggedSet(s.activeWorkout, setRecord, activePatch, draftKey) }
-        })
+        setState((s) => setLoggedState(s, setRecord, activePatch, draftKey))
       },
       updateActiveSet(index, patch) {
-        setState((s) => {
-          if (!s.activeWorkout) return s
-          return {
-            ...s,
-            activeWorkout: {
-              ...s.activeWorkout,
-              sets: (s.activeWorkout.sets || []).map((set, i) =>
-                i === index ? { ...set, ...patch } : set,
-              ),
-            },
-          }
-        })
+        setState((s) => activeSetUpdatedState(s, index, patch))
       },
+      // req-25 — clears the armed rest too (activeSetRemovedState).
       removeActiveSet(index) {
-        setState((s) => {
-          if (!s.activeWorkout) return s
-          return {
-            ...s,
-            activeWorkout: {
-              ...s.activeWorkout,
-              sets: (s.activeWorkout.sets || []).filter((_, i) => i !== index),
-              restEndsAt: null,
-              restPausedRemaining: null,
-            },
-          }
-        })
+        setState((s) => activeSetRemovedState(s, index))
       },
       updateWorkout(workoutId, patch) {
-        setState((s) => ({
-          ...s,
-          workouts: s.workouts.map((w) => (w.id === workoutId ? { ...w, ...patch } : w)),
-        }))
+        setState((s) => workoutUpdatedState(s, workoutId, patch))
       },
       removeWorkout(workoutId) {
-        setState((s) => ({
-          ...s,
-          workouts: s.workouts.filter((w) => w.id !== workoutId),
-        }))
+        setState((s) => workoutRemovedState(s, workoutId))
       },
       recalculateFuturePlans(workoutId) {
         setState((s) => recalculatedState(s, workoutId))

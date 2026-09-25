@@ -365,7 +365,11 @@ describe('req-125 Complete / Skip wiring (static)', () => {
     })
   }
 
+  // req-164 — the updater moved to state-reducers.js (setLoggedState); the pin follows it:
+  // the store delegates inside its functional update, and the reducer calls withLoggedSet.
   it('store.completeSet clears inside its functional update via withLoggedSet', () => {
-    assert.match(store, /completeSet\(setRecord, activePatch = \{\}, \{ draftKey = null \} = \{\}\) \{\s*setState\(\(s\) => \{[\s\S]*?withLoggedSet\(s\.activeWorkout, setRecord, activePatch, draftKey\)/)
+    assert.match(store, /completeSet\(setRecord, activePatch = \{\}, \{ draftKey = null \} = \{\}\) \{\s*setState\(\(s\) => setLoggedState\(s, setRecord, activePatch, draftKey\)\)/)
+    const reducers = readFileSync(new URL('./state-reducers.js', import.meta.url), 'utf8')
+    assert.match(reducers, /export function setLoggedState\(s, setRecord, activePatch = \{\}, draftKey = null\) \{[\s\S]*?withLoggedSet\(s\.activeWorkout, setRecord, activePatch, draftKey\)/)
   })
 })

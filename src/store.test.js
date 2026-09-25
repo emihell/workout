@@ -51,18 +51,25 @@ describe('req-38 day key is stamped in local time, not UTC', () => {
     assert.match(dateKey(new Date()), /^\d{4}-\d{2}-\d{2}$/)
   })
 
+  // req-164 — Start's reducer moved to state-reducers.js (startedWorkoutState): the store
+  // reads the clock once (`now = new Date()`) and the reducer stamps both day keys from it.
   it('store.jsx stamps both day keys via dateKey(new Date()), with no UTC slice left', () => {
     const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
-    // The acceptance grep, enforced as a test: no UTC day-slice anywhere in the store.
-    assert.equal(
-      /toISOString\(\)\.slice\(0,\s*10\)/.test(src),
-      false,
-      'store.jsx must not build a day key from the UTC toISOString slice',
-    )
-    // Both sites (plan.date default + performedOn) now use the canonical local key.
-    const localStamps = src.match(/dateKey\(new Date\(\)\)/g) || []
-    assert.equal(localStamps.length, 2, 'expected dateKey(new Date()) at both store sites')
-    assert.match(src, /import\s*\{[^}]*\bdateKey\b[^}]*\}\s*from\s*'\.\/schedule'/)
+    const reducers = readFileSync(fileURLToPath(new URL('./state-reducers.js', import.meta.url)), 'utf8')
+    // The acceptance grep, enforced as a test: no UTC day-slice anywhere in either.
+    for (const text of [src, reducers]) {
+      assert.equal(
+        /toISOString\(\)\.slice\(0,\s*10\)/.test(text),
+        false,
+        'no day key from the UTC toISOString slice',
+      )
+    }
+    // Both sites (plan.date default + performedOn) use the canonical local key of `now`.
+    assert.match(src, /const now = new Date\(\)\s*setState\(\(s\) => startedWorkoutState\(s, \{[^}]*\bnow\b[^}]*\}\)\)/)
+    const body = reducers.slice(reducers.indexOf('export function startedWorkoutState'), reducers.indexOf('\n}\n', reducers.indexOf('export function startedWorkoutState')))
+    const localStamps = body.match(/dateKey\(now\)/g) || []
+    assert.equal(localStamps.length, 2, 'expected dateKey(now) at both sites')
+    assert.match(reducers, /import\s*\{[^}]*\bdateKey\b[^}]*\}\s*from\s*'\.\/schedule\.js'/)
   })
 })
 
@@ -74,21 +81,32 @@ describe('req-38 day key is stamped in local time, not UTC', () => {
 describe('req-25 store.removeActiveSet clears the armed rest (no double timer)', () => {
   const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
 
+  // req-164 — the updater moved to state-reducers.js (activeSetRemovedState); the pin
+  // follows it (and state-reducers' behaviour is tested in req-164.test.js).
   it('removeActiveSet resets restEndsAt and restPausedRemaining to null', () => {
     const body = src.match(/removeActiveSet\(index\)\s*\{[\s\S]*?\n {6}\},/)
     assert.ok(body, 'removeActiveSet method not found in store.jsx')
-    assert.match(body[0], /restEndsAt:\s*null/, 'removeActiveSet must clear restEndsAt')
-    assert.match(body[0], /restPausedRemaining:\s*null/, 'removeActiveSet must clear restPausedRemaining')
+    assert.match(body[0], /setState\(\(s\) => activeSetRemovedState\(s, index\)\)/)
+    const reducers = readFileSync(fileURLToPath(new URL('./state-reducers.js', import.meta.url)), 'utf8')
+    const reducer = reducers.match(/export function activeSetRemovedState\(s, index\) \{[\s\S]*?\n\}/)
+    assert.ok(reducer, 'activeSetRemovedState not found')
+    assert.match(reducer[0], /restEndsAt:\s*null/, 'removeActiveSet must clear restEndsAt')
+    assert.match(reducer[0], /restPausedRemaining:\s*null/, 'removeActiveSet must clear restPausedRemaining')
   })
 })
 
 describe('req-83 store wiring for live seed overrides', () => {
   const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
 
+  // req-164 — Start's reducer moved to state-reducers.js (startedWorkoutState).
   it('startWorkout seeds an empty seedOverrides map on the new active workout', () => {
     const body = src.match(/startWorkout\([\s\S]*?\n {6}\},/)
     assert.ok(body, 'startWorkout method not found in store.jsx')
-    assert.match(body[0], /seedOverrides:\s*\{\}/, 'startWorkout must init seedOverrides: {}')
+    assert.match(body[0], /startedWorkoutState\(s, /)
+    const reducers = readFileSync(fileURLToPath(new URL('./state-reducers.js', import.meta.url)), 'utf8')
+    const reducer = reducers.match(/export function startedWorkoutState\([\s\S]*?\n\}/)
+    assert.ok(reducer, 'startedWorkoutState not found')
+    assert.match(reducer[0], /seedOverrides:\s*\{\}/, 'startWorkout must init seedOverrides: {}')
   })
 
   // req-112 — the finish reducer moved to workout-log.finishedState; the seedOverrides
