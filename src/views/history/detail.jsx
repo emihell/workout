@@ -1,6 +1,6 @@
 import { formatSetLine, roleTag } from '../../ids'
 import { go } from '../../route'
-import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
+import { durationLabel, exerciseById, routineById, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-log'
 import { Back, Missing } from '../shared'
@@ -25,7 +25,7 @@ export function HistoryDetail({ workoutId }) {
     return <Missing>Not found.</Missing>
   }
 
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   const snapshot = workout.snapshot
   const sets = workout.sets || []
   const groups = groupSetsByExercise(sets, {

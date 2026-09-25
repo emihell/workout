@@ -4,7 +4,7 @@ import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing } from './shared'
-import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
+import { deletionConfirmHead, exerciseById, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
@@ -362,7 +362,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
 
 export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const store = useStore()
-  const ex = store.exercises.find((e) => e.id === exerciseId)
+  const ex = exerciseById(store.exercises, exerciseId)
   const [name, setName] = useState(ex?.name || '')
   const [type, setType] = useState(ex?.type || 'free')
   const [equipment, setEquipment] = useState(ex?.equipment || '')
@@ -450,7 +450,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
 
 export function ExerciseDetail({ exerciseId }) {
   const store = useStore()
-  const ex = store.exercises.find((e) => e.id === exerciseId)
+  const ex = exerciseById(store.exercises, exerciseId)
   if (!ex) {
     return <Missing>Not found.</Missing>
   }

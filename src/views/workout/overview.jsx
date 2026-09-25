@@ -3,7 +3,7 @@ import { roleTag } from '../../ids'
 import { go } from '../../route'
 import { finishedForPlan } from '../../current-workout'
 import { dateKey, planDateFor } from '../../schedule'
-import { findRoutine } from '../../storage'
+import { routineById } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
 import { allItemsDone, autoCompleteArmed, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
@@ -38,7 +38,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   // req-107 — the "Add note" reveal (req-26/req-80 pattern). Tapping opens the field
   // for this mount; once the note has text it stays shown on every visit.
   const [noteOpen, setNoteOpen] = useState(false)
-  const { routine } = findRoutine(store.routines, routineId)
+  const routine = routineById(store.routines, routineId)
   const active = store.activeWorkout
   const mine = isActiveFor(active, routineId)
   const plan = !mine

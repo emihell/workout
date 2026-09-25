@@ -1,4 +1,6 @@
-import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
+import { SCHEMA_VERSION, exerciseById, migrateState, routineById } from './model.js'
+
+export { exerciseById, routineById }
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
 import { isAddedMidWorkout, isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
@@ -293,13 +295,6 @@ export function saveState(state) {
   }
 }
 
-export function routineById(routines, routineId) {
-  return (routines || []).find((routine) => routine.id === routineId) ?? null
-}
-
-export function findRoutine(routines, routineId) {
-  return findRoutineInState(routines, routineId)
-}
 
 // req-28 — the workouts finished on a given calendar day (dateKey(finishedAt) ===
 // dayKey), newest-finished first. The Today page's "Completed today" section reads
@@ -335,7 +330,7 @@ export function groupWorkoutsByRoutine(workouts, routines) {
     const name = w.snapshot?.routineName
     const key = w.snapshot ? `${routineId}::${w.snapshot.programName || ''}::${name}` : routineId
     if (!indexByRoutine.has(key)) {
-      const { routine } = findRoutine(routines, routineId)
+      const routine = routineById(routines, routineId)
       indexByRoutine.set(key, groups.length)
       groups.push({
         groupId: key,
@@ -467,7 +462,7 @@ export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().t
 // bring back the routine / planned-workout rows the archive removed. Returns `s`
 // unchanged (same reference) for an unknown or non-archived id.
 export function restoreExerciseInState(s, exerciseId) {
-  const target = (s.exercises || []).find((ex) => ex.id === exerciseId)
+  const target = exerciseById(s.exercises, exerciseId)
   if (!target || !target.archivedAt) return s
   return {
     ...s,
@@ -482,7 +477,7 @@ export function restoreExerciseInState(s, exerciseId) {
 // case no item with `id` exists.
 export function replaceItemInState(s, itemId, exerciseId, id) {
   const active = s.activeWorkout
-  const exercise = (s.exercises || []).find((candidate) => candidate.id === exerciseId)
+  const exercise = exerciseById(s.exercises, exerciseId)
   const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
   if (!active || !exercise || !original) return s
   const replacement = replacementItem({
@@ -539,7 +534,7 @@ export function exercisesInHistory(workouts, exercises, routines) {
   return ids
     .map((id) => ({
       id,
-      exercise: (exercises || []).find((e) => e.id === id) || null,
+      exercise: exerciseById(exercises, id),
       routines: routinesUsingExercise(routines, id),
     }))
     .sort((a, b) => (a.exercise?.name || a.id).localeCompare(b.exercise?.name || b.id))
@@ -636,9 +631,6 @@ export function workoutVolume(workout) {
   return total
 }
 
-export function exerciseById(exercises, id) {
-  return exercises.find((e) => e.id === id) ?? null
-}
 
 export function durationLabel(startedAt, finishedAt) {
   if (!startedAt || !finishedAt) return ''

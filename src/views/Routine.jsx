@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, routineItemMeta } from '../ids'
 import { parseRoutineItem } from '../routine-item-parse'
 import { go } from '../route'
-import { deletionConfirmHead, routineById, historyPrescription, routineDeletionImpact, routineInActiveWorkout } from '../storage'
+import { deletionConfirmHead, exerciseById, routineById, historyPrescription, routineDeletionImpact, routineInActiveWorkout } from '../storage'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
@@ -145,7 +145,7 @@ export function RoutineDetail({ routineId, paths }) {
       {routine.exercises.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {routine.exercises.map((item, index) => {
-          const ex = store.exercises.find((e) => e.id === item.exerciseId)
+          const ex = exerciseById(store.exercises, item.exerciseId)
           return (
             <Row
               key={item.id || `${item.exerciseId}-${index}`}
@@ -402,7 +402,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
   const nav = pathsFor(routineId, paths)
-  const ex = store.exercises.find((e) => e.id === exerciseId)
+  const ex = exerciseById(store.exercises, exerciseId)
   const history = historyPrescription(store.workouts, ex?.id)
   const defaults = {
     role: ex?.type === 'cardio' ? 'warmup' : 'main',
@@ -450,7 +450,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
   const nav = pathsFor(routineId, paths)
   const index = routine?.exercises?.findIndex((candidate) => candidate.id === itemId)
   const item = routine?.exercises?.[index]
-  const ex = store.exercises.find((e) => e.id === item?.exerciseId)
+  const ex = exerciseById(store.exercises, item?.exerciseId)
   const parent = routine ? nav.base : '/routines'
 
   if (!routine || index < 0 || !item) {

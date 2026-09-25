@@ -1,7 +1,7 @@
 import { inWorkoutFallback } from '../../workout-paths'
 import { useEffect } from 'react'
 import { go, hashPath } from '../../route'
-import { findRoutine } from '../../storage'
+import { routineById } from '../../storage'
 import { useStore } from '../../store-context'
 import { Missing } from '../shared'
 
@@ -22,7 +22,7 @@ export function NotInWorkout({ routineId }) {
   const args = {
     active: store.activeWorkout,
     routineId,
-    routineKnown: Boolean(findRoutine(store.routines, routineId).routine),
+    routineKnown: Boolean(routineById(store.routines, routineId)),
   }
   const outcome = inWorkoutFallback({ ...args, currentPath: hashPath(window.location.hash) })
   useEffect(() => {
