@@ -1,6 +1,6 @@
 // req-169 (DEC-089) — (1) a finished workout's snapshot is a reference even with zero logged
-// sets (exercise), and a finished workout naming its routine only by snapshot.routineId is
-// one too; schedule slots still are not (DEC-031). (2) the delete confirm tells the truth
+// sets (exercise); the routine side has no such gap in loaded data (measured, pinned below);
+// schedule slots still are not a reference (DEC-031). (2) the delete confirm tells the truth
 // about a draft-only reference. The confirm and the reducer read the same impact.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
@@ -48,11 +48,11 @@ describe('1 — finished history names a reference by its snapshot too (DEC-089 
     assert.equal(exerciseDeletionImpact(s, 'ex-zero').hasHistory, true)
     assert.equal(removeExerciseFromState(s, 'ex-zero', AT).exercises.find((e) => e.id === 'ex-zero')?.archivedAt, AT)
   })
-  it('a routine a finished workout names only by snapshot.routineId → archived (was: hard-deleted)', () => {
-    const s = doc()
-    assert.equal(s.workouts.find((w) => w.id === 'w2').routineId, undefined, 'the migrated shape')
-    assert.equal(routineDeletionImpact(s, 'r-snap').hasHistory, true)
-    assert.equal(removeRoutineFromState(s, 'r-snap', AT).routines.find((r) => r.id === 'r-snap')?.archivedAt, AT)
+  it('routine side, measured: a loaded workout never names its routine only by snapshot.routineId — migrateState rebuilds the snapshot from routineId, so that shape arrives with NO routine reference at all (a load-path finding, reported, not changed here)', () => {
+    const w2 = doc().workouts.find((w) => w.id === 'w2')
+    assert.equal(w2.routineId, undefined)
+    assert.equal(w2.snapshot.routineId, undefined, 'dropped on load — nothing left for an impact check to read')
+    assert.equal(w2.snapshot.routineName, 'Snap')
   })
   it('control (DEC-031 stands): a routine referenced only by a schedule slot is hard-deleted; its slot goes', () => {
     const s = doc()
@@ -108,7 +108,6 @@ describe('the confirm and the reducer read the same impact: "archived" wording �
     })
   }
   const routineCases = [
-    ['r-snap', 'past workouts'],
     ['r1', 'past workouts'],
     ['r-free', 'current workout'],
     ['r-slot', null],
