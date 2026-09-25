@@ -21,7 +21,7 @@ describe('the three ways out of a workout to Today use leaveWorkoutToToday (QA-1
     // req-153 review — pin the ORDER too: the exit follows finishWorkout / abandonWorkout.
     assert.match(read('./views/workout/finish.jsx'), /store\.finishWorkout\([^)]*\)\s*\n\s*leaveWorkoutToToday\(\)/)
     assert.match(read('./views/workout/auto-complete.jsx'), /store\.finishWorkout\(autoFinishArgs[^\n]*\n\s*leaveWorkoutToToday\(\)/)
-    assert.match(read('./views/workout/helpers.jsx'), /store\.abandonWorkout\(\)\n\s*leaveWorkoutToToday\(\)/)
+    assert.match(read('./views/workout/workout-helpers.js'), /store\.abandonWorkout\(\)\n\s*leaveWorkoutToToday\(\)/)
   })
 })
 

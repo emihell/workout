@@ -227,7 +227,7 @@ describe('search via aliases', () => {
   // req-130 review — the seed aliases must not reorder single-word queries: a word
   // inside a multi-word alias ranks below every name hit (was: tier 1 via a word split,
   // which put Dip Machine first for "press"). "Without" = the stored aliases stripped.
-  const noAliases = library.map(({ aliases, ...entry }) => entry)
+  const noAliases = library.map(({ aliases: _aliases, ...entry }) => entry)
   for (const [query, notFirst] of [
     ['press', 'Dip_Machine'],
     ['row', 'One-Arm_Dumbbell_Row'],

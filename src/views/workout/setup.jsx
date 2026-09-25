@@ -3,12 +3,15 @@ import { go } from '../../route'
 import { exerciseById } from '../../storage'
 import { useStore } from '../../store-context'
 import { itemLoggingState } from '../../workout-log'
-import { navForBase, RoutineScreens } from '../Routine'
+import { RoutineScreens } from '../Routine'
+import { navForBase } from '../routine-nav.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, NavLink, Screen, Textarea, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemCurrentPath, NotInWorkout } from './helpers'
+import { NotInWorkout } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
 import { RestPill } from './rest'
-import { useWeightStep, WeightStepField } from '../weight-step-field.jsx'
+import { WeightStepField } from '../weight-step-field.jsx'
+import { useWeightStep } from '../use-weight-step.js'
 
 export function WorkoutItemExercise({ routineId, itemId }) {
   const store = useStore()

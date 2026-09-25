@@ -78,7 +78,6 @@ export function leaveWorkoutToToday() {
 // day) — already active, so just navigate; (2) a legacy `draftWorkout` — promote it
 // to the single active, discarding any current active (with the warning).
 export async function continueInProgress(store, workout) {
-  const routineId = workoutRoutineId(workout)
   const active = store.activeWorkout
   if (active && active.id === workout.id) {
     // req-76 — resume straight into the current exercise (or the overview if all done).

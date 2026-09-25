@@ -301,7 +301,7 @@ describe('req-109 Replace exercise (replaceItemPatch + replacementItem)', () => 
     let state = replace(baseState(), 'ex-c')
     const items = state.activeWorkout.snapshot.items.map((item, i) => {
       if (i !== 1) return item
-      const { addedMidWorkout, ...rest } = item
+      const { addedMidWorkout: _addedMidWorkout, ...rest } = item
       return rest
     })
     state = withActive(state, { snapshot: { ...state.activeWorkout.snapshot, items } })
@@ -315,7 +315,7 @@ describe('req-109 Replace exercise (replaceItemPatch + replacementItem)', () => 
     assert.deepEqual(legacyReload(marked).activeWorkout.snapshot.items[1].targets, [])
     const items = marked.activeWorkout.snapshot.items.map((item, i) => {
       if (i !== 1) return item
-      const { addedMidWorkout, ...rest } = item
+      const { addedMidWorkout: _addedMidWorkout, ...rest } = item
       return rest
     })
     const unmarked = withActive(marked, { snapshot: { ...marked.activeWorkout.snapshot, items } })

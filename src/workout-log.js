@@ -182,7 +182,7 @@ export function withSkippedUnloggedSets(workout) {
 export function finishedState(state, { overallNote, overallFeel } = {}, finishedAt = new Date().toISOString()) {
   if (!state?.activeWorkout) return state
   const {
-    seedOverrides,
+    seedOverrides: _seedOverrides,
     autoFinishDismissed: _dismissed,
     setDraft: _draft,
     progression: _progression,

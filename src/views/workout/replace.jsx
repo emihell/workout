@@ -5,7 +5,8 @@ import { useStore } from '../../store-context'
 import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemLogPath, MissingItem, NotInWorkout } from './helpers'
+import { MissingItem, NotInWorkout } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemLogPath } from './workout-helpers.js'
 import { RestPill } from './rest'
 
 // req-109 — the Replace exercise picker (reached from the item's log screen). Lists the

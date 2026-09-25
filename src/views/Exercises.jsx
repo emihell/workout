@@ -9,7 +9,8 @@ import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, R
 import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
 import { defaultDurationToSave } from '../seconds-input.js'
-import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
+import { WeightStepField } from './weight-step-field.jsx'
+import { useWeightStep } from './use-weight-step.js'
 import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } from '../exercise-names.js'
 import { askConfirm } from '../ui/confirm.js'
 

@@ -8,7 +8,6 @@
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
-import { lookClass } from '../views/nav-look.js'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
 import { kgError } from '../kg-input.js'

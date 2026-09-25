@@ -10,6 +10,7 @@ import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing } from './shared'
 import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { askConfirm } from '../ui/confirm.js'
+import { navForBase } from './routine-nav.js'
 
 function routinePath(routineId, extra = '') {
   return `/routines/${routineId}${extra}`
@@ -23,21 +24,6 @@ function exerciseSettingsLink(exerciseId, returnPath) {
   return `/exercises/${exerciseId}/edit?from=${encodeURIComponent(returnPath)}`
 }
 
-export function navForBase(base, done, { extra = null, showDelete = true } = {}) {
-  return {
-    base,
-    done,
-    extra,
-    showDelete,
-    edit: `${base}/edit`,
-    pick: `${base}/exercise/new`,
-    create: `${base}/exercise/create`,
-    createManual: `${base}/exercise/create/manual`,
-    createSearch: `${base}/exercise/create/search`,
-    newItem: (exerciseId) => `${base}/exercise/new/${exerciseId}`,
-    item: (itemId) => `${base}/exercise/${itemId}`,
-  }
-}
 
 function pathsFor(routineId, paths) {
   return paths || navForBase(`/routines/${routineId}`, '/routines')

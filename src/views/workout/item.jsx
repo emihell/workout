@@ -34,8 +34,10 @@ import { SetEditForm } from '../set-edit'
 import { activeSetPatch, liveSetWeight } from '../set-values.js'
 import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
-import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath, MissingItem, NotInWorkout } from './helpers'
-import { RestPill, useRestCountdown } from './rest'
+import { MissingItem, NotInWorkout } from './helpers'
+import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath } from './workout-helpers.js'
+import { RestPill } from './rest'
+import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
 
 // req-109 — how long an armed "Skip exercise" waits for its second tap.
@@ -376,12 +378,16 @@ function WorkoutItemLive({ routineId, item }) {
   const draft = draftSnap.key === setSeedKey ? draftSnap.draft : setDraftFor(active, setSeedKey)
   const formInit = formFieldsWithDraft({ seed, draft, weighted, durationTarget })
   const noteSeed = formInit.note
-  const [note, setNote] = useState(noteSeed)
-  const [showNote, setShowNote] = useState(Boolean(noteSeed))
-  useEffect(() => {
-    setNote(noteSeed)
-    setShowNote(Boolean(noteSeed))
-  }, [setSeedKey, noteSeed])
+  // req-165 (F-LINT-1) — re-seeded when the set (or its seed) changes by adjusting state
+  // during render, as draftSnap above does, rather than in an effect (which rendered one
+  // pass with the old set's note first). Same trigger: setSeedKey or noteSeed.
+  const noteKey = `${setSeedKey}\u0000${noteSeed}`
+  const [noteState, setNoteState] = useState(() => ({ key: noteKey, note: noteSeed, show: Boolean(noteSeed) }))
+  if (noteState.key !== noteKey) setNoteState({ key: noteKey, note: noteSeed, show: Boolean(noteSeed) })
+  const current = noteState.key === noteKey ? noteState : { note: noteSeed, show: Boolean(noteSeed) }
+  const { note, show: showNote } = current
+  const setNote = (value) => setNoteState((s) => ({ ...s, note: value }))
+  const setShowNote = (value) => setNoteState((s) => ({ ...s, show: value }))
   // req-78 — the next set's log form is now shown throughout rest (rest doesn't block
   // input), so the note affordance shows whenever the form does: any time the exercise
   // isn't planned-done. (`resting` no longer gates the form.)

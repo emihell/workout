@@ -56,6 +56,9 @@ function TypeScale() {
   const [px, setPx] = useState({})
   useEffect(() => {
     const cs = getComputedStyle(document.documentElement)
+    // Kept (req-165, F-LINT-1): reads the applied stylesheet (an external system) after
+    // mount, so the dev-only showcase reports the real computed sizes.
+    // oxlint-disable-next-line react/set-state-in-effect
     setPx(Object.fromEntries(SCALE.map(({ token }) => [token, cs.getPropertyValue(token).trim()])))
   }, [])
   return (

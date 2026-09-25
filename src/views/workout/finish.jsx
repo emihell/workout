@@ -8,7 +8,8 @@ import { Back } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { anythingLogged, loggedSetCount } from '../../workout-log'
 import { activeFeel, activeNote } from '../../workout-note.js'
-import { abandonWorkout, isActiveFor, NotInWorkout } from './helpers'
+import { NotInWorkout } from './helpers'
+import { abandonWorkout, isActiveFor } from './workout-helpers.js'
 import { RestPill } from './rest'
 
 export function WorkoutFinish({ routineId }) {

@@ -1,23 +1,8 @@
-import { useEffect, useState } from 'react'
 import { recordButton } from '../../analytics'
 import { useStore } from '../../store-context'
-import { restRemaining } from '../../workout-log'
 import { RestPill as UIRestPill } from '../../ui/index.jsx'
+import { useRestCountdown } from './rest-countdown.js'
 
-// Reads the workout-level rest state (restEndsAt / restPausedRemaining, both
-// already persisted on activeWorkout) and ticks a display clock while a rest is
-// running. Used by the RestPill for display; the countdown logic lives in one place.
-export function useRestCountdown(active) {
-  const restEndsAt = active?.restEndsAt ?? null
-  const restPausedRemaining = active?.restPausedRemaining ?? null
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    if (!restEndsAt && restPausedRemaining == null) return undefined
-    const t = setInterval(() => setNow(Date.now()), 250)
-    return () => clearInterval(t)
-  }, [restEndsAt, restPausedRemaining])
-  return restRemaining(active, now)
-}
 
 // req-78 — the single, persistent rest UI, now a small floating pill (was RestBar).
 // Self-contained: reads only activeWorkout rest state, renders nothing when no rest is
