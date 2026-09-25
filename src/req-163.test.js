@@ -183,7 +183,7 @@ describe('6 — DEC-087 §2: Effort in History', () => {
     const store = historyStore({ exercise: PRESS, items: item(PRESS), sets })
     view = await mount(store, h(HistoryWorkoutExercise, { workoutId: 'wo-h', exerciseId: 'si-a' }))
     const rows = view.all('a').map((a) => a.textContent)
-    const wuRow = rows.find((t) => t.startsWith('WU set'))
+    const wuRow = rows.find((t) => t.startsWith('Warm-up set'))
     const workRow = rows.find((t) => t.startsWith('40 kg'))
     assert.doesNotMatch(wuRow, /Moderate/, 'was "WU set · 10 kg · 12 · Moderate" on main')
     assert.match(workRow, /Moderate/, 'a work set keeps its effort')
@@ -196,7 +196,7 @@ describe('6 — DEC-087 §2: Effort in History', () => {
     assert.doesNotMatch(view.text(), /Moderate/)
   })
   it('(a) formatSetLine: WU / cardio never labelled; a work set is', () => {
-    assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12', rpe: 3 }), 'WU set · 10 kg · 12')
+    assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12', rpe: 3 }), 'Warm-up set · 10 kg · 12')
     assert.equal(formatSetLine({ setType: 'work', reps: '6 min', rpe: 3 }, { cardio: true }), '6 min')
     assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 3 }), '40 kg · 8 · Moderate')
   })
@@ -212,7 +212,7 @@ describe('6 — DEC-087 §2: Effort in History', () => {
     view = await mount(store, h(HistorySet, { workoutId: 'wo-h', index: 0 }))
     await view.click(setType(view, 'Work'))
     assert.match(view.text(), /Effort/)
-    await view.click(setType(view, 'WU set'))
+    await view.click(setType(view, 'Warm-up set'))
     assert.doesNotMatch(view.text(), /Effort/)
   })
   it('(b) a cardio work set: no Effort, rpe null; a normal work set keeps Effort and its value', async () => {

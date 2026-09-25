@@ -27,7 +27,7 @@ const EFFORT = [
   { value: 2, label: 'Easy' },
   { value: 3, label: 'Moderate' },
   { value: 4, label: 'Hard' },
-  { value: 5, label: 'Failure' },
+  { value: 5, label: "Couldn't finish" },
 ]
 
 // The block label is a small eyebrow caption (e.g. "BUTTON"), not a section

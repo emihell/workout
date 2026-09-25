@@ -19,12 +19,12 @@ describe('req-44 isWeightedType (unifies usesWeight/usesLoad/weighted/bodyweight
 })
 
 describe('effort labels', () => {
-  it('maps stored numbers to Easy Moderate Hard Failure', () => {
+  it('maps stored numbers to Easy Moderate Hard Couldn\'t finish', () => {
     assert.equal(rpeLabel(1), 'Easy')
     assert.equal(rpeLabel(2), 'Easy')
     assert.equal(rpeLabel(3), 'Moderate')
     assert.equal(rpeLabel(4), 'Hard')
-    assert.equal(rpeLabel(5), 'Failure')
+    assert.equal(rpeLabel(5), "Couldn't finish")
     assert.equal(rpeLabel(''), '')
   })
 
@@ -52,7 +52,7 @@ describe('req-93 roleTag (main is unlabelled; only non-main roles carry a tag)',
     assert.equal(roleTag('warmup'), roleLabel('warmup'))
     assert.equal(roleTag('finisher'), roleLabel('finisher'))
     assert.equal(roleTag('cardio'), roleLabel('cardio'))
-    assert.equal(roleTag('warmup'), 'WU routine')
+    assert.equal(roleTag('warmup'), 'Warm-up')
     assert.equal(roleTag('finisher'), 'Finisher')
   })
 })
@@ -67,7 +67,7 @@ describe('req-103 routineItemMeta (routine editor row meta line)', () => {
     assert.ok(!meta.includes('Main'))
   })
   it('non-main roles keep their tag first', () => {
-    assert.equal(routineItemMeta({ role: 'warmup', sets: 2 }), 'WU routine · 2 sets')
+    assert.equal(routineItemMeta({ role: 'warmup', sets: 2 }), 'Warm-up · 2 sets')
     assert.equal(routineItemMeta({ role: 'finisher', sets: 1 }), 'Finisher · 1 set')
     assert.equal(routineItemMeta({ role: 'cardio' }), 'Cardio · 1 set')
   })

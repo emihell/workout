@@ -18,7 +18,7 @@ import { compareWorkoutsNewestFirst } from '../../history-queries.js'
 export function historyGroupMeta(snapshotItem, setCount, { skipped = false } = {}) {
   return [
     roleTag(snapshotItem?.role),
-    snapshotItem?.warmup ? 'WU set' : '',
+    snapshotItem?.warmup ? 'Warm-up set' : '',
     skipped ? 'skipped' : `${setCount} set${setCount === 1 ? '' : 's'}`,
   ]
     .filter(Boolean)

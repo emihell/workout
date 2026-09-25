@@ -56,7 +56,7 @@ export function Actions({ retreat, lateral, forward, className }) {
 }
 
 // SegmentedControl — radio group as equal-width segments; selected set apart by
-// fill/weight (grayscale). Covers effort (Easy/Moderate/Hard/Failure) and feel.
+// fill/weight (grayscale). Covers effort (Easy/Moderate/Hard/Couldn't finish) and feel.
 // `clearable` prepends a leading "none" segment (`—`, value `''`) that resets the
 // control to empty — the idiom three call sites used to hand-roll. Off by default,
 // so non-clearable controls are unchanged. The `—` label / `''` value are the
@@ -398,7 +398,7 @@ export function SetLogForm({
     { value: 2, label: 'Easy' },
     { value: 3, label: 'Moderate' },
     { value: 4, label: 'Hard' },
-    { value: 5, label: 'Failure' },
+    { value: 5, label: "Couldn't finish" },
   ],
   initialWeight = '',
   initialReps = '',

@@ -52,7 +52,7 @@ export function HistoryDetail({ workoutId, from = null }) {
           durationLabel(workout.startedAt, workout.finishedAt),
           // req-116 — skipped sets aren't counted, matching Finish and the summary.
           `${loggedSetCount(workout)} sets`,
-          `${workoutVolume(workout)} kg`,
+          `${workoutVolume(workout).toLocaleString('en-US')} kg lifted`,
         ]
           .filter(Boolean)
           .join(' · ')}
@@ -128,7 +128,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId, from = null }) {
       <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
       <p className="ui-sub">
         {/* req-128 — req-93 rule: main unlabelled (roleTag), non-main tagged. */}
-        {[roleTag(snapshotItem?.role), snapshotItem?.warmup ? 'WU set' : null, whenLabel(workout)]
+        {[roleTag(snapshotItem?.role), snapshotItem?.warmup ? 'Warm-up set' : null, whenLabel(workout)]
           .filter(Boolean)
           .join(' · ')}
       </p>

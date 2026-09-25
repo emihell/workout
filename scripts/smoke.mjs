@@ -236,15 +236,15 @@ async function main() {
       const detail = `/history/${workout.id}?from=${encodeURIComponent(month)}`
       await clickSelector(page, `a[href="#${detail}"]`)
       await waitHash(page, new RegExp(`^#/history/${workout.id}\\?`))
-      await waitText(page, `${LOG_EXERCISE} — WU set · 1 set`)
-      await waitText(page, `${SKIP_EXERCISE} — WU set · skipped`)
+      await waitText(page, `${LOG_EXERCISE} — Warm-up set · 1 set`)
+      await waitText(page, `${SKIP_EXERCISE} — Warm-up set · skipped`)
       // The per-exercise sets screen shows the logged value as the app displays it.
       await clickSelector(page, `a[href="#/history/${workout.id}/exercise/${logKey}?from=${encodeURIComponent(detail)}"]`)
       await waitText(page, '22.5')
     })
     await step('Back → Back from the exercise returns to the month list (req-171)', async () => {
       await clickLink(page, '‹ Back')
-      await waitText(page, `${LOG_EXERCISE} — WU set · 1 set`)
+      await waitText(page, `${LOG_EXERCISE} — Warm-up set · 1 set`)
       await clickLink(page, '‹ Back')
       await waitHash(page, new RegExp(`^#/history/month/${workout.performedOn.slice(0, 7)}$`))
     })

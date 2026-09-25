@@ -89,7 +89,7 @@ describe('History detail exercise meta (QA-4)', () => {
     assert.match(read('./views/history/detail.jsx'), /historyGroupRowMeta\(snapshotItem, group\.items\)/)
   })
   it('all sets skipped → "· skipped" (the overview word), no count', () => {
-    assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 0, { skipped: true }), 'WU set · skipped')
+    assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 0, { skipped: true }), 'Warm-up set · skipped')
   })
   it('2 of 4 skipped → the logged count, no "skipped"', () => {
     const meta = historyGroupMeta({ role: 'main' }, 2, { skipped: false })

@@ -98,7 +98,7 @@ describe('3 — History toggle Work → WU clears the duration', () => {
   it('a timed work set toggled to WU saves durationSec null (was: kept, so the WU row read "46s")', async () => {
     const store = historyStore(PLANK, [{ exerciseId: 'ex-a', routineItemId: 'si-a', setType: 'work', weight: '', reps: '', durationSec: 46, rpe: null, note: '' }])
     view = await mount(store)
-    await view.click(typeButton(view, 'WU set'))
+    await view.click(typeButton(view, 'Warm-up set'))
     await view.click(view.button('Save'))
     assert.equal(store.writes[0].patch.sets[0].setType, 'wu')
     assert.equal(store.writes[0].patch.sets[0].durationSec, null)
@@ -111,7 +111,7 @@ describe('3 — History toggle Work → WU clears the duration', () => {
     await view.unmount()
     const plain = historyStore(PRESS, [{ exerciseId: 'ex-a', routineItemId: 'si-a', setType: 'work', weight: 40, reps: '8', rpe: 3, note: '' }])
     view = await mount(plain)
-    await view.click(typeButton(view, 'WU set'))
+    await view.click(typeButton(view, 'Warm-up set'))
     await view.click(view.button('Save'))
     assert.equal('durationSec' in plain.writes[0].patch.sets[0], false)
   })
