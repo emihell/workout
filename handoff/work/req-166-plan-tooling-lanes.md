@@ -1,6 +1,6 @@
 # req-166 — tooling: check_handoff knows lanes; the reviewer check before merge; `plan` fetches
 
-**Status: READY** (2026-09-25) — **Lane: tooling.** DEC-085 §6, DEC-087. Source: `handoff/audits/workflow-2026-09-24.md`
+**Status: BUILT — branch `req-166` (`f5f1d73`), NOT merged.** (2026-09-25) — **Lane: tooling.** DEC-085 §6, DEC-087. Source: `handoff/audits/workflow-2026-09-24.md`
 (recommendations 7, 8; the L-014 fetch note) + BACKLOG "check_handoff knows lanes".
 
 1. `scripts/check_handoff.py`: accept a `**Lane: <ui|bug|data|content|design|backend|tooling|audit>**` tag, and a design
