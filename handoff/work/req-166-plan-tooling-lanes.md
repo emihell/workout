@@ -11,6 +11,8 @@
    gate line names no reviewer, refuse unless `--no-reviewer "<reason>"` is given (the reason is appended to SHIPPED).
 3. `plan status` / `plan save` run `git fetch origin` first (L-014) and warn if `planning` is behind `origin/planning`.
 
+4. Run `scripts/check-cycles.mjs` in `./check` (~50 ms; req-164) — a new import cycle fails the gate.
+
 ## Acceptance criteria
 
 - check_handoff: a test per new tag/status (accepted), a bad Lane value (fails), an old Gate-only req (warns) — paste.
