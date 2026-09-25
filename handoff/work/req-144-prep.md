@@ -706,3 +706,7 @@ Caveat (the agent's own): it knew the jargon and kept going where a real beginne
 
 **Worked well:** making a routine and schedule is quick once found; logging is one-handed with big fields; the rest timer
 starts itself and shows on every screen; Effort words are plain; History detail is accurate.
+
+**From req-175's review (2026-09-25):** a warm-up *exercise* (role) and a warm-up *set* now share the word — History can read
+"Warm-up · Warm-up set · 1 set"; the routine editor still says "WU set" (`ids.js:95`, `Routine.jsx:351`) next to role "Warm-up";
+the assistant prompt `exchange.js:38` still says "WU routine"; `README.md:8` says "WU set". Decide the two names in req-144.
