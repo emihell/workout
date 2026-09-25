@@ -16,11 +16,15 @@ import { historyPrescription, routinesUsingExercise } from './history-queries.js
 // counts match what
 // the delete removes. The logic in the store is unchanged (DEC-031) — this is only
 // how we describe it.
+// req-168 — a legacy `draftWorkout` (an old unfinished workout, shown in History as a
+// Continue row) references its routine and exercises too (DESIGN §3: referenced setup is
+// archived, not deleted). It counts in `hasHistory`, which both the confirm wording and
+// the reducer read, so the two can't disagree.
 export function routineDeletionImpact(state, routineId) {
   const refersTo = (obj) => obj.routineId === routineId
   return {
     slots: (state?.schedule?.slots || []).filter(refersTo).length,
-    hasHistory: (state?.workouts || []).some(refersTo),
+    hasHistory: [...(state?.workouts || []), ...(state?.draftWorkouts || [])].some(refersTo),
   }
 }
 
@@ -31,9 +35,14 @@ export function routineDeletionImpact(state, routineId) {
 export function exerciseDeletionImpact(state, exerciseId) {
   return {
     routines: routinesUsingExercise(state?.routines, exerciseId).length,
-    hasHistory: (state?.workouts || []).some((workout) =>
-      (workout.sets || []).some((set) => set.exerciseId === exerciseId),
-    ),
+    // req-168 — legacy drafts too, by their logged sets or their snapshot items.
+    hasHistory:
+      (state?.workouts || []).some((workout) => (workout.sets || []).some((set) => set.exerciseId === exerciseId)) ||
+      (state?.draftWorkouts || []).some(
+        (draft) =>
+          (draft.sets || []).some((set) => set.exerciseId === exerciseId) ||
+          (draft.snapshot?.items || []).some((item) => item.exerciseId === exerciseId),
+      ),
   }
 }
 
