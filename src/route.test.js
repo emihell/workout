@@ -320,3 +320,20 @@ describe('req-99 — exercise-edit carries an optional ?from= return path', () =
     )
   })
 })
+
+// req-172 — a route change to a different path scrolls to the top; same-path never does.
+describe('req-172 — screenChanged decides the scroll-to-top', () => {
+  it('a different path is a screen change', () => {
+    assert.equal(route.screenChanged('#/routines/r1/exercise/new', '#/routines/r1'), true)
+    assert.equal(route.screenChanged('#/routines', '#/exercises/e1'), true)
+  })
+
+  it('the same path (a re-render: a set logged, a rest tick, typing) is not', () => {
+    assert.equal(route.screenChanged('#/workout/w1', '#/workout/w1'), false)
+    assert.equal(route.screenChanged('#/', ''), false)
+  })
+
+  it('the same path with only a different ?from= return target is not', () => {
+    assert.equal(route.screenChanged('#/exercises/e1/edit?from=%2Froutines', '#/exercises/e1/edit'), false)
+  })
+})

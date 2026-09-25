@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { recordScreen } from './analytics.js'
 
 const NAV_KEY = 'workout-mvp-nav-2'
@@ -55,8 +55,28 @@ function remember(hash) {
   if (changed) recordScreen(parseRoute(last).name)
 }
 
+// req-172 — a move to a DIFFERENT screen opens it at the top. Hash navigation keeps the
+// document, so without this the new screen inherited the old one's scrollY (a routine
+// with 4+ exercises came back from Add exercise scrolled, and the next tap hit a row).
+// Compared on the path without its `?from=` query: the same screen re-entered with a
+// different return target, or any same-path re-render (logging a set, a rest tick,
+// typing), never scrolls. Back to a list also opens at its top (not its old position).
+export function screenChanged(prevHash, nextHash) {
+  const strip = (hash) => hashPath(hash).split('?')[0]
+  return strip(prevHash) !== strip(nextHash)
+}
+
 export function useHashRoute() {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
+  const shownHash = useRef(hash)
+
+  // Layout effect: runs once the new screen is in the DOM, before it paints, so the old
+  // scroll position is never visible on the new screen.
+  useLayoutEffect(() => {
+    if (!screenChanged(shownHash.current, hash)) return
+    shownHash.current = hash
+    window.scrollTo(0, 0)
+  }, [hash])
 
   useEffect(() => {
     remember(window.location.hash || '#/')
