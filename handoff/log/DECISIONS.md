@@ -1586,5 +1586,4 @@ note ("4. good"); req-174 empty home → "Create your first routine" ("5. good")
 **Rejected — auto-jump to the next exercise:** "when you are in a gym, you share all equipment, so doing an excercise is
 not always possible … can be annoying if its automatic". Back to the list stays. **Kept — home order** (req-60): "yes
 future on top history at bottom today in the middle". **Waits for req-144:** the routine's kg box the workout ignores, taps to
-add an exercise, routine-form jargon, the " — Machines" suffix, rest blank by default. **Open:** the Finish screen listing
-unfinished exercises (recommended, not yet answered).
+add an exercise, routine-form jargon, the " — Machines" suffix, rest blank by default. **Finish lists unfinished exercises** → req-176 (Emilio: "i go with yes").
