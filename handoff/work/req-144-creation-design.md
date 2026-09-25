@@ -1,6 +1,6 @@
 # req-144 — creation design: how beginners and advanced users create exercises, routines and programs
 
-**Status: NEEDS DECISIONS** — **a design req, no code.** It's owned by planning + Emilio, working live, and its output is
+**Status: NEEDS DECISIONS** **Lane: design** — **a design req, no code.** It's owned by planning + Emilio, working live, and its output is
 a design doc, `DEC-`s and the build reqs that follow. Opens Phase 2 (BACKLOG §Phase 2: "Define the model first, then the
 creation UX"). Emilio 2026-09-24: creating exercises and routines is "the hardest thing to simplify… the difference
 between a first time gym goer and an advanced user are so far apart… but i want support for both". It absorbs `req-10`

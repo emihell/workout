@@ -1,6 +1,6 @@
 # req-10 — "set up" flow for a first-time exercise (guided calibration)
 
-**Status: READY** — the two shaping decisions are settled (DEC-012: guided calibration, not an
+**Status: READY** **Lane: ui** (a new feature — after the follow-ups, DEC-087; rescan before building) — the two shaping decisions are settled (DEC-012: guided calibration, not an
 invented number; auto-prompt on no-history). Remaining choices are flagged defaults below, and
 this is a UI/flow req — READY on intent + constraints, appearance refined at review
 (`rules/WORKFLOW.md`). Interacts with `req-02` (see Integration). Larger than most Phase-1 reqs;

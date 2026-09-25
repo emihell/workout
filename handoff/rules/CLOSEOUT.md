@@ -40,6 +40,11 @@ pushed, the branch is not deleted, and a re-run after fixing the gate recovers f
    checkout/merge/publish/push — don't run those by hand.
 3. Run `./plan closeout req-N` yourself (after the merge gate). Nothing else.
 
+## The reviewer gate (req-166)
+`./plan closeout` refuses **before** merging when the diff touches a DEC-057 §1 trigger file and the SHIPPED entry's gate
+line names no reviewer. If a review truly isn't needed, say why: `./plan closeout req-N --no-reviewer "<reason>"` — the
+reason is appended to SHIPPED. Never pass it to skip a review that should have run.
+
 ## Done when
 `./plan status` prints "planning is fully merged, both worktrees clean." If it shows
 handoff drift about req-N's status, the merge didn't land — re-run `./plan closeout
