@@ -1975,3 +1975,6 @@ behind (L-014). `./check` step 1c runs `check-cycles.mjs` (46 ms). Gate (tooling
 check-lanes.test.sh 9/9 (main's check_handoff fails 4); each guard shown firing in a sandbox copy or a throwaway commit
 (L-040): closeout refused (exit 1, main unmoved), `--no-reviewer` proceeds and records; behind → WARNING; a throwaway cycle
 → `check: RED`. Reviewer: none (no trigger files). Planner used it right after the merge (receipt below).
+Planner after merge: `./plan status` → `plan status: fetched origin` … `fully merged, both worktrees clean`;
+`check_handoff.py --ref main` warned only on req-10/req-144 (as Builder said) → Lanes added (ui, design) → exit 0, no
+warnings. CLOSEOUT.md documents the reviewer gate + `--no-reviewer`.
