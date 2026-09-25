@@ -1927,3 +1927,16 @@ the step it fires in; `./check` step 1b runs `check_skills.py` (0.13 s). Gate (b
 throwaway commit (L-040). Reviewer: none (no trigger files). Planner's QA: `./plan qa req-162` → smoke `green — 11 steps`,
 no note; the same smoke vs `./plan qa main` → red at the Skip step ("‹ Back | Not found."). Slip: Planner put a temp copy of
 the branch's smoke script in the code worktree to run it (removed at once; `git status` 0) — L-041.
+
+## req-163 — one "newest workout" ordering; History logs durations and hides warm-up effort (DEC-087)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `3624c7f`…`ceac8d4`). `finishedNewestFirst` (finishedAt desc, then id) feeds
+Finish's beat-last-time, auto-complete's prior and the prefill (F-CODE-3); auto-complete skips warm-up-only priors; History
+set Edit/Add has Duration (s) for timed work sets; History never labels effort on WU/cardio and its form hides Effort there
+(rpe null). Items 2 and 4 were already fixed on main (req-128/152) — pinned by tests, not changed (L-042). Gate (bug lane):
+req-163.test.js on main 5 pass / 15 fail, branch 20/20; `./check --smoke` green; reviewer (storage.js) → `# tests 998 #
+pass 998 # fail 0`, **No blockers.** (2 latent + 2 nits → req-167). Planner's QA (`./plan qa`, oldest-first seed, puppeteer
+390 px, 0 dialogs): Chest Press 32×8 → branch Finish shows no "Heavier" (vs w42, 35 kg) where **main shows "↑Heavier on
+Chest Press"** (vs w38); History Plank fields `kg, Reps, Duration (s), Note`, "45,5" → `durationSec: 46` (main: no field);
+WU row "WU set · 10 kg · 12" (main "· Moderate"), stored rpe 3 kept; WU edit hides Effort, Work toggle shows it, Save → rpe
+null.
