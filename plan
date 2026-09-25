@@ -128,6 +128,32 @@ now_md_limit() {
   python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); import check_handoff; print(check_handoff.NOW_MD_RULE_LIMIT)' "$1"
 }
 
+# req-166 (L-014) — fetch origin first, then warn when a local branch is BEHIND its
+# origin copy: a session that reasons from a stale local planning branch re-does work
+# that already exists (L-014 lost a whole session to it). Never blocks and never prompts:
+# offline or no origin → a note, and the check uses the last-fetched refs. Stalls are cut
+# off by http.lowSpeed*; GIT_TERMINAL_PROMPT=0 stops a credential prompt from hanging.
+fetch_origin_and_warn() {
+  local label="$1" b behind
+  if ! git -C "$CODE_DIR" remote get-url origin >/dev/null 2>&1; then
+    echo "$label: no 'origin' remote — nothing fetched" >&2
+    return 0
+  fi
+  if GIT_TERMINAL_PROMPT=0 git -C "$CODE_DIR" -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=10 fetch --quiet origin 2>/dev/null; then
+    echo "$label: fetched origin"
+  else
+    echo "$label: WARNING — git fetch origin failed (offline?); comparing against the last-fetched origin refs" >&2
+  fi
+  for b in planning main; do
+    git -C "$CODE_DIR" rev-parse --verify --quiet "refs/remotes/origin/$b" >/dev/null || continue
+    behind="$(git -C "$CODE_DIR" rev-list --count "$b..origin/$b" 2>/dev/null || echo 0)"
+    if [ "${behind:-0}" -gt 0 ]; then
+      echo "$label: WARNING — local $b is $behind commit(s) BEHIND origin/$b (L-014). Look first:" >&2
+      echo "    git log --oneline $b..origin/$b     then merge it in before you rely on $b" >&2
+    fi
+  done
+}
+
 cmd_save() {
   local message="${1:-}"
   if [ -z "$message" ]; then
@@ -143,6 +169,7 @@ cmd_save() {
     echo "plan save: run this from the planning worktree ($PLANNING_DIR), not $here" >&2
     exit 1
   fi
+  fetch_origin_and_warn "plan save"
 
   # req-100 (R2): NOW.md exceeding its own ≤N-line rule is the one drift that is
   # always the author's to fix in the SAME edit — so block it BEFORE the commit
@@ -426,6 +453,7 @@ cmd_next() {
 
 cmd_status() {
   find_worktrees
+  fetch_origin_and_warn "plan status"
 
   local code_branch code_dirty planning_dirty unpublished
   code_branch="$(git -C "$CODE_DIR" rev-parse --abbrev-ref HEAD)"
