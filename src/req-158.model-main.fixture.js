@@ -1,3 +1,6 @@
+// req-158 — main's model.js at 3aa7990, verbatim below this header, so req-158.test.js can
+// deep-equal the branch's migrateState against main's. Not imported by the app.
+
 import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
 import { isAddedMidWorkout, isSkippedSet } from './workout-log.js'
@@ -29,11 +32,7 @@ function migrateRoutine(routine, exercises, legacyRecommendations, legacy) {
       const id = itemId(routine.id, item, index)
       const ex = exercises.find((candidate) => candidate.id === item.exerciseId)
       const recorded = legacyRecommendations[id]
-      // req-158 (audit F-DEAD-4, DEC-085 §3) — a baseline is recorded only for legacy
-      // (pre-v9) input, the only input that reads it (below, and workoutSnapshot). On v9
-      // nothing reads it, so nothing is added: the map no longer grows on every load.
-      // Entries already stored are kept as they are (the spread in migrateState).
-      if (legacy && !recorded && (item.targets?.length || item.suggestedWeights?.length)) {
+      if (!recorded && (item.targets?.length || item.suggestedWeights?.length)) {
         legacyRecommendations[id] = {
           targets: [...(item.targets || [])],
           suggestedWeights: [...(item.suggestedWeights || [])],
@@ -42,7 +41,7 @@ function migrateRoutine(routine, exercises, legacyRecommendations, legacy) {
       }
       // req-120 (audit C) — the recorded baseline refills empty lists only for legacy
       // (pre-v9) input. On v9 an empty list is the user's own choice and stays empty
-      // (DESIGN §1: never invent).
+      // (DESIGN §1: never invent). Recording above still runs, so the map is unchanged.
       const baseline = legacy ? legacyRecommendations[id] : null
       const targets = item.targets?.length ? [...item.targets] : [...(baseline?.targets || [])]
       const suggestedWeights = item.suggestedWeights?.length
@@ -267,8 +266,7 @@ export function findRoutineInState(routines, routineId) {
 // req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from
 // the RAW stored value, before any `{ ...emptyState(), ...raw }` merge (which injects
 // schemaVersion 9). Only legacy input gets the plan backfill/baseline; the default is
-// the safe side (false: never invent a plan value). Callers MUST pass `legacy: true`
-// for pre-v9 input, or its recorded baselines are neither written nor applied.
+// the safe side (false: never invent a plan value).
 export function migrateState(input, { legacy = false } = {}) {
   const source = structuredClone(input || {})
   const exercises = Array.isArray(source.exercises) ? source.exercises : []
@@ -354,10 +352,10 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
   })
 }
 
-// req-40 (F-CODE-1) — the single, canonical per-item progression computation, used by
-// `progressionFromWorkout` (the History recalc path, the one that writes the routine).
-// req-158 — the Finish screen no longer computes or stores a `progression` record
-// (buildFinishProgression removed), so recalc is its only caller. It used to be
+// req-40 (F-CODE-1) — the single, canonical per-item progression computation shared
+// by BOTH the Finish screen (finish.jsx, the `progression` record a finished workout
+// stores — req-112 / DEC-056: stored only, no longer written onto the routine) and
+// `progressionFromWorkout` (the History recalc path, the one that writes the routine). It used to be
 // computed twice with divergent set-matching, so the same workout could yield two
 // different saved recommendations (fails DESIGN §2). This reconciles to the fuller
 // model.js semantics (DEC at merge): match a working set by `routineItemId ||
@@ -365,7 +363,8 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
 // legacy/fallback-keyed sets finish.jsx's `routineItemId`-only match missed), and on
 // no matched working sets keep the item's own `targets`/`suggestedWeights` rather than
 // emitting a from-zero recommendation. Pure (L-007): unit-tested, not inline in a view.
-// Returns `sets`/`recommendation`/`to`/`targetsTo`/`routineItemId`.
+// Returns the core both callers need; finish.jsx wraps its display-only fields around
+// `sets`/`recommendation`/`to`/`targetsTo`/`routineItemId`.
 export function progressionForItem(exercises, workout, item) {
   const exercise =
     (exercises || []).find((candidate) => candidate.id === item.exerciseId) || {
@@ -393,6 +392,33 @@ export function progressionForItem(exercises, workout, item) {
     to: sets.length ? recommendation.weights : item.suggestedWeights || [],
     targetsTo: sets.length ? recommendation.targets : item.targets || [],
   }
+}
+
+// The finish-time progression array, exactly as the Finish screen builds it. The
+// saved core ({ routineItemId, sets, recommendation, to, targetsTo }) comes from
+// the ONE shared progressionForItem helper (identical to the History recalc path);
+// the extra fields here are display-only. Extracted so the manual Finish screen
+// (finish.jsx) and the req-84 auto-complete path pass byte-identical progression to
+// store.finishWorkout — no second, drifting copy of this shape.
+export function buildFinishProgression(exercises, active) {
+  const items = active?.snapshot?.items || []
+  return items.map((item) => {
+    const core = progressionForItem(exercises, active, item)
+    const skippedForItem = (active?.sets || []).some(
+      (set) => set.routineItemId === core.routineItemId && isSkippedSet(set),
+    )
+    return {
+      routineItemId: core.routineItemId,
+      exerciseId: item.exerciseId,
+      name: item.exerciseName,
+      from: item.suggestedWeights || [],
+      to: core.to,
+      targetsFrom: item.targets || [],
+      targetsTo: core.targetsTo,
+      action: core.recommendation.action,
+      reason: core.sets.length ? core.recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
+    }
+  })
 }
 
 export function progressionFromWorkout(state, workout) {

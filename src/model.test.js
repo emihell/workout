@@ -48,7 +48,9 @@ function stateFixture() {
 
 describe('state migration', () => {
   it('keeps prescriptions on routine exercises', () => {
-    const migrated = migrateState(stateFixture())
+    // req-158 — a legacy (programs/sessions) fixture, so { legacy: true }, as loadState and
+    // applyBackup pass for it; the baseline is recorded only for legacy input now.
+    const migrated = migrateState(stateFixture(), { legacy: true })
     const item = migrated.routines[0].exercises[0]
     assert.equal(migrated.schemaVersion, SCHEMA_VERSION)
     assert.equal(migrated.routines[0].name, 'Push')

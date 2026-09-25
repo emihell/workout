@@ -24,7 +24,8 @@ export function activeFeel(active) {
 // The store.finishWorkout arguments for the req-84 auto-complete commit. The note is
 // whatever the user wrote on the overview — '' when they wrote none, exactly as before
 // req-107. req-116 — Feel is whatever the user chose on Finish (activeFeel); still ''
-// when they chose none, so auto-complete never invents a Feel (DESIGN §1).
-export function autoFinishArgs(active, progression) {
-  return { overallNote: activeNote(active), overallFeel: activeFeel(active), progression }
+// when they chose none, so auto-complete never invents a Feel (DESIGN §1). req-158 — no
+// progression argument: Finish stores none.
+export function autoFinishArgs(active) {
+  return { overallNote: activeNote(active), overallFeel: activeFeel(active) }
 }

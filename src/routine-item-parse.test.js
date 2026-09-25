@@ -72,6 +72,9 @@ describe('req-118 failure case — blank Duration', () => {
 
 describe('req-118 failure case — cleared Kg survives reload (needs req-120)', () => {
   it('an item with a legacyRecommendations baseline, Kg cleared → migrateState → still []', () => {
+    // req-158 — v9 no longer RECORDS a baseline, so the baseline is one already stored
+    // (as on a device migrated from v8); it is kept untouched, and must still not refill.
+    const baseline = { targets: ['8'], suggestedWeights: [40, 40, 40], sets: 3 }
     const v9 = migrateState({
       exercises: [{ id: 'ex-1', name: 'Chest press', type: 'machine', weightStep: '5' }],
       routines: [
@@ -82,8 +85,9 @@ describe('req-118 failure case — cleared Kg survives reload (needs req-120)', 
         },
       ],
       workouts: [],
+      legacyRecommendations: { 'si-1': baseline },
     })
-    assert.deepEqual(v9.legacyRecommendations['si-1'].suggestedWeights, [40, 40, 40])
+    assert.deepEqual(v9.legacyRecommendations['si-1'], baseline)
     const { value } = parseRoutineItem({ sets: '3', reps: '8', kg: '' })
     assert.deepEqual(value.suggestedWeights, [])
     v9.routines[0].exercises[0] = { ...v9.routines[0].exercises[0], ...value, durations: [] }

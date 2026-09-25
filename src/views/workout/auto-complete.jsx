@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { go } from '../../route'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
-import { buildFinishProgression } from '../../model'
 import { defaultBeep } from '../../rest-cue.js'
 import { summaryPriorWorkout, workoutSummaryStats } from '../../storage'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
@@ -12,7 +11,7 @@ import { autoFinishArgs } from '../../workout-note.js'
 // mounts this instead of the list: a "great job" summary (volume/duration/sets, each
 // with a delta vs the previous SAME-routine workout when one exists) and a ~10s
 // countdown that auto-commits the finish. The finish it writes is identical to the
-// manual Finish screen's (the active Feel, buildFinishProgression), so this adds no new
+// manual Finish screen's (the active Note and Feel), so this adds no new
 // persisted shape — see store.finishWorkout / finish.jsx. req-116: Sets counts only
 // non-skipped sets (workoutSummaryStats → loggedSetCount). req-107 — the Note is the
 // active workout's note (written on the overview), not '', so it isn't lost silently.
@@ -21,7 +20,7 @@ import { autoFinishArgs } from '../../workout-note.js'
 // Cancel and Edit both set `autoFinishDismissed` on the active workout, so the summary
 // stays dismissed for this workout (a remount or reload doesn't re-arm it). Feel is the
 // active workout's overallFeel (chosen on Finish), '' when none was chosen. Edit opens the manual
-// Finish screen so Feel/Note/progression can be set. The countdown is a UI-only timer
+// Finish screen so Feel/Note can be set. The countdown is a UI-only timer
 // (a deadline + 250ms tick, the useRestCountdown pattern) — never the persisted
 // restEndsAt, which carries pause/skip semantics.
 
@@ -52,8 +51,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
     // Optional cue at commit — the AudioContext is already unlocked from set-complete
     // taps; defaultBeep is fail-silent if not.
     defaultBeep()
-    const progression = buildFinishProgression(store.exercises, active)
-    store.finishWorkout(autoFinishArgs(active, progression))
+    store.finishWorkout(autoFinishArgs(active))
     leaveWorkoutToToday()
   }
 

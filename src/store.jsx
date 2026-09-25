@@ -204,7 +204,6 @@ export function StoreProvider({ children }) {
               restEndsAt: null,
               restPausedRemaining: null,
               sets: [],
-              progression: null,
               // req-83 (N9) — live, session-scoped per-field seed overrides
               // (exerciseId::setType → {weight?, reps?}). Transient: never a schema
               // field, cleared when the workout finishes (activeWorkout → null).

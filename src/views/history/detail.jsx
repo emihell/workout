@@ -79,8 +79,8 @@ export function HistoryDetail({ workoutId }) {
 
       {/* req-96 — the "Next time" load-recommendation surface was removed here (and on
           the Finish screen). It only moved with an RPE signal, which isn't logged, so it
-          just echoed the workout. workout.progression is still persisted on the record;
-          this only drops its display. History detail gets no "beat last time" line — it's
+          just echoed the workout. req-158 — the record's `progression` field is no longer
+          written on Finish (older workouts keep theirs; nothing reads it). History detail gets no "beat last time" line — it's
           a past record, not a forward celebration (decided). */}
       <Button
         onClick={async () => {
