@@ -1643,3 +1643,17 @@ From prep §E.4 (~55 taps for a 5-exercise routine). Independent review 2026-09-
 6. **Bug, fix rides along:** `catalogItemToExercise` (`exerciseCatalog.js:155-171`) drops `logAs`, so a timed library entry
    (Plank) becomes untimed [measured by the reviewer].
 Held for the "where to start" question: starter templates.
+
+## DEC-098 — beginners start from a slot template chosen by days per week  (Emilio, 2026-09-26, req-144)
+
+Emilio rejected fixed templates ("we dont know what the users eqquipment situation is") and chose slots: "the template is
+essentially just a muscle group that we recommend you train - then you add the exercises yourself … you could choose how
+many days you want to rotate". Research: req-144 prep §F.
+1. **Pick days per week → a recommended split; each day is a list of slots** the user fills with exercises they have
+   (DEC-097 picker, filtered to the slot's pattern). No equipment assumed.
+2. **Offered: 1–4 days** (Emilio: "go with a"). 1 = full body, labelled "minimum"; 2 = full body A/B; 3 = full body A/B/C;
+   4 = upper/lower ×2 (prep §F table). 5–6 not offered to first-timers (NSCA: 4–6 = advanced; no 5-day beginner source).
+3. **Planner's calls (DEC-095):** slots named in plain words ("Squat", "Row", never "hinge"); a slot lists staples first,
+   "show more" for the rest (`common` is true on all 366, so `staple` is the filter); no Carry slot; dips' `vertical-push`
+   pattern is a library fix (rides with the build).
+4. **Blank routine stays** as the alternative to a template.
