@@ -566,6 +566,9 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ---
 
+- **req-161 nits** (small): one Import's copies can carry different timestamps when one is reused (no loss; harder to
+  group by hand); add the quota → free space → retry → release test (the reviewer's probe passed).
+
 ## Workflow / tooling backlog (infra, not product)
 
 - **`check_handoff` knows lanes** (DEC-085 §6, WORKFLOW §Requirement lanes): accept a `Lane:` tag and a `DECIDED <date> →
