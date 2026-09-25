@@ -1,6 +1,6 @@
 # req-176 — Finish lists what's unfinished before you save
 
-**Status: READY** (2026-09-25). **Lane: ui.** Source: persona run (req-144 prep §E.7). Emilio: "i go with yes" to
+**Status: BUILT — branch `req-176` (`b740037`, 2 commits), NOT merged.** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.7). Emilio: "i go with yes" to
 Planner's recommendation (DEC-093, closing its Open item).
 
 ## Today [read 2026-09-25]
