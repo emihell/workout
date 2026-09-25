@@ -19,12 +19,12 @@ describe('req-44 isWeightedType (unifies usesWeight/usesLoad/weighted/bodyweight
 })
 
 describe('effort labels', () => {
-  it('maps stored numbers to Easy Moderate Hard Couldn\'t finish', () => {
+  it('maps stored numbers to Easy Moderate Hard Max', () => {
     assert.equal(rpeLabel(1), 'Easy')
     assert.equal(rpeLabel(2), 'Easy')
     assert.equal(rpeLabel(3), 'Moderate')
     assert.equal(rpeLabel(4), 'Hard')
-    assert.equal(rpeLabel(5), "Couldn't finish")
+    assert.equal(rpeLabel(5), 'Max')
     assert.equal(rpeLabel(''), '')
   })
 

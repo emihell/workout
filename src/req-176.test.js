@@ -51,7 +51,7 @@ describe('req-176 — finishSkippedLines', () => {
     const w = workoutOf([curl, ext, press], [work(curl), work(ext), work(ext)])
     assert.deepEqual(finishSkippedLines(w), [
       'Leg curl: 1 of 3 sets. The other 2 will be saved as skipped.',
-      'Leg press: not started. 3 sets will be saved as skipped.',
+      'Not started, saved as skipped: Leg press.', // req-177 wording
     ])
     assertMatchesSave(w)
   })
@@ -62,7 +62,7 @@ describe('req-176 — finishSkippedLines', () => {
     assertMatchesSave(w)
   })
 
-  it('an unlogged planned warm-up is named, and counted in what Save adds', () => {
+  it('an unlogged planned warm-up is counted in what Save adds, but no longer named (req-177)', () => {
     const warm = { reps: 12 }
     const a = item('pi-a', 'Squat', 3, { warmup: warm })
     const b = item('pi-b', 'Row', 2, { warmup: warm })
@@ -70,10 +70,11 @@ describe('req-176 — finishSkippedLines', () => {
     const d = item('pi-d', 'Dip', 2, { warmup: warm })
     const w = workoutOf([a, b, c, d], [work(a), work(b), work(b), wu(d)])
     assert.deepEqual(finishSkippedLines(w), [
-      'Squat: 1 of 3 sets. The other 2 and the warm-up set will be saved as skipped.',
-      'Row: 2 of 2 sets. The warm-up set will be saved as skipped.',
-      'Press: not started. 1 set and the warm-up set will be saved as skipped.',
+      // req-177 wording: warm-ups unnamed (so Row, only its warm-up left, has no line),
+      // untouched exercises collapse into the one "Not started" line.
+      'Squat: 1 of 3 sets. The other 2 will be saved as skipped.',
       'Dip: 0 of 2 sets. 2 sets will be saved as skipped.',
+      'Not started, saved as skipped: Press.',
     ])
     assertMatchesSave(w)
   })
@@ -100,7 +101,7 @@ describe('req-176 — finishSkippedLines', () => {
     const w = workoutOf([a, b], [{ routineItemId: 'si-a', exerciseId: 'ex-si-a', setType: 'work', weight: 40, reps: '8', rpe: 3, note: '' }])
     assert.deepEqual(finishSkippedLines(w), [
       'Bench: 1 of 3 sets. The other 2 will be saved as skipped.',
-      'Fly: not started. 2 sets will be saved as skipped.',
+      'Not started, saved as skipped: Fly.', // req-177 wording
     ])
     assertMatchesSave(w)
   })
@@ -148,7 +149,10 @@ describe('req-176 — the Finish screen', () => {
       }),
     )
     const lines = finishSkippedLines(captured.store.activeWorkout)
-    assert.equal(lines.length, active.snapshot.items.length, 'every item has something left')
+    // req-177: lines now collapse, so "every item has something left" is asserted on the
+    // per-item entries; the lines are one for the started item + one "Not started" line.
+    assert.equal(finishSkippedByItem(captured.store.activeWorkout).length, active.snapshot.items.length, 'every item has something left')
+    assert.equal(lines.length, 2)
     await mount(h(WorkoutFinish, { routineId: 'sess-lower' }))
     const text = view.text()
     for (const line of lines) assert.ok(text.includes(line), `on screen: ${line}`)
@@ -174,6 +178,6 @@ describe('req-176 — the Finish screen', () => {
     await mount(h(WorkoutFinish, { routineId: 'sess-lower' }))
     const text = view.text()
     for (const line of finishSkippedLines(captured.store.activeWorkout)) assert.ok(text.includes(line), line)
-    assert.match(text, /not started\./)
+    assert.match(text, /Not started, saved as skipped: /) // req-177 wording
   })
 })

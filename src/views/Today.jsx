@@ -321,30 +321,33 @@ export function Today() {
         <Title subtitle="Nothing here yet.">Today</Title>
         {/* req-174 — the empty home's primary action: navigation only, so a NavLink with
             the button look (DEC-040), as TodayEmpty's. Import stays below as the secondary. */}
-        <NavLink to="/routines/new" look="primary" block>
-          Create your first routine
-        </NavLink>
-        <FileButton
-          label="Import"
-          accept="application/json,.json"
-          onFiles={(files) => {
-            // req-153 — a new pick starts clean: the last file's error never lingers
-            // over this one's outcome (a success, a cancel, or its own error).
-            setImportError('')
-            const file = files?.[0]
-            if (!file) return
-            file.text().then(async (text) => {
-              try {
-                const payload = JSON.parse(text)
-                const result = await importWithBackup({ store, payload })
-                if (!result) return // cancelled at the confirm
-                recordButton('import')
-              } catch (err) {
-                setImportError(err instanceof Error ? err.message : 'Could not import.')
-              }
-            })
-          }}
-        />
+        {/* req-177 — the two actions stack with the app's standard gap (.ui-first-run-actions). */}
+        <div className="ui-first-run-actions">
+          <NavLink to="/routines/new" look="primary" block>
+            Create your first routine
+          </NavLink>
+          <FileButton
+            label="Import"
+            accept="application/json,.json"
+            onFiles={(files) => {
+              // req-153 — a new pick starts clean: the last file's error never lingers
+              // over this one's outcome (a success, a cancel, or its own error).
+              setImportError('')
+              const file = files?.[0]
+              if (!file) return
+              file.text().then(async (text) => {
+                try {
+                  const payload = JSON.parse(text)
+                  const result = await importWithBackup({ store, payload })
+                  if (!result) return // cancelled at the confirm
+                  recordButton('import')
+                } catch (err) {
+                  setImportError(err instanceof Error ? err.message : 'Could not import.')
+                }
+              })
+            }}
+          />
+        </div>
         {importError ? <Banner role="alert">{importError}</Banner> : null}
         <List>
           <Row to="/routines">Routines</Row>
