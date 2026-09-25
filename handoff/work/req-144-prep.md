@@ -710,3 +710,27 @@ starts itself and shows on every screen; Effort words are plain; History detail 
 **From req-175's review (2026-09-25):** a warm-up *exercise* (role) and a warm-up *set* now share the word — History can read
 "Warm-up · Warm-up set · 1 set"; the routine editor still says "WU set" (`ids.js:95`, `Routine.jsx:351`) next to role "Warm-up";
 the assistant prompt `exchange.js:38` still says "WU routine"; `README.md:8` says "WU set". Decide the two names in req-144.
+
+## F. Slot templates — research, 2026-09-26 (agent, sources fetched)
+
+Emilio: "the template is essentially just a muscle group that we recommend you train - then you add the exercises yourself …
+you could choose how many days you want to rotate, then we can give a template where a recommended split is added".
+
+| Days | Split | Slots per day |
+|---|---|---|
+| 1 | Full body ("minimum") | Squat · Hinge · H-Push · H-Pull · Core |
+| 2 | Full body A/B | A: Squat · H-Push · H-Pull · Core — B: Hinge · V-Push · V-Pull · Lunge |
+| 3 | Full body A/B/C | A, B as above — C: Squat · H-Push · V-Pull · Core |
+| 4 | Upper/Lower ×2 | Upper: H-Push · H-Pull · V-Push · V-Pull — Lower: Squat · Hinge · Lunge · Core |
+| 5 | U/L/Full/U/L [inferred, no source] | |
+| 6 | Push/Pull/Legs ×2 | Push: H-Push · V-Push · H-Push · Core — Pull: V-Pull · H-Pull · Hinge · Core — Legs: Squat · Hinge · Lunge · Core |
+
+4–5 slots a session. Weekly rule: squat, hinge, push, pull, core ≥1×; from 2 days, each ≥2× and both push/pull planes.
+Evidence: ACSM 2009 (PMID 19204579) "2-3 d x wk(-1) for novice"; ACSM 2026 (PMID 41843416) "≥2 sessions/wk", "≥10 sets/wk";
+NSCA: novice "two or three days per week when training the entire body", U/L 4× = intermediate, 4–6 = advanced;
+Schoenfeld 2016 (27102172) "at least twice a week"; Schoenfeld 2019 (30558493) frequency doesn't matter volume-equated;
+split vs full body 2024 (38595233) "based on personal preferences"; Weekend Warrior (PMC11127831) one session supported;
+CDC "2 or more days a week". Sources agree beginners = 2–3 full-body days.
+Library fit [measured, `src/library/exercises.json`, visible 366]: `common` is true on all 366 (useless as a filter); `staple`
+194/172 is the useful flag. Every slot has ≥3 staples overall; thin per equipment: V-Pull barbell/dumbbell 0 (expected),
+Lunge machine 0, Hinge bodyweight 1, Carry only 3 exercises. Dips are tagged `vertical-push` (likely wrong).
