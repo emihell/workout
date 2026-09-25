@@ -1543,3 +1543,12 @@ Emilio: "fix the last things, i trust you recommandation" (the two minor points 
 2. **The delete confirm tells the truth about a draft-only reference:** "{name} is in an unfinished workout and will be
    archived (kept)." — not "has past workouts". Order of wording: current workout → past workouts → unfinished (draft) →
    plain delete. → req-169.
+
+## DEC-090 — on load, a workout's routine falls back to the one its snapshot names  (Emilio, 2026-09-25)
+
+Emilio: "Fix it" (asked under ask-gate #2 as a migration change). `workoutSnapshot` (`model.js:88`) takes `workout.routineId
+|| workout.sessionId` and rewrites `snapshot.routineId` from it — so a workout naming its routine **only** in its snapshot
+(a hand-edited or AI-edited import; the app always writes the top level) comes out with no routine link, and that routine
+can be hard-deleted while History still shows its name (req-169 review latent). **Fix:** fall back to `snapshot.routineId`,
+then `snapshot.sessionId`. Additive only — no field is removed; records affected in data the app wrote: expected **0**
+(to be measured on Emilio's Export at reimport time). → req-170.
