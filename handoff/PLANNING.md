@@ -402,6 +402,8 @@ path it came in on.
 
 ## Talking to Emilio
 
+- **If you can do it, do it — no asking (DEC-095).** Ask only for an irreversible change to his stored history, real-device
+  feel, or product direction in a live design session. Report what you did and chose after.
 - **Plain words first (DEC-091).** Say what he'd see or feel in the app and what "no" means; never assume he
   knows the code or a `DEC-`. **A binary call (fix the broken thing or keep it) is yours — fix it, report it.** Ask
   only a real behaviour choice, one at a time. **Test everything checkable yourself** (Chrome, code, a unit test);

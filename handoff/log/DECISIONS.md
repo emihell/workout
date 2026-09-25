@@ -1594,3 +1594,13 @@ Emilio, on three "worth a look on your phone" items: "these things you can check
 wrapping, spacing and wording length are checkable at 390×844 by Planner; decide, fix, and list the calls as reversible.
 Emilio's eyes stay for real-device feel (touch, one-handed, gym light). First use: req-177 ("Couldn't finish" → "Max",
 Finish list collapses not-started exercises, "1 set", empty-home gap).
+
+## DEC-095 — if Planner can do it, Planner does it; no asking  (Emilio, 2026-09-26)
+
+Emilio: "please record, that everything you can do, do - no need to ask me". Supersedes the ask-list in DEC-091 §4 and
+DEC-094 as the default: Planner decides, builds (via Builder/agents), tests, merges and reports after. It asks **only**:
+1. **Irreversible changes to his stored history** — a migration, a schema bump or a bulk rewrite (CLAUDE.md ask-gate #2):
+   there is no backup and no undo, so "can do" isn't enough there.
+2. **What only a person can judge** — real-device feel (touch, one-handed, gym light).
+3. **Product direction in a live design session he runs** (req-144 is design lane, live with him).
+Anything else: do it, then say what was done and what was chosen, so it can be reversed.
