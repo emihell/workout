@@ -1,5 +1,5 @@
 // req-169 (DEC-089) — (1) a finished workout's snapshot is a reference even with zero logged
-// sets (exercise); the routine side has no such gap in loaded data (measured, pinned below);
+// sets (exercise); the routine side is covered by req-170's snapshot fallback (pinned below);
 // schedule slots still are not a reference (DEC-031). (2) the delete confirm tells the truth
 // about a draft-only reference. The confirm and the reducer read the same impact.
 import { describe, it } from 'node:test'
@@ -34,7 +34,7 @@ const doc = (extra = {}) =>
         snapshot: { routineId: 'r1', routineName: 'R1', items: [{ routineItemId: 'i1', exerciseId: 'ex-a' }, { routineItemId: 'i2', exerciseId: 'ex-zero' }] },
         sets: [{ exerciseId: 'ex-a', routineItemId: 'i1', setType: 'work', weight: 20, reps: '8' }, { exerciseId: 'ex-past', routineItemId: 'i9', setType: 'work', weight: 5, reps: '5' }],
       },
-      // names its routine only by snapshot.routineId (migrateState leaves routineId undefined)
+      // names its routine only by snapshot.routineId (req-170: migrateState restores routineId from it)
       { id: 'w2', finishedAt: '2026-09-21T10:00:00Z', snapshot: { routineId: 'r-snap', routineName: 'Snap', items: [] }, sets: [] },
     ],
     draftWorkouts: [{ id: 'd1', routineId: 'r1', startedAt: '2025-01-01T10:00:00Z', snapshot: { routineId: 'r1', routineName: 'R1', items: [{ routineItemId: 'x', exerciseId: 'ex-draft' }] }, sets: [] }],
@@ -48,11 +48,13 @@ describe('1 — finished history names a reference by its snapshot too (DEC-089 
     assert.equal(exerciseDeletionImpact(s, 'ex-zero').hasHistory, true)
     assert.equal(removeExerciseFromState(s, 'ex-zero', AT).exercises.find((e) => e.id === 'ex-zero')?.archivedAt, AT)
   })
-  it('routine side, measured: a loaded workout never names its routine only by snapshot.routineId — migrateState rebuilds the snapshot from routineId, so that shape arrives with NO routine reference at all (a load-path finding, reported, not changed here)', () => {
-    const w2 = doc().workouts.find((w) => w.id === 'w2')
-    assert.equal(w2.routineId, undefined)
-    assert.equal(w2.snapshot.routineId, undefined, 'dropped on load — nothing left for an impact check to read')
+  it('routine side: a finished workout naming its routine only by snapshot.routineId keeps it on load, so deleting the routine archives it (req-170 / DEC-090)', () => {
+    const s = doc()
+    const w2 = s.workouts.find((w) => w.id === 'w2')
+    assert.equal(w2.routineId, 'r-snap')
+    assert.equal(w2.snapshot.routineId, 'r-snap')
     assert.equal(w2.snapshot.routineName, 'Snap')
+    assert.equal(removeRoutineFromState(s, 'r-snap', AT).routines.find((r) => r.id === 'r-snap')?.archivedAt, AT)
   })
   it('control (DEC-031 stands): a routine referenced only by a schedule slot is hard-deleted; its slot goes', () => {
     const s = doc()
