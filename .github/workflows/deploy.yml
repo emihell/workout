@@ -36,7 +36,7 @@ jobs:
       # req-159: the core loop by real clicks in headless Chrome (scripts/smoke.mjs)
       # on an isolated build of this commit; a red smoke blocks the deploy. Chrome
       # comes from puppeteer's npm ci download; CI=true makes it run --no-sandbox
-      # (the Ubuntu runner's AppArmor blocks Chrome's user-namespace sandbox).
+      # (Ubuntu 23.10+ runners can block Chrome's user-namespace sandbox; not yet run on one).
       - run: node scripts/smoke.mjs
       - run: npm run build
         env:
