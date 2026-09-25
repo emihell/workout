@@ -1964,3 +1964,14 @@ Gate: golden of main (`b78e73d`) for migrate/load/save-reload/finish, 7/7; `chec
 not weakened). Reviewer (mandatory) → 1017/1017, 59 moved declarations `diffs 0`, 22 reducers match, **No blockers.** (2
 latent test gaps → req-167). Planner's QA (`./plan qa`): smoke green; routine add/Up/remove and schedule add/remove slot
 stored correctly; 0 errors, 0 dialogs.
+
+## req-166 — plan tooling: check_handoff knows lanes; closeout needs a reviewer before merging; plan fetches; a cycle gate  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `13f9cb1`…`f5f1d73`). check_handoff reads `**Lane: X` (bad value fails) and a
+design req's `DECIDED <date> → …` terminal status; it warns only on open reqs with neither Lane nor Gate. `plan closeout`
+step 2b, **before** the merge: a trigger-file diff whose SHIPPED gate line names no reviewer → refused, unless
+`--no-reviewer "<reason>"` (appended to SHIPPED). `plan status`/`save` fetch origin first and warn when planning or main is
+behind (L-014). `./check` step 1c runs `check-cycles.mjs` (46 ms). Gate (tooling lane): 6 self-tests green,
+check-lanes.test.sh 9/9 (main's check_handoff fails 4); each guard shown firing in a sandbox copy or a throwaway commit
+(L-040): closeout refused (exit 1, main unmoved), `--no-reviewer` proceeds and records; behind → WARNING; a throwaway cycle
+→ `check: RED`. Reviewer: none (no trigger files). Planner used it right after the merge (receipt below).
