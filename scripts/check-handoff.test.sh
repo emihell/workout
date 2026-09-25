@@ -44,8 +44,9 @@ printf 'export const app = 1\n' > app.js
 # req-200: genuinely shipped — BUILT AND MERGED + a real landing commit below.
 printf '# req-200\n\n**Status: BUILT AND MERGED, 2026-01-01.**\nShipped thing.\n' \
   > handoff/work/req-200-shipped-thing.md
-# req-201: genuinely pending — READY, never landed. The control.
-printf '# req-201\n\n**Status: READY** — not built yet.\n' \
+# req-201: genuinely pending — READY, never landed. The control. req-166 — it names its
+# lane, as an open req must (without one check_handoff warns; tested in check-lanes.test.sh).
+printf '# req-201\n\n**Status: READY** — **Lane: bug** — not built yet.\n' \
   > handoff/work/req-201-pending-thing.md
 git add -A && git commit -qm init
 # the landing commit for req-200: subject names it as its own, touches code.
