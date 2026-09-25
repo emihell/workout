@@ -1,12 +1,17 @@
 ---
-description: Prefill logging reps from target and effort Moderate; other fields only from history
+description: Prefills come only from finished-workout history, plus four sanctioned exceptions (DESIGN §1)
 alwaysApply: true
 ---
 
 # Prefills
 
-On the live set log screen, prefill **Reps** from that set's target and **How hard was it?** with Moderate. Going back a set keeps the values just logged.
+A prefill comes only from this exercise's previous **finished-workout** data for that same field (`historyPrescription` / `lastSetsForExercise` / `historySetPrefill`). The sanctioned exceptions — all the user's own input, not invented data (`handoff/rules/DESIGN.md` §1):
 
-Everywhere else, do not prefill from plans, recommendations, library cues, or type defaults. Prefill only when this exercise has previous **finished-workout** data for that same field (`historyPrescription` / `lastSetsForExercise` / `historySetPrefill`).
+1. On the live set log screen, **Reps** prefills from that set's target, and **Effort** with Moderate **only where Effort is shown** — warm-up and cardio sets carry no effort (req-156).
+2. The **kg** just entered this session carries to the next working set when history has **no set at that index**: a no-history exercise (DEC-002), an Add set, or a routine that grew (req-152). Reps never carry (DEC-052).
+3. An in-session kg change carries to the remaining sets (req-83 / DEC-052).
+4. An unsaved draft restores what was typed (req-125); going back a set restores the values just logged.
+
+Everywhere else, do not prefill from plans, recommendations, library cues, a routine number, or type defaults.
 
 Do not invent warmup (50% load, 12 reps), rest (90s), or notes (copy of `ex.cues`). Editing an existing record may show that record's saved values.
