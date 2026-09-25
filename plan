@@ -20,6 +20,11 @@ plan preview [req-N]   build the checked-out (or a named req-N) branch and
                         serve it over Tailscale (HTTPS) to test on the phone
                         before merge; run in the CODE worktree (DEC-041)
 plan preview stop      tear down that preview server + tailscale serve
+plan qa <ref>          build any ref (git archive, no checkout) and serve it on a
+                        free 127.0.0.1 port, seeded with src/db.json under the v8
+                        key (--seed <file> to change). Read-only to both worktrees;
+                        safe from either. (req-159)
+plan qa --stop         stop it and delete its build   ·   plan qa --status
 plan doctor            verify first-machine setup (layout, hooks, deps, grants,
                         git identity), then print status. Read-only; exits
                         non-zero if any check needs a fix.
@@ -1218,6 +1223,41 @@ cmd_preview() {
   echo "  stop when done:  ./plan preview stop"
 }
 
+# req-159: `plan qa <ref>` — an isolated browser build of any ref on its own origin
+# (L-033's by-hand recipe). All the work is scripts/qa.mjs (node builtins only): git
+# archive into a temp dir, borrowed node_modules, vite build, a detached static
+# server, the seed inlined into index.html. Nothing is written to either worktree, so
+# it runs from the planning worktree too: it uses this checkout's qa.mjs (else the
+# code worktree's, for a planning branch that predates it) and always the code
+# worktree's node_modules, the one that has them. Browser-smoke it with
+# `node scripts/smoke.mjs --url <url>`.
+cmd_qa() {
+  local self_dir qa
+  self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  find_worktrees
+  qa="$self_dir/scripts/qa.mjs"
+  [ -f "$qa" ] || qa="$CODE_DIR/scripts/qa.mjs"
+  if [ ! -f "$qa" ]; then
+    echo "plan qa: no scripts/qa.mjs here or in $CODE_DIR — merge req-159 first." >&2
+    exit 1
+  fi
+  case "${1:-}" in
+    --stop|stop)
+      node "$qa" stop
+      ;;
+    --status|status)
+      node "$qa" status
+      ;;
+    ""|-h|--help)
+      echo "usage: plan qa <ref> [--seed <file>]   |   plan qa --stop   |   plan qa --status" >&2
+      exit 1
+      ;;
+    *)
+      node "$qa" start "$@" --node-modules "$CODE_DIR/node_modules"
+      ;;
+  esac
+}
+
 # req-90: `_PLAN_NO_MAIN=1 source ./plan` loads the functions without dispatching,
 # so the ledger helpers (append_shipped_stub / bump_now_range) can be exercised
 # against fixtures by scripts/plan-ledger.test.sh. No effect on normal invocation.
@@ -1281,6 +1321,10 @@ case "${1:-}" in
     fi
     trap 'rm -f "${_PLAN_SELF:-}"' EXIT
     cmd_preview "$@"
+    ;;
+  qa)
+    shift
+    cmd_qa "$@"
     ;;
   *)
     usage

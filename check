@@ -15,7 +15,10 @@
 #
 # A gate can't be narrowed from the command line: arguments are ignored and
 # the full gate always runs (so `./check clean` runs the gate, it doesn't
-# error).
+# error). The one argument it reads WIDENS it: `--smoke` (req-159) adds the
+# headless browser smoke test (scripts/smoke.mjs — the core loop by real clicks
+# on an isolated build of HEAD, ~5s). Off by default so every ./check stays
+# fast; the Pages deploy always runs it.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,8 +29,13 @@ if [ -n "${WORKOUT_SKIP_CHECK:-}" ]; then
   exit 0
 fi
 
-if [ "$#" -gt 0 ]; then
-  echo "check: ignoring arguments ($*) — the gate always runs the full set." >&2
+smoke=""
+ignored=()
+for arg in "$@"; do
+  if [ "$arg" = "--smoke" ]; then smoke=1; else ignored+=("$arg"); fi
+done
+if [ "${#ignored[@]}" -gt 0 ]; then
+  echo "check: ignoring arguments (${ignored[*]}) — the gate always runs the full set." >&2
 fi
 
 cd "$HERE"
@@ -67,5 +75,14 @@ node --test "${testfiles[@]}" || fail "the test suite"
 # 3. Production build (vite) — main must stay deployable to Pages.
 echo "check: building (vite build)…"
 npm run --silent build >/dev/null || fail "the production build"
+
+# 4. (--smoke only) the browser smoke test — HEAD's committed tree, not the
+# working copy (it builds from `git archive HEAD`).
+if [ -n "$smoke" ]; then
+  echo "check: smoke test (headless browser, HEAD)…"
+  node scripts/smoke.mjs || fail "the smoke test"
+  echo "check: green — lint, ${#testfiles[@]} test file(s), the build, and the smoke test all passed."
+  exit 0
+fi
 
 echo "check: green — lint, ${#testfiles[@]} test file(s), and the build all passed."
