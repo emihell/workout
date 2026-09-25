@@ -2053,3 +2053,7 @@ kg box, no note; 0 dialogs. History set editor (SetEditForm) unchanged — own r
 Import (unchanged); `isFirstRun` gate unchanged. Gate (ui): req-174.test.js 3/0; agent's seeds empty / history-only /
 routine-only match main's gate; Import still replaces; `./check --smoke` green; Planner's run (emptyState seed): text + lands
 `#/routines/new`, screenshot checked — the two buttons sit tight (4 px), feel item for Emilio. Subtitle `(unconfirmed)`. `reports/req-174.md`.
+
+## req-174 — an empty home says "Create your first routine"  (merged 2026-09-25)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

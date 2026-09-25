@@ -1,6 +1,6 @@
 # req-174 — an empty home says "Create your first routine"
 
-**Status: BUILT — branch `req-174` (`31a51f1`, 3 commits), NOT merged.** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.10). Emilio approved ("5. good", DEC-093).
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-174` (`99874de`…`31a51f1`, 3 commits).** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.10). Emilio approved ("5. good", DEC-093).
 
 ## Today [read 2026-09-25]
 With no data, Home shows `<Title subtitle="No data. Import, or start empty.">Today</Title>` and one grey **Import** button
