@@ -2078,4 +2078,4 @@ Feel for Emilio: an unlogged warm-up is named ("… and the warm-up set"), so an
 collapsed into one line, warm-ups not named; "1 set"; empty-home gap `--ui-s2` (8 px). Gate (ui): req-177.test.js green, suite
 1136/0; `./check --smoke` green 12; Feel top 336 px (<844); stored Max set rpe 5. Planner viewed the three 390×844 screenshots:
 Max on one line, Finish fits with Save on screen, home gap even. Test edits wording-only (req-176's `assertMatchesSave` untouched).
-Builder's calls (reversible): not-started line last; warm-up-only leftovers get no line; plain names. `reports/req-177.md`.
+Builder's calls (reversible): not-started line last; warm-up-only leftovers get no line; plain names. Merge `7a455b6`. `reports/req-177.md`.
