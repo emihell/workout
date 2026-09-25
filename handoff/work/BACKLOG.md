@@ -605,8 +605,8 @@ backend (database) ─→ users ─→ (multi-device)
 
 ## Current shape (reference, not a task list)
 
-> Stale (2026-09-12 shape). Stored fields: `reference/schema.md` (2026-09-25). The module map changes in req-164 (the
-> `storage.js` split) — refresh this section from that report.
+> Stale (2026-09-12 shape) — the tree below is history. Current module map: `reports/req-164.md` (persistence /
+> history-queries / state-reducers / set-rules; storage.js a re-export). Stored fields: `reference/schema.md`.
 
 ```
 src/
