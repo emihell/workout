@@ -13,48 +13,46 @@ export function toHash(path) {
   return `#${next}`
 }
 
-export function applyVisit(stack, path, { replace = false } = {}) {
+// req-165 (BACKLOG Tier-3) — only the LAST visited path is kept (per tab, in
+// sessionStorage). Its one reader is screen-view analytics: recordScreen counts a real move
+// to a NEW path (so returning to the same screen isn't recounted and the initial '#/'
+// redirect doesn't double-count `today`). The rest of the old visit stack had no reader
+// since req-49 removed the stack-pop Back; replace vs push both left its top equal to the
+// new path, so the top is all that decided anything.
+export function visitChange(last, path) {
   const next = hashPath(path)
-  if (stack[stack.length - 1] === next) return stack
-  if (replace && stack.length) {
-    stack[stack.length - 1] = next
-    return stack
-  }
-  stack.push(next)
-  if (stack.length > 50) stack.splice(0, stack.length - 50)
-  return stack
+  return { last: next, changed: last !== next }
 }
 
-function loadVisits() {
-  if (typeof sessionStorage === 'undefined') return []
+// Reads NAV_KEY as written before req-165 (the stack array) or after (a one-element array).
+function loadLastVisit() {
+  if (typeof sessionStorage === 'undefined') return null
   try {
     const parsed = JSON.parse(sessionStorage.getItem(NAV_KEY) || '[]')
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : []
+    const last = Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string').at(-1) : null
+    return last ?? null
   } catch {
-    return []
+    return null
   }
 }
 
-const visits = loadVisits()
+let lastVisit = loadLastVisit()
 
-function persistVisits() {
+function setLastVisit(path) {
+  lastVisit = path
   if (typeof sessionStorage === 'undefined') return
   try {
-    sessionStorage.setItem(NAV_KEY, JSON.stringify(visits))
+    sessionStorage.setItem(NAV_KEY, JSON.stringify([lastVisit]))
   } catch {
     // ignore quota / private mode
   }
 }
 
 function remember(hash) {
-  const path = hashPath(hash)
-  // Only a real move to a new path counts as a screen view — mirrors applyVisit's
-  // consecutive-dedupe, so returning to the same screen isn't recounted and the
-  // initial '#/' redirect doesn't double-count `today`. req-08: fail-silent.
-  const changed = visits[visits.length - 1] !== path
-  applyVisit(visits, hash)
-  persistVisits()
-  if (changed) recordScreen(parseRoute(path).name)
+  // req-08: fail-silent.
+  const { last, changed } = visitChange(lastVisit, hash)
+  setLastVisit(last)
+  if (changed) recordScreen(parseRoute(last).name)
 }
 
 export function useHashRoute() {
@@ -79,13 +77,14 @@ export function useHashRoute() {
 }
 
 // req-152 / DEC-081 — `replace` replaces the BROWSER history entry too (it used to only
-// rewrite the in-app visit stack, so device Back still stopped on the replaced screen —
+// rewrite the in-app visit record, so device Back still stopped on the replaced screen —
 // e.g. a dead `/workout/<id>/finish` after Save). location.replace with the same URL and a
 // new hash is a same-document fragment navigation: no reload, hashchange still fires.
 export function go(path, { replace = false } = {}) {
   const next = hashPath(path)
-  applyVisit(visits, next, { replace })
-  persistVisits()
+  // Marked visited BEFORE the hash changes, so go()'s own hashchange isn't a new screen
+  // view (unchanged since before req-165).
+  setLastVisit(next)
   if (typeof window !== 'undefined' && hashPath(window.location.hash) !== next) {
     if (replace) {
       const { href } = window.location

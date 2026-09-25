@@ -8,7 +8,7 @@
 // save-failure banner (req-01 / DEC-001): losing analytics is acceptable, losing
 // the user's history is not. A throwing write (quota, iOS private mode) is
 // swallowed here and never surfaces into the UI, blocks navigation, or reaches the
-// workout save path — same feature/guard shape as route.js's `visits` stack.
+// workout save path — same feature/guard shape as route.js's `lastVisit` record.
 
 const ANALYTICS_KEY = 'workout-mvp-analytics'
 

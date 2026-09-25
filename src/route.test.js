@@ -1,14 +1,14 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import * as route from './route.js'
-import { activeTab, applyVisit, hashPath, parseRoute } from './route.js'
+import { activeTab, hashPath, parseRoute, visitChange } from './route.js'
 
 // req-49 — Back returns to a screen's logical PARENT (a `to` prop passed at each
 // call site), never the last-visited screen. The visit-stack "go back" primitive
 // (back()/applyBack) that popped NAV_KEY has been removed: nothing derives Back
 // from visit order any more, so parent resolution is independent of how you
-// arrived. The visit stack itself stays, but only to feed screen-view analytics
-// (recordScreen), which is why applyVisit remains.
+// arrived. req-165 — the visit stack is gone too: screen-view analytics (recordScreen)
+// only ever read its top, now the one `lastVisit` path (visitChange).
 describe('req-49 — the visit-stack back primitive is gone', () => {
   it('normalizes hashes to paths (hashPath stays — Back builds targets from it)', () => {
     assert.equal(hashPath('#/routines'), '/routines')
@@ -21,24 +21,23 @@ describe('req-49 — the visit-stack back primitive is gone', () => {
     assert.equal(route.applyBack, undefined, 'applyBack() must be removed with its only caller')
   })
 
-  it('still records every screen for analytics, independent of any back logic', () => {
-    // applyVisit feeds recordScreen (screen-view counting) — a separate concern that
-    // stays. It records visit order but nothing reads it to resolve a Back target.
-    const stack = []
-    applyVisit(stack, '/')
-    applyVisit(stack, '/exercises')
-    applyVisit(stack, '/')
-    applyVisit(stack, '/workout/sess-upper')
-    assert.deepEqual(stack, ['/', '/exercises', '/', '/workout/sess-upper'])
+  // req-165 — was: two tests of the stack array applyVisit built. The observable they
+  // guarded is which moves count as a screen view; that is what's pinned now.
+  it('still records every screen for analytics: a move to a new path counts, the same path does not', () => {
+    const views = []
+    let last = null
+    for (const path of ['#/', '/', '/exercises', '/', '/workout/sess-upper', '#/workout/sess-upper']) {
+      const next = visitChange(last, path)
+      if (next.changed) views.push(next.last)
+      last = next.last
+    }
+    assert.deepEqual(views, ['/', '/exercises', '/', '/workout/sess-upper'])
   })
 
-  it('replaces the current screen when a preview becomes the live workout', () => {
-    const stack = []
-    applyVisit(stack, '/')
-    applyVisit(stack, '/schedule')
-    applyVisit(stack, '/workout/sess-upper/slot-a/2026-08-31')
-    applyVisit(stack, '/workout/sess-upper', { replace: true })
-    assert.deepEqual(stack, ['/', '/schedule', '/workout/sess-upper'])
+  it('a preview replaced by the live workout counts once, as a move to the live route', () => {
+    let last = visitChange(null, '/schedule').last
+    last = visitChange(last, '/workout/sess-upper/slot-a/2026-08-31').last
+    assert.deepEqual(visitChange(last, '/workout/sess-upper'), { last: '/workout/sess-upper', changed: true })
   })
 })
 
