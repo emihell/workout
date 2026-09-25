@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { go } from '../../route'
-import { exerciseById } from '../../storage'
+import { exerciseById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { itemLoggingState } from '../../workout-log'
 import { RoutineScreens } from '../Routine'

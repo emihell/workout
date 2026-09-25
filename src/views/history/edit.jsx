@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { go } from '../../route'
-import { exerciseById, routineById } from '../../storage'
+import { exerciseById, routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
 import { historySetFields, historySetKind } from '../set-values.js'

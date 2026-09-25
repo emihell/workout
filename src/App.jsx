@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { StoreProvider } from './store'
-import { getSaveFailed, subscribeSaveFailed, getLoadUnreadable, subscribeLoadUnreadable, getExternalChanged, subscribeExternalChange } from './storage'
+import { getExternalChanged, getLoadUnreadable, getSaveFailed, subscribeExternalChange, subscribeLoadUnreadable, subscribeSaveFailed } from './persistence.js'
 import { ErrorBoundary } from './error-boundary'
 import { WakeLock } from './wake-lock'
 import { RestEndCue } from './rest-cue'

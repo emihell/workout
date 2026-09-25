@@ -3,7 +3,7 @@ import { go } from '../../route'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { defaultBeep } from '../../rest-cue.js'
-import { summaryPriorWorkout, workoutSummaryStats } from '../../storage'
+import { summaryPriorWorkout, workoutSummaryStats } from '../../history-queries.js'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
 

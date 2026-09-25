@@ -4,7 +4,8 @@ import { RPE_OPTIONS, formatSetLine, isWeightedType, roleTag } from '../../ids'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
-import { exerciseById, historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../storage'
+import { exerciseById } from '../../model.js'
+import { historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import {
   canRemoveAddedSet,

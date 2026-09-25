@@ -1,7 +1,7 @@
 import { inWorkoutFallback } from '../../workout-paths'
 import { useEffect } from 'react'
 import { go, hashPath } from '../../route'
-import { routineById } from '../../storage'
+import { routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { Missing } from '../shared'
 

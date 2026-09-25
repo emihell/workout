@@ -1,7 +1,7 @@
 import { EXERCISE_TYPES, ROUTINE_ROLES, WEEKDAYS } from './ids.js'
 import { SCHEMA_VERSION, migrateState } from './model.js'
 import { withDefaultAnchor } from './schedule.js'
-import { emptyState } from './storage.js'
+import { emptyState } from './persistence.js'
 
 export const BACKUP_KIND = 'workout-mvp-backup'
 export const BACKUP_VERSION = 1

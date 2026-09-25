@@ -1,13 +1,12 @@
 import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
-import { isAddedMidWorkout, isSkippedSet } from './workout-log.js'
+import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 
 export const SCHEMA_VERSION = 9
 
-// req-85 — default target seconds for a timed exercise that has no per-set
-// duration set yet. Used as the exercise-level default and the fallback when a
-// routine item's `durations` array is empty.
-export const DEFAULT_DURATION_SEC = 30
+// req-164 — defined in the leaf set-rules.js (breaks the model ↔ workout-log cycle);
+// re-exported here for its existing importers.
+export { DEFAULT_DURATION_SEC }
 
 function inferRole(item, exercise, index) {
   if (item.role) return item.role
@@ -340,7 +339,9 @@ export function migrateState(input, { legacy = false } = {}) {
 }
 
 export function applyProgressionToRoutines(routines, routineId, progression) {
-  const byKey = new Map((progression || []).map((item) => [item.routineItemId || item.sessionItemId, item]))
+  // req-164 — keyed by routineItemId alone: its one caller passes progressionFromWorkout's
+  // output, which always sets it (the req-165 latent `sessionItemId` fallback is gone).
+  const byKey = new Map((progression || []).map((item) => [item.routineItemId, item]))
   return (routines || []).map((routine) => {
     if (routine.id !== routineId) return routine
     return {

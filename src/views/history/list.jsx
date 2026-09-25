@@ -1,5 +1,6 @@
 import { dateKey } from '../../schedule'
-import { exerciseById, exercisesInHistory, routineById, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../storage'
+import { exerciseById, routineById } from '../../model.js'
+import { exercisesInHistory, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { abandonInProgress, continueInProgress } from '../../workout-actions'
 import { Back } from '../shared'
