@@ -1866,3 +1866,15 @@ downloadBlob) → release → import. Round 1 (`7731c59`) sent back: reviewer **
 Planner's browser runs (isolated origin, corrupt v9 ending in a lone `\uD83D`): copy write forced to fail → "Couldn't keep a
 copy…", keys unchanged, 0 downloads; Replace → copy key `===` raw, 1 `.txt`, v9 = import (13 workouts), no banner; reload →
 copy key still present. **Emilio approved the merge** ("Merge now, fix later"; Export on his phone).
+
+## req-158 — stop recording two persisted fields nothing reads (DEC-085 §3, audit F-DEAD-4)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `05bb20b`…`4f332c3`, 3 commits). `legacyRecommendations` gets baselines only
+for legacy (pre-v9) input; `workout.progression` is no longer written at Finish or Start, and the dead
+`buildFinishProgression` is deleted (Emilio: "Tidy first" → cleanup commit `4f332c3`). Old stored entries and old
+workouts' `progression` untouched. Gate: Builder `./check` green, 962/962; v8 migrate deep-equals main (frozen fixture
+`req-158.model-main.fixture.js`); 4+5 test edits, all mechanism (reviewer-confirmed). Independent reviewer ×2 (DEC-057 §1:
+model/workout-log/store) → `# tests 960 # pass 960` then `# tests 962 # pass 962`, **no blockers**. Planner's browser runs
+(isolated origin, v8 seed): baselines 24 → a new v9 item + reload → still 24 (main: 25); Start → active has no
+`progression`; manual Finish → no key; auto-complete (countdown ran out) → note "auto note" saved, no key; 0 workouts with
+the key. Emilio approved the merge.
