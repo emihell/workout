@@ -2049,11 +2049,9 @@ unchanged (saves 0). Gate (ui): req-173.test.js 6/0; AC2 stored set deep-equals 
 branch (no invented 0); `./check --smoke` green; Planner's run: Leg Press / Leg Curl blank → note, 40 → gone; cardio (Stairs) no
 kg box, no note; 0 dialogs. History set editor (SetEditForm) unchanged — own req if wanted. Merge `33c2ce8`. `reports/req-173.md`.
 
+## req-174 — an empty home says "Create your first routine"  (merged 2026-09-25)
+
 **req-174** (2026-09-25) — empty home: "Nothing here yet." + primary "Create your first routine" (→ `#/routines/new`) above
 Import (unchanged); `isFirstRun` gate unchanged. Gate (ui): req-174.test.js 3/0; agent's seeds empty / history-only /
 routine-only match main's gate; Import still replaces; `./check --smoke` green; Planner's run (emptyState seed): text + lands
-`#/routines/new`, screenshot checked — the two buttons sit tight (4 px), feel item for Emilio. Subtitle `(unconfirmed)`. `reports/req-174.md`.
-
-## req-174 — an empty home says "Create your first routine"  (merged 2026-09-25)
-
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+`#/routines/new`, screenshot checked — the two buttons sit tight (4 px), feel item for Emilio. Subtitle `(unconfirmed)`. Merge `cf880ee`. `reports/req-174.md`.
