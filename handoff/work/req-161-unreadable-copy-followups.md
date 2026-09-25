@@ -1,6 +1,6 @@
 # req-161 — two follow-ups to the unreadable-state copy (req-157)
 
-**Status: READY** (2026-09-25) — **Lane: data** (reviewer + Emilio's eyes). DEC-086. Source: req-157's re-review
+**Status: BUILT — branch `req-161` (`fd9bffe`), NOT merged.** (2026-09-25) — **Lane: data** (reviewer + Emilio's eyes). DEC-086. Source: req-157's re-review
 (SHIPPED req-157). Emilio: "merge now, fix later".
 
 1. **A leftover legacy key isn't copied.** v9 corrupt **and** a leftover v8 (an interrupted cleanup): only the key that was

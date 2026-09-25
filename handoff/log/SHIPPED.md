@@ -1906,3 +1906,14 @@ three phrasings didn't (Builder sessions, where planning owns closeout/spec — 
 works. Planner read all five and ran the checker after merge (receipt below). Not built: `build-brief` (not in the req).
 Planner after merge: `python3 scripts/check_skills.py` → `6 skill(s), 0 failing`; `.claude/skills/` lists all six in the
 planning worktree. Session-context triggering: new skills load at the next session start — checked then.
+
+## req-161 — the unreadable-state copy covers every workout key and doesn't pile up (DEC-086)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `497de37`…`fd9bffe`, 2 commits). Import in the unreadable state copies every
+present workout key (v9 + each legacy) as `workout-mvp-unreadable-<ISO>-<vN>` (collision suffix `~2`), verified by
+read-back; an identical same-source copy is reused (0 writes); a storage-full error says how to make room (wording approved
+by Emilio). Gate (data lane): Builder `./check --smoke` green (63 files, 11 steps); independent reviewer → `# tests 976
+# pass 976 # fail 0`, **No blockers.** (3 nits → BACKLOG); Planner's QA (`./plan qa req-161`, smoke green, scripted
+puppeteer, 0 native dialogs): corrupt v9 (lone `\uD83D`) + leftover v8 → a forced download failure → both copies written,
+lock kept → retry → 0 new keys, 1 `.txt` → reload: both copies `=== true`, v8 cleaned up, 13 workouts, no banner. **Emilio
+approved the merge.**
