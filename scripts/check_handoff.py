@@ -172,6 +172,15 @@ class ReqTag:
     reqid: str
     path: str
     tag_text: str
+    head: str = ""  # req-166: the doc's first lines, where the Lane / legacy Gate tag sits
+
+
+# req-166 (DEC-085 §6) — a requirement names its lane: `**Lane: <lane>**` (a trailing `.`
+# or a following note is fine: `**Lane: tooling.**`, `**Lane: bug** (small)`). Old reqs
+# keep their legacy Gate tag (`Gate: …` or a bold `**[…]**` tag).
+LANES = ("ui", "bug", "data", "content", "design", "backend", "tooling", "audit")
+LANE_RE = re.compile(r"\*\*Lane:\s*([^*\s.]+)")
+LEGACY_GATE_RE = re.compile(r"\bGate:|\*\*\[")
 
 
 def find_requirement_tags(repo: str, ref: str) -> list[ReqTag]:
@@ -207,13 +216,17 @@ def find_requirement_tags(repo: str, ref: str) -> list[ReqTag]:
         # `**` without hard-coding to a single physical line.
         window = "\n".join(content.splitlines()[:6])
         m = STATUS_RE.search(window)
-        out.append(ReqTag(slug=slug, reqid=reqid, path=path, tag_text=m.group(1) if m else ""))
+        out.append(ReqTag(slug=slug, reqid=reqid, path=path, tag_text=m.group(1) if m else "", head=window))
     return out
 
 
 def classify_tag(tag_text: str) -> tuple[str, str | None]:
-    """One of 'merged' | 'not-merged' | 'blocked' | 'unknown', plus a hash
+    """One of 'merged' | 'not-merged' | 'blocked' | 'decided' | 'unknown', plus a hash
     (for 'merged') or a blocking reqid (for 'blocked') when present."""
+    # req-166 (DEC-085 §6) — a design req ends `DECIDED <date> → DEC-…, req-…`: terminal,
+    # nothing to merge (a design req has no branch).
+    if re.search(r"\bDECIDED\s+\d{4}-\d{2}-\d{2}\s*(→|->)", tag_text):
+        return ("decided", None)
     if re.search(r"BUILT AND (MERGED|VERIFIED)", tag_text):
         m = HASH_RE.search(tag_text)
         return ("merged", m.group(1) if m else None)
@@ -330,8 +343,9 @@ def parse_now_md_claims(now_md_text: str) -> dict[str, str]:
 
 
 def _now_claim_disagrees(category: str, now_claim: str) -> bool:
+    # req-166 — a DECIDED design req is finished like a merged one (nothing to merge).
     if now_claim == "merged":
-        return category != "merged"
+        return category not in ("merged", "decided")
     if now_claim == "ready":
         return category != "not-merged"
     if now_claim in ("shelved", "withdrawn"):
@@ -343,8 +357,24 @@ def _now_claim_disagrees(category: str, now_claim: str) -> bool:
         # says the work actually shipped. "unknown" (can't place it), still
         # "not-merged", or "blocked" are all consistent with "not shipped
         # yet" — stay silent. This is the whole conservative bargain.
-        return category == "merged"
+        return category in ("merged", "decided")
     return False
+
+
+def check_lane(tag: ReqTag, category: str) -> list[Finding]:
+    """req-166 — a Lane tag must name a known lane (else fail). An OPEN req (not merged,
+    decided, shelved or withdrawn) with neither a Lane nor a legacy Gate warns: it is about
+    to be built without its gate named. Finished docs are history and are not flagged —
+    55 of them predate Gate tags, and a warning each on every run would be noise."""
+    m = LANE_RE.search(tag.head)
+    if m:
+        lane = m.group(1).lower()
+        if lane not in LANES:
+            return [Finding("lane", "fail", tag.reqid, f"unknown Lane {m.group(1)!r} (expected one of {', '.join(LANES)})")]
+        return []
+    if LEGACY_GATE_RE.search(tag.head) or category in ("merged", "decided", "unknown"):
+        return []
+    return [Finding("lane", "warn", tag.reqid, "no **Lane: …** tag (and no legacy Gate) — name its lane (WORKFLOW §Requirement lanes)")]
 
 
 def check_status_lines(repo: str, ref: str) -> list[Finding]:
@@ -356,6 +386,7 @@ def check_status_lines(repo: str, ref: str) -> list[Finding]:
 
     for tag in tags:
         category, extra = classify_tag(tag.tag_text)
+        findings.extend(check_lane(tag, category))
 
         # Checked first, for every category: the merged/blocked/unknown
         # branches below each `continue`, so a claim check left at the tail of
@@ -404,6 +435,9 @@ def check_status_lines(repo: str, ref: str) -> list[Finding]:
                         f"blocked on {extra}, which is already tagged merged",
                     ))
                     continue
+
+        elif category == "decided":
+            continue
 
         elif category == "unknown":
             findings.append(Finding(

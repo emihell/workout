@@ -74,6 +74,12 @@ npm run --silent lint || fail "lint (oxlint)"
 echo "check: skills (check_skills.py)…"
 python3 scripts/check_skills.py >/dev/null || { python3 scripts/check_skills.py >&2 || true; fail "the skills check (scripts/check_skills.py)"; }
 
+# 1c. Import cycles (req-166, from req-164): scripts/check-cycles.mjs lists every static
+# import cycle among src/ modules; one fails the gate (model ↔ workout-log was broken in
+# req-164 and must stay broken).
+echo "check: import cycles (check-cycles.mjs)…"
+node scripts/check-cycles.mjs >/dev/null || { node scripts/check-cycles.mjs >&2 || true; fail "the import-cycle check (scripts/check-cycles.mjs)"; }
+
 # 2. Unit tests (node --test) — the behaviour gate.
 echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
 node --test "${testfiles[@]}" || fail "the test suite"
@@ -87,8 +93,8 @@ npm run --silent build >/dev/null || fail "the production build"
 if [ -n "$smoke" ]; then
   echo "check: smoke test (headless browser, HEAD)…"
   node scripts/smoke.mjs || fail "the smoke test"
-  echo "check: green — lint, skills, ${#testfiles[@]} test file(s), the build, and the smoke test all passed."
+  echo "check: green — lint, skills, no import cycles, ${#testfiles[@]} test file(s), the build, and the smoke test all passed."
   exit 0
 fi
 
-echo "check: green — lint, skills, ${#testfiles[@]} test file(s), and the build all passed."
+echo "check: green — lint, skills, no import cycles, ${#testfiles[@]} test file(s), and the build all passed."
