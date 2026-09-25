@@ -1,6 +1,6 @@
 # req-168 — backlog sweep: the last low-priority follow-ups before new features
 
-**Status: BUILT — branch `req-168` (`376a01a`), NOT merged.** (2026-09-25) **Lane: bug** (mixed tooling + tests; the reviewer fires if storage/reducers are touched).
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-168` (`b4adba8`…`376a01a`, 3 commits).** (2026-09-25) **Lane: bug** (mixed tooling + tests; the reviewer fires if storage/reducers are touched).
 Emilio: "do it" — clear the table before features (DEC-087). **Reproduce each item on main first (L-042); an item that
 doesn't reproduce is reported and dropped, not built.**
 
