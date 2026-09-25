@@ -12,11 +12,11 @@ This browser-only MVP supports one trustworthy loop: set up exercises and reusab
 
 ## Recommendation rules
 
-Completed history supplies the next load. Easy completed work moves one valid equipment step up; missed reps or failure move one step down; moderate work holds. Alternating 4/5 kg stacks use their real sequence rather than a rounded 5 kg increment.
+Completed history supplies the next load. Easy completed work moves one valid equipment step up; missed reps or failure move one step down; moderate work holds. Alternating 4/5 kg stacks use their real sequence rather than a rounded 5 kg increment. A target the app can't read as a single number (a range like 8–12, AMRAP, a duration, text) and any assisted exercise hold — the same kg and target — until the progression rules are defined.
 
 A weighted exercise without history has no invented starting weight. Its dated plan explains calibration: start light, perform the program reps, and adjust by valid increments based on effort.
 
-Correcting meaningful history shows a recalculation preview. Recalculation writes next kg and reps onto the routine from that workout.
+Finishing a workout never changes the routine. Correcting history offers an update: Apply writes that workout's kg and reps onto the routine; Skip leaves it as it is.
 
 ## Action vocabulary
 
@@ -117,7 +117,7 @@ Live (after GitHub Pages is set to the `gh-pages` branch): https://emihell.githu
 
 ## Deferred scope
 
-No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, social features, or visual-design pass are part of this MVP.
+No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, social features, or visual-design pass are part of this MVP. This is the browser-only MVP. The product is headed for other users and training together on a server (DEC-073); that scope opens with the backend design (req-146), not before.
 
 ## Planning workflow
 

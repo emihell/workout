@@ -1,6 +1,6 @@
 import { formatSetLine, roleTag } from '../../ids'
 import { go } from '../../route'
-import { durationLabel, exerciseById, findRoutine, groupSetsByExercise, workoutVolume } from '../../storage'
+import { durationLabel, exerciseById, routineById, groupSetsByExercise, workoutVolume } from '../../storage'
 import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-log'
 import { Back, Missing } from '../shared'
@@ -25,7 +25,7 @@ export function HistoryDetail({ workoutId }) {
     return <Missing>Not found.</Missing>
   }
 
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   const snapshot = workout.snapshot
   const sets = workout.sets || []
   const groups = groupSetsByExercise(sets, {
@@ -79,10 +79,12 @@ export function HistoryDetail({ workoutId }) {
       </p>
 
       {/* req-96 — the "Next time" load-recommendation surface was removed here (and on
-          the Finish screen). It only moved with an RPE signal, which isn't logged, so it
-          just echoed the workout. req-158 — the record's `progression` field is no longer
-          written on Finish (older workouts keep theirs; nothing reads it). History detail gets no "beat last time" line — it's
-          a past record, not a forward celebration (decided). */}
+          the Finish screen): at the time it only moved with an RPE signal the app didn't
+          log, so it just echoed the workout. (req-165: Effort is logged on work sets now;
+          the recommendation lives on History → correct → "Update?", DEC-056.)
+          req-158 — the record's `progression` field is no longer written on Finish (older
+          workouts keep theirs; nothing reads it). History detail gets no "beat last time"
+          line — it's a past record, not a forward celebration (decided). */}
       <Button
         onClick={async () => {
           if (!(await askConfirm(`Delete ${workoutRoutineName(workout, routine)}?`, { confirmLabel: 'Delete' }))) return

@@ -3,7 +3,7 @@ import { roleTag } from '../../ids'
 import { go } from '../../route'
 import { finishedForPlan } from '../../current-workout'
 import { dateKey, planDateFor } from '../../schedule'
-import { findRoutine } from '../../storage'
+import { routineById } from '../../storage'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
 import { allItemsDone, autoCompleteArmed, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
@@ -11,7 +11,8 @@ import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
 import { weekdayDate } from '../history/helpers'
-import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, MissingItem, NotInWorkout } from './helpers'
+import { MissingItem, NotInWorkout } from './helpers'
+import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
 
@@ -37,7 +38,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   // req-107 — the "Add note" reveal (req-26/req-80 pattern). Tapping opens the field
   // for this mount; once the note has text it stays shown on every visit.
   const [noteOpen, setNoteOpen] = useState(false)
-  const { routine } = findRoutine(store.routines, routineId)
+  const routine = routineById(store.routines, routineId)
   const active = store.activeWorkout
   const mine = isActiveFor(active, routineId)
   const plan = !mine
@@ -114,7 +115,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     return (
       <Screen>
         <Back to="/" />
-        <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || 'Workout'}</Title>
+        <Title>{active.snapshot?.routineName || 'Workout'}</Title>
         <p className="ui-sub">No exercises.</p>
         <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
           Abandon
@@ -148,7 +149,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           active (resume via Continue). Abandon (below) is the explicit discard. */}
       <Back to="/" />
       <RestPill />
-      <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</Title>
+      <Title>{active.snapshot?.routineName || routine?.name || 'Workout'}</Title>
       <List>
         {items.map((item) => {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone

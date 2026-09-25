@@ -2,7 +2,8 @@ import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
 import { clampLoopWeeks, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
 import { go } from '../route'
 import { useStore } from '../store-context'
-import { RoutineNewForm, RoutineScreens, navForBase } from './Routine'
+import { RoutineNewForm, RoutineScreens } from './Routine'
+import { navForBase } from './routine-nav.js'
 import { Back, Missing } from './shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, Select, Title } from '../ui/index.jsx'
 import { askConfirm } from '../ui/confirm.js'
@@ -18,7 +19,7 @@ function slotLabel(routines, slot) {
 }
 
 function slotRoutineId(slot) {
-  return slot.routineId || slot.sessionId
+  return slot.routineId
 }
 
 function activeRoutines(store) {

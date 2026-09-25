@@ -126,6 +126,9 @@ export function RestEndCue({ beep = defaultBeep, vibrate = defaultVibrate } = {}
   // so a freshly-armed rest is evaluated against a current clock, not a stale one.
   useEffect(() => {
     if (restEndsAt == null) return undefined
+    // Kept (req-165, F-LINT-1): this effect syncs with an external system, the wall clock,
+    // at the moment a rest arms; deriving it in render would make render impure.
+    // oxlint-disable-next-line react/set-state-in-effect
     setNow(Date.now())
     const t = setInterval(() => setNow(Date.now()), 250)
     return () => clearInterval(t)

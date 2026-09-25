@@ -4,12 +4,13 @@ import { EXERCISE_TYPES } from '../ids'
 import { go } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing } from './shared'
-import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
+import { deletionConfirmHead, exerciseById, exerciseDeletionImpact, exerciseInActiveWorkout } from '../storage'
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
 import { DEFAULT_DURATION_SEC } from '../model'
 import { describeWeightStep } from '../weight-step.js'
 import { defaultDurationToSave } from '../seconds-input.js'
-import { useWeightStep, WeightStepField } from './weight-step-field.jsx'
+import { WeightStepField } from './weight-step-field.jsx'
+import { useWeightStep } from './use-weight-step.js'
 import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } from '../exercise-names.js'
 import { askConfirm } from '../ui/confirm.js'
 
@@ -361,7 +362,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
 
 export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const store = useStore()
-  const ex = store.exercises.find((e) => e.id === exerciseId)
+  const ex = exerciseById(store.exercises, exerciseId)
   const [name, setName] = useState(ex?.name || '')
   const [type, setType] = useState(ex?.type || 'free')
   const [equipment, setEquipment] = useState(ex?.equipment || '')
@@ -449,7 +450,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
 
 export function ExerciseDetail({ exerciseId }) {
   const store = useStore()
-  const ex = store.exercises.find((e) => e.id === exerciseId)
+  const ex = exerciseById(store.exercises, exerciseId)
   if (!ex) {
     return <Missing>Not found.</Missing>
   }
@@ -480,7 +481,7 @@ export function ExerciseDetail({ exerciseId }) {
           const impact = exerciseDeletionImpact(store, ex.id)
           const removes =
             impact.routines > 0
-              ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'} (and any planned workouts).`
+              ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'}.`
               : ''
           // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
           const head = deletionConfirmHead(ex.name, {

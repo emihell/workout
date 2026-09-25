@@ -1,5 +1,5 @@
 import { dateKey } from '../../schedule'
-import { exerciseById, exercisesInHistory, findRoutine, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../storage'
+import { exerciseById, exercisesInHistory, routineById, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
 import { abandonInProgress, continueInProgress } from '../../workout-actions'
 import { Back } from '../shared'
@@ -17,7 +17,7 @@ import {
 } from './helpers'
 
 function WorkoutHistoryRow({ store, workout }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   const programName = workout.snapshot?.programName
   const name = workoutRoutineName(workout, routine)
   const label = programName ? `${programName} — ${name}` : name
@@ -35,7 +35,7 @@ function WorkoutHistoryRow({ store, workout }) {
 // and never feeds progress.js. No link to a detail page (there is no finished record
 // to open); the row's action buttons are the only affordances.
 function InProgressHistoryRow({ store, workout }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   const name = workoutRoutineName(workout, routine)
   return (
     <Row

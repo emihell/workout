@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { go } from '../../route'
-import { exerciseById, findRoutine } from '../../storage'
+import { exerciseById, routineById } from '../../storage'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
 import { historySetFields, historySetKind } from '../set-values.js'
@@ -58,7 +58,7 @@ export function HistorySetNew({ workoutId }) {
     return <Missing>Not found.</Missing>
   }
 
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   const snapshotItems = workout.snapshot?.items || []
   const fromRoutine = snapshotItems.length
     ? snapshotItems.map((item) => ({

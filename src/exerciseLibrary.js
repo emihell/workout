@@ -53,7 +53,7 @@ export const OWN_FIELDS = [
 ]
 
 // primaryMuscles → coarse group. Every primary muscle in the library must be here.
-// rhomboids / rear delts come from the extras (unconfirmed, req-130 spec).
+// rhomboids / rear delts come from the extras (req-130; confirmed by DEC-078).
 export const MUSCLE_GROUPS = {
   Chest: ['chest'],
   Back: ['lats', 'middle back', 'lower back', 'traps', 'rhomboids'],
@@ -541,7 +541,8 @@ export function deriveLibrary(freeDb) {
   return list
 }
 
-// Lazy chunk (~1 MB) so the main bundle doesn't carry it. The `with` attribute is
+// Lazy chunk (1,538 kB minified, 264 kB gzip, measured req-165; the JSON is 1.8 MB) so the
+// main bundle doesn't carry it; vite.config.js sets the chunk-size warning just above it. The `with` attribute is
 // required by node --test (ERR_IMPORT_ATTRIBUTE_MISSING without it).
 let libraryPromise = null
 export function loadExerciseLibrary() {
@@ -582,6 +583,8 @@ function indexFor(library) {
 // else null. No fuzzy guess. req-139: exact name stays ahead of alias, so a stored
 // "Air Bike" without a libraryId is free-db's crunch, not Fan Bike (common-first is
 // search only).
+// Kept though only tests call it today (req-165, F-DEAD-5): the resolver req-130 specified
+// for the planned per-exercise pictures/video link (BACKLOG), exercised by the library tests.
 export function libraryEntryFor(exercise, library) {
   if (!exercise || !library) return null
   const index = indexFor(library)

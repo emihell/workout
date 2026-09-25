@@ -4,7 +4,7 @@
 // node, no JSX transform) can't import and render it. The behavioural check is
 // Emilio's browser test; the source is locked here as text — the same
 // static-source approach as BottomMenu.test.js and safe-area.test.js. The routing
-// half (back()/applyBack removed, applyVisit kept) is asserted in route.test.js.
+// half (back()/applyBack removed; req-165: the visit stack too) is asserted in route.test.js.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'

@@ -4,7 +4,7 @@ import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
 import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
-import { completedOnDayKey, findRoutine, isFirstRun, staleInProgressWorkouts } from '../storage'
+import { completedOnDayKey, routineById, isFirstRun, staleInProgressWorkouts } from '../storage'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { routineStartable } from '../exercise-names.js'
@@ -38,7 +38,7 @@ function StartButton({ store, routine, slot, date, label = 'Start', variant, blo
 }
 
 function activeRoutineId(workout) {
-  return workout?.routineId || workout?.sessionId
+  return workout?.routineId
 }
 
 // req-53 — the "in progress" marker that sits next to the routine info in the
@@ -76,7 +76,7 @@ function WorkoutInfo({ when, name, focus, today }) {
 // shared info format (iter 5); `when` is "Today" (all completed today), focus from
 // the immutable snapshot. Program name dropped so it matches the other sections.
 function CompletedTodayRow({ store, workout, todayKey }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
     <Row to={`/history/${workout.id}`}>
       <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
@@ -87,7 +87,7 @@ function CompletedTodayRow({ store, workout, todayKey }) {
 // req-14 (Emilio review) — a recent-history peek row linking to the History detail.
 // Shared info format (iter 5): `when` is the workout's date, focus from the snapshot.
 function HistoryPeekRow({ store, workout, todayKey }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
     <Row to={`/history/${workout.id}`}>
       <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
@@ -174,7 +174,7 @@ function TodayWorkouts({ store, todays, date }) {
 // occurrences. It is the one hero whatever it was started from (today's slot,
 // tomorrow's started early, off-schedule).
 function HeroRoutine({ store, workout }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
     <>
       <p className="ui-today-workout__name">
@@ -223,7 +223,7 @@ function TodayHero({ store, workout, others, date }) {
 // Marked "in progress"; never a finished-history link. Continue resumes it
 // (abandoning any current active via the warning).
 function InProgressPeekRow({ store, workout, todayKey }) {
-  const { routine } = findRoutine(store.routines, workoutRoutineId(workout))
+  const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
     <Row
       action={

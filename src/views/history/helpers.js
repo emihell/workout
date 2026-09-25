@@ -34,15 +34,15 @@ export function historyGroupRowMeta(snapshotItem, groupItems) {
 }
 
 export function itemIdOf(obj) {
-  return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''
+  return obj?.routineItemId || obj?.id || ''
 }
 
 export function workoutRoutineId(workout) {
-  return workout?.routineId || workout?.sessionId
+  return workout?.routineId
 }
 
 export function workoutRoutineName(workout, routine) {
-  return workout?.snapshot?.routineName || workout?.snapshot?.sessionName || routine?.name || 'Workout'
+  return workout?.snapshot?.routineName || routine?.name || 'Workout'
 }
 
 export function routineTitle(program, routine) {

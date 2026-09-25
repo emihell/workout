@@ -9,7 +9,7 @@
 import { historySetFields } from '../set-values.js'
 
 function idOf(obj) {
-  return obj?.routineItemId || obj?.sessionItemId || obj?.id || ''
+  return obj?.routineItemId || obj?.id || ''
 }
 
 function lastSetFor(workout, exerciseId, routineItemId) {

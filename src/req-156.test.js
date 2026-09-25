@@ -111,14 +111,16 @@ describe('live log screen (render) — WorkoutItemLog + the real store', () => {
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
-    let store
+    const captured = {} // the live store, read by the test (a holder, not a reassigned outer variable)
     function Screen({ started }) {
-      store = useStore()
+      // Kept (req-165, F-LINT-1): a test harness reading the live store out of the tree.
+      // oxlint-disable-next-line react/immutability
+      captured.store = useStore()
       return started ? h(WorkoutItemLog, { routineId: 'sess-lower', itemId: 'si-sess-lower-2-ex-leg-extension' }) : null
     }
     view = await render(h(StoreProvider, null, h(Screen, { started: false })))
     const { act } = await import('./test-support/render.js')
-    await act(async () => store.startWorkout('sess-lower'))
+    await act(async () => captured.store.startWorkout('sess-lower'))
     await view.unmount()
     view = await render(h(StoreProvider, null, h(Screen, { started: true })))
     assert.match(view.text(), /WU set/)
@@ -126,7 +128,7 @@ describe('live log screen (render) — WorkoutItemLog + the real store', () => {
     await view.click(view.button('Complete'))
     assert.equal(view.text().includes('Effort'), true, 'the work set shows Effort')
     await view.click(view.button('Complete'))
-    const sets = store.activeWorkout.sets.map(({ setType, rpe }) => ({ setType, rpe }))
+    const sets = captured.store.activeWorkout.sets.map(({ setType, rpe }) => ({ setType, rpe }))
     assert.deepEqual(sets, [
       { setType: 'wu', rpe: null },
       { setType: 'work', rpe: 3 },

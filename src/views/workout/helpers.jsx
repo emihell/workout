@@ -1,34 +1,13 @@
-import { itemKey, itemLoggingState } from '../../workout-log'
-import { inWorkoutFallback, itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
-import { recordButton } from '../../analytics'
+import { inWorkoutFallback } from '../../workout-paths'
 import { useEffect } from 'react'
 import { go, hashPath } from '../../route'
-import { leaveWorkoutToToday } from '../../workout-actions'
-import { findRoutine } from '../../storage'
+import { routineById } from '../../storage'
 import { useStore } from '../../store-context'
 import { Missing } from '../shared'
-import { askConfirm } from '../../ui/confirm.js'
 
-// req-76 — the item log/done path builders now live in the JSX-free workout-paths
-// module (so workout-actions.js can share them); re-exported here so the workout
-// screens' `import { itemCurrentPath, … } from './helpers'` keep working unchanged.
-export { itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath }
-
-// Shared helpers for the in-workout screens (req-19 split of Workout.jsx). These
-// are the only symbols used by more than one of the workout/ screen modules;
-// single-screen helpers stay local to their module.
-
-export function exerciseName(item) {
-  return item.exerciseName || 'Exercise'
-}
-
-export function findItem(items, itemId) {
-  return (items || []).find((item) => itemKey(item) === itemId || item.id === itemId) || null
-}
-
-export function isActiveFor(active, routineId) {
-  return Boolean(active && (active.routineId || active.sessionId) === routineId)
-}
+// The in-workout screens' shared COMPONENTS. req-165 (F-LINT-1) — their shared plain
+// helpers moved to ./workout-helpers.js, so this file exports components only (Fast
+// Refresh: only-export-components).
 
 export function MissingItem() {
   return <Missing>Not found.</Missing>
@@ -43,7 +22,7 @@ export function NotInWorkout({ routineId }) {
   const args = {
     active: store.activeWorkout,
     routineId,
-    routineKnown: Boolean(findRoutine(store.routines, routineId).routine),
+    routineKnown: Boolean(routineById(store.routines, routineId)),
   }
   const outcome = inWorkoutFallback({ ...args, currentPath: hashPath(window.location.hash) })
   useEffect(() => {
@@ -52,18 +31,4 @@ export function NotInWorkout({ routineId }) {
     }
   })
   return outcome === 'missing' ? <MissingItem /> : null
-}
-
-export function itemSetsPath(routineId, item, workout) {
-  if (!item) return `/workout/${routineId}`
-  return itemCurrentPath(routineId, item, itemLoggingState(workout, item).plannedDone)
-}
-
-// Discard the active workout (confirm first). Shared by the overview's Abandon and, since
-// req-116, the Finish screen's "Nothing logged" Abandon.
-export async function abandonWorkout(store) {
-  if (!(await askConfirm('Abandon?', { confirmLabel: 'Abandon' }))) return
-  recordButton('abandon-workout')
-  store.abandonWorkout()
-  leaveWorkoutToToday()
 }

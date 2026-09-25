@@ -27,7 +27,7 @@ function migrateRoutine(routine, exercises, legacyRecommendations, legacy) {
     archivedAt: routine.archivedAt || null,
     exercises: (routine.exercises || []).map((item, index) => {
       const id = itemId(routine.id, item, index)
-      const ex = exercises.find((candidate) => candidate.id === item.exerciseId)
+      const ex = exerciseById(exercises, item.exerciseId)
       const recorded = legacyRecommendations[id]
       // req-158 (audit F-DEAD-4, DEC-085 §3) — a baseline is recorded only for legacy
       // (pre-v9) input, the only input that reads it (below, and workoutSnapshot). On v9
@@ -87,7 +87,7 @@ function programLabelFrom(source, routineId) {
 
 function workoutSnapshot(state, workout, origin = state, legacy = false) {
   const routineId = workout.routineId || workout.sessionId
-  const found = findRoutineInState(state.routines, routineId)
+  const foundRoutine = routineById(state.routines, routineId)
   if (workout.snapshot) {
     // req-109 — items added mid-workout (a replacement, isAddedMidWorkout) and their
     // sets' keys. With none (every workout before req-109) this set is empty and the
@@ -101,12 +101,12 @@ function workoutSnapshot(state, workout, origin = state, legacy = false) {
       // finish never writes it onto the routine; and no targets/weights backfill, so
       // it stays blank across reloads (its prefill comes from its own history).
       if (isAddedMidWorkout(item)) return item
-      const templateItem = found.routine?.exercises?.find(
+      const templateItem = foundRoutine?.exercises?.find(
         (candidate) =>
           candidate.id === (item.routineItemId || item.sessionItemId) ||
           candidate.exerciseId === item.exerciseId,
       )
-      const exercise = (state.exercises || []).find((candidate) => candidate.id === item.exerciseId)
+      const exercise = exerciseById(state.exercises, item.exerciseId)
       const actualWorkingSets = (workout.sets || []).filter((set) => {
         const setItemId = set.routineItemId || set.sessionItemId
         const itemIdValue = item.routineItemId || item.sessionItemId
@@ -161,7 +161,7 @@ function workoutSnapshot(state, workout, origin = state, legacy = false) {
         ...snapshot,
         routineId,
         routineName:
-          workout.snapshot.routineName || workout.snapshot.sessionName || found.routine?.name || '',
+          workout.snapshot.routineName || workout.snapshot.sessionName || foundRoutine?.name || '',
       },
       sets: (workout.sets || []).map((set) => {
         const { sessionItemId, ...rest } = set
@@ -178,15 +178,15 @@ function workoutSnapshot(state, workout, origin = state, legacy = false) {
       }),
     }
   }
-  const routineName = found.routine?.name || workout.routineName || workout.sessionName || 'Deleted routine'
+  const routineName = foundRoutine?.name || workout.routineName || workout.sessionName || 'Deleted routine'
   const legacyProgram = programLabelFrom(origin, routineId)
   const items = []
   const seen = new Set()
   for (const set of workout.sets || []) {
     if (seen.has(set.exerciseId)) continue
     seen.add(set.exerciseId)
-    const ex = (state.exercises || []).find((x) => x.id === set.exerciseId)
-    const templateItem = found.routine?.exercises?.find((x) => x.exerciseId === set.exerciseId)
+    const ex = exerciseById(state.exercises, set.exerciseId)
+    const templateItem = foundRoutine?.exercises?.find((x) => x.exerciseId === set.exerciseId)
     // req-120 — the recorded baseline is legacy-only here too. This branch rebuilds a
     // MISSING snapshot (pre-snapshot data), so its logged-set reconstruction stays.
     const baseline = legacy && templateItem?.id ? state.legacyRecommendations?.[templateItem.id] : null
@@ -231,7 +231,7 @@ function workoutSnapshot(state, workout, origin = state, legacy = false) {
       programName: workout.programName || workout.snapshot?.programName || legacyProgram.programName,
       routineId,
       routineName,
-      focus: found.routine?.focus || '',
+      focus: foundRoutine?.focus || '',
       items,
     },
     sets: (workout.sets || []).map((set) => {
@@ -259,9 +259,16 @@ function stripLegacyWorkoutKeys(workout) {
   return next
 }
 
-export function findRoutineInState(routines, routineId) {
-  const routine = (routines || []).find((candidate) => candidate.id === routineId) || null
-  return { routine }
+// req-165 (F-STRUCT-7) — ONE lookup per entity: the record, or null. Replaces the
+// `{ routine }`-wrapper pair (findRoutineInState / findRoutine, a leftover from the
+// program lookup) and the inline `exercises.find(… .id === …)` copies. storage.js
+// re-exports both for the views.
+export function routineById(routines, routineId) {
+  return (routines || []).find((routine) => routine.id === routineId) ?? null
+}
+
+export function exerciseById(exercises, id) {
+  return (exercises || []).find((exercise) => exercise.id === id) ?? null
 }
 
 // req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from
@@ -368,7 +375,7 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
 // Returns `sets`/`recommendation`/`to`/`targetsTo`/`routineItemId`.
 export function progressionForItem(exercises, workout, item) {
   const exercise =
-    (exercises || []).find((candidate) => candidate.id === item.exerciseId) || {
+    exerciseById(exercises, item.exerciseId) || {
       type: item.exerciseType,
       weightStep: item.weightStep,
     }
@@ -419,10 +426,10 @@ export function recalculatedState(state, workoutId) {
 }
 
 export function buildPlannedWorkout(state, { routineId, date, scheduleSlotId = null, occurrenceId = null }) {
-  const { routine } = findRoutineInState(state.routines, routineId)
+  const routine = routineById(state.routines, routineId)
   if (!routine) return null
   const items = (routine.exercises || []).map((item) => {
-    const exercise = (state.exercises || []).find((candidate) => candidate.id === item.exerciseId)
+    const exercise = exerciseById(state.exercises, item.exerciseId)
     const targets = [...(item.targets || [])]
     const suggestedWeights = [...(item.suggestedWeights || [])]
     const sets = Number(item.sets) || targets.length || 1

@@ -1,6 +1,7 @@
 import { go } from '../../route'
 import { useStore } from '../../store-context'
-import { navForBase, RoutineScreens } from '../Routine'
+import { RoutineScreens } from '../Routine'
+import { navForBase } from '../routine-nav.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, NavLink, Screen, Title } from '../../ui/index.jsx'
 import { whenLabel, workoutRoutineId, workoutRoutineName } from './helpers'

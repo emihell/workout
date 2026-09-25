@@ -10,6 +10,7 @@
 // req-84's auto-complete "vs last time" volume summary still uses those untouched.
 import { isWeightedType } from './ids.js'
 import { isSkippedSet } from './workout-log.js'
+import { exerciseById } from './model.js'
 
 // Parse a stored numeric field defensively. Reps can be non-numeric ("AMRAP") and
 // duration can be absent; anything that isn't a finite number reads as 0 — i.e. "no
@@ -67,13 +68,13 @@ function snapshotItemFor(workout, exerciseId) {
 function exerciseTypeFor(workout, exerciseId, exercises) {
   const fromSnapshot = snapshotItemFor(workout, exerciseId)?.exerciseType
   if (fromSnapshot) return fromSnapshot
-  return (exercises || []).find((e) => e.id === exerciseId)?.type
+  return exerciseById(exercises, exerciseId)?.type
 }
 
 function exerciseNameFor(workout, exerciseId, exercises) {
   return (
     snapshotItemFor(workout, exerciseId)?.exerciseName ||
-    (exercises || []).find((e) => e.id === exerciseId)?.name ||
+    exerciseById(exercises, exerciseId)?.name ||
     exerciseId
   )
 }

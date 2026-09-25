@@ -7,6 +7,6 @@
 // `node --test` can import it; no imports on purpose.
 export function snapshotItemFor(items, key, exerciseId = key) {
   const list = items || []
-  const idOf = (item) => item?.routineItemId || item?.sessionItemId || item?.id || ''
+  const idOf = (item) => item?.routineItemId || item?.id || ''
   return list.find((item) => idOf(item) === key) || list.find((item) => item.exerciseId === exerciseId) || null
 }

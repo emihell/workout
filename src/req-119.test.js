@@ -14,7 +14,7 @@ import {
   exerciseDeletionImpact,
   exerciseInActiveWorkout,
   exercisesInHistory,
-  findRoutine,
+  routineById,
   isFirstRun,
   removeExerciseFromState,
   removeRoutineFromState,
@@ -121,7 +121,7 @@ describe('req-119 delete during a workout archives (DEC-058 §5)', () => {
     const workout = state.workouts[0]
     // History names a workout by snapshot.routineName, else the routine record
     // (views/history/helpers.js workoutRoutineName — .js but imports a bare path).
-    const { routine } = findRoutine(state.routines, workout.routineId)
+    const routine = routineById(state.routines, workout.routineId) // req-165: the one routine lookup
     assert.equal(routine?.id, 'r1') // the id still points at a routine record
     assert.equal(routine?.name, 'Push')
     assert.equal(workout.snapshot.routineName, 'Push')

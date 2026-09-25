@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkout, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
+import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
 import { dateKey, mondayOf } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -414,41 +414,41 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     schedule: {
       slots: [
         { routineId: 'r1' },
-        { sessionId: 'r1' }, // legacy field name still counts
+        // req-165 — was the raw legacy `{ sessionId: 'r1' }`; migrateState renames it before
+        // any reader sees it (req-165.test.js), so the fixture holds the migrated shape.
+        { routineId: 'r1' },
         { routineId: 'r2' },
       ],
     },
     plannedWorkouts: [{ routineId: 'r1' }, { routineId: 'other' }],
     workouts: [
       { routineId: 'r2', sets: [{ exerciseId: 'e1' }] },
-      { sessionId: 'r-old', sets: [{ exerciseId: 'e2' }] },
+      { routineId: 'r-old', sets: [{ exerciseId: 'e2' }] }, // req-165: migrated from sessionId
     ],
   }
 
-  it('routineDeletionImpact counts slots + plans and flags no history', () => {
-    // r1: two slots (routineId + legacy sessionId), one plan, never finished.
+  // req-165 — `plans` is gone from the impact (stored plans are no longer read or pruned).
+  it('routineDeletionImpact counts slots and flags no history', () => {
+    // r1: two slots (one migrated from a legacy sessionId), never finished.
     assert.deepEqual(routineDeletionImpact(state, 'r1'), {
       slots: 2,
-      plans: 1,
       hasHistory: false,
     })
   })
 
-  it('routineDeletionImpact flags history via routineId || sessionId', () => {
+  it('routineDeletionImpact flags history via routineId (legacy sessionId migrated to it)', () => {
     // r2: one slot, no plan, has a finished workout (routineId).
     assert.deepEqual(routineDeletionImpact(state, 'r2'), {
       slots: 1,
-      plans: 0,
       hasHistory: true,
     })
-    // r-old referenced only by a workout's legacy sessionId still counts as history.
+    // r-old referenced only by a workout migrated from a legacy sessionId still counts.
     assert.equal(routineDeletionImpact(state, 'r-old').hasHistory, true)
   })
 
   it('a routine with no references at all is all-zero, no history', () => {
     assert.deepEqual(routineDeletionImpact(state, 'nope'), {
       slots: 0,
-      plans: 0,
       hasHistory: false,
     })
   })
@@ -692,6 +692,9 @@ describe('req-84 workoutSummaryStats', () => {
   })
 })
 
+// req-165 (F-DEAD-5) — previousSameRoutineWorkout (the head) was test-only and is gone;
+// its cases now read the head of previousSameRoutineWorkouts, which the app uses.
+const previousSameRoutineWorkout = (active, workouts, routines) => previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
 describe('req-84 previousSameRoutineWorkout', () => {
   const wk = (id, routineId, name, extra = {}) => ({
     id,

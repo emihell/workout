@@ -1,4 +1,6 @@
-import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
+import { SCHEMA_VERSION, exerciseById, migrateState, routineById } from './model.js'
+
+export { exerciseById, routineById }
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
 import { isAddedMidWorkout, isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
@@ -112,7 +114,6 @@ export function emptyState() {
     routines: [],
     schedule: defaultSchedule(),
     workouts: [],
-    plannedWorkouts: [],
     draftWorkouts: [],
     activeWorkout: null,
     legacyRecommendations: {},
@@ -294,13 +295,6 @@ export function saveState(state) {
   }
 }
 
-export function routineById(routines, routineId) {
-  return (routines || []).find((routine) => routine.id === routineId) ?? null
-}
-
-export function findRoutine(routines, routineId) {
-  return findRoutineInState(routines, routineId)
-}
 
 // req-28 — the workouts finished on a given calendar day (dateKey(finishedAt) ===
 // dayKey), newest-finished first. The Today page's "Completed today" section reads
@@ -332,11 +326,11 @@ export function groupWorkoutsByRoutine(workouts, routines) {
   const groups = []
   const indexByRoutine = new Map()
   for (const w of workouts || []) {
-    const routineId = w.routineId || w.sessionId || 'unknown'
-    const name = w.snapshot?.routineName || w.snapshot?.sessionName
+    const routineId = w.routineId || 'unknown'
+    const name = w.snapshot?.routineName
     const key = w.snapshot ? `${routineId}::${w.snapshot.programName || ''}::${name}` : routineId
     if (!indexByRoutine.has(key)) {
-      const { routine } = findRoutine(routines, routineId)
+      const routine = routineById(routines, routineId)
       indexByRoutine.set(key, groups.length)
       groups.push({
         groupId: key,
@@ -346,8 +340,8 @@ export function groupWorkoutsByRoutine(workouts, routines) {
           : null,
         routine: w.snapshot
           ? {
-              id: w.snapshot.routineId || w.snapshot.sessionId,
-              name: w.snapshot.routineName || w.snapshot.sessionName,
+              id: w.snapshot.routineId,
+              name: w.snapshot.routineName,
               exercises: w.snapshot.items || [],
             }
           : routine,
@@ -364,7 +358,7 @@ export function groupSetsByExercise(sets, routine) {
   const routineItems = []
   const seen = new Set()
   for (const item of routine?.exercises || []) {
-    const key = item.routineItemId || item.sessionItemId || item.id || item.exerciseId
+    const key = item.routineItemId || item.id || item.exerciseId
     if (item.exerciseId && !seen.has(key)) {
       seen.add(key)
       routineItems.push({ key, exerciseId: item.exerciseId })
@@ -372,7 +366,7 @@ export function groupSetsByExercise(sets, routine) {
   }
   const extra = []
   for (const s of list) {
-    const key = s.routineItemId || s.sessionItemId || s.exerciseId
+    const key = s.routineItemId || s.exerciseId
     if (s.exerciseId && !seen.has(key)) {
       seen.add(key)
       extra.push({ key, exerciseId: s.exerciseId })
@@ -383,7 +377,7 @@ export function groupSetsByExercise(sets, routine) {
     exerciseId,
     items: list
       .map((s, index) => ({ s, index }))
-      .filter((x) => (x.s.routineItemId || x.s.sessionItemId || x.s.exerciseId) === key),
+      .filter((x) => (x.s.routineItemId || x.s.exerciseId) === key),
   }))
 }
 
@@ -394,23 +388,24 @@ export function routinesUsingExercise(routines, exerciseId) {
 }
 
 // req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the
-// confirm can name it. removeRoutine (store.jsx) also drops every schedule slot and
-// planned workout that references the routine, and archives-vs-deletes on whether
-// finished history references it. These are pure reads that mirror the store's own
-// reference tests exactly (routineId || sessionId) so the confirm counts match what
+// confirm can name it. removeRoutine (store.jsx) also drops every schedule slot that
+// references the routine (req-165: stored plannedWorkouts are no longer read or pruned —
+// nothing has written one since workouts are built on Start; an old doc keeps its key),
+// and archives-vs-deletes on whether finished history references it. These are pure
+// reads that mirror the store's own reference tests exactly (routineId) so the confirm
+// counts match what
 // the delete removes. The logic in the store is unchanged (DEC-031) — this is only
 // how we describe it.
 export function routineDeletionImpact(state, routineId) {
-  const refersTo = (obj) => (obj.routineId || obj.sessionId) === routineId
+  const refersTo = (obj) => obj.routineId === routineId
   return {
     slots: (state?.schedule?.slots || []).filter(refersTo).length,
-    plans: (state?.plannedWorkouts || []).filter(refersTo).length,
     hasHistory: (state?.workouts || []).some(refersTo),
   }
 }
 
 // req-43 / DEC-031 — the blast radius of deleting an exercise. removeExercise strips
-// it from every routine (and planned-workout item) and archives-vs-deletes on
+// it from every routine and archives-vs-deletes on
 // finished history (a set with this exerciseId). Reuses routinesUsingExercise for
 // the routine count; history mirrors the store's set.exerciseId test.
 export function exerciseDeletionImpact(state, exerciseId) {
@@ -438,15 +433,15 @@ export function exerciseInActiveWorkout(state, exerciseId) {
 export function routineInActiveWorkout(state, routineId) {
   const active = state?.activeWorkout
   if (!active) return false
-  return (active.routineId || active.sessionId || active.snapshot?.routineId) === routineId
+  return (active.routineId || active.snapshot?.routineId) === routineId
 }
 
 // req-119 — the delete reducers, moved out of store.jsx so the archive-vs-delete rule
 // is unit-tested. Referenced = finished history (DEC-031) OR the in-progress workout
 // (DEC-058 §5) → archived via the existing `archivedAt` path; otherwise hard-deleted.
 // Everything else each delete did is unchanged: removeExercise strips the exercise
-// from every routine and planned-workout item; removeRoutine drops its schedule slots
-// and planned workouts. Neither touches activeWorkout — its snapshot is its own.
+// from every routine; removeRoutine drops its schedule slots (req-165: stored plans are
+// no longer touched). Neither touches activeWorkout — its snapshot is its own.
 export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().toISOString()) {
   const referenced = exerciseDeletionImpact(s, exerciseId).hasHistory || exerciseInActiveWorkout(s, exerciseId)
   return {
@@ -458,10 +453,6 @@ export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().t
       ...routine,
       exercises: (routine.exercises || []).filter((item) => item.exerciseId !== exerciseId),
     })),
-    plannedWorkouts: (s.plannedWorkouts || []).map((plan) => ({
-      ...plan,
-      items: (plan.items || []).filter((item) => item.exerciseId !== exerciseId),
-    })),
   }
 }
 
@@ -471,7 +462,7 @@ export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().t
 // bring back the routine / planned-workout rows the archive removed. Returns `s`
 // unchanged (same reference) for an unknown or non-archived id.
 export function restoreExerciseInState(s, exerciseId) {
-  const target = (s.exercises || []).find((ex) => ex.id === exerciseId)
+  const target = exerciseById(s.exercises, exerciseId)
   if (!target || !target.archivedAt) return s
   return {
     ...s,
@@ -486,7 +477,7 @@ export function restoreExerciseInState(s, exerciseId) {
 // case no item with `id` exists.
 export function replaceItemInState(s, itemId, exerciseId, id) {
   const active = s.activeWorkout
-  const exercise = (s.exercises || []).find((candidate) => candidate.id === exerciseId)
+  const exercise = exerciseById(s.exercises, exerciseId)
   const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
   if (!active || !exercise || !original) return s
   const replacement = replacementItem({
@@ -508,9 +499,8 @@ export function removeRoutineFromState(s, routineId, archivedAt = new Date().toI
       : (s.routines || []).filter((routine) => routine.id !== routineId),
     schedule: {
       ...s.schedule,
-      slots: (s.schedule?.slots || []).filter((slot) => (slot.routineId || slot.sessionId) !== routineId),
+      slots: (s.schedule?.slots || []).filter((slot) => slot.routineId !== routineId),
     },
-    plannedWorkouts: (s.plannedWorkouts || []).filter((plan) => (plan.routineId || plan.sessionId) !== routineId),
   }
 }
 
@@ -544,7 +534,7 @@ export function exercisesInHistory(workouts, exercises, routines) {
   return ids
     .map((id) => ({
       id,
-      exercise: (exercises || []).find((e) => e.id === id) || null,
+      exercise: exerciseById(exercises, id),
       routines: routinesUsingExercise(routines, id),
     }))
     .sort((a, b) => (a.exercise?.name || a.id).localeCompare(b.exercise?.name || b.id))
@@ -641,9 +631,6 @@ export function workoutVolume(workout) {
   return total
 }
 
-export function exerciseById(exercises, id) {
-  return exercises.find((e) => e.id === id) ?? null
-}
 
 export function durationLabel(startedAt, finishedAt) {
   if (!startedAt || !finishedAt) return ''
@@ -685,16 +672,6 @@ export function workoutSummaryStats(active, prior, now) {
   }
 }
 
-// The most recent FINISHED workout of the same routine as `active`, or null if this is
-// the first. Reuses the exact grouping key that groupWorkoutsByRoutine already applies
-// (routineId + program + name) by grouping [active, ...workouts] together: `active` is
-// prepended so it heads its own group, and its immediate neighbour (index 1) is the
-// prior same-routine workout. req-163 — the list is sorted newest-first
-// (finishedNewestFirst), so index 1 is the most recent prior whatever the stored order.
-export function previousSameRoutineWorkout(active, workouts, routines) {
-  return previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
-}
-
 // req-128 — the prior the auto-complete summary compares against: the most recent
 // previous same-routine workout with a done WORKING set. An all-skipped prior holds no
 // volume/sets to compare with, so its deltas would be nonsense; it is passed over.
@@ -709,8 +686,9 @@ function hasDoneWorkingSet(workout) {
   return (workout?.sets || []).some((set) => set.setType !== 'wu' && !isSkippedSet(set))
 }
 
-// req-111 — every prior same-routine finished workout, newest-first (same grouping as
-// previousSameRoutineWorkout, which is its head). beat-last-time takes the whole list
+// req-111 — every prior same-routine finished workout, newest-first. The grouping reuses
+// groupWorkoutsByRoutine's key (routineId + program + name) on [active, ...workouts]:
+// `active` heads its own group, so the rest of that group are its priors. beat-last-time takes the whole list
 // so each exercise can look past a workout where it was entirely skipped (DEC-053).
 // req-163 — newest-first by finishedAt (finishedNewestFirst), not by array order.
 export function previousSameRoutineWorkouts(active, workouts, routines) {
