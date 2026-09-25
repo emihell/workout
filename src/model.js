@@ -267,7 +267,8 @@ export function findRoutineInState(routines, routineId) {
 // req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from
 // the RAW stored value, before any `{ ...emptyState(), ...raw }` merge (which injects
 // schemaVersion 9). Only legacy input gets the plan backfill/baseline; the default is
-// the safe side (false: never invent a plan value).
+// the safe side (false: never invent a plan value). Callers MUST pass `legacy: true`
+// for pre-v9 input, or its recorded baselines are neither written nor applied.
 export function migrateState(input, { legacy = false } = {}) {
   const source = structuredClone(input || {})
   const exercises = Array.isArray(source.exercises) ? source.exercises : []
@@ -353,10 +354,10 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
   })
 }
 
-// req-40 (F-CODE-1) — the single, canonical per-item progression computation shared
-// by BOTH the Finish screen (finish.jsx, the `progression` record a finished workout
-// stores — req-112 / DEC-056: stored only, no longer written onto the routine) and
-// `progressionFromWorkout` (the History recalc path, the one that writes the routine). It used to be
+// req-40 (F-CODE-1) — the single, canonical per-item progression computation, used by
+// `progressionFromWorkout` (the History recalc path, the one that writes the routine).
+// req-158 — the Finish screen no longer computes or stores a `progression` record
+// (buildFinishProgression removed), so recalc is its only caller. It used to be
 // computed twice with divergent set-matching, so the same workout could yield two
 // different saved recommendations (fails DESIGN §2). This reconciles to the fuller
 // model.js semantics (DEC at merge): match a working set by `routineItemId ||
@@ -364,8 +365,7 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
 // legacy/fallback-keyed sets finish.jsx's `routineItemId`-only match missed), and on
 // no matched working sets keep the item's own `targets`/`suggestedWeights` rather than
 // emitting a from-zero recommendation. Pure (L-007): unit-tested, not inline in a view.
-// Returns the core both callers need; finish.jsx wraps its display-only fields around
-// `sets`/`recommendation`/`to`/`targetsTo`/`routineItemId`.
+// Returns `sets`/`recommendation`/`to`/`targetsTo`/`routineItemId`.
 export function progressionForItem(exercises, workout, item) {
   const exercise =
     (exercises || []).find((candidate) => candidate.id === item.exerciseId) || {
@@ -393,33 +393,6 @@ export function progressionForItem(exercises, workout, item) {
     to: sets.length ? recommendation.weights : item.suggestedWeights || [],
     targetsTo: sets.length ? recommendation.targets : item.targets || [],
   }
-}
-
-// The finish-time progression array, exactly as the Finish screen builds it. The
-// saved core ({ routineItemId, sets, recommendation, to, targetsTo }) comes from
-// the ONE shared progressionForItem helper (identical to the History recalc path);
-// the extra fields here are display-only. Extracted so the manual Finish screen
-// (finish.jsx) and the req-84 auto-complete path pass byte-identical progression to
-// store.finishWorkout — no second, drifting copy of this shape.
-export function buildFinishProgression(exercises, active) {
-  const items = active?.snapshot?.items || []
-  return items.map((item) => {
-    const core = progressionForItem(exercises, active, item)
-    const skippedForItem = (active?.sets || []).some(
-      (set) => set.routineItemId === core.routineItemId && isSkippedSet(set),
-    )
-    return {
-      routineItemId: core.routineItemId,
-      exerciseId: item.exerciseId,
-      name: item.exerciseName,
-      from: item.suggestedWeights || [],
-      to: core.to,
-      targetsFrom: item.targets || [],
-      targetsTo: core.targetsTo,
-      action: core.recommendation.action,
-      reason: core.sets.length ? core.recommendation.reason : skippedForItem ? 'Skipped.' : 'None.',
-    }
-  })
 }
 
 export function progressionFromWorkout(state, workout) {

@@ -168,9 +168,12 @@ export function withSkippedUnloggedSets(workout) {
 // store.finishWorkout's reducer (manual Finish and the req-84 auto-complete both call
 // it). req-158 (audit F-DEAD-4, DEC-085 §3) — a new finished record no longer carries
 // `progression`: nothing read it (History recalc recomputes from the sets,
-// progressionFromWorkout), and it went stale after a set edit. The argument is still
-// accepted and ignored; the start-time `progression: null` is dropped too. Workouts
-// finished before keep theirs untouched, and nothing may start reading it. req-112 / DEC-056: `routines` is NOT touched — updating the routine is a deliberate
+// progressionFromWorkout), and it went stale after a set edit. No caller passes one; a
+// `progression` on the active workout (the start-time null an in-progress workout saved
+// before req-158 may carry) is stripped. Workouts finished before keep theirs untouched,
+// and nothing may start reading it.
+//
+// req-112 / DEC-056: `routines` is NOT touched — updating the routine is a deliberate
 // choice (History recalc), never a side effect of Finish. req-83 (N9) — the live
 // seed-override map is transient session state, dropped so it never lands on the
 // finished-history record (which feeds history-prefill from `sets` alone). req-116 —

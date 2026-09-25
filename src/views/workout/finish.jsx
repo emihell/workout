@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
-import { buildFinishProgression } from '../../model'
 import { beatLastTimeLine, beatLastTimeWins } from '../../beat-last-time'
 import { previousSameRoutineWorkouts } from '../../storage'
 import { useStore } from '../../store-context'
@@ -38,12 +37,8 @@ function FinishScreen({ routineId }) {
   // req-116 / DEC-058 §4 — nothing logged (every set skipped, or none at all): warn,
   // make Abandon the primary action, and keep "Save anyway" as the secondary one.
   const empty = !anythingLogged(active)
-  // req-40 — the saved core comes from the ONE shared progressionForItem helper
-  // (identical to the History recalc path); req-84 — the same builder now feeds the
-  // auto-complete path, so both persist byte-identical progression. req-96 removed the
-  // "Next time" SURFACE (inert without RPE logging) but the progression is still
-  // computed and persisted on finish (below) — only its display was dropped.
-  const progression = buildFinishProgression(store.exercises, active)
+  // req-158 (DEC-085 §3) — Finish computes and stores no progression record; the
+  // recommendation is computed only by History recalc (progressionFromWorkout).
 
   // req-96 — a quiet "you beat last time" line: any exercise heavier / more reps /
   // longer than the previous same-routine workout. Pure + inspectable; silent when
@@ -92,7 +87,7 @@ function FinishScreen({ routineId }) {
         block
         onClick={() => {
           recordButton('finish-workout')
-          store.finishWorkout({ overallNote, overallFeel, progression })
+          store.finishWorkout({ overallNote, overallFeel })
           leaveWorkoutToToday()
         }}
       >

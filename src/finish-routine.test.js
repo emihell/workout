@@ -5,11 +5,11 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  buildFinishProgression,
   buildPlannedWorkout,
   migrateState,
   planSnapshot,
   progressionForItem,
+  progressionFromWorkout,
   recalculatedState,
 } from './model.js'
 import { recommendNextPrescription } from './progress.js'
@@ -85,9 +85,9 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
   it('manual Finish: routines deep-equal to before; no progression recorded (req-158)', () => {
     const s = logged(baseState())
     const before = structuredClone(s.routines)
-    const progression = buildFinishProgression(s.exercises, s.activeWorkout)
+    const progression = progressionFromWorkout(s, s.activeWorkout)
     assert.notDeepEqual(progression[0].to, pressOf(before).suggestedWeights, 'the recommendation does differ')
-    const next = finishedState(s, { overallNote: 'n', overallFeel: 'Good', progression }, '2026-09-23T11:00:00.000Z')
+    const next = finishedState(s, { overallNote: 'n', overallFeel: 'Good' }, '2026-09-23T11:00:00.000Z')
     assert.deepEqual(next.routines, before)
     assert.equal(next.routines, s.routines, 'same reference: Finish does not touch routines at all')
     // req-158 (DEC-085 §3) — was: history carries the progression record. Nothing read it;
@@ -99,8 +99,7 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
   it('auto-complete Finish (autoFinishArgs): routines deep-equal to before', () => {
     const s = logged(baseState())
     const before = structuredClone(s.routines)
-    const progression = buildFinishProgression(s.exercises, s.activeWorkout)
-    const next = finishedState(s, autoFinishArgs(s.activeWorkout, progression))
+    const next = finishedState(s, autoFinishArgs(s.activeWorkout))
     assert.deepEqual(next.routines, before)
     assert.equal('progression' in next.workouts[0], false, 'req-158 — was: deepEqual(progression)')
     assert.equal(next.workouts[0].overallNote, 'felt strong')
@@ -108,7 +107,7 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
 
   it('everything else Finish did is unchanged: plan removed, active cleared, seedOverrides dropped, unlogged → skipped', () => {
     const s = withSets(baseState(), [work(item(baseState(), 0), 30, 10)])
-    const next = finishedState(s, { progression: [] }, '2026-09-23T11:00:00.000Z')
+    const next = finishedState(s, {}, '2026-09-23T11:00:00.000Z')
     assert.equal(next.activeWorkout, null)
     assert.deepEqual(next.plannedWorkouts, [])
     const finished = next.workouts[0]
@@ -119,7 +118,7 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
 
   it('no active workout → same state', () => {
     const s = { ...baseState(), activeWorkout: null }
-    assert.equal(finishedState(s, { progression: [] }), s)
+    assert.equal(finishedState(s), s)
   })
 })
 
@@ -184,7 +183,7 @@ describe('req-112 per-set recommendation (the spec table)', () => {
 describe('req-112 recalc stays, and is the only path that writes the routine', () => {
   function finishWith(sets) {
     const s = withSets(baseState(), sets(baseState()))
-    return finishedState(s, { progression: buildFinishProgression(s.exercises, s.activeWorkout) }, '2026-09-23T11:00:00.000Z')
+    return finishedState(s, {}, '2026-09-23T11:00:00.000Z')
   }
 
   it('failure case — all skipped: recalc leaves weights and targets unchanged', () => {

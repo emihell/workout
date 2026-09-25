@@ -93,7 +93,7 @@ describe('2 — workout.progression', () => {
       startedAt: '2026-09-25T10:00:00.000Z',
       snapshot: { items: [] },
       sets: [],
-      progression: null, // what store.startWorkout writes today
+      progression: null, // what store.startWorkout wrote before req-158
       ...extra,
     },
     workouts: [],
@@ -118,6 +118,27 @@ describe('2 — workout.progression', () => {
     // and a Finish after it doesn't touch it
     const finished = finishedState({ ...loaded, ...active() , workouts: loaded.workouts }, {}, '2026-09-25T11:00:00.000Z')
     assert.deepEqual(finished.workouts[1].progression, old)
+  })
+  it('an in-progress workout saved before req-158 (progression: null) loads, finishes, and saves without the field', () => {
+    const state = migrateState(structuredClone(v8), { legacy: true })
+    disk.set('workout-mvp-v9', JSON.stringify({ ...state, ...active({ id: 'wo-old-live' }), workouts: state.workouts }))
+    const loaded = loadState()
+    assert.equal(loaded.activeWorkout.id, 'wo-old-live')
+    assert.equal(loaded.activeWorkout.progression, null, 'load leaves the stale key alone (no rewrite)')
+    const finished = finishedState(loaded, { overallFeel: 'Good' }, '2026-09-25T11:00:00.000Z')
+    assert.equal(finished.activeWorkout, null)
+    assert.equal(finished.workouts.length, state.workouts.length + 1)
+    const saved = finished.workouts.find((w) => w.id === 'wo-old-live')
+    assert.equal('progression' in saved, false)
+    saveState(finished)
+    assert.equal('progression' in loadState().workouts.find((w) => w.id === 'wo-old-live'), false)
+  })
+  it('startWorkout no longer writes progression; no src caller passes one to Finish', () => {
+    const src = (f) => readFileSync(new URL(f, import.meta.url), 'utf8')
+    assert.doesNotMatch(src('./store.jsx'), /progression: null/)
+    for (const view of ['./views/workout/finish.jsx', './views/workout/auto-complete.jsx']) {
+      assert.doesNotMatch(src(view), /buildFinishProgression|const progression|, progression/, view)
+    }
   })
   it('nothing in src reads .progression (tests and the frozen fixture excluded)', async () => {
     const { execSync } = await import('node:child_process')
