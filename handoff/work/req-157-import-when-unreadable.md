@@ -1,6 +1,6 @@
 # req-157 — Import from the "unreadable data" state keeps the raw value first, then really saves
 
-**Status: READY** (2026-09-24) — Phase 1 bug, **persisted data** (reviewer + DEC-046 backup reminder before merge). DEC-085
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-157` (`c9dc089`…`7d2f571`, 4 commits).** (2026-09-24) — Phase 1 bug, **persisted data** (reviewer + DEC-046 backup reminder before merge). DEC-085
 §2; refines DEC-032. Source: `audits/2026-09-24.md` **F-RISK-5**.
 
 Today: when the stored value can't be read, `saveState` refuses every write (`storage.js:208`, DEC-032, to keep the

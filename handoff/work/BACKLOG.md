@@ -568,6 +568,10 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
+- **`check_handoff` knows lanes** (DEC-085 §6, WORKFLOW §Requirement lanes): accept a `Lane:` tag and a `DECIDED <date> →
+  DEC-…, req-…` terminal status for design reqs (today `classify_tag` has merged/not-merged/blocked/unknown only,
+  `scripts/check_handoff.py:214-247`); give req-146/149 their `work/` docs when they start. Small, tooling lane.
+
 - **[optional, Builder] Slim the readiness taxonomy.** The 6-state tag set (READY / NEEDS DECISIONS /
   BLOCKED / SHELVED / WITHDRAWN / BUILT-MERGED) is more than a solo backlog needs (workflow audit
   2026-09-14 §3). Slimming it means editing `scripts/check_handoff.py:220-248`, which validates the exact

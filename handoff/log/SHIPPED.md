@@ -1854,3 +1854,15 @@ Gate: Builder `check: green — lint, 60 test file(s), and the build all passed.
 (DEC-057 §1 doesn't fire — forms only). Planner's browser run: WU no Effort, stored `rpe=null`; work set Hard → `rpe=4`;
 Stairs `rpe=null`; History "WU set · 9 kg · 12" | "18 kg · 12 · Hard". Open for Emilio: hide "Moderate" on OLD warm-ups
 (display-only; Builder recommends yes), and whether History's set edit should hide Effort for warm-ups.
+
+## req-157 — Import from the "unreadable data" state keeps a verified copy, downloads it, then really saves (DEC-085 §2, DEC-086)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `c9dc089`…`7d2f571`, 4 commits). In the unreadable state Import: validate →
+confirm ("…is kept as a copy on this device and downloaded first") → read raw fresh → write `workout-mvp-unreadable-<ISO>`
+and verify by read-back (any failure: inline error, lock kept, nothing saved) → download `.txt` (revoke delayed 60 s, shared
+downloadBlob) → release → import. Round 1 (`7731c59`) sent back: reviewer **blocker** — lock lifted right after
+`link.click()` (L-039). Gate: Builder `check: green — lint, 61 test file(s), and the build all passed.` (953/953, req-157
+13/13, none edited); independent re-review → `# tests 953 # pass 953 # fail 0`, **no blockers**, 2 should-fixes → req-161;
+Planner's browser runs (isolated origin, corrupt v9 ending in a lone `\uD83D`): copy write forced to fail → "Couldn't keep a
+copy…", keys unchanged, 0 downloads; Replace → copy key `===` raw, 1 `.txt`, v9 = import (13 workouts), no banner; reload →
+copy key still present. **Emilio approved the merge** ("Merge now, fix later"; Export on his phone).
