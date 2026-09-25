@@ -9,7 +9,10 @@ import { importJsx, render, act } from './test-support/render.js'
 import { StoreContext } from './store-context.js'
 import { migrateState } from './model.js'
 import { finishedNewestFirst, lastSetsForExercise, previousSameRoutineWorkouts } from './history-queries.js'
-import { sortWorkoutsByDate } from './views/history/helpers.js'
+import { sortWorkoutsByDate, workoutDateKey } from './views/history/helpers.js'
+import { workoutTime } from './history-queries.js'
+import { dateKey } from './schedule.js'
+import { recalculatedState } from './model.js'
 import { startedWorkoutState } from './state-reducers.js'
 
 const { HistorySet } = await importJsx('./views/history/edit.jsx', import.meta.url)
@@ -56,6 +59,16 @@ describe('2 — a workout without finishedAt: placed by performedOn / date, neve
     const set = { exerciseId: 'ex', routineItemId: 'i', setType: 'work', weight: 40, reps: '8' }
     const last = lastSetsForExercise([wo('old', { finishedAt: '2026-09-01T10:00:00Z', sets: [{ ...set, weight: 30 }] }), wo('legacy', { date: '2026-09-10', sets: [set] })], 'ex')
     assert.equal(last.workout.id, 'legacy')
+  })
+  it('a date-only workout gets the SAME day in History as in the priors (review should-fix)', () => {
+    const legacy = wo('legacy', { date: '2026-09-22' })
+    assert.equal(workoutDateKey(legacy), '2026-09-22', 'was "unknown" — filed at the bottom of History')
+    assert.equal(dateKey(new Date(workoutTime(legacy))), workoutDateKey(legacy))
+    const a = wo('a', { finishedAt: '2026-09-24T18:00:00Z' })
+    const b = wo('b', { finishedAt: '2026-09-20T18:00:00Z' })
+    const order = sortWorkoutsByDate([b, legacy, a]).map((w) => w.id)
+    assert.deepEqual(order, ['a', 'legacy', 'b'])
+    assert.deepEqual(previousSameRoutineWorkouts(active, [b, legacy, a], []).map((w) => w.id), order)
   })
   it('a workout with no readable time at all is still not history', () => {
     assert.deepEqual(finishedNewestFirst([wo('none')]), [])
@@ -156,11 +169,15 @@ describe('5b — every store action through the REAL store: store → reducer ar
     }
     view = await render(h(StoreProvider, null, h(Probe)))
     const s = () => captured.store
+    // After EVERY action the saved doc is exactly the store's state (saveState ran in the
+    // same update) — not only at the end.
+    const saved = () => JSON.parse(localStorage.getItem('workout-mvp-v9'))
     const run = async (fn) => {
       let out
       await act(async () => {
         out = fn(s())
       })
+      assert.deepEqual(saved(), JSON.parse(JSON.stringify(s())), 'persisted after the action')
       return out
     }
     const routine = (id) => s().routines.find((r) => r.id === id)
@@ -226,8 +243,13 @@ describe('5b — every store action through the REAL store: store → reducer ar
     assert.deepEqual([done.overallFeel, s().activeWorkout], ['Good', null])
     await run((st) => st.updateWorkout(liveId, { overallNote: 'edited' })) // (workoutId, patch)
     assert.equal(s().workouts.find((w) => w.id === liveId).overallNote, 'edited')
+    // recalc writes THIS workout's recommendation onto its routine (DEC-056): the result is
+    // exactly the pure recalculatedState of the state before, and it changed the routine.
+    const beforeRecalc = JSON.parse(JSON.stringify(s()))
     await run((st) => st.recalculateFuturePlans(liveId))
-    assert.ok(routine('sess-upper'))
+    const expected = recalculatedState(beforeRecalc, liveId).routines
+    assert.deepEqual(JSON.parse(JSON.stringify(s().routines)), JSON.parse(JSON.stringify(expected)))
+    assert.notDeepEqual(beforeRecalc.routines.find((r) => r.id === 'sess-upper'), routine('sess-upper'), 'the recalc changed the routine')
     await run((st) => st.removeWorkout(liveId))
     assert.equal(s().workouts.some((w) => w.id === liveId), false)
     // archive + restore, routine removal, legacy drafts

@@ -58,6 +58,9 @@ export function workoutDateKey(workout) {
   // every real date and displayed as "NaN"); only a readable one names the day.
   const stamp = [workout.finishedAt, workout.startedAt].find((value) => value && Number.isFinite(Date.parse(value)))
   if (stamp) return dateKey(stamp)
+  // req-167 review — a legacy / imported workout with only `date` is dated by it, as
+  // workoutTime (history-queries.js) dates it for "last time"; was filed as "Unknown".
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(workout.date || ''))) return workout.date
   return workout.scheduledFor || 'unknown'
 }
 
