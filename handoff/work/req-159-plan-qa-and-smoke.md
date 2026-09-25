@@ -1,6 +1,6 @@
 # req-159 — `plan qa`: an isolated browser build of any branch, and a scripted smoke test that gates deploy
 
-**Status: READY** (2026-09-24) — tooling. DEC-085 §5 + planning's list. Gate: tooling (run it, paste output). Source:
+**Status: BUILT — branch `req-159` (`75b5f82`), NOT merged.** (2026-09-24) — tooling. DEC-085 §5 + planning's list. Gate: tooling (run it, paste output). Source:
 `audits/workflow-2026-09-24.md` (recommendation 1), L-033, L-036. Builds on `scripts/capture.mjs` / `screenshot.mjs`
 (puppeteer already in devDependencies — verify).
 

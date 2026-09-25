@@ -1878,3 +1878,16 @@ model/workout-log/store) → `# tests 960 # pass 960` then `# tests 962 # pass 9
 (isolated origin, v8 seed): baselines 24 → a new v9 item + reload → still 24 (main: 25); Start → active has no
 `progression`; manual Finish → no key; auto-complete (countdown ran out) → note "auto note" saved, no key; 0 workouts with
 the key. Emilio approved the merge.
+
+## req-159 — `plan qa` (isolated browser build of any ref) + a headless smoke test that gates the deploy (DEC-085 §5)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `f90b52f`…`75b5f82`, 2 commits). `./plan qa <ref>` / `--stop` / `--status`
+(`scripts/qa.mjs`, node builtins; export + build under tmpdir, detached server on a free 127.0.0.1 port, `src/db.json`
+seeded under the v8 key on an empty origin only); `scripts/smoke.mjs` — 11 real-click steps in headless Chrome (clock
+shifted to Mon 2026-09-21; native dialogs recorded = fail); `./check --smoke` (6.7 s; plain `./check` unchanged 1.9 s); the
+Pages workflow runs the smoke between `./check` and the build. Gate (tooling lane): Builder — 5 green runs; 2 deliberate
+reds (a broken "22,5" parse → `got [2250]`, exit 1; a native confirm → exit 1); workflow steps green in a `--depth 1` clone
+with CI=true. Planner read the diff (all writes under tmpdir; nothing touches either worktree) and uses it right after the
+merge (receipt below). Reviewer: none (no trigger files). Not verified: the GitHub Ubuntu runner — the first deploy is the
+receipt; a red smoke blocks the deploy, it doesn't ship. Found on main by the smoke (not fixed): Skip exercise flashes
+"Not found." for one render (`item.jsx:116`).
