@@ -272,11 +272,11 @@ live code. All Phase 1. **All specced and LIVE 2026-09-23** (req-103..112, see t
 
 - **Tooling: `npm run shot` can't reach states behind a click** (req-105) — add `--click <text>` / `--scroll-bottom`.
 
-- **req-111 follow-ups:** (a) the auto-complete "vs last time" volume (`workoutSummaryStats`) still compares
+- **req-111 follow-ups:** ~~(a)~~ ~~(b)~~ — both fixed (req-128/req-152; warm-up-only prior skip in req-163). Was: (a) the auto-complete "vs last time" volume (`workoutSummaryStats`) still compares
   against an all-skipped prior; (b) an exercise with only warm-up history gets neither a work prefill nor the
   DEC-002 kg carry (pre-existing). Small.
 
-- **req-109 follow-ups:** (a) ~~Q: Skip exercise leaves a running rest going~~ — **keep** (Emilio, DEC-056). (b) `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
+- **req-109 follow-ups:** (a) ~~Q: Skip exercise leaves a running rest going~~ — **keep** (Emilio, DEC-056). ~~(b)~~ fixed in req-128 (pinned by req-163). Was: `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
   replacement they read its rest 0. (c) routine lost per-set weights on a skipped set → **fixed in req-112** (DEC-056).
 
 **On-device test list — CLOSED 2026-09-24, run by Planner, not Emilio** (desktop Chrome at 500 px + a 375 px iframe,
@@ -333,7 +333,7 @@ says "Not timed. Edit exercise settings to add a duration." (judgement: findable
   as the code worktree and refuses ("code worktree is on 'req-120'"), 2026-09-23. Resolve the code worktree by exact path.
 - **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
   `item.jsx` passes the restored duration to the form (covered by puppeteer only) — a small jsdom/puppeteer smoke;
-  (b) History Add/Edit set can't capture `durationSec` for a timed exercise (pre-existing, joins the req-85 gap).
+  ~~(b)~~ fixed in req-163. Was: History Add/Edit set can't capture `durationSec` for a timed exercise (pre-existing, joins the req-85 gap).
 - **req-119 follow-ups (low):** the logged-sets branch of `exerciseInActiveWorkout` is untested (probably unreachable);
   legacy `draftWorkouts` aren't counted as references.
 - **Tooling: `plan closeout` warns when the diff touches store/model/storage/progress/workout-log/migration and

@@ -442,3 +442,11 @@ To run req-162's smoke script before merge, Planner wrote `scripts/.smoke162.tmp
 `./qa.mjs` relatively), then deleted it (`git status` 0). It breaks "planning never touches code" (DEC-005) even though
 nothing was committed. **How to apply:** to run an unmerged script, `git archive <branch>` into the scratchpad (with the
 scripts it imports) and run it there — or test it right after the merge (tooling lane allows it).
+
+## L-042 — backlog follow-ups go stale; rescan the code before speccing them  (2026-09-25)
+
+req-163's items 2 and 4 came straight from BACKLOG notes (req-109 b, req-111 b) and were already fixed on main (req-128,
+req-152); item 3 was half fixed. Builder caught it ("the code wins") and pinned them with tests instead of inventing
+changes. The `spec` skill's step 1 (rescan the code this session) wasn't run for those items. **How to apply:** before a
+BACKLOG item enters a spec, reproduce it on main (a test or a browser run) — no repro, no item; strike fixed BACKLOG notes
+at the closeout that fixed them.
