@@ -1487,7 +1487,7 @@ idea to try later: on a popstate that lands on an entry identical to the one jus
 
 ## DEC-085 — the 2026-09-24 audits: all of planning's recommendations taken  (Emilio, 2026-09-24)
 
-Emilio: "all your recs", on the 10-item list from `audits/2026-09-24.md` (code) + `audits/workflow-2026-09-24.md`:
+Emilio: "all your recs", on the 10-item list from `audits/2026-09-24.md` (code) + `handoff/audits/workflow-2026-09-24.md`:
 1. Warm-up/cardio sets stop saving a hidden effort; **old rows left** (no bulk write) → req-156.
 2. Unreadable stored data (DEC-032): Import first **downloads the raw stored value**, then may replace → req-157.
 3. Stop recording `workout.progression` and new `legacyRecommendations` entries; existing data kept → req-158.

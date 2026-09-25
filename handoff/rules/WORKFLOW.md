@@ -76,7 +76,7 @@ answer.
 
 Every requirement names its **`Lane:`** (replaces the old `Gate:` tag, which DEC-057 had emptied — safety now follows the
 files touched). Who builds it (Builder session / throwaway agent / live with Emilio, DEC-055) is separate from its lane.
-Source: `audits/workflow-2026-09-24.md` §A.
+Source: `handoff/audits/workflow-2026-09-24.md` §A.
 
 | Lane | Ready when | Gate before merge | Report | Emilio |
 |---|---|---|---|---|
