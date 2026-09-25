@@ -2055,3 +2055,11 @@ kg box, no note; 0 dialogs. History set editor (SetEditForm) unchanged — own r
 Import (unchanged); `isFirstRun` gate unchanged. Gate (ui): req-174.test.js 3/0; agent's seeds empty / history-only /
 routine-only match main's gate; Import still replaces; `./check --smoke` green; Planner's run (emptyState seed): text + lands
 `#/routines/new`, screenshot checked — the two buttons sit tight (4 px), feel item for Emilio. Subtitle `(unconfirmed)`. Merge `cf880ee`. `reports/req-174.md`.
+
+## req-175 — plain words in the workout and History  (merged 2026-09-25)
+
+**req-175** (2026-09-25) — plain words: Warm-up set / Warm-up · / role "Warm-up" (was "WU routine", shared string, amended
+on Planner's ask) / Swap exercise (+ the picker's row button "Swap") / Couldn't finish / "5,873 kg lifted". Display only.
+Gate (ui): req-175.test.js 2/0 (fails on main); suite 1119/0; `./check --smoke` green; Reviewer: independent reviewer
+(DEC-057 §1: `workout-log.js` setPreview label) → **No blockers.**, 4 nits (→ req-144 prep §E). Planner's run: History
+"5,873 kg lifted", overview/log new words, no old words, 0 dialogs. `reports/req-175.md`.
