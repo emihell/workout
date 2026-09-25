@@ -270,7 +270,7 @@ live code. All Phase 1. **All specced and LIVE 2026-09-23** (req-103..112, see t
 
 - **Done view: exercise title renders below Add set** (req-104 follow-up) — `WorkoutItemDone` markup order. Small.
 
-- **Tooling: `npm run shot` can't reach states behind a click** (req-105) — add `--click <text>` / `--scroll-bottom`.
+- → **`req-168`** · **Tooling: `npm run shot` can't reach states behind a click** (req-105) — add `--click <text>` / `--scroll-bottom`.
 
 - **req-111 follow-ups:** ~~(a)~~ ~~(b)~~ — both fixed (req-128/req-152; warm-up-only prior skip in req-163). Was: (a) the auto-complete "vs last time" volume (`workoutSummaryStats`) still compares
   against an all-skipped prior; (b) an exercise with only warm-up history gets neither a work prefill nor the
@@ -326,18 +326,17 @@ says "Not timed. Edit exercise settings to add a duration." (judgement: findable
 - **Dropped report items (retro 2026-09-23), small:** Abandon falls below the fold with the overview note open on
   an 8-exercise routine (req-107); the `.ui-navlink` left inset misaligns a second line under a link (req-103 gotcha).
 
-- **Tooling: the pre-push fast-forward guard false-positives** when a req branch was just created at main's tip
+- → **`req-168`** · **Tooling: the pre-push fast-forward guard false-positives** when a req branch was just created at main's tip
   (2026-09-23: `req-120 (1dd4b54)` refused while the build agent hadn't committed yet). Exempt a branch with no
   commits beyond main. Small.
-- **Tooling: `plan publish` reads a throwaway agent's nested worktree** (`workout-codebase/.claude/worktrees/agent-*`)
+- → **`req-168`** · **Tooling: `plan publish` reads a throwaway agent's nested worktree** (`workout-codebase/.claude/worktrees/agent-*`)
   as the code worktree and refuses ("code worktree is on 'req-120'"), 2026-09-23. Resolve the code worktree by exact path.
-- **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
+- → **`req-168`** · **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
   `item.jsx` passes the restored duration to the form (covered by puppeteer only) — a small jsdom/puppeteer smoke;
   ~~(b)~~ fixed in req-163. Was: History Add/Edit set can't capture `durationSec` for a timed exercise (pre-existing, joins the req-85 gap).
-- **req-119 follow-ups (low):** the logged-sets branch of `exerciseInActiveWorkout` is untested (probably unreachable);
+- → **`req-168`** · **req-119 follow-ups (low):** the logged-sets branch of `exerciseInActiveWorkout` is untested (probably unreachable);
   legacy `draftWorkouts` aren't counted as references.
-- **Tooling: `plan closeout` warns when the diff touches store/model/storage/progress/workout-log/migration and
-  the SHIPPED gate line names no reviewer** (DEC-057, L-023).
+- ~~**Tooling: `plan closeout` warns when … names no reviewer**~~ — done in req-166 (it refuses before merging).
 
 **Specced 2026-09-23:** F1→req-103, F3+F5→req-104, F6→req-105, F4→req-106, F7→req-107, F9→req-108 (DEC-052), F10→req-110; F2+F8→req-109 (blank-state replace; external review found the migrate-on-load blockers); review also found → req-111 (DEC-053). **Grouping (original):** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
 (both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
@@ -566,7 +565,7 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ---
 
-- **req-161 nits** (small): one Import's copies can carry different timestamps when one is reused (no loss; harder to
+- → **`req-168`** · **req-161 nits** (small): one Import's copies can carry different timestamps when one is reused (no loss; harder to
   group by hand); add the quota → free space → retry → release test (the reviewer's probe passed).
 
 ## Workflow / tooling backlog (infra, not product)
