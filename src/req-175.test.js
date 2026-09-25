@@ -40,7 +40,7 @@ async function harness(payload, { viaImport = false } = {}) {
 }
 
 describe('req-175 — the live workout: new words on screen, stored setType / rpe unchanged', () => {
-  it('Leg Extension: Warm-up set title and preview, Swap exercise, "Couldn\'t finish"; the finished sets deep-equal main', async () => {
+  it('Leg Extension: Warm-up set title and preview, Swap exercise, "Max" (req-177); the finished sets deep-equal main', async () => {
     const { captured, mount } = await harness(fixture())
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     const { RPE_OPTIONS } = await import('./ids.js')
@@ -53,7 +53,7 @@ describe('req-175 — the live workout: new words on screen, stored setType / rp
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
     await view.click(view.button('Complete')) // the warm-up, as prefilled
     const effort5 = RPE_OPTIONS.find((o) => o.value === 5).label // label-agnostic, so it runs on main too
-    assert.equal(effort5, "Couldn't finish")
+    assert.equal(effort5, 'Max')
     assert.ok(view.button(effort5), 'the Effort control shows the new word')
     assert.equal(view.text().includes('Failure'), false)
     await view.click(view.button(effort5))
@@ -77,7 +77,7 @@ const EXPECTED_MAIN = [
 ]
 
 describe('req-175 — an imported old (v8) backup displays with the new words', () => {
-  it('History: "Warm-up set" rows, "Couldn\'t finish" effort, "{n} kg lifted" with a thousands separator', async () => {
+  it('History: "Warm-up set" rows, "Max" effort (req-177), "{n} kg lifted" with a thousands separator', async () => {
     const { captured, mount } = await harness(fixture(), { viaImport: true })
     const { HistoryDetail, HistoryWorkoutExercise } = await importJsx('./views/history/index.jsx', import.meta.url)
     const { workoutVolume } = await import('./history-queries.js')
@@ -93,7 +93,7 @@ describe('req-175 — an imported old (v8) backup displays with the new words', 
     await mount(h(HistoryWorkoutExercise, { workoutId: workout.id, exerciseId: 'ex-chest-press' }))
     let text = view.text()
     assert.match(text, /Warm-up set · /)
-    assert.match(text, /Couldn't finish/)
+    assert.match(text, / · Max\b/)
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
 
     await mount(h(HistoryDetail, { workoutId: workout.id }))

@@ -235,7 +235,7 @@ describe('req-116 review — cross-midnight finish covers the ad hoc preview (6 
 describe('req-116 review — History detail counts sets like Finish and the summary', () => {
   it('detail.jsx uses loggedSetCount, not sets.length', () => {
     const src = readFileSync(new URL('./views/history/detail.jsx', import.meta.url), 'utf8')
-    assert.match(src, /`\$\{loggedSetCount\(workout\)\} sets`/)
+    assert.match(src, /`\$\{loggedSetCount\(workout\)\} \$\{loggedSetCount\(workout\) === 1 \? .set. : .sets.\}`/) // req-177: "1 set" / "N sets"
     assert.doesNotMatch(src, /`\$\{sets\.length\} sets`/)
   })
   it('the finished record of 1 WU + 2 work + 1 skipped counts 3', () => {

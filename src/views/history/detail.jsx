@@ -51,7 +51,8 @@ export function HistoryDetail({ workoutId, from = null }) {
           whenLabel(workout),
           durationLabel(workout.startedAt, workout.finishedAt),
           // req-116 — skipped sets aren't counted, matching Finish and the summary.
-          `${loggedSetCount(workout)} sets`,
+          // req-177 — "1 set" / "N sets".
+          `${loggedSetCount(workout)} ${loggedSetCount(workout) === 1 ? 'set' : 'sets'}`,
           `${workoutVolume(workout).toLocaleString('en-US')} kg lifted`,
         ]
           .filter(Boolean)

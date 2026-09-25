@@ -211,6 +211,16 @@ a.ui-btn--quiet:active {
   margin-top: var(--ui-s4);
 }
 
+/* req-177 — the empty home's two stacked actions (Create your first routine over Import):
+ * the same gap as the other stacked actions (.ui-workout-end, .ui-actions). Import keeps
+ * its own width (flex-start); the primary link is already block-width. */
+.ui-first-run-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ui-s2);
+}
+
 /* ---- NavLink (the shared primitive, styled) ---- */
 .ui-navlink {
   font-family: var(--ui-font);

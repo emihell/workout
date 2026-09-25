@@ -62,7 +62,7 @@ function FinishScreen({ routineId }) {
       <RestPill />
       <Title>Finish</Title>
       <p className="ui-sub">
-        {name} — {minutes} min · {setCount} sets
+        {name} — {minutes} min · {setCount} {setCount === 1 ? 'set' : 'sets'}
       </p>
       {skippedLines.map((line, i) => (
         <p key={i} className="ui-sub">

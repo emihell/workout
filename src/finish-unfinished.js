@@ -39,21 +39,26 @@ function plural(n, word) {
   return `${n} ${n === 1 ? word : `${word}s`}`
 }
 
-// One quiet sentence per entry. Work sets are counted as the overview counts them; an
-// unlogged planned warm-up is named ("the warm-up set"), so the line accounts for every
-// set Save adds.
-export function finishSkippedLine({ item, warmupSkipped, workSkipped, workLogged, workCount, started }) {
+// req-177 — one quiet sentence per PARTLY logged exercise (it has any set before Finish).
+// Work sets are counted as the overview counts them. An unlogged planned warm-up is still
+// saved as skipped (it is in `added`) but no longer named, so an exercise whose only
+// unlogged set is its warm-up gets no line.
+export function finishSkippedLine({ item, workSkipped, workLogged, workCount }) {
+  if (workSkipped === 0) return null
   const name = item?.exerciseName || 'Exercise'
-  const wu = warmupSkipped > 0
-  const head = started ? `${name}: ${workLogged} of ${plural(workCount, 'set')}.` : `${name}: not started.`
+  const head = `${name}: ${workLogged} of ${plural(workCount, 'set')}.`
   let what
-  if (workSkipped === 0) what = 'The warm-up set'
-  else if (started && workLogged > 0) what = workSkipped === 1 ? 'The other set' : `The other ${workSkipped}`
+  if (workLogged > 0) what = workSkipped === 1 ? 'The other set' : `The other ${workSkipped}`
   else what = plural(workSkipped, 'set')
-  if (workSkipped > 0 && wu) what += ' and the warm-up set'
   return `${head} ${what} will be saved as skipped.`
 }
 
+// req-177 — the partly-logged lines (workout order), then ONE line naming every exercise
+// not started, in workout order. Nothing to skip → [].
 export function finishSkippedLines(workout) {
-  return finishSkippedByItem(workout).map(finishSkippedLine)
+  const entries = finishSkippedByItem(workout)
+  const lines = entries.filter((entry) => entry.started).map(finishSkippedLine).filter(Boolean)
+  const untouched = entries.filter((entry) => !entry.started).map((entry) => entry.item?.exerciseName || 'Exercise')
+  if (untouched.length) lines.push(`Not started, saved as skipped: ${untouched.join(', ')}.`)
+  return lines
 }

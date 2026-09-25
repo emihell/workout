@@ -29,14 +29,14 @@ export const RPE_OPTIONS = [
   { value: 2, label: 'Easy' },
   { value: 3, label: 'Moderate' },
   { value: 4, label: 'Hard' },
-  { value: 5, label: "Couldn't finish" },
+  { value: 5, label: 'Max' },
 ]
 
 export function rpeLabel(value) {
   const n = Number(value)
   if (!Number.isFinite(n) || n === 0) return ''
   if (n <= 2) return 'Easy'
-  if (n >= 5) return "Couldn't finish"
+  if (n >= 5) return 'Max'
   return RPE_OPTIONS.find((opt) => opt.value === n)?.label || ''
 }
 
