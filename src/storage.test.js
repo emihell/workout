@@ -702,7 +702,9 @@ describe('req-84 previousSameRoutineWorkout', () => {
   const active = wk('active', 'r1', 'Push')
 
   it('returns the most recent finished workout of the same routine', () => {
-    const workouts = [wk('w2', 'r1', 'Push'), wk('w1', 'r1', 'Push'), wk('x', 'r2', 'Pull')]
+    // req-163 — "most recent" is by finishedAt now, not array position (fixture gains it).
+    const at = (d) => ({ finishedAt: `2026-09-${d}T10:00:00.000Z` })
+    const workouts = [wk('w2', 'r1', 'Push', at(22)), wk('w1', 'r1', 'Push', at(21)), wk('x', 'r2', 'Pull', at(23))]
     const prior = previousSameRoutineWorkout(active, workouts, [])
     assert.equal(prior.id, 'w2')
   })
@@ -874,11 +876,12 @@ describe('req-111 lastSetsForExercise skips all-skipped workouts', () => {
 })
 
 describe('req-111 previousSameRoutineWorkouts', () => {
-  const wk = (id, routineId, name) => ({ id, routineId, snapshot: { routineId, routineName: name } })
+  // req-163 — ordered by finishedAt, not array position (fixture gains it: w3 newer than w1).
+  const wk = (id, routineId, name, day = 20) => ({ id, routineId, finishedAt: `2026-09-${day}T10:00:00.000Z`, snapshot: { routineId, routineName: name } })
   const active = wk('active', 'r1', 'Push')
 
   it('every prior same-routine workout newest-first; head equals previousSameRoutineWorkout', () => {
-    const workouts = [wk('w3', 'r1', 'Push'), wk('x', 'r2', 'Pull'), wk('w1', 'r1', 'Push')]
+    const workouts = [wk('w3', 'r1', 'Push', 23), wk('x', 'r2', 'Pull', 22), wk('w1', 'r1', 'Push', 21)]
     assert.deepEqual(previousSameRoutineWorkouts(active, workouts, []).map((w) => w.id), ['w3', 'w1'])
     assert.equal(previousSameRoutineWorkout(active, workouts, []).id, 'w3')
   })

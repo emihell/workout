@@ -3,11 +3,12 @@ import { go } from '../../route'
 import { exerciseById, findRoutine } from '../../storage'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
-import { historySetFields } from '../set-values.js'
+import { historySetFields, historySetKind } from '../set-values.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
 import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
+import { snapshotItemFor } from './snapshot-item.js'
 import { askConfirm } from '../../ui/confirm.js'
 
 export function HistoryEdit({ workoutId }) {
@@ -131,6 +132,8 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
     (workout.snapshot?.items || []).some((item) => itemIdOf(item) === itemId) ||
     (workout.sets || []).some((set) => itemIdOf(set) === itemId)
   const backTo = known ? `/history/${workout.id}/exercise/${itemId}` : `/history/${workout.id}`
+  // req-163 — Effort / Duration shown as the live forms decide (historySetKind).
+  const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemId, exerciseId), exerciseById(store.exercises, exerciseId))
 
   return (
     <Screen>
@@ -140,7 +143,8 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
       <SetEditForm
         set={historyAddSetDraft(workout, exerciseId, itemId)}
         showLoad
-        showEffort
+        showEffort={kind.showEffort}
+        showDuration={kind.showDuration}
         setTypeOptions={[
           { value: 'wu', label: 'WU set' },
           { value: 'work', label: 'Work' },
@@ -166,6 +170,9 @@ export function HistorySet({ workoutId, index }) {
   if (!workout || !set) {
     return <Missing>Not found.</Missing>
   }
+  // req-163 — Effort hidden on a warm-up / cardio set (saves rpe null), Duration on a timed
+  // exercise's work set (historySetKind, the live forms' rule).
+  const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemIdOf(set), set.exerciseId), exerciseById(store.exercises, set.exerciseId))
 
   return (
     <Screen>
@@ -177,7 +184,8 @@ export function HistorySet({ workoutId, index }) {
       <SetEditForm
         set={set}
         showLoad
-        showEffort
+        showEffort={kind.showEffort}
+        showDuration={kind.showDuration}
         setTypeOptions={[
           { value: 'wu', label: 'WU set' },
           { value: 'work', label: 'Work' },

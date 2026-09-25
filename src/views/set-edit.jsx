@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { RPE_OPTIONS, rpeOptionValue } from '../ids'
 import { kgError } from '../kg-input.js'
+import { secondsError } from '../seconds-input.js'
 import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedControl } from '../ui/index.jsx'
 
 // req-18 / DEC-021 #2 — the shared kg / reps / effort / note editor for a single
@@ -22,13 +23,19 @@ import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedC
 //     and runs its own store mutation + routing. Keeping coercion in the caller preserves the
 //     two paths' exact, differing save behaviour.
 //   - cancelTo — the Cancel link's route.
+//   - req-163 — `showEffort` / `showDuration` may be a function of the form's current set
+//     type (History's WU/Work toggle): History hides Effort on a warm-up or cardio set, as
+//     the live forms do (DEC-087 §2), and shows a Duration (s) field on a timed exercise's
+//     work set (req-117 b). A hidden field submits nothing of its own (L-038): Effort ''
+//     (→ rpe null), and no `durationSec` key at all. Duration text goes through the one
+//     seconds parse (seconds-input.js: `30,5` → 31); unreadable text is refused inline.
 //   - req-154 — when the kg is shown, Save first checks it reads as a number (`22,5` does,
 //     DEC-058 §1); if not (`abc`, `2,5,5`) the form shows the error inline and does not
 //     call onSave. The callers' coercion lives in set-values.js.
 //
 // Everything around the form (Screen / Back / RestPill / header / History's
 // Remove button) stays in the caller.
-export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave, cancelTo }) {
+export function SetEditForm({ set, showLoad, showEffort, showDuration = false, setTypeOptions, onSave, cancelTo }) {
   const [weight, setWeight] = useState(set?.weight ?? '')
   const [reps, setReps] = useState(set?.reps ?? '')
   const [rpe, setRpe] = useState(() =>
@@ -37,6 +44,10 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
   const [note, setNote] = useState(set?.note || '')
   const [setType, setSetType] = useState(set?.setType || 'work')
   const [weightError, setWeightError] = useState(null)
+  const [duration, setDuration] = useState(set?.durationSec != null && set.durationSec !== '' ? String(set.durationSec) : '')
+  const [durationError, setDurationError] = useState(null)
+  const effortShown = typeof showEffort === 'function' ? showEffort(setType) : Boolean(showEffort)
+  const durationShown = typeof showDuration === 'function' ? showDuration(setType) : Boolean(showDuration)
 
   return (
     <form
@@ -45,11 +56,20 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
         // req-156 — a hidden Effort saves no effort ('' → rpe null), not the stored value
         // the user can't see (an old warm-up's rpe 3).
         const error = showLoad ? kgError(weight) : null
-        if (error) {
+        const secondsProblem = durationShown ? secondsError(duration) : null
+        if (error || secondsProblem) {
           setWeightError(error)
+          setDurationError(secondsProblem)
           return
         }
-        onSave({ weight, reps, rpe: showEffort ? rpe : '', note, setType })
+        onSave({
+          weight,
+          reps,
+          rpe: effortShown ? rpe : '',
+          note,
+          setType,
+          ...(durationShown ? { durationSec: duration } : {}),
+        })
       }}
     >
       {setTypeOptions ? (
@@ -79,7 +99,22 @@ export function SetEditForm({ set, showLoad, showEffort, setTypeOptions, onSave,
         </p>
       ) : null}
       <Field label="Reps" value={reps} onChange={(event) => setReps(event.target.value)} />
-      {showEffort ? (
+      {durationShown ? (
+        <NumberField
+          label="Duration (s)"
+          value={duration}
+          onChange={(event) => {
+            setDuration(event.target.value)
+            setDurationError(null)
+          }}
+        />
+      ) : null}
+      {durationShown && durationError ? (
+        <p className="ui-field-error" role="alert">
+          {durationError}
+        </p>
+      ) : null}
+      {effortShown ? (
         <>
           <SectionHeader>Effort</SectionHeader>
           {/* clearable keeps effort resettable, as the old <select> did */}

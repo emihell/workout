@@ -145,7 +145,9 @@ describe('the forms refuse Complete / Save with an inline error', () => {
   })
   it('SetEditForm checks kgError before onSave and shows it', () => {
     const edit = src('./views/set-edit.jsx')
-    assert.match(edit, /const error = showLoad \? kgError\(weight\) : null\n\s*if \(error\) \{\n\s*setWeightError\(error\)\n\s*return\n\s*\}\n\s*onSave\(/)
+    // req-163 — the same gate now also checks History's Duration (`|| secondsProblem`); the
+    // kg check still runs first and still returns before onSave.
+    assert.match(edit, /const error = showLoad \? kgError\(weight\) : null\n\s*const secondsProblem = [^\n]*\n\s*if \(error \|\| secondsProblem\) \{\n\s*setWeightError\(error\)\n[^}]*return\n\s*\}\n\s*onSave\(/)
     assert.match(edit, /\{showLoad && weightError \? \(\n\s*<p className="ui-field-error" role="alert">/)
   })
 })
