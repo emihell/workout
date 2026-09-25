@@ -1,6 +1,6 @@
 # req-169 — finished snapshots count as references; a draft-only reference is worded truthfully
 
-**Status: READY** (2026-09-25) **Lane: bug** (small; the reviewer fires — state-reducers.js). DEC-089 (refines DEC-031,
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-169` (`3d54a0b`…`f2fa6ad`, 3 commits).** (2026-09-25) **Lane: bug** (small; the reviewer fires — state-reducers.js). DEC-089 (refines DEC-031,
 DEC-058 §5, req-168). Reproduce both on main first (L-042).
 
 1. `exerciseDeletionImpact` (`state-reducers.js` ~:34) counts finished workouts by their **sets** only; an exercise listed
