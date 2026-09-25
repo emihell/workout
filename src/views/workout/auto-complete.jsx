@@ -70,7 +70,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   }, [deadline])
 
   const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
-  const name = active?.snapshot?.routineName || active?.snapshot?.sessionName || 'Workout'
+  const name = active?.snapshot?.routineName || 'Workout'
   const d = stats.deltas
   const rows = [
     { label: 'Volume', value: `${stats.volume} kg`, delta: d ? `${signed(d.volume)} kg` : null },

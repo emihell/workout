@@ -28,7 +28,7 @@ export function isCurrentWorkout(workout, now = new Date(), todayKey = dateKey(n
 // otherwise Today listed R twice (in progress + Start).
 export function otherTodayOccurrences(todays, active, todayKey) {
   if (!active) return todays || []
-  const activeRoutine = active.routineId || active.sessionId
+  const activeRoutine = active.routineId
   const offScheduleToday = !active.scheduleSlotId && active.performedOn === todayKey
   return (todays || []).filter(({ slot, routine }) => {
     if (occurrenceId(slot.id, todayKey) === active.occurrenceId) return false
@@ -50,7 +50,7 @@ export function otherTodayOccurrences(todays, active, todayKey) {
 // the DEC-058 §2 window (CURRENT_WINDOW_MS), as isCurrentWorkout uses. `now` injected.
 export function finishedForPlan(workouts, plan, now = new Date()) {
   if (!plan) return null
-  const sameRoutine = (w) => (w.routineId || w.sessionId) === plan.routineId
+  const sameRoutine = (w) => w.routineId === plan.routineId
   const exact = (workouts || []).find(
     (w) => w.finishedAt && plan.occurrenceId && w.occurrenceId === plan.occurrenceId && sameRoutine(w),
   )

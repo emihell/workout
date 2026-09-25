@@ -115,7 +115,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     return (
       <Screen>
         <Back to="/" />
-        <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || 'Workout'}</Title>
+        <Title>{active.snapshot?.routineName || 'Workout'}</Title>
         <p className="ui-sub">No exercises.</p>
         <Button variant="quiet" block onClick={() => abandonWorkout(store)}>
           Abandon
@@ -149,7 +149,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           active (resume via Continue). Abandon (below) is the explicit discard. */}
       <Back to="/" />
       <RestPill />
-      <Title>{active.snapshot?.routineName || active.snapshot?.sessionName || routine?.name || 'Workout'}</Title>
+      <Title>{active.snapshot?.routineName || routine?.name || 'Workout'}</Title>
       <List>
         {items.map((item) => {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone

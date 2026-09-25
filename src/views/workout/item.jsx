@@ -574,7 +574,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   const workout = store.activeWorkout
   const set = workout?.routineId === routineId ? workout.sets?.[index] : null
   const item = workout?.snapshot?.items?.find(
-    (candidate) => itemKey(candidate) === (set?.routineItemId || set?.sessionItemId),
+    (candidate) => itemKey(candidate) === (set?.routineItemId),
   )
   const usesLoad = isWeightedType(item?.exerciseType)
   const usesRpe = set?.setType !== 'wu' && item?.exerciseType !== 'cardio'
@@ -589,7 +589,7 @@ export function WorkoutSetEdit({ routineId, index }) {
     <Screen className="ui-screen--rest">
       <Back to={itemPath} />
       <RestPill />
-      <p className="ui-sub">{workout.snapshot?.routineName || workout.snapshot?.sessionName}</p>
+      <p className="ui-sub">{workout.snapshot?.routineName}</p>
       <Title>Set</Title>
       <SetEditForm
         set={set}

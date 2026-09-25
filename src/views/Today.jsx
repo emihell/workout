@@ -38,7 +38,7 @@ function StartButton({ store, routine, slot, date, label = 'Start', variant, blo
 }
 
 function activeRoutineId(workout) {
-  return workout?.routineId || workout?.sessionId
+  return workout?.routineId
 }
 
 // req-53 — the "in progress" marker that sits next to the routine info in the

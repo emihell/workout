@@ -3,8 +3,11 @@ import { rpeOptionValue } from './ids.js'
 // model.js <-> workout-log.js import cycle is safe under ESM live bindings.
 import { DEFAULT_DURATION_SEC } from './model.js'
 
+// req-165 (F-DEAD-3) — the legacy `session*` fallbacks (sessionItemId, sessionId,
+// sessionName, completedSessionItemIds) are gone from every reader: migrateState strips
+// them on every load and import (model.js), so they could never be reached.
 export function itemKey(item) {
-  return item?.routineItemId || item?.sessionItemId || item?.id || ''
+  return item?.routineItemId || item?.id || ''
 }
 
 export function setsForItem(sets, item) {
@@ -12,10 +15,8 @@ export function setsForItem(sets, item) {
   return (sets || []).filter(
     (set) =>
       set.routineItemId === key ||
-      set.sessionItemId === key ||
       set.routineItemId === item?.id ||
-      set.sessionItemId === item?.id ||
-      (!set.routineItemId && !set.sessionItemId && set.exerciseId === item?.exerciseId),
+      (!set.routineItemId && set.exerciseId === item?.exerciseId),
   )
 }
 
@@ -319,7 +320,7 @@ export function itemLoggingState(workout, item) {
 
 export function itemIsMarkedDone(workout, item) {
   const key = itemKey(item)
-  const ids = workout?.completedItemIds || workout?.completedSessionItemIds || []
+  const ids = workout?.completedItemIds || []
   return ids.includes(key)
 }
 
@@ -367,7 +368,7 @@ export function markItemDonePatch(workout, item) {
   const key = itemKey(item)
   return {
     completedItemIds: [
-      ...new Set([...(workout?.completedItemIds || workout?.completedSessionItemIds || []), key]),
+      ...new Set([...(workout?.completedItemIds || []), key]),
     ],
   }
 }
@@ -379,7 +380,7 @@ export function markItemDonePatch(workout, item) {
 export function reopenItemPatch(workout, item) {
   const key = itemKey(item)
   return {
-    completedItemIds: (workout?.completedItemIds || workout?.completedSessionItemIds || []).filter(
+    completedItemIds: (workout?.completedItemIds || []).filter(
       (id) => id !== key,
     ),
   }

@@ -331,8 +331,8 @@ export function groupWorkoutsByRoutine(workouts, routines) {
   const groups = []
   const indexByRoutine = new Map()
   for (const w of workouts || []) {
-    const routineId = w.routineId || w.sessionId || 'unknown'
-    const name = w.snapshot?.routineName || w.snapshot?.sessionName
+    const routineId = w.routineId || 'unknown'
+    const name = w.snapshot?.routineName
     const key = w.snapshot ? `${routineId}::${w.snapshot.programName || ''}::${name}` : routineId
     if (!indexByRoutine.has(key)) {
       const { routine } = findRoutine(routines, routineId)
@@ -345,8 +345,8 @@ export function groupWorkoutsByRoutine(workouts, routines) {
           : null,
         routine: w.snapshot
           ? {
-              id: w.snapshot.routineId || w.snapshot.sessionId,
-              name: w.snapshot.routineName || w.snapshot.sessionName,
+              id: w.snapshot.routineId,
+              name: w.snapshot.routineName,
               exercises: w.snapshot.items || [],
             }
           : routine,
@@ -363,7 +363,7 @@ export function groupSetsByExercise(sets, routine) {
   const routineItems = []
   const seen = new Set()
   for (const item of routine?.exercises || []) {
-    const key = item.routineItemId || item.sessionItemId || item.id || item.exerciseId
+    const key = item.routineItemId || item.id || item.exerciseId
     if (item.exerciseId && !seen.has(key)) {
       seen.add(key)
       routineItems.push({ key, exerciseId: item.exerciseId })
@@ -371,7 +371,7 @@ export function groupSetsByExercise(sets, routine) {
   }
   const extra = []
   for (const s of list) {
-    const key = s.routineItemId || s.sessionItemId || s.exerciseId
+    const key = s.routineItemId || s.exerciseId
     if (s.exerciseId && !seen.has(key)) {
       seen.add(key)
       extra.push({ key, exerciseId: s.exerciseId })
@@ -382,7 +382,7 @@ export function groupSetsByExercise(sets, routine) {
     exerciseId,
     items: list
       .map((s, index) => ({ s, index }))
-      .filter((x) => (x.s.routineItemId || x.s.sessionItemId || x.s.exerciseId) === key),
+      .filter((x) => (x.s.routineItemId || x.s.exerciseId) === key),
   }))
 }
 
@@ -395,13 +395,14 @@ export function routinesUsingExercise(routines, exerciseId) {
 // req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the
 // confirm can name it. removeRoutine (store.jsx) also drops every schedule slot that
 // references the routine (req-165: stored plannedWorkouts are no longer read or pruned —
-// nothing has written one since workouts are built on Start; an old doc keeps its key), and archives-vs-deletes on whether
-// finished history references it. These are pure reads that mirror the store's own
-// reference tests exactly (routineId || sessionId) so the confirm counts match what
+// nothing has written one since workouts are built on Start; an old doc keeps its key),
+// and archives-vs-deletes on whether finished history references it. These are pure
+// reads that mirror the store's own reference tests exactly (routineId) so the confirm
+// counts match what
 // the delete removes. The logic in the store is unchanged (DEC-031) — this is only
 // how we describe it.
 export function routineDeletionImpact(state, routineId) {
-  const refersTo = (obj) => (obj.routineId || obj.sessionId) === routineId
+  const refersTo = (obj) => obj.routineId === routineId
   return {
     slots: (state?.schedule?.slots || []).filter(refersTo).length,
     hasHistory: (state?.workouts || []).some(refersTo),
@@ -437,7 +438,7 @@ export function exerciseInActiveWorkout(state, exerciseId) {
 export function routineInActiveWorkout(state, routineId) {
   const active = state?.activeWorkout
   if (!active) return false
-  return (active.routineId || active.sessionId || active.snapshot?.routineId) === routineId
+  return (active.routineId || active.snapshot?.routineId) === routineId
 }
 
 // req-119 — the delete reducers, moved out of store.jsx so the archive-vs-delete rule
@@ -503,7 +504,7 @@ export function removeRoutineFromState(s, routineId, archivedAt = new Date().toI
       : (s.routines || []).filter((routine) => routine.id !== routineId),
     schedule: {
       ...s.schedule,
-      slots: (s.schedule?.slots || []).filter((slot) => (slot.routineId || slot.sessionId) !== routineId),
+      slots: (s.schedule?.slots || []).filter((slot) => slot.routineId !== routineId),
     },
   }
 }

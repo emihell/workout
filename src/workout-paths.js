@@ -39,7 +39,7 @@ export function itemCurrentPath(routineId, item, done) {
 // re-renders once more before the router hears of it — it must not pull the user back
 // to the overview ('left': render nothing, the router is about to show Today).
 export function inWorkoutFallback({ active, routineId, routineKnown, currentPath }) {
-  const activeHere = Boolean(active && (active.routineId || active.sessionId) === routineId)
+  const activeHere = Boolean(active && active.routineId === routineId)
   if (activeHere || !routineKnown) return 'missing'
   if (currentPath != null && !String(currentPath).startsWith(`/workout/${routineId}/`)) return 'left'
   return 'redirect'

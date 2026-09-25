@@ -49,7 +49,7 @@ function FinishScreen({ routineId }) {
   const priors = previousSameRoutineWorkouts(active, store.workouts, store.routines)
   const beatLine = beatLastTimeLine(beatLastTimeWins(active, priors, store.exercises))
 
-  const name = active?.snapshot?.routineName || active?.snapshot?.sessionName
+  const name = active?.snapshot?.routineName
 
   return (
     <Screen className="ui-screen--rest">

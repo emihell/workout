@@ -90,7 +90,7 @@ export function slotsForWeekDay(schedule, week, weekday) {
 }
 
 export function resolveSlot(routines, slot) {
-  const id = slot.routineId || slot.sessionId
+  const id = slot.routineId
   const routine = (routines || []).find((candidate) => candidate.id === id) || null
   return { slot, routine }
 }
@@ -101,7 +101,7 @@ export function occurrenceId(slotId, date) {
 
 export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlotId = null) {
   const done = (workouts || []).filter((w) => {
-    const id = w.routineId || w.sessionId
+    const id = w.routineId
     if (!w.finishedAt || id !== routineId) return false
     if (scheduleSlotId && w.scheduleSlotId && w.scheduleSlotId !== scheduleSlotId) return false
     return true

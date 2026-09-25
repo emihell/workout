@@ -12,7 +12,7 @@ export const ABANDON_ON_NEW_WARNING =
   'Starting a new workout will abandon the workout in progress. Continue?'
 
 function workoutRoutineId(workout) {
-  return workout?.routineId || workout?.sessionId
+  return workout?.routineId
 }
 
 // req-76 — where a Continue/resume lands. Route straight into the "current" exercise:

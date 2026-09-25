@@ -24,7 +24,7 @@ export function findItem(items, itemId) {
 }
 
 export function isActiveFor(active, routineId) {
-  return Boolean(active && (active.routineId || active.sessionId) === routineId)
+  return Boolean(active && active.routineId === routineId)
 }
 
 export function itemSetsPath(routineId, item, workout) {

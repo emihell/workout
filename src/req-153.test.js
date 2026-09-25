@@ -187,7 +187,8 @@ describe('item 2 — an in-workout route with no active workout', () => {
   })
   it('active for this routine (the item/set itself is missing) → "Not found."', () => {
     assert.equal(inWorkoutFallback({ active: { routineId: 'r1' }, routineId: 'r1', routineKnown: true }), 'missing')
-    assert.equal(inWorkoutFallback({ active: { sessionId: 'r1' }, routineId: 'r1', routineKnown: true }), 'missing')
+    // req-165 — a raw `{ sessionId }` active workout can't reach this: migrateState renames it
+    // to routineId on load (req-165.test.js); that case was the line above.
   })
   it('the redirect is a replace: Save → Back reaches the dead item page, which becomes the overview in place', () => {
     // [#/, overview, item log, finish] → Save (finish replaced with #/)

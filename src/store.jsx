@@ -128,7 +128,7 @@ export function StoreProvider({ children }) {
             (candidate) =>
               Number(candidate.week) === Number(week) &&
               Number(candidate.weekday) === Number(weekday) &&
-              (candidate.routineId || candidate.sessionId) === routineId,
+              candidate.routineId === routineId,
           )
           if (duplicate) return s
           return {

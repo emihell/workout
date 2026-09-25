@@ -19,7 +19,7 @@ function slotLabel(routines, slot) {
 }
 
 function slotRoutineId(slot) {
-  return slot.routineId || slot.sessionId
+  return slot.routineId
 }
 
 function activeRoutines(store) {
