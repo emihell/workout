@@ -501,6 +501,12 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   interpolated) reads but is crude — style needs iteration. **Reference only free-db photos / general knowledge,
   never RepDB images** (DEC-060 §3). Cost [inferred]: ~10–15k tokens per exercise with 2–3 rounds.
 
+### req-171 follow-ups (Back / `?from=`, DEC-092) — 2026-09-25
+- **Active workout overview Back → Today** even when started from Routines (treated as the workout's hub). Decide with
+  req-144: is the overview "where you came from" or home base?
+- **recalc → Routine → an inner editor screen** loses the chain (`navForBase` paths are used as URL prefixes).
+- **A stale id with a valid shape** (`/history/<deleted>`) is accepted as `from` → Back lands on "Not found.". Rare.
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it

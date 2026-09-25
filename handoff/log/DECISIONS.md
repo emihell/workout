@@ -1568,3 +1568,13 @@ you think i know exactly what you are talking about") and more pushback.
    bulk-rewrite ask (CLAUDE.md gate 2) still stands.
 5. **Testing:** "test thing yourself if you can - you can always use chrome and/or check code - only ask me to test
    things if they need human eyes/touch, like design and ux feel". Extends DEC-035.
+
+## DEC-092 — a screen with more than one way in returns via `?from=`  (Builder, req-171; planning, 2026-09-25)
+
+The rule for multi-entry screens (Emilio's ask, DEC-091 §4): the link in carries `?from=<path>` (`route.js` `withFrom`);
+Back and the exits that return "up" go to `from`, else the fixed parent; a deeper screen links with `childLink(child,
+here, from)` so the chain unwinds one screen at a time; an exit that skips its parent walks it (`findInFromChain`).
+`from` is kept only if it decodes, is `/`-prefixed (not `//`), and matches a route shape — else dropped. No
+`history.back()`/timers (DEC-084). New multi-entry links follow this rule. Limits kept (BACKLOG §Phase 1, req-171
+follow-ups): the active overview is a hub (Back → Today); recalc → routine → inner editor loses the chain; a stale id
+with a valid shape is accepted.

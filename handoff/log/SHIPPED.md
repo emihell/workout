@@ -2028,3 +2028,7 @@ snapshot.routineId naming a *different* existing routine is trusted — import-o
 (`./plan qa --seed`, "Snap Probe"): branch `routineId: "r-snap"`, "…will be archived" → archived, History still names it;
 main `routineId: null`, "Delete Snap Probe?" → REMOVED. **Emilio approved the merge.** Test edit: req-169's load-path pin
 inverted (it pinned the removed behaviour).
+
+**req-171** (2026-09-25) — Back returns to the screen you came from (`?from=` chain, DEC-092); 35-site sweep, 9 fixed. Gate
+(bug lane): AC1 red on main / green on branch; req-171.test.js 26/0; branch smoke green 12 steps; Planner's headless run 7/7
+(Today→detail→Back=`#/`, chain unwinds, month, type list, by-exercise, bad/off-app `from` → `#/history`, 0 dialogs). No trigger files → no reviewer. `reports/req-171.md`.

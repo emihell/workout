@@ -450,3 +450,8 @@ req-152); item 3 was half fixed. Builder caught it ("the code wins") and pinned 
 changes. The `spec` skill's step 1 (rescan the code this session) wasn't run for those items. **How to apply:** before a
 BACKLOG item enters a spec, reproduce it on main (a test or a browser run) — no repro, no item; strike fixed BACKLOG notes
 at the closeout that fixed them.
+
+## L-044 — `./check --smoke` builds HEAD's committed tree, not the working tree  (Builder, req-171, 2026-09-25)
+
+Builder's first green smoke run tested main's code: the smoke builds with `git archive HEAD`, and the fix wasn't
+committed yet. **How to apply:** commit before `./check --smoke`, and read the sha it prints against the branch head.
