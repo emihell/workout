@@ -271,7 +271,7 @@ describe('Finish → Save / Abandon lands on Today (the finish screen re-renders
 describe('History detail row meta from its sets (was a detail.jsx source regex)', () => {
   const set = (skipped) => ({ s: { setType: 'work', weight: skipped ? null : 40, reps: skipped ? 'skipped' : '8' } })
   it('all four skipped → "skipped"', () => {
-    assert.equal(historyGroupRowMeta({ role: 'main', warmup: true }, [set(true), set(true), set(true), set(true)]), 'WU set · skipped')
+    assert.equal(historyGroupRowMeta({ role: 'main', warmup: true }, [set(true), set(true), set(true), set(true)]), 'Warm-up set · skipped')
   })
   it('2 of 4 skipped → "2 sets"', () => {
     assert.equal(historyGroupRowMeta({ role: 'main' }, [set(false), set(true), set(false), set(true)]), '2 sets')

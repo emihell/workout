@@ -421,7 +421,7 @@ function WorkoutItemLive({ routineId, item }) {
         ex={ex}
         bits={[
           roleTag(item.role),
-          currentType === 'wu' ? 'WU set' : null,
+          currentType === 'wu' ? 'Warm-up set' : null,
           setProgressLabel(item, state, currentType, currentWorkIndex),
         ]}
         aside={
@@ -486,7 +486,7 @@ function WorkoutItemLive({ routineId, item }) {
       ) : null}
       {/* req-109 — exercise-level lateral actions, in normal flow below the form (the
           set-level Previous · Skip · Complete bar stays pinned at the bottom). Skip
-          exercise writes (a Button, two taps); Replace exercise only opens the picker
+          exercise writes (a Button, two taps); Swap exercise only opens the picker
           (a NavLink wearing the button look, DEC-040). */}
       {logging ? (
         <Actions
@@ -503,7 +503,7 @@ function WorkoutItemLive({ routineId, item }) {
                 {skipArmed ? 'Tap again to skip' : 'Skip exercise'}
               </Button>
               <NavLink to={itemReplacePath(routineId, item)} look="quiet">
-                Replace exercise
+                Swap exercise
               </NavLink>
             </>
           }

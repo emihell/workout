@@ -836,7 +836,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
   it('fixed numbers: WU 10×10, work 20×8 / 22×8 / 24×6 → exact lines', () => {
     assert.deepEqual(
       previewFor(odp).map((line) => line.text),
-      ['WU · 10 kg × 10', '1 · 20 kg × 8', '2 · 22 kg × 8', '3 · 24 kg × 6'],
+      ['Warm-up · 10 kg × 10', '1 · 20 kg × 8', '2 · 22 kg × 8', '3 · 24 kg × 6'],
     )
   })
 
@@ -868,7 +868,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
     assert.deepEqual(lines.map((line) => line.reps), ['10', '8', '8', '6'])
     assert.deepEqual(
       lines.map((line) => line.text),
-      ['WU · — × 10', '1 · — × 8', '2 · — × 8', '3 · — × 6'],
+      ['Warm-up · — × 10', '1 · — × 8', '2 · — × 8', '3 · — × 6'],
     )
   })
 
@@ -886,7 +886,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
     const lines = previewFor(odp, { seedOverrides: { 'odp::work': { weight: '26' }, 'other::work': { weight: '99' } } })
     assert.deepEqual(
       lines.map((line) => line.text),
-      ['WU · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'],
+      ['Warm-up · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'],
     )
   })
 
@@ -912,7 +912,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
       assert.equal(lines[i].weight, form.weight)
       assert.equal(lines[i].reps, form.reps)
     })
-    assert.deepEqual(lines.map((line) => line.text), ['WU · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'])
+    assert.deepEqual(lines.map((line) => line.text), ['Warm-up · 10 kg × 10', '1 · 26 kg × 8', '2 · 26 kg × 8', '3 · 26 kg × 6'])
   })
 
   it('no warm-up → work lines only', () => {
@@ -931,7 +931,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
   it('timed: work sets show the duration (per-set, then last in list); the WU stays reps', () => {
     const plank = { exerciseId: 'pl', sets: 3, warmup: { reps: 5 }, targets: ['', '', ''], durations: [45, 60] }
     const lines = previewFor(plank, { workouts: [], weighted: false, ex: { hasDuration: true, durationSec: 20 } })
-    assert.deepEqual(lines.map((line) => line.text), ['WU · 5', '1 · 45s', '2 · 60s', '3 · 60s'])
+    assert.deepEqual(lines.map((line) => line.text), ['Warm-up · 5', '1 · 45s', '2 · 60s', '3 · 60s'])
     assert.deepEqual(lines.map((line) => line.durationSec), [null, 45, 60, 60])
   })
 })

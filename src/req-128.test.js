@@ -17,9 +17,9 @@ describe('req-128 1: History detail row meta follows the req-93 rule', () => {
   })
   it('warm-up / finisher / cardio carry their tag; WU set marker kept', () => {
     assert.equal(historyGroupMeta({ role: 'warmup' }, 2), 'WU routine · 2 sets')
-    assert.equal(historyGroupMeta({ role: 'finisher', warmup: true }, 1), 'Finisher · WU set · 1 set')
+    assert.equal(historyGroupMeta({ role: 'finisher', warmup: true }, 1), 'Finisher · Warm-up set · 1 set')
     assert.equal(historyGroupMeta({ role: 'cardio' }, 1), 'Cardio · 1 set')
-    assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 4), 'WU set · 4 sets')
+    assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 4), 'Warm-up set · 4 sets')
   })
 })
 

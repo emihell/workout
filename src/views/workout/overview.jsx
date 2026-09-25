@@ -72,7 +72,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           {plan.items.map((item) => (
             <Row key={item.id} value={`${item.sets} ${item.sets === 1 ? 'set' : 'sets'}`}>
               <ExerciseLabel item={item} />
-              {item.warmup ? ' · WU set' : ''}
+              {item.warmup ? ' · Warm-up set' : ''}
             </Row>
           ))}
         </List>

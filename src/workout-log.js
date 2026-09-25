@@ -717,7 +717,7 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
     const entry = {
       setType,
       workIndex,
-      label: setType === 'wu' ? 'WU' : String(workIndex + 1),
+      label: setType === 'wu' ? 'Warm-up' : String(workIndex + 1),
       weight: fields.weight,
       reps: timed ? '' : fields.reps,
       durationSec: timed ? durationTargetFor(item, ex, workIndex) : null,

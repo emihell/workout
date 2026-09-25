@@ -94,7 +94,7 @@ describe('SetEditForm (render) — active set edit and History', () => {
     const values = await editSet({
       set: { ...draft, setType: 'wu' },
       showEffort: true,
-      setTypeOptions: [{ value: 'wu', label: 'WU set' }, { value: 'work', label: 'Work' }],
+      setTypeOptions: [{ value: 'wu', label: 'Warm-up set' }, { value: 'work', label: 'Work' }],
     })
     assert.equal(values.setType, 'wu')
     const patch = withHistorySet(workout, { exerciseId: 'ex-a', itemId: 'ri-a', exercise: null, values })
@@ -123,7 +123,7 @@ describe('live log screen (render) — WorkoutItemLog + the real store', () => {
     await act(async () => captured.store.startWorkout('sess-lower'))
     await view.unmount()
     view = await render(h(StoreProvider, null, h(Screen, { started: true })))
-    assert.match(view.text(), /WU set/)
+    assert.match(view.text(), /Warm-up set/)
     assert.equal(view.text().includes('Effort'), false)
     await view.click(view.button('Complete'))
     assert.equal(view.text().includes('Effort'), true, 'the work set shows Effort')

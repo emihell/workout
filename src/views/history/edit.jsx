@@ -149,7 +149,7 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId, from = null }) {
         showEffort={kind.showEffort}
         showDuration={kind.showDuration}
         setTypeOptions={[
-          { value: 'wu', label: 'WU set' },
+          { value: 'wu', label: 'Warm-up set' },
           { value: 'work', label: 'Work' },
         ]}
         cancelTo={backTo}
@@ -193,7 +193,7 @@ export function HistorySet({ workoutId, index, from = null }) {
         showEffort={kind.showEffort}
         showDuration={kind.showDuration}
         setTypeOptions={[
-          { value: 'wu', label: 'WU set' },
+          { value: 'wu', label: 'Warm-up set' },
           { value: 'work', label: 'Work' },
         ]}
         cancelTo={back}

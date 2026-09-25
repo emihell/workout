@@ -29,14 +29,14 @@ export const RPE_OPTIONS = [
   { value: 2, label: 'Easy' },
   { value: 3, label: 'Moderate' },
   { value: 4, label: 'Hard' },
-  { value: 5, label: 'Failure' },
+  { value: 5, label: "Couldn't finish" },
 ]
 
 export function rpeLabel(value) {
   const n = Number(value)
   if (!Number.isFinite(n) || n === 0) return ''
   if (n <= 2) return 'Easy'
-  if (n >= 5) return 'Failure'
+  if (n >= 5) return "Couldn't finish"
   return RPE_OPTIONS.find((opt) => opt.value === n)?.label || ''
 }
 
@@ -118,7 +118,7 @@ export function greeting() {
 // know its exercise's type).
 export function formatSetLine(set, { cardio = false } = {}) {
   const bits = []
-  if (set.setType === 'wu') bits.push('WU set')
+  if (set.setType === 'wu') bits.push('Warm-up set')
   if (set.weight != null && set.weight !== '' && Number(set.weight) !== 0) {
     bits.push(`${set.weight} kg`)
   }

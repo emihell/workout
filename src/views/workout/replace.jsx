@@ -56,7 +56,7 @@ export function WorkoutItemReplace({ routineId, itemId }) {
       <Back to={backTo} />
       <RestPill />
       <p className="ui-sub">{exerciseName(item)}</p>
-      <Title>Replace exercise</Title>
+      <Title>Swap exercise</Title>
       <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
       {matches.length === 0 ? <p className="ui-sub">No matches.</p> : null}
       <List>
@@ -65,7 +65,7 @@ export function WorkoutItemReplace({ routineId, itemId }) {
             key={ex.id}
             action={
               <Button variant="secondary" onClick={() => pick(ex.id)}>
-                Replace
+                Swap
               </Button>
             }
           >
