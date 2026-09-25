@@ -1,6 +1,6 @@
 # req-163 — "last time" comparisons and History set bugs (audit + BACKLOG follow-ups)
 
-**Status: READY** (2026-09-25) — **Lane: bug.** DEC-087. Reviewer fires (storage.js / workout-log.js). Build on `main` ≥
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-163` (`3624c7f`…`ceac8d4`, 2 commits).** (2026-09-25) — **Lane: bug.** DEC-087. Reviewer fires (storage.js / workout-log.js). Build on `main` ≥
 `ba7d1b2`. Rescan each site first; the refs below are from `main` 2026-09-25.
 
 1. **F-CODE-3 — "the previous workout" is chosen two ways.** `previousSameRoutineWorkouts` (`storage.js:699`; comment
