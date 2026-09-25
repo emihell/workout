@@ -89,7 +89,7 @@ Source: `handoff/audits/workflow-2026-09-24.md` §A.
 | **tooling** | the failure it fixes, observed | a self-test proving the guard **fires**; Planner uses the tool at once | brief | only if his steps change |
 | **audit** | brief + scope | none (read-only); findings → backlog | the report | reads it, triages |
 
-The **independent reviewer** still fires on the files touched (DEC-057 §1) in every lane. **(unconfirmed)** refinements
+The **independent reviewer** still fires on the files touched (DEC-057 §1) in every lane. Refinements (confirmed DEC-087)
 from the audit: the *backup reminder* fires only when stored records are written, not on every trigger file (req-150
 already read it that way); SHIPPED entries stay ≤3 lines per req (what, gate receipt, report path). `check_handoff` needs
 the `DECIDED` status and a `Lane:` tag before this is enforced — tooling follow-up.

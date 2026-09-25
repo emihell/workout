@@ -1511,3 +1511,17 @@ saved. Then it downloads the `.txt`, and only then lifts the lock and imports. T
 copy key. Why: a triggered download is not a backup — on iPhone the save could proceed after a cancelled "Download?"
 prompt or a PWA that ignores blob downloads, losing the only copy (reviewer blocker on `7731c59`); a Blob also mangles an
 unpaired surrogate, the copy doesn't. Emilio chose "merge now, fix later" for the two rare should-fixes → req-161.
+
+## DEC-087 — the open calls closed with planning's recommendations; follow-ups before any new feature  (Emilio, 2026-09-25)
+
+Emilio: "i want to finish all of the follow ups before any new features - do a … with your recommendations"; req-10 is a
+new feature, not a follow-up (so not folded in here).
+1. **README/DESIGN catch-up** approved as drafted (`work/contract-drift-draft.md`): DESIGN applied by planning (§1 carry
+   exceptions, §2 hold, §3 deliberate update); README + `.cursor/rules/history-prefill.mdc` → Builder (req-165).
+2. **Confirmed:** hide "Moderate" on **old** warm-up/cardio sets in History (display only, no rewrite) and hide Effort when
+   editing a warm-up/cardio set in History (→ req-163); a comma duration rounds half up (req-155); an in-workout route with
+   no active workout redirects to its overview (req-153); the lane refinements — the backup reminder only when stored
+   records are written, SHIPPED ≤3 lines per req (WORKFLOW §Requirement lanes).
+3. **Phone feel** (the ~30 px reserved top space, the swipe-back change) accepted; caught in real use.
+4. **Order:** req-163 bugs → req-165 cleanup (dead code, docs, lint) → req-164 `storage.js` split → req-166 tooling; then
+   new features.

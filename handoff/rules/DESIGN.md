@@ -33,14 +33,13 @@ This is the one that decides the hard cases.
 - **A weighted exercise with no history has no invented starting weight.** Its dated
   plan explains calibration (start light, do the program reps, adjust by valid
   increments). It does not guess a number and present it as a plan.
-- **Prefills come only from finished-workout history for that same field.** Two
-  sanctioned exceptions, both the user's own input rather than invented data: (1) the
-  live set-log screen prefills Reps from that set's target and effort Moderate
-  (`.cursor/rules/history-prefill.mdc`); (2) for a **no-history** exercise, the next
-  working set carries the kg+reps of the most recent set logged **this session**
-  (DEC-002) — it's the value the user just entered, filling what would otherwise be
-  blank, and stays an editable prefill. Nowhere else does a plan, a library cue, a
-  recommendation, or a type default become a prefilled value.
+- **Prefills come only from finished-workout history for that same field.** Sanctioned exceptions, all the user's own
+  input rather than invented data: (1) the live set-log screen prefills Reps from that set's target, and Effort Moderate
+  **only where Effort is shown** (warm-up/cardio carry no effort, req-156); (2) the **kg** the user just entered this
+  session carries to the next working set when history has **no set at that index** — a no-history exercise (DEC-002),
+  an Add set, or a routine that grew (req-152); reps never carry (DEC-052); (3) an in-session kg change carries to the
+  remaining sets (DEC-052); (4) an unsaved draft restores what was typed (req-125). Nowhere else does a plan, a library
+  cue, a recommendation, a routine number, or a type default become a prefilled value.
 - **Never invent warmup (e.g. 50% / 12 reps), rest (e.g. 90s), or notes (a copy of
   cues).** Absent is absent. Editing an existing record may show that record's saved
   values — that's history, not invention.
@@ -53,12 +52,14 @@ record it came from? If not, it must not appear as if the user entered it.
 Completed history supplies the next load. Easy completed work moves one valid
 equipment step up; missed reps or failure move one step down; moderate work holds.
 Alternating stacks (e.g. 4/5 kg) use their real sequence, not a rounded increment.
+A target that isn't a single number (a range, AMRAP, a duration, text), and any assisted exercise, hold — same kg,
+same target (DEC-075/076).
 
 - **The recommendation is computed from history and nothing else**, and its decision
   is inspectable (`progress.js`). A load you can't trace back to effort + increment
   is a bug you can't see.
-- **Correcting meaningful history shows a recalculation preview** before it writes
-  next kg/reps onto the routine. Nothing silently rewrites the plan.
+- **Correcting meaningful history offers an update** (Apply / Skip) before anything
+  is written onto the routine. Nothing silently rewrites the plan.
 
 **The test:** given the same history, does the recommendation always produce the same
 explainable step? A recommendation that can't be explained from its inputs fails.
@@ -70,8 +71,9 @@ explainable step? A recommendation that can't be explained from its inputs fails
   what already happened.
 - **Referenced setup objects are archived, not deleted.** Only unreferenced objects
   can be hard-deleted. History keeps pointing at what it recorded.
-- **Completed (non-skipped) history writes next kg/reps onto the routine** — that is
-  the one direction data flows from history into setup, and it's explicit.
+- **History reaches the routine only by a deliberate step.** Finishing never changes the routine
+  (DEC-056); correcting history offers an update, and only Apply writes that workout's kg/reps onto it. That is
+  the one direction data flows from history into setup.
 
 **The test:** after this change, can any past workout read differently than it did
 when it was logged? If yes, it's wrong.

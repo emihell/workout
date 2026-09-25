@@ -1,6 +1,6 @@
 # Draft — README + DESIGN catch up with DEC-052/056/073/075/076/082 (for Emilio's review)
 
-**Status: DRAFT, awaiting Emilio** (DEC-085 §4). Source: `audits/2026-09-24.md` F-DRIFT-5, F-DIV-2. On his OK: planning
+**Status: APPROVED 2026-09-25 (DEC-087)** — DESIGN applied by planning; README + .cursor rule → req-165. Source: `audits/2026-09-24.md` F-DRIFT-5, F-DIV-2. On his OK: planning
 applies the DESIGN edits; Builder applies the README edits (README is code-side) as a tiny tooling-lane req.
 
 ## README.md (product contract)
