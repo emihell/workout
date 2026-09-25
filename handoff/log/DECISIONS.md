@@ -1525,3 +1525,11 @@ new feature, not a follow-up (so not folded in here).
 3. **Phone feel** (the ~30 px reserved top space, the swipe-back change) accepted; caught in real use.
 4. **Order:** req-163 bugs → req-165 cleanup (dead code, docs, lint) → req-164 `storage.js` split → req-166 tooling; then
    new features.
+
+## DEC-088 — a legacy in-progress workout's sets belong only to their own item  (planning, from req-165's review, 2026-09-25; unconfirmed)
+
+On main, `setsForItem` matched `set.sessionItemId === item.id`, true when both were undefined — so in a legacy-migrated
+in-progress workout (snapshot items without `id`) every set counted for every item: all items showed done and Finish wrote
+no skipped sets. req-165 dropped the dead `session*` fallbacks, which makes each item show its real state and Finish write
+the unlogged sets as skipped — the normal rule. **Kept** (the correct behaviour); pinned by a finish-path test; normal
+workouts (`buildPlannedWorkout`, `pi-…` ids) are unaffected. Rare: only a workout left in progress from before v9.
