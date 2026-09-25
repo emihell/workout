@@ -1904,3 +1904,5 @@ their rule files, not copies): `qa-branch`, `review`, `closeout`, `spec`, `workf
 (tooling lane): `./check` green; a fresh session lists all six; model-triggering sampled — review ×2 and qa-branch fired,
 three phrasings didn't (Builder sessions, where planning owns closeout/spec — not a fair test); explicit `/name` always
 works. Planner read all five and ran the checker after merge (receipt below). Not built: `build-brief` (not in the req).
+Planner after merge: `python3 scripts/check_skills.py` → `6 skill(s), 0 failing`; `.claude/skills/` lists all six in the
+planning worktree. Session-context triggering: new skills load at the next session start — checked then.
