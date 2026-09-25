@@ -1917,3 +1917,13 @@ by Emilio). Gate (data lane): Builder `./check --smoke` green (63 files, 11 step
 puppeteer, 0 native dialogs): corrupt v9 (lone `\uD83D`) + leftover v8 → a forced download failure → both copies written,
 lock kept → retry → 0 new keys, 1 `.txt` → reload: both copies `=== true`, v8 cleaned up, 13 workouts, no banner. **Emilio
 approved the merge.**
+
+## req-162 — Skip no longer flashes "Not found."; the smoke test fails on any flash; `./check` runs the skills check  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `20e61e0`…`c161939`, 2 commits). `WorkoutItemLog` renders `null` for a
+marked-done item while its redirect is pending (an unknown id still says "Not found."); `smoke.mjs`'s tripwire now fails
+the step it fires in; `./check` step 1b runs `check_skills.py` (0.13 s). Gate (bug lane): render test red on main
+(`actual: '‹ BackNot found.'`), 2/2 on the branch; `./check --smoke` green (6.7 s; plain 2.0 s); skills gate shown red on a
+throwaway commit (L-040). Reviewer: none (no trigger files). Planner's QA: `./plan qa req-162` → smoke `green — 11 steps`,
+no note; the same smoke vs `./plan qa main` → red at the Skip step ("‹ Back | Not found."). Slip: Planner put a temp copy of
+the branch's smoke script in the code worktree to run it (removed at once; `git status` 0) — L-041.

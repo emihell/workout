@@ -435,3 +435,10 @@ To show the smoke test fails on a real regression, Builder built a throwaway com
 hash-object -w` + `git commit-tree`) with the "22,5" parse broken, and ran the gate on it — no checkout, no stash, no worktree
 change. **How to apply:** a guard's "fires" receipt (tooling lane) uses a throwaway commit object or `git archive` of one,
 never an edit-and-revert in a worktree (L-034).
+
+## L-041 — planning ran a branch's script by copying it into the code worktree  (2026-09-25)
+
+To run req-162's smoke script before merge, Planner wrote `scripts/.smoke162.tmp.mjs` into the code worktree (it imports
+`./qa.mjs` relatively), then deleted it (`git status` 0). It breaks "planning never touches code" (DEC-005) even though
+nothing was committed. **How to apply:** to run an unmerged script, `git archive <branch>` into the scratchpad (with the
+scripts it imports) and run it there — or test it right after the merge (tooling lane allows it).
