@@ -1,6 +1,6 @@
 # req-171 — Back returns to the screen you came from
 
-**Status: BUILT — branch `req-171` (`9dd0c00`, 3 commits), NOT merged.** (2026-09-25) **Lane: bug.** Source: Emilio's in-app note on `/history/wo-mu6t2qbm-ne2q5c`
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-171` (`7af9364`…`9dd0c00`, 3 commits).** (2026-09-25) **Lane: bug.** Source: Emilio's in-app note on `/history/wo-mu6t2qbm-ne2q5c`
 (2026-09-24): "Sent from main page here, when i press back i go to history? This is weird behaviour - i think pages we
 can access from several pages must be able to get us back to where we got here from". A binary fix under DEC-091 §4 —
 no behaviour question open.
