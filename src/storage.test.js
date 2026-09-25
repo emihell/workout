@@ -433,6 +433,7 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     assert.deepEqual(routineDeletionImpact(state, 'r1'), {
       slots: 2,
       hasHistory: false,
+      inDraft: false, // req-169 (DEC-089): drafts reported apart
     })
   })
 
@@ -441,6 +442,7 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     assert.deepEqual(routineDeletionImpact(state, 'r2'), {
       slots: 1,
       hasHistory: true,
+      inDraft: false, // req-169 (DEC-089): drafts reported apart
     })
     // r-old referenced only by a workout migrated from a legacy sessionId still counts.
     assert.equal(routineDeletionImpact(state, 'r-old').hasHistory, true)
@@ -450,6 +452,7 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     assert.deepEqual(routineDeletionImpact(state, 'nope'), {
       slots: 0,
       hasHistory: false,
+      inDraft: false, // req-169 (DEC-089): drafts reported apart
     })
   })
 
@@ -458,17 +461,19 @@ describe('req-43 deletion-impact helpers (audit F-DIV-3)', () => {
     assert.deepEqual(exerciseDeletionImpact(state, 'e1'), {
       routines: 2,
       hasHistory: true,
+      inDraft: false, // req-169 (DEC-089): drafts reported apart
     })
     // e2: in r1 + r3, finished set exists (in the sessionId workout).
     assert.deepEqual(exerciseDeletionImpact(state, 'e2'), {
       routines: 2,
       hasHistory: true,
+      inDraft: false, // req-169 (DEC-089): drafts reported apart
     })
   })
 
   it('exerciseDeletionImpact: an exercise used in a routine but never logged', () => {
     const s = { routines: [{ id: 'r', exercises: [{ exerciseId: 'e9' }] }], workouts: [] }
-    assert.deepEqual(exerciseDeletionImpact(s, 'e9'), { routines: 1, hasHistory: false })
+    assert.deepEqual(exerciseDeletionImpact(s, 'e9'), { routines: 1, hasHistory: false, inDraft: false }) // req-169: + inDraft
   })
 })
 

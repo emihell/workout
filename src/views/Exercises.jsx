@@ -484,8 +484,10 @@ export function ExerciseDetail({ exerciseId }) {
               ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'}.`
               : ''
           // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
+          // req-169 (DEC-089) — and a legacy unfinished (draft) workout, worded as such.
           const head = deletionConfirmHead(ex.name, {
             hasHistory: impact.hasHistory,
+            inDraft: impact.inDraft,
             inCurrentWorkout: exerciseInActiveWorkout(store, ex.id),
           })
           if (!(await askConfirm(head + removes, { confirmLabel: 'Delete' }))) return

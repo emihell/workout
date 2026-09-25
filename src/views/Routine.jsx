@@ -186,8 +186,10 @@ export function RoutineDetail({ routineId, paths }) {
               parts.push(`${impact.slots} schedule slot${impact.slots === 1 ? '' : 's'}`)
             const removes = parts.length ? ` This removes ${parts.join(' and ')}.` : ''
             // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
+            // req-169 (DEC-089) — and a legacy unfinished (draft) workout, worded as such.
             const head = deletionConfirmHead(routine.name, {
               hasHistory: impact.hasHistory,
+              inDraft: impact.inDraft,
               inCurrentWorkout: routineInActiveWorkout(store, routine.id),
             })
             if (!(await askConfirm(head + removes, { confirmLabel: 'Delete' }))) return
