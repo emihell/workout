@@ -161,7 +161,7 @@ function Screen() {
   if (route.name === 'exercise-new-search') return <ExerciseNewSearch />
   if (route.name === 'exercise-new') return <ExerciseNew />
   if (route.name === 'exercise-edit') return <ExerciseEdit key={route.id} exerciseId={route.id} returnTo={route.from} />
-  if (route.name === 'exercise') return <ExerciseDetail exerciseId={route.id} />
+  if (route.name === 'exercise') return <ExerciseDetail key={route.id} exerciseId={route.id} from={route.from} />
   if (route.name === 'workout-set') return <WorkoutSetEdit key={`${route.routineId}-${route.index}`} routineId={route.routineId} index={route.index} />
   if (route.name === 'workout-item-done') {
     return <WorkoutItemDone key={`${route.routineId}-${route.itemId}`} routineId={route.routineId} itemId={route.itemId} />
@@ -206,11 +206,12 @@ function Screen() {
         key={`${route.id}-${route.exerciseId}`}
         workoutId={route.id}
         exerciseId={route.exerciseId}
+        from={route.from}
       />
     )
   }
-  if (route.name === 'history-edit') return <HistoryEdit key={route.id} workoutId={route.id} />
-  if (route.name === 'history-recalculate') return <HistoryRecalculate key={route.id} workoutId={route.id} />
+  if (route.name === 'history-edit') return <HistoryEdit key={route.id} workoutId={route.id} from={route.from} />
+  if (route.name === 'history-recalculate') return <HistoryRecalculate key={route.id} workoutId={route.id} from={route.from} />
   if (route.name === 'history-routine') {
     return (
       <HistoryRoutine
@@ -219,6 +220,7 @@ function Screen() {
         screen={route.screen}
         itemId={route.itemId}
         exerciseId={route.exerciseId}
+        from={route.from}
       />
     )
   }
@@ -229,12 +231,13 @@ function Screen() {
         workoutId={route.id}
         exerciseId={route.exerciseId}
         itemId={route.itemId}
+        from={route.from}
       />
     )
   }
-  if (route.name === 'history-set-new') return <HistorySetNew key={route.id} workoutId={route.id} />
-  if (route.name === 'history-set') return <HistorySet key={`${route.id}-${route.index}`} workoutId={route.id} index={route.index} />
-  if (route.name === 'history-detail') return <HistoryDetail workoutId={route.id} />
+  if (route.name === 'history-set-new') return <HistorySetNew key={route.id} workoutId={route.id} from={route.from} />
+  if (route.name === 'history-set') return <HistorySet key={`${route.id}-${route.index}`} workoutId={route.id} index={route.index} from={route.from} />
+  if (route.name === 'history-detail') return <HistoryDetail key={route.id} workoutId={route.id} from={route.from} />
   if (route.name === 'settings') return <Settings />
   if (route.name === 'components') return <Showcase />
   return <Today />

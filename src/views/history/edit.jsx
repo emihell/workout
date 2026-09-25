@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { go } from '../../route'
+import { childLink, go } from '../../route'
 import { exerciseById, routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
@@ -9,9 +9,10 @@ import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedCo
 import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
 import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
 import { snapshotItemFor } from './snapshot-item.js'
+import { historyAddSetBack, historyDetailReturn, historySetBack } from './return-paths.js'
 import { askConfirm } from '../../ui/confirm.js'
 
-export function HistoryEdit({ workoutId }) {
+export function HistoryEdit({ workoutId, from = null }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
   const [overallFeel, setOverallFeel] = useState(workout?.overallFeel || '')
@@ -21,15 +22,16 @@ export function HistoryEdit({ workoutId }) {
     return <Missing>Not found.</Missing>
   }
 
+  const back = historyDetailReturn(workout.id, from)
   return (
     <Screen>
-      <Back to={`/history/${workout.id}`} />
+      <Back to={back} />
       <Title>Edit</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault()
           store.updateWorkout(workout.id, { overallFeel, overallNote })
-          go(`/history/${workout.id}`)
+          go(back)
         }}
       >
         <SectionHeader>Feel</SectionHeader>
@@ -42,7 +44,7 @@ export function HistoryEdit({ workoutId }) {
         />
         <Textarea label="Note" value={overallNote} onChange={(e) => setOverallNote(e.target.value)} rows={3} />
         <Actions
-          retreat={<NavLink to={`/history/${workout.id}`} look="quiet">Cancel</NavLink>}
+          retreat={<NavLink to={back} look="quiet">Cancel</NavLink>}
           forward={<Button type="submit" variant="primary">Save</Button>}
         />
       </form>
@@ -50,7 +52,7 @@ export function HistoryEdit({ workoutId }) {
   )
 }
 
-export function HistorySetNew({ workoutId }) {
+export function HistorySetNew({ workoutId, from = null }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
 
@@ -99,14 +101,14 @@ export function HistorySetNew({ workoutId }) {
 
   return (
     <Screen>
-      <Back to={`/history/${workout.id}`} />
+      <Back to={historyDetailReturn(workout.id, from)} />
       <Title>Add set</Title>
       {choices.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {choices.map((choice) => (
           <Row key={choice.routineItemId || choice.exerciseId}>
             {/* req-117 — opens the add form; nothing is written until its Save. */}
-            <Button onClick={() => go(historyAddSetPath(workout, choice.exerciseId, choice.routineItemId))}>
+            <Button onClick={() => go(childLink(historyAddSetPath(workout, choice.exerciseId, choice.routineItemId), `/history/${workout.id}/set/new`, from))}>
               {choice.name || choice.exerciseId}
             </Button>
           </Row>
@@ -120,7 +122,7 @@ export function HistorySetNew({ workoutId }) {
 // Save writes it (and its snapshot item, if new) in one updateWorkout, then goes on to
 // the recalc preview as editing a set does. Cancel/Back write nothing: they return to
 // the exercise's page when the workout already has it, else to the workout.
-export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
+export function HistorySetAdd({ workoutId, exerciseId, itemId, from = null }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
 
@@ -131,7 +133,8 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
   const known =
     (workout.snapshot?.items || []).some((item) => itemIdOf(item) === itemId) ||
     (workout.sets || []).some((set) => itemIdOf(set) === itemId)
-  const backTo = known ? `/history/${workout.id}/exercise/${itemId}` : `/history/${workout.id}`
+  // req-171 — and to the exact screen it was opened from (return-paths.js).
+  const backTo = historyAddSetBack(workout.id, itemId, known, from)
   // req-163 — Effort / Duration shown as the live forms decide (historySetKind).
   const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemId, exerciseId), exerciseById(store.exercises, exerciseId))
 
@@ -155,14 +158,14 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId }) {
           const patch = withHistorySet(workout, { exerciseId, itemId, exercise, values })
           if (!patch) return
           store.updateWorkout(workout.id, patch)
-          go(`/history/${workout.id}/recalculate`)
+          go(childLink(`/history/${workout.id}/recalculate`, historyAddSetPath(workout, exerciseId, itemId), from))
         }}
       />
     </Screen>
   )
 }
 
-export function HistorySet({ workoutId, index }) {
+export function HistorySet({ workoutId, index, from = null }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
   const set = workout?.sets?.[index]
@@ -173,12 +176,15 @@ export function HistorySet({ workoutId, index }) {
   // req-163 — Effort hidden on a warm-up / cardio set (saves rpe null), Duration on a timed
   // exercise's work set (historySetKind, the live forms' rule).
   const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemIdOf(set), set.exerciseId), exerciseById(store.exercises, set.exerciseId))
+  const back = historySetBack(workout.id, itemIdOf(set) || set.exerciseId, from)
+  // req-171 — the recalc after a change returns to the workout as it was opened.
+  const recalc = childLink(`/history/${workout.id}/recalculate`, `/history/${workout.id}/set/${index}`, from)
 
   return (
     <Screen>
       {/* req-49 — a set is opened from its exercise screen, so Back returns there
           (the same target as the form's Cancel), not two levels up to the workout. */}
-      <Back to={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`} />
+      <Back to={back} />
       <p className="ui-sub">{workoutRoutineName(workout, null)}</p>
       <Title>Set</Title>
       <SetEditForm
@@ -190,21 +196,21 @@ export function HistorySet({ workoutId, index }) {
           { value: 'wu', label: 'WU set' },
           { value: 'work', label: 'Work' },
         ]}
-        cancelTo={`/history/${workout.id}/exercise/${itemIdOf(set) || set.exerciseId}`}
+        cancelTo={back}
         onSave={(values) => {
           // req-154 — `22,5` → 22.5; unreadable kg → null (the form already shows why).
           const fields = historySetFields(values)
           if (!fields) return
           const sets = (workout.sets || []).map((s, i) => (i === index ? { ...s, ...fields } : s))
           store.updateWorkout(workout.id, { sets })
-          go(`/history/${workout.id}/recalculate`)
+          go(recalc)
         }}
       />
       <Button
         onClick={async () => {
           if (!(await askConfirm('Remove set?', { confirmLabel: 'Remove' }))) return
           store.updateWorkout(workout.id, { sets: (workout.sets || []).filter((_, i) => i !== index) })
-          go(`/history/${workout.id}/recalculate`)
+          go(recalc)
         }}
       >
         Remove

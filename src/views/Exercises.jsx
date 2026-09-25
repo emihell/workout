@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog'
 import { EXERCISE_TYPES } from '../ids'
-import { go } from '../route'
+import { childLink, go, withFrom } from '../route'
 import { useStore } from '../store-context'
 import { Back, Missing } from './shared'
 import { DEFAULT_DURATION_SEC, exerciseById } from '../model'
@@ -51,12 +51,14 @@ function groupedByType(exercises) {
   return named
 }
 
-function ExerciseList({ exercises, showType = false }) {
+// req-171 — `from`: the list's own path when it isn't the detail's fixed parent
+// (/exercises), so the detail's Back returns to that list.
+function ExerciseList({ exercises, showType = false, from = null }) {
   if (exercises.length === 0) return null
   return (
     <List>
       {exercises.map((ex) => (
-        <Row key={ex.id} to={`/exercises/${ex.id}`}>
+        <Row key={ex.id} to={withFrom(`/exercises/${ex.id}`, from)}>
           {ex.name} — {ex.equipment}
           {showType ? ` · ${typeLabel(ex.type)}` : ''}
         </Row>
@@ -81,7 +83,7 @@ export function Exercises({ type = null }) {
         <Title>{typeLabel(type)}</Title>
         <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
         {items.length === 0 ? <p className="ui-sub">{q ? 'No matches.' : 'None.'}</p> : null}
-        <ExerciseList exercises={items} />
+        <ExerciseList exercises={items} from={`/exercises/type/${type}`} />
       </Screen>
     )
   }
@@ -448,19 +450,20 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
   )
 }
 
-export function ExerciseDetail({ exerciseId }) {
+export function ExerciseDetail({ exerciseId, from = null }) {
   const store = useStore()
   const ex = exerciseById(store.exercises, exerciseId)
   if (!ex) {
     return <Missing>Not found.</Missing>
   }
 
+  const back = from || '/exercises'
   return (
     <Screen>
-      <Back to="/exercises" />
+      <Back to={back} />
       <Title>{ex.name}</Title>
       <p>
-        <NavLink to={`/exercises/${ex.id}/edit`} chevron="forward">Edit</NavLink>
+        <NavLink to={childLink(`/exercises/${ex.id}/edit`, `/exercises/${ex.id}`, from)} chevron="forward">Edit</NavLink>
       </p>
       <p className="ui-sub">
         {[ex.equipment, typeLabel(ex.type), describeWeightStep(ex.weightStep), ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
@@ -492,7 +495,7 @@ export function ExerciseDetail({ exerciseId }) {
           })
           if (!(await askConfirm(head + removes, { confirmLabel: 'Delete' }))) return
           store.removeExercise(ex.id)
-          go('/exercises')
+          go(back)
         }}
       >
         Delete

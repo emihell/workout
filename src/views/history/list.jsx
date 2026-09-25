@@ -3,6 +3,7 @@ import { exerciseById, routineById } from '../../model.js'
 import { exercisesInHistory, groupWorkoutsByRoutine, staleInProgressWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { abandonInProgress, continueInProgress } from '../../workout-actions'
+import { withFrom } from '../../route'
 import { Back } from '../shared'
 import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import {
@@ -17,13 +18,13 @@ import {
   workoutRoutineName,
 } from './helpers'
 
-function WorkoutHistoryRow({ store, workout }) {
+function WorkoutHistoryRow({ store, workout, from }) {
   const routine = routineById(store.routines, workoutRoutineId(workout))
   const programName = workout.snapshot?.programName
   const name = workoutRoutineName(workout, routine)
   const label = programName ? `${programName} — ${name}` : name
   return (
-    <Row to={`/history/${workout.id}`}>
+    <Row to={withFrom(`/history/${workout.id}`, from)}>
       {label} — {compactDate(workoutDateKey(workout))}
     </Row>
   )
@@ -78,7 +79,7 @@ export function History({ month = null }) {
         ) : (
           <List>
             {workouts.map((workout) => (
-              <WorkoutHistoryRow key={workout.id} store={store} workout={workout} />
+              <WorkoutHistoryRow key={workout.id} store={store} workout={workout} from={`/history/month/${month}`} />
             ))}
           </List>
         )}
@@ -154,7 +155,7 @@ export function HistoryExercise({ exerciseId }) {
             {sortWorkoutsByDate(group.workouts).map((w) => {
               const count = (w.sets || []).filter((s) => s.exerciseId === exerciseId).length
               return (
-                <Row key={w.id} to={`/history/${w.id}/exercise/${exerciseId}`} value={`${count} set${count === 1 ? '' : 's'}`}>
+                <Row key={w.id} to={withFrom(`/history/${w.id}/exercise/${exerciseId}`, `/history/exercise/${exerciseId}`)} value={`${count} set${count === 1 ? '' : 's'}`}>
                   {whenLabel(w)}
                 </Row>
               )

@@ -60,7 +60,8 @@ test('the preview shows Done (finishedForPlan) instead of Start once finished', 
   const w = fnBody('Workout')
   assert.match(w, /const done = finishedForPlan\(store\.workouts, plan\)/)
   assert.ok(w.indexOf('{done ? (') < w.indexOf('startOrContinue('), 'the Done branch comes before Start')
-  assert.match(w, /to=\{`\/history\/\$\{done\.id\}`\}/)
+  // req-171 — the link carries this preview as its `from`, so the detail's Back returns here.
+  assert.match(w, /to=\{withFrom\(`\/history\/\$\{done\.id\}`, here\)\}/)
 })
 
 // req-107 — one workout note on the active workout, shared by the overview and Finish.

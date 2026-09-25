@@ -8,6 +8,7 @@ import { routineById } from '../model.js'
 import { completedOnDayKey, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
+import { withFrom } from '../route'
 import { routineStartable } from '../exercise-names.js'
 import { Banner, Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
@@ -73,24 +74,26 @@ function WorkoutInfo({ when, name, focus, today }) {
   )
 }
 
-// req-28 — a completed-today workout row, linking to its History detail. Uses the
+// req-28 — a completed-today workout row, linking to its History detail (req-171:
+// carrying `from=/`, so its Back returns to Today). Uses the
 // shared info format (iter 5); `when` is "Today" (all completed today), focus from
 // the immutable snapshot. Program name dropped so it matches the other sections.
 function CompletedTodayRow({ store, workout, todayKey }) {
   const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
-    <Row to={`/history/${workout.id}`}>
+    <Row to={withFrom(`/history/${workout.id}`, '/')}>
       <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
     </Row>
   )
 }
 
-// req-14 (Emilio review) — a recent-history peek row linking to the History detail.
+// req-14 (Emilio review) — a recent-history peek row linking to the History detail
+// (req-171: its Back returns to Today).
 // Shared info format (iter 5): `when` is the workout's date, focus from the snapshot.
 function HistoryPeekRow({ store, workout, todayKey }) {
   const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
-    <Row to={`/history/${workout.id}`}>
+    <Row to={withFrom(`/history/${workout.id}`, '/')}>
       <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
     </Row>
   )

@@ -136,27 +136,6 @@ function parseRoutineNested(rest) {
   return { screen: 'detail' }
 }
 
-// req-99 — a route may carry a `?from=<encoded-path>` return target (the exercise
-// settings link from the routine editor uses it so Save/Back land back where you
-// came from). Split the query off before path parsing so no branch sees the `?`,
-// and only the routes that opt in read a param out of it. `path` is the hash body
-// (already `#`-stripped); the query travels with it through hashPath/go untouched.
-function queryParam(rawQuery, key) {
-  for (const pair of String(rawQuery || '').split('&')) {
-    if (!pair) continue
-    const eq = pair.indexOf('=')
-    const k = eq < 0 ? pair : pair.slice(0, eq)
-    if (k !== key) continue
-    const v = eq < 0 ? '' : pair.slice(eq + 1)
-    try {
-      return decodeURIComponent(v)
-    } catch {
-      return v
-    }
-  }
-  return null
-}
-
 function safeDecode(segment) {
   try {
     return decodeURIComponent(segment)
@@ -165,9 +144,76 @@ function safeDecode(segment) {
   }
 }
 
+// req-99 — a route may carry a `?from=<encoded-path>` return target (first used by the
+// exercise settings link from the routine editor, so Save/Back land back where you came
+// from). The query is split off before path parsing so no branch sees the `?`; the
+// query travels with the path through hashPath/go untouched.
+//
+// req-171 — a return target is only honoured when it is an in-app path this router
+// knows: `/`-prefixed (not `//`, which a browser reads as another host), decodable, and
+// matching a route shape. Anything else — empty, off-app, `%E0%A4%A`, an unknown route —
+// is dropped, so the screen's Back falls back to its fixed parent.
+function returnPathOf(rawQuery) {
+  const raw = rawQueryValue(rawQuery, 'from')
+  if (!raw) return null
+  let path
+  try {
+    path = decodeURIComponent(raw)
+  } catch {
+    return null
+  }
+  if (!path.startsWith('/') || path.startsWith('//') || path.includes('\\')) return null
+  return matchRoute(path.split('?')[0]) ? path : null
+}
+
+function rawQueryValue(rawQuery, key) {
+  for (const pair of String(rawQuery || '').split('&')) {
+    const eq = pair.indexOf('=')
+    if (eq > 0 && pair.slice(0, eq) === key) return pair.slice(eq + 1)
+  }
+  return null
+}
+
+// req-171 — `?from=` on any route (was exercise-edit only, req-99): the path of the
+// screen the user came from, for a screen with more than one way in. Present on the
+// parsed route only when valid (returnPathOf).
 export function parseRoute(path) {
   const [rawPath, rawQuery] = String(path).split('?')
-  const parts = rawPath.split('/').filter(Boolean)
+  const route = matchRoute(rawPath) || { name: 'today' }
+  const from = returnPathOf(rawQuery)
+  return from ? { ...route, from } : route
+}
+
+// `?from=` for a link: `path` carrying `from` (as given — a path, not yet encoded), or
+// `path` unchanged when there is none.
+export function withFrom(path, from) {
+  return from ? `${path}?from=${encodeURIComponent(from)}` : path
+}
+
+// A link from the screen at `here` (its own path, without query) down to `child`,
+// whose fixed parent IS `here`. When `here` was itself entered with a `from`, the link
+// carries `here?from=…` so the child's Back returns to this exact screen and this
+// screen's Back still returns to where it was entered from — the chain unwinds.
+export function childLink(child, here, from) {
+  return from ? withFrom(child, withFrom(here, from)) : child
+}
+
+// For an exit that returns past the immediate parent (e.g. History's recalc → the
+// workout): walks the `from` chain for the first path whose route passes `match`.
+// null when the chain has none — the caller then uses its fixed target.
+export function findInFromChain(from, match) {
+  let path = from
+  for (let hops = 0; path && hops < 20; hops += 1) {
+    const route = parseRoute(path)
+    if (match(route)) return path
+    path = route.from
+  }
+  return null
+}
+
+// The route shape of a path (no query), or null when no route matches.
+function matchRoute(rawPath) {
+  const parts = String(rawPath).split('/').filter(Boolean)
   if (parts.length === 0) return { name: 'today' }
 
   if (parts[0] === 'schedule' && parts[1] === 'loop') return { name: 'schedule-loop' }
@@ -256,8 +302,7 @@ export function parseRoute(path) {
     return { name: 'exercises-type', type: parts[2] }
   }
   if (parts[0] === 'exercises' && parts[1] && parts[2] === 'edit') {
-    const from = queryParam(rawQuery, 'from')
-    return from ? { name: 'exercise-edit', id: parts[1], from } : { name: 'exercise-edit', id: parts[1] }
+    return { name: 'exercise-edit', id: parts[1] }
   }
   if (parts[0] === 'exercises' && parts[1]) return { name: 'exercise', id: parts[1] }
   if (parts[0] === 'exercises') return { name: 'exercises' }
@@ -344,5 +389,5 @@ export function parseRoute(path) {
   if (parts[0] === 'settings') return { name: 'settings' }
   if (parts[0] === 'components') return { name: 'components' }
 
-  return { name: 'today' }
+  return null
 }

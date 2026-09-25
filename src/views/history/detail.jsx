@@ -1,5 +1,5 @@
 import { formatSetLine, roleTag } from '../../ids'
-import { go } from '../../route'
+import { childLink, go } from '../../route'
 import { exerciseById, routineById } from '../../model.js'
 import { durationLabel, groupSetsByExercise, workoutVolume } from '../../history-queries.js'
 import { useStore } from '../../store-context'
@@ -16,10 +16,11 @@ import {
   workoutRoutineName,
 } from './helpers'
 import { snapshotItemFor } from './snapshot-item.js'
+import { historyDetailBack, historyDetailPath, historyExerciseBack, historyExercisePath } from './return-paths.js'
 import { historySetKind } from '../set-values.js'
 import { askConfirm } from '../../ui/confirm.js'
 
-export function HistoryDetail({ workoutId }) {
+export function HistoryDetail({ workoutId, from = null }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
   if (!workout) {
@@ -33,9 +34,11 @@ export function HistoryDetail({ workoutId }) {
     exercises: snapshot?.items || routine?.exercises || [],
   })
 
+  // req-171 — opened from Today, a month list or an overview: Back returns there.
+  const here = historyDetailPath(workout.id)
   return (
     <Screen>
-      <Back to="/history" />
+      <Back to={historyDetailBack(from)} />
       <Title>
         {snapshot
           ? snapshot.programName
@@ -56,7 +59,7 @@ export function HistoryDetail({ workoutId }) {
       </p>
       <p className="ui-sub">
         {workout.overallFeel ? `${workout.overallFeel} · ` : ''}
-        <NavLink to={`/history/${workout.id}/edit`} chevron="forward">Edit</NavLink>
+        <NavLink to={childLink(`${here}/edit`, here, from)} chevron="forward">Edit</NavLink>
       </p>
       {workout.overallNote ? <p className="ui-sub">{workout.overallNote}</p> : null}
 
@@ -68,7 +71,7 @@ export function HistoryDetail({ workoutId }) {
           // req-109 — id first, exerciseId only as the fallback (snapshot-item.js).
           const snapshotItem = snapshotItemFor(snapshot?.items, group.routineItemId, group.exerciseId)
           return (
-            <Row key={group.routineItemId} to={`/history/${workout.id}/exercise/${group.routineItemId}`}>
+            <Row key={group.routineItemId} to={childLink(historyExercisePath(workout.id, group.routineItemId), here, from)}>
               {snapshotItem?.exerciseName || ex?.name || group.exerciseId}
               {` — ${historyGroupRowMeta(snapshotItem, group.items)}`}
             </Row>
@@ -76,7 +79,7 @@ export function HistoryDetail({ workoutId }) {
         })}
       </List>
       <p>
-        <NavLink to={`/history/${workout.id}/set/new`} chevron="forward">Add set</NavLink>
+        <NavLink to={childLink(`${here}/set/new`, here, from)} chevron="forward">Add set</NavLink>
       </p>
 
       {/* req-96 — the "Next time" load-recommendation surface was removed here (and on
@@ -90,7 +93,7 @@ export function HistoryDetail({ workoutId }) {
         onClick={async () => {
           if (!(await askConfirm(`Delete ${workoutRoutineName(workout, routine)}?`, { confirmLabel: 'Delete' }))) return
           store.removeWorkout(workout.id)
-          go('/history')
+          go(historyDetailBack(from))
         }}
       >
         Delete
@@ -99,7 +102,7 @@ export function HistoryDetail({ workoutId }) {
   )
 }
 
-export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
+export function HistoryWorkoutExercise({ workoutId, exerciseId, from = null }) {
   const store = useStore()
   const workout = store.workouts.find((x) => x.id === workoutId)
   // req-109 — the route param is an item id (or a legacy exerciseId): id first.
@@ -118,9 +121,10 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
     return <Missing>Not found.</Missing>
   }
 
+  const here = historyExercisePath(workout.id, exerciseId)
   return (
     <Screen>
-      <Back to={`/history/${workout.id}`} />
+      <Back to={historyExerciseBack(workout.id, from)} />
       <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
       <p className="ui-sub">
         {/* req-128 — req-93 rule: main unlabelled (roleTag), non-main tagged. */}
@@ -131,7 +135,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
       {items.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {items.map(({ s, index }) => (
-          <Row key={index} to={`/history/${workout.id}/set/${index}`}>
+          <Row key={index} to={childLink(`/history/${workout.id}/set/${index}`, here, from)}>
             {/* req-163 — no effort label on a warm-up or cardio set (DEC-087 §2, display only). */}
             {formatSetLine(s, { cardio: historySetKind(snapshotItem, ex).cardio })}
             {s.note ? ` — ${s.note}` : ''}
@@ -142,7 +146,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
           placeholder set first. Navigation, so it wears the link treatment (DESIGN §4). */}
       <p>
         <NavLink
-          to={historyAddSetPath(workout, actualExerciseId, itemIdOf(snapshotItem) || null)}
+          to={childLink(historyAddSetPath(workout, actualExerciseId, itemIdOf(snapshotItem) || null), here, from)}
           chevron="forward"
         >
           Add set
