@@ -318,7 +318,12 @@ export function Today() {
   if (isFirstRun(store)) {
     return (
       <Screen>
-        <Title subtitle="No data. Import, or start empty.">Today</Title>
+        <Title subtitle="Nothing here yet.">Today</Title>
+        {/* req-174 — the empty home's primary action: navigation only, so a NavLink with
+            the button look (DEC-040), as TodayEmpty's. Import stays below as the secondary. */}
+        <NavLink to="/routines/new" look="primary" block>
+          Create your first routine
+        </NavLink>
         <FileButton
           label="Import"
           accept="application/json,.json"
