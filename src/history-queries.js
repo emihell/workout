@@ -124,16 +124,43 @@ export function exercisesInHistory(workouts, exercises, routines) {
     .sort((a, b) => (a.exercise?.name || a.id).localeCompare(b.exercise?.name || b.id))
 }
 
-// req-163 (audit F-CODE-3) — the ONE order for every "previous / last time" choice:
-// finished workouts only, newest `finishedAt` first, ties broken by id (descending) — never
-// by array position. `workouts` is newest-first only while every workout was appended by
+// req-167 — WHEN a stored workout happened, as a number for ordering: its `finishedAt`
+// parsed as a time (so `2026-09-25T11:00:00+02:00` is 09:00 UTC, before `…09:30:00Z`; a
+// string compare put it after), else the local day of `performedOn` / `date` (a legacy or
+// imported workout with no finishedAt: migrateState never invents one, DESIGN §1). NaN
+// when neither reads as a time.
+const DAY_RE = /^(\d{4})-(\d{2})-(\d{2})$/
+export function workoutTime(workout) {
+  const finished = Date.parse(workout?.finishedAt ?? '')
+  if (Number.isFinite(finished)) return finished
+  const day = DAY_RE.exec(String(workout?.performedOn || workout?.date || ''))
+  return day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])).getTime() : NaN
+}
+
+// req-167 — the ONE newest-first comparator for stored workouts (finishedNewestFirst here,
+// sortWorkoutsByDate's tie-break in History): later workoutTime first, an unreadable time
+// last, ties by id (descending) — never array position.
+export function compareWorkoutsNewestFirst(a, b) {
+  const ta = workoutTime(a)
+  const tb = workoutTime(b)
+  const aBad = !Number.isFinite(ta)
+  const bBad = !Number.isFinite(tb)
+  if (aBad !== bBad) return aBad ? 1 : -1
+  if (!aBad && ta !== tb) return tb - ta
+  return String(b?.id ?? '').localeCompare(String(a?.id ?? ''))
+}
+
+// req-163 (audit F-CODE-3) — the ONE order for every "previous / last time" choice, never
+// by array position: `workouts` is newest-first only while every workout was appended by
 // Finish; an imported backup can hold any order (e.g. oldest-first), and Finish's
 // beat-last-time then compared against the OLDEST workout while the prefill
-// (lastSetsForExercise) read the newest. Both now read this.
+// (lastSetsForExercise) read the newest. Both read this. req-167 — ordered by
+// compareWorkoutsNewestFirst (parsed time, mixed offsets right), and a workout without
+// finishedAt is kept, placed by its performedOn/date (was: dropped from the priors). One
+// with no readable time at all is not history and is left out (an unfinished workout gives
+// no "last time", DESIGN §1); the History list still shows it, last.
 export function finishedNewestFirst(workouts) {
-  return (workouts || [])
-    .filter((w) => w?.finishedAt)
-    .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)) || String(b.id ?? '').localeCompare(String(a.id ?? '')))
+  return (workouts || []).filter((w) => w && Number.isFinite(workoutTime(w))).sort(compareWorkoutsNewestFirst)
 }
 
 // req-111 / DEC-053 — "last time" is the most recent finished workout with at least

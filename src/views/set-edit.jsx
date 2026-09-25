@@ -36,17 +36,21 @@ import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedC
 // Everything around the form (Screen / Back / RestPill / header / History's
 // Remove button) stays in the caller.
 export function SetEditForm({ set, showLoad, showEffort, showDuration = false, setTypeOptions, onSave, cancelTo }) {
+  const effortFor = (type) => (typeof showEffort === 'function' ? showEffort(type) : Boolean(showEffort))
   const [weight, setWeight] = useState(set?.weight ?? '')
   const [reps, setReps] = useState(set?.reps ?? '')
+  // req-167 — the stored effort seeds the control only if Effort shows for the set's OWN
+  // type: a warm-up / cardio set's legacy rpe 3 (pre-req-156) was never shown or chosen, so
+  // toggling it to Work starts Effort unset, as a fresh work set would — not "Moderate".
   const [rpe, setRpe] = useState(() =>
-    set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : '',
+    effortFor(set?.setType || 'work') && set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : '',
   )
   const [note, setNote] = useState(set?.note || '')
   const [setType, setSetType] = useState(set?.setType || 'work')
   const [weightError, setWeightError] = useState(null)
   const [duration, setDuration] = useState(set?.durationSec != null && set.durationSec !== '' ? String(set.durationSec) : '')
   const [durationError, setDurationError] = useState(null)
-  const effortShown = typeof showEffort === 'function' ? showEffort(setType) : Boolean(showEffort)
+  const effortShown = effortFor(setType)
   const durationShown = typeof showDuration === 'function' ? showDuration(setType) : Boolean(showDuration)
 
   return (
@@ -68,7 +72,13 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
           rpe: effortShown ? rpe : '',
           note,
           setType,
-          ...(durationShown ? { durationSec: duration } : {}),
+          // req-167 — a warm-up saves no duration (as the live form logs a WU set): a
+          // stored duration is cleared (→ null) when the set is, or is toggled to, WU.
+          ...(durationShown
+            ? { durationSec: duration }
+            : setType === 'wu' && set?.durationSec != null && set.durationSec !== ''
+              ? { durationSec: '' }
+              : {}),
         })
       }}
     >
