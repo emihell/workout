@@ -1,5 +1,6 @@
 import { isWeightedType } from './ids.js'
 import { ALTERNATING, parseWeightStep } from './weight-step.js'
+import { isSkippedSet } from './set-rules.js'
 
 export function validWeights(exercise, max = 250) {
   if (Array.isArray(exercise?.weightOptions) && exercise.weightOptions.length) {
@@ -52,12 +53,6 @@ function isAmrap(value) {
   return String(value || '').toLowerCase().includes('amrap')
 }
 
-// Same predicate as workout-log.js isSkippedSet (not imported: workout-log imports
-// model, which imports this file).
-function isSkipped(set) {
-  return String(set?.reps || '').toLowerCase() === 'skipped'
-}
-
 function countableReps(value) {
   if (isDurationTarget(value) || isAmrap(value)) return null
   return parseReps(value)
@@ -98,7 +93,7 @@ export function recommendNextPrescription({ targets, weights: routineWeights, se
   const positional = sets || []
   let lastLogged = -1
   positional.forEach((set, index) => {
-    if (set && !isSkipped(set)) lastLogged = index
+    if (set && !isSkippedSet(set)) lastLogged = index
   })
   const weights = Array.from(
     { length: Math.max(baseWeights.length, lastLogged + 1) },
@@ -114,7 +109,7 @@ export function recommendNextPrescription({ targets, weights: routineWeights, se
   const held = new Set()
 
   positional.forEach((set, index) => {
-    if (!set || isSkipped(set)) return
+    if (!set || isSkippedSet(set)) return
     const actualWeight = Number(set.weight) || 0
     // req-150 — a held set keeps what was done (its kg; its target stays in nextTargets).
     if (assisted || unreadableTarget(targets?.[index] ?? targets?.at(-1))) {

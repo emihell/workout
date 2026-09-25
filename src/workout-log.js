@@ -1,7 +1,9 @@
 import { rpeOptionValue } from './ids.js'
-// DEFAULT_DURATION_SEC is read only inside durationTargetFor (call time), so the
-// model.js <-> workout-log.js import cycle is safe under ESM live bindings.
-import { DEFAULT_DURATION_SEC } from './model.js'
+// req-164 — from the leaf set-rules.js, not model.js: the model ↔ workout-log cycle is gone.
+import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
+
+// Re-exported from set-rules.js for their existing importers.
+export { isAddedMidWorkout, isSkippedSet }
 
 // req-165 (F-DEAD-3) — the legacy `session*` fallbacks (sessionItemId, sessionId,
 // sessionName, completedSessionItemIds) are gone from every reader: migrateState strips
@@ -216,15 +218,6 @@ export function skipItemPatch(workout, itemId) {
   return { sets, ...markItemDonePatch(workout, item) }
 }
 
-// req-109 — the marker on a snapshot item added mid-workout (a replacement). It tells
-// workoutSnapshot (model.js) to skip, for this item, the routine-template match and the
-// targets/weights backfill, so the item keeps its own unique routineItemId (never a
-// template id → applyProgressionToRoutines never writes it onto the routine) and stays
-// blank across reloads. Persisted on the snapshot item; absent on every other item.
-export function isAddedMidWorkout(item) {
-  return item?.addedMidWorkout === true
-}
-
 // req-109 — the blank replacement item for `exercise`, inserted after `original`.
 // 1 working set, no reps target, no suggested weight, no warm-up, no notes: nothing is
 // copied from the original but its ROLE (a slot value: a warm-up replacement still
@@ -391,13 +384,6 @@ export function lastLoggedSetIndex(workout, item) {
   const lastSet = logged[logged.length - 1]
   if (!lastSet) return -1
   return (workout.sets || []).lastIndexOf(lastSet)
-}
-
-// req-44 — the one shared skipped-set predicate (was duplicated in storage.js and
-// inlined in model.js/item.jsx/finish.jsx). Guards a null/undefined `reps` via
-// `|| ''` — the finish.jsx site previously dropped that guard.
-export function isSkippedSet(set) {
-  return String(set?.reps || '').toLowerCase() === 'skipped'
 }
 
 // The most recent non-skipped working set already logged this session, scanning
