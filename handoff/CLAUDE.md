@@ -157,11 +157,6 @@ beats an hour of reasoning.
 **Say what you did, not what you intended.** If a tool call or a test didn't run,
 it didn't run. Past tense is for completed work only.
 
-**The shell is zsh — quote its specials.** Single-quote any argument with `=`, `*`,
-`?`, `[`, `~` or `!` (`echo '---'`, `--include='*.js'`): unquoted, zsh fails the
-command red (`echo ======` → `not found`; an unmatched glob → `no matches found`).
-Every red error is noise Emilio has to read and judge (2026-09-25).
-
 **Deterministic work goes in a script or a test**, not a prose description — a
 migration, a recomputation, a data reshape. If it can be run, run it and paste
 the output.
