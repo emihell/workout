@@ -8,7 +8,8 @@
 //
 // The loop: Start today's routine → log a set typed "22,5" → skip an exercise →
 // Finish → Save → the stored workout has 22.5 kg and the skipped sets → Back never
-// renders "Not found." → History shows the workout. Exit 0 green, 1 on the first failed
+// renders "Not found." → History shows the workout → Back, Back unwinds to its month
+// (req-171). Exit 0 green, 1 on the first failed
 // step (the step, the reason and the screen's text are printed), 2 on a setup error.
 //
 // Deterministic by construction:
@@ -228,14 +229,24 @@ async function main() {
       await clickLink(page, 'History')
       await waitHash(page, /^#\/history$/)
       // History lists months; the workout is under its own (performedOn's YYYY-MM).
-      await clickSelector(page, `a[href="#/history/month/${workout.performedOn.slice(0, 7)}"]`)
-      await clickSelector(page, `a[href="#/history/${workout.id}"]`)
-      await waitHash(page, new RegExp(`^#/history/${workout.id}$`))
+      const month = `/history/month/${workout.performedOn.slice(0, 7)}`
+      await clickSelector(page, `a[href="#${month}"]`)
+      // req-171 — the row carries its month list as `from`, and the detail's links pass
+      // the detail (with that from) down, so Back unwinds to the month.
+      const detail = `/history/${workout.id}?from=${encodeURIComponent(month)}`
+      await clickSelector(page, `a[href="#${detail}"]`)
+      await waitHash(page, new RegExp(`^#/history/${workout.id}\\?`))
       await waitText(page, `${LOG_EXERCISE} — WU set · 1 set`)
       await waitText(page, `${SKIP_EXERCISE} — WU set · skipped`)
       // The per-exercise sets screen shows the logged value as the app displays it.
-      await clickSelector(page, `a[href="#/history/${workout.id}/exercise/${logKey}"]`)
+      await clickSelector(page, `a[href="#/history/${workout.id}/exercise/${logKey}?from=${encodeURIComponent(detail)}"]`)
       await waitText(page, '22.5')
+    })
+    await step('Back → Back from the exercise returns to the month list (req-171)', async () => {
+      await clickLink(page, '‹ Back')
+      await waitText(page, `${LOG_EXERCISE} — WU set · 1 set`)
+      await clickLink(page, '‹ Back')
+      await waitHash(page, new RegExp(`^#/history/month/${workout.performedOn.slice(0, 7)}$`))
     })
   } catch (err) {
     const failed = err instanceof StepFailure || err?.name === 'TimeoutError'
