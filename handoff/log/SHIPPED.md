@@ -1978,3 +1978,16 @@ check-lanes.test.sh 9/9 (main's check_handoff fails 4); each guard shown firing 
 Planner after merge: `./plan status` → `plan status: fetched origin` … `fully merged, both worktrees clean`;
 `check_handoff.py --ref main` warned only on req-10/req-144 (as Builder said) → Lanes added (ui, design) → exit 0, no
 warnings. CLOSEOUT.md documents the reviewer gate + `--no-reviewer`.
+
+## req-167 — one workout time and comparator; History's type toggle stops carrying stale values; store tests (DEC-087)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `5a2c84d`…`bb96f9f`). `workoutTime` (Date.parse(finishedAt), else the local
+day of performedOn/date) + `compareWorkoutsNewestFirst` (unreadable last, ties by id) drive both the priors/prefill and
+History's order; a date-only legacy workout is kept and dated the same in both (`workoutDateKey` falls back to `date`);
+"NaN-NaN-NaN" → "unknown"; History Work→WU saves `durationSec: null`, WU→Work doesn't revive a legacy rpe; a real-store
+test drives all 30 actions and checks the saved doc after each. Known, not fixed: cross-midnight vs date-only legacy ordering
+(rare, legacy-only). Gate: req-167.test.js red on main (7 fail), branch 16/16; `./check --smoke` green; mutation receipts.
+Reviewer: independent reviewer (DEC-057 §1: history-queries/state-reducers/store) → `# tests 1032 # pass 1032`, also under
+two extreme TZs, **No blockers.** (1 should-fix → fixed in `bb96f9f`, red→green). Planner's QA (`./plan qa`, mixed-offset
+seed): History A(09:30Z) before B(11:00+02:00) and the prefill from A (40 kg); Plank → WU `durationSec: null`; old WU rpe 3
+→ Work "—" → rpe null; no NaN; 0 dialogs.

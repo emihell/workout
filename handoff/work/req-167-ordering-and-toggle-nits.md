@@ -1,6 +1,6 @@
 # req-167 — req-163's reviewer leftovers: timestamp ordering and the History type toggle
 
-**Status: READY** (2026-09-25) — **Lane: bug** (small). DEC-087 (follow-ups before features). Reviewer fires (storage.js).
+**Status: BUILT — branch `req-167` (`bb96f9f`), NOT merged.** (2026-09-25) — **Lane: bug** (small). DEC-087 (follow-ups before features). Reviewer fires (storage.js).
 Reproduce each on main first (L-042).
 
 1. **Mixed-offset timestamps sort wrong** (latent): `finishedNewestFirst` (`storage.js:562`) compares `finishedAt` as a
