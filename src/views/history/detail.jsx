@@ -15,6 +15,7 @@ import {
   workoutRoutineName,
 } from './helpers'
 import { snapshotItemFor } from './snapshot-item.js'
+import { historySetKind } from '../set-values.js'
 import { askConfirm } from '../../ui/confirm.js'
 
 export function HistoryDetail({ workoutId }) {
@@ -128,7 +129,8 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId }) {
       <List>
         {items.map(({ s, index }) => (
           <Row key={index} to={`/history/${workout.id}/set/${index}`}>
-            {formatSetLine(s)}
+            {/* req-163 — no effort label on a warm-up or cardio set (DEC-087 §2, display only). */}
+            {formatSetLine(s, { cardio: historySetKind(snapshotItem, ex).cardio })}
             {s.note ? ` — ${s.note}` : ''}
           </Row>
         ))}

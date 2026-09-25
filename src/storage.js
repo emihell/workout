@@ -1,7 +1,7 @@
 import { SCHEMA_VERSION, findRoutineInState, migrateState } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey, defaultSchedule, withDefaultAnchor } from './schedule.js'
-import { anythingLogged, isAddedMidWorkout, isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
+import { isAddedMidWorkout, isSkippedSet, itemKey, loggedSetCount, replaceItemPatch, replacementItem } from './workout-log.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -550,6 +550,18 @@ export function exercisesInHistory(workouts, exercises, routines) {
     .sort((a, b) => (a.exercise?.name || a.id).localeCompare(b.exercise?.name || b.id))
 }
 
+// req-163 (audit F-CODE-3) — the ONE order for every "previous / last time" choice:
+// finished workouts only, newest `finishedAt` first, ties broken by id (descending) — never
+// by array position. `workouts` is newest-first only while every workout was appended by
+// Finish; an imported backup can hold any order (e.g. oldest-first), and Finish's
+// beat-last-time then compared against the OLDEST workout while the prefill
+// (lastSetsForExercise) read the newest. Both now read this.
+export function finishedNewestFirst(workouts) {
+  return (workouts || [])
+    .filter((w) => w?.finishedAt)
+    .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)) || String(b.id ?? '').localeCompare(String(a.id ?? '')))
+}
+
 // req-111 / DEC-053 — "last time" is the most recent finished workout with at least
 // one NON-skipped WORKING set of the exercise. A workout where every work set was
 // skipped (incl. "warmed up, then the machine was taken") holds no work load/reps for
@@ -559,9 +571,7 @@ export function exercisesInHistory(workouts, exercises, routines) {
 // skipped workout still counts; its skipped sets are returned but every reader
 // (historySetPrefill / historyPrescription) already drops them.
 export function lastSetsForExercise(workouts, exerciseId) {
-  const done = [...(workouts || [])]
-    .filter((w) => w.finishedAt)
-    .sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt)))
+  const done = finishedNewestFirst(workouts)
   let warmupOnly = null
   for (const w of done) {
     const sets = (w.sets || []).filter((s) => s.exerciseId === exerciseId)
@@ -679,26 +689,33 @@ export function workoutSummaryStats(active, prior, now) {
 // the first. Reuses the exact grouping key that groupWorkoutsByRoutine already applies
 // (routineId + program + name) by grouping [active, ...workouts] together: `active` is
 // prepended so it heads its own group, and its immediate neighbour (index 1) is the
-// prior same-routine workout. `workouts` is newest-first (store.finishWorkout prepends),
-// so index 1 is the most recent prior. No duplicated key logic.
+// prior same-routine workout. req-163 — the list is sorted newest-first
+// (finishedNewestFirst), so index 1 is the most recent prior whatever the stored order.
 export function previousSameRoutineWorkout(active, workouts, routines) {
   return previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
 }
 
 // req-128 — the prior the auto-complete summary compares against: the most recent
-// previous same-routine workout in which anything was logged (anythingLogged). An
-// all-skipped prior holds no volume/sets to compare with, so its deltas would be
-// nonsense; it is passed over. None → null → workoutSummaryStats shows no deltas.
+// previous same-routine workout with a done WORKING set. An all-skipped prior holds no
+// volume/sets to compare with, so its deltas would be nonsense; it is passed over.
+// req-163 (req-111 a, DEC-053) — so is a warm-up-only one: warm-ups are outside the
+// volume, and DEC-053 counts "only warm-ups done" as no work history. None → null →
+// workoutSummaryStats shows no deltas.
 export function summaryPriorWorkout(active, workouts, routines) {
-  return previousSameRoutineWorkouts(active, workouts, routines).find(anythingLogged) ?? null
+  return previousSameRoutineWorkouts(active, workouts, routines).find(hasDoneWorkingSet) ?? null
+}
+
+function hasDoneWorkingSet(workout) {
+  return (workout?.sets || []).some((set) => set.setType !== 'wu' && !isSkippedSet(set))
 }
 
 // req-111 — every prior same-routine finished workout, newest-first (same grouping as
 // previousSameRoutineWorkout, which is its head). beat-last-time takes the whole list
 // so each exercise can look past a workout where it was entirely skipped (DEC-053).
+// req-163 — newest-first by finishedAt (finishedNewestFirst), not by array order.
 export function previousSameRoutineWorkouts(active, workouts, routines) {
   if (!active) return []
-  const groups = groupWorkoutsByRoutine([active, ...(workouts || [])], routines)
+  const groups = groupWorkoutsByRoutine([active, ...finishedNewestFirst(workouts)], routines)
   const group = groups.find((g) => g.workouts[0] === active)
   return group ? group.workouts.slice(1) : []
 }

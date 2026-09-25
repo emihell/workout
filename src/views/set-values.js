@@ -8,6 +8,7 @@
 // SetEditForm) already refuse Complete/Save with an inline error (kg-input.js kgError),
 // so null here is the backstop: bad text is never written as 0 or NaN.
 import { kgToSave } from '../kg-input.js'
+import { secondsToSave } from '../seconds-input.js'
 
 function effortValue(rpe) {
   return rpe === '' || rpe == null ? null : Number(rpe)
@@ -31,8 +32,31 @@ export function activeSetPatch({ weight, reps, rpe, note }, { showLoad = true } 
 }
 
 // HistorySet's (and History add set's) set fields. A blank kg stays ''.
-export function historySetFields({ weight, reps, rpe, note, setType }) {
+// req-163 (req-117 b) — a `durationSec` in the values (the form showed Duration: a timed
+// exercise's work set) is saved as whole seconds (`30,5` → 31); blank → null (no
+// duration). Absent (the field wasn't shown) → no durationSec key, so the stored one is
+// left as it is.
+export function historySetFields({ weight, reps, rpe, note, setType, durationSec }) {
   const kg = kgToSave(weight, '')
   if (kg.error) return null
-  return { setType, weight: kg.value, reps, rpe: effortValue(rpe), note }
+  const fields = { setType, weight: kg.value, reps, rpe: effortValue(rpe), note }
+  if (durationSec === undefined) return fields
+  const seconds = secondsToSave(durationSec, null)
+  if (seconds.error) return null
+  return { ...fields, durationSec: seconds.value }
+}
+
+// req-163 (DEC-087 §2, req-117 b) — what History's set form shows for a set of this
+// exercise, decided the way the live forms decide it: Effort only on a work set of a
+// non-cardio exercise; Duration only on a work set of a timed exercise. The exercise's
+// kind comes from the workout's snapshot item (frozen at Start, as History records it),
+// else the exercise record.
+export function historySetKind(item, exercise) {
+  const type = item?.exerciseType || exercise?.type
+  const timed = item?.hasDuration ?? Boolean(exercise?.hasDuration)
+  return {
+    showEffort: (setType) => setType !== 'wu' && type !== 'cardio',
+    showDuration: (setType) => Boolean(timed) && setType !== 'wu',
+    cardio: type === 'cardio',
+  }
 }

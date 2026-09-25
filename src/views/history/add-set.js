@@ -64,6 +64,8 @@ export function withHistorySet(workout, { exerciseId, itemId, exercise, values }
       reps: fields.reps,
       rpe: fields.rpe,
       note: fields.note || '',
+      // req-163 (req-117 b) — a timed exercise's seconds, when the form showed Duration.
+      ...(fields.durationSec !== undefined ? { durationSec: fields.durationSec } : {}),
     },
   ]
   const items = workout.snapshot?.items || []

@@ -112,7 +112,11 @@ export function greeting() {
   return 'Good evening'
 }
 
-export function formatSetLine(set) {
+// req-163 (DEC-087 §2) — a warm-up or cardio set carries no effort (req-156), so its
+// label is never shown, even on an OLD set stored with rpe 3 before req-156: display only,
+// the stored value is not rewritten. `cardio` comes from the caller (the set alone doesn't
+// know its exercise's type).
+export function formatSetLine(set, { cardio = false } = {}) {
   const bits = []
   if (set.setType === 'wu') bits.push('WU set')
   if (set.weight != null && set.weight !== '' && Number(set.weight) !== 0) {
@@ -121,6 +125,6 @@ export function formatSetLine(set) {
   // req-85 — a timed set logs seconds in place of reps; show it as e.g. "30s".
   if (set.durationSec != null && set.durationSec !== '') bits.push(`${set.durationSec}s`)
   if (set.reps != null && set.reps !== '') bits.push(`${set.reps}`)
-  if (set.rpe) bits.push(rpeLabel(set.rpe) || 'logged')
+  if (set.rpe && set.setType !== 'wu' && !cardio) bits.push(rpeLabel(set.rpe) || 'logged')
   return bits.join(' · ') || 'logged'
 }
