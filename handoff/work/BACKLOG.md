@@ -605,7 +605,8 @@ backend (database) ─→ users ─→ (multi-device)
 
 ## Current shape (reference, not a task list)
 
-> Stale (2026-09-12 shape). Today's module map: `audits/2026-09-24.md` F-STRUCT-6.
+> Stale (2026-09-12 shape). Stored fields: `reference/schema.md` (2026-09-25). The module map changes in req-164 (the
+> `storage.js` split) — refresh this section from that report.
 
 ```
 src/
