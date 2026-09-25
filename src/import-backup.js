@@ -1,7 +1,7 @@
 import { applyBackup as validateBackup, buildBackup } from './exchange.js'
 import { askConfirm } from './ui/confirm.js'
 import { dateKey } from './schedule.js'
-import { getLoadUnreadable, keepUnreadableCopy, readUnreadableValues, releaseUnreadable } from './storage.js'
+import { getLoadUnreadable, keepUnreadableCopy, readUnreadableValues, releaseUnreadable } from './persistence.js'
 
 // req-157 — the object URL is revoked a while AFTER the click, not synchronously: revoking
 // straight away can cancel a download the browser hasn't started reading yet.

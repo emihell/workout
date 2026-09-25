@@ -1,6 +1,7 @@
 import { formatSetLine, roleTag } from '../../ids'
 import { go } from '../../route'
-import { durationLabel, exerciseById, routineById, groupSetsByExercise, workoutVolume } from '../../storage'
+import { exerciseById, routineById } from '../../model.js'
+import { durationLabel, groupSetsByExercise, workoutVolume } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-log'
 import { Back, Missing } from '../shared'
