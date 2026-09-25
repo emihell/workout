@@ -288,6 +288,13 @@ a.ui-btn--quiet:active {
 .ui-field-error::before {
   content: '! ';
 }
+/* req-173 — a quiet inline note under a field (not an error): the .ui-field-error slot,
+   secondary ink, no weight or marker. */
+.ui-field-note {
+  margin: calc(-1 * var(--ui-s2)) 0 var(--ui-s3);
+  font-size: var(--ui-text-caption);
+  color: var(--ui-ink-2);
+}
 .ui-input[aria-invalid='true'] {
   border: 2px solid var(--ui-ink);
 }
