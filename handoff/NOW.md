@@ -22,9 +22,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
   lane, live with Emilio), then req-10. Emilio: Export + reimport whenever convenient (safe since req-163).
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
   search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
-- **First, a binary fix (DEC-091 §4):** Back on a workout's detail always goes to History (`views/history/detail.jsx:38`),
-  even when opened from Today (`Today.jsx:82,93`) — make Back return where you came from; sweep every screen with more
-  than one entry point; Planner tests in Chrome. Not yet specced.
+- **In build: req-171** — Back returns to the screen you came from (bug lane). Then a beginner-persona run of the
+  app in Chrome (findings → req-144), then the req-144 design session with Emilio.
 - **Order (DEC-091):** req-144 creation design → req-10 + in-gym flow → req-146 server later. Export stays.
 - **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
 - **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter (+ libraryId in the feedback note) → 132 → 137 →
