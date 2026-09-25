@@ -10,7 +10,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
-import { kgError } from '../kg-input.js'
+import { kgError, readKg } from '../kg-input.js'
 import { readSeconds, secondsToSave } from '../seconds-input.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
@@ -480,6 +480,10 @@ export function SetLogForm({
           />
         )}
       </div>
+      {/* req-173 (DEC-093) — a weighted set with an empty kg box says so, quietly. Not a
+          block or a confirm: Complete still logs it in one tap, as 0 (set-values.js
+          liveSetWeight), exactly as before. Never a default weight (DESIGN core rule). */}
+      {weighted && readKg(weight).empty ? <p className="ui-field-note">No weight entered</p> : null}
       {weightError ? (
         <p className="ui-field-error" role="alert">
           {weightError}
