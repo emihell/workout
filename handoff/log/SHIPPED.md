@@ -1991,3 +1991,16 @@ Reviewer: independent reviewer (DEC-057 §1: history-queries/state-reducers/stor
 two extreme TZs, **No blockers.** (1 should-fix → fixed in `bb96f9f`, red→green). Planner's QA (`./plan qa`, mixed-offset
 seed): History A(09:30Z) before B(11:00+02:00) and the prefill from A (40 kg); Plank → WU `durationSec: null`; old WU rpe 3
 → Work "—" → rpe null; no NaN; 0 dialogs.
+
+## req-168 — backlog sweep: legacy drafts count as references; the last component/import tests (DEC-087)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `b4adba8`…`376a01a`). Deletion impact counts legacy `draftWorkouts`
+(routineId, sets, snapshot items), so setup referenced only by an old draft is **archived**, not hard-deleted; render tests
+for History Add set (Cancel = no write) and the restored duration; import tests (one Import's copies share one ISO; quota →
+retry → release). **3 of 6 dropped** (L-042 — already fixed by req-129: the pre-push guard, the nested-worktree resolve,
+`shot --click/--scroll-bottom`; each reproduced in a sandbox). Gate: red on main (item 1's 4 cases), branch 10/10;
+`./check --smoke` green, 1043; mutation receipts. Reviewer: independent reviewer (DEC-057 §1: state-reducers) → `# tests
+1043 # pass 1043`, **No blockers.** (1 nit: the draft-only confirm says "has past workouts"; 1 latent: a finished workout's
+zero-set snapshot item isn't a reference — main's behaviour, per DEC-031). Planner's QA (`./plan qa`, a draft-only
+exercise): branch "…has past workouts and will be archived" → `archivedAt` set; **main** "Delete Draft Only Row?" →
+`HARD-DELETED`.
