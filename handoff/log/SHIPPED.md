@@ -2062,4 +2062,4 @@ routine-only match main's gate; Import still replaces; `./check --smoke` green; 
 on Planner's ask) / Swap exercise (+ the picker's row button "Swap") / Couldn't finish / "5,873 kg lifted". Display only.
 Gate (ui): req-175.test.js 2/0 (fails on main); suite 1119/0; `./check --smoke` green; Reviewer: independent reviewer
 (DEC-057 §1: `workout-log.js` setPreview label) → **No blockers.**, 4 nits (→ req-144 prep §E). Planner's run: History
-"5,873 kg lifted", overview/log new words, no old words, 0 dialogs. `reports/req-175.md`.
+"5,873 kg lifted", overview/log new words, no old words, 0 dialogs. Merge `49d427f`. `reports/req-175.md`.

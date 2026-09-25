@@ -22,7 +22,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
   lane, live with Emilio), then req-10. Emilio: Export + reimport whenever convenient (safe since req-163).
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
   search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
-- **Beginner-run fixes (DEC-093), batch → throwaway agents in order (172–174 shipped):** req-175 → req-176. Then
+- **Beginner-run fixes (DEC-093), batch → throwaway agents in order (172–175 shipped):** req-176. Then
   the req-144 design session with Emilio.
 - **Order (DEC-091):** req-144 creation design → req-10 + in-gym flow → req-146 server later. Export stays.
 - **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
