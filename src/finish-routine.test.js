@@ -82,7 +82,7 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
   // Easy press sets → the recommendation differs from the routine, so the test has teeth.
   const logged = (s) => withSets(s, [work(item(s, 0), 30, 10, 1), work(item(s, 0), 35, 8, 1), work(item(s, 1), 0, 12, 3)])
 
-  it('manual Finish: routines deep-equal to before; the progression is still recorded', () => {
+  it('manual Finish: routines deep-equal to before; no progression recorded (req-158)', () => {
     const s = logged(baseState())
     const before = structuredClone(s.routines)
     const progression = buildFinishProgression(s.exercises, s.activeWorkout)
@@ -90,10 +90,10 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
     const next = finishedState(s, { overallNote: 'n', overallFeel: 'Good', progression }, '2026-09-23T11:00:00.000Z')
     assert.deepEqual(next.routines, before)
     assert.equal(next.routines, s.routines, 'same reference: Finish does not touch routines at all')
-    // history still carries the progression record, as before
+    // req-158 (DEC-085 §3) — was: history carries the progression record. Nothing read it;
+    // the finished record no longer has the field at all (not even the start-time null).
     assert.equal(next.workouts.length, 1)
-    assert.deepEqual(next.workouts[0].progression, progression)
-    assert.deepEqual(next.workouts[0].progression[0].to, [32.5, 37.5])
+    assert.equal('progression' in next.workouts[0], false)
   })
 
   it('auto-complete Finish (autoFinishArgs): routines deep-equal to before', () => {
@@ -102,7 +102,7 @@ describe('req-112 Finish leaves the routine alone (DEC-056)', () => {
     const progression = buildFinishProgression(s.exercises, s.activeWorkout)
     const next = finishedState(s, autoFinishArgs(s.activeWorkout, progression))
     assert.deepEqual(next.routines, before)
-    assert.deepEqual(next.workouts[0].progression, progression)
+    assert.equal('progression' in next.workouts[0], false, 'req-158 — was: deepEqual(progression)')
     assert.equal(next.workouts[0].overallNote, 'felt strong')
   })
 

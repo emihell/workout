@@ -1,3 +1,6 @@
+// req-158 — main's model.js at 3aa7990, verbatim below this header, so req-158.test.js can
+// deep-equal the branch's migrateState against main's. Not imported by the app.
+
 import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
 import { isAddedMidWorkout, isSkippedSet } from './workout-log.js'
@@ -29,11 +32,7 @@ function migrateRoutine(routine, exercises, legacyRecommendations, legacy) {
       const id = itemId(routine.id, item, index)
       const ex = exercises.find((candidate) => candidate.id === item.exerciseId)
       const recorded = legacyRecommendations[id]
-      // req-158 (audit F-DEAD-4, DEC-085 §3) — a baseline is recorded only for legacy
-      // (pre-v9) input, the only input that reads it (below, and workoutSnapshot). On v9
-      // nothing reads it, so nothing is added: the map no longer grows on every load.
-      // Entries already stored are kept as they are (the spread in migrateState).
-      if (legacy && !recorded && (item.targets?.length || item.suggestedWeights?.length)) {
+      if (!recorded && (item.targets?.length || item.suggestedWeights?.length)) {
         legacyRecommendations[id] = {
           targets: [...(item.targets || [])],
           suggestedWeights: [...(item.suggestedWeights || [])],
@@ -42,7 +41,7 @@ function migrateRoutine(routine, exercises, legacyRecommendations, legacy) {
       }
       // req-120 (audit C) — the recorded baseline refills empty lists only for legacy
       // (pre-v9) input. On v9 an empty list is the user's own choice and stays empty
-      // (DESIGN §1: never invent).
+      // (DESIGN §1: never invent). Recording above still runs, so the map is unchanged.
       const baseline = legacy ? legacyRecommendations[id] : null
       const targets = item.targets?.length ? [...item.targets] : [...(baseline?.targets || [])]
       const suggestedWeights = item.suggestedWeights?.length

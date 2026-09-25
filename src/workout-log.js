@@ -166,16 +166,25 @@ export function withSkippedUnloggedSets(workout) {
 }
 
 // store.finishWorkout's reducer (manual Finish and the req-84 auto-complete both call
-// it). The finished record carries `progression` as history (recalc reads it), but
-// req-112 / DEC-056: `routines` is NOT touched — updating the routine is a deliberate
+// it). req-158 (audit F-DEAD-4, DEC-085 §3) — a new finished record no longer carries
+// `progression`: nothing read it (History recalc recomputes from the sets,
+// progressionFromWorkout), and it went stale after a set edit. The argument is still
+// accepted and ignored; the start-time `progression: null` is dropped too. Workouts
+// finished before keep theirs untouched, and nothing may start reading it. req-112 / DEC-056: `routines` is NOT touched — updating the routine is a deliberate
 // choice (History recalc), never a side effect of Finish. req-83 (N9) — the live
 // seed-override map is transient session state, dropped so it never lands on the
 // finished-history record (which feeds history-prefill from `sets` alone). req-116 —
 // the auto-finish dismissed flag is transient in the same way and is dropped too.
 // req-125 — so is the set-form draft (`setDraft`).
-export function finishedState(state, { overallNote, overallFeel, progression = [] } = {}, finishedAt = new Date().toISOString()) {
+export function finishedState(state, { overallNote, overallFeel } = {}, finishedAt = new Date().toISOString()) {
   if (!state?.activeWorkout) return state
-  const { seedOverrides, autoFinishDismissed: _dismissed, setDraft: _draft, ...activeToFinish } = state.activeWorkout
+  const {
+    seedOverrides,
+    autoFinishDismissed: _dismissed,
+    setDraft: _draft,
+    progression: _progression,
+    ...activeToFinish
+  } = state.activeWorkout
   const finished = withSkippedUnloggedSets({
     ...activeToFinish,
     finishedAt,
@@ -183,7 +192,6 @@ export function finishedState(state, { overallNote, overallFeel, progression = [
     overallFeel: overallFeel || '',
     restEndsAt: null,
     restPausedRemaining: null,
-    progression,
   })
   return {
     ...state,
