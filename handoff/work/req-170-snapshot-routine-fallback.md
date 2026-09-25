@@ -1,6 +1,6 @@
 # req-170 — a workout's routine falls back to the one its snapshot names
 
-**Status: BUILT — branch `req-170` (`962ebdf`), NOT merged.** (2026-09-25) **Lane: data** — migration change: reviewer + a migration test + Emilio's eyes before merge
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-170` (`ed161b4`…`962ebdf`, 3 commits).** (2026-09-25) **Lane: data** — migration change: reviewer + a migration test + Emilio's eyes before merge
 (he approved the change itself, DEC-090). Source: req-169's review (latent, `model.js:88,161`).
 
 **Reproduce on main first:** a finished workout (and an active one, and a draft) with no top-level `routineId`/`sessionId`
