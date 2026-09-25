@@ -18,7 +18,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 **READY, held:**
 - **All follow-ups done (DEC-087)** — audits 2026-09-24 closed out: bugs, cleanup, the storage split, tooling (see
-  SHIPPED 2026-09-24/25). **The table is clean** (req-169 closed req-168's last two points). Last: `req-170` (DEC-090, a small migration fallback, Emilio approved). Next: new features, starting with the creation design (req-144, design
+  SHIPPED 2026-09-24/25). **The table is clean** (the review leftovers are closed; see SHIPPED). Last: `req-170` (DEC-090, a small migration fallback, Emilio approved). Next: new features, starting with the creation design (req-144, design
   lane, live with Emilio), then req-10. Emilio: Export + reimport whenever convenient (safe since req-163).
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
   search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
