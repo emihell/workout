@@ -18,13 +18,21 @@ import { historyPrescription, routinesUsingExercise } from './history-queries.js
 // how we describe it.
 // req-168 — a legacy `draftWorkout` (an old unfinished workout, shown in History as a
 // Continue row) references its routine and exercises too (DESIGN §3: referenced setup is
-// archived, not deleted). It counts in `hasHistory`, which both the confirm wording and
-// the reducer read, so the two can't disagree.
+// archived, not deleted). req-169 (DEC-089) — reported apart from finished history as
+// `inDraft`, so the confirm can say so truthfully; the reducer archives on either. A stored
+// workout names its routine by `routineId` alone: Finish always writes it, and migrateState
+// rebuilds the snapshot from it (model.js workoutSnapshot), so a loaded workout never
+// carries only `snapshot.routineId` (req-169 measured it; that is no gap here). Schedule
+// slots are never a reference (DEC-031).
+function workoutNamesRoutine(workout, routineId) {
+  return workout?.routineId === routineId
+}
+
 export function routineDeletionImpact(state, routineId) {
-  const refersTo = (obj) => obj.routineId === routineId
   return {
-    slots: (state?.schedule?.slots || []).filter(refersTo).length,
-    hasHistory: [...(state?.workouts || []), ...(state?.draftWorkouts || [])].some(refersTo),
+    slots: (state?.schedule?.slots || []).filter((slot) => slot.routineId === routineId).length,
+    hasHistory: (state?.workouts || []).some((w) => workoutNamesRoutine(w, routineId)),
+    inDraft: (state?.draftWorkouts || []).some((w) => workoutNamesRoutine(w, routineId)),
   }
 }
 
@@ -32,17 +40,21 @@ export function routineDeletionImpact(state, routineId) {
 // it from every routine and archives-vs-deletes on
 // finished history (a set with this exerciseId). Reuses routinesUsingExercise for
 // the routine count; history mirrors the store's set.exerciseId test.
+// req-169 (DEC-089) — a workout names an exercise by a logged set OR its snapshot item: a
+// finished workout that listed it with zero logged sets is still its history (was: sets
+// only, so it was hard-deleted). Legacy drafts the same way, reported as `inDraft`.
+function workoutNamesExercise(workout, exerciseId) {
+  return (
+    (workout?.sets || []).some((set) => set.exerciseId === exerciseId) ||
+    (workout?.snapshot?.items || []).some((item) => item.exerciseId === exerciseId)
+  )
+}
+
 export function exerciseDeletionImpact(state, exerciseId) {
   return {
     routines: routinesUsingExercise(state?.routines, exerciseId).length,
-    // req-168 — legacy drafts too, by their logged sets or their snapshot items.
-    hasHistory:
-      (state?.workouts || []).some((workout) => (workout.sets || []).some((set) => set.exerciseId === exerciseId)) ||
-      (state?.draftWorkouts || []).some(
-        (draft) =>
-          (draft.sets || []).some((set) => set.exerciseId === exerciseId) ||
-          (draft.snapshot?.items || []).some((item) => item.exerciseId === exerciseId),
-      ),
+    hasHistory: (state?.workouts || []).some((w) => workoutNamesExercise(w, exerciseId)),
+    inDraft: (state?.draftWorkouts || []).some((w) => workoutNamesExercise(w, exerciseId)),
   }
 }
 
@@ -72,7 +84,8 @@ export function routineInActiveWorkout(state, routineId) {
 // from every routine; removeRoutine drops its schedule slots (req-165: stored plans are
 // no longer touched). Neither touches activeWorkout — its snapshot is its own.
 export function removeExerciseFromState(s, exerciseId, archivedAt = new Date().toISOString()) {
-  const referenced = exerciseDeletionImpact(s, exerciseId).hasHistory || exerciseInActiveWorkout(s, exerciseId)
+  const impact = exerciseDeletionImpact(s, exerciseId)
+  const referenced = impact.hasHistory || impact.inDraft || exerciseInActiveWorkout(s, exerciseId)
   return {
     ...s,
     exercises: referenced
@@ -120,7 +133,8 @@ export function replaceItemInState(s, itemId, exerciseId, id) {
 }
 
 export function removeRoutineFromState(s, routineId, archivedAt = new Date().toISOString()) {
-  const referenced = routineDeletionImpact(s, routineId).hasHistory || routineInActiveWorkout(s, routineId)
+  const impact = routineDeletionImpact(s, routineId)
+  const referenced = impact.hasHistory || impact.inDraft || routineInActiveWorkout(s, routineId)
   return {
     ...s,
     routines: referenced
@@ -135,10 +149,13 @@ export function removeRoutineFromState(s, routineId, archivedAt = new Date().toI
 
 // req-119 — the head line of the delete confirm (Exercises.jsx / Routine.jsx), pure so
 // the wording per case is tested. The current workout wins over past history in the
-// wording: it is the reference the user is in the middle of.
-export function deletionConfirmHead(name, { hasHistory, inCurrentWorkout }) {
+// wording: it is the reference the user is in the middle of. req-169 (DEC-089) — then
+// finished history, then a legacy unfinished (draft) workout, then a plain delete; the
+// same three references the reducers archive on.
+export function deletionConfirmHead(name, { hasHistory, inCurrentWorkout, inDraft = false }) {
   if (inCurrentWorkout) return `${name} is in the current workout and will be archived (the workout keeps it).`
   if (hasHistory) return `${name} has past workouts and will be archived (kept in your history).`
+  if (inDraft) return `${name} is in an unfinished workout and will be archived (kept).`
   return `Delete ${name}?`
 }
 

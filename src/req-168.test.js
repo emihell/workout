@@ -53,7 +53,8 @@ describe('1 — a legacy draft workout is a reference: delete archives, never ha
 
   it('an exercise whose only reference is a draft (a logged set) → archived: archivedAt set, not removed (was: hard-deleted)', () => {
     const s = state()
-    assert.equal(exerciseDeletionImpact(s, 'ex-only-draft').hasHistory, true)
+    // req-169 (DEC-089) — was `.hasHistory`: a draft is now reported apart, as `inDraft`.
+    assert.deepEqual([exerciseDeletionImpact(s, 'ex-only-draft').hasHistory, exerciseDeletionImpact(s, 'ex-only-draft').inDraft], [false, true])
     const kept = removeExerciseFromState(s, 'ex-only-draft', AT).exercises.find((e) => e.id === 'ex-only-draft')
     assert.equal(kept?.archivedAt, AT)
   })
@@ -63,13 +64,17 @@ describe('1 — a legacy draft workout is a reference: delete archives, never ha
   })
   it('a routine whose only reference is a draft → archived (was: hard-deleted)', () => {
     const s = state()
-    assert.equal(routineDeletionImpact(s, 'r-only-draft').hasHistory, true)
+    // req-169 (DEC-089) — was `.hasHistory`: reported apart, as `inDraft`.
+    assert.deepEqual([routineDeletionImpact(s, 'r-only-draft').hasHistory, routineDeletionImpact(s, 'r-only-draft').inDraft], [false, true])
     const kept = removeRoutineFromState(s, 'r-only-draft', AT).routines.find((r) => r.id === 'r-only-draft')
     assert.equal(kept?.archivedAt, AT)
   })
-  it('the confirm names it the same way the delete treats it (both read hasHistory)', () => {
+  // req-169 (DEC-089) — was "…(both read hasHistory)" matching /archived/; the draft wording
+  // is now its own ("in an unfinished workout"), still an archive.
+  it('the confirm names it the same way the delete treats it (both read the impact)', () => {
     const s = state()
-    assert.match(deletionConfirmHead('Old', { hasHistory: routineDeletionImpact(s, 'r-only-draft').hasHistory, inCurrentWorkout: false }), /archived/)
+    const impact = routineDeletionImpact(s, 'r-only-draft')
+    assert.match(deletionConfirmHead('Old', { ...impact, inCurrentWorkout: false }), /is in an unfinished workout and will be archived/)
   })
   it('control: unreferenced setup is still hard-deleted', () => {
     const s = state()
