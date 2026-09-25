@@ -1587,3 +1587,10 @@ note ("4. good"); req-174 empty home → "Create your first routine" ("5. good")
 not always possible … can be annoying if its automatic". Back to the list stays. **Kept — home order** (req-60): "yes
 future on top history at bottom today in the middle". **Waits for req-144:** the routine's kg box the workout ignores, taps to
 add an exercise, routine-form jargon, the " — Machines" suffix, rest blank by default. **Finish lists unfinished exercises** → req-176 (Emilio: "i go with yes").
+
+## DEC-094 — Planner owns what it can see on a phone-size screenshot  (Emilio, 2026-09-26)
+
+Emilio, on three "worth a look on your phone" items: "these things you can check?" — extends DEC-091 §5: layout, fit,
+wrapping, spacing and wording length are checkable at 390×844 by Planner; decide, fix, and list the calls as reversible.
+Emilio's eyes stay for real-device feel (touch, one-handed, gym light). First use: req-177 ("Couldn't finish" → "Max",
+Finish list collapses not-started exercises, "1 set", empty-home gap).
