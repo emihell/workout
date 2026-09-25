@@ -2004,3 +2004,15 @@ retry → release). **3 of 6 dropped** (L-042 — already fixed by req-129: the 
 zero-set snapshot item isn't a reference — main's behaviour, per DEC-031). Planner's QA (`./plan qa`, a draft-only
 exercise): branch "…has past workouts and will be archived" → `archivedAt` set; **main** "Delete Draft Only Row?" →
 `HARD-DELETED`.
+
+## req-169 — finished snapshots count as references; a draft-only reference is worded truthfully (DEC-089)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `3d54a0b`…`f2fa6ad`, 3 commits; `3d54a0b` carried 2 failing tests fixed in
+`ccf9455`). A finished workout names an exercise by a set **or** a snapshot item; impacts return `inDraft` separately;
+the confirm reads current → past → "{name} is in an unfinished workout and will be archived (kept)." → plain. Routine side:
+no gap in loaded data (migration rebuilds snapshots from `routineId`). Gate: req-169.test.js 17/17 (main 6 fail);
+`./check --smoke` green, 1060. Reviewer: independent reviewer (DEC-057 §1: state-reducers) → `# tests 1060 # pass 1060`,
+lint clean, all 8 live×history×draft combinations text ⇔ outcome, **No blockers.** (1 latent: a hand-made import naming its
+routine only in the snapshot loses the link on load — `model.js:88,161`, pre-existing → Emilio's call). Planner's QA
+(`./plan qa`, probe seed): Zero Probe main "Delete…" → REMOVED / branch "has past workouts…" → archived; Draft Probe main
+"has past workouts…" / branch "is in an unfinished workout…" → archived; Free Probe "Delete Free Probe?" → removed on both.
