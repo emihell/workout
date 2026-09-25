@@ -658,3 +658,21 @@ Draft observations for the session (suggestions, not decisions):
   fields, with no program layer.
 - Rows 17, 18, 28–30 are the "program" layer. They're the A-only rows, and they're the ones that need the
   program-vs-routine model question (Q5) answered first.
+
+---
+
+## D. Inputs from Emilio, 2026-09-25 (after the prep)
+
+1. **Pin + search the whole library** (in-app note, `/exercises`, 2026-09-24): "pin your favorite exercises, or add if
+   there is missing ones - but not add from the library - then when you create a rutine - you can just search the whole
+   library - that removes one step". Planner: agree; picking a library entry creates the user's own exercise record
+   silently (it holds his settings — weight step, equipment, cues, timed — and is what history links to). **Check first:**
+   why search became own-only on 2026-09-24, so that change isn't undone blind.
+2. **History independent of the exercise records:** Emilio asked to "stamp" exercises into each workout. Already true
+   in part — each finished workout's `snapshot.items[]` keeps `exerciseName, equipment, exerciseType, weightStep`
+   [measured on his 2026-09-25 export]. The `exerciseId` link is still needed (last-time prefill, load recommendation).
+   **Gaps to decide:** the snapshot doesn't keep `muscles` or `libraryId`; adding them to new workouts only (no rewrite)
+   would make a future exercise-database swap a one-time id mapping. Feeds req-146 (server).
+3. **Back is a design signal** (in-app note, `/history/:id`): "going back is heavy signal that you made an error -
+   unless you want to inspect something - but then that information should be available to you fast". Consider
+   surfacing workout detail where it's opened from (Today).
