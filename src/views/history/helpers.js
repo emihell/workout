@@ -1,6 +1,7 @@
 import { roleTag } from '../../ids.js'
 import { isSkippedSet } from '../../workout-log.js'
 import { dateKey } from '../../schedule.js'
+import { compareWorkoutsNewestFirst } from '../../history-queries.js'
 
 // Shared helpers for the history screens (req-19 split of History.jsx): id/name
 // resolution, date formatting + grouping. Used by more than one history/ screen module. `workoutMonthKey` stays
@@ -53,8 +54,13 @@ export function routineTitle(program, routine) {
 
 export function workoutDateKey(workout) {
   if (workout.performedOn) return workout.performedOn
-  const stamp = workout.finishedAt || workout.startedAt
+  // req-167 — an unreadable stamp falls through (was: 'NaN-NaN-NaN', which sorted before
+  // every real date and displayed as "NaN"); only a readable one names the day.
+  const stamp = [workout.finishedAt, workout.startedAt].find((value) => value && Number.isFinite(Date.parse(value)))
   if (stamp) return dateKey(stamp)
+  // req-167 review — a legacy / imported workout with only `date` is dated by it, as
+  // workoutTime (history-queries.js) dates it for "last time"; was filed as "Unknown".
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(workout.date || ''))) return workout.date
   return workout.scheduledFor || 'unknown'
 }
 
@@ -93,7 +99,8 @@ export function sortWorkoutsByDate(workouts) {
     if (left === 'unknown' && right !== 'unknown') return 1
     if (right === 'unknown' && left !== 'unknown') return -1
     if (left !== right) return right.localeCompare(left)
-    return new Date(b.finishedAt || b.startedAt || 0).getTime() - new Date(a.finishedAt || a.startedAt || 0).getTime()
+    // req-167 — within a day, the shared comparator (parsed time, as the priors use).
+    return compareWorkoutsNewestFirst(a, b)
   })
 }
 
