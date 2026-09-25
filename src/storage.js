@@ -203,40 +203,74 @@ export function loadState() {
 }
 
 // req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — Import is the one way out of the
-// unreadable state. It reads the raw value that made the load unreadable FRESH from disk,
-// with loadState's own key choice (the current key, else the first legacy key):
-//   { raw }    — the stored string;
+// unreadable state. req-161 (DEC-086) — it reads, FRESH from disk, EVERY workout key that is
+// present (the current key, then each legacy key, in loadState's order), not only the one
+// the load read: a corrupt v9 beside a leftover v8 (an interrupted cleanup) must keep both,
+// because the first readable save lets the next load's cleanup delete v8. `values[0]` is
+// the one loadState read.
+//   { values: [{ key, raw }, …] } — each stored string;
 //   { gone }   — getItem answered and nothing is stored any more (nothing left to keep);
 //   { error }  — getItem THREW: we can't tell, so the caller must keep the lock;
 //   { unlocked } — not in the unreadable state.
-export function readUnreadableRaw() {
+export function readUnreadableValues() {
   if (!getLoadUnreadable()) return { unlocked: true }
   try {
-    const current = localStorage.getItem(STORAGE_KEY)
-    const raw = current || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean)
-    return raw ? { raw } : { gone: true }
+    const values = [STORAGE_KEY, ...LEGACY_KEYS].map((key) => ({ key, raw: localStorage.getItem(key) })).filter((v) => v.raw)
+    return values.length ? { values } : { gone: true }
   } catch {
     return { error: true }
   }
 }
 
-// req-157 — the on-device copy of the unreadable value, kept BEFORE the lock is lifted, so
+// req-157 — the on-device copy of an unreadable value, kept BEFORE the lock is lifted, so
 // the raw string survives even if its download never reaches the user (iOS asks "Download?"
 // after the page has moved on; a home-screen app can ignore a blob download). Written with
 // setItem and read back: only an exact === match counts. The key is never read by the app,
 // never migrated, and NEVER deleted by it — it's there for recovery by hand. localStorage
 // keeps JS strings as they are, so an unpaired surrogate (a value cut mid-emoji) survives
 // here even though a UTF-8 download can't carry it.
+//
+// req-161 (DEC-086) — the key names its source: `workout-mvp-unreadable-<ISO time>-v8` for
+// a copy of `workout-mvp-v8`. A retry doesn't pile up copies: when a copy of the SAME source
+// with the SAME content (===) already exists, it is reused and nothing is written (req-157's
+// unsuffixed copies name no source, so they never count as a match). A differing value gets
+// its own copy. `quota` says setItem threw a storage-full error, so the caller can say what
+// to do about it.
 export const UNREADABLE_COPY_PREFIX = 'workout-mvp-unreadable-'
+const WORKOUT_KEY_PREFIX = 'workout-mvp-'
 
-export function keepUnreadableCopy(raw, now = new Date()) {
-  const key = `${UNREADABLE_COPY_PREFIX}${now.toISOString()}`
+function isQuotaError(error) {
+  return error?.name === 'QuotaExceededError' || error?.name === 'NS_ERROR_DOM_QUOTA_REACHED' || error?.code === 22
+}
+
+function existingCopyOf(raw, suffix) {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key?.startsWith(UNREADABLE_COPY_PREFIX) && key.endsWith(suffix) && localStorage.getItem(key) === raw) return key
+  }
+  return null
+}
+
+export function keepUnreadableCopy(raw, sourceKey, now = new Date()) {
+  const suffix = `-${sourceKey.slice(WORKOUT_KEY_PREFIX.length)}`
   try {
+    const existing = existingCopyOf(raw, suffix)
+    if (existing) return { key: existing, reused: true }
+  } catch {
+    return { error: true }
+  }
+  let key = null
+  try {
+    // Never write over another copy: a second Import within the same millisecond (or a
+    // clock set back) gets `<ISO>~2-v9`, `~3`, … rather than the same key.
+    const base = `${UNREADABLE_COPY_PREFIX}${now.toISOString()}`
+    key = `${base}${suffix}`
+    for (let n = 2; localStorage.getItem(key) != null; n++) key = `${base}~${n}${suffix}`
     localStorage.setItem(key, raw)
     if (localStorage.getItem(key) !== raw) return { error: true, key }
     return { key }
-  } catch {
-    return { error: true, key }
+  } catch (error) {
+    return { error: true, key, quota: isQuotaError(error) }
   }
 }
 

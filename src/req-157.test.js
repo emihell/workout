@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { importWithBackup, downloadText, KEEP_FAILED_MESSAGE, REPLACE_MESSAGE, REPLACE_UNREADABLE_MESSAGE } from './import-backup.js'
 import { commitBackup } from './exchange.js'
-import { getLoadUnreadable, loadState, readUnreadableRaw, saveState, UNREADABLE_COPY_PREFIX } from './storage.js'
+import { getLoadUnreadable, loadState, readUnreadableValues, saveState, UNREADABLE_COPY_PREFIX } from './storage.js'
 
 const KEY = 'workout-mvp-v9'
 // Cut mid-emoji: ends in an unpaired high surrogate, the shape a truncated value has.
@@ -35,6 +35,11 @@ beforeEach(() => {
       disk.set(key, String(value))
     },
     removeItem: (key) => disk.delete(key),
+    // req-161 — the copy de-dup enumerates keys, as real localStorage allows.
+    get length() {
+      return disk.size
+    },
+    key: (i) => [...disk.keys()][i] ?? null,
   }
 })
 afterEach(() => {
@@ -85,7 +90,7 @@ describe('unreadable state + valid import + confirm', () => {
     // the copy: one key, exactly the stored string (unpaired surrogate included)
     const kept = copies()
     assert.equal(kept.length, 1)
-    assert.match(kept[0], /^workout-mvp-unreadable-\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+    assert.match(kept[0], /^workout-mvp-unreadable-\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-v9$/) // req-161: names its source
     assert.equal(disk.get(kept[0]), CORRUPT)
     assert.equal(disk.get(kept[0]).at(-1), '\uD83D')
     // the download: after the copy, before the lock lifts
@@ -204,7 +209,7 @@ describe('cancel, bad file, value gone, readable state', () => {
   it('readable data → the usual question and JSON backup; no copy, no raw download', async () => {
     disk.set(KEY, JSON.stringify({ ...fixture, schemaVersion: 9 }))
     loadState()
-    assert.deepEqual(readUnreadableRaw(), { unlocked: true })
+    assert.deepEqual(readUnreadableValues(), { unlocked: true })
     const { calls, done } = run({ answer: true })
     await done
     assert.deepEqual(calls.asked, [REPLACE_MESSAGE])
