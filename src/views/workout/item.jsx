@@ -113,7 +113,10 @@ export function WorkoutItemLog({ routineId, itemId }) {
 
   if (!mine) return <NotInWorkout routineId={routineId} />
   if (!item) return <MissingItem />
-  if (markedDone) return <MissingItem />
+  // req-162 — a marked-done item (just skipped, or done) is leaving: the effect above
+  // replaces the route with the overview. Render nothing meanwhile — "Not found." here
+  // flashed for one render after Skip exercise. An unknown item still says Not found.
+  if (markedDone) return null
 
   return <WorkoutItemLive routineId={routineId} item={item} />
 }
