@@ -7,6 +7,7 @@ import { useStore } from '../../store-context'
 import { Back } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { anythingLogged, loggedSetCount } from '../../workout-log'
+import { finishSkippedLines } from '../../finish-unfinished.js'
 import { activeFeel, activeNote } from '../../workout-note.js'
 import { NotInWorkout } from './helpers'
 import { abandonWorkout, isActiveFor } from './workout-helpers.js'
@@ -38,6 +39,10 @@ function FinishScreen({ routineId }) {
   // req-116 / DEC-058 §4 — nothing logged (every set skipped, or none at all): warn,
   // make Abandon the primary action, and keep "Save anyway" as the secondary one.
   const empty = !anythingLogged(active)
+  // req-176 — one quiet line per exercise Save will add skipped sets to, derived from
+  // what Save writes (finish-unfinished.js → withSkippedUnloggedSets). Empty when every
+  // planned set was logged.
+  const skippedLines = finishSkippedLines(active)
   // req-158 (DEC-085 §3) — Finish computes and stores no progression record; the
   // recommendation is computed only by History recalc (progressionFromWorkout).
 
@@ -59,6 +64,11 @@ function FinishScreen({ routineId }) {
       <p className="ui-sub">
         {name} — {minutes} min · {setCount} sets
       </p>
+      {skippedLines.map((line, i) => (
+        <p key={i} className="ui-sub">
+          {line}
+        </p>
+      ))}
       {beatLine ? (
         <p className="ui-beat">
           <span className="ui-beat__mark" aria-hidden="true">↑</span>
