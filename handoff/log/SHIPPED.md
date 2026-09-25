@@ -1891,3 +1891,6 @@ with CI=true. Planner read the diff (all writes under tmpdir; nothing touches ei
 merge (receipt below). Reviewer: none (no trigger files). Not verified: the GitHub Ubuntu runner — the first deploy is the
 receipt; a red smoke blocks the deploy, it doesn't ship. Found on main by the smoke (not fixed): Skip exercise flashes
 "Not found." for one render (`item.jsx:116`).
+**Planner's use after merge:** `./plan qa main` → `page: 200`; `node scripts/smoke.mjs --url …` → `smoke: green — 11 steps
+(build 0.0s, browser 4.4s)`; `--stop` → port freed (`after stop: 000`); both worktrees 0 changes. **First CI run**
+(`gh run 36108691933`, `361b765`): `Run node scripts/smoke.mjs: success` → Pages deployed — the Ubuntu runner works. → req-162.

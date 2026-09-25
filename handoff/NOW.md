@@ -17,7 +17,7 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 **Nothing in flight.** **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **Audit follow-ups (DEC-085), in order:** `req-160` skills → `req-161` unreadable-copy follow-ups [data]. Planning: DEC digest/archive, stale
+- **Audit follow-ups (DEC-085), in order:** `req-160` skills → `req-161` unreadable-copy follow-ups [data] → `req-162` Skip flashes "Not found." [bug]. Planning: DEC digest/archive, stale
   docs, lanes draft, README/DESIGN drafts. Later: `storage.js` split. **Emilio:** Builder's permission mode, a fresh
   Export, remove the `git commit:*`/`git reset:*` grants.
 - **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only

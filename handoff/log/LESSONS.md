@@ -428,3 +428,10 @@ req-157's first build lifted DEC-032's write lock right after `link.click()`; no
 Planner flagged it on reading the diff; the reviewer made it a blocker. **How to apply:** before lifting any write lock or
 overwriting stored data, keep a verified copy in the same store (write, read back, compare); a download is a convenience on
 top, never the safety net.
+
+## L-040 — prove a gate goes red without touching a worktree  (Builder, req-159, 2026-09-25)
+
+To show the smoke test fails on a real regression, Builder built a throwaway commit object (`GIT_INDEX_FILE` + `git
+hash-object -w` + `git commit-tree`) with the "22,5" parse broken, and ran the gate on it — no checkout, no stash, no worktree
+change. **How to apply:** a guard's "fires" receipt (tooling lane) uses a throwaway commit object or `git archive` of one,
+never an edit-and-revert in a worktree (L-034).
