@@ -1604,3 +1604,21 @@ DEC-094 as the default: Planner decides, builds (via Builder/agents), tests, mer
 2. **What only a person can judge** — real-device feel (touch, one-handed, gym light).
 3. **Product direction in a live design session he runs** (req-144 is design lane, live with him).
 Anything else: do it, then say what was done and what was chosen, so it can be reversed.
+
+## DEC-096 — the routine sets the workout's weight; history prefills the routine  (Emilio, 2026-09-26, req-144)
+
+Emilio: "the weight i enter here is what sets the weight when i do excercise - it should not be history - i think i got it
+backwards becouse i delevoped the app around my excel sheet". **Reverses the core prefill rule** (CLAUDE.md "prefills come
+only from finished-workout data"; DEC-082 §2; `.cursor/rules/history-prefill.mdc`). Still honest: the routine's kg is a
+number the user typed or confirmed, never invented.
+1. **The workout's kg comes from the routine item** (`suggestedWeights`). Blank in the routine → blank in the workout.
+2. **Adding an exercise to a routine prefills its kg from that exercise's history** (latest finished workout), editable.
+3. **An "update routine" step carries a new weight back — offered when you finish the exercise**, confirmed, never
+   automatic (keeps DEC-056). Planner's shape: an inline offer after the last set, not a popup (DEC-093's "annoying if
+   automatic" applies).
+4. **Per routine**, not per exercise: updating Day A's deadlift leaves Day B's (heavy/light days are real).
+5. **No "last time" beside the plan** — Emilio: "is this really nessecary?" Dropped.
+6. **His existing routines get a one-time fill from latest history** — Emilio: "you can update my data file". A bulk
+   rewrite: the build req shows what changes and to how many records first (ask-gate #2), with a migration test.
+Rule text (CLAUDE.md, rules/DESIGN.md, WORKFLOW/AUDIT/PLANNING mentions, the `.mdc`) is rewritten with the build req, so
+the docs match the code on the day it ships.
