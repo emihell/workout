@@ -2063,3 +2063,11 @@ on Planner's ask) / Swap exercise (+ the picker's row button "Swap") / Couldn't 
 Gate (ui): req-175.test.js 2/0 (fails on main); suite 1119/0; `./check --smoke` green; Reviewer: independent reviewer
 (DEC-057 §1: `workout-log.js` setPreview label) → **No blockers.**, 4 nits (→ req-144 prep §E). Planner's run: History
 "5,873 kg lifted", overview/log new words, no old words, 0 dialogs. Merge `49d427f`. `reports/req-175.md`.
+
+## req-176 — Finish lists what's unfinished before you save  (merged 2026-09-25)
+
+**req-176** (2026-09-25) — Finish shows one quiet line per exercise Save will add skipped sets to, derived from
+`withSkippedUnloggedSets` item by item (`src/finish-unfinished.js`; `workout-log.js` not edited). Gate (ui): req-176.test.js
+8/0 (counts asserted against the real function; empty/legacy shapes); agent's browser run: 7 lines match the stored skipped sets
+per exercise; `./check --smoke` green; Planner's run: untouched Upper Body → a line per exercise, 0 dialogs. No trigger files.
+Feel for Emilio: an unlogged warm-up is named ("… and the warm-up set"), so an early stop lists every exercise. `reports/req-176.md`.
