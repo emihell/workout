@@ -15,7 +15,10 @@ plan ping req-N        verify req-N's doc is on main AND planning is fully
 plan sync              both directions of staleness: unpublished planning
                         AND the planning worktree's own code falling behind
 plan closeout req-N    merge a built branch, flip its doc status, publish,
-                        push both branches, delete the branch — one command
+                        push both branches, delete the branch — one command.
+                        Refuses BEFORE merging when the diff touches a DEC-057
+                        trigger file and the SHIPPED gate line names no reviewer;
+                        override: --no-reviewer "<reason>" (recorded in SHIPPED)
 plan preview [req-N]   build the checked-out (or a named req-N) branch and
                         serve it over Tailscale (HTTPS) to test on the phone
                         before merge; run in the CODE worktree (DEC-041)
@@ -635,8 +638,71 @@ reviewer_warning() {
   echo "  (DEC-057: the reviewer comes BEFORE merge. Not blocking — record why none ran, or get one now.)"
 }
 
+# req-166 (DEC-057 §1, DEC-085 §6) — the reviewer check BEFORE the merge. Prints the
+# trigger files (tests excluded) that `main...<branch>` touches; empty = no reviewer needed.
+reviewer_trigger_files() {
+  local code_dir="$1" branch="$2"
+  git -C "$code_dir" diff --name-only "main...$branch" 2>/dev/null \
+    | grep -Ev '\.test\.(js|jsx|mjs)$' | grep -E "$REVIEWER_TRIGGER_RE" || true
+}
+
+# The req's SHIPPED.md entry (its "## req-N " heading up to the next "## "), recorded by
+# the recording pass before closeout (CLOSEOUT.md §Preconditions).
+shipped_entry() {
+  local shipped="$1" reqid="$2"
+  [ -f "$shipped" ] || return 0
+  awk -v h="## ${reqid} " 'index($0, h) == 1 { on = 1; print; next } on && /^## / { exit } on { print }' "$shipped"
+}
+
+# 0 when the entry's gate line names a reviewer: "reviewer" (any case) from the entry's
+# first "Gate" onward — DEC-057 §4's "the gate line … names the reviewer".
+shipped_names_reviewer() {
+  local entry
+  entry="$(shipped_entry "$1" "$2")"
+  [ -n "$entry" ] || return 1
+  # The --no-reviewer note (below) mentions "reviewer" too; it is not a named reviewer.
+  printf '%s\n' "$entry" | awk '/Gate/ { on = 1 } on' | grep -v '^No independent reviewer (`plan closeout --no-reviewer`)' | grep -qi 'reviewer'
+}
+
+# `--no-reviewer "<reason>"`: the reason is recorded in the req's SHIPPED entry (appended
+# to it, or to the stub closeout writes). Idempotent: the same note is not added twice.
+append_no_reviewer_note() {
+  local shipped="$1" reqid="$2" reason="$3"
+  local note="No independent reviewer (\`plan closeout --no-reviewer\`): ${reason}"
+  if shipped_entry "$shipped" "$reqid" | grep -qF "$note"; then
+    return 0
+  fi
+  python3 - "$shipped" "$reqid" "$note" <<'PY'
+import sys
+path, reqid, note = sys.argv[1], sys.argv[2], sys.argv[3]
+lines = open(path, encoding="utf-8").read().split("\n")
+start = next(i for i, l in enumerate(lines) if l.startswith(f"## {reqid} "))
+end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+while end > start + 1 and not lines[end - 1].strip():
+    end -= 1
+lines[end:end] = ["", note]
+open(path, "w", encoding="utf-8").write("\n".join(lines))
+PY
+  echo "plan closeout: SHIPPED.md — recorded the --no-reviewer reason under ${reqid}."
+}
+
 cmd_closeout() {
-  local arg="${1:-}"
+  # req-166 — `--no-reviewer "<reason>"` may come before or after req-N.
+  local arg="" no_reviewer="" no_reviewer_set=""
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --no-reviewer)
+        if [ -z "${2:-}" ]; then
+          echo 'plan closeout: --no-reviewer needs a reason, e.g. --no-reviewer "docs-only; no trigger code changed"' >&2
+          exit 1
+        fi
+        no_reviewer="$2"; no_reviewer_set=1; shift 2 ;;
+      --no-reviewer=*)
+        no_reviewer="${1#--no-reviewer=}"; no_reviewer_set=1; shift
+        if [ -z "$no_reviewer" ]; then echo 'plan closeout: --no-reviewer needs a reason' >&2; exit 1; fi ;;
+      *) [ -z "$arg" ] && arg="$1" || { echo "plan closeout: unexpected argument '$1'" >&2; exit 1; }; shift ;;
+    esac
+  done
   if [ -z "$arg" ]; then
     echo 'plan closeout: needs a requirement, e.g. ./plan closeout req-138' >&2
     exit 1
@@ -727,6 +793,27 @@ cmd_closeout() {
     exit 1
   fi
 
+  # 2b. req-166 (DEC-057 §1) — the reviewer check, BEFORE anything is merged. The diff
+  # touches a trigger file and the req's SHIPPED entry names no reviewer on its gate line
+  # → refuse, unless `--no-reviewer "<reason>"` (recorded in SHIPPED below). A re-run of
+  # an already-merged req only warns (step 4c): the merge has landed, and refusing would
+  # block the recovery the re-run exists for.
+  local shipped_path="$PLANNING_DIR/handoff/log/SHIPPED.md" triggers=""
+  if [ -z "$already_merged" ]; then
+    triggers="$(reviewer_trigger_files "$CODE_DIR" "$branch")"
+    if [ -n "$triggers" ] && ! shipped_names_reviewer "$shipped_path" "$reqid" && [ -z "$no_reviewer_set" ]; then
+      echo "plan closeout: refusing — $branch touches DEC-057 trigger file(s) and the $reqid SHIPPED entry names no reviewer:" >&2
+      printf '%s\n' "$triggers" | sed 's/^/  /' >&2
+      echo "  Get the independent review, and name it on the SHIPPED gate line (\"… Gate: … independent reviewer …\"), or" >&2
+      echo "  close out anyway with the reason recorded:  ./plan closeout $reqid --no-reviewer \"<why no reviewer>\"" >&2
+      echo "  Nothing was merged." >&2
+      exit 1
+    fi
+    if [ -n "$triggers" ] && [ -n "$no_reviewer_set" ]; then
+      echo "plan closeout: no reviewer, by choice — reason: $no_reviewer"
+    fi
+  fi
+
   # Capture the branch's commit range for the status line. In the normal path
   # this must be read BEFORE the merge (main..req-N is empty once merged); on
   # re-run it comes from the merge commit's two parents.
@@ -780,6 +867,10 @@ cmd_closeout() {
   if [ -f "$shipped" ]; then
     append_shipped_stub "$shipped" "$reqid" "$co_title" "$co_date" \
       || echo "plan closeout: WARNING — could not append the SHIPPED stub; add it by hand." >&2
+    if [ -n "$no_reviewer_set" ] && [ -n "$triggers" ]; then
+      append_no_reviewer_note "$shipped" "$reqid" "$no_reviewer" \
+        || echo "plan closeout: WARNING — could not record the --no-reviewer reason; add it to SHIPPED by hand." >&2
+    fi
   else
     echo "plan closeout: WARNING — $shipped not found; SHIPPED stub not appended." >&2
   fi
@@ -798,11 +889,11 @@ cmd_closeout() {
     echo "plan closeout: WARNING — $now not found; shipped range not bumped." >&2
   fi
 
-  # 4c. req-129 (DEC-057): reviewer reminder from the merged diff's files. Printed
-  # now and again in the final summary, since publish's ./check output scrolls it
-  # away. Never blocks: the merge has already landed.
+  # 4c. req-129 (DEC-057): reviewer reminder from the merged diff's files — now only for
+  # a re-run of an already-merged req (req-166: a fresh merge was checked at 2b, before
+  # merging). Printed now and in the final summary. Never blocks: the merge has landed.
   local review_warn=""
-  if [ -n "$merge_commit" ]; then
+  if [ -n "$merge_commit" ] && [ -n "$already_merged" ]; then
     review_warn="$(reviewer_warning "$CODE_DIR" "$merge_commit" "$reqid")"
     [ -z "$review_warn" ] || printf '%s\n' "$review_warn" >&2
   fi
