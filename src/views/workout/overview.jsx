@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { roleTag } from '../../ids'
-import { go } from '../../route'
+import { go, withFrom } from '../../route'
 import { finishedForPlan } from '../../current-workout'
 import { dateKey, planDateFor } from '../../schedule'
 import { routineById } from '../../model.js'
@@ -62,6 +62,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     // req-116 — the guard for Back after Finish: an occurrence that already has a
     // finished workout shows Done and a link to it in History, never a fresh Start.
     const done = finishedForPlan(store.workouts, plan)
+    // req-171 — the History detail opened from here returns here.
+    const here = scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}` : `/workout/${routineId}`
     return (
       <Screen>
         <Back to="/" />
@@ -78,7 +80,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           <>
             <p className="ui-sub">Done {weekdayDate(dateKey(done.finishedAt))}</p>
             <p>
-              <NavLink to={`/history/${done.id}`} chevron="forward">
+              <NavLink to={withFrom(`/history/${done.id}`, here)} chevron="forward">
                 View in History
               </NavLink>
             </p>
