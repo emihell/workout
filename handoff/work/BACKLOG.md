@@ -501,6 +501,11 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   interpolated) reads but is crude — style needs iteration. **Reference only free-db photos / general knowledge,
   never RepDB images** (DEC-060 §3). Cost [inferred]: ~10–15k tokens per exercise with 2–3 rounds.
 
+### req-173 follow-ups — 2026-09-25
+- **The active set edit (SetEditForm) saves a blank kg as 0 with no note**; History keeps `''`. Add the note there too?
+- **Unexplained `targetWeight: 60`** on a stored set whose seed routine item had no suggested weights (req-173 AC3 run,
+  seed `db.json` via v8→v9 migration — likely `legacyRecommendations`). Not shown to the user; check before req-144.
+
 ### req-171 follow-ups (Back / `?from=`, DEC-092) — 2026-09-25
 - **Active workout overview Back → Today** even when started from Routines (treated as the workout's hub). Decide with
   req-144: is the overview "where you came from" or home base?
