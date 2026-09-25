@@ -60,7 +60,7 @@ export function isWeightedType(type) {
 }
 
 export const ROUTINE_ROLES = [
-  { value: 'warmup', label: 'WU routine' },
+  { value: 'warmup', label: 'Warm-up' },
   { value: 'main', label: 'Main' },
   { value: 'finisher', label: 'Finisher' },
   { value: 'cardio', label: 'Cardio' },
