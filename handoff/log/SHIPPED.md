@@ -2046,3 +2046,7 @@ branch smoke green 12. No trigger files. Merge `54b9d62`. `reports/req-172.md`.
 unchanged (saves 0). Gate (ui): req-173.test.js 6/0; AC2 stored set deep-equals main's; AC3 next-workout kg `""` on main and
 branch (no invented 0); `./check --smoke` green; Planner's run: Leg Press / Leg Curl blank → note, 40 → gone; cardio (Stairs) no
 kg box, no note; 0 dialogs. History set editor (SetEditForm) unchanged — own req if wanted. `reports/req-173.md`.
+
+## req-173 — a quiet "No weight entered" note on a weighted set  (merged 2026-09-25)
+
+_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._

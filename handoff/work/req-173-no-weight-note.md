@@ -1,6 +1,6 @@
 # req-173 — a quiet "No weight entered" note on a weighted set
 
-**Status: BUILT — branch `req-173` (`fec8649`, 2 commits), NOT merged.** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.2). Emilio approved the
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-173` (`64ea164`…`fec8649`, 2 commits).** (2026-09-25) **Lane: ui.** Source: persona run (req-144 prep §E.2). Emilio approved the
 recommendation 2026-09-25 ("4. good", DEC-093).
 
 ## Today [read 2026-09-25]
