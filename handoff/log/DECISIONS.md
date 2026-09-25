@@ -1552,3 +1552,19 @@ Emilio: "Fix it" (asked under ask-gate #2 as a migration change). `workoutSnapsh
 can be hard-deleted while History still shows its name (req-169 review latent). **Fix:** fall back to `snapshot.routineId`,
 then `snapshot.sessionId`. Additive only — no field is removed; records affected in data the app wrote: expected **0**
 (to be measured on Emilio's Export at reimport time). → req-170.
+
+## DEC-091 — flow before the server; fix the obvious, test it myself, ask only for feel  (Emilio, 2026-09-25)
+
+After the audit, Emilio "did not really follow with all the choices" and asked for plainer explanations ("it feels like
+you think i know exactly what you are talking about") and more pushback.
+1. **Order:** req-144 creation design → req-10 and the in-gym flow → req-146 server later. Moving the server first was
+   Planner's suggestion, withdrawn: its value is other users, and the flow comes first (milestone 2026-09-07). Export
+   stays either way — it carries the history to the server.
+2. **Browser storage:** no freeze rule; Planner suggests safeguards when worth it, Emilio decides.
+3. **DEC-088 confirmed:** "yes, is this even a choice? the previous way sounds broken?"
+4. **Choices:** "if its a logical choice, like keeping something broken or fix it, almost like a bool, then just fix it."
+   Ask only for a real choice about what he'd see or how it behaves, one at a time, in plain words (what he'd see, what
+   no means), no codes unexplained. Requirement size fits the job ("bigger is not always better"). The migration /
+   bulk-rewrite ask (CLAUDE.md gate 2) still stands.
+5. **Testing:** "test thing yourself if you can - you can always use chrome and/or check code - only ask me to test
+   things if they need human eyes/touch, like design and ux feel". Extends DEC-035.

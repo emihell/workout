@@ -402,6 +402,11 @@ path it came in on.
 
 ## Talking to Emilio
 
+- **Plain words first (DEC-091).** Say what he'd see or feel in the app and what "no" means; never assume he
+  knows the code or a `DEC-`. **A binary call (fix the broken thing or keep it) is yours — fix it, report it.** Ask
+  only a real behaviour choice, one at a time. **Test everything checkable yourself** (Chrome, code, a unit test);
+  ask him only for eyes/touch (design, feel). Push back when you think he's wrong — he wants it.
+
 - **One thing at a time.** Finish the thing in front of you. Don't narrate the
   next two steps.
 - **Don't run ahead.** Verifying something is not permission to merge it. Ask.
