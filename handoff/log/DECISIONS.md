@@ -1622,3 +1622,24 @@ number the user typed or confirmed, never invented.
    rewrite: the build req shows what changes and to how many records first (ask-gate #2), with a migration test.
 Rule text (CLAUDE.md, rules/DESIGN.md, WORKFLOW/AUDIT/PLANNING mentions, the `.mdc`) is rewritten with the build req, so
 the docs match the code on the day it ships.
+
+## DEC-097 — adding exercises to a routine: own first, whole library, multi-select, a shown starting plan  (Emilio, 2026-09-26, req-144)
+
+From prep §E.4 (~55 taps for a 5-exercise routine). Independent review 2026-09-26 agreed on (a)(b); its findings folded in.
+1. **Picker:** your exercises first, **recent** on top (not most-used: stable positions), then search falls through to the
+   whole bundled library. **No pinning** (Planner: your done exercises are the pins; Emilio: "sounds good"). Picking a library
+   entry creates the user's own exercise record. DEC-064 §2 took RepDB out of search; it never limited search to own
+   exercises, so this undoes nothing.
+2. **Empty search shows the staples grouped by muscle** (a new user has no own/recent list; today `searchCommonFirst(cat,'')`
+   returns 0).
+3. **Multi-select, "Add N".**
+4. **Values: history first, whole prescription** — sets, reps, rest, kg (`historyPrescription`, `Routine.jsx:410`); DEC-096
+   for kg. **No history → a starting plan, shown, not silent:** "Starting plan: 3 × 10, 90 s rest — change any time", by
+   logging type (reps → 3 × 10; time → sets × duration; cardio → 1 block). Emilio chose this ("a") over blank-but-required.
+   **Amends DESIGN §1** ("never invent … rest (e.g. 90s)") for this one case: a visible, accepted starting plan at routine
+   creation. Never a load — kg stays history or blank. Rule text rewritten with the build req (as DEC-096).
+5. **Near-duplicate guard:** a library pick that loosely matches an own record ("Bench" vs "Bench Press", or an archived
+   one) asks "Use your 'Bench'?" — `libraryItemMatch` (`exercise-names.js:40`) is exact-name/libraryId only.
+6. **Bug, fix rides along:** `catalogItemToExercise` (`exerciseCatalog.js:155-171`) drops `logAs`, so a timed library entry
+   (Plank) becomes untimed [measured by the reviewer].
+Held for the "where to start" question: starter templates.
