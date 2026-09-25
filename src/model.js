@@ -339,7 +339,9 @@ export function migrateState(input, { legacy = false } = {}) {
 }
 
 export function applyProgressionToRoutines(routines, routineId, progression) {
-  const byKey = new Map((progression || []).map((item) => [item.routineItemId || item.sessionItemId, item]))
+  // req-164 — keyed by routineItemId alone: its one caller passes progressionFromWorkout's
+  // output, which always sets it (the req-165 latent `sessionItemId` fallback is gone).
+  const byKey = new Map((progression || []).map((item) => [item.routineItemId, item]))
   return (routines || []).map((routine) => {
     if (routine.id !== routineId) return routine
     return {
