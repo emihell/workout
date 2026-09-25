@@ -1894,3 +1894,13 @@ receipt; a red smoke blocks the deploy, it doesn't ship. Found on main by the sm
 **Planner's use after merge:** `./plan qa main` → `page: 200`; `node scripts/smoke.mjs --url …` → `smoke: green — 11 steps
 (build 0.0s, browser 4.4s)`; `--stop` → port freed (`after stop: 000`); both worktrees 0 changes. **First CI run**
 (`gh run 36108691933`, `361b765`): `Run node scripts/smoke.mjs: success` → Pages deployed — the Ubuntu runner works. → req-162.
+
+## req-160 — Claude Code skills for the repeated procedures (DEC-085)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `503e0d7`). Five skills under `.claude/skills/` (19–26 lines each, pointers to
+their rule files, not copies): `qa-branch`, `review`, `closeout`, `spec`, `workflow-audit` (slash-only), beside `audit`.
+`scripts/check_skills.py` checks every pointer resolves and no 8-word run of a skill body appears in the rules
+(`check-skills.test.sh` proves it fires on copied text, a dead L-/DEC-/§ pointer, a missing path, an empty dir). Gate
+(tooling lane): `./check` green; a fresh session lists all six; model-triggering sampled — review ×2 and qa-branch fired,
+three phrasings didn't (Builder sessions, where planning owns closeout/spec — not a fair test); explicit `/name` always
+works. Planner read all five and ran the checker after merge (receipt below). Not built: `build-brief` (not in the req).

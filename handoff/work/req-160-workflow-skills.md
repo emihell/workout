@@ -1,7 +1,7 @@
 # req-160 — Claude Code skills for the repeated procedures
 
-**Status: READY** (2026-09-24) — tooling. DEC-085 (planning's list). Gate: tooling. Source:
-`audits/workflow-2026-09-24.md` (recommendation 10). After req-159 (qa-branch uses `plan qa`).
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-160` (`503e0d7`…`503e0d7`, 1 commit).** (2026-09-24) — tooling. DEC-085 (planning's list). Gate: tooling. Source:
+`handoff/audits/workflow-2026-09-24.md` (recommendation 10). After req-159 (qa-branch uses `plan qa`).
 
 Add skills under `.claude/skills/` (only `audit` exists), each short, pointing at the rule files rather than copying them:
 - **qa-branch** — `plan qa <branch>`, dialog stubs, per-item stored-value receipts, isolated origin only (L-033).
