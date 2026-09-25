@@ -1953,3 +1953,14 @@ DEC-088's sets; `./check --smoke` green; reviewer → `# tests 1002 # pass 1002`
 blockers.** (1 should-fix → DEC-088 + pin test, red on main `expected: 13, actual: 0`). Planner's QA (`./plan qa`): smoke
 green; delete confirm "…removes it from 1 routine."; the item note typed/kept/stored identically to main; 6 screens render,
 0 errors, 0 dialogs.
+
+## req-164 — `storage.js` split by job; the model ↔ workout-log cycle broken; store reducers pure (DEC-085 §10)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `42972d5`…`30cb172`, 6 commits). Leaf `set-rules.js`; `persistence.js` /
+`history-queries.js` / `state-reducers.js` (storage.js a 4-line re-export for one release; all 16 app importers moved);
+all 22 inline store updaters → pure reducers (uid/now passed in); `applyProgressionToRoutines` keyed by `routineItemId`.
+Gate: golden of main (`b78e73d`) for migrate/load/save-reload/finish, 7/7; `check-cycles.mjs` main `CYCLE (2)` → branch
+`no import cycles`; bundle 347.20 → 348.01 kB; `./check --smoke` green; 4 source pins moved with their code (reviewer:
+not weakened). Reviewer (mandatory) → 1017/1017, 59 moved declarations `diffs 0`, 22 reducers match, **No blockers.** (2
+latent test gaps → req-167). Planner's QA (`./plan qa`): smoke green; routine add/Up/remove and schedule add/remove slot
+stored correctly; 0 errors, 0 dialogs.

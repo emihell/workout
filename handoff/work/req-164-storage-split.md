@@ -1,6 +1,6 @@
 # req-164 — split `storage.js` by job; break the model ↔ workout-log import cycle
 
-**Status: READY** (2026-09-25) — **Lane: tooling** (pure refactor, no behaviour change) — shared core → reviewer
+**Status: BUILT — branch `req-164` (`30cb172`), NOT merged.** (2026-09-25) — **Lane: tooling** (pure refactor, no behaviour change) — shared core → reviewer
 mandatory. DEC-085 §10. After req-165. Source: `audits/2026-09-24.md` **F-STRUCT-6** (39 exports, 15 importers; only ~10
 are persistence; the `model.js` ↔ `workout-log.js` cycle forces a duplicate `isSkipped` in `progress.js`; `store.jsx` has
 10 inline reducers).
