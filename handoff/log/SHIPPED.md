@@ -2029,10 +2029,8 @@ snapshot.routineId naming a *different* existing routine is trusted — import-o
 main `routineId: null`, "Delete Snap Probe?" → REMOVED. **Emilio approved the merge.** Test edit: req-169's load-path pin
 inverted (it pinned the removed behaviour).
 
-**req-171** (2026-09-25) — Back returns to the screen you came from (`?from=` chain, DEC-092); 35-site sweep, 9 fixed. Gate
-(bug lane): AC1 red on main / green on branch; req-171.test.js 26/0; branch smoke green 12 steps; Planner's headless run 7/7
-(Today→detail→Back=`#/`, chain unwinds, month, type list, by-exercise, bad/off-app `from` → `#/history`, 0 dialogs). No trigger files → no reviewer. `reports/req-171.md`.
-
 ## req-171 — Back returns to the screen you came from  (merged 2026-09-25)
 
-_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._
+**req-171** (2026-09-25) — Back returns to the screen you came from (`?from=` chain, DEC-092); 35-site sweep, 9 fixed. Gate
+(bug lane): AC1 red on main / green on branch; req-171.test.js 26/0; branch smoke green 12 steps; Planner's headless run 7/7
+(Today→detail→Back=`#/`, chain unwinds, month, type list, by-exercise, bad/off-app `from` → `#/history`, 0 dialogs). No trigger files → no reviewer. Merge `a179f3b`. `reports/req-171.md`.
