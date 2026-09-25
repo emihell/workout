@@ -2016,3 +2016,15 @@ lint clean, all 8 live×history×draft combinations text ⇔ outcome, **No block
 routine only in the snapshot loses the link on load — `model.js:88,161`, pre-existing → Emilio's call). Planner's QA
 (`./plan qa`, probe seed): Zero Probe main "Delete…" → REMOVED / branch "has past workouts…" → archived; Draft Probe main
 "has past workouts…" / branch "is in an unfinished workout…" → archived; Free Probe "Delete Free Probe?" → removed on both.
+
+## req-170 — on load, a workout's routine falls back to the one its snapshot names (DEC-090)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `cc2e588`…`962ebdf`). `workoutSnapshot` (`model.js:88`) takes `routineId ||
+sessionId || snapshot.routineId || snapshot.sessionId`; top-level still wins; nothing removed. Gate (data lane):
+req-170.test.js 19/19 (main 12 fail); the req-164 golden deep-equals main 12/12; db.json main vs branch — 13 records, **0
+changed**; `./check --smoke` green, 1079. Reviewer: independent reviewer (DEC-057 §1: model.js migration) → `# tests 1079 #
+pass 1079`, identical output on every app-written shape incl. v5–v8, **No blockers.** (latent: a hand-edited
+snapshot.routineId naming a *different* existing routine is trusted — import-only; recorded in the report). Planner's QA
+(`./plan qa --seed`, "Snap Probe"): branch `routineId: "r-snap"`, "…will be archived" → archived, History still names it;
+main `routineId: null`, "Delete Snap Probe?" → REMOVED. **Emilio approved the merge.** Test edit: req-169's load-path pin
+inverted (it pinned the removed behaviour).
