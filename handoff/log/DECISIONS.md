@@ -1533,3 +1533,13 @@ in-progress workout (snapshot items without `id`) every set counted for every it
 no skipped sets. req-165 dropped the dead `session*` fallbacks, which makes each item show its real state and Finish write
 the unlogged sets as skipped — the normal rule. **Kept** (the correct behaviour); pinned by a finish-path test; normal
 workouts (`buildPlannedWorkout`, `pi-…` ids) are unaffected. Rare: only a workout left in progress from before v9.
+
+## DEC-089 — a finished workout's snapshot counts as a reference; a draft-only reference says so  (Emilio, 2026-09-25)
+
+Emilio: "fix the last things, i trust you recommandation" (the two minor points from req-168's review).
+1. **An exercise listed in a finished workout's snapshot is referenced even with zero logged sets** → delete archives it.
+   This applies DEC-031 ("referenced by finished history") correctly — the finished record names it — rather than broadening
+   it; schedule slots still don't count (DEC-031's rejection stands).
+2. **The delete confirm tells the truth about a draft-only reference:** "{name} is in an unfinished workout and will be
+   archived (kept)." — not "has past workouts". Order of wording: current workout → past workouts → unfinished (draft) →
+   plain delete. → req-169.

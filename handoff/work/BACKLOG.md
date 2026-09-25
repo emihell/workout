@@ -568,7 +568,7 @@ target before starting any of these; each is a milestone, not a `req`.
 - → **`req-168`** · **req-161 nits** (small): one Import's copies can carry different timestamps when one is reused (no loss; harder to
   group by hand); add the quota → free space → retry → release test (the reviewer's probe passed).
 
-- **Known, minor (req-168 review), not scheduled:** (a) the delete confirm for setup referenced only by a legacy draft
+- **→ `req-169` (DEC-089)** — was: known, minor (req-168 review): (a) the delete confirm for setup referenced only by a legacy draft
   says "has past workouts" — a draft isn't a finished workout (wording; the archive is right); (b) an exercise that sits in
   a finished workout's snapshot with zero logged sets isn't a reference, so it hard-deletes — main's behaviour per DEC-031
   (History still renders from the stored `exerciseName`). Emilio's call whether either matters.
