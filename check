@@ -68,6 +68,12 @@ fail() {
 echo "check: linting (oxlint)…"
 npm run --silent lint || fail "lint (oxlint)"
 
+# 1b. Skills (req-162, from req-160): every .claude/skills pointer (path, L-/DEC- id,
+# §section) still resolves, and no rule text is copied into a skill — so renaming a
+# rule section or retiring an entry breaks here, loudly, not silently in a skill.
+echo "check: skills (check_skills.py)…"
+python3 scripts/check_skills.py >/dev/null || { python3 scripts/check_skills.py >&2 || true; fail "the skills check (scripts/check_skills.py)"; }
+
 # 2. Unit tests (node --test) — the behaviour gate.
 echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
 node --test "${testfiles[@]}" || fail "the test suite"
@@ -81,8 +87,8 @@ npm run --silent build >/dev/null || fail "the production build"
 if [ -n "$smoke" ]; then
   echo "check: smoke test (headless browser, HEAD)…"
   node scripts/smoke.mjs || fail "the smoke test"
-  echo "check: green — lint, ${#testfiles[@]} test file(s), the build, and the smoke test all passed."
+  echo "check: green — lint, skills, ${#testfiles[@]} test file(s), the build, and the smoke test all passed."
   exit 0
 fi
 
-echo "check: green — lint, ${#testfiles[@]} test file(s), and the build all passed."
+echo "check: green — lint, skills, ${#testfiles[@]} test file(s), and the build all passed."

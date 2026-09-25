@@ -23,6 +23,8 @@
 //   there is one page in the foreground. The loop is chosen so no countdown screen
 //   appears: exercises remain undone, so the req-84 auto-complete never mounts.
 // - One step per await: each step acts, then waits for the screen it expects.
+// - req-162: a "Not found." render at ANY point — even a one-render flash, caught by the
+//   page's MutationObserver tripwire — fails the step it happened in.
 
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -124,6 +126,8 @@ async function main() {
       const all = [...dialogs, ...nativeDialogs]
       if (all.length) throw new StepFailure(`native dialog(s) called: ${all.join('; ')}`)
       if (pageErrors.length) throw new StepFailure(`page error: ${pageErrors.join('; ')}`)
+      const notFound = await takeNotFound(page)
+      if (notFound.length) throw new StepFailure(`"Not found." rendered (even one render counts) at ${notFound.join(', ')}`)
 
       passed++
       console.log(`  ok ${passed} — ${name}`)
@@ -207,9 +211,6 @@ async function main() {
       console.log(`       ${workout.id}: ${LOG_EXERCISE} ${logged[0].weight} kg × ${logged[0].reps}; ${SKIP_EXERCISE} ${skipped.length} skipped set(s)`)
     })
     await step('Back (browser) never renders "Not found."', async () => {
-      // The tripwire catches even a one-render flash; only Back's own renders count here.
-      const seen = await takeNotFound(page)
-      if (seen.length) notes.push(`"Not found." flashed before Back, at ${seen.join(', ')} (not part of this check)`)
       for (let i = 0; i < 4; i++) {
         const before = page.url()
         await page.goBack()
@@ -261,13 +262,11 @@ async function main() {
       process.exit(2)
     }
     const s = (ms) => `${(ms / 1000).toFixed(1)}s`
-    for (const n of notes) console.log(`smoke: note — ${n}`)
     console.log(`smoke: green — ${passed} steps (build ${s(tBuilt - t0)}, browser ${s(Date.now() - tBuilt)})`)
   }
 }
 
 const nativeDialogs = []
-const notes = []
 // The "Not found." renders the page's tripwire recorded since the last call, then clears them.
 const takeNotFound = (page) =>
   page.evaluate(() => {
