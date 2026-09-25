@@ -1940,3 +1940,16 @@ pass 998 # fail 0`, **No blockers.** (2 latent + 2 nits → req-167). Planner's 
 Chest Press"** (vs w38); History Plank fields `kg, Reps, Duration (s), Note`, "45,5" → `durationSec: 46` (main: no field);
 WU row "WU set · 10 kg · 12" (main "· Moderate"), stored rpe 3 kept; WU edit hides Effort, Work toggle shows it, Save → rpe
 null.
+
+## req-165 — cleanup: dead code, lint 0, chunk limit, one lookup each, README catch-up (DEC-087, DEC-088)  (merged 2026-09-25)
+
+Closeout 2026-09-25 (Builder session, branch `715eeba`…`2725986`, 10 commits). Removed the 39 unreachable `session*`
+fallbacks, `plannedWorkouts` reads/prunes (the key still loads and survives), route.js's stack (keeps `lastVisit`),
+test-only exports, 4 unused assets; lint 22 → 0 with `--deny-warnings`; `chunkSizeWarningLimit` with measured sizes;
+`routineById`/`exerciseById` replace the lookups; README §Recommendation/§Deferred + `history-prefill.mdc` per the approved
+draft. **One behaviour change, declared (DEC-088):** a legacy id-less in-progress workout now finishes with its real
+skipped sets (13, main 0). Gate: a golden file of **main's** migrate/load/**finish** output deep-equals the branch except
+DEC-088's sets; `./check --smoke` green; reviewer → `# tests 1002 # pass 1002`, lint exit 0, no chunk warning, **No
+blockers.** (1 should-fix → DEC-088 + pin test, red on main `expected: 13, actual: 0`). Planner's QA (`./plan qa`): smoke
+green; delete confirm "…removes it from 1 routine."; the item note typed/kept/stored identically to main; 6 screens render,
+0 errors, 0 dialogs.
