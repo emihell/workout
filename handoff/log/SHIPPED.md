@@ -2056,6 +2056,8 @@ Import (unchanged); `isFirstRun` gate unchanged. Gate (ui): req-174.test.js 3/0;
 routine-only match main's gate; Import still replaces; `./check --smoke` green; Planner's run (emptyState seed): text + lands
 `#/routines/new`, screenshot checked — the two buttons sit tight (4 px), feel item for Emilio. Subtitle `(unconfirmed)`. Merge `cf880ee`. `reports/req-174.md`.
 
+## req-175 — plain words in the workout and History  (merged 2026-09-25)
+
 **req-175** (2026-09-25) — plain words: Warm-up set / Warm-up · / role "Warm-up" (was "WU routine", shared string, amended
 on Planner's ask) / Swap exercise (+ the picker's row button "Swap") / Couldn't finish / "5,873 kg lifted". Display only.
 Gate (ui): req-175.test.js 2/0 (fails on main); suite 1119/0; `./check --smoke` green; Reviewer: independent reviewer
