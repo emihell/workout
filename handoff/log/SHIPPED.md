@@ -2034,3 +2034,8 @@ inverted (it pinned the removed behaviour).
 **req-171** (2026-09-25) — Back returns to the screen you came from (`?from=` chain, DEC-092); 35-site sweep, 9 fixed. Gate
 (bug lane): AC1 red on main / green on branch; req-171.test.js 26/0; branch smoke green 12 steps; Planner's headless run 7/7
 (Today→detail→Back=`#/`, chain unwinds, month, type list, by-exercise, bad/off-app `from` → `#/history`, 0 dialogs). No trigger files → no reviewer. Merge `a179f3b`. `reports/req-171.md`.
+
+**req-172** (2026-09-25) — every screen opens at the top (`route.js` `screenChanged` + a layout effect; path compared
+without `?from=`). Gate (bug lane): agent's main vs branch scrollY 441 → 0 after Save, same-screen 120 → 120 (typing,
+Complete, rest tick); `./check --smoke` green; Planner's run: routine scrolled to 362 → exercise opens at 0, Back at 0, 0 dialogs;
+branch smoke green 12. No trigger files. `reports/req-172.md`.
