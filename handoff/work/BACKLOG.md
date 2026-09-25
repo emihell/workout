@@ -581,6 +581,9 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
+- **`plan qa --empty`** (2026-09-25): serve a true first-time user. The seed is re-injected whenever storage is empty
+  (`scripts/qa.mjs:66-67`), so clearing storage brings the demo back — it misled the beginner-persona run.
+
 - **`check_handoff` knows lanes** (DEC-085 §6, WORKFLOW §Requirement lanes): accept a `Lane:` tag and a `DECIDED <date> →
   DEC-…, req-…` terminal status for design reqs (today `classify_tag` has merged/not-merged/blocked/unknown only,
   `scripts/check_handoff.py:214-247`); give req-146/149 their `work/` docs when they start. Small, tooling lane.

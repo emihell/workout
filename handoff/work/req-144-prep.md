@@ -676,3 +676,33 @@ Draft observations for the session (suggestions, not decisions):
 3. **Back is a design signal** (in-app note, `/history/:id`): "going back is heavy signal that you made an error -
    unless you want to inspect something - but then that information should be available to you fast". Consider
    surfacing workout detail where it's opened from (Today).
+
+## E. Beginner-persona run, 2026-09-25 (an AI agent as "Sam", phone width, main `63f4554`)
+
+Two runs. Run 1's top finding (a new user sees someone's demo data) was **the harness**: `plan qa` re-injects its seed
+whenever storage is empty (`scripts/qa.mjs:66-67`); a real first load is `emptyState()` (`persistence.js:159-161`).
+Run 2 used an empty seed (`emptyState()` written to the scratchpad). Findings 3–8 reproduced in **both** runs.
+Caveat (the agent's own): it knew the jargon and kept going where a real beginner would stop.
+
+**For the design (Emilio's calls):**
+1. **The routine asks for kg, and the workout never uses it.** Sam typed 40 kg into the routine; the first workout's kg
+   field was blank, the plan read "1 · — × 10". By rule: prefills come only from history (DEC-082 §2 — the live seed never
+   reads `suggestedWeights`). So either the routine shouldn't ask, or it's the one allowed "plan" number. Biggest one.
+2. **Blank kg is accepted on Complete** for a weighted exercise — no hint; a beginner would log a whole workout at "—".
+3. **Jargon:** "WU set", "WU routine", "Role" (Main/Finisher), "Focus", "Rest (s)", "12/11/10" slash notation, "Loop ·
+   1 week", "Failure", "Replace exercise", "Import", "full library", an unlabelled "3200 kg" in History.
+4. **Adding an exercise to a routine:** 4 taps before typing (Add exercise → Create exercise → Search → Loading…); ~11 taps
+   per exercise, ~55 for a 5-exercise routine. Emilio's pin + search-the-whole-library idea (§D.1) targets this.
+5. **Rest is blank by default** → no rest timer unless the beginner fills it in.
+6. **" — Machines"** is appended to every routine name from the Focus default Sam never chose.
+7. **Finish with an exercise half-done** goes straight to Feel, no warning; the set count includes warm-ups.
+8. **No move to the next exercise** after the last set — back to the list each time.
+9. **Home order** (future at top, today in the middle, req-60 — Emilio's own choice) read "upside down" to Sam.
+10. **Empty Home:** "No data. Import, or start empty." — "start empty" isn't a button; nothing says "make your first routine".
+
+**Bug (binary, DEC-091 §4 — Planner fixes):** the routine screen comes back scrolled down after saving an exercise
+(`scrollY` 58.5 after the 4th, 136.5 after the 5th; 0 with ≤3) and the edit screen opens scrolled with its title cut off
+— a mis-tap in the run.
+
+**Worked well:** making a routine and schedule is quick once found; logging is one-handed with big fields; the rest timer
+starts itself and shows on every screen; Effort words are plain; History detail is accurate.
