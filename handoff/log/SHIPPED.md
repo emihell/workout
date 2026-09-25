@@ -2070,4 +2070,4 @@ Gate (ui): req-175.test.js 2/0 (fails on main); suite 1119/0; `./check --smoke` 
 `withSkippedUnloggedSets` item by item (`src/finish-unfinished.js`; `workout-log.js` not edited). Gate (ui): req-176.test.js
 8/0 (counts asserted against the real function; empty/legacy shapes); agent's browser run: 7 lines match the stored skipped sets
 per exercise; `./check --smoke` green; Planner's run: untouched Upper Body → a line per exercise, 0 dialogs. No trigger files.
-Feel for Emilio: an unlogged warm-up is named ("… and the warm-up set"), so an early stop lists every exercise. `reports/req-176.md`.
+Feel for Emilio: an unlogged warm-up is named ("… and the warm-up set"), so an early stop lists every exercise. Merge `3d0bc8a`. `reports/req-176.md`.
