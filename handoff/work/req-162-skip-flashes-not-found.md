@@ -1,6 +1,6 @@
 # req-162 — Skip exercise flashes "Not found." for one render
 
-**Status: READY** (2026-09-25) — **Lane: bug.** Found by req-159's smoke test on main (it logs it as a `note:`).
+**Status: BUILT — branch `req-162` (`c161939`), NOT merged.** (2026-09-25) — **Lane: bug.** Found by req-159's smoke test on main (it logs it as a `note:`).
 
 After Skip exercise (two taps), the log screen renders "‹ Back / Not found." for one frame before the replace-redirect to
 the overview lands: `WorkoutItemLog` returns `<MissingItem/>` for a marked-done item (`item.jsx:113-116`) while the
