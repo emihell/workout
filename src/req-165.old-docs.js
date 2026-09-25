@@ -58,5 +58,11 @@ export const OLD_V9_WITH_PLAN = (() => {
   const d = structuredClone(db)
   d.schemaVersion = 9
   d.plannedWorkouts = [plan(upper, { routineId: 'sess-upper', routineName: 'Upper Body' })]
+  // req-165 (DEC-088 follow-up) — an in-progress workout of TODAY's shape: every snapshot
+  // item has an `id` (as Start writes it), 3 sets logged. Main and the branch must finish
+  // it identically.
+  const w = structuredClone(d.workouts[0])
+  const items = w.snapshot.items.map((item) => ({ ...item, id: `pi-${item.routineItemId}` }))
+  d.activeWorkout = { ...w, id: 'wo-live-v9', finishedAt: null, completedItemIds: [], snapshot: { ...w.snapshot, items }, sets: w.sets.slice(0, 3) }
   return d
 })()
