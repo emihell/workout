@@ -270,7 +270,7 @@ live code. All Phase 1. **All specced and LIVE 2026-09-23** (req-103..112, see t
 
 - **Done view: exercise title renders below Add set** (req-104 follow-up) — `WorkoutItemDone` markup order. Small.
 
-- → **`req-168`** · **Tooling: `npm run shot` can't reach states behind a click** (req-105) — add `--click <text>` / `--scroll-bottom`.
+- ~~**Tooling: `npm run shot` can't reach states behind a click**~~ — already done on main (req-129: `--click`, `--scroll-bottom`); req-168 confirmed. (req-105) — add `--click <text>` / `--scroll-bottom`.
 
 - **req-111 follow-ups:** ~~(a)~~ ~~(b)~~ — both fixed (req-128/req-152; warm-up-only prior skip in req-163). Was: (a) the auto-complete "vs last time" volume (`workoutSummaryStats`) still compares
   against an all-skipped prior; (b) an exercise with only warm-up history gets neither a work prefill nor the
@@ -326,10 +326,10 @@ says "Not timed. Edit exercise settings to add a duration." (judgement: findable
 - **Dropped report items (retro 2026-09-23), small:** Abandon falls below the fold with the overview note open on
   an 8-exercise routine (req-107); the `.ui-navlink` left inset misaligns a second line under a link (req-103 gotcha).
 
-- → **`req-168`** · **Tooling: the pre-push fast-forward guard false-positives** when a req branch was just created at main's tip
+- ~~**Tooling: the pre-push fast-forward guard false-positives**~~ — already fixed (req-129); req-168 sandbox: 5 empty branches pass, a real FF refused. when a req branch was just created at main's tip
   (2026-09-23: `req-120 (1dd4b54)` refused while the build agent hadn't committed yet). Exempt a branch with no
   commits beyond main. Small.
-- → **`req-168`** · **Tooling: `plan publish` reads a throwaway agent's nested worktree** (`workout-codebase/.claude/worktrees/agent-*`)
+- ~~**Tooling: `plan publish` reads a throwaway agent's nested worktree**~~ — already fixed (req-129); req-168 confirmed. (`workout-codebase/.claude/worktrees/agent-*`)
   as the code worktree and refuses ("code worktree is on 'req-120'"), 2026-09-23. Resolve the code worktree by exact path.
 - → **`req-168`** · **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
   `item.jsx` passes the restored duration to the form (covered by puppeteer only) — a small jsdom/puppeteer smoke;
@@ -567,6 +567,11 @@ target before starting any of these; each is a milestone, not a `req`.
 
 - → **`req-168`** · **req-161 nits** (small): one Import's copies can carry different timestamps when one is reused (no loss; harder to
   group by hand); add the quota → free space → retry → release test (the reviewer's probe passed).
+
+- **Known, minor (req-168 review), not scheduled:** (a) the delete confirm for setup referenced only by a legacy draft
+  says "has past workouts" — a draft isn't a finished workout (wording; the archive is right); (b) an exercise that sits in
+  a finished workout's snapshot with zero logged sets isn't a reference, so it hard-deletes — main's behaviour per DEC-031
+  (History still renders from the stored `exerciseName`). Emilio's call whether either matters.
 
 ## Workflow / tooling backlog (infra, not product)
 
