@@ -420,3 +420,11 @@ them through the one parsed value.
 `SetLogForm` hid Effort on warm-up/cardio sets but still submitted its seeded value (rpe 3), so History showed "Moderate"
 for sets the user never rated — it existed since 2026-09-12 and only a rendered form test would have caught it. **How to
 apply:** the form owns "not shown → no value"; a render test per hidden-field case (the req-156 harness makes it cheap).
+
+## L-039 — a triggered download is not a backup  (req-157, 2026-09-25)
+
+req-157's first build lifted DEC-032's write lock right after `link.click()`; nothing proves a download reached the user
+(an iOS prompt can be cancelled, a home-screen app can ignore it), so the only copy of the raw value could be overwritten.
+Planner flagged it on reading the diff; the reviewer made it a blocker. **How to apply:** before lifting any write lock or
+overwriting stored data, keep a verified copy in the same store (write, read back, compare); a download is a convenience on
+top, never the safety net.

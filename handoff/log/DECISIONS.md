@@ -1502,3 +1502,12 @@ Emilio: "all your recs", on the 10-item list from `audits/2026-09-24.md` (code) 
 Planning's own list (no objection): `plan qa` (isolated build + serve + seed + dialog stubs), skills (qa-branch, review,
 closeout, spec), the DEC digest refresh + archive split, stale-doc fixes, and removing the raw `git commit:*` / `git
 reset:*` grants (L-032) — settings are Emilio's to edit.
+
+## DEC-086 — an unreadable value is kept as an on-device copy before Import may replace it  (planning, from req-157's review; Emilio approved the merge, 2026-09-25)
+
+Refines DEC-032 / DEC-085 §2. In the unreadable state, Import first writes the raw string to
+`workout-mvp-unreadable-<ISO ts>` and verifies it by read-back (`===`); any failure aborts with the lock kept and nothing
+saved. Then it downloads the `.txt`, and only then lifts the lock and imports. The app never reads, migrates or deletes a
+copy key. Why: a triggered download is not a backup — on iPhone the save could proceed after a cancelled "Download?"
+prompt or a PWA that ignores blob downloads, losing the only copy (reviewer blocker on `7731c59`); a Blob also mangles an
+unpaired surrogate, the copy doesn't. Emilio chose "merge now, fix later" for the two rare should-fixes → req-161.
