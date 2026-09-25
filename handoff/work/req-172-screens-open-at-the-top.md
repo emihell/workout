@@ -1,6 +1,6 @@
 # req-172 — every screen opens at the top
 
-**Status: READY** (2026-09-25). **Lane: bug.** Source: beginner-persona run (req-144 prep §E, "Bug"). Binary fix, DEC-091 §4.
+**Status: BUILT AND MERGED, 2026-09-25 — branch `req-172` (`daa1280`…`290a306`, 2 commits).** (2026-09-25) **Lane: bug.** Source: beginner-persona run (req-144 prep §E, "Bug"). Binary fix, DEC-091 §4.
 
 ## Reproduction [measured by the persona agent, main `63f4554`, 390×844, empty seed; both runs]
 A routine with ≥4 exercises → Add exercise → Save → the routine screen comes back at `scrollY` 58.5 (4th) / 136.5 (5th),
