@@ -103,6 +103,9 @@ function rankedHits(list, query, keep = null) {
   return scored.map((row) => row.item)
 }
 
+// Kept though only tests call it (req-165, F-DEAD-5): it is rankedHits + a limit — the
+// ranking the app's searchCommonFirst uses — and the ranking tests pin search order
+// through it (the DEC-022 F3 "helper exported for tests" case).
 export function searchExerciseCatalog(list, query, limit = 25) {
   return rankedHits(list, query).slice(0, limit)
 }

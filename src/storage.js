@@ -685,16 +685,6 @@ export function workoutSummaryStats(active, prior, now) {
   }
 }
 
-// The most recent FINISHED workout of the same routine as `active`, or null if this is
-// the first. Reuses the exact grouping key that groupWorkoutsByRoutine already applies
-// (routineId + program + name) by grouping [active, ...workouts] together: `active` is
-// prepended so it heads its own group, and its immediate neighbour (index 1) is the
-// prior same-routine workout. req-163 — the list is sorted newest-first
-// (finishedNewestFirst), so index 1 is the most recent prior whatever the stored order.
-export function previousSameRoutineWorkout(active, workouts, routines) {
-  return previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
-}
-
 // req-128 — the prior the auto-complete summary compares against: the most recent
 // previous same-routine workout with a done WORKING set. An all-skipped prior holds no
 // volume/sets to compare with, so its deltas would be nonsense; it is passed over.
@@ -709,8 +699,9 @@ function hasDoneWorkingSet(workout) {
   return (workout?.sets || []).some((set) => set.setType !== 'wu' && !isSkippedSet(set))
 }
 
-// req-111 — every prior same-routine finished workout, newest-first (same grouping as
-// previousSameRoutineWorkout, which is its head). beat-last-time takes the whole list
+// req-111 — every prior same-routine finished workout, newest-first. The grouping reuses
+// groupWorkoutsByRoutine's key (routineId + program + name) on [active, ...workouts]:
+// `active` heads its own group, so the rest of that group are its priors. beat-last-time takes the whole list
 // so each exercise can look past a workout where it was entirely skipped (DEC-053).
 // req-163 — newest-first by finishedAt (finishedNewestFirst), not by array order.
 export function previousSameRoutineWorkouts(active, workouts, routines) {

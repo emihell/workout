@@ -443,13 +443,6 @@ export function restoreFromLoggedSet(set) {
   }
 }
 
-// req-117 — the seconds a timed set's form starts from: the restored (Previous) set's
-// logged duration when there is one, else the target (durationTargetFor).
-export function initialDurationFor({ fromRestore, restore, target }) {
-  if (fromRestore && restore?.durationSec != null) return restore.durationSec
-  return target
-}
-
 // kg + reps to prefill the set-log form, in priority order (req-02 / DEC-002):
 //   restore (un-logging via "Previous")  →  session seed override (req-83)  →
 //   carried last live set (NO-history exercise only)  →  history prefill weight +

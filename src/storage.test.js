@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkout, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
+import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
 import { dateKey, mondayOf } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently
@@ -692,6 +692,9 @@ describe('req-84 workoutSummaryStats', () => {
   })
 })
 
+// req-165 (F-DEAD-5) — previousSameRoutineWorkout (the head) was test-only and is gone;
+// its cases now read the head of previousSameRoutineWorkouts, which the app uses.
+const previousSameRoutineWorkout = (active, workouts, routines) => previousSameRoutineWorkouts(active, workouts, routines)[0] ?? null
 describe('req-84 previousSameRoutineWorkout', () => {
   const wk = (id, routineId, name, extra = {}) => ({
     id,

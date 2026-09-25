@@ -12,7 +12,8 @@ import {
   autoCompleteArmed,
   canRemoveAddedSet,
   finishedState,
-  initialDurationFor,
+  formFieldsWithDraft,
+  setDraftFromLoggedSet,
   isSkippedSet,
   itemIsMarkedDone,
   itemKey,
@@ -189,22 +190,27 @@ describe('req-117 Remove set (an unlogged extra set)', () => {
   })
 })
 
+// req-165 (F-DEAD-5) — initialDurationFor was superseded by req-125's draft path and
+// removed; these now run the path the log screen uses: Previous writes the un-logged set
+// as the draft (setDraftFromLoggedSet), and the form starts from formFieldsWithDraft.
+const SEED = { weight: '', reps: '', effort: 3, note: '' }
+const durationAfterPrevious = (set, target) =>
+  formFieldsWithDraft({ seed: SEED, draft: set ? setDraftFromLoggedSet('k', set) : null, weighted: false, durationTarget: target }).durationSec
+
 describe('req-117 Previous on a timed set restores its time', () => {
   it('log 50 s → Previous → the form shows 50 s, not the target', () => {
     const set = { routineItemId: 'ri-p', exerciseId: 'ex-p', setType: 'work', weight: 0, reps: '', durationSec: 50, rpe: 3, note: '' }
     const restore = restoreFromLoggedSet(set)
     assert.equal(restore.durationSec, 50)
-    assert.equal(initialDurationFor({ fromRestore: true, restore, target: 30 }), 50)
+    assert.equal(durationAfterPrevious(set, 30), 50)
     // not restoring → the target, as before
-    assert.equal(initialDurationFor({ fromRestore: false, restore, target: 30 }), 30)
-    assert.equal(initialDurationFor({ fromRestore: false, restore: null, target: 30 }), 30)
+    assert.equal(durationAfterPrevious(null, 30), 30)
   })
 
   it('a reps set restores as before (no durationSec); a skipped timed set gets the target', () => {
     const reps = restoreFromLoggedSet({ setType: 'work', weight: 40, reps: '8', rpe: 4, note: 'x' })
     assert.deepEqual(reps, { setType: 'work', workIndex: null, weight: '40', reps: '8', rpe: '4', note: 'x' })
-    const skipped = restoreFromLoggedSet({ setType: 'work', weight: 0, reps: 'skipped', durationSec: 0, note: 'skipped' })
-    assert.equal(initialDurationFor({ fromRestore: true, restore: skipped, target: 30 }), 30)
+    assert.equal(durationAfterPrevious({ setType: 'work', weight: 0, reps: 'skipped', durationSec: 0, note: 'skipped' }, 30), 30)
   })
 })
 
