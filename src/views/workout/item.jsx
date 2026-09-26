@@ -354,6 +354,9 @@ function WorkoutItemLive({ routineId, item }) {
   const override = (active.seedOverrides || {})[seedOverrideKey(item.exerciseId, currentType)]
   // req-78 — the req-27 upcoming-weight override is gone (the next set's form is now the
   // editable surface). req-178 — a work set's kg comes from the routine, not history.
+  // req-183 — also handed to SetLogForm with historyPrefill.weight, for the kg notes only
+  // (kg-hints.js: last time / big change); the box's value is still the seed's.
+  const routineKg = routineKgFor(item, currentType, currentWorkIndex)
   const seed = initialSetFields({
     weighted,
     fromRestore: false,
@@ -365,7 +368,7 @@ function WorkoutItemLive({ routineId, item }) {
     target,
     override,
     // req-178 / DEC-096 §1 — a work set's kg is the routine's (the snapshot item's).
-    routineKg: routineKgFor(item, currentType, currentWorkIndex),
+    routineKg,
   })
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
@@ -471,6 +474,8 @@ function WorkoutItemLive({ routineId, item }) {
           initialReps={formInit.reps}
           initialDuration={formInit.durationSec}
           initialEffort={formInit.effort}
+          routineKg={routineKg}
+          lastKg={historyPrefill.weight}
           canGoBack={canGoBack}
           onComplete={({ weight, reps, effort, durationSec }) =>
             completeSet({ weight, reps, rpe: effort, note, durationSec })

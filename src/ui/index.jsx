@@ -11,6 +11,7 @@ import { NavLink as BaseNavLink } from '../views/shared'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
 import { kgError, readKg } from '../kg-input.js'
+import { kgHints } from '../kg-hints.js'
 import { readSeconds, secondsToSave } from '../seconds-input.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
@@ -404,6 +405,8 @@ export function SetLogForm({
   initialReps = '',
   initialDuration = 0,
   initialEffort = 3,
+  routineKg,
+  lastKg = '',
   canGoBack = true,
   onComplete,
   onSkip,
@@ -441,6 +444,7 @@ export function SetLogForm({
       durationSec: timed ? next.duration : undefined,
     })
   }
+  const hints = kgHints({ weighted, kg: weight, routineKg, lastKg })
   return (
     <form
       className="ui-setlog"
@@ -483,7 +487,19 @@ export function SetLogForm({
       {/* req-173 (DEC-093) — a weighted set with an empty kg box says so, quietly. Not a
           block or a confirm: Complete still logs it in one tap, as 0 (set-values.js
           liveSetWeight), exactly as before. Never a default weight (DESIGN core rule). */}
-      {weighted && readKg(weight).empty ? <p className="ui-field-note">No weight entered</p> : null}
+      {/* req-183 (DEC-102) — beside it, two more quiet notes (kg-hints.js): the last-time kg
+          when the routine has none here (named, never put in the box), and a big-change
+          note on a > 50% jump. Neither blocks Complete. */}
+      {weighted && readKg(weight).empty ? (
+        <p className="ui-field-note">
+          {hints.lastTime != null ? `No weight entered · last time ${hints.lastTime} kg` : 'No weight entered'}
+        </p>
+      ) : hints.lastTime != null ? (
+        <p className="ui-field-note">Last time: {hints.lastTime} kg</p>
+      ) : null}
+      {hints.bigJumpFrom != null ? (
+        <p className="ui-field-note">That&apos;s a big change from {hints.bigJumpFrom} kg</p>
+      ) : null}
       {weightError ? (
         <p className="ui-field-error" role="alert">
           {weightError}
