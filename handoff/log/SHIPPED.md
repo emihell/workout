@@ -2139,3 +2139,14 @@ kept), per-routine update, blank device; the edit-after-import bug seen on `740b
 via `test-support/fill.js`, targets 20→18 etc.) judged real by the reviewer. Builder's additions: offer on the auto-finish
 summary; blank device starts marked. **For Emilio:** finish/abandon any live workout before opening the new build; to import
 an old backup, run it through `--out` first. `reports/req-178.md`.
+
+## req-182 — the offer names the exercise; plan fill shows your pick  (merged 2026-09-26)
+
+**req-182** (2026-09-26, from the Sam run, prep §G) — offer row: exercise name, "You lifted 32.5 kg · routine says 30 kg" / "…
+· not in the routine yet", "Save to {routine}" → "Saved to {routine}." Auto-finish with an offer open: no countdown, primary
+Finish (same commit, once-guarded); no offers → countdown unchanged. Plan fill rows lead with the pick; a later day's unset
+slot carries the same slot's earlier pick (`carriedFills`, never over an explicit pick/skip). Gate (ui): req-182.test.js 7/0;
+suite 1210/0; `./check --smoke` green. No trigger files. Test edits real (req-178 offer words; req-181 3-day flow now also makes
+C from carried picks). Planner's QA agent (390×844): 7/7 — 15 s wait commits nothing, Finish ×2 → one workout, Finish writes no
+routine; no-offer countdown still commits; carry/change/skip with v9 receipts; screenshot viewed. Builder's calls (reversible):
+Edit secondary while waiting; no "same as A" marker; filling only A also makes C. `reports/req-182.md`.

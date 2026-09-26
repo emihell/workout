@@ -1,6 +1,6 @@
 # req-182 — the update-routine offer says what it's about; the plan's fill screen shows what you picked
 
-**Status: READY** (2026-09-26). **Lane: ui.** Source: Sam run on main `6c4dc7c` (2026-09-26, after req-178..181), findings 1
+**Status: BUILT AND MERGED, 2026-09-26 — branch `req-182` (`b623c58`…`b623c58`, 1 commit).** (2026-09-26). **Lane: ui.** Source: Sam run on main `6c4dc7c` (2026-09-26, after req-178..181), findings 1
 and 6 (req-144 prep §G). Planner's calls under DEC-095, marked `(unconfirmed)`, go on Emilio's end-of-batch list. Builds on
 req-178 (offer) and req-181 (plan).
 
