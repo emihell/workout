@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { FOCUS_OPTIONS, ROUTINE_ROLES, formatTargets, routineItemMeta } from '../ids'
+import { routineItemMeta } from '../ids'
 import { parseRoutineItem } from '../routine-item-parse'
+import { perSetCount, perSetStart, perSetText, perSetValues, savedRole } from '../routine-form.js'
 import { go } from '../route'
 import { exerciseById, routineById } from '../model.js'
 import { historyPrescription } from '../history-queries.js'
@@ -10,7 +11,7 @@ import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { Back, Missing } from './shared'
-import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
+import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Textarea, Title } from '../ui/index.jsx'
 import { askConfirm } from '../ui/confirm.js'
 import { navForBase } from './routine-nav.js'
 
@@ -65,7 +66,7 @@ export function Routines() {
               </>
             }
           >
-            {routine.name} — {routine.focus}
+            {routine.name}
           </Row>
         ))}
       </List>
@@ -77,7 +78,6 @@ export function Routines() {
 // Button calling go(); callers pass the path instead of an onCancel handler.
 export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
   const [name, setName] = useState('')
-  const [focus, setFocus] = useState('Machines')
   // req-127 — trimmed; empty is an inline error that blocks Save (after the first try).
   const [tried, setTried] = useState(false)
   const error = tried ? nameError(name) : null
@@ -88,12 +88,11 @@ export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
         e.preventDefault()
         setTried(true)
         if (nameError(name)) return
-        onSave({ name: name.trim(), focus })
+        onSave({ name: name.trim() })
       }}
     >
       <Field label="Name" value={name} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
       {error ? <FieldError>{error}</FieldError> : null}
-      <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
       <Actions
         retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
         forward={<Button type="submit" variant="primary">{submitLabel}</Button>}
@@ -110,8 +109,8 @@ export function RoutineNew() {
       <Back to="/routines" />
       <Title>Add routine</Title>
       <RoutineNewForm
-        onSave={({ name, focus }) => {
-          const id = store.addRoutine({ name, focus })
+        onSave={({ name }) => {
+          const id = store.addRoutine({ name })
           go(routinePath(id))
         }}
         cancelTo="/routines"
@@ -129,7 +128,7 @@ export function RoutineDetail({ routineId, paths }) {
     return <Missing>Not found.</Missing>
   }
 
-  const meta = [nav.extra, routine.focus].filter(Boolean).join(' · ')
+  const meta = nav.extra || ''
 
   return (
     <Screen>
@@ -209,7 +208,6 @@ export function RoutineEdit({ routineId, paths }) {
   const routine = routineById(store.routines, routineId)
   const nav = pathsFor(routineId, paths)
   const [name, setName] = useState(routine?.name || '')
-  const [focus, setFocus] = useState(routine?.focus || 'Machines')
   // req-127 — empty name blocks Save with an inline error (was: kept the old name).
   const [tried, setTried] = useState(false)
   const error = tried ? nameError(name) : null
@@ -227,13 +225,13 @@ export function RoutineEdit({ routineId, paths }) {
           e.preventDefault()
           setTried(true)
           if (nameError(name)) return
-          store.updateRoutine(routine.id, { name: name.trim(), focus })
+          // req-179 — name only: a stored `focus` is left as it is (unread, DEC-099 §1).
+          store.updateRoutine(routine.id, { name: name.trim() })
           go(nav.base)
         }}
       >
         <Field label="Name" value={name} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
         {error ? <FieldError>{error}</FieldError> : null}
-        <Select label="Focus" options={FOCUS_OPTIONS} value={focus} onChange={(e) => setFocus(e.target.value)} />
         <Actions
           retreat={<NavLink to={nav.base} look="quiet">Cancel</NavLink>}
           forward={<Button type="submit" variant="primary">Save</Button>}
@@ -296,37 +294,98 @@ function FieldError({ children }) {
   )
 }
 
+// req-179 (DEC-099 §4) — one value for every set, or, behind "Different … per set",
+// one field per set ("Set 1" … count). The value goes to routine-item-parse.js as the
+// same slash text as before (routine-form.js), so its errors keep their Set N positions.
+function PerSetField({ label, switchLabel, state, onState, count, error, inputMode }) {
+  const values = perSetValues(state.perSet, count)
+  return (
+    <div role="group" aria-label={label}>
+      {state.different ? (
+        <>
+          <span className="ui-field__label">{label}</span>
+          {values.map((value, i) => (
+            <Field
+              key={i}
+              label={`Set ${i + 1}`}
+              inputMode={inputMode}
+              value={value}
+              aria-invalid={Boolean(error && error.position === i + 1)}
+              onChange={(e) => {
+                const next = [...values]
+                next[i] = e.target.value
+                onState({ ...state, perSet: next })
+              }}
+            />
+          ))}
+        </>
+      ) : (
+        <Field
+          label={label}
+          inputMode={inputMode}
+          value={state.single}
+          aria-invalid={Boolean(error)}
+          onChange={(e) => onState({ ...state, single: e.target.value })}
+        />
+      )}
+      {error ? <FieldError>{error.message}</FieldError> : null}
+      {count > 1 || state.different ? (
+        <Checkbox
+          label={switchLabel}
+          checked={state.different}
+          onChange={(on) =>
+            // On: every set starts as the one value. Off: Set 1's value applies to all.
+            onState(
+              on
+                ? { ...state, different: true, perSet: Array.from({ length: count }, () => state.single) }
+                : { ...state, different: false, single: values[0] ?? '' },
+            )
+          }
+        />
+      ) : null}
+    </div>
+  )
+}
+
 // req-121 — `cancelTo` (a path) replaces onCancel: Cancel is a NavLink (DEC-040).
 function ExerciseFields({ item, onChange, cancelTo, defaults, timed = false, settingsLink = null }) {
-  const [role, setRole] = useState(item.role || defaults.role || 'main')
-  const [warmup, setWarmup] = useState(Boolean(item.warmup))
-  // req-30 — warmup reps come only from what the user typed (or a saved value when
-  // editing): blank for a new warmup, never a default. See the submit below and DESIGN §1.
-  const [warmupReps, setWarmupReps] = useState(() => {
-    const value = item.warmup?.reps
-    return value == null || value === '' ? '' : String(value)
-  })
+  // req-179 (DEC-099 §2) — Role is one switch. Off saves 'main', except a stored
+  // finisher/cardio is kept (savedRole) — no silent rewrite of what the form can't show.
+  const storedRole = item.role || defaults.role || 'main'
+  const [warmupExercise, setWarmupExercise] = useState(storedRole === 'warmup')
+  // req-179 (DEC-099 §3) — a warm-up set is no longer offered. One that exists is kept
+  // byte-for-byte (DEC-022: never re-invent its reps) unless unticked; it can't be re-added.
+  const [keepWarmup, setKeepWarmup] = useState(Boolean(item.warmup))
   const [sets, setSets] = useState(() => {
     const value = item.sets ?? defaults.sets
     return value == null || value === '' ? '' : String(value)
   })
-  const [targets, setTargets] = useState(formatTargets(item.targets || defaults.targets || []))
-  const [weights, setWeights] = useState((item.suggestedWeights || defaults.suggestedWeights || []).join('/'))
+  const [targets, setTargets] = useState(() => perSetStart(item.targets || defaults.targets || []))
+  const [weights, setWeights] = useState(() => perSetStart(item.suggestedWeights || defaults.suggestedWeights || []))
   const [restSec, setRestSec] = useState(() => {
     const value = item.restSec ?? defaults.restSec
     return value == null || value === '' ? '' : String(value)
   })
   const [notes, setNotes] = useState(item.notes || '')
-  // req-85 — per-set target seconds for a timed exercise, slash/comma separated (req-118:
-  // like Reps; Kg treats `,` as a decimal) and stored parallel to targets. Only shown
-  // when the exercise is timed.
-  const [durations, setDurations] = useState((item.durations || []).join('/'))
+  // req-85 — per-set target seconds for a timed exercise, stored parallel to targets.
+  // Only shown when the exercise is timed.
+  const [durations, setDurations] = useState(() => perSetStart(item.durations || []))
+  const longest = Math.max(targets.perSet.length, weights.perSet.length, timed ? durations.perSet.length : 0)
+  const count = perSetCount(sets, longest)
   // req-118 — errors appear after the first Save attempt and then track each edit, so a
   // fixed field clears its message at once. Parsing is routine-item-parse.js (pure, tested).
   const [tried, setTried] = useState(false)
-  const parsed = parseRoutineItem({ sets, reps: targets, kg: weights, duration: durations, timed })
+  const parsed = parseRoutineItem({
+    sets,
+    reps: perSetText(targets, count),
+    kg: perSetText(weights, count),
+    duration: perSetText(durations, count),
+    timed,
+  })
   const errors = tried ? parsed.errors : {}
   const errorText = (field) => (errors[field] ? <FieldError>{errors[field].message}</FieldError> : null)
+  const warmupReps = item.warmup?.reps
+  const hasWarmupReps = warmupReps != null && warmupReps !== ''
 
   return (
     <form
@@ -336,8 +395,8 @@ function ExerciseFields({ item, onChange, cancelTo, defaults, timed = false, set
         if (Object.keys(parsed.errors).length) return
         const { value } = parsed
         onChange({
-          role,
-          warmup: warmup ? { reps: warmupReps } : null,
+          role: savedRole(storedRole, warmupExercise),
+          warmup: keepWarmup && item.warmup ? item.warmup : null,
           sets: value.sets,
           targets: value.targets,
           suggestedWeights: value.suggestedWeights,
@@ -347,40 +406,43 @@ function ExerciseFields({ item, onChange, cancelTo, defaults, timed = false, set
         })
       }}
     >
-      <Select label="Role" options={ROUTINE_ROLES} value={role} onChange={(e) => setRole(e.target.value)} />
-      <Checkbox label="WU set" checked={warmup} onChange={setWarmup} />
-      {warmup ? (
-        <Field
-          label="Warmup reps"
-          type="number"
-          min="1"
-          value={warmupReps}
-          onChange={(e) => setWarmupReps(e.target.value)}
+      <Checkbox label="Warm-up exercise" checked={warmupExercise} onChange={setWarmupExercise} />
+      {item.warmup ? (
+        <Checkbox
+          label={`Keep warm-up set${hasWarmupReps ? ` (${warmupReps} reps)` : ''}`}
+          checked={keepWarmup}
+          onChange={setKeepWarmup}
         />
       ) : null}
       <Field label="Sets" type="number" min="1" value={sets} onChange={(e) => setSets(e.target.value)} />
       {errorText('sets')}
-      <Field label="Reps" value={targets} aria-invalid={Boolean(errors.reps)} onChange={(e) => setTargets(e.target.value)} />
-      {errorText('reps')}
-      {/* req-118 — decimal keypad: `,` is Kg's decimal point (DEC-058 §1), `/` separates. */}
-      <Field
-        label="Kg"
-        inputMode="decimal"
-        value={weights}
-        aria-invalid={Boolean(errors.kg)}
-        onChange={(e) => setWeights(e.target.value)}
+      <PerSetField
+        label="Reps"
+        switchLabel="Different reps per set"
+        state={targets}
+        onState={setTargets}
+        count={count}
+        error={errors.reps}
       />
-      {errorText('kg')}
+      {/* req-118 — decimal keypad: `,` is Kg's decimal point (DEC-058 §1). */}
+      <PerSetField
+        label="Kg"
+        switchLabel="Different kg per set"
+        state={weights}
+        onState={setWeights}
+        count={count}
+        error={errors.kg}
+        inputMode="decimal"
+      />
       {timed ? (
-        <>
-          <Field
-            label="Duration (s)"
-            value={durations}
-            aria-invalid={Boolean(errors.duration)}
-            onChange={(e) => setDurations(e.target.value)}
-          />
-          {errorText('duration')}
-        </>
+        <PerSetField
+          label="Duration (s)"
+          switchLabel="Different duration per set"
+          state={durations}
+          onState={setDurations}
+          count={count}
+          error={errors.duration}
+        />
       ) : (
         // req-99 — Timed lives on the exercise, not the routine row. When the exercise
         // isn't timed there's no Duration field, so signpost where the flag actually is
@@ -392,7 +454,7 @@ function ExerciseFields({ item, onChange, cancelTo, defaults, timed = false, set
           <NavLink to={settingsLink} chevron="forward">Edit exercise settings</NavLink>
         </p>
       ) : null}
-      <Field label="Rest (s)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
+      <Field label="Rest (seconds)" type="number" min="0" value={restSec} onChange={(e) => setRestSec(e.target.value)} />
       <Textarea label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={5} />
       <Actions
         retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
@@ -409,7 +471,8 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
   const ex = exerciseById(store.exercises, exerciseId)
   const history = historyPrescription(store.workouts, ex?.id)
   const defaults = {
-    role: ex?.type === 'cardio' ? 'warmup' : 'main',
+    // req-179 — every new item starts as Main, cardio included (DEC-099 §2).
+    role: 'main',
     restSec: history?.restSec ?? '',
     sets: history?.sets ?? '',
     targets: history?.targets || [],
@@ -429,7 +492,8 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
         item={{
           role: defaults.role,
           notes: history?.notes || '',
-          warmup: history?.warmup || null,
+          // req-179 — a warm-up set is no longer offered, nor copied from history.
+          warmup: null,
           restSec: defaults.restSec,
           sets: defaults.sets,
           targets: defaults.targets,

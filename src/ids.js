@@ -16,15 +16,6 @@ export const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0]
 
 export const LOOP_WEEKS = [1, 2, 3, 4]
 
-export const FOCUS_OPTIONS = [
-  'Machines',
-  'Free weights',
-  'Bodyweight',
-  'Cardio',
-  'Mobility',
-  'Mixed',
-]
-
 export const RPE_OPTIONS = [
   { value: 2, label: 'Easy' },
   { value: 3, label: 'Moderate' },
@@ -73,15 +64,15 @@ export function roleLabel(role) {
 // req-93 — in the in-workout flow, 'main' is the default and carries no information
 // (most exercises are main), so it is shown name-only. roleTag returns a label ONLY
 // for non-main roles (warm-up, finisher, cardio); main / absent role → '' (falsy, so
-// callers filtering by Boolean drop it). roleLabel itself is unchanged (the item
-// editor's role picker still lists every role); req-103 extends the rule to the
+// callers filtering by Boolean drop it). roleLabel itself is unchanged (req-179: the
+// item editor has no role picker now, but stored finisher/cardio still read); req-103 extends the rule to the
 // routine editor's exercise rows via routineItemMeta below.
 export function roleTag(role) {
   return (role || 'main') === 'main' ? '' : roleLabel(role)
 }
 
 // req-103 — the muted second line of a routine-editor exercise row:
-// `[role tag] · WU set · N sets · kg`. Main is unlabelled (roleTag); empty parts are
+// `[role tag] · Warm-up set · N sets · kg`. Main is unlabelled (roleTag); empty parts are
 // dropped so a minimal item reads just `1 set` with no stray separators. kg shows
 // only when some suggested weight is > 0, joined by a no-break space so `kg` never
 // wraps alone. req-113 — a weight that is 0, empty or missing means "no weight" (DESIGN
@@ -92,17 +83,13 @@ export function routineItemMeta(item) {
   const kg = weights.some((weight) => Number(weight) > 0)
     ? `${Array.from(weights, (weight) => (Number(weight) > 0 ? weight : '—')).join('/')}\u00a0kg`
     : ''
-  return [roleTag(item.role), item.warmup ? 'WU set' : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
+  return [roleTag(item.role), item.warmup ? 'Warm-up set' : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
     .filter(Boolean)
     .join(' · ')
 }
 
 export function weekdayName(value) {
   return WEEKDAYS.find((d) => d.value === Number(value))?.label ?? ''
-}
-
-export function formatTargets(targets) {
-  return (targets || []).map((value) => String(value).trim()).filter(Boolean).join('/')
 }
 
 export function greeting() {

@@ -54,21 +54,18 @@ function InProgressMark() {
 // req-14 (Emilio review iter 5) — the ONE shared row-info format for every workout
 // row on the screen (Upcoming / Today / Recent / Completed today). req-47: a
 // two-line stack echoing the Today block — the date (`when`) on its own line in
-// caption size, then `name — focus` below (the old ` · ` separator is gone). `focus`
-// degrades gracefully — when a source has none (an older history snapshot without
-// focus, or a deleted routine) the "— focus" is dropped rather than invented
-// (DESIGN §1: never invent absent data). `when` uses the one shared `weekdayDate`
+// caption size, then the name below (req-179 / DEC-099: the " — focus" suffix is gone;
+// stored focus values stay, unread). `when` uses the one shared `weekdayDate`
 // format across all rows (iter 6). `today` colors the body black (`--ui-ink`) when
 // the row's date is today, gray (`--ui-ink-2`) otherwise, so the eye lands on today;
 // it is keyed off the row's date-vs-today, not the component. This is INFO only;
 // each row keeps its own action/status (Start, Done, the history link).
-function WorkoutInfo({ when, name, focus, today }) {
+function WorkoutInfo({ when, name, today }) {
   return (
     <span className={`ui-workout-info${today ? ' ui-workout-info--today' : ''}`}>
       <span className="ui-workout-info__date">{when}</span>
       <span className="ui-workout-info__body">
         {name}
-        {focus ? ` — ${focus}` : ''}
       </span>
     </span>
   )
@@ -76,25 +73,24 @@ function WorkoutInfo({ when, name, focus, today }) {
 
 // req-28 — a completed-today workout row, linking to its History detail (req-171:
 // carrying `from=/`, so its Back returns to Today). Uses the
-// shared info format (iter 5); `when` is "Today" (all completed today), focus from
-// the immutable snapshot. Program name dropped so it matches the other sections.
+// shared info format (iter 5); `when` is "Today" (all completed today). Program name dropped so it matches the other sections.
 function CompletedTodayRow({ store, workout, todayKey }) {
   const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
     <Row to={withFrom(`/history/${workout.id}`, '/')}>
-      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} today={workoutDateKey(workout) === todayKey} />
     </Row>
   )
 }
 
 // req-14 (Emilio review) — a recent-history peek row linking to the History detail
 // (req-171: its Back returns to Today).
-// Shared info format (iter 5): `when` is the workout's date, focus from the snapshot.
+// Shared info format (iter 5): `when` is the workout's date.
 function HistoryPeekRow({ store, workout, todayKey }) {
   const routine = routineById(store.routines, workoutRoutineId(workout))
   return (
     <Row to={withFrom(`/history/${workout.id}`, '/')}>
-      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} focus={workout.snapshot?.focus} today={workoutDateKey(workout) === todayKey} />
+      <WorkoutInfo when={weekdayDate(workoutDateKey(workout))} name={workoutRoutineName(workout, routine)} today={workoutDateKey(workout) === todayKey} />
     </Row>
   )
 }
@@ -117,14 +113,14 @@ function UpcomingRow({ store, date, slot, routine, todayKey }) {
     !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
   return (
     <Row value={done ? `Done ${weekdayDate(dateKey(done.finishedAt))}` : null} action={startAction}>
-      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} focus={routine.focus} today={dk === todayKey} />
+      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} today={dk === todayKey} />
     </Row>
   )
 }
 
 // req-14 (Emilio review) — today's workout is the Workout screen's focal point and
 // main call to action. Iter 8: a two-line stack — the bold date on top, then
-// "name — focus" as a secondary line — then a large, primary, full-width Start.
+// the name as a secondary line — then a large, primary, full-width Start.
 // `Done …` shows once logged. req-55/DEC-038: this block never carries the
 // in-progress state — a current active workout is the single hero (`TodayHero`,
 // which req-114 renders above today's other occurrences), and a stale active
@@ -132,7 +128,7 @@ function UpcomingRow({ store, date, slot, routine, todayKey }) {
 // ever shows Start (or Done); the Continue path lives elsewhere. req-114: `Done`
 // uses the shared weekdayDate format, like every other row.
 // req-110 — a day with two+ routines is ONE day: the date line prints once, then
-// each routine (name — focus, and its own Start or `Done …`) in schedule order.
+// each routine (name, and its own Start or `Done …`) in schedule order.
 // With one routine the markup is exactly the pre-req-110 block (date, name, Start).
 // Each routine keeps the full-width primary Start (one clearly-tappable Start per
 // routine); `__routine` only spaces the routines apart under the shared date.
@@ -142,7 +138,6 @@ function TodayRoutine({ store, routine, slot, date }) {
     <>
       <p className="ui-today-workout__name">
         {routine.name}
-        {routine.focus ? ` — ${routine.focus}` : ''}
       </p>
       {done ? (
         <p className="ui-sub">Done {weekdayDate(dateKey(done.finishedAt))}</p>
@@ -170,7 +165,7 @@ function TodayWorkouts({ store, todays, date }) {
   )
 }
 
-// req-55 / DEC-038 — the single in-progress hero: name/focus resolve from the
+// req-55 / DEC-038 — the single in-progress hero: the name resolves from the
 // workout's OWN record (snapshot name survives a deleted/archived routine — DESIGN §1,
 // never invented), marked in progress, with Continue (same resume call). req-114 /
 // DEC-058: it no longer REPLACES today's block — it sits inside it, under today's
@@ -183,7 +178,6 @@ function HeroRoutine({ store, workout }) {
     <>
       <p className="ui-today-workout__name">
         {workoutRoutineName(workout, routine)}
-        {workout.snapshot?.focus ? ` — ${workout.snapshot.focus}` : ''}
         <InProgressMark />
       </p>
       {/* req-114 review — resume BY ID (continueInProgress never abandons). The hero is
@@ -237,7 +231,7 @@ function InProgressPeekRow({ store, workout, todayKey }) {
       <WorkoutInfo
         when={weekdayDate(workoutDateKey(workout))}
         name={workoutRoutineName(workout, routine)}
-        focus={workout.snapshot?.focus}
+       
         today={workoutDateKey(workout) === todayKey}
       />
       <InProgressMark />

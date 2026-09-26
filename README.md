@@ -5,7 +5,7 @@ This browser-only MVP supports one trustworthy loop: set up exercises and reusab
 ## Entity ownership
 
 - Exercise: reusable name, equipment, type, cues, muscles and valid weight increments.
-- Routine: ordered exercise references plus the prescription (sets, reps, kg, rest, notes, WU set). This is next time's source of truth.
+- Routine: ordered exercise references plus the prescription (sets, reps, kg, rest, notes; a warm-up exercise is marked with a switch). This is next time's source of truth.
 - Schedule slot: recurring week/day placement `{ id, week, weekday, routineId }`. It never owns kg or reps.
 - Live workout: a snapshot of the routine at Start, plus logged and skipped sets. Extra sets stay on this snapshot only until Finish.
 - Completed workout: the snapshot plus actual sets. Unopened planned sets are recorded as skipped at Finish. Finish never changes the routine (DEC-056); the routine only changes when you edit it, or when you Apply a recalculation.
