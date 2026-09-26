@@ -2107,3 +2107,18 @@ v9 receipts (no kg written; Cancel leaves v9 byte-identical; blocked library chu
 the 3 other entry points return to their screen); screenshots viewed. Follow-ups → BACKLOG: sticky bar has no background (a
 sliver of list shows between it and the dock); first-muscle grouping puts Burpee under Chest. Builder's calls (reversible):
 recency = non-skipped sets; timed plan targets []; "Last time: 4 × 6 · 80 kg" label; sticky bar placement. `reports/req-180.md`.
+
+## req-181 — start from a plan: pick days per week, fill the slots  (merged 2026-09-26)
+
+**req-181** (2026-09-26, DEC-098) — `/routines/new`: "Start from a plan" (primary) / "Blank routine" (`/routines/new/blank`).
+1–4 days (1 = "Minimum"); each slot opens the req-180 picker single-select, filtered to its pattern (own by libraryId, then
+staples, "Show more"; typing searches all). Save = one write via `applyPlan` → pure `planToState` (`src/plan-templates.js`):
+exercises deduped across slots, a routine per day with a pick, the week (Mon / Mon-Thu / Mon-Wed-Fri / Mon-Tue-Thu-Fri,
+loopWeeks 1) only if the schedule is empty, else a done screen. Dips → horizontal-push (7 rows; vertical-push staples 14→8,
+horizontal-push 16→22; libraryProblems []). Gate (ui + trigger `store.jsx`): req-181.test.js 20/0; suite 1182/0; `./check
+--smoke` green. **Independent reviewer: No blockers.**; its latent double-tap Save (a second routine set) fixed on the branch
+(`cfa5ff0`, test fails without the guard). Planner's QA agent (390×844, empty + db seeds): 10/10 with v9 receipts; Fill's Save
+could sit behind the dock mid-scroll (a tap went Home, losing the plan) → pinned like the picker (`e5f023b`), re-verified at 5
+scroll positions + a real double-tap → one routine set. AC6 amended (contradicted Change 4; Builder flagged). Test edits real:
+`req-122` Actions 17→18, `req-179` mounts `RoutineNewBlank`. Builder's calls (reversible): Save disabled until one pick; plan
+routines carry focus 'Machines'. `reports/req-181.md`.

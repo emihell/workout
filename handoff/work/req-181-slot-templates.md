@@ -1,6 +1,6 @@
 # req-181 — start from a plan: pick days per week, fill the slots
 
-**Status: READY — build after req-180 merges (uses its picker); behaviour calls below are `(unconfirmed)`.** (2026-09-26)
+**Status: BUILT AND MERGED, 2026-09-26 — branch `req-181` (`1dab597`…`e5f023b`, 3 commits).** (behaviour calls below are `(unconfirmed)`). (2026-09-26)
 **Lane: ui** (plus one content fix, the dips tag). Source: DEC-098, req-144 prep §F. Blank routine stays (DEC-098 §4).
 
 ## Today [read 2026-09-26, main `1e228c0`]
@@ -81,7 +81,8 @@ picker itself (req-180); the routine form (req-179); weight carry-back (req-178)
 5. Library: `libraryProblems()` empty; visible count still 366; vertical-push staples 14 → 8 and horizontal-push
    staples 16 → 22 [expected from the rows above; Builder pastes the measured numbers].
 6. Browser (Planner, `plan qa --seed` with an `emptyState()` file, as req-174): empty home → Create your first routine → Start from a plan → 3 days → fill
-   A's slots (one own, one library, one skipped) → Save → Home; Schedule shows Mon/Wed/Fri; stored routines read back.
+   A's slots (one own, one library, one skipped) and at least one slot in B and C → Save → Home; Schedule shows Mon/Wed/Fri
+   *(amended 2026-09-26: as first written it contradicted Change 4 — a day with nothing chosen makes no routine; Builder flagged, Change 4 wins)*; stored routines read back.
 7. From the Routines list with an existing schedule → plan → Save → routines added, schedule unchanged.
 8. Blank routine still works as before from both entry points.
 9. `./check --smoke` green.
