@@ -84,8 +84,9 @@ describe('req-179 — pure helpers', () => {
 describe('req-179 AC1/AC2 — Focus is gone from every screen, stored focus untouched', () => {
   it('Add routine and Edit routine render no Focus; Save then Edit→Save leave routines[i].focus as stored', async () => {
     const { captured, mount } = await harness()
-    const { RoutineNew, RoutineEdit } = await Routine()
-    await mount(h(RoutineNew))
+    // req-181 — the name form moved from /routines/new (now the two starts) to RoutineNewBlank.
+    const { RoutineNewBlank, RoutineEdit } = await Routine()
+    await mount(h(RoutineNewBlank))
     assert.equal(view.text().includes('Focus'), false)
     assert.equal(view.container.querySelector('select'), null)
     await view.type(view.input('Name'), 'Arms')

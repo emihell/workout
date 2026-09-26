@@ -285,6 +285,14 @@ function matchRoute(rawPath) {
   if (parts[0] === 'schedule') return { name: 'schedule' }
 
   if (parts[0] === 'routines') {
+    // req-181 — the two starts: a blank routine, or a plan (days → slots, one screen type
+    // so the in-flow choices survive moving between its steps).
+    if (parts[1] === 'new' && parts[2] === 'blank') return { name: 'routine-new-blank' }
+    if (parts[1] === 'new' && parts[2] === 'plan') {
+      const days = parts[3] != null ? Number(parts[3]) : null
+      const slot = parts[4] != null && parts[5] != null ? [Number(parts[4]), Number(parts[5])] : null
+      return { name: 'routine-plan', days, slot }
+    }
     if (parts[1] === 'new') return { name: 'routine-new' }
     if (parts[1] && parts[2] === 'edit') {
       return { name: 'routine-edit', routineId: parts[1] }

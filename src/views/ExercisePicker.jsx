@@ -2,13 +2,18 @@
 // recently done first), then the bundled library (staples by muscle when the search is
 // empty), multi-select, "Add N". Values per item come from routine-picker.js (history, or a
 // starting plan shown on the selected row). A library pick creates your own record only at
-// Add N — backing out creates nothing. req-181 reuses this with its own filters:
-//   ownFilter(exercise) / libraryFilter(entry) — optional predicates narrowing each list.
+// Add N — backing out creates nothing. req-181 (a plan slot) reuses it:
+//   ownFilter(exercise) / libraryFilter(entry) — optional predicates narrowing the EMPTY-search
+//     view (a filtered library shows its staples, then "Show N more"); typing searches everything.
 //   onAdd([{ exerciseId, item }]) — called once, in tap order, after the records exist.
+//   onPick([pick]) — instead of onAdd: nothing is written; each pick is { kind: 'own', exerciseId,
+//     restore, item, name } or { kind: 'library', data (catalogItemToExercise), item, name }.
+//   max — 1 makes a tap replace the selection; addLabel(n) — the primary button's text;
+//   lateral — an extra control between Cancel and the primary (a plan slot's Skip).
 import { useEffect, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog.js'
 import { libraryItemMatch } from '../exercise-names.js'
-import { looseOwnMatch, ownRecentFirst, pickerItem, staplesByMuscle } from '../routine-picker.js'
+import { filteredBrowse, looseOwnMatch, ownRecentFirst, pickerItem, staplesByMuscle } from '../routine-picker.js'
 import { useStore } from '../store-context'
 import { Actions, Button, Checkbox, Field, List, NavLink, Row, SectionHeader } from '../ui/index.jsx'
 
@@ -32,6 +37,10 @@ function PickRow({ name, checked, plan, onToggle }) {
 // `loadCatalog` is injectable for tests only (a failing load → "Could not load.").
 export function ExercisePicker({
   onAdd,
+  onPick = null,
+  max = Infinity,
+  addLabel = (n) => `Add ${n}`,
+  lateral = null,
   cancelTo,
   createTo = null,
   ownFilter = null,
@@ -64,16 +73,20 @@ export function ExercisePicker({
 
   const workouts = store.workouts
   const q = query.trim().toLowerCase()
-  // Own list: today's substring rule on name / equipment / muscles.
-  const own = ownRecentFirst(store.exercises, workouts).filter(
-    (ex) => (!ownFilter || ownFilter(ex)) && (!q || `${ex.name} ${ex.equipment} ${ex.muscles}`.toLowerCase().includes(q)),
+  // Own list: the filter narrows the empty search only; typing uses today's substring rule
+  // on name / equipment / muscles over all of them.
+  const own = ownRecentFirst(store.exercises, workouts).filter((ex) =>
+    q ? `${ex.name} ${ex.equipment} ${ex.muscles}`.toLowerCase().includes(q) : !ownFilter || ownFilter(ex),
   )
   // Library minus the rows you already have (a live match shows in your list above).
-  const shown = (entry) =>
-    (!libraryFilter || libraryFilter(entry)) && libraryItemMatch(store.exercises, entry)?.kind !== 'live'
-  const library = (catalog || []).filter((entry) => !libraryFilter || libraryFilter(entry))
-  const groups = catalog && !q ? staplesByMuscle(library).map((g) => ({ ...g, items: g.items.filter(shown) })) : []
-  const found = catalog && q ? searchCommonFirst(library, query, 25, { exercises: store.exercises }) : null
+  const shown = (entry) => libraryItemMatch(store.exercises, entry)?.kind !== 'live'
+  const groups =
+    catalog && !q && !libraryFilter ? staplesByMuscle(catalog).map((g) => ({ ...g, items: g.items.filter(shown) })) : []
+  // Empty search + a filter (a plan slot): its staples, the rest on request.
+  const browse = catalog && !q && libraryFilter ? filteredBrowse(catalog, libraryFilter) : null
+  const found = catalog && q ? searchCommonFirst(catalog, query, 25, { exercises: store.exercises }) : browse
+    ? { common: browse.staples, rest: browse.rest, restCount: browse.rest.length }
+    : null
   const restDirect = found ? found.common.length === 0 : false
   const hits = found ? (restDirect || showRest ? [...found.common, ...found.rest] : found.common).filter(shown) : []
 
@@ -83,7 +96,11 @@ export function ExercisePicker({
   const libraryPicked = (entry) =>
     picks.find((pick) => pick.key === `lib:${entry.id}` || (pick.fromLibrary && pick.fromLibrary === entry.id))
   const drop = (pick) => setPicks((list) => list.filter((candidate) => candidate !== pick))
-  const push = (pick) => setPicks((list) => (list.some((candidate) => candidate.key === pick.key) ? list : [...list, pick]))
+  const push = (pick) =>
+    setPicks((list) => {
+      if (list.some((candidate) => candidate.key === pick.key)) return list
+      return max === 1 ? [pick] : [...list, pick]
+    })
 
   const toggleOwn = (exercise) => {
     const picked = ownPicked(exercise)
@@ -138,6 +155,17 @@ export function ExercisePicker({
   }
 
   const add = () => {
+    if (onPick) {
+      onPick(
+        picks.map((pick) => {
+          const { item, label } = pickPlan(pick)
+          return pick.kind === 'library'
+            ? { kind: 'library', data: catalogItemToExercise(pick.entry), item, label, name: shownName(pick.entry) }
+            : { kind: 'own', exerciseId: pick.exercise.id, restore: Boolean(pick.restore), item, label, name: pick.exercise.name }
+        }),
+      )
+      return
+    }
     const added = picks.map((pick) => {
       const { item } = pickPlan(pick)
       let exerciseId
@@ -211,9 +239,10 @@ export function ExercisePicker({
       <Actions
         className="ui-picker-bar"
         retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
+        lateral={lateral}
         forward={
           <Button variant="primary" disabled={picks.length === 0} onClick={add}>
-            Add {picks.length}
+            {addLabel(picks.length)}
           </Button>
         }
       />
