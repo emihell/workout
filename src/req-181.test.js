@@ -207,7 +207,8 @@ describe('req-181 — the flow (rendered, real store)', () => {
     assert.equal(box('Bench Press — '), null, 'not a squat')
     await view.click(box(`${shownName(squat)} — `))
     await visit(view.button('Use'))
-    assert.match(view.text(), new RegExp(`${shownName(squat)} · Starting plan: 3 × 10`))
+    // req-182 (sanctioned edit) — a picked row leads with the exercise; the slot + plan is the meta.
+    assert.match(view.text(), new RegExp(`${shownName(squat)}Squat · Starting plan: 3 × 10`))
 
     await visit(view.all('a').filter((a) => a.textContent.trim().startsWith('Chest press'))[0])
     assert.ok(box('Bench Press — Barbell'), 'own exercise from a chest staple leads the slot')
@@ -222,11 +223,15 @@ describe('req-181 — the flow (rendered, real store)', () => {
     await visit(view.button('Save'))
     assert.equal(window.location.hash, '#/')
     const after = stored()
-    assert.deepEqual(after.routines.map((r) => r.name), ['Full body A'], 'B and C had nothing chosen')
+    // req-182 (sanctioned edit) — Full body C's Squat and Chest press now carry A's picks
+    // (same slots), so C is made too (Monday + Friday); B shares no slot with A and stays empty.
+    assert.deepEqual(after.routines.map((r) => r.name), ['Full body A', 'Full body C'], 'B had nothing chosen')
     const items = after.routines[0].exercises
     const created = after.exercises.find((ex) => ex.libraryId === squat.id)
     assert.deepEqual(items.map((i) => i.exerciseId), [created.id, 'ex-own-bench'])
-    assert.deepEqual(after.schedule.slots.map((s) => [s.week, s.weekday]), [[0, 1]])
+    assert.deepEqual(after.routines[1].exercises.map((i) => i.exerciseId), [created.id, 'ex-own-bench'])
+    assert.equal(after.exercises.filter((ex) => ex.libraryId === squat.id).length, 1, 'one record')
+    assert.deepEqual(after.schedule.slots.map((s) => [s.week, s.weekday]), [[0, 1], [0, 5]])
     assert.equal(after.schedule.loopWeeks, 1)
     assert.ok(items.every((i) => !i.suggestedWeights.some((kg) => Number(kg) > 0)), 'no kg without history')
   })

@@ -39,6 +39,13 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   const [deadline] = useState(() => Date.now() + COUNTDOWN_MS)
   const [now, setNow] = useState(() => Date.now())
   const committedRef = useRef(false)
+  // req-182 — the items with an "update routine" offer, captured at mount: while any is
+  // shown there is no countdown (Sam ran out of time reading them), and the rows stay
+  // listed after a tap so each shows its "Saved to …" confirmation.
+  const [offered] = useState(() =>
+    (active?.snapshot?.items || []).filter((item) => routineUpdateOffer(active, store.routines, item)),
+  )
+  const waiting = offered.length > 0
   const [stats] = useState(() => {
     const prior = summaryPriorWorkout(active, store.workouts, store.routines)
     return workoutSummaryStats(active, prior, mountNow)
@@ -58,6 +65,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   }
 
   useEffect(() => {
+    if (waiting) return undefined
     const t = setInterval(() => {
       const n = Date.now()
       setNow(n)
@@ -67,13 +75,12 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
       }
     }, 250)
     return () => clearInterval(t)
-    // deadline is set once; commit closes over stable store/active. Run-once interval.
+    // deadline and waiting are set once; commit closes over stable store/active. Run-once interval.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deadline])
+  }, [deadline, waiting])
 
   const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
   const name = active?.snapshot?.routineName || 'Workout'
-  const items = active?.snapshot?.items || []
   const d = stats.deltas
   const rows = [
     { label: 'Volume', value: `${stats.volume} kg`, delta: d ? `${signed(d.volume)} kg` : null },
@@ -93,23 +100,28 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
         ))}
       </List>
       {/* req-178 — the last exercise's "update routine" offer would otherwise never show:
-          once every exercise is done the overview is this summary. Tapping one doesn't
-          stop the countdown; Finish still never writes the routine itself (DEC-056). */}
-      {items.some((item) => routineUpdateOffer(active, store.routines, item)) ? (
+          once every exercise is done the overview is this summary. Finish still never
+          writes the routine itself (DEC-056). req-182 — with an offer there is no countdown:
+          Finish (the countdown's own commit) is the primary action instead. */}
+      {waiting ? (
         <>
           <SectionHeader>Update your routine?</SectionHeader>
           <List>
-            {items.map((item) => (
+            {offered.map((item) => (
               <RoutineUpdateOffer key={item.routineItemId || item.id} store={store} active={active} item={item} />
             ))}
           </List>
+          <Button variant="primary" block onClick={commit}>
+            Finish
+          </Button>
         </>
-      ) : null}
-      <p className="ui-sub" aria-live="polite">
-        Finishing in {secondsLeft}s…
-      </p>
+      ) : (
+        <p className="ui-sub" aria-live="polite">
+          Finishing in {secondsLeft}s…
+        </p>
+      )}
       <Button
-        variant="primary"
+        variant={waiting ? 'secondary' : 'primary'}
         block
         onClick={() => {
           recordButton('auto-finish-edit')

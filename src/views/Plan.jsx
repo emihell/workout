@@ -5,7 +5,7 @@
 // reload starts over.
 import { useEffect, useRef, useState } from 'react'
 import { loadExerciseCatalog } from '../exerciseCatalog.js'
-import { PLAN_DAYS, PLAN_TEMPLATES, SLOTS, slotFilters } from '../plan-templates.js'
+import { PLAN_DAYS, PLAN_SKIP, PLAN_TEMPLATES, SLOTS, carriedFills, slotFilters } from '../plan-templates.js'
 import { go, useHashRoute } from '../route'
 import { useStore } from '../store-context'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
@@ -13,7 +13,7 @@ import { ExercisePicker } from './ExercisePicker'
 import { Back } from './shared'
 
 const BASE = '/routines/new/plan'
-const SKIP = 'skip'
+const SKIP = PLAN_SKIP
 
 function daysLabel(n) {
   return `${n} ${n === 1 ? 'day' : 'days'} a week`
@@ -114,13 +114,15 @@ function Fill({ days, fills, onSave, saving }) {
           <SectionHeader>{routine.name}</SectionHeader>
           <List>
             {routine.slots.map((key, s) => {
+              // req-182 — a picked slot leads with the exercise; the slot is the meta.
               const pick = fills[r]?.[s]
+              const picked = pick && pick !== SKIP
               return (
                 <Row key={key} to={`${BASE}/${days}/${r}/${s}`}>
                   <span className="ui-row__stack">
-                    <span>{SLOTS[key].label}</span>
+                    <span>{picked ? pick.name : SLOTS[key].label}</span>
                     <span className="ui-row__meta">
-                      {pick === SKIP ? 'Skipped' : pick ? `${pick.name} · ${pick.label}` : 'Choose'}
+                      {picked ? `${SLOTS[key].label} · ${pick.label}` : pick === SKIP ? 'Skipped' : 'Choose'}
                     </span>
                   </span>
                 </Row>
@@ -179,9 +181,13 @@ export function RoutinePlan() {
 
   if (done) return <Done />
   if (!days) return <DaysChoice />
-  const fills = byDays[days] || []
+  // req-182 — what the screen shows and Save saves: the explicit choices, with each unset
+  // slot carrying the same slot's pick from an earlier day (carriedFills).
+  const explicit = byDays[days] || []
+  const fills = carriedFills(days, explicit)
   const setFill = (r, s, pick) =>
     setByDays((all) => {
+      // Explicit choices only: a carried pick becomes explicit only when the user picks it.
       const next = (all[days] || []).map((row) => [...(row || [])])
       while (next.length <= r) next.push([])
       next[r][s] = pick

@@ -49,6 +49,32 @@ export const PLAN_TEMPLATES = {
 
 export const PLAN_DAYS = [1, 2, 3, 4]
 
+// The fill screen's explicit "skip" for a slot (a pick is an object; unset is undefined).
+export const PLAN_SKIP = 'skip'
+
+// req-182 (unconfirmed) — a slot inherits the same slot's pick from an earlier day: Day C's
+// Squat shows Day A's Squat pick until changed or skipped. An explicit pick or skip is never
+// overwritten; a skip is never inherited. `fills[r][s]` → the same shape with each unset slot
+// filled from the latest earlier day whose same slot key holds a pick (itself possibly carried).
+export function carriedFills(days, fills) {
+  const template = PLAN_TEMPLATES[days]
+  if (!template) return fills || []
+  const out = []
+  template.routines.forEach((routine, r) => {
+    out[r] = routine.slots.map((key, s) => {
+      const own = fills?.[r]?.[s]
+      if (own !== undefined && own !== null) return own
+      for (let earlier = r - 1; earlier >= 0; earlier--) {
+        const at = template.routines[earlier].slots.indexOf(key)
+        const pick = at >= 0 ? out[earlier][at] : undefined
+        if (pick && pick !== PLAN_SKIP) return pick
+      }
+      return undefined
+    })
+  })
+  return out
+}
+
 // The picker's filters for a slot (req-180 ExercisePicker ownFilter / libraryFilter): a
 // library entry by its pattern; an own exercise by its libraryId's entry (a manual one has
 // no pattern, so it is only found by typing). `patterns` is a pattern or a list.

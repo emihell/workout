@@ -397,7 +397,9 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     await view?.unmount()
     view = null
   })
-  it('routine kg 50, history 40 → set 1 shows 50; log 55 → overview offers "Update Day A" → routine 55', async () => {
+  // req-182 (sanctioned edit) — the offer's words: "You lifted … · routine says …", "Save to Day A",
+  // then "Saved to Day A."; on the summary an open offer stops the countdown.
+  it('routine kg 50, history 40 → set 1 shows 50; log 55 → overview offers "Save to Day A" → routine 55', async () => {
     const ex = (id, name) => ({ id, name, type: 'machine', equipment: 'Machine', weightStep: 'n/a', muscles: '', cues: '' })
     const state = {
       ...emptyState(),
@@ -439,22 +441,23 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     await view.type(view.input('kg'), '55')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'dayA' }))
-    assert.match(view.text(), /You did 55 kg\. Routine: 50\./)
-    assert.ok(view.button('Update Day A'))
+    assert.match(view.text(), /You lifted 55 kg · routine says 50 kg/)
+    assert.ok(view.button('Save to Day A'))
     // Leg Curl not done yet: no offer for it.
-    assert.equal(view.all('button').filter((b) => b.textContent.startsWith('Update')).length, 1)
-    await view.click(view.button('Update Day A'))
+    assert.equal(view.all('button').filter((b) => b.textContent.startsWith('Save to')).length, 1)
+    await view.click(view.button('Save to Day A'))
     const saved = () => JSON.parse(localStorage.getItem('workout-mvp-v9')).routines[0].exercises
     assert.deepEqual(saved()[0].suggestedWeights, [55])
-    assert.equal(view.button('Update Day A'), null, 'offer gone once the routine matches')
+    assert.equal(view.button('Save to Day A'), null, 'button gone once saved')
+    assert.match(view.text(), /Saved to Day A\./)
     // The last exercise: done → the auto-finish summary shows (not the list), and carries its offer.
     await mount(h(WorkoutItemLog, { routineId: 'dayA', itemId: 'ib' }))
     await view.type(view.input('kg'), '32,5')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'dayA' }))
     assert.match(view.text(), /Great job!/)
-    assert.match(view.text(), /You did 32\.5 kg\. Routine: 30\./)
-    await view.click(view.button('Update Day A'))
+    assert.match(view.text(), /You lifted 32\.5 kg · routine says 30 kg/)
+    await view.click(view.button('Save to Day A'))
     assert.deepEqual(saved()[1].suggestedWeights, [32.5])
     assert.deepEqual(saved()[0].suggestedWeights, [55])
   })
