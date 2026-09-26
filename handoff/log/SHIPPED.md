@@ -2150,3 +2150,14 @@ suite 1210/0; `./check --smoke` green. No trigger files. Test edits real (req-17
 C from carried picks). Planner's QA agent (390×844): 7/7 — 15 s wait commits nothing, Finish ×2 → one workout, Finish writes no
 routine; no-offer countdown still commits; carry/change/skip with v9 receipts; screenshot viewed. Builder's calls (reversible):
 Edit secondary while waiting; no "same as A" marker; filling only A also makes C. `reports/req-182.md`.
+
+## req-183 — kg hints: last time when the routine is blank, a big-jump note  (merged 2026-09-26)
+
+**req-183** (2026-09-26, DEC-102) — weighted work set, routine kg blank at that index, history has a kg → "No weight entered ·
+last time 30 kg" (empty box) / "Last time: 30 kg" (typed); box never prefilled. |kg − ref|/ref > 0.5 (ref = routine kg, else
+last time) → "That's a big change from 50 kg"; no dialog, no block. Pure `src/kg-hints.js`; history via the existing
+`historySetPrefill`. Gate (ui): req-183.test.js 12/0; `./check --smoke` green. No trigger files, no data change. Planner's QA agent
+(390×844): 7/7 — 500/60/75/76 boundaries, one-tap Complete stores 500, warm-up/bodyweight no hints, Complete on screen;
+screenshot viewed. **Checked:** a routine kg blanked through the UI stays `[]` across reloads (migrateState's baseline refill is
+legacy-v8 only, `model.js:45`) — Builder's test note, not a user bug. Builder's call: "Last time" stays after typing (reversible).
+`reports/req-183.md`.
