@@ -255,6 +255,26 @@ describe('req-181 — the flow (rendered, real store)', () => {
     assert.deepEqual(after.routines.map((r) => r.name), ['Mine', 'Full body'])
   })
 
+  it('review: two Save taps in the same tick write one set of routines', async () => {
+    const state = emptyState()
+    await harness(state)
+    await visit(link('2 days a week'))
+    await visit(link('Squat'))
+    await view.click(view.all('label.ui-check')[0].querySelector('input'))
+    await visit(view.button('Use'))
+    const save = view.button('Save')
+    await act(async () => {
+      save.click()
+      save.click()
+    })
+    await flush()
+    const after = stored()
+    assert.deepEqual(after.routines.map((r) => r.name), ['Full body A'])
+    assert.equal(after.exercises.length, 1)
+    assert.equal(after.schedule.slots.length, 1)
+    assert.equal(window.location.hash, '#/', 'went Home (scheduled), not the Done screen')
+  })
+
   it('abandon mid-flow: v9 unchanged', async () => {
     const state = emptyState()
     await harness(state)

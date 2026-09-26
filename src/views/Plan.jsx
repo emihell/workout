@@ -3,7 +3,7 @@
 // One component for every step (route 'routine-plan'), so the choices survive moving
 // between the steps; they are in memory only — leaving before Save writes nothing, and a
 // reload starts over.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { loadExerciseCatalog } from '../exerciseCatalog.js'
 import { PLAN_DAYS, PLAN_TEMPLATES, SLOTS, slotFilters } from '../plan-templates.js'
 import { go, useHashRoute } from '../route'
@@ -101,7 +101,7 @@ function SlotPick({ days, r, s, onPick }) {
   )
 }
 
-function Fill({ days, fills, onSave }) {
+function Fill({ days, fills, onSave, saving }) {
   const template = PLAN_TEMPLATES[days]
   const chosen = fills.flat().filter((pick) => pick && pick !== SKIP).length
   return (
@@ -132,7 +132,7 @@ function Fill({ days, fills, onSave }) {
       <Actions
         retreat={<NavLink to="/routines/new" look="secondary">Cancel</NavLink>}
         forward={
-          <Button variant="primary" disabled={chosen === 0} onClick={onSave}>
+          <Button variant="primary" disabled={chosen === 0 || saving} onClick={onSave}>
             Save
           </Button>
         }
@@ -167,6 +167,11 @@ export function RoutinePlan() {
   // to another count keeps what was chosen there.
   const [byDays, setByDays] = useState({})
   const [done, setDone] = useState(false)
+  // req-181 review — Save navigates Home on a later hashchange, so the enabled Save stays
+  // mounted for a moment: a second tap would write a second set of routines. The ref blocks
+  // a tap in the same tick (before any re-render); `saving` disables the button after.
+  const savedRef = useRef(false)
+  const [saving, setSaving] = useState(false)
   const days = PLAN_TEMPLATES[route.days] ? route.days : null
 
   if (done) return <Done />
@@ -188,7 +193,11 @@ export function RoutinePlan() {
     <Fill
       days={days}
       fills={fills}
+      saving={saving}
       onSave={() => {
+        if (savedRef.current) return
+        savedRef.current = true
+        setSaving(true)
         const cleaned = fills.map((row) => (row || []).map((pick) => (pick && pick !== SKIP ? pick : null)))
         const { scheduled } = store.applyPlan({ days, fills: cleaned })
         if (scheduled) go('/')

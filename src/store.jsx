@@ -104,12 +104,17 @@ export function StoreProvider({ children }) {
       },
       // req-181 (DEC-098) — "Start from a plan": exercises, routines, items and (on an empty
       // schedule) the week's slots in ONE state write. The ids are made here, before the
-      // updater, so a re-run updater (StrictMode) builds the same records; the result is read
-      // from the same pure reducer on the current state.
+      // updater, so a re-run updater (StrictMode) builds the same records. The result returned
+      // is the one the updater wrote (req-181 review); React runs it at once here (a click, no
+      // pending update) — only if it were deferred does this fall back to this render's state.
       applyPlan(choices) {
         const ids = planIds(choices, uid, new Date())
-        setState((s) => planToState(s, choices, ids()).state)
-        const { routineIds, scheduled } = planToState(state, choices, ids())
+        let written = null
+        setState((s) => {
+          written = planToState(s, choices, ids())
+          return written.state
+        })
+        const { routineIds, scheduled } = written || planToState(state, choices, ids())
         return { routineIds, scheduled }
       },
       removeSlot(slotId) {
