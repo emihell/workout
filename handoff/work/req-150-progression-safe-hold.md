@@ -6,7 +6,7 @@ app to change anything yet… a separate req where we set the rules… for now d
 fix it." So this req **adds no new progression rules**. It only stops three known-wrong answers by **holding** (no change)
 where the app can't judge correctly. The real rules come in **req-149**.
 
-## Why [measured, req-144 prep §A, `work/req-144-prep.md`]
+## Why [measured, req-144 prep §A, `work/req-144-creation-design/prep.md`]
 
 `recommendNextPrescription` (`progress.js:~74-149`) judges each set: a miss or Failure → one step down, Easy → one step
 up, otherwise hold.

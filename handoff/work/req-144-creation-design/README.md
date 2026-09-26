@@ -28,7 +28,7 @@ between a first time gym goer and an advanced user are so far apart… but i wan
 7. **Real people:** can Emilio get one real beginner and one experienced lifter to try creating a routine (paper or the
    current app) while he watches?
 
-## Prep (planning, before session 1) — DONE 2026-09-24: `work/req-144-prep.md`
+## Prep (planning, before session 1) — DONE 2026-09-24: `work/req-144-creation-design/prep.md`
 
 - **Current model audit** [to measure]: what the routine/schedule model holds today (fields, per-set targets, warm-ups,
   rest, duration, anything superset-like), and what the old program layer looked like.

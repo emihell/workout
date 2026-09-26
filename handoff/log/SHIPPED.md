@@ -2082,82 +2082,36 @@ Builder's calls (reversible): not-started line last; warm-up-only leftovers get 
 
 ## req-179 — routine form cleanup: no Focus, "Warm-up exercise" switch, no warm-up set, plain words  (merged 2026-09-26)
 
-**req-179** (2026-09-26, DEC-099) — Focus gone from both forms and 9 display sites (the 9th, the workout preview subtitle
-`workout/overview.jsx:61`, found by Builder); stored focus untouched. Role → one "Warm-up exercise" switch (`savedRole`,
-`src/routine-form.js`; stored finisher/cardio kept while off). New items: warmup null, role main. Existing warm-up set →
-"Keep warm-up set (N reps)". "Different reps/kg/duration per set" fieldsets feed the unchanged parser. "Rest (seconds)",
-"Warm-up set"; README/exchange.js text. Gate (ui): req-179.test.js 14/0 (11 fail on main); suite 1150/0; `./check --smoke`
-green 12. Planner's QA agent (390×844, db.json seed): items 1–10 pass with stored-value receipts, 0 dialogs. Layout fix on
-Planner's ask (`58251a9`: switch under its own legend, 24 px between groups) — screenshot viewed. No trigger files. Only test
-edit `ids.test.js:66` label. Builder's calls (reversible): per-set switch hidden at Sets ≤1; new set fields copy the previous
-one; "Duration (s)" not renamed (follow-up). Feel for Emilio: 6 stacked per-set fields one-handed. `reports/req-179.md`.
-
-No independent reviewer (`plan closeout --no-reviewer`): exchange.js diff is assistant-prompt text only (3 strings + focus dropped from the example); Planner read it; no import validation reads focus (git grep)
+**req-179** (DEC-099) — Focus gone (9 sites), Role → "Warm-up exercise" switch, no new warm-up sets, "Different … per set" fields, plain labels.
+Gate (ui): tests 14/0, suite 1150/0, smoke green; Planner QA 10/10 + layout fix `58251a9`; `exchange.js` prompt text only (--no-reviewer, read by Planner).
+`reports/req-179.md`.
 
 ## req-180 — add exercises: own first, whole library, multi-select, shown starting plan  (merged 2026-09-26)
 
-**req-180** (2026-09-26, DEC-097) — one picker (`views/ExercisePicker.jsx`, filters as props; helpers `src/routine-picker.js`):
-own exercises by recency, then the library; empty search = 194 staples under Chest/Back/Shoulders/Arms/Legs/Core; checkbox
-rows + sticky "Add N"; history → whole `historyPrescription`, else "Starting plan: 3 × 10, 90 s rest — change any time" (timed
-3 × duration; cardio 1 set, rest 0), never kg; "Use your 'X'?" guard (Cancel / Add as new / Use mine; archived → restored);
-records created only at Add N; `catalogItemToExercise` reads `logAs` (Plank hasDuration, rowing cardio). Gate (ui):
-req-180.test.js 12/0 (6 fail on main); suite 1162/0; `./check --smoke` green. Test edit `req-122.test.js:89` Actions count
-15→17 (the picker's two rows) — a real change. No trigger files. Planner's QA agent (390×844, db + empty seeds): 11/11 with
-v9 receipts (no kg written; Cancel leaves v9 byte-identical; blocked library chunk → "Could not load." with own list working;
-the 3 other entry points return to their screen); screenshots viewed. Follow-ups → BACKLOG: sticky bar has no background (a
-sliver of list shows between it and the dock); first-muscle grouping puts Burpee under Chest. Builder's calls (reversible):
-recency = non-skipped sets; timed plan targets []; "Last time: 4 × 6 · 80 kg" label; sticky bar placement. `reports/req-180.md`.
+**req-180** (DEC-097) — `ExercisePicker` (own by recency → library; empty search = staples by muscle; "Add N"; starting plan, never kg; "Use your 'X'?"); `logAs` fix.
+Gate (ui): tests 12/0, suite 1162/0, smoke green; Planner QA 11/11 (Cancel leaves v9 identical). Follow-ups → BACKLOG (bar background, Burpee under Chest).
+`reports/req-180.md`.
 
 ## req-181 — start from a plan: pick days per week, fill the slots  (merged 2026-09-26)
 
-**req-181** (2026-09-26, DEC-098) — `/routines/new`: "Start from a plan" (primary) / "Blank routine" (`/routines/new/blank`).
-1–4 days (1 = "Minimum"); each slot opens the req-180 picker single-select, filtered to its pattern (own by libraryId, then
-staples, "Show more"; typing searches all). Save = one write via `applyPlan` → pure `planToState` (`src/plan-templates.js`):
-exercises deduped across slots, a routine per day with a pick, the week (Mon / Mon-Thu / Mon-Wed-Fri / Mon-Tue-Thu-Fri,
-loopWeeks 1) only if the schedule is empty, else a done screen. Dips → horizontal-push (7 rows; vertical-push staples 14→8,
-horizontal-push 16→22; libraryProblems []). Gate (ui + trigger `store.jsx`): req-181.test.js 20/0; suite 1182/0; `./check
---smoke` green. **Independent reviewer: No blockers.**; its latent double-tap Save (a second routine set) fixed on the branch
-(`cfa5ff0`, test fails without the guard). Planner's QA agent (390×844, empty + db seeds): 10/10 with v9 receipts; Fill's Save
-could sit behind the dock mid-scroll (a tap went Home, losing the plan) → pinned like the picker (`e5f023b`), re-verified at 5
-scroll positions + a real double-tap → one routine set. AC6 amended (contradicted Change 4; Builder flagged). Test edits real:
-`req-122` Actions 17→18, `req-179` mounts `RoutineNewBlank`. Builder's calls (reversible): Save disabled until one pick; plan
-routines carry focus 'Machines'. `reports/req-181.md`.
+**req-181** (DEC-098) — "Start from a plan": 1–4 days, pattern-filtered slots, one-write `applyPlan`, schedule only if empty; dips → horizontal-push.
+Gate (ui + `store.jsx`): tests 20/0, suite 1182/0, smoke green; independent reviewer No blockers (double-tap Save fixed `cfa5ff0`); QA 10/10, Save pinned `e5f023b`.
+`reports/req-181.md`.
 
 ## req-178 — the routine sets the workout's weight  (merged 2026-09-26)
 
-**req-178** (2026-09-26, DEC-096/100/101) — work-set kg seeds draft > session override > routine kg at that index > carry
-(routine has none) > blank; warm-ups stay on history; the preview follows. Replacement's first set from history. After an
-exercise (overview, and the auto-finish summary): "You did 55 kg. Routine: 50. [Update <routine>]" → writes that routine's
-item only. One-time fill of routine kg from latest history, once per device (DEC-101). Rule text rewritten (CLAUDE.md,
-DESIGN §1, AUDIT, PLANNING, DECISIONS index; `.mdc`/README/exchange by Builder). **Data lane:** dry run on Emilio's Export
-2026-09-25 (sha256 c28733d7…cfa7 unchanged): (a) 10 of 40 items change, (b) 0; Emilio's eyes waived (DEC-100). Gate: req-178
-tests 21/0; suite 1203/0; `./check --smoke` green; v8 legacy key → filled, workouts deep-equal, v8 removed. **Independent
-reviewer:** 1st pass **blocker** (assistant round-trip re-fills) → device marker (`6d2229c`); re-review **No blockers.**, a
-should-fix (failed load-time save → later re-fill) → pending flag (`d1baea1`, test fails without it). Planner's QA agent
-(390×844): 8/8 incl. his export (10 items, 30 unchanged, second reload byte-identical), offer + auto-finish offer (countdown
-kept), per-routine update, blank device; the edit-after-import bug seen on `740bc82` gone on `d1baea1`. Test edits (load goldens
-via `test-support/fill.js`, targets 20→18 etc.) judged real by the reviewer. Builder's additions: offer on the auto-finish
-summary; blank device starts marked. **For Emilio:** finish/abandon any live workout before opening the new build; to import
-an old backup, run it through `--out` first. `reports/req-178.md`.
+**req-178** (DEC-096/100/101) — kg seeds from the routine; "Save to routine" offer; one-time fill once per device (his Export: 10 of 40 items); rule text rewritten.
+Gate (data): tests 21/0, suite 1203/0, smoke green; independent reviewer blocker (assistant round-trip re-fill) → device marker, re-review No blockers; QA 8/8 on his Export.
+`reports/req-178.md`.
 
 ## req-182 — the offer names the exercise; plan fill shows your pick  (merged 2026-09-26)
 
-**req-182** (2026-09-26, from the Sam run, prep §G) — offer row: exercise name, "You lifted 32.5 kg · routine says 30 kg" / "…
-· not in the routine yet", "Save to {routine}" → "Saved to {routine}." Auto-finish with an offer open: no countdown, primary
-Finish (same commit, once-guarded); no offers → countdown unchanged. Plan fill rows lead with the pick; a later day's unset
-slot carries the same slot's earlier pick (`carriedFills`, never over an explicit pick/skip). Gate (ui): req-182.test.js 7/0;
-suite 1210/0; `./check --smoke` green. No trigger files. Test edits real (req-178 offer words; req-181 3-day flow now also makes
-C from carried picks). Planner's QA agent (390×844): 7/7 — 15 s wait commits nothing, Finish ×2 → one workout, Finish writes no
-routine; no-offer countdown still commits; carry/change/skip with v9 receipts; screenshot viewed. Builder's calls (reversible):
-Edit secondary while waiting; no "same as A" marker; filling only A also makes C. `reports/req-182.md`.
+**req-182** (Sam run, prep §G) — offer names the exercise, "Saved to …"; auto-finish waits for Finish while an offer is open; plan picks lead and carry to later days.
+Gate (ui): tests 7/0, suite 1210/0, smoke green; Planner QA 7/7 (15 s wait commits nothing, Finish ×2 → one workout).
+`reports/req-182.md`.
 
 ## req-183 — kg hints: last time when the routine is blank, a big-jump note  (merged 2026-09-26)
 
-**req-183** (2026-09-26, DEC-102) — weighted work set, routine kg blank at that index, history has a kg → "No weight entered ·
-last time 30 kg" (empty box) / "Last time: 30 kg" (typed); box never prefilled. |kg − ref|/ref > 0.5 (ref = routine kg, else
-last time) → "That's a big change from 50 kg"; no dialog, no block. Pure `src/kg-hints.js`; history via the existing
-`historySetPrefill`. Gate (ui): req-183.test.js 12/0; `./check --smoke` green. No trigger files, no data change. Planner's QA agent
-(390×844): 7/7 — 500/60/75/76 boundaries, one-tap Complete stores 500, warm-up/bodyweight no hints, Complete on screen;
-screenshot viewed. **Checked:** a routine kg blanked through the UI stays `[]` across reloads (migrateState's baseline refill is
-legacy-v8 only, `model.js:45`) — Builder's test note, not a user bug. Builder's call: "Last time" stays after typing (reversible).
+**req-183** (DEC-102) — "No weight entered · last time 30 kg" when the routine is blank; "That's a big change from 50 kg" over 50%; no block.
+Gate (ui): tests 12/0, smoke green; Planner QA 7/7 (a blanked routine kg stays [] across reloads — migrateState refill is v8-only).
 `reports/req-183.md`.
