@@ -734,3 +734,13 @@ CDC "2 or more days a week". Sources agree beginners = 2–3 full-body days.
 Library fit [measured, `src/library/exercises.json`, visible 366]: `common` is true on all 366 (useless as a filter); `staple`
 194/172 is the useful flag. Every slot has ≥3 staples overall; thin per equipment: V-Pull barbell/dumbbell 0 (expected),
 Lunge machine 0, Hinge bodyweight 1, Carry only 3 exercises. Dips are tagged `vertical-push` (likely wrong).
+
+## G. Sam run on the new flow, 2026-09-26 (main `6c4dc7c`, after req-178..181)
+
+Plan: empty Home → saved 3-day plan **40 taps** (12 slots × 3; 9 are re-picks of A/B in C). Picker: 2 exercises in 4 taps +
+2 searches. §E fixed: 1, 4, 5, 6, 7, 10, scroll bug; partly 3 (Loop, Import, full library, slash, Volume remain); open 2, 8, 9.
+Findings: (1) auto-finish offer doesn't name the exercise, "Routine: —", under a countdown → **req-182**; (2) skipping the offer
+loses the weight — next time kg blank, nothing shows what he lifted (DEC-096 §5 "no last time") → Emilio; (3) blank kg accepted
+(Row stored weight 0) → Emilio; (4) no sanity check: mis-typed 500/350 kg saved → Emilio; (5) Home: today unlabelled, dock
+"Workout" does nothing with no workout; (6) plan fill shows slot not pick → **req-182**; (7) "Warm-up exercise" unexplained,
+"Not timed…" line puzzles; (8) jargon above; (9) no next exercise (DEC-093 keeps it).
