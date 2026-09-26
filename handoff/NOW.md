@@ -2,8 +2,6 @@
 
 Updated 2026-09-26. **Shipped: req-01–09, req-11–23, req-25–31, req-33–108, req-110–111, req-109, req-112–113, req-115, req-114, req-120, req-118, req-116–117, req-119, req-121–130, req-133, req-139, req-138, req-140, req-143, req-145, req-147, req-148, req-151, req-150, req-142, req-141, req-24, req-152, req-153, req-154, req-155, req-156, req-157, req-158, req-159, req-160, req-161, req-162, req-163, req-165, req-164, req-166, req-167, req-168, req-169, req-170, req-171–177, req-179–181, req-178, req-182** (req-10 pending; req-32 dropped; req-77 PAUSED). **Gym-flow batch 4 LIVE 2026-09-23:** Emilio's feedback JSON
 (F1..F10) → req-103..111, plus req-112 (Finish no longer rewrites the routine, DEC-056). DEC-052..057, L-022/023.
-**Test lists closed 2026-09-24** (run by Planner in a browser, not on a device; Emilio accepts feel is caught in use):
-batch 4 12/12, Tier 1 10/11 + 1 by unit test, batch-3 feel 3 checked (no-zoom: all inputs ≥17 px) + QA findings (BACKLOG §batch 4).
 `log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -19,21 +17,22 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **All follow-ups done (DEC-087)** — audits 2026-09-24 closed out: bugs, cleanup, the storage split, tooling (see
-  SHIPPED 2026-09-24/25). **The table is clean** (the review leftovers are closed; see SHIPPED). Next: new features, starting with the creation design (req-144, design
-  lane, live with Emilio), then req-10. Export verified 2026-09-25 (his iCloud file round-trips identical through `applyBackup`).
-- **Nothing in flight.** Library follow-ups DONE 2026-09-24: 366 fully written (194 staples), 0 rough visible, own-only
-  search, RepDB gone, fresh-eyes scanned. No new library fields until req-144 says.
-- **2026-09-25/26 shipped:** Back returns where you came from (DEC-092), the beginner-run fixes (DEC-093) and phone polish
-  (DEC-094). Working rule: DEC-095 (if Planner can do it, do it). **Next: the req-144 design session with Emilio** (prep §D–E).
-- **Order (DEC-091):** req-144 creation design → req-10 + in-gym flow → req-146 server later. Export stays.
-- **Waiting (Emilio, DEC-075):** req-146 backend (own server), req-144 creation design, req-149 progression rules.
-- **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter (+ libraryId in the feedback note) → 132 → 137 →
-  131 → 135 → avatars + own figures.
-- `req-10` **first-time-exercise setup flow** — waiting (Emilio 2026-09-24: "core still needs improvement");
-  spec predates ~100 reqs, rescan before building. **[ux-feel]**
+- **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
+- **Order (DEC-091):** req-144 (advanced/program questions next session) → req-10 + in-gym flow → req-146 server later.
+- **Waiting (Emilio, DEC-075):** req-146 backend, req-149 progression rules. `req-10` first-time setup — rescan first. **[ux-feel]**
+- **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter → 132 → 137 → 131 → 135 → avatars.
 
 **Gym-flow batch 2 (req-76..86): all LIVE except `req-77` (PAUSED — affordance; folds in n1 Finish/Abandon).**
+
+## Emilio's list — batch 2026-09-26 (req-178..182)
+
+**Three decisions (Sam run, prep §G):** (1) you skip the "Save to routine" offer and the routine had no kg → next time the kg
+is blank with no trace of what you lifted: show "last time" only in that case? (DEC-096 §5 dropped it) (2) blank kg accepted on
+Complete — block it, or keep the note? (3) no check on typos (500 kg saved) — warn on a jump over, say, 50%?
+**Planner's calls to glance at** (all reversible, details in each req): 3×10/90 s starting plan wording; slot names and
+weekdays (Mon / Mon-Thu / Mon-Wed-Fri / Mon-Tue-Thu-Fri); dips → chest; auto-finish waits when an offer is open; picks carry
+to later days; routine kg fill once per device, an imported old backup keeps its kg (fix a backup first with
+`node scripts/fill-routine-kg.mjs <file> --out <copy>`). **Feel on a phone:** per-set fields, pinned Save bars.
 
 ## Needs decisions — parked until their phase
 
