@@ -7,13 +7,13 @@ import React from 'react'
 import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdtempSync } from 'node:fs'
+import { linkSync, mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
 import { carryForSet, initialSetFields, nextSeedOverrides, replacementItem, routineKgFor, setPreview } from './workout-log.js'
 import { historyPrescription, historySetPrefill, lastSetsForExercise } from './history-queries.js'
-import { emptyState, getLoadUnreadable, loadState } from './persistence.js'
+import { emptyState, getLoadUnreadable, loadState, saveState } from './persistence.js'
 import { migrateState } from './model.js'
 import { buildBackup, applyBackup } from './exchange.js'
 import { replaceItemInState } from './state-reducers.js'
@@ -232,6 +232,35 @@ describe('req-178 AC6 / AC8 — the one-time fill', () => {
     assert.equal(localStorage.getItem('workout-mvp-v9'), JSON.stringify(imported), 'nothing written')
   })
 
+  it('re-review: the load-time save fails (quota) → the first later successful save sets the marker → reload keeps the edit', () => {
+    // A Map-backed localStorage whose v9 setItem throws (quota) only during the first load.
+    const previous = globalThis.localStorage
+    const map = new Map([['workout-mvp-v9', JSON.stringify(state())]])
+    let failV9 = true
+    globalThis.localStorage = {
+      getItem: (key) => (map.has(key) ? map.get(key) : null),
+      setItem: (key, value) => {
+        if (failV9 && key === 'workout-mvp-v9') throw new Error('QuotaExceededError')
+        map.set(key, String(value))
+      },
+      removeItem: (key) => map.delete(key),
+    }
+    try {
+      const loaded = loadState()
+      failV9 = false
+      assert.deepEqual(loaded.routines[0].exercises[0].suggestedWeights, [45, 47.5, 40], 'filled in memory')
+      assert.equal(map.get(DEVICE_FILL_KEY), undefined, 'not marked while the fill is not on disk')
+      // The user edits a routine kg; the store saves (this save works).
+      const edited = structuredClone(loaded)
+      edited.routines[0].exercises[0].suggestedWeights = [25, 25, 25]
+      assert.equal(saveState(edited), true)
+      assert.ok(map.get(DEVICE_FILL_KEY), 'marked on the first successful save')
+      assert.deepEqual(loadState().routines[0].exercises[0].suggestedWeights, [25, 25, 25], 'the edit survives the reload')
+    } finally {
+      globalThis.localStorage = previous
+    }
+  })
+
   it('a blank device sets the marker at start, so a routine typed on it is never filled later', () => {
     localStorage.clear()
     loadState()
@@ -332,6 +361,11 @@ describe('req-178 AC9 — the dry-run script (same function, read-only)', () => 
     assert.deepEqual(copy.workouts, applyBackup(JSON.parse(readFileSync(path, 'utf8'))).state.workouts, 'history untouched')
     const refused = spawnSync(process.execPath, [script, path, '--out', path], { encoding: 'utf8' })
     assert.equal(refused.status, 1)
+    // A hard link to the input is the same file too (re-review nit): refused.
+    const hard = join(dir, 'hard-link.json')
+    linkSync(path, hard)
+    const refusedLink = spawnSync(process.execPath, [script, path, '--out', hard], { encoding: 'utf8' })
+    assert.equal(refusedLink.status, 1, refusedLink.stdout)
     assert.equal(sha(), before)
   })
 })

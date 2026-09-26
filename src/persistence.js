@@ -160,6 +160,11 @@ function markDeviceFilled(now = new Date()) {
   }
 }
 
+// req-178 re-review — the filled state is in memory but its load-time save failed (quota):
+// the marker waits for the FIRST successful saveState, which writes that filled state. Without
+// this, a later save (a routine kg edit) would persist unmarked and the next load re-fill it.
+let deviceMarkPending = false
+
 // A blank device has nothing to fill, and a routine typed on it later must never be filled.
 function blankDeviceState() {
   markDeviceFilled()
@@ -236,15 +241,20 @@ export function loadState() {
     return emptyState()
   }
   setLoadUnreadable(false)
-  // req-178 — the one-time fill (fillOnce above), saved with the rest. The marker is set only
-  // once the filled state is on disk (or nothing changed), so a failed save retries next load.
+  // req-178 — the one-time fill (fillOnce above), saved with the rest. The marker is set once
+  // the filled state is on disk: now, or — if this save fails — on the first save that works
+  // (deviceMarkPending, set in saveState).
+  deviceMarkPending = false
   const filled = fillOnce(state)
   if (filled.state !== state) {
     state = filled.state
     mustSave = true
   }
-  if (mustSave) saveState(state)
-  if (filled.mark && !getSaveFailed()) markDeviceFilled()
+  const saved = mustSave ? saveState(state) : true
+  if (filled.mark) {
+    if (saved) markDeviceFilled()
+    else deviceMarkPending = true
+  }
   // Only reached when this device had data (fresh migration, or already current
   // with a legacy copy left over from an interrupted cleanup). The read-back gate
   // decides whether any legacy key is actually removed.
@@ -337,6 +347,11 @@ export function saveState(state) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     setSaveFailed(false)
+    // req-178 — a fill whose load-time save failed is on disk now: mark the device.
+    if (deviceMarkPending) {
+      deviceMarkPending = false
+      markDeviceFilled()
+    }
     return true
   } catch {
     setSaveFailed(true)

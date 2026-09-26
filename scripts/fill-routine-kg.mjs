@@ -10,7 +10,7 @@
 // keeps its routine kg. This writes a copy with rule (a) applied — same backup wrapper, the
 // state as the app would load it, filled — to import instead. It refuses to overwrite the input.
 
-import { readFileSync, realpathSync, existsSync, writeFileSync } from 'node:fs'
+import { readFileSync, realpathSync, existsSync, statSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { applyBackup } from '../src/exchange.js'
 import { fillRoutineKgFromHistory } from '../src/routine-kg-fill.js'
@@ -40,7 +40,12 @@ for (const mode of ['overwrite', 'blanks']) {
 }
 
 if (out) {
-  const same = existsSync(out) && realpathSync(out) === realpathSync(path)
+  // The same file by path, by symlink (realpath) or by hard link (device + inode).
+  const inode = (file) => {
+    const stat = statSync(file)
+    return `${stat.dev}:${stat.ino}`
+  }
+  const same = existsSync(out) && (realpathSync(out) === realpathSync(path) || inode(out) === inode(path))
   if (same || resolve(out) === resolve(path)) {
     console.error('\n--out is the input file; refusing (the input is never written).')
     process.exit(1)
