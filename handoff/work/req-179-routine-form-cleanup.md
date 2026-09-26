@@ -1,6 +1,6 @@
 # req-179 — Routine form cleanup: no Focus, a "Warm-up exercise" switch, no warm-up set, plain words
 
-**Status: BUILT, NOT merged** (2026-09-26). **Lane: ui.** Source: DEC-099 (Emilio, req-144 prep §E.3/§E.6 + req-175 review).
+**Status: BUILT AND MERGED, 2026-09-26 — branch `req-179` (`5c814b3`…`58251a9`, 2 commits).** (2026-09-26). **Lane: ui.** Source: DEC-099 (Emilio, req-144 prep §E.3/§E.6 + req-175 review).
 Behaviour calls below are Planner's under DEC-095, marked `(unconfirmed)`, and go on Emilio's end-of-batch list.
 **Build order (Planner, 2026-09-26):** **req-179** → req-180 → req-181 on main; req-178 is held for Emilio's Q1 and
 the data-lane gate, and rebases onto these (it shares `ExerciseFields` in `views/Routine.jsx`, incl. the Kg field). req-180 (picker) rewrites the add flow

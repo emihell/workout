@@ -2091,3 +2091,5 @@ green 12. Planner's QA agent (390×844, db.json seed): items 1–10 pass with st
 Planner's ask (`58251a9`: switch under its own legend, 24 px between groups) — screenshot viewed. No trigger files. Only test
 edit `ids.test.js:66` label. Builder's calls (reversible): per-set switch hidden at Sets ≤1; new set fields copy the previous
 one; "Duration (s)" not renamed (follow-up). Feel for Emilio: 6 stacked per-set fields one-handed. `reports/req-179.md`.
+
+No independent reviewer (`plan closeout --no-reviewer`): exchange.js diff is assistant-prompt text only (3 strings + focus dropped from the example); Planner read it; no import validation reads focus (git grep)
