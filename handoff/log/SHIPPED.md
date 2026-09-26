@@ -2079,3 +2079,15 @@ collapsed into one line, warm-ups not named; "1 set"; empty-home gap `--ui-s2` (
 1136/0; `./check --smoke` green 12; Feel top 336 px (<844); stored Max set rpe 5. Planner viewed the three 390×844 screenshots:
 Max on one line, Finish fits with Save on screen, home gap even. Test edits wording-only (req-176's `assertMatchesSave` untouched).
 Builder's calls (reversible): not-started line last; warm-up-only leftovers get no line; plain names. Merge `7a455b6`. `reports/req-177.md`.
+
+## req-179 — routine form cleanup: no Focus, "Warm-up exercise" switch, no warm-up set, plain words  (merged 2026-09-26)
+
+**req-179** (2026-09-26, DEC-099) — Focus gone from both forms and 9 display sites (the 9th, the workout preview subtitle
+`workout/overview.jsx:61`, found by Builder); stored focus untouched. Role → one "Warm-up exercise" switch (`savedRole`,
+`src/routine-form.js`; stored finisher/cardio kept while off). New items: warmup null, role main. Existing warm-up set →
+"Keep warm-up set (N reps)". "Different reps/kg/duration per set" fieldsets feed the unchanged parser. "Rest (seconds)",
+"Warm-up set"; README/exchange.js text. Gate (ui): req-179.test.js 14/0 (11 fail on main); suite 1150/0; `./check --smoke`
+green 12. Planner's QA agent (390×844, db.json seed): items 1–10 pass with stored-value receipts, 0 dialogs. Layout fix on
+Planner's ask (`58251a9`: switch under its own legend, 24 px between groups) — screenshot viewed. No trigger files. Only test
+edit `ids.test.js:66` label. Builder's calls (reversible): per-set switch hidden at Sets ≤1; new set fields copy the previous
+one; "Duration (s)" not renamed (follow-up). Feel for Emilio: 6 stacked per-set fields one-handed. `reports/req-179.md`.
