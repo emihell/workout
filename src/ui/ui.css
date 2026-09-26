@@ -281,6 +281,17 @@ a.ui-btn--quiet:active {
   display: block;
   margin: var(--ui-s3) 0;
 }
+/* req-179 — a routine item's Reps / Kg / Duration group: label, "Different … per set"
+   switch, field(s). A clear gap between groups so a switch reads as its own group's. */
+.ui-per-set {
+  border: 0;
+  padding: 0;
+  margin: var(--ui-s4) 0;
+  min-width: 0;
+}
+.ui-per-set > .ui-field {
+  margin: var(--ui-s2) 0;
+}
 .ui-field__label {
   display: block;
   font-size: var(--ui-text-caption);

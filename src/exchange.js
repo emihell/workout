@@ -16,7 +16,7 @@ export const ASSISTANT = {
     '- Do they want small tweaks, new routines added to the calendar, or a full schedule rewrite?',
     '',
     'Then recommend concrete changes. You may:',
-    '- Edit existing routines (swap exercises, change sets/reps/kg/rest, add or remove a WU set).',
+    '- Edit existing routines (swap exercises, change sets/reps/kg/rest).',
     '- Create new routines and put them on weekdays.',
     '- Add new exercises to the library when a routine needs a movement that is not there yet.',
     '- Change the whole weekly schedule, or only append a routine to a day.',
@@ -35,10 +35,10 @@ export const ASSISTANT = {
       id: 'Stable routine-item id. Keep existing ids when editing a known row.',
       exerciseId: 'Must exist on state.exercises.',
       role:
-        'warmup = WU routine: this whole exercise warms up the routine (e.g. rowing). main | finisher | cardio for the rest.',
+        'warmup for a warm-up exercise (e.g. 5 min bike), otherwise main; keep finisher/cardio where they already exist.',
       warmup:
-        'null, or { reps: 12 } for a WU set: an easy set before working weight on that same exercise. Not the same as role warmup.',
-      sets: 'Number of working sets (not counting the WU set).',
+        'Keep an existing { reps } as it is; null on new items. (An easy set before working weight on that same exercise; not the same as role warmup.)',
+      sets: 'Number of working sets (not counting a warm-up set).',
       targets: 'Reps or duration per working set, e.g. ["12","10","8"] or ["5-8 min"].',
       suggestedWeights: 'Kg per working set. Empty for bodyweight/cardio.',
       restSec: 'Seconds between working sets.',
@@ -79,7 +79,6 @@ export const ASSISTANT = {
         {
           id: 'sess-upper',
           name: 'Upper Body',
-          focus: 'Machines | Free weights | Bodyweight | Cardio | Mobility | Mixed',
           archivedAt: null,
           exercises: [
             {

@@ -58,7 +58,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     if (!plan) {
       return <Missing>Not found.</Missing>
     }
-    const previewMeta = [plan.focus, plan.date].filter(Boolean).join(' · ')
+    const previewMeta = plan.date || ''
     // req-116 — the guard for Back after Finish: an occurrence that already has a
     // finished workout shows Done and a link to it in History, never a fresh Start.
     const done = finishedForPlan(store.workouts, plan)

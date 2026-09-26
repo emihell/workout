@@ -158,8 +158,8 @@ export function ScheduleDayAdd({ week, weekday }) {
       <Title>Add routine</Title>
       {routines.length === 0 ? (
         <RoutineNewForm
-          onSave={({ name, focus }) => {
-            const id = store.addRoutine({ name, focus })
+          onSave={({ name }) => {
+            const id = store.addRoutine({ name })
             store.addSlot({ week, weekday, routineId: id })
             go(dayPath)
           }}
@@ -175,7 +175,7 @@ export function ScheduleDayAdd({ week, weekday }) {
                 slotRoutineId(slot) === routine.id,
             )
             return (
-              <Row key={routine.id} value={routine.focus}>
+              <Row key={routine.id}>
                 <Button
                   disabled={assigned}
                   onClick={() => {
