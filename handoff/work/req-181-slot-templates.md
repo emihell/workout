@@ -1,6 +1,6 @@
 # req-181 — start from a plan: pick days per week, fill the slots
 
-**Status: BUILT, NOT merged** (behaviour calls below are `(unconfirmed)`). (2026-09-26)
+**Status: BUILT AND MERGED, 2026-09-26 — branch `req-181` (`1dab597`…`e5f023b`, 3 commits).** (behaviour calls below are `(unconfirmed)`). (2026-09-26)
 **Lane: ui** (plus one content fix, the dips tag). Source: DEC-098, req-144 prep §F. Blank routine stays (DEC-098 §4).
 
 ## Today [read 2026-09-26, main `1e228c0`]
