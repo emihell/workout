@@ -45,3 +45,11 @@ export function routineUpdateOffer(active, routines, item) {
 export function kgListText(list) {
   return (list || []).map((value) => (Number(value) > 0 ? String(Number(value)) : '—')).join('/')
 }
+
+// req-182 — the offer's meta line, plain words (unconfirmed wording): "You lifted 32.5 kg ·
+// routine says 30 kg", or "… · not in the routine yet" when the routine has no kg there.
+export function offerText(offer) {
+  const routineHasKg = (offer.from || []).some((kg) => Number(kg) > 0)
+  const lifted = `You lifted ${kgListText(offer.to)} kg`
+  return routineHasKg ? `${lifted} · routine says ${kgListText(offer.from)} kg` : `${lifted} · not in the routine yet`
+}
