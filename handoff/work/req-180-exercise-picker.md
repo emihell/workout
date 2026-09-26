@@ -1,6 +1,6 @@
 # req-180 — Add exercises to a routine: own first, whole library, multi-select
 
-**Status: READY** (behaviour calls marked `(unconfirmed)` go on Emilio's end-of-batch list). **Lane: ui.** Source: DEC-097
+**Status: BUILT, NOT merged** (behaviour calls marked `(unconfirmed)` go on Emilio's end-of-batch list). **Lane: ui.** Source: DEC-097
 §1–6 (req-144 prep §E.4: ~55 taps for a 5-exercise routine). Amends DESIGN §1 for one case (DEC-097 §4). Depends on
 **req-179** (the routine item's fields after DEC-099); kg is today's history prefill (= DEC-096 §2), so it doesn't wait for
 req-178 (held for Emilio, rebased last); **req-181** builds on this picker.

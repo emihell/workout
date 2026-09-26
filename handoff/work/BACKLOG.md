@@ -530,6 +530,8 @@ week structure that owns routines and their placement. The code still carries le
 `programs`/`programName` remnants (`model.js`, `storage.js`) — a program layer existed
 once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
+- **req-180 picker follow-ups** (QA 2026-09-26, small, ui): the sticky Cancel/Add N bar has no background, so a sliver of
+  list shows between it and the dock; empty-search grouping by an entry's *first* muscle group puts Burpee under Chest.
 - **`req-150` progression safe-hold** (READY) — the three wrong cases hold instead of guessing (DEC-075).
 - **`req-149` progression rules** (later, a design req; DEC-075) — the rules and code for how the app upgrades routines:
   rep ranges, AMRAP, an assisted flag, when to suggest vs apply. Inputs: DEC-056, req-144 prep §A.
