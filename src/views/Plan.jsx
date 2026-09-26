@@ -129,7 +129,10 @@ function Fill({ days, fills, onSave, saving }) {
           </List>
         </section>
       ))}
+      {/* req-181 QA — pinned above the dock like the picker's bar: unpinned, a tap aimed at
+          Save mid-scroll hit the dock's Workout link and dropped the unsaved plan. */}
       <Actions
+        className="ui-picker-bar"
         retreat={<NavLink to="/routines/new" look="secondary">Cancel</NavLink>}
         forward={
           <Button variant="primary" disabled={chosen === 0 || saving} onClick={onSave}>

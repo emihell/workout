@@ -4,6 +4,7 @@
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import React from 'react'
+import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
 import { catalogItemToExercise, loadExerciseCatalog, shownName } from './exerciseCatalog.js'
 import { libraryProblems } from './exerciseLibrary.js'
@@ -273,6 +274,18 @@ describe('req-181 — the flow (rendered, real store)', () => {
     assert.equal(after.exercises.length, 1)
     assert.equal(after.schedule.slots.length, 1)
     assert.equal(window.location.hash, '#/', 'went Home (scheduled), not the Done screen')
+  })
+
+  it('QA: the Fill screen\'s Cancel / Save row is pinned above the dock (the picker bar\'s class)', async () => {
+    await harness(emptyState())
+    await visit(link('1 day a week'))
+    const bar = view.button('Save').closest('.ui-actions')
+    assert.ok(bar.classList.contains('ui-picker-bar'))
+    assert.ok([...bar.querySelectorAll('a')].some((a) => a.textContent.trim() === 'Cancel'))
+    const css = readFileSync(new URL('./ui/ui.css', import.meta.url), 'utf8')
+    const rule = css.slice(css.indexOf('.ui-picker-bar {'), css.indexOf('}', css.indexOf('.ui-picker-bar {')))
+    assert.match(rule, /position: sticky/)
+    assert.match(rule, /bottom: calc\(var\(--ui-dock-clear\)/)
   })
 
   it('abandon mid-flow: v9 unchanged', async () => {

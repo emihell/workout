@@ -282,7 +282,8 @@ a.ui-btn--quiet:active {
   margin: var(--ui-s3) 0;
 }
 /* req-180 — the exercise picker's Cancel / "Add N" row stays in reach over a long list:
-   stuck above the floating dock, on the page background. */
+   stuck above the floating dock, on the page background. req-181: the plan's Cancel / Save
+   row too (a tap on an unpinned Save could land on the dock and lose the plan). */
 .ui-picker-bar {
   position: sticky;
   bottom: calc(var(--ui-dock-clear) + var(--ui-s2));
