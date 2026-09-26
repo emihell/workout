@@ -33,19 +33,23 @@ This is the one that decides the hard cases.
 - **A weighted exercise with no history has no invented starting weight.** Its dated
   plan explains calibration (start light, do the program reps, adjust by valid
   increments). It does not guess a number and present it as a plan.
-- **Prefills come only from finished-workout history for that same field.** Sanctioned exceptions, all the user's own
-  input rather than invented data: (1) the live set-log screen prefills Reps from that set's target, and Effort Moderate
+- **The workout's work-set kg comes from the routine** (DEC-096): the user typed or confirmed it. Adding an exercise to a
+  routine prefills its kg from that exercise's history; after the exercise, a confirmed "Update routine" offer carries the
+  logged kg back to that routine only — never automatic (DEC-056). Routine kg blank → the set starts blank.
+- **Every other prefill comes only from finished-workout history for that same field.** Sanctioned exceptions, all the
+  user's own input rather than invented data: (1) the live set-log screen prefills Reps from that set's target, and Effort Moderate
   **only where Effort is shown** (warm-up/cardio carry no effort, req-156); (2) the **kg** the user just entered this
-  session carries to the next working set when history has **no set at that index** — a no-history exercise (DEC-002),
+  session carries to the next working set when the routine has **no kg at that index** — a no-history exercise (DEC-002),
   an Add set, or a routine that grew (req-152); reps never carry (DEC-052); (3) an in-session kg change carries to the
-  remaining sets (DEC-052); (4) an unsaved draft restores what was typed (req-125). Nowhere else does a plan, a library
-  cue, a recommendation, a routine number, or a type default become a prefilled value.
+  remaining sets (DEC-052); (4) an unsaved draft restores what was typed (req-125). Nowhere else does a library cue, a
+  recommendation, or a type default become a prefilled value.
 - **Never invent warmup (e.g. 50% / 12 reps), rest (e.g. 90s), or notes (a copy of
-  cues).** Absent is absent. Editing an existing record may show that record's saved
+  cues).** Absent is absent. One exception (DEC-097 §4): adding a no-history exercise to a routine shows a
+  **starting plan** ("3 × 10, 90 s rest — change any time"), visible and accepted by adding — never a kg. Editing an existing record may show that record's saved
   values — that's history, not invention.
 
-**The test for any prefilled or suggested value:** can you name the finished-workout
-record it came from? If not, it must not appear as if the user entered it.
+**The test for any prefilled or suggested value:** can you name the record it came from — a
+finished workout, or the routine value the user set? If not, it must not appear as if the user entered it.
 
 ## 2. Recommendations are explainable, and use real increments
 

@@ -45,8 +45,9 @@ later DEC replaced carries a `> SUPERSEDED` marker at its top. Refreshed 2026-09
 - **Audits 2026-09-24** — all recommendations taken (req-156..160, planning docs, Emilio's actions). → **DEC-085**
 
 **Data & trust**
-- **History is the source of truth** — never invent data: prefills come from finished-workout data for that field; a
-  no-history exercise carries the kg just entered; never invent warm-up reps; hold with no valid increment. → **DEC-002**,
+- **History is the source of truth** — never invent data: the workout's kg comes from the routine the user set, prefilled
+  from history when added and updated by a confirmed offer (**DEC-096**); other prefills come from finished-workout data; a
+  routine with no kg carries the kg just entered; never invent warm-up reps; hold with no valid increment. → **DEC-002**,
   **DEC-022**, **DEC-030**
 - **Carry** — a changed weight carries to the remaining sets, reps never do; an added set with nothing logged stays blank,
   never the routine's number. → **DEC-052**, **DEC-082** §2
@@ -1677,3 +1678,14 @@ import it later". So req-178's one-time fill merges on Planner's gate (tests, re
 `~/Library/Mobile Documents/com~apple~CloudDocs/workout-database-2026-09-25.json`), without waiting for his eyes. It applies to this
 batch only: the DEC-035 carve-out stands for later migrations. **Q1 (req-178):** (a) overwrite routine kg with latest
 history where history has a kg, so the next workout reads as it would have before `(unconfirmed)`, Planner's call.
+
+## DEC-101 — the routine-kg fill runs once per device; an import never fills  (Planner, from req-178 review, 2026-09-26)
+
+The independent reviewer found an in-state marker was dropped by an Export → assistant → Import round-trip, so the next
+load re-filled and silently overwrote the kg the user/assistant chose (blocker, reproduced). Decided (DEC-095): the marker
+is a device key `workout-routine-kg-filled` outside the state doc; it's set only once the filled state is saved (a pending
+flag covers a failed load-time save); a blank device starts marked; the fill runs outside the parse/migrate `try`.
+**Accepted trade-off:** importing an old Export after the fill (or on a new device) keeps that Export's routine kg — the
+after-exercise offer corrects it. Remedy for a backup: `node scripts/fill-routine-kg.mjs <export> --out <copy>` writes a
+filled copy (input only read; same file/symlink/hard link refused). Accepted latents: skipped-set index drift between fill
+and offer (none in Emilio's data); a tab on the old build.

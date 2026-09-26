@@ -439,8 +439,8 @@ comments describing the very function the commit is about.
 
 `rules/DESIGN.md` states each value as a test you can apply to a proposal rather
 than an adjective. Read it before commenting on anything the user sees. The core
-of this app: **history is the source of truth, and the app never invents data it
-doesn't have.** Trust in the record beats every convenience that would fabricate
+of this app: **history is the record, the routine is the user's plan, and the app never
+invents data it doesn't have** (DEC-096). Trust in the record beats every convenience that would fabricate
 one.
 
 ## Re-check CC's judgment, read CC's mechanics

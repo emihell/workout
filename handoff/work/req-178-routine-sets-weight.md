@@ -1,6 +1,6 @@
 # req-178 — The routine sets the workout's weight
 
-**Status: READY** (Q1 → (a) overwrite, DEC-100 `(unconfirmed)`; Emilio's eyes waived for this batch, DEC-100 — dry run on his Export still required and pasted). **Lane: data** (bulk write of stored routines) — the
+**Status: BUILT AND MERGED, 2026-09-26 — branch `req-178` (`740bc82`…`d1baea1`, 3 commits).** (Q1 → (a) overwrite, DEC-100 `(unconfirmed)`; Emilio's eyes waived for this batch, DEC-100 — dry run on his Export still required and pasted). **Lane: data** (bulk write of stored routines) — the
 gate is the data lane's: round-trip + legacy-key tests, independent reviewer, dry run on Emilio's latest Export, backup
 reminder (DEC-046), **Emilio's eyes before merge** (DEC-035 carve-out). Source: DEC-096 (don't relitigate), DEC-099 §3.
 Siblings (build order): **req-178** → req-179 routine form → req-180 picker → req-181 slot templates. 179 edits the same
