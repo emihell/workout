@@ -1,8 +1,10 @@
 // req-178 (DEC-096 §6, DEC-100 Q1) — the one-time fill: since the routine now sets the
 // workout's kg, each routine item's kg is brought in line with the exercise's latest
 // finished history once, so the next workout reads as it did before (history seeded it).
-// Pure: loadState (persistence.js) runs it once, guarded by the stored marker; the dry run
-// (scripts/fill-routine-kg.mjs) runs the SAME function read-only on an Export.
+// Pure: loadState (persistence.js) runs it ONCE PER DEVICE, guarded by a marker kept in its
+// own localStorage key (DEVICE_FILL_KEY), outside the state document, so no Import (an old
+// Export, an assistant's reply) can remove it and re-trigger a fill (req-178 review, DEC-095).
+// The dry run (scripts/fill-routine-kg.mjs) runs the SAME function on an Export.
 //
 // Per routine item — a weighted exercise with a history prescription that has kg:
 //   for each set i < min(item sets, history sets) with history kg > 0 → to[i] = history[i].
@@ -14,7 +16,9 @@ import { isWeightedType } from './ids.js'
 import { historyPrescription } from './history-queries.js'
 import { exerciseById } from './model.js'
 
-export const FILL_MARKER = 'routineKgFilledAt'
+// The device marker: an ISO time, set once the fill has run (or at a blank device's start).
+// Not under `workout-mvp-`, so the unreadable-copy scan and the legacy cleanup never see it.
+export const DEVICE_FILL_KEY = 'workout-routine-kg-filled'
 
 function sameKg(a, b) {
   const x = a || []
@@ -43,10 +47,8 @@ export function filledKg(item, exercise, workouts, mode = 'overwrite') {
 }
 
 // → { state, changes: [{ routineId, routineName, itemId, exerciseId, exerciseName, from, to }] }.
-// `at` (an ISO time) is written as the marker; `at: null` (the dry run) writes no marker.
-// A state that already has the marker is returned as it is, with no changes.
-export function fillRoutineKgFromHistory(state, { mode = 'overwrite', at = null } = {}) {
-  if (state?.[FILL_MARKER]) return { state, changes: [] }
+// No change → the same state object. Whether to run it at all is the caller's (the device marker).
+export function fillRoutineKgFromHistory(state, { mode = 'overwrite' } = {}) {
   const changes = []
   const routines = (state?.routines || []).map((routine) => {
     let changed = false
@@ -68,6 +70,5 @@ export function fillRoutineKgFromHistory(state, { mode = 'overwrite', at = null 
     })
     return changed ? { ...routine, exercises } : routine
   })
-  const next = changes.length ? { ...state, routines } : state
-  return { state: at ? { ...next, [FILL_MARKER]: at } : next, changes }
+  return { state: changes.length ? { ...state, routines } : state, changes }
 }

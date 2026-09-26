@@ -1,30 +1,51 @@
-// req-178 — dry run of the one-time routine-kg fill on an Export (or any stored doc), READ
-// ONLY: the file is read, never written. It runs the SAME function loadState runs
-// (fillRoutineKgFromHistory, src/routine-kg-fill.js) on the state the app would load
-// (applyBackup: migrate + anchor, as an import does), for both Q1 rules, and prints each
-// change and the totals.
+// req-178 — the one-time routine-kg fill, on an Export (or any stored doc). The input file is
+// only READ, never written. It runs the SAME function loadState runs (fillRoutineKgFromHistory,
+// src/routine-kg-fill.js) on the state the app would load (applyBackup: migrate + anchor, as an
+// import does), for both Q1 rules, and prints each change and the totals.
 //
-//   node scripts/fill-routine-kg.mjs <export.json>
+//   node scripts/fill-routine-kg.mjs <export.json>                   # dry run
+//   node scripts/fill-routine-kg.mjs <export.json> --out <copy.json> # + write a filled COPY
+//
+// --out (req-178 review): the fill runs once per device, so an OLD Export imported after it
+// keeps its routine kg. This writes a copy with rule (a) applied — same backup wrapper, the
+// state as the app would load it, filled — to import instead. It refuses to overwrite the input.
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, realpathSync, existsSync, writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { applyBackup } from '../src/exchange.js'
-import { FILL_MARKER, fillRoutineKgFromHistory } from '../src/routine-kg-fill.js'
+import { fillRoutineKgFromHistory } from '../src/routine-kg-fill.js'
 
-const path = process.argv[2]
-if (!path) {
-  console.error('usage: node scripts/fill-routine-kg.mjs <export.json>')
+const args = process.argv.slice(2)
+const outAt = args.indexOf('--out')
+const out = outAt >= 0 ? args[outAt + 1] : null
+const path = args.find((arg, i) => i !== outAt && (outAt < 0 || i !== outAt + 1))
+if (!path || (outAt >= 0 && !out)) {
+  console.error('usage: node scripts/fill-routine-kg.mjs <export.json> [--out <copy.json>]')
   process.exit(2)
 }
-const { state } = applyBackup(JSON.parse(readFileSync(path, 'utf8')))
+const input = JSON.parse(readFileSync(path, 'utf8'))
+const { state } = applyBackup(input)
 const kg = (list) => `[${(list || []).join(', ')}]`
 const items = (state.routines || []).reduce((n, routine) => n + (routine.exercises || []).length, 0)
 
 console.log(`file: ${path}`)
 console.log(`routines ${state.routines.length} · items ${items} · workouts ${state.workouts.length}`)
-if (state[FILL_MARKER]) console.log(`marker ${FILL_MARKER} = ${state[FILL_MARKER]}: loadState would NOT fill this state`)
 
+let filled = null
 for (const mode of ['overwrite', 'blanks']) {
-  const { changes } = fillRoutineKgFromHistory({ ...state, [FILL_MARKER]: undefined }, { mode, at: null })
-  console.log(`\n(${mode === 'overwrite' ? 'a' : 'b'}) ${mode}${mode === 'overwrite' ? ' — the shipped rule (DEC-100)' : ' — dry run only'}: ${changes.length} item(s) change`)
-  for (const c of changes) console.log(`  ${c.routineName} · ${c.exerciseName}: ${kg(c.from)} → ${kg(c.to)}`)
+  const result = fillRoutineKgFromHistory(state, { mode })
+  if (mode === 'overwrite') filled = result.state
+  console.log(`\n(${mode === 'overwrite' ? 'a' : 'b'}) ${mode}${mode === 'overwrite' ? ' — the shipped rule (DEC-100)' : ' — dry run only'}: ${result.changes.length} item(s) change`)
+  for (const c of result.changes) console.log(`  ${c.routineName} · ${c.exerciseName}: ${kg(c.from)} → ${kg(c.to)}`)
+}
+
+if (out) {
+  const same = existsSync(out) && realpathSync(out) === realpathSync(path)
+  if (same || resolve(out) === resolve(path)) {
+    console.error('\n--out is the input file; refusing (the input is never written).')
+    process.exit(1)
+  }
+  const doc = input && input.kind && input.state ? { ...input, state: filled } : filled
+  writeFileSync(out, `${JSON.stringify(doc, null, 2)}\n`)
+  console.log(`\nwrote a filled copy (rule a) to ${out}`)
 }

@@ -3,7 +3,7 @@
 // external-change signals, and the unreadable-state copies (DEC-032, DEC-086).
 import { SCHEMA_VERSION, migrateState } from './model.js'
 import { defaultSchedule, withDefaultAnchor } from './schedule.js'
-import { FILL_MARKER, fillRoutineKgFromHistory } from './routine-kg-fill.js'
+import { DEVICE_FILL_KEY, fillRoutineKgFromHistory } from './routine-kg-fill.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -139,12 +139,44 @@ function removeLegacyKeysIfCurrentPersisted() {
   }
 }
 
-// req-178 — a blank device starts with the one-time fill already marked done: it has no
-// routines to fill, and a routine typed on it later must never be overwritten by the fill.
-// NOT in emptyState(), which is also the merge base for stored values (a stored value
-// without the marker must still be filled).
-function blankDeviceState(now = new Date()) {
-  return { ...emptyState(), [FILL_MARKER]: now.toISOString() }
+// req-178 (DEC-096 §6, DEC-100; review: DEC-095) — the one-time routine-kg fill, ONCE PER
+// DEVICE. Its marker is its own key (DEVICE_FILL_KEY), not a state field: an Import (an old
+// Export, an assistant's reply that dropped unknown fields) can never remove it, so no
+// imported doc ever triggers a fill. Accepted trade-off: an old Export imported after the fill
+// keeps its routine kg (the offer after each exercise corrects it; `fill-routine-kg.mjs --out`
+// fixes a copy before importing).
+function deviceFilled() {
+  try {
+    return localStorage.getItem(DEVICE_FILL_KEY) != null
+  } catch {
+    return true // can't read the marker: never risk a second fill
+  }
+}
+function markDeviceFilled(now = new Date()) {
+  try {
+    localStorage.setItem(DEVICE_FILL_KEY, now.toISOString())
+  } catch {
+    // Not stored: the next load tries again (the fill is idempotent on its own output).
+  }
+}
+
+// A blank device has nothing to fill, and a routine typed on it later must never be filled.
+function blankDeviceState() {
+  markDeviceFilled()
+  return emptyState()
+}
+
+// Runs OUTSIDE loadState's parse/migrate try (review): a throw here must never raise the
+// "unreadable" banner on readable data. On a throw: no fill, no marker (retried next load),
+// logged. → the state to use (the same object when nothing changed) and whether to mark.
+function fillOnce(state) {
+  if (deviceFilled()) return { state, mark: false }
+  try {
+    return { state: fillRoutineKgFromHistory(state).state, mark: true }
+  } catch (error) {
+    console.error('req-178: routine kg fill skipped', error)
+    return { state, mark: false }
+  }
 }
 
 export function loadState() {
@@ -175,6 +207,8 @@ export function loadState() {
   // back emptyState so the UI still renders — under the distinct banner. The raw
   // value stays on disk untouched and recoverable. A legacy-only key that won't
   // parse counts too (it is the only surviving copy).
+  let state
+  let mustSave
   try {
     const parsed = JSON.parse(raw)
     // req-115 — a value that parses to a non-plain-object ("x", [1,2], 42, null) is
@@ -195,26 +229,27 @@ export function loadState() {
     // migrateState: the default is clock-dependent.
     const schedule = withDefaultAnchor(migrated.schedule)
     const anchorDefaulted = schedule !== migrated.schedule
-    const anchored = anchorDefaulted ? { ...migrated, schedule } : migrated
-    // req-178 (DEC-096 §6, DEC-100) — the one-time fill: routine kg from latest history,
-    // once per stored state (the marker is kept by migrateState's spread and by backups),
-    // saved with the rest. A state already marked comes back as it is.
-    const filled = fillRoutineKgFromHistory(anchored, { at: new Date().toISOString() })
-    const fillRan = filled.state !== anchored
-    const state = filled.state
-    setLoadUnreadable(false)
-    if (legacy || anchorDefaulted || fillRan) {
-      saveState(state)
-    }
-    // Only reached when this device had data (fresh migration, or already current
-    // with a legacy copy left over from an interrupted cleanup). The read-back gate
-    // decides whether any legacy key is actually removed.
-    removeLegacyKeysIfCurrentPersisted()
-    return state
+    state = anchorDefaulted ? { ...migrated, schedule } : migrated
+    mustSave = legacy || anchorDefaulted
   } catch {
     setLoadUnreadable(true)
     return emptyState()
   }
+  setLoadUnreadable(false)
+  // req-178 — the one-time fill (fillOnce above), saved with the rest. The marker is set only
+  // once the filled state is on disk (or nothing changed), so a failed save retries next load.
+  const filled = fillOnce(state)
+  if (filled.state !== state) {
+    state = filled.state
+    mustSave = true
+  }
+  if (mustSave) saveState(state)
+  if (filled.mark && !getSaveFailed()) markDeviceFilled()
+  // Only reached when this device had data (fresh migration, or already current
+  // with a legacy copy left over from an interrupted cleanup). The read-back gate
+  // decides whether any legacy key is actually removed.
+  removeLegacyKeysIfCurrentPersisted()
+  return state
 }
 
 // req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — Import is the one way out of the

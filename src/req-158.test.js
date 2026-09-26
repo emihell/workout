@@ -43,7 +43,7 @@ describe('1 — legacy (v8) migration is identical to main', () => {
     disk.set('workout-mvp-v8', JSON.stringify(v8))
     const loaded = loadState()
     // req-178 (sanctioned edit) — main's migration with the one-time routine-kg fill applied.
-    const main = filledLike(migrateStateMain({ ...structuredClone(v8) }, { legacy: true }), loaded.routineKgFilledAt)
+    const main = filledLike(migrateStateMain({ ...structuredClone(v8) }, { legacy: true }))
     // loadState merges emptyState() first and defaults a missing schedule anchor; compare the migrated parts
     for (const key of ['exercises', 'routines', 'workouts', 'legacyRecommendations', 'plannedWorkouts']) {
       assert.deepEqual(loaded[key], main[key], key)

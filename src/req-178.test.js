@@ -6,14 +6,18 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
 import { carryForSet, initialSetFields, nextSeedOverrides, replacementItem, routineKgFor, setPreview } from './workout-log.js'
 import { historyPrescription, historySetPrefill, lastSetsForExercise } from './history-queries.js'
-import { emptyState, loadState } from './persistence.js'
+import { emptyState, getLoadUnreadable, loadState } from './persistence.js'
 import { migrateState } from './model.js'
 import { buildBackup, applyBackup } from './exchange.js'
 import { replaceItemInState } from './state-reducers.js'
-import { FILL_MARKER, fillRoutineKgFromHistory } from './routine-kg-fill.js'
+import { DEVICE_FILL_KEY, fillRoutineKgFromHistory } from './routine-kg-fill.js'
 import { routineUpdateOffer } from './routine-update-offer.js'
 
 const h = React.createElement
@@ -124,7 +128,8 @@ describe('req-178 AC5 — the "update routine" offer', () => {
 
   it('applying it (store.applyRoutineUpdate) changes Day A\'s item only; Day B\'s same exercise is unchanged', async () => {
     localStorage.clear()
-    const state = { ...emptyState(), routines, [FILL_MARKER]: '2026-09-26T00:00:00.000Z' }
+    const state = { ...emptyState(), routines }
+    localStorage.setItem(DEVICE_FILL_KEY, '2026-09-26T00:00:00.000Z')
     localStorage.setItem('workout-mvp-v9', JSON.stringify(state))
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
@@ -174,8 +179,7 @@ describe('req-178 AC6 / AC8 — the one-time fill', () => {
 
   it('overwrite: latest history kg per set (> 0); a skipped / missing set keeps the routine; others untouched', () => {
     const before = state()
-    const { state: after, changes } = fillRoutineKgFromHistory(before, { at: '2026-09-26T08:00:00.000Z' })
-    assert.equal(after[FILL_MARKER], '2026-09-26T08:00:00.000Z')
+    const { state: after, changes } = fillRoutineKgFromHistory(before)
     const items = Object.fromEntries(after.routines[0].exercises.map((i) => [i.id, i]))
     assert.deepEqual(items['i-w'].suggestedWeights, [45, 47.5, 40], 'set 3 was skipped: routine kept')
     assert.deepEqual(items['i-short'].suggestedWeights, [20], 'blank routine filled at set 1 only')
@@ -183,9 +187,10 @@ describe('req-178 AC6 / AC8 — the one-time fill', () => {
     // AC8 — never logged, and bodyweight: untouched (same object).
     assert.equal(items['i-never'], before.routines[0].exercises[2])
     assert.equal(items['i-bw'], before.routines[0].exercises[1])
-    // Every other field of a changed item, and workouts / exercises / schedule, untouched.
     assert.deepEqual({ ...items['i-w'], suggestedWeights: null }, { ...before.routines[0].exercises[0], suggestedWeights: null })
     for (const key of ['workouts', 'exercises', 'schedule']) assert.equal(after[key], before[key], key)
+    assert.equal('routineKgFilledAt' in after, false, 'no marker in the state document')
+    assert.equal(fillRoutineKgFromHistory(after).changes.length, 0, 'idempotent on its own output')
   })
 
   it('blanks (Q1 b, dry run only): only items with no kg at all', () => {
@@ -193,37 +198,80 @@ describe('req-178 AC6 / AC8 — the one-time fill', () => {
     assert.deepEqual(changes.map((c) => c.itemId), ['i-short'])
   })
 
-  it('AC6: through loadState — fills once, marks, saves; loaded again → nothing changes (idempotent)', () => {
+  it('AC6: through loadState — fills once, saves, sets the DEVICE marker key; a second load writes nothing', () => {
     localStorage.clear()
     localStorage.setItem('workout-mvp-v9', JSON.stringify(state()))
     const first = loadState()
-    assert.ok(first[FILL_MARKER])
     assert.deepEqual(first.routines[0].exercises[0].suggestedWeights, [45, 47.5, 40])
+    const marker = localStorage.getItem(DEVICE_FILL_KEY)
+    assert.ok(marker, 'device marker set')
     const disk = localStorage.getItem('workout-mvp-v9')
-    assert.equal(JSON.parse(disk)[FILL_MARKER], first[FILL_MARKER], 'saved with the marker')
-    // The user edits the routine kg after the fill; the next load leaves it alone.
+    assert.deepEqual(JSON.parse(disk).routines[0].exercises[0].suggestedWeights, [45, 47.5, 40], 'saved')
+    assert.equal('routineKgFilledAt' in JSON.parse(disk), false)
     const edited = JSON.parse(disk)
     edited.routines[0].exercises[0].suggestedWeights = [99, 99, 99]
     localStorage.setItem('workout-mvp-v9', JSON.stringify(edited))
     const again = loadState()
     assert.deepEqual(again.routines[0].exercises[0].suggestedWeights, [99, 99, 99])
     assert.equal(localStorage.getItem('workout-mvp-v9'), JSON.stringify(edited), 'nothing written')
+    assert.equal(localStorage.getItem(DEVICE_FILL_KEY), marker, 'marker unchanged')
   })
 
-  it('a blank device starts marked, so a routine typed on it is never filled later', () => {
+  it('review blocker: an Import of a doc without any marker after the fill → reload → kg unchanged', () => {
+    // The assistant round trip: Export → assistant (returns the state, sets biceps 20/20/20,
+    // knows nothing of any marker) → Import → reload. The device marker survives the Import.
     localStorage.clear()
-    const blank = loadState()
-    assert.ok(blank[FILL_MARKER])
+    localStorage.setItem('workout-mvp-v9', JSON.stringify(state()))
+    loadState() // the fill runs once
+    const reply = JSON.parse(JSON.stringify(buildBackup(state())))
+    reply.state.routines[0].exercises[0].suggestedWeights = [20, 20, 20]
+    const { state: imported } = applyBackup(reply)
+    localStorage.setItem('workout-mvp-v9', JSON.stringify(imported)) // commitBackup → setState → saveState
+    const reloaded = loadState()
+    assert.deepEqual(reloaded.routines[0].exercises[0].suggestedWeights, [20, 20, 20], 'not re-filled from history')
+    assert.equal(localStorage.getItem('workout-mvp-v9'), JSON.stringify(imported), 'nothing written')
   })
 
-  it('the marker survives migrateState and an Export → Import round-trip', () => {
-    const marked = { ...state(), [FILL_MARKER]: '2026-09-26T08:00:00.000Z' }
-    assert.equal(migrateState(structuredClone(marked))[FILL_MARKER], marked[FILL_MARKER])
-    const { state: imported } = applyBackup(JSON.parse(JSON.stringify(buildBackup(marked))))
-    assert.equal(imported[FILL_MARKER], marked[FILL_MARKER])
-    // An old Export (no marker) imports unchanged (applyBackup is untouched); the next load fills it.
-    const { state: old } = applyBackup(JSON.parse(JSON.stringify(buildBackup(state()))))
-    assert.equal(old[FILL_MARKER], undefined)
+  it('a blank device sets the marker at start, so a routine typed on it is never filled later', () => {
+    localStorage.clear()
+    loadState()
+    assert.ok(localStorage.getItem(DEVICE_FILL_KEY))
+    localStorage.setItem('workout-mvp-v9', JSON.stringify(state()))
+    assert.deepEqual(loadState().routines[0].exercises[0].suggestedWeights, [40, 40, 40])
+  })
+
+  it('review latent: a throw in the fill → readable data loads, no "unreadable", no marker, logged', () => {
+    localStorage.clear()
+    localStorage.setItem('workout-mvp-v9', JSON.stringify(state()))
+    const errors = []
+    const original = console.error
+    console.error = (...args) => errors.push(args.join(' '))
+    // Make only the fill throw: its history lookup sorts workouts (finishedNewestFirst);
+    // parse / migrate / anchor don't sort, so the load itself stays readable. The logged
+    // line proves the throw came from the fill.
+    const sort = Array.prototype.sort
+    Array.prototype.sort = function () {
+      throw new Error('boom')
+    }
+    let loaded
+    try {
+      loaded = loadState()
+    } finally {
+      Array.prototype.sort = sort
+      console.error = original
+    }
+    assert.equal(getLoadUnreadable(), false, 'no unreadable banner')
+    assert.deepEqual(loaded.routines[0].exercises[0].suggestedWeights, [40, 40, 40], 'loaded, unfilled')
+    assert.equal(localStorage.getItem(DEVICE_FILL_KEY), null, 'no marker: retried next load')
+    assert.ok(errors.some((line) => line.includes('routine kg fill skipped')), 'logged')
+    // Next load (no throw) fills.
+    assert.deepEqual(loadState().routines[0].exercises[0].suggestedWeights, [45, 47.5, 40])
+    assert.ok(localStorage.getItem(DEVICE_FILL_KEY))
+  })
+
+  it('no marker field travels in the state: migrateState / Export → Import carry none', () => {
+    const { state: imported } = applyBackup(JSON.parse(JSON.stringify(buildBackup(state()))))
+    assert.equal('routineKgFilledAt' in imported, false)
   })
 })
 
@@ -233,7 +281,7 @@ describe('req-178 AC7 — migration: a workout-mvp-v8 key → migrated, filled, 
     localStorage.setItem('workout-mvp-v8', JSON.stringify(DB))
     const loaded = loadState()
     const migrated = migrateState(structuredClone(DB), { legacy: true })
-    const { changes } = fillRoutineKgFromHistory(migrated, { at: null })
+    const { changes } = fillRoutineKgFromHistory(migrated)
     assert.equal(changes.length, 12)
     assert.deepEqual(loaded.workouts, migrated.workouts, 'every workout and set unchanged')
     const changed = new Set(changes.map((c) => c.itemId))
@@ -247,8 +295,12 @@ describe('req-178 AC7 — migration: a workout-mvp-v8 key → migrated, filled, 
     )
     const v9 = JSON.parse(localStorage.getItem('workout-mvp-v9'))
     assert.deepEqual(v9.routines, JSON.parse(JSON.stringify(loaded.routines)), 'saved to v9')
-    assert.ok(v9[FILL_MARKER])
+    assert.ok(localStorage.getItem(DEVICE_FILL_KEY), 'device marker set')
     assert.equal(localStorage.getItem('workout-mvp-v8'), null, 'v8 removed after the v9 read-back')
+    // A second load: nothing written, nothing changed.
+    const disk = localStorage.getItem('workout-mvp-v9')
+    assert.deepEqual(JSON.parse(JSON.stringify(loadState())), JSON.parse(disk))
+    assert.equal(localStorage.getItem('workout-mvp-v9'), disk)
   })
 })
 
@@ -262,6 +314,26 @@ describe('req-178 AC9 — the dry-run script (same function, read-only)', () => 
     assert.match(run.stdout, /Lower Body · Leg Extension: \[20, 24, 24\] → \[18, 22, 25\]/)
     assert.equal(readFileSync(path, 'utf8'), before)
   })
+
+  it('--out writes a filled COPY: the input sha unchanged, the output has the filled kg; --out = input refused', () => {
+    const path = new URL('./db.json', import.meta.url).pathname
+    const sha = () => createHash('sha256').update(readFileSync(path)).digest('hex')
+    const before = sha()
+    const dir = mkdtempSync(join(tmpdir(), 'fill-'))
+    const out = join(dir, 'filled.json')
+    const script = new URL('../scripts/fill-routine-kg.mjs', import.meta.url).pathname
+    const run = spawnSync(process.execPath, [script, path, '--out', out], { encoding: 'utf8' })
+    assert.equal(run.status, 0, run.stderr)
+    assert.equal(sha(), before, 'input untouched')
+    const { state: copy } = applyBackup(JSON.parse(readFileSync(out, 'utf8')))
+    const leg = copy.routines.find((r) => r.id === 'sess-lower').exercises.find((i) => i.exerciseId === 'ex-leg-extension')
+    assert.deepEqual(leg.suggestedWeights, [18, 22, 25])
+    assert.equal(fillRoutineKgFromHistory(copy).changes.length, 0, 'the copy is already filled')
+    assert.deepEqual(copy.workouts, applyBackup(JSON.parse(readFileSync(path, 'utf8'))).state.workouts, 'history untouched')
+    const refused = spawnSync(process.execPath, [script, path, '--out', path], { encoding: 'utf8' })
+    assert.equal(refused.status, 1)
+    assert.equal(sha(), before)
+  })
 })
 
 describe('req-178 DEC-096 §2 — adding to a routine prefills kg from latest history', () => {
@@ -272,7 +344,8 @@ describe('req-178 DEC-096 §2 — adding to a routine prefills kg from latest hi
   })
   it('RoutineExerciseNew for Leg Press → Save → stored suggestedWeights = historyPrescription\'s', async () => {
     localStorage.clear()
-    localStorage.setItem('workout-mvp-v9', JSON.stringify({ ...migrateState(structuredClone(DB), { legacy: true }), [FILL_MARKER]: 'x' }))
+    localStorage.setItem(DEVICE_FILL_KEY, '2026-09-26T00:00:00.000Z')
+    localStorage.setItem('workout-mvp-v9', JSON.stringify(migrateState(structuredClone(DB), { legacy: true })))
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { RoutineExerciseNew } = await importJsx('./views/Routine.jsx', import.meta.url)
     view = await render(h(StoreProvider, null, h(RoutineExerciseNew, { routineId: 'sess-upper', exerciseId: 'ex-leg-press' })))
@@ -294,7 +367,6 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     const ex = (id, name) => ({ id, name, type: 'machine', equipment: 'Machine', weightStep: 'n/a', muscles: '', cues: '' })
     const state = {
       ...emptyState(),
-      [FILL_MARKER]: '2026-09-26T00:00:00.000Z',
       exercises: [ex('ex-a', 'Row Machine'), ex('ex-b', 'Leg Curl')],
       routines: [
         {
@@ -310,6 +382,7 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
       workouts: [finished('w0', [work('ex-a', 40, 8, { routineItemId: 'ia' }), work('ex-b', 30, 8, { routineItemId: 'ib' })])],
     }
     localStorage.clear()
+    localStorage.setItem(DEVICE_FILL_KEY, '2026-09-26T00:00:00.000Z')
     localStorage.setItem('workout-mvp-v9', JSON.stringify(state))
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
