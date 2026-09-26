@@ -1,6 +1,6 @@
 # req-183 — kg hints: last time when the routine is blank, a big-jump note
 
-**Status: BUILT, NOT merged** (2026-09-26). **Lane: ui.** Source: DEC-102 (Emilio: "ill go with your recommandations"), Sam run prep §G 2–4.
+**Status: BUILT AND MERGED, 2026-09-26 — branch `req-183` (`c3adca7`…`82e36f1`, 2 commits).** (2026-09-26). **Lane: ui.** Source: DEC-102 (Emilio: "ill go with your recommandations"), Sam run prep §G 2–4.
 
 ## Today [read 2026-09-26, main `e6a1d30`]
 - Set-log form `ui/index.jsx:466-490`: kg `NumberField` (`:468`); under it `No weight entered` when weighted and empty
