@@ -540,7 +540,8 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
   assisted machines progress backwards (a miss lowers assistance = harder). Load recommendations the user sees, so
   these are bugs (CLAUDE.md "reasoning made visible"). Small fix req, independent of the design; the proper model
   (real ranges, assisted flag) comes from req-144.
-- **`req-144` creation design** (NEEDS DECISIONS — a design req, no code; planning + Emilio live) — personas, the
+- **`req-184` creation design session 2** (NEEDS DECISIONS — advanced users, programs, Emilio's feedback on req-178..183).
+- **`req-144` creation design** (SESSION 1 DONE → DEC-096..102; was NEEDS DECISIONS — a design req, no code; planning + Emilio live) — personas, the
   simplicity rule, the parameter table, flows, model + library asks. Absorbs req-10 and the DEC-056 review step.
 - **Define the model first** — program vs routine vs schedule; what a program owns, how
   it maps onto the weekly loop, how progression flows through it. A decision doc before
