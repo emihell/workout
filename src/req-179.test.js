@@ -41,10 +41,17 @@ async function harness(payload = fixture()) {
   return { captured, mount }
 }
 
-// The input labelled `label` inside the per-set group `group` ("Reps", "Kg", "Duration (s)").
+// The per-set group (a fieldset) whose legend is `group` ("Reps", "Kg", "Duration (s)").
+function groupOf(group) {
+  return view.all('fieldset').find((node) => node.querySelector('legend')?.textContent.trim() === group) ?? null
+}
+
+// Inside group `group`: the single field (aria-label = the group name) or a "Set N" field.
 function inGroup(group, label) {
-  const root = view.container.querySelector(`[role="group"][aria-label="${group}"]`)
-  return [...(root?.querySelectorAll('label') || [])]
+  const root = groupOf(group)
+  if (!root) return null
+  if (label === group) return root.querySelector(`input[aria-label="${group}"]`)
+  return [...root.querySelectorAll('label')]
     .find((node) => node.textContent.trim().startsWith(label))
     ?.querySelector('input') ?? null
 }
@@ -250,6 +257,25 @@ describe('req-179 AC5 — "Different … per set" in place of slash input', () =
     await view.type(inGroup('Duration (s)', 'Set 2'), '45')
     await view.click(view.button('Save'))
     assert.deepEqual(storedRoutine('sess-upper').exercises.at(-1).durations, [30, 45])
+  })
+})
+
+describe('req-179 QA layout — each switch sits under its own group label, before the fields', () => {
+  it('Reps and Kg: legend, then "Different … per set", then the field(s); groups in order', async () => {
+    const { mount } = await harness()
+    const { RoutineExerciseEdit } = await Routine()
+    await mount(h(RoutineExerciseEdit, { routineId: 'sess-upper', itemId: 'si-sess-upper-1-ex-chest-press' }))
+    const order = (group) =>
+      [...groupOf(group).querySelectorAll('legend, input')].map((node) =>
+        node.tagName === 'LEGEND' ? 'legend' : node.type === 'checkbox' ? node.closest('label').textContent.trim() : 'field',
+      )
+    // Chest Press: targets 12/11/9 (switch on), weights 25/30/30 (switch on).
+    assert.deepEqual(order('Reps'), ['legend', 'Different reps per set', 'field', 'field', 'field'])
+    assert.deepEqual(order('Kg'), ['legend', 'Different kg per set', 'field', 'field', 'field'])
+    await view.click(view.input('Different kg per set'))
+    assert.deepEqual(order('Kg'), ['legend', 'Different kg per set', 'field'])
+    const groups = view.all('fieldset').map((node) => node.querySelector('legend').textContent.trim())
+    assert.deepEqual(groups, ['Reps', 'Kg'])
   })
 })
 

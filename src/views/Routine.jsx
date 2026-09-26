@@ -297,38 +297,13 @@ function FieldError({ children }) {
 // req-179 (DEC-099 §4) — one value for every set, or, behind "Different … per set",
 // one field per set ("Set 1" … count). The value goes to routine-item-parse.js as the
 // same slash text as before (routine-form.js), so its errors keep their Set N positions.
+// Layout (req-179 QA): the group label, then its switch, then the field(s), in a
+// fieldset spaced apart from the next group, so a switch never reads as the next label's.
 function PerSetField({ label, switchLabel, state, onState, count, error, inputMode }) {
   const values = perSetValues(state.perSet, count)
   return (
-    <div role="group" aria-label={label}>
-      {state.different ? (
-        <>
-          <span className="ui-field__label">{label}</span>
-          {values.map((value, i) => (
-            <Field
-              key={i}
-              label={`Set ${i + 1}`}
-              inputMode={inputMode}
-              value={value}
-              aria-invalid={Boolean(error && error.position === i + 1)}
-              onChange={(e) => {
-                const next = [...values]
-                next[i] = e.target.value
-                onState({ ...state, perSet: next })
-              }}
-            />
-          ))}
-        </>
-      ) : (
-        <Field
-          label={label}
-          inputMode={inputMode}
-          value={state.single}
-          aria-invalid={Boolean(error)}
-          onChange={(e) => onState({ ...state, single: e.target.value })}
-        />
-      )}
-      {error ? <FieldError>{error.message}</FieldError> : null}
+    <fieldset className="ui-per-set">
+      <legend className="ui-field__label">{label}</legend>
       {count > 1 || state.different ? (
         <Checkbox
           label={switchLabel}
@@ -343,7 +318,32 @@ function PerSetField({ label, switchLabel, state, onState, count, error, inputMo
           }
         />
       ) : null}
-    </div>
+      {state.different ? (
+        values.map((value, i) => (
+          <Field
+            key={i}
+            label={`Set ${i + 1}`}
+            inputMode={inputMode}
+            value={value}
+            aria-invalid={Boolean(error && error.position === i + 1)}
+            onChange={(e) => {
+              const next = [...values]
+              next[i] = e.target.value
+              onState({ ...state, perSet: next })
+            }}
+          />
+        ))
+      ) : (
+        <Field
+          aria-label={label}
+          inputMode={inputMode}
+          value={state.single}
+          aria-invalid={Boolean(error)}
+          onChange={(e) => onState({ ...state, single: e.target.value })}
+        />
+      )}
+      {error ? <FieldError>{error.message}</FieldError> : null}
+    </fieldset>
   )
 }
 
