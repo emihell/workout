@@ -1657,3 +1657,15 @@ many days you want to rotate". Research: req-144 prep §F.
    "show more" for the rest (`common` is true on all 366, so `staple` is the filter); no Carry slot; dips' `vertical-push`
    pattern is a library fix (rides with the build).
 4. **Blank routine stays** as the alternative to a template.
+
+## DEC-099 — the routine form: Focus gone, Role → one "Warm-up exercise" switch, no warm-up set  (Emilio, 2026-09-26, req-144)
+
+From prep §E.3/§E.6 and req-175's review. Role is a label only [measured: `ids.js:62-82`, only `roleLabel`/`roleTag` read it].
+1. **Focus dropped from the form**, and no longer appended to the routine name (" — Machines"). Stored values kept, unread.
+2. **Role → one switch, "Warm-up exercise"** (e.g. 5 min bike). Main is the default; Cardio comes from the exercise type;
+   Finisher dropped (the routine order says it). Existing role values stay in the data.
+3. **Warm-up set removed from the routine form** — Emilio: "warm up in the excercises as a set - that we maybe could
+   remmove". Items/workouts that already have one keep it (no rewrite). Accepted cost: a warm-up logged as a normal set
+   can pull down the load recommendation; an in-workout "warm-up" tap is the fix if it bites.
+4. **Plain words:** "Rest (seconds)", "Different reps per set" instead of slash notation.
+Form = exercise, sets, reps, kg, rest, the warm-up-exercise switch.
