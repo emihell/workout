@@ -26,7 +26,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 ## Emilio's list — batch 2026-09-26 (req-178..182)
 
-**Decisions → DEC-102** (Emilio: "ill go with your recommandations"); **building req-183** (kg hints). Feel: Emilio in workouts.
+**Decisions → DEC-102** (Emilio: "ill go with your recommandations"); req-183 kg hints shipped. Feel: Emilio in workouts.
 **Planner's calls to glance at** (all reversible, details in each req): 3×10/90 s starting plan wording; slot names and
 weekdays (Mon / Mon-Thu / Mon-Wed-Fri / Mon-Tue-Thu-Fri); dips → chest; auto-finish waits when an offer is open; picks carry
 to later days; routine kg fill once per device, an imported old backup keeps its kg (fix a backup first with
