@@ -31,8 +31,10 @@ product contract; read it).
 
 **It is a logging tool built on one rule: history is the source of truth, and the
 app never invents data it doesn't have.** A weighted exercise with no history has
-no invented starting weight; prefills come only from finished-workout data for
-that same field. That distinction decides more than it sounds like it should —
+no invented starting weight. **The workout's kg comes from the routine** — a number the user
+typed or confirmed (DEC-096); the routine's kg is prefilled from history when an exercise is added, and a
+confirmed "Update routine" offer carries new kg back. Every other prefill comes only from finished-workout
+data for that same field. That distinction decides more than it sounds like it should —
 `handoff/rules/DESIGN.md` states it as a test, and `.cursor/rules/history-prefill.mdc`
 is the live example.
 

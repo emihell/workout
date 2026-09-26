@@ -76,7 +76,7 @@ live reference. Precision matters — a near-name (`lastSetsForExercise` vs
 ## Step 3 — divergence
 
 Where does the code disagree with the README contract or `rules/DESIGN.md`? A prefill
-that comes from a plan instead of history; a relationship page using Delete instead of
+that comes from neither the routine the user set nor history; a relationship page using Delete instead of
 Remove; a setup edit that reaches into a historical snapshot; a recommendation that
 doesn't use valid increments. Each is a divergence from a stated rule — cite the rule
 and the file:line.

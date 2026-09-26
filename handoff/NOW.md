@@ -14,9 +14,8 @@ Phase 1 in-gym flow (now, browser-only) · Phase 2 program-creation · Phase 3 b
 
 ## Next — READY, held for Emilio's go (batches → throwaway agents, DEC-055)
 
-**In flight (2026-09-26, Emilio: "start building and merge, one by one … close out yourself"):** from req-144 DEC-096..099:
-form cleanup, picker, slot templates shipped. **Building: req-178** (routine sets the weight + one-time fill); Emilio's
-data gate waived for this batch (DEC-100, he has a backup).
+**Batch 2026-09-26 (req-144 → req-178..181) shipped** — Emilio: "start building and merge, one by one … close out yourself".
+Next: Sam beginner run on the live flow; then the end-of-batch `(unconfirmed)` list for Emilio.
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**

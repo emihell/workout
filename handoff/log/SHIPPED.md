@@ -2122,3 +2122,20 @@ could sit behind the dock mid-scroll (a tap went Home, losing the plan) → pinn
 scroll positions + a real double-tap → one routine set. AC6 amended (contradicted Change 4; Builder flagged). Test edits real:
 `req-122` Actions 17→18, `req-179` mounts `RoutineNewBlank`. Builder's calls (reversible): Save disabled until one pick; plan
 routines carry focus 'Machines'. `reports/req-181.md`.
+
+## req-178 — the routine sets the workout's weight  (merged 2026-09-26)
+
+**req-178** (2026-09-26, DEC-096/100/101) — work-set kg seeds draft > session override > routine kg at that index > carry
+(routine has none) > blank; warm-ups stay on history; the preview follows. Replacement's first set from history. After an
+exercise (overview, and the auto-finish summary): "You did 55 kg. Routine: 50. [Update <routine>]" → writes that routine's
+item only. One-time fill of routine kg from latest history, once per device (DEC-101). Rule text rewritten (CLAUDE.md,
+DESIGN §1, AUDIT, PLANNING, DECISIONS index; `.mdc`/README/exchange by Builder). **Data lane:** dry run on Emilio's Export
+2026-09-25 (sha256 c28733d7…cfa7 unchanged): (a) 10 of 40 items change, (b) 0; Emilio's eyes waived (DEC-100). Gate: req-178
+tests 21/0; suite 1203/0; `./check --smoke` green; v8 legacy key → filled, workouts deep-equal, v8 removed. **Independent
+reviewer:** 1st pass **blocker** (assistant round-trip re-fills) → device marker (`6d2229c`); re-review **No blockers.**, a
+should-fix (failed load-time save → later re-fill) → pending flag (`d1baea1`, test fails without it). Planner's QA agent
+(390×844): 8/8 incl. his export (10 items, 30 unchanged, second reload byte-identical), offer + auto-finish offer (countdown
+kept), per-routine update, blank device; the edit-after-import bug seen on `740bc82` gone on `d1baea1`. Test edits (load goldens
+via `test-support/fill.js`, targets 20→18 etc.) judged real by the reviewer. Builder's additions: offer on the auto-finish
+summary; blank device starts marked. **For Emilio:** finish/abandon any live workout before opening the new build; to import
+an old backup, run it through `--out` first. `reports/req-178.md`.
