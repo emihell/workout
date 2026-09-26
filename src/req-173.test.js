@@ -94,5 +94,7 @@ const EXPECTED_WORK_SET = {
   rpe: 3,
   note: '',
   targetReps: '12',
-  targetWeight: 20,
+  // req-178 (sanctioned edit) — was 20: the one-time fill set Leg Extension's routine kg
+  // (recorded as targetWeight) to history's 18; the stored blank-kg set is otherwise main's.
+  targetWeight: 18,
 }

@@ -11,6 +11,7 @@ import { migrateState } from './model.js'
 import { migrateState as migrateStateMain } from './req-158.model-main.fixture.js'
 import { finishedState } from './workout-log.js'
 import { loadState, saveState } from './storage.js'
+import { filledLike } from './test-support/fill.js'
 
 const v8 = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
 const count = (state) => Object.keys(state.legacyRecommendations || {}).length
@@ -41,7 +42,8 @@ describe('1 — legacy (v8) migration is identical to main', () => {
   it('the real load path: a v8 key → loadState deep-equals main-migrated, and so does the saved v9', () => {
     disk.set('workout-mvp-v8', JSON.stringify(v8))
     const loaded = loadState()
-    const main = migrateStateMain({ ...structuredClone(v8) }, { legacy: true })
+    // req-178 (sanctioned edit) — main's migration with the one-time routine-kg fill applied.
+    const main = filledLike(migrateStateMain({ ...structuredClone(v8) }, { legacy: true }))
     // loadState merges emptyState() first and defaults a missing schedule anchor; compare the migrated parts
     for (const key of ['exercises', 'routines', 'workouts', 'legacyRecommendations', 'plannedWorkouts']) {
       assert.deepEqual(loaded[key], main[key], key)

@@ -14,6 +14,7 @@ import {
   durationTargetFor,
   formFieldsWithDraft,
   initialSetFields,
+  routineKgFor,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
@@ -351,8 +352,8 @@ function WorkoutItemLive({ routineId, item }) {
   // remaining sets (see nextSeedOverrides, applied on completeSet below). Absent for
   // an untouched field, so the normal carry/history/target seed shows through.
   const override = (active.seedOverrides || {})[seedOverrideKey(item.exerciseId, currentType)]
-  // req-78 — the weight seed comes from restore/carry/history only; the req-27
-  // upcoming-weight override is gone (the next set's form is now the editable surface).
+  // req-78 — the req-27 upcoming-weight override is gone (the next set's form is now the
+  // editable surface). req-178 — a work set's kg comes from the routine, not history.
   const seed = initialSetFields({
     weighted,
     fromRestore: false,
@@ -363,6 +364,8 @@ function WorkoutItemLive({ routineId, item }) {
     carry: carryForSet(currentType, state.workLogged),
     target,
     override,
+    // req-178 / DEC-096 §1 — a work set's kg is the routine's (the snapshot item's).
+    routineKg: routineKgFor(item, currentType, currentWorkIndex),
   })
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise

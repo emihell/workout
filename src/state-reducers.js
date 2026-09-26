@@ -122,11 +122,14 @@ export function replaceItemInState(s, itemId, exerciseId, id) {
   const exercise = exerciseById(s.exercises, exerciseId)
   const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
   if (!active || !exercise || !original) return s
+  const history = historyPrescription(s.workouts, exerciseId)
+  const firstKg = Number(history?.suggestedWeights?.[0]) || 0
   const replacement = replacementItem({
     id,
     original,
     exercise,
-    restSec: historyPrescription(s.workouts, exerciseId)?.restSec,
+    restSec: history?.restSec,
+    suggestedWeights: firstKg > 0 ? [firstKg] : [],
   })
   const patch = replaceItemPatch(active, itemId, replacement)
   return patch ? { ...s, activeWorkout: { ...active, ...patch } } : s

@@ -3,6 +3,7 @@
 // external-change signals, and the unreadable-state copies (DEC-032, DEC-086).
 import { SCHEMA_VERSION, migrateState } from './model.js'
 import { defaultSchedule, withDefaultAnchor } from './schedule.js'
+import { DEVICE_FILL_KEY, fillRoutineKgFromHistory } from './routine-kg-fill.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -138,6 +139,51 @@ function removeLegacyKeysIfCurrentPersisted() {
   }
 }
 
+// req-178 (DEC-096 §6, DEC-100; review: DEC-095) — the one-time routine-kg fill, ONCE PER
+// DEVICE. Its marker is its own key (DEVICE_FILL_KEY), not a state field: an Import (an old
+// Export, an assistant's reply that dropped unknown fields) can never remove it, so no
+// imported doc ever triggers a fill. Accepted trade-off: an old Export imported after the fill
+// keeps its routine kg (the offer after each exercise corrects it; `fill-routine-kg.mjs --out`
+// fixes a copy before importing).
+function deviceFilled() {
+  try {
+    return localStorage.getItem(DEVICE_FILL_KEY) != null
+  } catch {
+    return true // can't read the marker: never risk a second fill
+  }
+}
+function markDeviceFilled(now = new Date()) {
+  try {
+    localStorage.setItem(DEVICE_FILL_KEY, now.toISOString())
+  } catch {
+    // Not stored: the next load tries again (the fill is idempotent on its own output).
+  }
+}
+
+// req-178 re-review — the filled state is in memory but its load-time save failed (quota):
+// the marker waits for the FIRST successful saveState, which writes that filled state. Without
+// this, a later save (a routine kg edit) would persist unmarked and the next load re-fill it.
+let deviceMarkPending = false
+
+// A blank device has nothing to fill, and a routine typed on it later must never be filled.
+function blankDeviceState() {
+  markDeviceFilled()
+  return emptyState()
+}
+
+// Runs OUTSIDE loadState's parse/migrate try (review): a throw here must never raise the
+// "unreadable" banner on readable data. On a throw: no fill, no marker (retried next load),
+// logged. → the state to use (the same object when nothing changed) and whether to mark.
+function fillOnce(state) {
+  if (deviceFilled()) return { state, mark: false }
+  try {
+    return { state: fillRoutineKgFromHistory(state).state, mark: true }
+  } catch (error) {
+    console.error('req-178: routine kg fill skipped', error)
+    return { state, mark: false }
+  }
+}
+
 export function loadState() {
   // Reading the raw value is separated from parsing/migrating it (req-36) so we can
   // tell "no value" (blank device) apart from "value present but unreadable". Only
@@ -151,14 +197,14 @@ export function loadState() {
     // localStorage itself is unreadable (access denied). Nothing legible to
     // preserve, so behave like a blank device rather than latching the signal.
     setLoadUnreadable(false)
-    return emptyState()
+    return blankDeviceState()
   }
 
-  // Absent or genuinely empty → blank device. Byte-for-byte the pre-req-36 path:
-  // emptyState(), saves work normally, signal clear.
+  // Absent or genuinely empty → blank device. The pre-req-36 path (emptyState(), saves
+  // work normally, signal clear), plus req-178's fill marker (blankDeviceState).
   if (!raw) {
     setLoadUnreadable(false)
-    return emptyState()
+    return blankDeviceState()
   }
 
   // A value IS present. If parse or migrate throws it is corrupt-but-present: latch
@@ -166,6 +212,8 @@ export function loadState() {
   // back emptyState so the UI still renders — under the distinct banner. The raw
   // value stays on disk untouched and recoverable. A legacy-only key that won't
   // parse counts too (it is the only surviving copy).
+  let state
+  let mustSave
   try {
     const parsed = JSON.parse(raw)
     // req-115 — a value that parses to a non-plain-object ("x", [1,2], 42, null) is
@@ -186,20 +234,32 @@ export function loadState() {
     // migrateState: the default is clock-dependent.
     const schedule = withDefaultAnchor(migrated.schedule)
     const anchorDefaulted = schedule !== migrated.schedule
-    const state = anchorDefaulted ? { ...migrated, schedule } : migrated
-    setLoadUnreadable(false)
-    if (legacy || anchorDefaulted) {
-      saveState(state)
-    }
-    // Only reached when this device had data (fresh migration, or already current
-    // with a legacy copy left over from an interrupted cleanup). The read-back gate
-    // decides whether any legacy key is actually removed.
-    removeLegacyKeysIfCurrentPersisted()
-    return state
+    state = anchorDefaulted ? { ...migrated, schedule } : migrated
+    mustSave = legacy || anchorDefaulted
   } catch {
     setLoadUnreadable(true)
     return emptyState()
   }
+  setLoadUnreadable(false)
+  // req-178 — the one-time fill (fillOnce above), saved with the rest. The marker is set once
+  // the filled state is on disk: now, or — if this save fails — on the first save that works
+  // (deviceMarkPending, set in saveState).
+  deviceMarkPending = false
+  const filled = fillOnce(state)
+  if (filled.state !== state) {
+    state = filled.state
+    mustSave = true
+  }
+  const saved = mustSave ? saveState(state) : true
+  if (filled.mark) {
+    if (saved) markDeviceFilled()
+    else deviceMarkPending = true
+  }
+  // Only reached when this device had data (fresh migration, or already current
+  // with a legacy copy left over from an interrupted cleanup). The read-back gate
+  // decides whether any legacy key is actually removed.
+  removeLegacyKeysIfCurrentPersisted()
+  return state
 }
 
 // req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — Import is the one way out of the
@@ -287,6 +347,11 @@ export function saveState(state) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     setSaveFailed(false)
+    // req-178 — a fill whose load-time save failed is on disk now: mark the device.
+    if (deviceMarkPending) {
+      deviceMarkPending = false
+      markDeviceFilled()
+    }
     return true
   } catch {
     setSaveFailed(true)

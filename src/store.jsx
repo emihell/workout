@@ -85,6 +85,15 @@ export function StoreProvider({ children }) {
       removeRoutineExercise(routineId, index) {
         patchRoutine(routineId, (routine) => routineItemRemoved(routine, index))
       },
+      // req-178 (DEC-096 §3–4) — the confirmed "update routine" offer (routine-update-offer.js):
+      // that routine's item only, through the normal edit path. Located by item id at write
+      // time, so a reorder since the offer was computed can't hit the wrong row.
+      applyRoutineUpdate(offer) {
+        patchRoutine(offer.routineId, (routine) => {
+          const index = (routine.exercises || []).findIndex((item) => item.id === offer.itemId)
+          return index < 0 ? routine : routineItemUpdated(routine, index, { suggestedWeights: offer.to })
+        })
+      },
       moveRoutineExercise(routineId, index, dir) {
         patchRoutine(routineId, (routine) => routineItemMoved(routine, index, dir))
       },

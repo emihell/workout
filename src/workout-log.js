@@ -225,7 +225,9 @@ export function skipItemPatch(workout, itemId) {
 // finished snapshot (historyPrescription), else 0. `id` must be unique and must not be
 // a routine template item's id; it is both `id` and `routineItemId`. Prefill then comes
 // from the exercise's own history through the normal log-form rule (DEC-053).
-export function replacementItem({ id, original, exercise, restSec }) {
+// req-178 — `suggestedWeights`: the replacement's routine kg, from its history's first
+// set (the DEC-096 §2 "history prefills the routine" rule, applied to a mid-workout add).
+export function replacementItem({ id, original, exercise, restSec, suggestedWeights = [] }) {
   return {
     id,
     routineItemId: id,
@@ -239,7 +241,7 @@ export function replacementItem({ id, original, exercise, restSec }) {
     role: original?.role || 'main',
     sets: 1,
     targets: [],
-    suggestedWeights: [],
+    suggestedWeights,
     durations: [],
     restSec: Number(restSec) || 0,
     notes: '',
@@ -456,13 +458,25 @@ export function restoreFromLoggedSet(set) {
 // "Add set" beyond last time's count, or a routine that grew): there is no history kg for
 // it, so the in-session carry applies, as for a no-history exercise — the kg just
 // logged carries (weight carries, reps per set). Absent = unchanged (history wins).
-export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override }) {
+//
+// req-178 / DEC-096 §1 — a WORK set's kg is the routine's: `routineKg` is the snapshot
+// item's suggestedWeights[workIndex] (frozen at Start). Chain: override (DEC-052) >
+// routine kg (> 0) > session carry (DEC-002 / req-152, only when the routine has no kg
+// there) > blank. History no longer seeds a work set's kg. `routineKg` undefined = the
+// warm-up path (the routine holds no warm-up kg), which keeps history as before.
+export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg }) {
   if (fromRestore) {
     return { weight: weighted ? restore.weight : '', reps: restore.reps }
   }
   const ov = override || {}
-  const useCarry = (!hasHistory || historyHasSet === false) && carry
-  const baseWeight = useCarry ? carry.weight : history.weight
+  let baseWeight
+  if (routineKg !== undefined) {
+    const planned = Number(routineKg) > 0 ? String(routineKg) : ''
+    baseWeight = planned || (carry ? carry.weight : '')
+  } else {
+    const useCarry = (!hasHistory || historyHasSet === false) && carry
+    baseWeight = useCarry ? carry.weight : history.weight
+  }
   return {
     weight: weighted ? (ov.weight != null ? ov.weight : baseWeight) : '',
     reps: target || '',
@@ -519,8 +533,9 @@ export function nextSeedOverrides(overrides, { exerciseId, setType, weighted, se
 // req-78 — the req-27 upcoming-weight override was removed: the next set's form is now
 // the editable surface during rest, so the weight seed comes from restore/carry/history
 // alone. (The pure pendingWeightFor helper went with it.)
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override }) {
-  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override })
+// req-178 — `routineKg` as setLogSeed (a work set's routine kg; undefined for a warm-up).
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg }) {
+  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg })
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe
@@ -679,6 +694,15 @@ export function setTargetFor(item, setType, workIndex) {
   return targets[workIndex] ?? targets[targets.length - 1] ?? ''
 }
 
+// req-178 / DEC-096 §1 — the kg the routine sets for a set: the snapshot item's
+// suggestedWeights at a WORK set's index ('' when it has none there); undefined for a
+// warm-up (the routine holds no warm-up kg, so that set stays on history). Shared by the
+// log form (item.jsx) and setPreview so the two can't drift.
+export function routineKgFor(item, setType, workIndex) {
+  if (setType === 'wu') return undefined
+  return item?.suggestedWeights?.[workIndex] ?? ''
+}
+
 // req-85, moved here by req-106 — a timed exercise's work-set target seconds: this
 // set's routine duration, else the last one in the list, else the exercise default,
 // else the app default. Was view code (item.jsx); shared by the log form and the
@@ -712,6 +736,7 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
       carry: null,
       target: setTargetFor(item, setType, workIndex),
       override: overrides[seedOverrideKey(item.exerciseId, setType)],
+      routineKg: routineKgFor(item, setType, workIndex),
     })
     const timed = Boolean(ex?.hasDuration) && setType === 'work'
     const entry = {

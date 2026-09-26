@@ -905,7 +905,9 @@ describe('req-111 previousSameRoutineWorkouts', () => {
 // and writes nothing; a present anchor is untouched and triggers no write.
 describe('req-114 loadState defaults a missing schedule anchor, saved once', () => {
   function counting(seed) {
-    const map = new Map(Object.entries(seed))
+    // req-178 (sanctioned edit) — a device already past the one-time routine-kg fill, so the
+    // only write these tests can see is the anchor's.
+    const map = new Map(Object.entries({ 'workout-routine-kg-filled': '2026-09-26T00:00:00.000Z', ...seed }))
     const writes = []
     const previous = globalThis.localStorage
     globalThis.localStorage = {

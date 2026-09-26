@@ -21,6 +21,7 @@ import {
   seedOverrideKey,
   nextSeedOverrides,
   setTargetFor,
+  routineKgFor,
   durationTargetFor,
   setPreview,
   setPreviewText,
@@ -817,6 +818,9 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
     sets: 3,
     warmup: { reps: 10 },
     targets: ['8', '8', '6'],
+    // req-178 (sanctioned edit) — the work-set kg now comes from the routine (DEC-096 §1),
+    // so the item carries it; history still seeds the warm-up. Lines are unchanged.
+    suggestedWeights: [20, 22, 24],
   }
   const workouts = [
     finished(hist('odp', [['wu', 10, '10'], ['work', 20, '8'], ['work', 22, '8'], ['work', 24, '6']])),
@@ -855,6 +859,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
         carry: null,
         target: setTargetFor(odp, setType, workIndex),
         override: undefined,
+        routineKg: routineKgFor(odp, setType, workIndex), // req-178 (sanctioned edit)
       })
       assert.equal(lines[i].setType, setType)
       assert.equal(lines[i].weight, form.weight)
@@ -862,8 +867,11 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
     })
   })
 
+  // req-178 (sanctioned edit, these two) — the work kg is the routine's now, so "no kg" needs
+  // a routine without kg too (`bare`); the routine-kg case itself is pinned in req-178.test.js.
+  const bare = { ...odp, suggestedWeights: [] }
   it('failure case — no finished history: no kg on any line, reps from targets', () => {
-    const lines = previewFor(odp, { workouts: [] })
+    const lines = previewFor(bare, { workouts: [] })
     assert.deepEqual(lines.map((line) => line.weight), ['', '', '', ''])
     assert.deepEqual(lines.map((line) => line.reps), ['10', '8', '8', '6'])
     assert.deepEqual(
@@ -873,7 +881,7 @@ describe('req-106 setPreview (start-of-exercise set preview)', () => {
   })
 
   it('an unfinished workout is not history (no kg)', () => {
-    const lines = previewFor(odp, { workouts: [{ sets: workouts[0].sets }] })
+    const lines = previewFor(bare, { workouts: [{ sets: workouts[0].sets }] })
     assert.ok(lines.every((line) => line.weight === ''))
   })
 

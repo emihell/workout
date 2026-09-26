@@ -6,6 +6,8 @@ import { defaultBeep } from '../../rest-cue.js'
 import { summaryPriorWorkout, workoutSummaryStats } from '../../history-queries.js'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
+import { routineUpdateOffer } from '../../routine-update-offer.js'
+import { RoutineUpdateOffer } from './routine-offer'
 
 // req-84 — auto-complete a finished routine. When every exercise is done the overview
 // mounts this instead of the list: a "great job" summary (volume/duration/sets, each
@@ -71,6 +73,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
 
   const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
   const name = active?.snapshot?.routineName || 'Workout'
+  const items = active?.snapshot?.items || []
   const d = stats.deltas
   const rows = [
     { label: 'Volume', value: `${stats.volume} kg`, delta: d ? `${signed(d.volume)} kg` : null },
@@ -89,6 +92,19 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
           </Row>
         ))}
       </List>
+      {/* req-178 — the last exercise's "update routine" offer would otherwise never show:
+          once every exercise is done the overview is this summary. Tapping one doesn't
+          stop the countdown; Finish still never writes the routine itself (DEC-056). */}
+      {items.some((item) => routineUpdateOffer(active, store.routines, item)) ? (
+        <>
+          <SectionHeader>Update your routine?</SectionHeader>
+          <List>
+            {items.map((item) => (
+              <RoutineUpdateOffer key={item.routineItemId || item.id} store={store} active={active} item={item} />
+            ))}
+          </List>
+        </>
+      ) : null}
       <p className="ui-sub" aria-live="polite">
         Finishing in {secondsLeft}s…
       </p>
