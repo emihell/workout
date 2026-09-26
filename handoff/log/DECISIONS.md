@@ -1689,3 +1689,14 @@ flag covers a failed load-time save); a blank device starts marked; the fill run
 after-exercise offer corrects it. Remedy for a backup: `node scripts/fill-routine-kg.mjs <export> --out <copy>` writes a
 filled copy (input only read; same file/symlink/hard link refused). Accepted latents: skipped-set index drift between fill
 and offer (none in Emilio's data); a tab on the old build.
+
+## DEC-102 — the Sam-run calls: last-time hint when the routine is blank, keep the note, warn on big jumps  (Emilio, 2026-09-26)
+
+Emilio: "ill go with your recommandations for the decisions". Planner's recommendations, now decided:
+1. **Blank routine kg + history → a quiet hint, not a prefill:** "Last time: 30 kg" under the empty kg box (history, named —
+   DESIGN §1 test holds). The box stays blank. Amends DEC-096 §5 for this case only (routine kg set → no hint).
+2. **Blank kg on Complete: keep the "No weight entered" note** (req-173), no block — a block adds a tap in the gym and some
+   weighted sets are legitimately unloaded (DEC-093's "annoying if automatic" logic).
+3. **Typo guard:** a kg that differs from the reference (the routine kg for that set, else the last-time kg) by more than 50%
+   shows an inline note "That's a big change from 50 kg" under the box — no dialog, Complete still one tap.
+Feel: Emilio tests during workouts.

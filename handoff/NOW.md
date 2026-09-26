@@ -26,9 +26,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 ## Emilio's list — batch 2026-09-26 (req-178..182)
 
-**Three decisions (Sam run, prep §G):** (1) you skip the "Save to routine" offer and the routine had no kg → next time the kg
-is blank with no trace of what you lifted: show "last time" only in that case? (DEC-096 §5 dropped it) (2) blank kg accepted on
-Complete — block it, or keep the note? (3) no check on typos (500 kg saved) — warn on a jump over, say, 50%?
+**Decisions → DEC-102** (Emilio: "ill go with your recommandations"); **building req-183** (kg hints). Feel: Emilio in workouts.
 **Planner's calls to glance at** (all reversible, details in each req): 3×10/90 s starting plan wording; slot names and
 weekdays (Mon / Mon-Thu / Mon-Wed-Fri / Mon-Tue-Thu-Fri); dips → chest; auto-finish waits when an offer is open; picks carry
 to later days; routine kg fill once per device, an imported old backup keeps its kg (fix a backup first with
