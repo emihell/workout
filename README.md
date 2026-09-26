@@ -5,14 +5,16 @@ This browser-only MVP supports one trustworthy loop: set up exercises and reusab
 ## Entity ownership
 
 - Exercise: reusable name, equipment, type, cues, muscles and valid weight increments.
-- Routine: ordered exercise references plus the prescription (sets, reps, kg, rest, notes; a warm-up exercise is marked with a switch). This is next time's source of truth.
+- Routine: ordered exercise references plus the prescription (sets, reps, kg, rest, notes; a warm-up exercise is marked with a switch). This is next time's source of truth: the routine's kg is the weight each working set starts at.
 - Schedule slot: recurring week/day placement `{ id, week, weekday, routineId }`. It never owns kg or reps.
 - Live workout: a snapshot of the routine at Start, plus logged and skipped sets. Extra sets stay on this snapshot only until Finish.
-- Completed workout: the snapshot plus actual sets. Unopened planned sets are recorded as skipped at Finish. Finish never changes the routine (DEC-056); the routine only changes when you edit it, or when you Apply a recalculation.
+- Completed workout: the snapshot plus actual sets. Unopened planned sets are recorded as skipped at Finish. Finish never changes the routine (DEC-056); the routine only changes when you edit it, when you tap the "Update routine" offer after an exercise, or when you Apply a recalculation.
 
 ## Recommendation rules
 
 Completed history supplies the next load. Easy completed work moves one valid equipment step up; missed reps or failure move one step down; moderate work holds. Alternating 4/5 kg stacks use their real sequence rather than a rounded 5 kg increment. A target the app can't read as a single number (a range like 8–12, AMRAP, a duration, text) and any assisted exercise hold — the same kg and target — until the progression rules are defined.
+
+The workout's kg is the routine's kg — a number you typed or confirmed (DEC-096). Adding an exercise to a routine takes its kg from that exercise's latest finished workout; after an exercise, the workout offers to carry the kg you logged back to that routine ("Update Day A") — per routine, only on a tap. A blank routine kg starts the set blank.
 
 A weighted exercise without history has no invented starting weight. Its dated plan explains calibration: start light, perform the program reps, and adjust by valid increments based on effort.
 

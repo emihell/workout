@@ -168,9 +168,12 @@ describe('req-06 legacy-key cleanup', () => {
     exercises: [{ id: 'ex-1', name: 'Press', equipment: 'Machine', type: 'machine', weightStep: '5' }],
     routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
   })
+  // req-178 (sanctioned edit) — a current value already past the one-time routine-kg fill
+  // (marked), so "already on v9 … nothing written" keeps meaning what it did.
   const validCurrent = JSON.stringify({
     ...emptyState(),
     routines: [{ id: 'sess-1', name: 'Upper', focus: 'Machines', exercises: [] }],
+    routineKgFilledAt: '2026-09-26T00:00:00.000Z',
   })
 
   it('happy path: migrates v7, writes v9, and removes every legacy key', () => {
@@ -918,9 +921,11 @@ describe('req-114 loadState defaults a missing schedule anchor, saved once', () 
     }
     return { map, writes, restore: () => (globalThis.localStorage = previous) }
   }
+  // req-178 (sanctioned edit) — marked past the one-time fill, so only the anchor can write.
   const stored = (schedule) =>
     JSON.stringify({
       ...emptyState(),
+      routineKgFilledAt: '2026-09-26T00:00:00.000Z',
       routines: [{ id: 'rtn-1', name: 'Upper', focus: '', exercises: [] }],
       schedule,
     })

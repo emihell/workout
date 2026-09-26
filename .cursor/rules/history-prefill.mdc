@@ -1,19 +1,27 @@
 ---
-description: Prefills come only from finished-workout history, plus sanctioned exceptions (DESIGN §1, DEC-097 §4)
+description: The workout's kg is the routine's kg (a number the user typed or confirmed); history prefills the routine, never invents (DEC-096, DESIGN §1)
 alwaysApply: true
 ---
 
 # Prefills
 
-A prefill comes only from this exercise's previous **finished-workout** data for that same field (`historyPrescription` / `lastSetsForExercise` / `historySetPrefill`). The sanctioned exceptions — all the user's own input, not invented data (`handoff/rules/DESIGN.md` §1):
+**The workout's kg is the routine's kg** — a number the user typed or confirmed (DEC-096). The routine gets it from **history** when an exercise is added (`historyPrescription`: the picker's `pickerItem`, `RoutineExerciseNew`, a plan slot, a mid-workout replacement's first set), and from the **user's confirmed update** after an exercise (the "Update <routine>" offer, `routineUpdateOffer` → `store.applyRoutineUpdate`, that routine only). Nothing else writes it silently: Finish never does (DEC-056); History's recalculation writes only on Apply.
 
-1. On the live set log screen, **Reps** prefills from that set's target, and **Effort** with Moderate **only where Effort is shown** — warm-up and cardio sets carry no effort (req-156).
-2. The **kg** just entered this session carries to the next working set when history has **no set at that index**: a no-history exercise (DEC-002), an Add set, or a routine that grew (req-152). Reps never carry (DEC-052).
-3. An in-session kg change carries to the remaining sets (req-83 / DEC-052).
-4. An unsaved draft restores what was typed (req-125); going back a set restores the values just logged.
+## The live set form (`setLogSeed` / `initialSetFields` / `setPreview`, `workout-log.js`)
 
-Everywhere else, do not prefill from plans, recommendations, library cues, a routine number, or type defaults.
+A **work set's kg**, highest first:
+1. an unsaved draft of this set (req-125), or the set just un-logged via Previous;
+2. an in-session kg change for this exercise (req-83 / DEC-052 override);
+3. **the routine kg at this set's index** (`routineKgFor` → the snapshot item's `suggestedWeights`, frozen at Start), when > 0;
+4. the kg just logged this session (DEC-002 / req-152 carry), only when the routine has no kg there;
+5. blank. History does **not** seed a work set's kg.
 
-Do not invent warmup (50% load, 12 reps), rest (90s), or notes (copy of `ex.cues`). Editing an existing record may show that record's saved values.
+A **warm-up set's kg** stays on history (`historySetPrefill`) — the routine holds no warm-up kg. **Reps** prefill from that set's target and never carry (DEC-052). **Effort** defaults to Moderate only where Effort is shown (req-156).
+
+## Never invented
+
+A weighted exercise without history and without a routine kg starts blank — no invented starting weight (DEC-012). Do not invent warmup (50% load, 12 reps), rest, or notes (copy of `ex.cues`); do not prefill from recommendations, library cues or type defaults. Editing an existing record may show that record's saved values.
 
 **One exception at routine creation (DEC-097 §4, req-180):** the Add exercise picker adds an exercise with **no history** with a **starting plan** — reps 3 × 10, 90 s rest; timed 3 × the exercise's duration, 90 s rest; cardio 1 set, rest 0 (`routine-picker.js` `pickerItem`). It is shown on the selected row ("Starting plan: … — change any time"), never silent, and **never a kg** (`suggestedWeights: []`). With history, the whole history prescription is used instead — the two are never mixed.
+
+**The one-time fill (req-178, DEC-096 §6 / DEC-100):** on the first load of this build, each routine item's kg is set from latest history where history has a kg (`routine-kg-fill.js`, marker `routineKgFilledAt`), so the next workout reads as it did when history seeded it. It runs once per stored state, never on a blank device.

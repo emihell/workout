@@ -71,9 +71,12 @@ describe('req-175 — the live workout: new words on screen, stored setType / rp
 const LEG = { routineItemId: 'si-sess-lower-2-ex-leg-extension', exerciseId: 'ex-leg-extension' }
 const EXPECTED_MAIN = [
   { ...LEG, setType: 'wu', weight: 9, reps: '12', rpe: null, note: '', targetReps: '12', targetWeight: null },
-  { ...LEG, setType: 'work', weight: 18, reps: '12', rpe: 5, note: '', targetReps: '12', targetWeight: 20 },
-  { ...LEG, setType: 'work', weight: 0, reps: 'skipped', rpe: null, note: 'skipped', targetReps: '12', targetWeight: 24 },
-  { ...LEG, setType: 'work', weight: 0, reps: 'skipped', rpe: null, note: 'skipped', targetReps: '13', targetWeight: 24 },
+  // req-178 (sanctioned edit) — the logged kg is main's (18: the routine now seeds it, and the
+  // one-time fill set Leg Extension's routine kg to history's [18, 22, 25]); only the recorded
+  // targetWeight (the routine kg) changed from [20, 24, 24] to that filled [18, 22, 25].
+  { ...LEG, setType: 'work', weight: 18, reps: '12', rpe: 5, note: '', targetReps: '12', targetWeight: 18 },
+  { ...LEG, setType: 'work', weight: 0, reps: 'skipped', rpe: null, note: 'skipped', targetReps: '12', targetWeight: 22 },
+  { ...LEG, setType: 'work', weight: 0, reps: 'skipped', rpe: null, note: 'skipped', targetReps: '13', targetWeight: 25 },
 ]
 
 describe('req-175 — an imported old (v8) backup displays with the new words', () => {

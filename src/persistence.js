@@ -3,6 +3,7 @@
 // external-change signals, and the unreadable-state copies (DEC-032, DEC-086).
 import { SCHEMA_VERSION, migrateState } from './model.js'
 import { defaultSchedule, withDefaultAnchor } from './schedule.js'
+import { FILL_MARKER, fillRoutineKgFromHistory } from './routine-kg-fill.js'
 
 const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
@@ -138,6 +139,14 @@ function removeLegacyKeysIfCurrentPersisted() {
   }
 }
 
+// req-178 — a blank device starts with the one-time fill already marked done: it has no
+// routines to fill, and a routine typed on it later must never be overwritten by the fill.
+// NOT in emptyState(), which is also the merge base for stored values (a stored value
+// without the marker must still be filled).
+function blankDeviceState(now = new Date()) {
+  return { ...emptyState(), [FILL_MARKER]: now.toISOString() }
+}
+
 export function loadState() {
   // Reading the raw value is separated from parsing/migrating it (req-36) so we can
   // tell "no value" (blank device) apart from "value present but unreadable". Only
@@ -151,14 +160,14 @@ export function loadState() {
     // localStorage itself is unreadable (access denied). Nothing legible to
     // preserve, so behave like a blank device rather than latching the signal.
     setLoadUnreadable(false)
-    return emptyState()
+    return blankDeviceState()
   }
 
-  // Absent or genuinely empty → blank device. Byte-for-byte the pre-req-36 path:
-  // emptyState(), saves work normally, signal clear.
+  // Absent or genuinely empty → blank device. The pre-req-36 path (emptyState(), saves
+  // work normally, signal clear), plus req-178's fill marker (blankDeviceState).
   if (!raw) {
     setLoadUnreadable(false)
-    return emptyState()
+    return blankDeviceState()
   }
 
   // A value IS present. If parse or migrate throws it is corrupt-but-present: latch
@@ -186,9 +195,15 @@ export function loadState() {
     // migrateState: the default is clock-dependent.
     const schedule = withDefaultAnchor(migrated.schedule)
     const anchorDefaulted = schedule !== migrated.schedule
-    const state = anchorDefaulted ? { ...migrated, schedule } : migrated
+    const anchored = anchorDefaulted ? { ...migrated, schedule } : migrated
+    // req-178 (DEC-096 §6, DEC-100) — the one-time fill: routine kg from latest history,
+    // once per stored state (the marker is kept by migrateState's spread and by backups),
+    // saved with the rest. A state already marked comes back as it is.
+    const filled = fillRoutineKgFromHistory(anchored, { at: new Date().toISOString() })
+    const fillRan = filled.state !== anchored
+    const state = filled.state
     setLoadUnreadable(false)
-    if (legacy || anchorDefaulted) {
+    if (legacy || anchorDefaulted || fillRan) {
       saveState(state)
     }
     // Only reached when this device had data (fresh migration, or already current

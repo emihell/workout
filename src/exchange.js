@@ -26,7 +26,7 @@ export const ASSISTANT = {
   ].join('\n'),
   howTheAppWorks: {
     summary:
-      'Browser-only gym log. Exercises are the library. Routines are reusable templates with the full prescription (state.routines). Schedule is only the calendar. A live workout is a snapshot of a routine at Start. History is finished snapshots. Extra sets stay on today only until Finish; then skipped unlogged planned sets are recorded, and completed history writes next kg/reps onto the routine.',
+      'Browser-only gym log. Exercises are the library. Routines are reusable templates with the full prescription (state.routines). Schedule is only the calendar. A live workout is a snapshot of a routine at Start. History is finished snapshots. Extra sets stay on today only until Finish; then skipped unlogged planned sets are recorded. Each working set starts at the routine kg (suggestedWeights) next time.',
     exercises:
       'Library of movements. type is machine | free | bodyweight | cardio. weightStep is a kg step, Alt 4/5, or n/a. Routines point at exercises by exerciseId.',
     routines:
@@ -40,14 +40,14 @@ export const ASSISTANT = {
         'Keep an existing { reps } as it is; null on new items. (An easy set before working weight on that same exercise; not the same as role warmup.)',
       sets: 'Number of working sets (not counting a warm-up set).',
       targets: 'Reps or duration per working set, e.g. ["12","10","8"] or ["5-8 min"].',
-      suggestedWeights: 'Kg per working set. Empty for bodyweight/cardio.',
+      suggestedWeights: 'Kg per working set; the workout starts each set at this kg. Empty for bodyweight/cardio.',
       restSec: 'Seconds between working sets.',
       notes: 'Free text cues.',
     },
     schedule:
       'loopWeeks 1–4. anchor is the YYYY-MM-DD Monday of loop week 1 (keep it when editing; if absent, the app sets it to the Monday of the import week). slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history.',
     workout:
-      'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, and stores the snapshot in workouts. Finish never changes the routine; only an explicit History recalculation writes suggestedWeights/targets onto it. Do not invent completed workouts.',
+      'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, and stores the snapshot in workouts. Finish never changes the routine; it changes only when the user edits it, confirms the "Update routine" offer after an exercise (the kg of that one routine), or applies a History recalculation (suggestedWeights/targets). Do not invent completed workouts.',
     ids: 'Reuse existing ids. New ones: ex-…, rtn-…, si-…, slot-…, wo-… Existing routine ids may still be sess-….',
   },
   import: {

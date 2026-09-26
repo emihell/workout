@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { roleTag } from '../../ids'
 import { go, withFrom } from '../../route'
 import { finishedForPlan } from '../../current-workout'
@@ -15,6 +15,7 @@ import { MissingItem, NotInWorkout } from './helpers'
 import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
 import { RestPill } from './rest'
+import { RoutineUpdateOffer } from './routine-offer'
 
 // req-93 — the exercise's label in the in-workout list. Main is the default and the
 // substance of the session, so it shows the name only, BOLD, with no "— Main". Non-main
@@ -159,12 +160,16 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           return (
             // req-79 — completed exercises read muted (ui-row--done) so the eye lands
             // on what's left; not-done rows stay full emphasis. Order/meaning unchanged.
-            <Row key={itemKey(item) || item.id} to={path} className={completed ? 'ui-row--done' : ''}>
-              <ExerciseLabel item={item} />
-              {/* req-109 — a done row whose sets are ALL skipped reads "skipped"; one
-                  logged set and it reads done (derived from the sets, no marker). */}
-              {completed ? (itemAllSkipped(active, item) ? ' · skipped' : ' · done') : ''}
-            </Row>
+            <Fragment key={itemKey(item) || item.id}>
+              <Row to={path} className={completed ? 'ui-row--done' : ''}>
+                <ExerciseLabel item={item} />
+                {/* req-109 — a done row whose sets are ALL skipped reads "skipped"; one
+                    logged set and it reads done (derived from the sets, no marker). */}
+                {completed ? (itemAllSkipped(active, item) ? ' · skipped' : ' · done') : ''}
+              </Row>
+              {/* req-178 — after the exercise's last set: carry today's kg back, on a tap. */}
+              {completed ? <RoutineUpdateOffer store={store} active={active} item={item} /> : null}
+            </Fragment>
           )
         })}
       </List>

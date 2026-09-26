@@ -173,6 +173,9 @@ afterEach(async () => {
 const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
 async function harness(payload) {
   localStorage.clear()
+  // req-178 (sanctioned edit) — a store already past the one-time routine-kg fill (marked),
+  // so loading it writes nothing and "v9 unchanged" still means the flow wrote nothing.
+  payload.routineKgFilledAt ??= '2026-09-26T00:00:00.000Z'
   localStorage.setItem('workout-mvp-v9', JSON.stringify(payload))
   const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
   const { RoutinePlan } = await importJsx('./views/Plan.jsx', import.meta.url)

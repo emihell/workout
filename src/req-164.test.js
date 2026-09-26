@@ -12,6 +12,7 @@ import { migrateState } from './model.js'
 import { loadState, saveState } from './storage.js'
 import { finishedState } from './workout-log.js'
 import { OLD_V8, OLD_V9_WITH_PLAN } from './req-165.old-docs.js'
+import { filledLike, loadFilledLike } from './test-support/fill.js'
 
 const golden = JSON.parse(gunzipSync(readFileSync(new URL('./req-164.golden.json.gz', import.meta.url))).toString('utf8'))
 const DB = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
@@ -47,12 +48,20 @@ describe(`req-164 — migrate, load, save round-trip and finish deep-equal main 
     it(`${name}: loadState, saveState → loadState, finishedState`, () => {
       disk.set(key, JSON.stringify(doc))
       const loaded = loadState()
-      assert.deepEqual({ state: plain(loaded), disk: snapshotDisk() }, golden[name].load)
+      // req-178 (sanctioned edit) — main's output with the one-time routine-kg fill applied
+      // (test-support/fill.js); everything else still deep-equals main.
+      const at = loaded.routineKgFilledAt
+      assert.ok(at, 'the fill ran and marked the state')
+      assert.deepEqual({ state: plain(loaded), disk: snapshotDisk() }, loadFilledLike(golden[name].load, loaded))
       saveState(loaded)
       const reloaded = loadState()
-      assert.deepEqual({ state: plain(reloaded), disk: snapshotDisk() }, golden[name].roundTrip)
+      assert.equal(reloaded.routineKgFilledAt, at, 'the fill runs once')
+      assert.deepEqual({ state: plain(reloaded), disk: snapshotDisk() }, loadFilledLike(golden[name].roundTrip, reloaded))
       const finish = loaded.activeWorkout ? plain(finishedState(loaded, { overallFeel: 'Good' }, FINISHED_AT)) : null
-      assert.deepEqual(finish, golden[name].finish)
+      // Finish never touches routines (DEC-056): main's finish, with the loaded (filled) routines.
+      const mainFinish = golden[name].finish
+      const filledRoutines = filledLike(golden[name].load.state, at).routines
+      assert.deepEqual(finish, mainFinish && { ...mainFinish, routines: filledRoutines, routineKgFilledAt: at })
     })
   }
   it('the golden has teeth: db.json migrated (13 workouts, v8 key removed after the round-trip) and both finishes wrote sets', () => {

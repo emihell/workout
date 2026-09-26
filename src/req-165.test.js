@@ -14,6 +14,7 @@ import { migrateState } from './model.js'
 import { loadState } from './storage.js'
 import { finishedState } from './workout-log.js'
 import { OLD_V8, OLD_V9_WITH_PLAN } from './req-165.old-docs.js'
+import { filledLike, loadFilledLike } from './test-support/fill.js'
 
 const golden = JSON.parse(gunzipSync(readFileSync(new URL('./req-165.golden.json.gz', import.meta.url))).toString('utf8'))
 
@@ -53,10 +54,14 @@ describe(`req-165 — old docs load to the same v9 state as main (${golden.mainS
   it('v9 with a stale plan: migrateState deep-equals main', () => {
     assert.deepEqual(plain(migrateState(structuredClone(OLD_V9_WITH_PLAN))), golden.migrate_v9)
   })
+  // req-178 (sanctioned edit) — main's output with the one-time routine-kg fill applied
+  // (test-support/fill.js); everything else still deep-equals main.
   it('loadState of each (the state AND what is left on disk) deep-equals main', () => {
-    assert.deepEqual(load('workout-mvp-v8', OLD_V8), golden.load_v8)
+    const v8 = load('workout-mvp-v8', OLD_V8)
+    assert.deepEqual(v8, loadFilledLike(golden.load_v8, v8.state))
     disk.clear()
-    assert.deepEqual(load('workout-mvp-v9', OLD_V9_WITH_PLAN), golden.load_v9)
+    const v9 = load('workout-mvp-v9', OLD_V9_WITH_PLAN)
+    assert.deepEqual(v9, loadFilledLike(golden.load_v9, v9.state))
   })
   it('the fixtures really carry what they claim, and main kept the stale plan and stripped every session* key', () => {
     assert.match(JSON.stringify(OLD_V8), /"sessionId"/)
@@ -66,13 +71,21 @@ describe(`req-165 — old docs load to the same v9 state as main (${golden.mainS
     assert.equal(golden.load_v9.disk['workout-mvp-v9'].plannedWorkouts.length, 1, 'the key survives a save')
     assert.doesNotMatch(JSON.stringify(golden.migrate_v8), /"session(Id|ItemId|Name)"|completedSessionItemIds/)
   })
+  // req-178 (sanctioned edit, this and the next) — Finish never touches routines (DEC-056):
+  // main's finish with the loaded, filled routines and the marker.
+  const withFilled = (finish, loadGolden, branch) => ({
+    ...finish,
+    routines: filledLike(loadGolden.state, branch.routineKgFilledAt).routines,
+    routineKgFilledAt: branch.routineKgFilledAt,
+  })
   it('finish (the path that writes history): a v9 in-progress workout (items with ids) finishes deep-equal to main', () => {
-    assert.deepEqual(finishLoaded('workout-mvp-v9', OLD_V9_WITH_PLAN), golden.finish_v9)
+    const branch = finishLoaded('workout-mvp-v9', OLD_V9_WITH_PLAN)
+    assert.deepEqual(branch, withFilled(golden.finish_v9, golden.load_v9, branch))
     assert.equal(skippedOf(golden.finish_v9.workouts[0]).length, 12, 'the case has teeth: unlogged sets are written skipped')
   })
   it('finish of the id-less v8 in-progress workout: everything deep-equals main except its sets (DEC-088)', () => {
     const branch = finishLoaded('workout-mvp-v8', OLD_V8)
-    const main = golden.finish_v8
+    const main = withFilled(golden.finish_v8, golden.load_v8, branch)
     const { sets: branchSets, ...branchRest } = branch.workouts[0]
     const { sets: mainSets, ...mainRest } = main.workouts[0]
     assert.deepEqual(branchRest, mainRest)
