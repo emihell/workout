@@ -281,6 +281,16 @@ a.ui-btn--quiet:active {
   display: block;
   margin: var(--ui-s3) 0;
 }
+/* req-180 — the exercise picker's Cancel / "Add N" row stays in reach over a long list:
+   stuck above the floating dock, on the page background. */
+.ui-picker-bar {
+  position: sticky;
+  bottom: calc(var(--ui-dock-clear) + var(--ui-s2));
+  z-index: 5;
+  justify-content: space-between;
+  padding: var(--ui-s2) 0;
+  background: var(--ui-bg);
+}
 /* req-179 — a routine item's Reps / Kg / Duration group: label, "Different … per set"
    switch, field(s). A clear gap between groups so a switch reads as its own group's. */
 .ui-per-set {

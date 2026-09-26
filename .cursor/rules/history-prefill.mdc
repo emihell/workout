@@ -1,5 +1,5 @@
 ---
-description: Prefills come only from finished-workout history, plus four sanctioned exceptions (DESIGN §1)
+description: Prefills come only from finished-workout history, plus sanctioned exceptions (DESIGN §1, DEC-097 §4)
 alwaysApply: true
 ---
 
@@ -15,3 +15,5 @@ A prefill comes only from this exercise's previous **finished-workout** data for
 Everywhere else, do not prefill from plans, recommendations, library cues, a routine number, or type defaults.
 
 Do not invent warmup (50% load, 12 reps), rest (90s), or notes (copy of `ex.cues`). Editing an existing record may show that record's saved values.
+
+**One exception at routine creation (DEC-097 §4, req-180):** the Add exercise picker adds an exercise with **no history** with a **starting plan** — reps 3 × 10, 90 s rest; timed 3 × the exercise's duration, 90 s rest; cardio 1 set, rest 0 (`routine-picker.js` `pickerItem`). It is shown on the selected row ("Starting plan: … — change any time"), never silent, and **never a kg** (`suggestedWeights: []`). With history, the whole history prescription is used instead — the two are never mixed.

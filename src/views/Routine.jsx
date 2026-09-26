@@ -10,6 +10,7 @@ import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
+import { ExercisePicker } from './ExercisePicker'
 import { Back, Missing } from './shared'
 import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Textarea, Title } from '../ui/index.jsx'
 import { askConfirm } from '../ui/confirm.js'
@@ -241,45 +242,31 @@ export function RoutineEdit({ routineId, paths }) {
   )
 }
 
+// req-180 (DEC-097) — one screen: your exercises, then the library, multi-select, "Add N".
+// Each item is added with its history prescription or a shown starting plan
+// (routine-picker.js pickerItem). Shared by the routine, schedule-slot, workout-setup and
+// history-recalc flows (nav from routine-nav.js).
 export function RoutineExercisePick({ routineId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
   const nav = pathsFor(routineId, paths)
-  const [query, setQuery] = useState('')
 
   if (!routine) {
     return <Missing>Not found.</Missing>
   }
 
-  const matches = store.exercises.filter((ex) => {
-    if (ex.archivedAt) return false
-    const q = query.trim().toLowerCase()
-    if (!q) return true
-    return `${ex.name} ${ex.equipment} ${ex.muscles}`.toLowerCase().includes(q)
-  })
-
   return (
     <Screen>
       <Back to={nav.base} />
       <Title>Add exercise</Title>
-      <p>
-        <NavLink to={nav.create} chevron="forward">Create exercise</NavLink>
-      </p>
-      {store.exercises.length === 0 ? (
-        <p className="ui-sub">None.</p>
-      ) : (
-        <>
-          <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
-          {matches.length === 0 ? <p className="ui-sub">No matches.</p> : null}
-          <List>
-            {matches.map((ex) => (
-              <Row key={ex.id} to={nav.newItem(ex.id)}>
-                {ex.name} — {ex.equipment}
-              </Row>
-            ))}
-          </List>
-        </>
-      )}
+      <ExercisePicker
+        cancelTo={nav.base}
+        createTo={nav.create}
+        onAdd={(added) => {
+          for (const { exerciseId, item } of added) store.addRoutineExercise(routine.id, { exerciseId, ...item })
+          go(nav.base)
+        }}
+      />
     </Screen>
   )
 }

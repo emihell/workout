@@ -152,8 +152,13 @@ export function inferExerciseType(equipment, category) {
   return 'free'
 }
 
+// req-180 (DEC-097 §6) — the library's `logAs` decides what equipment can't: a `cardio`
+// entry is a cardio exercise (Battle Ropes was typed free), and `time` / `weight-time`
+// entries are timed (Plank was untimed). Only records created from now on (no bulk write).
+const TIMED_LOG_AS = new Set(['time', 'weight-time'])
+
 export function catalogItemToExercise(item) {
-  const type = inferExerciseType(item.equipment, item.category)
+  const type = item.logAs === 'cardio' ? 'cardio' : inferExerciseType(item.equipment, item.category)
   const equipmentLabel = item.equipment ? titleCase(item.equipment) : type === 'bodyweight' ? 'Bodyweight' : 'Unknown'
   return {
     // req-139 — the name saved is the shown one; libraryId keeps the link.
@@ -165,6 +170,7 @@ export function catalogItemToExercise(item) {
     weightStep: 'n/a',
     muscles: [...(item.primaryMuscles || []), ...(item.secondaryMuscles || [])].map(titleCase).join(', '),
     cues: (item.instructions || []).join('\n').trim(),
+    ...(TIMED_LOG_AS.has(item.logAs) ? { hasDuration: true } : {}),
     // req-130 — every catalog item is a library entry since req-139 (no RepDB hits).
     ...(item.id ? { libraryId: String(item.id) } : {}),
   }
