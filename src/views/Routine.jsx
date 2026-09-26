@@ -102,13 +102,35 @@ export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
   )
 }
 
+// req-181 (DEC-098 §4) — two starts: a plan (days per week → slots, views/Plan.jsx) on top,
+// or today's blank routine. Both are navigation, so NavLinks (DESIGN §4 / DEC-016).
 export function RoutineNew() {
-  const store = useStore()
-
   return (
     <Screen>
       <Back to="/routines" />
       <Title>Add routine</Title>
+      <p>
+        <NavLink to="/routines/new/plan" look="primary" block>
+          Start from a plan
+        </NavLink>
+      </p>
+      <p className="ui-sub">Pick how many days a week, then an exercise for each slot.</p>
+      <p>
+        <NavLink to="/routines/new/blank" look="secondary" block>
+          Blank routine
+        </NavLink>
+      </p>
+    </Screen>
+  )
+}
+
+export function RoutineNewBlank() {
+  const store = useStore()
+
+  return (
+    <Screen>
+      <Back to="/routines/new" />
+      <Title>Blank routine</Title>
       <RoutineNewForm
         onSave={({ name }) => {
           const id = store.addRoutine({ name })

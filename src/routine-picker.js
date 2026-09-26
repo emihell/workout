@@ -48,6 +48,15 @@ export function staplesByMuscle(catalog) {
     .filter((row) => row.items.length)
 }
 
+// req-181 — a filtered browse (a plan slot's pattern): the matching listable staples, then
+// the rest behind "Show more", each A→Z by the shown name. The picker and slotCandidates
+// (plan-templates.js) both read this, so what a test asserts is what the slot shows.
+export function filteredBrowse(catalog, filter) {
+  const rows = (catalog || []).filter((item) => listable(item) && filter(item))
+  const sorted = (list) => list.sort((a, b) => shownName(a).localeCompare(shownName(b)))
+  return { staples: sorted(rows.filter((item) => item.staple)), rest: sorted(rows.filter((item) => !item.staple)) }
+}
+
 function words(name) {
   return normalName(name).replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean)
 }

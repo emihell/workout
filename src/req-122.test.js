@@ -86,6 +86,7 @@ test('call sites that pass both put the retreat link in retreat and the commit i
   const count = views.reduce((n, { src }) => n + (src.match(/<Actions\b/g) || []).length, 0)
   // the 13 hand-written .ui-actions rows (12 + item.jsx's ui-exercise-actions), plus
   // req-127's two name-match rows in Exercises.jsx (duplicate warning, Restore offer),
-  // plus req-180's two in ExercisePicker.jsx (the "Use your …?" question, Cancel / Add N)
-  assert.equal(count, 17)
+  // plus req-180's two in ExercisePicker.jsx (the "Use your …?" question, Cancel / Add N),
+  // plus req-181's plan Fill screen (Cancel / Save) in Plan.jsx
+  assert.equal(count, 18)
 })

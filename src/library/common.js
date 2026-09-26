@@ -26,12 +26,14 @@ const ROWS = [
   ['Incline_Push-Up', 'horizontal-push', 'bodyweight bench', 'mid-lower-chest', 'triceps front-delt', 'bodyweight-reps', 'fam-push-up', ['Hands-Elevated Push-Up', 'Incline Push-Ups']],
   ['Decline_Push-Up', 'horizontal-push', 'bodyweight bench', 'upper-chest', 'triceps front-delt', 'bodyweight-reps', 'fam-push-up', ['Feet-Elevated Push-Up', 'Decline Push-Ups']],
   ['Push-Ups_-_Close_Triceps_Position', 'horizontal-push', 'bodyweight', 'triceps', 'pecs front-delt', 'bodyweight-reps', 'fam-push-up', ['Close-Grip Push-Up', 'Triangle Push-Up']],
-  ['Dips_-_Chest_Version', 'vertical-push', 'dip-bars bodyweight', 'mid-lower-chest triceps', 'front-delt', 'bodyweight-reps', 'fam-dip', ['Chest Dips']],
-  ['Dips_-_Triceps_Version', 'vertical-push', 'dip-bars bodyweight', 'triceps', 'mid-lower-chest front-delt', 'bodyweight-reps', 'fam-dip', ['Dips', 'Dip', 'Triceps Dips', 'Tricep Dips', 'Parallel Bar Dip']],
-  ['Bench_Dips', 'vertical-push', 'bench bodyweight', 'triceps', 'front-delt pecs', 'bodyweight-reps', 'fam-dip', ['Chair Dips']],
-  ['Dip_Machine', 'vertical-push', 'machine', 'triceps', 'pecs front-delt', 'weight-reps', 'fam-dip', ['Seated Dip Machine', 'Triceps Dip Machine', 'Seated Dip']],
-  ['own-weighted-dip', 'vertical-push', 'dip-bars plate', 'triceps', 'mid-lower-chest front-delt', 'weight-reps', 'fam-dip', ['Weighted Dips', 'Weighted Parallel Bar Dip']],
-  ['own-assisted-dip', 'vertical-push', 'machine', 'triceps mid-lower-chest', 'front-delt', 'weight-reps', 'fam-dip', ['Assisted Dips', 'Machine Assisted Dip', 'Assisted Dip Machine']],
+  // req-181 (DEC-067 content call) — dips are horizontal-push, not vertical-push, so a plan's
+  // "Overhead press" slot lists overhead presses only. Ring_Dips (Back section) likewise.
+  ['Dips_-_Chest_Version', 'horizontal-push', 'dip-bars bodyweight', 'mid-lower-chest triceps', 'front-delt', 'bodyweight-reps', 'fam-dip', ['Chest Dips']],
+  ['Dips_-_Triceps_Version', 'horizontal-push', 'dip-bars bodyweight', 'triceps', 'mid-lower-chest front-delt', 'bodyweight-reps', 'fam-dip', ['Dips', 'Dip', 'Triceps Dips', 'Tricep Dips', 'Parallel Bar Dip']],
+  ['Bench_Dips', 'horizontal-push', 'bench bodyweight', 'triceps', 'front-delt pecs', 'bodyweight-reps', 'fam-dip', ['Chair Dips']],
+  ['Dip_Machine', 'horizontal-push', 'machine', 'triceps', 'pecs front-delt', 'weight-reps', 'fam-dip', ['Seated Dip Machine', 'Triceps Dip Machine', 'Seated Dip']],
+  ['own-weighted-dip', 'horizontal-push', 'dip-bars plate', 'triceps', 'mid-lower-chest front-delt', 'weight-reps', 'fam-dip', ['Weighted Dips', 'Weighted Parallel Bar Dip']],
+  ['own-assisted-dip', 'horizontal-push', 'machine', 'triceps mid-lower-chest', 'front-delt', 'weight-reps', 'fam-dip', ['Assisted Dips', 'Machine Assisted Dip', 'Assisted Dip Machine']],
 
   // Shoulders
   ['Standing_Military_Press', 'vertical-push', 'barbell', 'front-delt', 'side-delt triceps upper-chest', 'weight-reps', 'fam-overhead-press', ['OHP', 'Military Press', 'Barbell Overhead Press', 'Strict Press']],
@@ -384,7 +386,7 @@ const ROWS = [
   ['Split_Jerk', 'olympic', 'barbell', 'deltoids quads', 'triceps glute-max hamstrings', 'weight-reps', 'fam-jerk', ['Barbell Split Jerk']],
   ['Hang_Snatch', 'olympic', 'barbell', 'hamstrings glute-max quads deltoids', 'traps lower-back', 'weight-reps', 'fam-snatch', ['Barbell Hang Snatch', 'Hang Power Snatch']],
   ['Power_Snatch', 'olympic', 'barbell', 'hamstrings glute-max quads deltoids', 'traps lower-back triceps', 'weight-reps', 'fam-snatch', ['Barbell Power Snatch']],
-  ['Ring_Dips', 'vertical-push', 'suspension bodyweight', 'triceps mid-lower-chest', 'front-delt', 'bodyweight-reps', 'fam-dip', ['Gymnastic Ring Dips', 'Rings Dip']],
+  ['Ring_Dips', 'horizontal-push', 'suspension bodyweight', 'triceps mid-lower-chest', 'front-delt', 'bodyweight-reps', 'fam-dip', ['Gymnastic Ring Dips', 'Rings Dip']],
   ['Rope_Climb', 'vertical-pull', 'bodyweight', 'lats', 'biceps forearms rhomboids', 'bodyweight-reps', 'fam-rope-climb', ['Rope Climbs', 'Rope Climbing']],
   ['own-archer-push-up', 'horizontal-push', 'bodyweight', 'pecs', 'triceps front-delt abs', 'bodyweight-reps', 'fam-push-up', ['Archer Push-Ups', 'Archer Press-Up']],
   ['own-archer-pull-up', 'vertical-pull', 'pull-up-bar bodyweight', 'lats', 'biceps rhomboids', 'bodyweight-reps', 'fam-pull-up', ['Archer Pull-Ups', 'Archer Chin-Up']],

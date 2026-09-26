@@ -34,6 +34,7 @@ import {
 } from './state-reducers.js'
 import { StoreContext } from './store-context'
 import { exerciseFromData } from './exercise-names.js'
+import { planIds, planToState } from './plan-templates.js'
 import { addWorkingSetToState, finishedState } from './workout-log'
 
 export function StoreProvider({ children }) {
@@ -100,6 +101,16 @@ export function StoreProvider({ children }) {
         }
         setState((s) => slotAddedState(s, slot))
         return slot.id
+      },
+      // req-181 (DEC-098) — "Start from a plan": exercises, routines, items and (on an empty
+      // schedule) the week's slots in ONE state write. The ids are made here, before the
+      // updater, so a re-run updater (StrictMode) builds the same records; the result is read
+      // from the same pure reducer on the current state.
+      applyPlan(choices) {
+        const ids = planIds(choices, uid, new Date())
+        setState((s) => planToState(s, choices, ids()).state)
+        const { routineIds, scheduled } = planToState(state, choices, ids())
+        return { routineIds, scheduled }
       },
       removeSlot(slotId) {
         setState((s) => slotRemovedState(s, slotId))

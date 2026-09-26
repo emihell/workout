@@ -3536,7 +3536,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "bench",
       "bodyweight"
@@ -10098,7 +10098,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "machine"
     ],
@@ -10176,7 +10176,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "dip-bars",
       "bodyweight"
@@ -10258,7 +10258,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "dip-bars",
       "bodyweight"
@@ -29667,7 +29667,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "suspension",
       "bodyweight"
@@ -43645,7 +43645,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "machine"
     ],
@@ -44164,7 +44164,7 @@
         "role": "secondary"
       }
     ],
-    "pattern": "vertical-push",
+    "pattern": "horizontal-push",
     "equipmentList": [
       "dip-bars",
       "plate"
