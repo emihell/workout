@@ -2093,3 +2093,17 @@ edit `ids.test.js:66` label. Builder's calls (reversible): per-set switch hidden
 one; "Duration (s)" not renamed (follow-up). Feel for Emilio: 6 stacked per-set fields one-handed. `reports/req-179.md`.
 
 No independent reviewer (`plan closeout --no-reviewer`): exchange.js diff is assistant-prompt text only (3 strings + focus dropped from the example); Planner read it; no import validation reads focus (git grep)
+
+## req-180 — add exercises: own first, whole library, multi-select, shown starting plan  (merged 2026-09-26)
+
+**req-180** (2026-09-26, DEC-097) — one picker (`views/ExercisePicker.jsx`, filters as props; helpers `src/routine-picker.js`):
+own exercises by recency, then the library; empty search = 194 staples under Chest/Back/Shoulders/Arms/Legs/Core; checkbox
+rows + sticky "Add N"; history → whole `historyPrescription`, else "Starting plan: 3 × 10, 90 s rest — change any time" (timed
+3 × duration; cardio 1 set, rest 0), never kg; "Use your 'X'?" guard (Cancel / Add as new / Use mine; archived → restored);
+records created only at Add N; `catalogItemToExercise` reads `logAs` (Plank hasDuration, rowing cardio). Gate (ui):
+req-180.test.js 12/0 (6 fail on main); suite 1162/0; `./check --smoke` green. Test edit `req-122.test.js:89` Actions count
+15→17 (the picker's two rows) — a real change. No trigger files. Planner's QA agent (390×844, db + empty seeds): 11/11 with
+v9 receipts (no kg written; Cancel leaves v9 byte-identical; blocked library chunk → "Could not load." with own list working;
+the 3 other entry points return to their screen); screenshots viewed. Follow-ups → BACKLOG: sticky bar has no background (a
+sliver of list shows between it and the dock); first-muscle grouping puts Burpee under Chest. Builder's calls (reversible):
+recency = non-skipped sets; timed plan targets []; "Last time: 4 × 6 · 80 kg" label; sticky bar placement. `reports/req-180.md`.
