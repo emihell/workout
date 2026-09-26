@@ -1669,3 +1669,11 @@ From prep §E.3/§E.6 and req-175's review. Role is a label only [measured: `ids
    can pull down the load recommendation; an in-workout "warm-up" tap is the fix if it bites.
 4. **Plain words:** "Rest (seconds)", "Different reps per set" instead of slash notation.
 Form = exercise, sets, reps, kg, rest, the warm-up-exercise switch.
+
+## DEC-100 — req-178's data gate waived for this batch; Q1 = overwrite  (Emilio + Planner, 2026-09-26)
+
+Emilio: "i have a backup on my data - so no need to stop for it or be mindful of it - we can always fix what i have en
+import it later". So req-178's one-time fill merges on Planner's gate (tests, reviewer, dry run on his latest Export
+`~/Library/Mobile Documents/com~apple~CloudDocs/workout-database-2026-09-25.json`), without waiting for his eyes. It applies to this
+batch only: the DEC-035 carve-out stands for later migrations. **Q1 (req-178):** (a) overwrite routine kg with latest
+history where history has a kg, so the next workout reads as it would have before `(unconfirmed)`, Planner's call.

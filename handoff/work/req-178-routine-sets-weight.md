@@ -1,10 +1,10 @@
 # req-178 — The routine sets the workout's weight
 
-**Status: NEEDS DECISIONS** (Q1 below; everything else decided). **Lane: data** (bulk write of stored routines) — the
+**Status: READY** (Q1 → (a) overwrite, DEC-100 `(unconfirmed)`; Emilio's eyes waived for this batch, DEC-100 — dry run on his Export still required and pasted). **Lane: data** (bulk write of stored routines) — the
 gate is the data lane's: round-trip + legacy-key tests, independent reviewer, dry run on Emilio's latest Export, backup
 reminder (DEC-046), **Emilio's eyes before merge** (DEC-035 carve-out). Source: DEC-096 (don't relitigate), DEC-099 §3.
 Siblings (build order): **req-178** → req-179 routine form → req-180 picker → req-181 slot templates. 179 edits the same
-`ExerciseFields` (`Routine.jsx:300`); 180 adds items without the form and must use Change 2's history kg. **Planner 2026-09-26: built last** — 179→180→181 merge first; this is held for Q1 + Emilio's eyes, then rebased onto them.
+`ExerciseFields` (`Routine.jsx:300`); 180 adds items without the form and must use Change 2's history kg. **Planner 2026-09-26: built last**, after 179→180→181 merge, on top of them.
 
 ## Open question (Emilio)
 **Q1 — the one-time fill (DEC-096 §6): what does it do to a routine item that already has a kg?**
