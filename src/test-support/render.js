@@ -18,7 +18,9 @@ register('./jsx-loader.js', import.meta.url)
 
 const window = new Window({ url: 'http://localhost/' })
 // The browser globals the app's modules touch at import or render time. `navigator` is
-// replaced even though Node 22 has one (the app reads DOM-only parts, e.g. wakeLock).
+// replaced even though Node 22 has one (the app reads DOM-only parts, e.g. wakeLock). A
+// global Node defines as `undefined` is replaced too: Node 26's `localStorage` /
+// `sessionStorage` getters return undefined without --localstorage-file (req-185).
 const GLOBALS = [
   'document', 'navigator', 'location', 'history', 'localStorage', 'sessionStorage',
   'HTMLElement', 'HTMLInputElement', 'Node', 'Event', 'MouseEvent', 'KeyboardEvent', 'SubmitEvent', 'CustomEvent',
@@ -26,7 +28,7 @@ const GLOBALS = [
 ]
 Object.defineProperty(globalThis, 'window', { value: window, configurable: true, writable: true })
 for (const key of GLOBALS) {
-  if (!(key in globalThis) || key === 'navigator') {
+  if (!(key in globalThis) || globalThis[key] === undefined || key === 'navigator') {
     const value = typeof window[key] === 'function' && /^[a-z]/.test(key) ? window[key].bind(window) : window[key]
     Object.defineProperty(globalThis, key, { value, configurable: true, writable: true })
   }
