@@ -1,6 +1,6 @@
-READY — Lane: bug · test-support only, no app, store or schema change
-
 # req-185 — the test suite passes on Node 26
+
+**Status: BUILT AND MERGED, 2026-09-29 — branch `req-185` (`8071ff3`…`8071ff3`, 1 commit).** **Lane: bug** · test-support only, no app, store or schema change. Emilio's go: "run it" (2026-09-29).
 
 Source: Builder, 2026-09-29, from the stale Mac: "The test suite fails on Node 26 … starting with
 src/req-183.test.js:110 'Cannot read properties of undefined (reading 'clear')'". Emilio's local default is Node 26
