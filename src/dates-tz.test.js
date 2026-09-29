@@ -12,9 +12,10 @@ const cases = fileURLToPath(new URL('./dates-tz.cases.js', import.meta.url))
 
 for (const tz of ['Europe/Stockholm', 'America/New_York']) {
   test(`date cases pass under TZ=${tz}`, () => {
-    // Drop the parent runner's NODE_TEST_CONTEXT so the child prints its own TAP.
+    // Drop the parent runner's NODE_TEST_CONTEXT so the child prints its own TAP. The
+    // reporter is explicit: Node 26 defaults to `spec` off a TTY, which the guard can't read.
     const { NODE_TEST_CONTEXT: _ctx, ...env } = process.env
-    const run = spawnSync(process.execPath, ['--test', cases], {
+    const run = spawnSync(process.execPath, ['--test', '--test-reporter=tap', cases], {
       env: { ...env, TZ: tz },
       encoding: 'utf8',
     })

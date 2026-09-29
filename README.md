@@ -52,7 +52,8 @@ git config core.hooksPath .githooks
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
 
-# 3 — install dependencies (node_modules is gitignored)
+# 3 — install dependencies (node_modules is gitignored). Node 22 is what CI runs
+#     (`nvm use` reads .nvmrc); Node 26 also passes ./check (req-185).
 npm install
 
 # 4 — add the planning worktree (branch `planning`, sibling directory)
