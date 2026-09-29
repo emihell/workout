@@ -595,6 +595,8 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
+- **req-185** — tests green on Node 26 + `.nvmrc` 22 (`work/req-185-node-26-tests.md`). READY, lane bug.
+
 - **`plan qa --empty`** (2026-09-25): serve a true first-time user. The seed is re-injected whenever storage is empty
   (`scripts/qa.mjs:66-67`), so clearing storage brings the demo back — it misled the beginner-persona run.
 

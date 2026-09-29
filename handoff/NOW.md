@@ -17,6 +17,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
+- **req-185** tests green on Node 26 (Builder 2026-09-29; lane bug, test-support only) — 50 fail on v26 today.
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
 - **Next: req-184** creation design session 2 (advanced users, programs) — **starts with Emilio's feedback from using the new
   setup in real workouts**. Then req-10 + in-gym flow → req-146 server later (DEC-091).
