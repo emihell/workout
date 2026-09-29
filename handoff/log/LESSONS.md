@@ -455,3 +455,10 @@ at the closeout that fixed them.
 
 Builder's first green smoke run tested main's code: the smoke builds with `git archive HEAD`, and the fix wasn't
 committed yet. **How to apply:** commit before `./check --smoke`, and read the sha it prints against the branch head.
+
+## L-045 — `node --test` counts a file with no tests as 1 pass  (Builder, req-185, 2026-09-29)
+
+A file with no `test()` calls reports itself as `ok 1` → `# pass 1 # fail 0` (v22 and v26, measured). So
+`dates-tz.test.js`'s `/# pass [1-9]/` guard can't catch an emptied cases file. It has never been able to, since req-114.
+**How to apply:** a vacuous-pass guard asserts the exact count, not "≥1". Follow-up in BACKLOG §Workflow / tooling.
+Related: Node 26's non-TTY default reporter is `spec`, not TAP, so a child run the parent parses needs `--test-reporter=tap`.

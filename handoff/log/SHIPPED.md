@@ -2115,3 +2115,9 @@ Gate (ui): tests 7/0, suite 1210/0, smoke green; Planner QA 7/7 (15 s wait commi
 **req-183** (DEC-102) — "No weight entered · last time 30 kg" when the routine is blank; "That's a big change from 50 kg" over 50%; no block.
 Gate (ui): tests 12/0, smoke green; Planner QA 7/7 (a blanked routine kg stays [] across reloads — migrateState refill is v8-only).
 `reports/req-183.md`.
+
+## req-185 — the test suite passes on Node 26  (merged 2026-09-29)
+
+**req-185** (Builder's note, 2026-09-29) — render.js installs happy-dom's `localStorage`/`sessionStorage` when Node 26 defines them as undefined; dates-tz's child runs `--test-reporter=tap`; guard test `render.test.js`; `.nvmrc` 22; README Node line.
+Gate (bug): v26 suite main fail 50 → branch 1224/0; Planner `./check` green on v22 and v26 (85 files). No trigger files → no reviewer. L-045.
+`reports/req-185.md`.
