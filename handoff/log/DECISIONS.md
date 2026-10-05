@@ -1700,3 +1700,20 @@ Emilio: "ill go with your recommandations for the decisions". Planner's recommen
 3. **Typo guard:** a kg that differs from the reference (the routine kg for that set, else the last-time kg) by more than 50%
    shows an inline note "That's a big change from 50 kg" under the box — no dialog, Complete still one tap.
 Feel: Emilio tests during workouts.
+
+## DEC-103 — in-workout feedback 2026-10-05: weight confirm on Complete, Swap in the list, one workout pill  (Emilio, 2026-10-05, req-184)
+
+From Emilio's 13 real-workout notes (req-184 §Feedback). Planner's recommendations, chosen by Emilio:
+1. **Routine-kg offer → a confirm sheet on the exercise's last Complete**, only when the logged kg differs from the routine:
+   "Use 25 kg next time in Upper body?" [Update routine] [Keep 20 kg]; then back to the list. **Nothing inline in the
+   overview list.** Emilio: "should be a pop/confirmation when pressing complete, not information in this list". Supersedes
+   DEC-096 §3's Planner shape (inline, not popup); the confirm itself stays (DEC-056, never automatic).
+2. **Swap moves to the workout list.** Emilio: "its hard to know you can swap, when its inside a ex, so its better thats in
+   the list instead". Planner's calls `(unconfirmed)`: Skip exercise moves to the list row with it, so the exercise page's
+   only Skip is the set one; the list gets "Add exercise" (whole library) — his "why not just add?".
+3. **One workout pill for the whole workout**: rest countdown + set count ("1:12 · set 2/4"), then a glowing "GO · set 2/4"
+   when rest ends; **a tap always opens the current exercise**. Skipping the rest moves to a small "Skip rest" on the
+   exercise page. Supersedes tap-to-skip (`rest.jsx:19-22`).
+4. **Planner's fixes (DEC-095):** Swap/Replace uses the routine's whole-library picker; the set list stays on screen all
+   exercise (current highlighted, done ticked); Previous no longer un-logs a set or clears the rest — it shows the logged
+   set, forward is a secondary "Next" (or "Save" if edited), the rest timer untouched.
