@@ -1717,3 +1717,14 @@ From Emilio's 13 real-workout notes (req-184 §Feedback). Planner's recommendati
 4. **Planner's fixes (DEC-095):** Swap/Replace uses the routine's whole-library picker; the set list stays on screen all
    exercise (current highlighted, done ticked); Previous no longer un-logs a set or clears the rest — it shows the logged
    set, forward is a secondary "Next" (or "Save" if edited), the rest timer untouched.
+
+## DEC-104 — a swapped-in or added exercise: history's plan, else ask sets and rest  (Emilio, 2026-10-06, req-188)
+
+Amends DEC-059 §1 ("a replacement starts with 1 blank set") and req-188 scope 4 (picker's starting plan). Emilio: "if there
+is history, take from history, if not, then let user enter manually the sets, start from 0" → "maybe ask how many sets and
+rest time, rest can be filled in during the sets".
+1. **History** → the item takes history's prescription (sets, reps, kg, rest), for Swap and Add exercise alike.
+2. **No history** → after the pick, a small step asks **Sets** (required) and **Rest (seconds)** (optional; blank = no rest
+   timer). Reps and kg start blank. No 3 × 10 starting plan mid-workout (DEC-097 §4's plan stays for routine creation only).
+3. Planner's calls `(unconfirmed)`: on Add with several no-history picks, one step lists each; editing rest during the
+   exercise is a follow-up (BACKLOG), not built now.

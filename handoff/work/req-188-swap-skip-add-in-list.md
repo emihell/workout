@@ -33,8 +33,8 @@ library pick, a new exercise record (as the routine picker does) — no bulk wri
 2. **Log screen:** remove Skip exercise and Swap exercise; keep Remove set. Bottom bar's Skip reads **"Skip set"**.
 3. **Swap screen uses `ExercisePicker`** (`max: 1`, `onPick`): own exercises first, then the whole library. A library pick
    creates the user's exercise record (as `Plan.jsx` does), then swaps. Back from Swap → the overview.
-4. **The swapped-in item takes the picker's prescription** (sets, reps, rest, kg — history, else the shown starting plan),
-   not 1 set. Still `addedMidWorkout`, still this workout only.
+4. **The swapped-in item takes history's prescription** (sets, reps, rest, kg); **no history → a step asks Sets and Rest**
+   (rest optional), reps/kg blank — DEC-104 (Emilio, 2026-10-06; was "the picker's starting plan"). Still `addedMidWorkout`, still this workout only.
 5. **"Add exercise"** at the bottom of the overview list (above Note/Finish): same picker, multi-select allowed; each pick
    is appended to the snapshot as a mid-workout item with the picker's prescription. The routine is never touched (the
    req-187 offer stays null for `addedMidWorkout`).
