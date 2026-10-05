@@ -19,7 +19,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **READY, held:**
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
 - **Next: req-186 → 187 → 188** (READY, Lane ui, DEC-103 — Emilio's 2026-10-05 gym notes: pill/set list/Previous, kg confirm on
-  Complete, Swap/Skip/Add in the list). Then req-184 session 2 (advanced users, programs), req-10, req-146 later (DEC-091).
+  Complete, Swap/Skip/Add in the list). **Batch approved 2026-10-05** (Emilio: "build" → "Batch"), order 186→187→188. Then req-184 session 2 (advanced users, programs), req-10, req-146 later (DEC-091).
 - **Waiting (Emilio, DEC-075):** req-146 backend, req-149 progression rules. `req-10` first-time setup — rescan first. **[ux-feel]**
 - **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter → 132 → 137 → 131 → 135 → avatars.
 
