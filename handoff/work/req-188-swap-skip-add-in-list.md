@@ -1,6 +1,6 @@
 # req-188 — Swap and Skip exercise move to the workout list; Add exercise; whole-library picker
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-103 §2 and §4 (req-184 feedback F3, F5). Siblings: after
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-188` (`a0f583f`…`b064c71`, 4 commits).** (2026-10-06). **Lane: ui.** From DEC-103 §2 and §4 (req-184 feedback F3, F5). Siblings: after
 **req-186** and **req-187** (all edit `views/workout/item.jsx`). Trigger files: `store.jsx` / `state-reducers.js` /
 `workout-log.js` (a new add-item reducer) → **independent reviewer** before merge; writes only the active workout and, for a
 library pick, a new exercise record (as the routine picker does) — no bulk write, no schema change.
