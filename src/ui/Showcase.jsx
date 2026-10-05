@@ -12,7 +12,7 @@ import {
   List,
   NavLink,
   NumberField,
-  RestPill,
+  WorkoutPill,
   Row,
   Screen,
   SectionHeader,
@@ -222,8 +222,9 @@ export function Showcase() {
         <Banner role="alert">Couldn't save your last change — export a backup from Settings.</Banner>
       </Block>
 
-      <Block heading="Rest pill">
-        <RestPill seconds={72} onSkip={() => {}} />
+      <Block heading="Workout pill">
+        {/* position: fixed — one at a time; the GO state is .ui-restpill--go */}
+        <WorkoutPill clock="1:12" setText="set 2/4" onOpen={() => {}} />
       </Block>
 
       <Block heading="Set-log form">

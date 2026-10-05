@@ -22,6 +22,18 @@ export function liveSetWeight(text, weighted) {
   return kg.error ? null : kg.value
 }
 
+// req-186 (DEC-103 §4) — Save on a logged set viewed via Previous on the live log screen:
+// the SetLogForm's values ({ weight, reps, effort, durationSec }) as the set patch, read
+// the way completeSet reads them (blank kg → 0, unweighted → 0; effort → rpe, hidden →
+// null; a timed work set keeps its seconds and no reps). Unreadable kg → null (don't save).
+export function liveSetEditPatch({ weight, reps, effort, durationSec }, { weighted, timed = false } = {}) {
+  const kg = liveSetWeight(weight, weighted)
+  if (kg == null) return null
+  const patch = { weight: kg, reps: timed ? '' : reps || '', rpe: effort ? Number(effort) : null }
+  if (timed && durationSec != null) patch.durationSec = durationSec
+  return patch
+}
+
 // WorkoutSetEdit's patch. `showLoad` false (cardio / bodyweight): the kg field isn't
 // shown, so the stored weight is left as it is rather than re-read.
 export function activeSetPatch({ weight, reps, rpe, note }, { showLoad = true } = {}) {

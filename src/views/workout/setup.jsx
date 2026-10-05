@@ -9,7 +9,7 @@ import { Back, Missing } from '../shared'
 import { Actions, Button, NavLink, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
-import { RestPill } from './rest'
+import { WorkoutPill } from './rest'
 import { WeightStepField } from '../weight-step-field.jsx'
 import { useWeightStep } from '../use-weight-step.js'
 
@@ -44,7 +44,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   return (
     <Screen>
       <Back to={backTo} />
-      <RestPill />
+      <WorkoutPill />
       <Title>{exerciseName(item)}</Title>
       <p className="ui-sub">{ex.equipment}</p>
       <form

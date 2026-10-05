@@ -7,7 +7,7 @@ import { Back } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, Title } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemLogPath } from './workout-helpers.js'
-import { RestPill } from './rest'
+import { WorkoutPill } from './rest'
 
 // req-109 — the Replace exercise picker (reached from the item's log screen). Lists the
 // library's exercises, archived ones excluded, with the RoutineExercisePick search.
@@ -54,7 +54,7 @@ export function WorkoutItemReplace({ routineId, itemId }) {
   return (
     <Screen>
       <Back to={backTo} />
-      <RestPill />
+      <WorkoutPill />
       <p className="ui-sub">{exerciseName(item)}</p>
       <Title>Swap exercise</Title>
       <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
