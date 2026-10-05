@@ -1,6 +1,6 @@
 # req-187 — new weight → a confirm on the exercise's last Complete, not a row in the list
 
-**Status: READY** (2026-10-05). **Lane: ui.** From DEC-103 §1 (req-184 feedback F4, F11–F13). Siblings: after **req-186**,
+**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-103 §1 (req-184 feedback F4, F11–F13). Siblings: after **req-186**,
 before **req-188** (all edit `views/workout/item.jsx`). Writes the routine only through the existing
 `store.applyRoutineUpdate` (no new write path, no schema change); touches `store.jsx` only if a sheet hook is needed →
 reviewer if it does.
@@ -56,3 +56,9 @@ reviewer if it does.
 - behaviour `(unconfirmed)`: wording ("Update {exercise}?", "Keep 20 kg" / "Update routine"); backdrop = Keep; no sheet
   for later set edits / Finish / History; auto-complete loses its offer section.
 - implementation: reuse/extend `ConfirmSheet` (cancel label, non-destructive styling) vs a new sheet — Builder's choice.
+
+## Built — calls for Emilio's end-of-batch list `(unconfirmed)`
+- Wording as specced ("Update Incline DB Press?" / "You lifted 20 kg · Push / Pull says 18 kg" / [Keep 18 kg] [Update routine]);
+  DEC-103 §1's example ("Use 25 kg next time in …?") was illustrative. Same kg on every set reads as one number.
+- Skipping the last set also opens the sheet when earlier sets differ (the list row that used to catch it is gone).
+- Routine with no kg → "not in {routine} yet" + [Keep blank]. Any other navigation while open = Keep.

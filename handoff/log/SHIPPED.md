@@ -2130,3 +2130,11 @@ Save re-carries kg only from the latest set); "Skip rest" on the log screen. 4 c
 Gate (ui): `check: green — lint, skills, no import cycles, 86 test file(s), and the build all passed.` (1250/0); smoke green; Planner QA
 10/10 at 375 px (sets.length 1→1 and restEndsAt identical across Previous/Next/Save). Reviewer (independent, 2 rounds): 5 should-fix
 fixed, "No blockers." `reports/req-186.md`.
+
+## req-187 — a new weight asks on the exercise's last Complete, not in the list  (batch 2026-10-06)
+
+**req-187** (DEC-103 §1) — sheet "Update {exercise}?" [Keep N kg] [Update routine] over the overview (`askConfirm` gains title /
+cancelLabel / stayOn); inline offer row and auto-complete's "Update your routine?" removed; summary waits while the sheet is open.
+Gate (ui): `check: green — lint, skills, no import cycles, 87 test file(s), and the build all passed.` (1266/0); smoke green; Planner QA
+4/4 (routine [18,18,18] → Update → [20,20,20]; equal kg → no sheet; restEndsAt armed). No trigger files → no reviewer; Planner read
+the diff (test edits in req-178/182/overview tests follow the removed row — real changes). `reports/req-187.md`.
