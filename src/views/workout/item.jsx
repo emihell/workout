@@ -18,7 +18,6 @@ import {
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
-  lastLoggedSetIndex,
   markItemDonePatch,
   nextSeedOverrides,
   removeAddedSetPatch,
@@ -29,16 +28,16 @@ import {
   setDraftFor,
   setDraftFromLoggedSet,
   setDraftKey,
-  setPreview,
+  setListRows,
   setTargetFor,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
-import { activeSetPatch, liveSetWeight } from '../set-values.js'
+import { activeSetPatch, liveSetWeight, viewedSetSave } from '../set-values.js'
 import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath } from './workout-helpers.js'
-import { RestPill } from './rest'
+import { SkipRest, WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
 
@@ -53,13 +52,6 @@ function liveExercise(store, item) {
 
 function exerciseEditorPath(routineId, item) {
   return `/workout/${routineId}/item/${itemKey(item)}/exercise`
-}
-
-function setProgressLabel(item, state, currentType, currentWorkIndex) {
-  const hasWu = Boolean(item?.warmup)
-  const total = (hasWu ? 1 : 0) + state.workCount
-  const current = currentType === 'wu' ? 1 : (hasWu ? 1 : 0) + currentWorkIndex + 1
-  return `${current}/${total}`
 }
 
 // `aside` (req-80) renders a small control beside the title — the live log screen
@@ -122,7 +114,9 @@ export function WorkoutItemLog({ routineId, itemId }) {
   // flashed for one render after Skip exercise. An unknown item still says Not found.
   if (markedDone) return null
 
-  return <WorkoutItemLive routineId={routineId} item={item} />
+  // req-186 — keyed by item, so the view state (a logged set being viewed via Previous)
+  // never carries over when the pill opens another exercise on this same route shape.
+  return <WorkoutItemLive key={itemKey(item)} routineId={routineId} item={item} />
 }
 
 // req-117 — restoreFromLoggedSet moved to workout-log.js (pure, unit-tested; it now
@@ -132,7 +126,7 @@ export function WorkoutItemLog({ routineId, itemId }) {
 // blocking rest) is gone. Rest no longer blocks: the next set's own log form is shown
 // immediately on completing a set, and its weight field IS the editable surface, so the
 // separate panel and its nextSetWeight override folded away. The rest itself now shows
-// only as the floating RestPill.
+// only as the floating pill (req-186: the WorkoutPill).
 
 // req-125 — the set-form draft writer (createSetDraftWriter, workout-log.js: debounced,
 // unit-tested) bound to the store. store.patchActive only calls the store's stable
@@ -183,6 +177,16 @@ function WorkoutItemLive({ routineId, item }) {
   // read only when the current set changes (draftSnap below).
   const setSeedKey = setDraftKey(item, currentType, currentWorkIndex)
   const draftWriter = useSetDraftWriter(store)
+  // req-186 — the logged set Previous is showing (an index into active.sets), as view
+  // state; null = the current set. Valid only while it is one of this item's logged sets.
+  const [viewIndex, setViewIndex] = useState(null)
+  const loggedIndexes = state.logged.map((set) => (active.sets || []).indexOf(set))
+  const viewing = viewIndex != null && loggedIndexes.includes(viewIndex)
+  const viewPos = viewing ? loggedIndexes.indexOf(viewIndex) : loggedIndexes.length
+  const viewedSet = viewing ? active.sets[viewIndex] : null
+  const viewedType = viewedSet?.setType === 'wu' ? 'wu' : 'work'
+  const viewedWorkIndex = viewedSet ? Math.max(0, state.workLogged.indexOf(viewedSet)) : 0
+  const viewedTimed = Boolean(ex?.hasDuration) && viewedType === 'work'
 
   useEffect(() => {
     if (!resting && plannedDone) markDoneAndGoToOverview(store, active, routineId, item)
@@ -276,21 +280,54 @@ function WorkoutItemLive({ routineId, item }) {
     if (done) markDoneAndGoToOverview(store, active, routineId, item)
   }
 
+  // req-186 (DEC-103 §4) — Previous VIEWS a logged set; it no longer un-logs it (was
+  // removeActiveSet + a draft, req-25/req-125, which also cleared the armed rest). Which
+  // set is shown is view state (`viewIndex`, an index into active.sets), not a stored
+  // field. From the current set it shows the last logged set of this item; while viewing,
+  // the one logged before the shown one. Nothing is written and the rest is untouched.
   function previousSet() {
-    const index = lastLoggedSetIndex(active, item)
-    const lastLogged = index >= 0 ? active.sets[index] : null
-    if (!lastLogged) return
+    const index = loggedIndexes[viewPos - 1]
+    if (index == null) return
     recordButton('previous-set')
     setSkipArmed(false)
-    draftWriter.cancel()
-    // req-125 — the un-logged set's values become the draft of the set Previous returns
-    // to (was the `restore` component state, which a reload lost).
-    const workIndex = lastLogged.setType === 'wu' ? 0 : state.workLogged.length - 1
-    const key = setDraftKey(item, lastLogged.setType || 'work', workIndex)
-    // req-25 — removeActiveSet clears the armed rest (restEndsAt/restPausedRemaining)
-    // so going back then forward re-arms a fresh timer rather than double-counting.
-    store.removeActiveSet(index)
-    store.patchActive({ setDraft: setDraftFromLoggedSet(key, lastLogged) })
+    // The current set's typing is kept: write the pending draft now, so Next can re-read it.
+    if (!viewing) draftWriter.flush()
+    setViewIndex(index)
+  }
+
+  // Next: back to the current set, nothing written, the rest untouched. The current set's
+  // form remounts, so re-read its draft (flushed by Previous) the way a set change does.
+  function backToCurrentSet() {
+    setDraftSnap({ key: setSeedKey, draft: setDraftFor(active, setSeedKey) })
+    setViewIndex(null)
+  }
+
+  function nextFromViewed() {
+    recordButton('next-set')
+    backToCurrentSet()
+  }
+
+  // Save (offered only once a field changed): the edited values onto that logged set via
+  // updateActiveSet — the sets array only, so restEndsAt / restPausedRemaining stay as they
+  // were — then back to the current set.
+  // Review fix 2 — a changed kg re-runs the seed overrides for that set (DEC-052), as the
+  // old un-log + re-Complete path did; written as seedOverrides only (rest untouched).
+  function saveViewedSet(values) {
+    const save = viewedSetSave(values, {
+      weighted,
+      timed: viewedTimed,
+      initialEffort: viewedEffort,
+      set: viewedSet,
+      presentedWeight: weighted ? viewedInit.weight : '',
+      seedOverrides: active.seedOverrides,
+      sets: active.sets || [],
+      setIndex: viewIndex,
+    })
+    if (!save) return
+    recordButton('save-set')
+    store.updateActiveSet(viewIndex, save.setPatch)
+    if (save.seedOverrides !== active.seedOverrides) store.patchActive({ seedOverrides: save.seedOverrides })
+    backToCurrentSet()
   }
 
   // req-109 — Skip exercise needs two taps: the first arms it ("Tap again to skip"),
@@ -331,7 +368,8 @@ function WorkoutItemLive({ routineId, item }) {
     go(`/workout/${routineId}`, { replace: true })
   }
 
-  const canGoBack = state.logged.length > 0
+  // req-186 — Previous shows when there is a logged set before the one on screen.
+  const canGoBack = viewPos > 0
   const weighted = isWeightedType(ex.type)
   const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
   const showEffort = currentType === 'work' && ex?.type !== 'cardio'
@@ -404,34 +442,50 @@ function WorkoutItemLive({ routineId, item }) {
   // Each line is exactly what that set's form would prefill (setPreview → the same
   // initialSetFields inputs as `seed` above). Gone once the first set is completed or
   // skipped.
-  const preview =
-    logging && state.logged.length === 0
-      ? setPreview({
-          item,
-          ex,
-          weighted,
-          hasHistory: Boolean(last),
-          historyFor: (at) => historySetPrefill(last, at),
-          seedOverrides: active.seedOverrides,
-        })
-      : null
+  // req-186 (DEC-103 §4) — the list now stays for the whole exercise (setListRows): done
+  // sets show what was logged, the set on screen is highlighted (aria-current), upcoming
+  // sets show what their form would prefill — the same rule as before, plus the session
+  // carry their form will apply.
+  const setRows = logging
+    ? setListRows({
+        workout: active,
+        item,
+        ex,
+        weighted,
+        hasHistory: Boolean(last),
+        historyFor: (at) => historySetPrefill(last, at),
+        viewingIndex: viewing ? viewIndex : null,
+      })
+    : null
+  // req-186 — the viewed logged set's form: its logged values (setDraftFromLoggedSet, the
+  // values Previous always restored), its own target/kg notes; Effort default when none.
+  const viewedInit = viewedSet ? setDraftFromLoggedSet('', viewedSet) : null
+  const viewedEffort = viewedInit && viewedInit.effort !== '' ? viewedInit.effort : 3
+  const viewedTarget = viewedSet ? setTargetFor(item, viewedType, viewedWorkIndex) : ''
 
   return (
     <Screen className="ui-screen--rest">
       <ExercisesLink routineId={routineId} />
-      {/* req-78 — the running rest is a small floating pill (self-hides when no rest). */}
-      <RestPill />
+      {/* req-186 — the workout pill (rest clock / GO + set N/M; self-hides with no current exercise). */}
+      <WorkoutPill />
       <ExerciseTitle
         routineId={routineId}
         item={item}
         ex={ex}
         bits={[
           roleTag(item.role),
-          currentType === 'wu' ? 'Warm-up set' : null,
-          setProgressLabel(item, state, currentType, currentWorkIndex),
+          // req-186 — the small "N/M" left the title: the set list and the workout pill
+          // carry it (itemSetPosition, workout-log.js).
+          // req-186 — while Previous shows a logged set, say which one, so it can't be
+          // mistaken for the set about to be logged (F9).
+          viewing
+            ? `${viewedType === 'wu' ? 'Warm-up set' : `Set ${viewedWorkIndex + 1}`} · logged`
+            : currentType === 'wu'
+              ? 'Warm-up set'
+              : null,
         ]}
         aside={
-          logging && !showNote ? (
+          logging && !viewing && !showNote ? (
             <Button variant="quiet" className="ui-addnote" onClick={() => setShowNote(true)}>
               Add note
             </Button>
@@ -441,7 +495,7 @@ function WorkoutItemLive({ routineId, item }) {
       {/* req-80 — the note field the "Add note" control reveals, rendered by the
           title (not inside SetLogForm). autoFocus only when opened by tapping (no
           seeded note); an empty field submits no note (unchanged behaviour). */}
-      {logging && showNote ? (
+      {logging && !viewing && showNote ? (
         <Field
           label="Note"
           value={note}
@@ -462,7 +516,31 @@ function WorkoutItemLive({ routineId, item }) {
           while the pill counts down (D2, self-paced). The form remounts per set by
           `key`; rest ending doesn't change the key, so in-progress edits survive. Once
           the exercise is planned-done, completeSet has already advanced to the overview. */}
-      {plannedDone ? null : (
+      {/* req-186 (DEC-103 §4) — Previous: the logged set's own values, not un-logged.
+          Bar: Previous (if an earlier one) · Next (secondary) / Save once edited (primary,
+          updateActiveSet). Neither touches the rest timer. Keyed per viewed set. */}
+      {!plannedDone && viewing ? (
+        <SetLogForm
+          key={`view-${viewIndex}`}
+          viewing
+          weighted={weighted}
+          timed={viewedTimed}
+          showEffort={viewedType === 'work' && ex?.type !== 'cardio'}
+          repsLabel={ex?.type === 'cardio' || isDurationTarget(viewedTarget) ? 'Duration' : 'Reps'}
+          effortOptions={RPE_OPTIONS}
+          initialWeight={weighted ? viewedInit.weight : ''}
+          initialReps={viewedInit.reps}
+          initialDuration={viewedInit.durationSec ?? durationTargetFor(item, ex, viewedWorkIndex)}
+          initialEffort={viewedEffort}
+          routineKg={routineKgFor(item, viewedType, viewedWorkIndex)}
+          lastKg={historySetPrefill(last, { setType: viewedType, workIndex: viewedWorkIndex }).weight}
+          canGoBack={canGoBack}
+          onComplete={saveViewedSet}
+          onNext={nextFromViewed}
+          onPrevious={previousSet}
+        />
+      ) : null}
+      {plannedDone || viewing ? null : (
         <SetLogForm
           key={setSeedKey}
           weighted={weighted}
@@ -485,10 +563,20 @@ function WorkoutItemLive({ routineId, item }) {
           onChange={(values) => draftWriter.form(setSeedKey, values, note)}
         />
       )}
-      {preview ? (
+      {setRows ? (
         <ul className="ui-setpreview" aria-label="Sets">
-          {preview.map((line) => (
-            <li key={`${line.setType}-${line.workIndex}`}>{line.text}</li>
+          {setRows.map((row) => (
+            <li
+              key={row.key}
+              className={`ui-setpreview__row is-${row.status}${row.highlighted ? ' is-here' : ''}`}
+              aria-current={row.highlighted ? 'step' : undefined}
+            >
+              <span className="ui-setpreview__mark" aria-hidden="true">
+                {row.status === 'done' ? '✓' : ''}
+              </span>
+              {row.status === 'done' ? <span className="ui-visually-hidden">Done: </span> : null}
+              {row.text}
+            </li>
           ))}
         </ul>
       ) : null}
@@ -501,6 +589,9 @@ function WorkoutItemLive({ routineId, item }) {
           className="ui-exercise-actions"
           lateral={
             <>
+              {/* req-186 (DEC-103 §3) — skipping the rest lives here now, quietly, only
+                  while resting (was the pill's tap). */}
+              <SkipRest />
               {/* req-117 — only on an unlogged extra set (canRemoveAddedSet). */}
               {removable ? (
                 <Button variant="quiet" onClick={removeSet}>
@@ -540,7 +631,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
   return (
     <Screen className="ui-screen--rest">
       <ExercisesLink routineId={routineId} />
-      <RestPill />
+      <WorkoutPill />
       <SectionHeader>Today</SectionHeader>
       {today.length ? (
         <List>
@@ -597,7 +688,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   return (
     <Screen className="ui-screen--rest">
       <Back to={itemPath} />
-      <RestPill />
+      <WorkoutPill />
       <p className="ui-sub">{workout.snapshot?.routineName}</p>
       <Title>Set</Title>
       <SetEditForm

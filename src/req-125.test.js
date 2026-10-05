@@ -327,7 +327,9 @@ describe('req-125 no mid-typing reset (static)', () => {
 
   it('item.jsx reads the draft only in the setSeedKey-keyed snapshot, and keys the form by it', () => {
     const reads = item.split('\n').filter((line) => line.includes('setDraftFor('))
-    assert.equal(reads.length, 3)
+    // req-186 — 3 → 4: Next (back from a logged set Previous showed) re-snaps the current
+    // set's draft into draftSnap, the same keyed read; the line check below still holds.
+    assert.equal(reads.length, 4)
     for (const line of reads) assert.match(line, /setDraftFor\(active, setSeedKey\)/)
     assert.match(item, /if \(draftSnap\.key !== setSeedKey\) setDraftSnap\(/)
     assert.match(item, /key=\{setSeedKey\}/)

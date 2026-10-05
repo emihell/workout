@@ -11,7 +11,7 @@ import { finishSkippedLines } from '../../finish-unfinished.js'
 import { activeFeel, activeNote } from '../../workout-note.js'
 import { NotInWorkout } from './helpers'
 import { abandonWorkout, isActiveFor } from './workout-helpers.js'
-import { RestPill } from './rest'
+import { WorkoutPill } from './rest'
 
 export function WorkoutFinish({ routineId }) {
   const store = useStore()
@@ -59,7 +59,7 @@ function FinishScreen({ routineId }) {
   return (
     <Screen className="ui-screen--rest">
       <Back to={`/workout/${routineId}`} />
-      <RestPill />
+      <WorkoutPill />
       <Title>Finish</Title>
       <p className="ui-sub">
         {name} — {minutes} min · {setCount} {setCount === 1 ? 'set' : 'sets'}

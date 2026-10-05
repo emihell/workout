@@ -14,7 +14,7 @@ import { weekdayDate } from '../history/helpers'
 import { MissingItem, NotInWorkout } from './helpers'
 import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
-import { RestPill } from './rest'
+import { WorkoutPill } from './rest'
 import { RoutineUpdateOffer } from './routine-offer'
 
 // req-93 — the exercise's label in the in-workout list. Main is the default and the
@@ -151,7 +151,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
       {/* req-49 — Back steps out of the in-workout hub to Today; the workout stays
           active (resume via Continue). Abandon (below) is the explicit discard. */}
       <Back to="/" />
-      <RestPill />
+      <WorkoutPill />
       <Title>{active.snapshot?.routineName || routine?.name || 'Workout'}</Title>
       <List>
         {items.map((item) => {

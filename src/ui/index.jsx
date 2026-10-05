@@ -295,22 +295,26 @@ export function ConfirmSheet() {
 
 // ---- Molecules (compose the atoms) ----
 
-// RestPill (req-78) — the rest countdown as a small floating pill, replacing the
-// full-width RestBar. Since the next set's form is always live during rest (D2), rest
-// never blocks input, so the pill is purely informational + dismissable: it shows the
-// remaining seconds and the whole pill is a tap-target that skips the rest. No
-// pause/+30s/next controls — those belonged to the blocking rest surface that's gone.
-// Presentational: the real screen wires onSkip; the showcase passes a stub.
-export function RestPill({ seconds = 0, onSkip }) {
+// WorkoutPill (req-186, DEC-103 §3; was RestPill, req-78) — one floating pill for the
+// whole workout. Resting: the rest clock + "set N/M"; rest over (or none armed): "GO" +
+// "set N/M", set apart by .ui-restpill--go (a pulse; static under reduced motion). The
+// whole pill is one tap-target that opens the current exercise — it no longer skips the
+// rest (that moved to "Skip rest" on the exercise screen). Presentational: the real
+// screen wires onOpen; the showcase passes a stub.
+export function WorkoutPill({ clock = null, setText = '', go = false, onOpen }) {
+  const lead = go ? 'GO' : clock
   return (
     <button
       type="button"
-      className="ui-restpill"
-      onClick={onSkip}
-      aria-label={`Rest ${seconds} seconds — tap to skip`}
+      className={cx('ui-restpill', go && 'ui-restpill--go')}
+      onClick={onOpen}
+      aria-label={`${go ? 'Go' : `Rest ${clock}`}, ${setText} — open the exercise`}
     >
-      <span className="ui-restpill__time">{seconds}s</span>
-      <span className="ui-restpill__skip">rest · skip</span>
+      <span className="ui-restpill__time">{lead}</span>
+      <span className="ui-restpill__sep" aria-hidden="true">
+        ·
+      </span>
+      <span className="ui-restpill__set">{setText}</span>
     </button>
   )
 }
@@ -412,6 +416,11 @@ export function SetLogForm({
   onSkip,
   onPrevious,
   onChange,
+  // req-186 (DEC-103 §4) — `viewing`: the form shows a set already logged (Previous). The
+  // bar becomes Previous (if `canGoBack`) · Next (secondary → onNext); once a field is
+  // changed the forward button is Save (primary, submits → onComplete with the values).
+  viewing = false,
+  onNext,
 }) {
   const [weight, setWeight] = useState(initialWeight)
   const [reps, setReps] = useState(initialReps)
@@ -426,8 +435,11 @@ export function SetLogForm({
   // values, so the caller can keep a draft of the un-logged set. It fires from the edit
   // itself (not an effect), so mounting or remounting writes nothing. `durationSec` is the
   // typed seconds as entered, present only on a timed form.
+  // req-186 — any edit while `viewing` a logged set turns Next into Save.
+  const [edited, setEdited] = useState(false)
   function edit(field, value) {
     const next = { weight, reps, effort, duration, [field]: value }
+    setEdited(true)
     if (field === 'weight') {
       setWeight(value)
       setWeightError(null)
@@ -450,6 +462,11 @@ export function SetLogForm({
       className="ui-setlog"
       onSubmit={(e) => {
         e.preventDefault()
+        // req-186 — viewing a logged set with nothing changed: the forward action is Next.
+        if (viewing && !edited) {
+          onNext?.()
+          return
+        }
         const error = weighted ? kgError(weight) : null
         // req-155 — a blank Duration logs 0 s, as before; unreadable text logs nothing.
         const seconds = timed ? secondsToSave(duration, 0) : null
@@ -521,10 +538,24 @@ export function SetLogForm({
           between (it neither logs nor retreats). Markup order = visual/focus order. */}
       <div className="ui-setlog__actions">
         {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
-        <Button onClick={onSkip}>Skip</Button>
-        <Button type="submit" variant="primary">
-          Complete
-        </Button>
+        {viewing ? (
+          edited ? (
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={onNext}>
+              Next
+            </Button>
+          )
+        ) : (
+          <>
+            <Button onClick={onSkip}>Skip</Button>
+            <Button type="submit" variant="primary">
+              Complete
+            </Button>
+          </>
+        )}
       </div>
     </form>
   )

@@ -670,9 +670,42 @@ a.ui-btn--quiet:active {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.ui-restpill__skip {
-  font-size: var(--ui-text-caption);
-  opacity: 0.75;
+/* req-186 (DEC-103 §3) — the pill is the workout pill: "1:12 · set 2/4" / "GO · set 2/4".
+ * The set count is body size and bold (F9: "make the 1 of 3 bigger"), not a caption. */
+.ui-restpill__sep {
+  font-size: var(--ui-text-body);
+  opacity: 0.6;
+}
+.ui-restpill__set {
+  font-size: var(--ui-text-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* Rest over: GO. Grayscale only (DEC-017), so "glowing" is a pulsing halo ring and a
+ * light/dark breathe on the fill rather than a hue. The ring is a box-shadow (no layout
+ * change, so the --ui-restpill-h reserve still holds) and stays within the s2 gap. */
+.ui-restpill--go {
+  animation: ui-restpill-go 1.4s ease-in-out infinite;
+}
+@keyframes ui-restpill-go {
+  0%,
+  100% {
+    background: var(--ui-ink);
+    box-shadow: 0 0 0 0 rgba(28, 28, 28, 0.55);
+  }
+  50% {
+    background: #444444;
+    box-shadow: 0 0 0 6px rgba(28, 28, 28, 0);
+  }
+}
+/* Reduced motion: no pulse — a static, high-contrast double ring marks GO instead. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-restpill--go {
+    animation: none;
+    box-shadow:
+      0 0 0 2px var(--ui-bg),
+      0 0 0 4px var(--ui-ink);
+  }
 }
 
 /* ---- SetLogForm (molecule) ---- */
@@ -795,6 +828,35 @@ a.ui-btn--quiet:active {
   line-height: 1.5;
   color: var(--ui-ink-2);
   font-variant-numeric: tabular-nums;
+}
+/* req-186 (DEC-103 §4) — the list stays all exercise. Each row: a tick column, then the
+ * text. Done rows read as logged (ink + ✓); the row on screen (the current set, or the
+ * logged set Previous is showing) is set apart by a fill and weight — never by hue. */
+.ui-setpreview__row {
+  display: flex;
+  gap: var(--ui-s1);
+  padding: 0 var(--ui-s2);
+  border-radius: var(--ui-radius);
+}
+.ui-setpreview__mark {
+  flex: 0 0 1.2em;
+}
+.ui-setpreview__row.is-done,
+.ui-setpreview__row.is-current {
+  color: var(--ui-ink);
+}
+.ui-setpreview__row.is-here {
+  background: var(--ui-fill);
+  color: var(--ui-ink);
+  font-weight: 700;
+}
+.ui-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 /* req-78 — the req-27 ".ui-upcoming" rest panel was removed with its RestUpcoming

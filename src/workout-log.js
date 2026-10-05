@@ -721,7 +721,11 @@ export function durationTargetFor(item, ex, workIndex) {
 // caller's historySetPrefill bound to the exercise's last finished sets (a callback so
 // this module stays free of storage.js). Timed work sets carry their target seconds
 // in place of reps, as the form does.
-export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides }) {
+// req-186 — `workLogged` (optional) is this item's logged work sets this session: when
+// given, an upcoming work set's kg follows the same in-session carry its form will use
+// (carryForSet — DEC-002 / req-152; still below the routine kg). Absent = the req-106
+// start-of-exercise preview (nothing logged, no carry), as before.
+export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides, workLogged = null }) {
   const overrides = seedOverrides || {}
   const slots = []
   if (item?.warmup) slots.push({ setType: 'wu', workIndex: 0 })
@@ -733,7 +737,7 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
       restore: null,
       hasHistory,
       history: historyFor({ setType, workIndex }),
-      carry: null,
+      carry: workLogged ? carryForSet(setType, workLogged) : null,
       target: setTargetFor(item, setType, workIndex),
       override: overrides[seedOverrideKey(item.exerciseId, setType)],
       routineKg: routineKgFor(item, setType, workIndex),
@@ -758,6 +762,132 @@ export function setPreviewText({ label, weight, reps, durationSec }, weighted) {
   const amount = durationSec != null ? `${durationSec}s` : reps || '—'
   const body = weighted ? `${weight ? `${weight} kg` : '—'} × ${amount}` : amount
   return `${label} · ${body}`
+}
+
+// req-186 (DEC-103 §4) — the log screen's set list, kept for the whole exercise. One row
+// per set of the item (warm-up first), each:
+//   done     → what was LOGGED (a skipped set reads "skipped"), `setIndex` = its index in
+//              workout.sets;
+//   current  → the set the form is on; upcoming → not reached yet. Both show what that
+//              set's form would prefill (setPreview, with the in-session carry), so a
+//              blank kg stays "—" (DESIGN §1).
+// `highlighted` marks the one row the screen is on: the current set, or — while Previous
+// is showing a logged set (`viewingIndex`, an index into workout.sets) — that set.
+export function setListRows({ workout, item, ex, weighted, hasHistory, historyFor, viewingIndex = null }) {
+  const state = itemLoggingState(workout, item)
+  const sets = workout?.sets || []
+  const wuSet = state.logged.find((set) => set.setType === 'wu') || null
+  const currentSlot = state.plannedDone ? null : state.needsWu ? 'wu|0' : `work|${state.currentWorkIndex}`
+  const slots = setPreview({
+    item,
+    ex,
+    weighted,
+    hasHistory,
+    historyFor,
+    seedOverrides: workout?.seedOverrides,
+    workLogged: state.workLogged,
+  })
+  return slots.map((slot) => {
+    const logged = slot.setType === 'wu' ? wuSet : state.workLogged[slot.workIndex] || null
+    if (logged) {
+      const setIndex = sets.indexOf(logged)
+      return {
+        key: `${slot.setType}|${slot.workIndex}`,
+        status: 'done',
+        setIndex,
+        text: loggedSetRowText(slot.label, logged, weighted),
+        highlighted: viewingIndex != null && viewingIndex === setIndex,
+      }
+    }
+    const key = `${slot.setType}|${slot.workIndex}`
+    const status = key === currentSlot ? 'current' : 'upcoming'
+    return {
+      key,
+      status,
+      setIndex: -1,
+      text: slot.text,
+      highlighted: viewingIndex == null && status === 'current',
+    }
+  })
+}
+
+// req-186 — a done row: the logged values in the preview's own shape ("1 · 20 kg × 8").
+export function loggedSetRowText(label, set, weighted) {
+  if (isSkippedSet(set)) return `${label} · skipped`
+  const durationSec = set?.durationSec != null && set.durationSec !== '' ? Number(set.durationSec) : null
+  const weight = set?.weight != null && Number(set.weight) !== 0 ? String(set.weight) : ''
+  return setPreviewText({ label, weight, reps: set?.reps != null ? String(set.reps) : '', durationSec }, weighted)
+}
+
+// req-186 (DEC-103 §3) — the workout pill's "current exercise". Review fix 1 — rule:
+//   - nothing LOGGED (no non-skipped set; loggedSetCount's meaning, DEC-058 §4) → null:
+//     a Skip exercise / Swap alone writes only skipped records and shows no pill;
+//   - the item of the most recent set record (completeSet appends), if it isn't done —
+//     a set-level Skip on an exercise in progress keeps it current;
+//   - that item done AND its last record skipped AND a replacement (addedMidWorkout)
+//     sits right after it in the snapshot (replaceItemPatch inserts it there) and isn't
+//     done → the replacement: a Swap points the pill at the swapped-in exercise;
+//   - else the item of the most recent NON-skipped set, if it isn't done (a Skip
+//     exercise on B doesn't pull the pill back to an untouched A while C is in progress);
+//   - else the first not-done item in snapshot order. All done → null.
+// "Done" is the overview's test: marked done, or every planned set logged.
+export function currentWorkoutItem(workout) {
+  const items = workout?.snapshot?.items || []
+  const sets = workout?.sets || []
+  if (!sets.some((set) => !isSkippedSet(set))) return null
+  const done = (item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone
+  const last = sets[sets.length - 1]
+  const at = items.findIndex((item) => setsForItem([last], item).length > 0)
+  const owner = at >= 0 ? items[at] : null
+  if (owner && !done(owner)) return owner
+  const next = at >= 0 ? items[at + 1] : null
+  if (owner && isSkippedSet(last) && next && isAddedMidWorkout(next) && !done(next)) return next
+  const lastReal = sets.findLast((set) => !isSkippedSet(set))
+  const realOwner = items.find((item) => setsForItem([lastReal], item).length > 0)
+  if (realOwner && !done(realOwner)) return realOwner
+  return items.find((item) => !done(item)) || null
+}
+
+// req-186 — "set N/M" for an item: the set the log form is on, counting a warm-up as a
+// set (the counting of item.jsx setProgressLabel, which this replaces; the title no longer
+// shows it). Clamped to M once every set is logged.
+export function itemSetPosition(workout, item) {
+  const state = itemLoggingState(workout, item)
+  const hasWu = Boolean(item?.warmup)
+  const total = (hasWu ? 1 : 0) + state.workCount
+  const current = state.needsWu ? 1 : Math.min(total, (hasWu ? 1 : 0) + state.currentWorkIndex + 1)
+  return { current, total }
+}
+
+// req-186 — the pill's rest clock: whole seconds ("45s") under a minute, m:ss ("1:12")
+// from 60 s.
+export function restClockText(seconds) {
+  const sec = Math.max(0, Math.ceil(Number(seconds) || 0))
+  if (sec < 60) return `${sec}s`
+  const m = Math.floor(sec / 60)
+  const s = sec % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+// req-186 — everything the workout pill shows, pure: null when there's no current
+// exercise; else the item, "set N/M", and either the rest clock (resting) or GO.
+export function workoutPillState(workout, now) {
+  const item = currentWorkoutItem(workout)
+  if (!item) return null
+  const { current, total } = itemSetPosition(workout, item)
+  const { remainingMs, resting } = restRemaining(workout, now)
+  const setText = `set ${current}/${total}`
+  const clock = resting ? restClockText(remainingMs / 1000) : null
+  return {
+    item,
+    current,
+    total,
+    resting,
+    go: !resting,
+    clock,
+    setText,
+    label: resting ? `${clock} · ${setText}` : `GO · ${setText}`,
+  }
 }
 
 // req-25 — the rest-patch decision, made pure so "when does rest run after a set"
