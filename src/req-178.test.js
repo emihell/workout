@@ -399,7 +399,10 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
   })
   // req-182 (sanctioned edit) — the offer's words: "You lifted … · routine says …", "Save to Day A",
   // then "Saved to Day A."; on the summary an open offer stops the countdown.
-  it('routine kg 50, history 40 → set 1 shows 50; log 55 → overview offers "Save to Day A" → routine 55', async () => {
+  // req-187 (sanctioned edit) — the offer is now the ConfirmSheet on the exercise's last Complete
+  // (DEC-103 §1), not a row on the overview / summary: mounted beside the screen, answered with
+  // "Update routine". The data checks (routine 55, then 32.5, Day A's other item untouched) stay.
+  it('routine kg 50, history 40 → set 1 shows 50; log 55 → the sheet → Update routine → routine 55', async () => {
     const ex = (id, name) => ({ id, name, type: 'machine', equipment: 'Machine', weightStep: 'n/a', muscles: '', cues: '' })
     const state = {
       ...emptyState(),
@@ -424,6 +427,8 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     const { Workout } = await importJsx('./views/workout/overview.jsx', import.meta.url)
+    const { ConfirmSheet } = await importJsx('./ui/index.jsx', import.meta.url)
+    const { getPendingConfirm } = await import('./ui/confirm.js')
     const captured = {}
     function Screen({ child }) {
       // oxlint-disable-next-line react/immutability
@@ -432,7 +437,7 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     }
     const mount = async (child) => {
       await view?.unmount()
-      view = await render(h(StoreProvider, null, h(Screen, { child })))
+      view = await render(h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet)))
     }
     await mount(null)
     await act(async () => captured.store.startWorkout('dayA'))
@@ -441,23 +446,22 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     await view.type(view.input('kg'), '55')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'dayA' }))
-    assert.match(view.text(), /You lifted 55 kg · routine says 50 kg/)
-    assert.ok(view.button('Save to Day A'))
-    // Leg Curl not done yet: no offer for it.
-    assert.equal(view.all('button').filter((b) => b.textContent.startsWith('Save to')).length, 1)
-    await view.click(view.button('Save to Day A'))
+    assert.match(view.text(), /You lifted 55 kg · Day A says 50 kg/)
+    await view.click(view.button('Update routine'))
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
     const saved = () => JSON.parse(localStorage.getItem('workout-mvp-v9')).routines[0].exercises
     assert.deepEqual(saved()[0].suggestedWeights, [55])
-    assert.equal(view.button('Save to Day A'), null, 'button gone once saved')
-    assert.match(view.text(), /Saved to Day A\./)
-    // The last exercise: done → the auto-finish summary shows (not the list), and carries its offer.
+    assert.equal(getPendingConfirm(), null, 'sheet answered')
+    assert.equal(view.text().includes('You lifted'), false, 'no inline offer on the overview')
+    // The last exercise: its sheet first, then the auto-finish summary (not the list).
     await mount(h(WorkoutItemLog, { routineId: 'dayA', itemId: 'ib' }))
     await view.type(view.input('kg'), '32,5')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'dayA' }))
+    assert.match(view.text(), /You lifted 32\.5 kg · Day A says 30 kg/)
+    await view.click(view.button('Update routine'))
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
     assert.match(view.text(), /Great job!/)
-    assert.match(view.text(), /You lifted 32\.5 kg · routine says 30 kg/)
-    await view.click(view.button('Save to Day A'))
     assert.deepEqual(saved()[1].suggestedWeights, [32.5])
     assert.deepEqual(saved()[0].suggestedWeights, [55])
   })

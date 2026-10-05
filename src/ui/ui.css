@@ -924,6 +924,13 @@ a.ui-btn--quiet:active {
     calc(var(--ui-s4) + env(safe-area-inset-bottom, 0px)) calc(var(--ui-s3) + env(safe-area-inset-left, 0px));
   font-family: var(--ui-font);
 }
+/* req-187 — the optional bold first line (the routine-kg sheet's "Update {exercise}?"). */
+.ui-sheet__title {
+  margin: 0 0 var(--ui-s2);
+  font-size: var(--ui-text-body);
+  font-weight: 600;
+  color: var(--ui-ink);
+}
 .ui-sheet__message {
   margin: 0 0 var(--ui-s4);
   font-size: var(--ui-text-body);

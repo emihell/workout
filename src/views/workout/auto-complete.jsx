@@ -6,8 +6,6 @@ import { defaultBeep } from '../../rest-cue.js'
 import { summaryPriorWorkout, workoutSummaryStats } from '../../history-queries.js'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
-import { routineUpdateOffer } from '../../routine-update-offer.js'
-import { RoutineUpdateOffer } from './routine-offer'
 
 // req-84 — auto-complete a finished routine. When every exercise is done the overview
 // mounts this instead of the list: a "great job" summary (volume/duration/sets, each
@@ -26,6 +24,11 @@ import { RoutineUpdateOffer } from './routine-offer'
 // (a deadline + 250ms tick, the useRestCountdown pattern) — never the persisted
 // restEndsAt, which carries pause/skip semantics.
 
+// req-187 (DEC-103 §1) — no "Update your routine?" section here any more (req-178/182 put
+// one in, and req-182 held the countdown while it was open). The routine-kg confirm is a
+// sheet on the last exercise's last Complete, answered before this summary mounts (the
+// overview waits for the sheet), so the countdown always runs.
+
 const COUNTDOWN_MS = 10000
 
 function signed(n) {
@@ -39,13 +42,6 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   const [deadline] = useState(() => Date.now() + COUNTDOWN_MS)
   const [now, setNow] = useState(() => Date.now())
   const committedRef = useRef(false)
-  // req-182 — the items with an "update routine" offer, captured at mount: while any is
-  // shown there is no countdown (Sam ran out of time reading them), and the rows stay
-  // listed after a tap so each shows its "Saved to …" confirmation.
-  const [offered] = useState(() =>
-    (active?.snapshot?.items || []).filter((item) => routineUpdateOffer(active, store.routines, item)),
-  )
-  const waiting = offered.length > 0
   const [stats] = useState(() => {
     const prior = summaryPriorWorkout(active, store.workouts, store.routines)
     return workoutSummaryStats(active, prior, mountNow)
@@ -65,7 +61,6 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   }
 
   useEffect(() => {
-    if (waiting) return undefined
     const t = setInterval(() => {
       const n = Date.now()
       setNow(n)
@@ -75,9 +70,9 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
       }
     }, 250)
     return () => clearInterval(t)
-    // deadline and waiting are set once; commit closes over stable store/active. Run-once interval.
+    // deadline is set once; commit closes over stable store/active. Run-once interval.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deadline, waiting])
+  }, [deadline])
 
   const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
   const name = active?.snapshot?.routineName || 'Workout'
@@ -99,29 +94,11 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
           </Row>
         ))}
       </List>
-      {/* req-178 — the last exercise's "update routine" offer would otherwise never show:
-          once every exercise is done the overview is this summary. Finish still never
-          writes the routine itself (DEC-056). req-182 — with an offer there is no countdown:
-          Finish (the countdown's own commit) is the primary action instead. */}
-      {waiting ? (
-        <>
-          <SectionHeader>Update your routine?</SectionHeader>
-          <List>
-            {offered.map((item) => (
-              <RoutineUpdateOffer key={item.routineItemId || item.id} store={store} active={active} item={item} />
-            ))}
-          </List>
-          <Button variant="primary" block onClick={commit}>
-            Finish
-          </Button>
-        </>
-      ) : (
-        <p className="ui-sub" aria-live="polite">
-          Finishing in {secondsLeft}s…
-        </p>
-      )}
+      <p className="ui-sub" aria-live="polite">
+        Finishing in {secondsLeft}s…
+      </p>
       <Button
-        variant={waiting ? 'secondary' : 'primary'}
+        variant="primary"
         block
         onClick={() => {
           recordButton('auto-finish-edit')

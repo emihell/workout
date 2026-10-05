@@ -6,7 +6,7 @@
 import { isWeightedType } from './ids.js'
 import { routineById } from './model.js'
 import { isSkippedSet } from './set-rules.js'
-import { itemKey, setsForItem } from './workout-log.js'
+import { itemKey, setsForItem, withLoggedSet } from './workout-log.js'
 
 // Two kg lists equal as numbers (0 / '' / missing = no weight) and in length.
 export function sameKgList(a, b) {
@@ -52,4 +52,35 @@ export function offerText(offer) {
   const routineHasKg = (offer.from || []).some((kg) => Number(kg) > 0)
   const lifted = `You lifted ${kgListText(offer.to)} kg`
   return routineHasKg ? `${lifted} · routine says ${kgListText(offer.from)} kg` : `${lifted} · not in the routine yet`
+}
+
+// req-187 (DEC-103 §1) — the call site's decision: on the set that FINISHES an exercise,
+// the offer with that set included (the store's own withLoggedSet, so it is the list the
+// store will hold), else null. Not the finishing set → null: no sheet mid-exercise.
+// routineUpdateOffer itself is unchanged; this only feeds it the post-Complete workout.
+export function offerOnFinishingSet(active, routines, item, setRecord, finishes) {
+  if (!finishes || !active) return null
+  return routineUpdateOffer(withLoggedSet(active, setRecord), routines, item)
+}
+
+// "25" when every set has the same kg, else the per-set list ("25/25/22.5", "—" = none).
+function kgSummary(list) {
+  const values = (list || []).map((value) => (Number(value) > 0 ? Number(value) : 0))
+  if (values.length > 0 && values[0] > 0 && values.every((value) => value === values[0])) return String(values[0])
+  return kgListText(list)
+}
+
+// req-187 — the sheet's words (unconfirmed wording): title "Update Bench Press?", body
+// "You lifted 25 kg · Upper body says 20 kg" (or "… · not in Upper body yet"), and the
+// buttons [Keep 20 kg] (or [Keep blank] when the routine has no kg) · [Update routine].
+export function offerSheetText(offer, exercise) {
+  const routineHasKg = (offer.from || []).some((kg) => Number(kg) > 0)
+  const routine = offer.routineName || 'the routine'
+  const lifted = `You lifted ${kgSummary(offer.to)} kg`
+  return {
+    title: `Update ${exercise || 'exercise'}?`,
+    body: routineHasKg ? `${lifted} · ${routine} says ${kgSummary(offer.from)} kg` : `${lifted} · not in ${routine} yet`,
+    keepLabel: routineHasKg ? `Keep ${kgSummary(offer.from)} kg` : 'Keep blank',
+    updateLabel: 'Update routine',
+  }
 }

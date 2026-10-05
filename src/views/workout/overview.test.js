@@ -49,7 +49,8 @@ test('a block-styled anchor fits its container (border-box on .ui-btn--block)', 
 // styles Finish; the mount-local autoDismissed state is gone (the flag is persisted).
 test('one allDone test gates both the summary and the Finish style', () => {
   assert.match(workout, /const allDone = allItemsDone\(active\)/)
-  assert.match(workout, /if \(autoCompleteArmed\(active\)\)/)
+  // req-187 (sanctioned edit) — the summary also waits while a sheet (the routine-kg confirm) is open.
+  assert.match(workout, /if \(autoCompleteArmed\(active\) && !sheetOpen\)/)
   assert.doesNotMatch(workout, /autoDismissed/)
   assert.match(workout, /onCancel=\{\(\) => store\.patchActive\(\{ autoFinishDismissed: true \}\)\}/)
   assert.doesNotMatch(workout, /items\.every\(/)

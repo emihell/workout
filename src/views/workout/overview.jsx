@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, useSyncExternalStore } from 'react'
 import { roleTag } from '../../ids'
 import { go, withFrom } from '../../route'
 import { finishedForPlan } from '../../current-workout'
@@ -15,7 +15,7 @@ import { MissingItem, NotInWorkout } from './helpers'
 import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
 import { WorkoutPill } from './rest'
-import { RoutineUpdateOffer } from './routine-offer'
+import { getPendingConfirm, subscribeConfirm } from '../../ui/confirm.js'
 
 // req-93 — the exercise's label in the in-workout list. Main is the default and the
 // substance of the session, so it shows the name only, BOLD, with no "— Main". Non-main
@@ -39,6 +39,9 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   // req-107 — the "Add note" reveal (req-26/req-80 pattern). Tapping opens the field
   // for this mount; once the note has text it stays shown on every visit.
   const [noteOpen, setNoteOpen] = useState(false)
+  // req-187 — while a sheet is open (the routine-kg confirm from the last Complete) the
+  // auto-complete summary waits: its countdown starts once the sheet is answered.
+  const sheetOpen = useSyncExternalStore(subscribeConfirm, getPendingConfirm, getPendingConfirm) != null
   const routine = routineById(store.routines, routineId)
   const active = store.activeWorkout
   const mine = isActiveFor(active, routineId)
@@ -135,7 +138,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
   // and Edit set the persisted autoFinishDismissed flag, so Back from Finish (a remount)
   // and a reload no longer re-arm the countdown.
   const allDone = allItemsDone(active)
-  if (autoCompleteArmed(active)) {
+  if (autoCompleteArmed(active) && !sheetOpen) {
     return (
       <AutoCompleteSummary
         routineId={routineId}
@@ -167,8 +170,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
                     logged set and it reads done (derived from the sets, no marker). */}
                 {completed ? (itemAllSkipped(active, item) ? ' · skipped' : ' · done') : ''}
               </Row>
-              {/* req-178 — after the exercise's last set: carry today's kg back, on a tap. */}
-              {completed ? <RoutineUpdateOffer store={store} active={active} item={item} /> : null}
+              {/* req-187 — no inline routine-kg offer here any more: it is a sheet on the
+                  exercise's last Complete (item.jsx askRoutineUpdate). */}
             </Fragment>
           )
         })}

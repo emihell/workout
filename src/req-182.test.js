@@ -31,8 +31,11 @@ describe('req-182 §1 — the offer text', () => {
   })
 })
 
-describe('req-182 AC1 — the overview offer, rendered against the real store', () => {
-  it('Chest Press, routine [30], logged [32.5] → named, plain words, "Save to Full body A" → "Saved to Full body A.", v9 [32.5]', async () => {
+// req-187 (sanctioned edit) — the overview offer row is gone (DEC-103 §1): the offer is the
+// ConfirmSheet on the exercise's last Complete. Was: a "Save to Full body A" row → "Saved to …".
+// Kept: the exercise is named, plain words, and the tap writes v9 [32.5].
+describe('req-182 AC1 (req-187) — the offer, rendered against the real store', () => {
+  it('Chest Press, routine [30], logged [32.5] → sheet "Update Chest Press?" names the routine → Update routine → v9 [32.5]; no overview row', async () => {
     const ex = (id, name) => ({ id, name, type: 'machine', equipment: 'Machine', weightStep: 'n/a', muscles: '', cues: '' })
     const state = {
       ...emptyState(),
@@ -46,6 +49,7 @@ describe('req-182 AC1 — the overview offer, rendered against the real store', 
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     const { Workout } = await importJsx('./views/workout/overview.jsx', import.meta.url)
+    const { ConfirmSheet } = await importJsx('./ui/index.jsx', import.meta.url)
     const captured = {}
     function Screen({ child }) {
       // oxlint-disable-next-line react/immutability
@@ -54,7 +58,7 @@ describe('req-182 AC1 — the overview offer, rendered against the real store', 
     }
     const mount = async (child) => {
       await view?.unmount()
-      view = await render(h(StoreProvider, null, h(Screen, { child })))
+      view = await render(h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet)))
     }
     await mount(null)
     await act(async () => captured.store.startWorkout('fba'))
@@ -62,13 +66,13 @@ describe('req-182 AC1 — the overview offer, rendered against the real store', 
     await view.type(view.input('kg'), '32,5')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'fba' }))
-    const offer = view.all('li').find((li) => li.textContent.includes('You lifted'))
-    assert.ok(offer, 'an offer row')
-    assert.equal(offer.querySelector('.ui-row__stack > span').textContent, 'Chest Press', 'names the exercise first')
-    assert.match(offer.textContent, /You lifted 32\.5 kg · routine says 30 kg/)
-    await view.click(view.button('Save to Full body A'))
-    assert.match(view.text(), /Saved to Full body A\./)
-    assert.equal(view.button('Save to Full body A'), null)
+    const sheet = view.all('[role="alertdialog"]')[0]
+    assert.ok(sheet, 'the sheet')
+    assert.equal(sheet.querySelector('.ui-sheet__title').textContent, 'Update Chest Press?', 'names the exercise')
+    assert.equal(sheet.querySelector('.ui-sheet__message').textContent, 'You lifted 32.5 kg · Full body A says 30 kg')
+    await view.click(view.button('Update routine'))
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
+    assert.equal(view.all('li').some((li) => li.textContent.includes('You lifted')), false, 'no overview offer row')
     assert.deepEqual(JSON.parse(localStorage.getItem('workout-mvp-v9')).routines[0].exercises[0].suggestedWeights, [32.5])
   })
 })
@@ -95,26 +99,23 @@ function summaryProps({ offers }) {
   return { props: { routineId: 'fba', active, store, onCancel: () => {} }, calls }
 }
 
-describe('req-182 AC3/AC4 — auto-finish waits while an offer is open', () => {
-  it('with offers: no "Finishing in"; 15 s later nothing committed; Finish commits exactly once; two exercises named', async () => {
+// req-187 (sanctioned edit) — the summary no longer lists offers or holds the countdown (the
+// sheet on the last Complete replaced both, DEC-103 §1). Was: with offers, no countdown, a
+// Finish button, two named offer rows. Now: the same offers-present workout counts down and
+// commits at 0 like any other, with no "Update your routine?" section and no write to the routine.
+describe('req-182 AC3/AC4 (req-187) — the summary never waits on an offer', () => {
+  it('with differing kg: "Finishing in 10s…", no offer section, commits at 0, routine never written', async () => {
     mock.timers.enable({ apis: ['setInterval', 'Date'], now: new Date(2026, 8, 26, 10, 0) })
     const { AutoCompleteSummary } = await importJsx('./views/workout/auto-complete.jsx', import.meta.url)
     const { props, calls } = summaryProps({ offers: true })
     view = await render(h(AutoCompleteSummary, props))
-    assert.equal(view.text().includes('Finishing in'), false)
-    // AC4 — two offers, two different exercises.
-    const offers = view.all('li').filter((li) => li.textContent.includes('You lifted'))
-    assert.deepEqual(offers.map((li) => li.querySelector('.ui-row__stack > span').textContent), ['Chest Press', 'Seated Row'])
-    assert.match(offers[1].textContent, /not in the routine yet/)
-    await act(async () => mock.timers.tick(15000))
-    assert.equal(calls.finish, 0, 'nothing committed after 15 s')
-    await view.click(view.button('Save to Full body A'))
-    assert.equal(calls.updates.length, 1)
-    assert.match(view.text(), /Saved to Full body A\./)
-    const finish = view.button('Finish')
-    await view.click(finish)
-    await view.click(finish)
-    assert.equal(calls.finish, 1, 'committed exactly once')
+    assert.match(view.text(), /Finishing in 10s…/)
+    assert.equal(view.text().includes('Update your routine?'), false)
+    assert.equal(view.text().includes('You lifted'), false)
+    assert.equal(view.button('Finish'), null)
+    await act(async () => mock.timers.tick(10250))
+    assert.equal(calls.finish, 1)
+    assert.equal(calls.updates.length, 0)
   })
 
   it('failure case — no offers: the countdown still commits at 0 (req-116 unchanged)', async () => {

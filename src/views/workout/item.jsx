@@ -40,6 +40,8 @@ import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, item
 import { SkipRest, WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
+import { askConfirm } from '../../ui/confirm.js'
+import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
 
 // req-109 — how long an armed "Skip exercise" waits for its second tap.
 const SKIP_EXERCISE_ARM_MS = 3000
@@ -94,6 +96,25 @@ function ExerciseSetupHeader({ item, ex, showNotes = true }) {
 function markDoneAndGoToOverview(store, workout, routineId, item) {
   store.patchActive(markItemDonePatch(workout, item))
   go(`/workout/${routineId}`, { replace: true })
+}
+
+// req-187 (DEC-103 §1) — the routine-kg confirm, opened on the set that finishes the
+// exercise when its kg differs from the routine (offerOnFinishingSet). It is the one
+// ConfirmSheet with `stayOn` the overview, so the navigation there (markDoneAndGoToOverview,
+// called first) does not dismiss it. Update → store.applyRoutineUpdate (the existing write
+// path); Keep / backdrop / Escape / any other navigation → nothing written. Rest is
+// untouched either way: it was armed by store.completeSet before this opens.
+function askRoutineUpdate(store, routineId, item, offer) {
+  const text = offerSheetText(offer, exerciseName(item))
+  askConfirm(text.body, {
+    title: text.title,
+    confirmLabel: text.updateLabel,
+    cancelLabel: text.keepLabel,
+    stayOn: `/workout/${routineId}`,
+  }).then((update) => {
+    recordButton(update ? 'routine-update-apply' : 'routine-update-keep')
+    if (update) store.applyRoutineUpdate(offer)
+  })
 }
 
 export function WorkoutItemLog({ routineId, itemId }) {
@@ -232,28 +253,33 @@ function WorkoutItemLive({ routineId, item }) {
       // req-154 — the parsed kg, not the typed text: `22,5` must compare (and carry) as 22.5.
       logged: { weight: loggedWeight, reps },
     })
-    store.completeSet(
-      {
-        routineItemId: itemKey(item),
-        exerciseId: item.exerciseId,
-        setType: currentType,
-        weight: loggedWeight,
-        reps: reps || '',
-        // req-85 — a timed work set logs seconds in place of reps; only set when present.
-        // req-155 — already whole seconds from SetLogForm (seconds-input.js).
-        ...(durationSec != null ? { durationSec } : {}),
-        rpe: rpe ? Number(rpe) : null,
-        note,
-        targetReps: target || '',
-        targetWeight:
-          currentType === 'work' && item.suggestedWeights?.[currentWorkIndex] != null
-            ? item.suggestedWeights[currentWorkIndex]
-            : null,
-      },
-      { ...restAfterSet(), seedOverrides },
-      { draftKey: setSeedKey },
-    )
-    if (done) markDoneAndGoToOverview(store, active, routineId, item)
+    const setRecord = {
+      routineItemId: itemKey(item),
+      exerciseId: item.exerciseId,
+      setType: currentType,
+      weight: loggedWeight,
+      reps: reps || '',
+      // req-85 — a timed work set logs seconds in place of reps; only set when present.
+      // req-155 — already whole seconds from SetLogForm (seconds-input.js).
+      ...(durationSec != null ? { durationSec } : {}),
+      rpe: rpe ? Number(rpe) : null,
+      note,
+      targetReps: target || '',
+      targetWeight:
+        currentType === 'work' && item.suggestedWeights?.[currentWorkIndex] != null
+          ? item.suggestedWeights[currentWorkIndex]
+          : null,
+    }
+    store.completeSet(setRecord, { ...restAfterSet(), seedOverrides }, { draftKey: setSeedKey })
+    if (done) finishExercise(setRecord)
+  }
+
+  // req-187 — the set that finishes the exercise: the overview as before, then (only when
+  // the logged kg differs from the routine) the routine-kg sheet over it.
+  function finishExercise(setRecord) {
+    const offer = offerOnFinishingSet(active, store.routines, item, setRecord, true)
+    markDoneAndGoToOverview(store, active, routineId, item)
+    if (offer) askRoutineUpdate(store, routineId, item, offer)
   }
 
   function skipSet() {
@@ -261,23 +287,22 @@ function WorkoutItemLive({ routineId, item }) {
     draftWriter.cancel()
     setSkipArmed(false)
     const done = finishAfterThisSet()
-    store.completeSet(
-      {
-        routineItemId: itemKey(item),
-        exerciseId: item.exerciseId,
-        setType: currentType,
-        weight: 0,
-        reps: 'skipped',
-        rpe: null,
-        note: 'skipped',
-        targetReps: target || '',
-        targetWeight:
-          currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
-      },
-      restAfterSet(true),
-      { draftKey: setSeedKey },
-    )
-    if (done) markDoneAndGoToOverview(store, active, routineId, item)
+    const setRecord = {
+      routineItemId: itemKey(item),
+      exerciseId: item.exerciseId,
+      setType: currentType,
+      weight: 0,
+      reps: 'skipped',
+      rpe: null,
+      note: 'skipped',
+      targetReps: target || '',
+      targetWeight:
+        currentType === 'work' ? item.suggestedWeights?.[currentWorkIndex] ?? null : null,
+    }
+    store.completeSet(setRecord, restAfterSet(true), { draftKey: setSeedKey })
+    // req-187 — skipping the last set also finishes the exercise: the sheet offers the kg of
+    // the sets that were logged (the skipped one keeps the routine's kg, routineUpdateOffer).
+    if (done) finishExercise(setRecord)
   }
 
   // req-186 (DEC-103 §4) — Previous VIEWS a logged set; it no longer un-logs it (was

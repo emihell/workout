@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
-import { answerConfirm, getPendingConfirm, subscribeConfirm } from './confirm.js'
+import { answerConfirm, getPendingConfirm, navigationCancels, subscribeConfirm } from './confirm.js'
 import { kgError, readKg } from '../kg-input.js'
 import { kgHints } from '../kg-hints.js'
 import { readSeconds, secondsToSave } from '../seconds-input.js'
@@ -250,6 +250,8 @@ export function Banner({ children, role = 'status' }) {
 // backdrop with the message, [Cancel] left and the destructive button right (DESIGN §4
 // order; ink-filled so it reads distinct, grayscale per DEC-017). Cancel is focused, so a
 // stray Enter never destroys. Backdrop tap, Escape and any navigation all cancel.
+// req-187 — optional bold title, a custom cancel label, and `stayOn` (a navigation to that
+// path does not cancel). The routine-kg sheet uses all three.
 export function ConfirmSheet() {
   const pending = useSyncExternalStore(subscribeConfirm, getPendingConfirm, getPendingConfirm)
   const cancelRef = useRef(null)
@@ -259,7 +261,10 @@ export function ConfirmSheet() {
     const onKey = (e) => {
       if (e.key === 'Escape') answerConfirm(false)
     }
-    const onHash = () => answerConfirm(false)
+    // req-187 — a sheet opened with `stayOn` survives the navigation to that screen.
+    const onHash = () => {
+      if (navigationCancels(pending, window.location.hash)) answerConfirm(false)
+    }
     window.addEventListener('keydown', onKey)
     window.addEventListener('hashchange', onHash)
     return () => {
@@ -274,15 +279,21 @@ export function ConfirmSheet() {
         className="ui-sheet"
         role="alertdialog"
         aria-modal="true"
-        aria-labelledby="ui-sheet-message"
+        aria-labelledby={pending.title ? 'ui-sheet-title' : 'ui-sheet-message'}
+        aria-describedby={pending.title ? 'ui-sheet-message' : undefined}
         onClick={(e) => e.stopPropagation()}
       >
+        {pending.title ? (
+          <p id="ui-sheet-title" className="ui-sheet__title">
+            {pending.title}
+          </p>
+        ) : null}
         <p id="ui-sheet-message" className="ui-sheet__message">
           {pending.message}
         </p>
         <div className="ui-sheet__actions">
           <button ref={cancelRef} type="button" className="ui-btn ui-btn--secondary" onClick={() => answerConfirm(false)}>
-            Cancel
+            {pending.cancelLabel || 'Cancel'}
           </button>
           <button type="button" className="ui-btn ui-btn--primary" onClick={() => answerConfirm(true)}>
             {pending.confirmLabel}
