@@ -81,10 +81,11 @@ describe('req-124 replaceItem returns the key of the inserted item', () => {
     const store = src('./store.jsx')
     assert.match(
       store,
-      /replaceItem\(itemId, exerciseId\) \{\s*const id = uid\('mid'\)\s*setState\(\(s\) => replaceItemInState\(s, itemId, exerciseId, id\)\)\s*return id\s*\}/,
+      // req-188 (test edit) — the picker's prescription is passed through as a 5th argument.
+      /replaceItem\(itemId, exerciseId, prescription = null\) \{\s*const id = uid\('mid'\)\s*setState\(\(s\) => replaceItemInState\(s, itemId, exerciseId, id, prescription\)\)\s*return id\s*\}/,
     )
     const picker = src('./views/workout/replace.jsx')
-    assert.match(picker, /const newKey = store\.replaceItem\(itemKey\(item\), exerciseId\)/)
+    assert.match(picker, /const newKey = store\.replaceItem\(itemKey\(item\), exerciseId, prescription\)/)
     assert.match(picker, /go\(itemLogPath\(routineId, \{ id: newKey \}\), \{ replace: true \}\)/)
     // the done-bounce (original now skipped → done) must not override that navigation
     assert.match(picker, /picked\.current = true\s*\/\/[^\n]*\n\s*const newKey = store\.replaceItem/)

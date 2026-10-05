@@ -1,29 +1,32 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { go } from '../../route'
 import { recordButton } from '../../analytics'
 import { useStore } from '../../store-context'
 import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back } from '../shared'
-import { Actions, Button, Field, List, NavLink, Row, Screen, Title } from '../../ui/index.jsx'
+import { Screen, Title } from '../../ui/index.jsx'
+import { ExercisePicker } from '../ExercisePicker'
 import { MissingItem, NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemLogPath } from './workout-helpers.js'
 import { WorkoutPill } from './rest'
 
-// req-109 — the Replace exercise picker (reached from the item's log screen). Lists the
-// library's exercises, archived ones excluded, with the RoutineExercisePick search.
-// Picking one is an action (it writes): the original's remaining sets are logged
-// skipped and a blank item for the picked exercise is inserted directly after it, for
-// this workout only (store.replaceItem), and the picker lands on the new item's log
-// screen (req-124). Back / Cancel change nothing. An exercise that
-// is already done can't be replaced (re-open it first), so a done item bounces back to
-// the overview.
+// req-109 — the Swap exercise picker. Picking one is an action (it writes): the original's
+// remaining sets are logged skipped and an item for the picked exercise is inserted directly
+// after it, for this workout only (store.replaceItem), and the picker lands on the new item's
+// log screen (req-124). Back / Cancel change nothing. An exercise that is already done can't
+// be replaced (re-open it first), so a done item bounces back to the overview.
+// req-188 (DEC-103 §2) — reached from the overview row's "⋯" sheet (no longer the log screen),
+// so Back / Cancel return to the overview. The picker is the routine's (ExercisePicker,
+// DEC-097): your exercises first, then the whole library, single pick. A library pick creates
+// your exercise record first (the picker's own add path, with its near-duplicate "Use your …?"
+// guard), then swaps. The swapped-in item takes the picker's prescription — history, else the
+// shown starting plan (never a kg) — instead of 1 blank set.
 export function WorkoutItemReplace({ routineId, itemId }) {
   const store = useStore()
   const active = store.activeWorkout
   const mine = isActiveFor(active, routineId)
   const item = mine ? findItem(active.snapshot?.items, itemId) : null
   const done = Boolean(item && (itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone))
-  const [query, setQuery] = useState('')
   // req-124 — a pick marks the original done (skipped), which would re-fire the bounce
   // below and override the navigation to the new item; a picked screen never bounces.
   const picked = useRef(false)
@@ -35,19 +38,13 @@ export function WorkoutItemReplace({ routineId, itemId }) {
   if (!mine) return <NotInWorkout routineId={routineId} />
   if (!item || done) return <MissingItem />
 
-  const backTo = itemLogPath(routineId, item)
-  const q = query.trim().toLowerCase()
-  const matches = (store.exercises || []).filter((ex) => {
-    if (ex.archivedAt) return false
-    if (!q) return true
-    return `${ex.name} ${ex.equipment} ${ex.muscles}`.toLowerCase().includes(q)
-  })
+  const backTo = `/workout/${routineId}`
 
-  function pick(exerciseId) {
+  function pick(exerciseId, prescription) {
     recordButton('replace-exercise')
     picked.current = true
     // req-124 — land on the new exercise's log screen (replacing the picker in history).
-    const newKey = store.replaceItem(itemKey(item), exerciseId)
+    const newKey = store.replaceItem(itemKey(item), exerciseId, prescription)
     go(itemLogPath(routineId, { id: newKey }), { replace: true })
   }
 
@@ -57,23 +54,14 @@ export function WorkoutItemReplace({ routineId, itemId }) {
       <WorkoutPill />
       <p className="ui-sub">{exerciseName(item)}</p>
       <Title>Swap exercise</Title>
-      <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
-      {matches.length === 0 ? <p className="ui-sub">No matches.</p> : null}
-      <List>
-        {matches.map((ex) => (
-          <Row
-            key={ex.id}
-            action={
-              <Button variant="secondary" onClick={() => pick(ex.id)}>
-                Swap
-              </Button>
-            }
-          >
-            {ex.name} — {ex.equipment}
-          </Row>
-        ))}
-      </List>
-      <Actions retreat={<NavLink to={backTo} look="quiet">Cancel</NavLink>} />
+      <ExercisePicker
+        cancelTo={backTo}
+        max={1}
+        addLabel={() => 'Swap'}
+        onAdd={([choice]) => {
+          if (choice) pick(choice.exerciseId, choice.item)
+        }}
+      />
     </Screen>
   )
 }

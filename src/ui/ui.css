@@ -412,6 +412,22 @@ a.ui-btn--quiet:active {
 .ui-row__chev {
   color: var(--ui-ink-3);
 }
+/* req-188 — a link row with a trailing control: the link takes the room, the control
+ * keeps its size. */
+.ui-row__link + .ui-row__action {
+  flex: none;
+}
+.ui-row__link:has(+ .ui-row__action) {
+  min-width: 0;
+}
+/* req-188 — the workout list's "⋯" row menu: a full tap target, quiet. */
+.ui-row-menu {
+  min-width: var(--ui-tap);
+  min-height: var(--ui-tap);
+  padding: 0;
+  font-size: var(--ui-text-body);
+  letter-spacing: 0.05em;
+}
 /* req-123 — a long unbroken name (titles, row labels, subtitles) wraps instead of
  * widening the page at 390px. `anywhere` (not `break-word`) so it also lowers the
  * min-content width, letting a flex row's label shrink. Values, chevrons and action
@@ -939,6 +955,13 @@ a.ui-btn--quiet:active {
 .ui-sheet__actions {
   display: flex;
   gap: var(--ui-s2);
+}
+/* req-188 — askChoice: the choices stacked full width above Cancel. */
+.ui-sheet__choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-s2);
+  margin: 0 0 var(--ui-s2);
 }
 .ui-sheet__actions > .ui-btn {
   flex: 1;

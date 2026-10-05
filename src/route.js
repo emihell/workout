@@ -354,6 +354,10 @@ function matchRoute(rawPath) {
   if (parts[0] === 'workout' && parts[1] && parts[2] === 'item' && parts[3]) {
     return { name: 'workout-item', routineId: parts[1], itemId: parts[3] }
   }
+  // req-188 — Add exercise, from the workout list.
+  if (parts[0] === 'workout' && parts[1] && parts[2] === 'add' && !parts[3]) {
+    return { name: 'workout-add', routineId: parts[1] }
+  }
   if (parts[0] === 'workout' && parts[1] && parts[2] === 'finish') {
     return { name: 'workout-finish', routineId: parts[1] }
   }

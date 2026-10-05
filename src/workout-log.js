@@ -227,7 +227,25 @@ export function skipItemPatch(workout, itemId) {
 // from the exercise's own history through the normal log-form rule (DEC-053).
 // req-178 — `suggestedWeights`: the replacement's routine kg, from its history's first
 // set (the DEC-096 §2 "history prefills the routine" rule, applied to a mid-workout add).
-export function replacementItem({ id, original, exercise, restSec, suggestedWeights = [] }) {
+// req-188 (DEC-103 §2) — `prescription`: the picker's item for this exercise (routine-picker.js
+// pickerItem: its history's whole prescription, else the shown starting plan, never a kg).
+// Given, the replacement takes its sets, reps, kg, durations and rest instead of 1 blank set;
+// role, warm-up (none) and notes (none) stay as above. Also builds an appended mid-workout
+// item (Add exercise: `original` null → role main). Absent → the req-109 blank item.
+function prescribed(prescription, restSec, suggestedWeights) {
+  if (!prescription) return { sets: 1, targets: [], suggestedWeights, durations: [], restSec: Number(restSec) || 0 }
+  const list = (value) => (Array.isArray(value) ? [...value] : [])
+  return {
+    sets: Math.max(1, Math.floor(Number(prescription.sets)) || 1),
+    targets: list(prescription.targets),
+    suggestedWeights: list(prescription.suggestedWeights),
+    durations: list(prescription.durations),
+    restSec: Number(prescription.restSec) || 0,
+  }
+}
+
+export function replacementItem({ id, original, exercise, restSec, suggestedWeights = [], prescription = null }) {
+  const plan = prescribed(prescription, restSec, suggestedWeights)
   return {
     id,
     routineItemId: id,
@@ -239,11 +257,11 @@ export function replacementItem({ id, original, exercise, restSec, suggestedWeig
     // req-119 — Timed frozen from the replacement's exercise, as buildPlannedWorkout does.
     hasDuration: Boolean(exercise.hasDuration),
     role: original?.role || 'main',
-    sets: 1,
-    targets: [],
-    suggestedWeights,
-    durations: [],
-    restSec: Number(restSec) || 0,
+    sets: plan.sets,
+    targets: plan.targets,
+    suggestedWeights: plan.suggestedWeights,
+    durations: plan.durations,
+    restSec: plan.restSec,
     notes: '',
     warmup: null,
     addedMidWorkout: true,
@@ -287,6 +305,15 @@ export function replaceItemPatch(workout, itemId, replacement) {
     if (itemKey(item) === itemId) items.push(replacement)
   }
   return { ...skip, snapshot: { ...workout.snapshot, items } }
+}
+
+// req-188 (DEC-103 §2) — "Add exercise" from the workout list: `item` (a replacementItem with
+// no original) appended at the end of the snapshot. This workout only: the routine is untouched,
+// no set is written. A key already in the snapshot → null.
+export function appendItemPatch(workout, item) {
+  const items = workout?.snapshot?.items || []
+  if (!item || items.some((candidate) => itemKey(candidate) === itemKey(item))) return null
+  return { snapshot: { ...workout.snapshot, items: [...items, item] } }
 }
 
 // req-109 — the overview's "skipped" state: the item has sets and every one of them is

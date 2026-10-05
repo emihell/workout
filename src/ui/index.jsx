@@ -199,8 +199,8 @@ export function SectionHeader({ children }) {
 // carry a right-aligned informational `value` (on a link it sits before the
 // chevron). A plain row may also carry a trailing `action` node (a control —
 // e.g. a <Button>) in its own slot; when both are present they render in order
-// `children … value action`. `action` is a plain-row affordance (link rows have
-// no caller that needs it); multiple controls in one `action` are laid out with
+// `children … value action`. On a link row (req-188) `action` sits after the link, outside
+// it (its own tap target); multiple controls in one `action` are laid out with
 // a consistent gap.
 export function List({ children }) {
   return <ul className="ui-list">{children}</ul>
@@ -219,6 +219,9 @@ export function Row({ children, value, action, to, className = '' }) {
           {value != null ? <span className="ui-row__value">{value}</span> : null}
           <span className="ui-row__chev">›</span>
         </NavLink>
+        {/* req-188 — a link row may carry a trailing control (the workout list's "⋯"): its
+            own tap target beside the link, never inside it. */}
+        {action != null ? <span className="ui-row__action">{action}</span> : null}
       </li>
     )
   }
@@ -280,7 +283,7 @@ export function ConfirmSheet() {
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={pending.title ? 'ui-sheet-title' : 'ui-sheet-message'}
-        aria-describedby={pending.title ? 'ui-sheet-message' : undefined}
+        aria-describedby={pending.title && pending.message ? 'ui-sheet-message' : undefined}
         onClick={(e) => e.stopPropagation()}
       >
         {pending.title ? (
@@ -288,16 +291,30 @@ export function ConfirmSheet() {
             {pending.title}
           </p>
         ) : null}
-        <p id="ui-sheet-message" className="ui-sheet__message">
-          {pending.message}
-        </p>
+        {pending.message ? (
+          <p id="ui-sheet-message" className="ui-sheet__message">
+            {pending.message}
+          </p>
+        ) : null}
+        {/* req-188 — askChoice: one button per choice, stacked, above Cancel. */}
+        {pending.choices ? (
+          <div className="ui-sheet__choices">
+            {pending.choices.map((choice) => (
+              <button key={choice.value} type="button" className="ui-btn ui-btn--secondary ui-btn--block" onClick={() => answerConfirm(choice.value)}>
+                {choice.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <div className="ui-sheet__actions">
           <button ref={cancelRef} type="button" className="ui-btn ui-btn--secondary" onClick={() => answerConfirm(false)}>
             {pending.cancelLabel || 'Cancel'}
           </button>
-          <button type="button" className="ui-btn ui-btn--primary" onClick={() => answerConfirm(true)}>
-            {pending.confirmLabel}
-          </button>
+          {pending.choices ? null : (
+            <button type="button" className="ui-btn ui-btn--primary" onClick={() => answerConfirm(true)}>
+              {pending.confirmLabel}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -561,7 +578,8 @@ export function SetLogForm({
           )
         ) : (
           <>
-            <Button onClick={onSkip}>Skip</Button>
+            {/* req-188 — the screen's only Skip: this set (Skip exercise is on the list). */}
+            <Button onClick={onSkip}>Skip set</Button>
             <Button type="submit" variant="primary">
               Complete
             </Button>

@@ -164,14 +164,13 @@ async function main() {
       await waitHash(page, /^#\/workout\/[^/]+$/)
       await waitText(page, SKIP_EXERCISE)
     })
-    await step(`open ${SKIP_EXERCISE} and Skip exercise`, async () => {
-      await clickLink(page, SKIP_EXERCISE)
-      await waitText(page, 'Skip exercise')
-      // Skip is a two-tap in-app confirm (never a native one): arm, then confirm.
+    await step(`Skip exercise ${SKIP_EXERCISE} from its row's ⋯ (the list)`, async () => {
+      // req-188 — Skip exercise lives in the overview row's ⋯ sheet (one tap there; never a
+      // native confirm), no longer on the log screen.
+      await clickSelector(page, `button[aria-label="Swap or skip ${SKIP_EXERCISE}"]`)
       await clickButton(page, 'Skip exercise')
-      await waitText(page, 'Tap again to skip')
-      await clickButton(page, 'Tap again to skip')
       await waitHash(page, /^#\/workout\/[^/]+$/)
+      await waitText(page, `${SKIP_EXERCISE} · skipped`)
       await page.waitForFunction(
         (key) => (JSON.parse(localStorage.getItem(key) || '{}').activeWorkout?.sets || []).filter((s) => s.reps === 'skipped').length > 0,
         { timeout: STEP_TIMEOUT },

@@ -20,7 +20,7 @@ import {
 import { ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
 import { RoutinePlan } from './views/Plan'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
-import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
+import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutAdd, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetAdd, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { Settings } from './views/Settings'
 import { BottomMenu } from './ui/BottomMenu.jsx'
@@ -182,6 +182,8 @@ function Screen() {
   if (route.name === 'workout-item') {
     return <WorkoutItem key={`${route.routineId}-${route.itemId}`} routineId={route.routineId} itemId={route.itemId} />
   }
+  // req-188 — Add exercise from the workout list.
+  if (route.name === 'workout-add') return <WorkoutAdd key={route.routineId} routineId={route.routineId} />
   if (route.name === 'workout-finish') return <WorkoutFinish key={route.routineId} routineId={route.routineId} />
   if (route.name === 'workout-setup') {
     return (
