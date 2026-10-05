@@ -2138,3 +2138,12 @@ cancelLabel / stayOn); inline offer row and auto-complete's "Update your routine
 Gate (ui): `check: green — lint, skills, no import cycles, 87 test file(s), and the build all passed.` (1266/0); smoke green; Planner QA
 4/4 (routine [18,18,18] → Update → [20,20,20]; equal kg → no sheet; restEndsAt armed). No trigger files → no reviewer; Planner read
 the diff (test edits in req-178/182/overview tests follow the removed row — real changes). `reports/req-187.md`.
+
+## req-188 — Swap / Skip exercise in the list, Add exercise, whole-library picker  (batch 2026-10-06)
+
+**req-188** (DEC-103 §2, DEC-104) — "⋯" row sheet (askChoice); log screen keeps "Skip set" only; Swap/Add use ExercisePicker (own →
+library); history → history's plan, no history → a Sets/Rest step (kg/reps blank); Swap items carry `replacesItemId` (pill rule);
+adding clears autoFinishDismissed. 4 commits `a0f583f`…`b064c71`.
+Gate (ui): `check: green — lint, skills, no import cycles, 88 test file(s), and the build all passed.`; branch smoke green; Planner QA
+5/5 (⋯ Skip → "· skipped"; Landmine swap → new record, sets 3, rest 0, kg []; Add history pick appended, routines byte-identical).
+Reviewer (independent, 2 rounds): 1 should-fix + 1 latent fixed, "No blockers." `reports/req-188.md`.

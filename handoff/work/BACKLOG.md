@@ -545,6 +545,8 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
   Complete; Swap/Skip exercise in the list, Add exercise, whole-library swap. Build in that order.
 - **Edit rest during an exercise** (DEC-104 §3 follow-up; Emilio: "rest can be filled in during the sets") — a mid-workout item
   added with blank rest has no way to set one on the log screen today. Small ui req.
+- **req-188 review latents:** a fast double tap on the picker's Add N / the step's Swap can commit twice (masked by the
+  navigation; ExercisePicker has the same pattern); Sets has no upper bound (99999 accepted).
 - **`req-144` creation design** (SESSION 1 DONE → DEC-096..102; was NEEDS DECISIONS — a design req, no code; planning + Emilio live) — personas, the
   simplicity rule, the parameter table, flows, model + library asks. Absorbs req-10 and the DEC-056 review step.
 - **Define the model first** — program vs routine vs schedule; what a program owns, how

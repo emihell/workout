@@ -1,6 +1,6 @@
 # req-188 — Swap and Skip exercise move to the workout list; Add exercise; whole-library picker
 
-**Status: READY** (2026-10-05). **Lane: ui.** From DEC-103 §2 and §4 (req-184 feedback F3, F5). Siblings: after
+**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-103 §2 and §4 (req-184 feedback F3, F5). Siblings: after
 **req-186** and **req-187** (all edit `views/workout/item.jsx`). Trigger files: `store.jsx` / `state-reducers.js` /
 `workout-log.js` (a new add-item reducer) → **independent reviewer** before merge; writes only the active workout and, for a
 library pick, a new exercise record (as the routine picker does) — no bulk write, no schema change.
@@ -62,3 +62,9 @@ library pick, a new exercise record (as the routine picker does) — no bulk wri
 - behaviour `(unconfirmed)`: the "⋯" + sheet shape; Skip exercise one tap inside the sheet; "Skip set" label; swapped-in
   item takes a full prescription; Add exercise at the list bottom; multi-select on Add, single on Swap.
 - implementation: the add reducer's home; sheet component (shared with req-187 if it fits).
+
+## Built — calls for Emilio's end-of-batch list `(unconfirmed)`
+- "⋯" per not-done row → sheet Swap exercise · Skip exercise · Cancel; Skip is one tap there. Log screen: "Skip set" only.
+- No-history step wording ("No history yet. Set the sets and rest; reps and kg you enter as you log."); no cap on Sets.
+- A Swap keeps the original's role; Add items are main, no warm-up. Add returns to the list; a Swap lands on the new exercise.
+- "Add exercise" isn't on the auto-complete summary (all-done screen).
