@@ -2121,3 +2121,12 @@ Gate (ui): tests 12/0, smoke green; Planner QA 7/7 (a blanked routine kg stays [
 **req-185** (Builder's note, 2026-09-29) — render.js installs happy-dom's `localStorage`/`sessionStorage` when Node 26 defines them as undefined; dates-tz's child runs `--test-reporter=tap`; guard test `render.test.js`; `.nvmrc` 22; README Node line.
 Gate (bug): v26 suite main fail 50 → branch 1224/0; Planner `./check` green on v22 and v26 (85 files). No trigger files → no reviewer. L-045.
 `reports/req-185.md`.
+
+## req-186 — one workout pill, the set list all exercise, Previous views instead of un-logging  (batch 2026-10-05)
+
+**req-186** (DEC-103 §3–4) — `WorkoutPill` replaces RestPill ("1:12 · set 2/4" → glowing "GO · set 2/4", tap → current exercise;
+none until a real set is logged); set list stays with done/current/upcoming; Previous shows the logged set (Next / Save, rest untouched;
+Save re-carries kg only from the latest set); "Skip rest" on the log screen. 4 commits `e9427eb`…`bd7a91e`.
+Gate (ui): `check: green — lint, skills, no import cycles, 86 test file(s), and the build all passed.` (1250/0); smoke green; Planner QA
+10/10 at 375 px (sets.length 1→1 and restEndsAt identical across Previous/Next/Save). Reviewer (independent, 2 rounds): 5 should-fix
+fixed, "No blockers." `reports/req-186.md`.

@@ -1,6 +1,6 @@
 # req-186 — the exercise page: set list all the way, Previous without un-logging, one workout pill
 
-**Status: READY** (2026-10-05). **Lane: ui.** Builder: throwaway agent or Builder session (DEC-055). From DEC-103 §3–4
+**Status: BUILT AND MERGED, 2026-10-05 — branch `req-186` (`e9427eb`…`bd7a91e`, 4 commits).** (2026-10-05). **Lane: ui.** Builder: throwaway agent or Builder session (DEC-055). From DEC-103 §3–4
 (req-184 feedback F6–F10, F8). Siblings, in order: **req-186 → req-187 → req-188** — all three edit `views/workout/item.jsx`;
 build and merge one before the next branches off `main`. Trigger files: `workout-log.js` likely (helpers) → independent
 reviewer before merge (WORKFLOW READY check 5); no stored-record write, so no backup reminder.
@@ -82,3 +82,9 @@ reviewer before merge (WORKFLOW READY check 5); no stored-record write, so no ba
 - behaviour `(unconfirmed)`: pill appears only once something is logged; "GO" stays until the next set is logged / the
   exercise changes; m:ss above a minute; "Skip rest" as a quiet control on the log screen; done-set marking style; the
   title's "N/M" removed; Save on an edited earlier set leaves the rest alone.
+
+## Built — calls for Emilio's end-of-batch list `(unconfirmed)`
+- GO is **grayscale** (pulsing halo + fill), not coloured — DEC-017 (no colour) vs his "glowing/changing colors". Colour needs DEC-017 reopened.
+- Viewing a logged set: list highlight moves to it, title "Set 1 · logged", Add note hidden; Next is secondary (navigation as a button,
+  a DESIGN §4 exception).
+- Pill rule: none until a real set is logged (a Swap before any log → no pill); after a Swap → the replacement.
