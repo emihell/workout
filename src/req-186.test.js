@@ -7,14 +7,21 @@ import React from 'react'
 import { readFileSync } from 'node:fs'
 import { importJsx, render, act } from './test-support/render.js'
 import {
+  carryForSet,
   currentWorkoutItem,
+  initialSetFields,
+  nextSeedOverrides,
+  replaceItemPatch,
+  replacementItem,
+  setDraftFromLoggedSet,
+  skipItemPatch,
   itemSetPosition,
   loggedSetRowText,
   restClockText,
   setListRows,
   workoutPillState,
 } from './workout-log.js'
-import { liveSetEditPatch } from './views/set-values.js'
+import { liveSetEditPatch, viewedSetSave } from './views/set-values.js'
 
 const h = React.createElement
 const DB = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
@@ -47,8 +54,74 @@ describe('acceptance 1 — currentWorkoutItem', () => {
     const swapped = [item('a'), { ...item('x'), addedMidWorkout: true }]
     const w = workout(swapped, [set('a', { reps: 'skipped' }), set('x')], { completedItemIds: ['a'] })
     assert.equal(currentWorkoutItem(w).routineItemId, 'x')
+    // review fix 1 — a Swap alone (only skipped records) is "nothing logged": no pill
     const w2 = workout(swapped, [set('a', { reps: 'skipped' })], { completedItemIds: ['a'] })
-    assert.equal(currentWorkoutItem(w2).routineItemId, 'x')
+    assert.equal(currentWorkoutItem(w2), null)
+  })
+})
+
+describe('review fix 1 — skipped records and Swap', () => {
+  const items = () => [item('a'), item('b'), item('c')]
+  it('(a) fresh workout, Skip exercise on A → no pill (skipped records are not "logged")', () => {
+    const w = workout(items())
+    const after = { ...w, ...skipItemPatch(w, 'a') }
+    assert.ok(after.sets.length > 0 && after.sets.every((x) => x.reps === 'skipped'))
+    assert.equal(currentWorkoutItem(after), null)
+  })
+  it('(b) A and C in progress, B replaced → the pill item is the replacement', () => {
+    let w = workout(items(), [set('a'), set('c')])
+    const b = w.snapshot.items[1]
+    const repl = replacementItem({ id: 'b-new', original: b, exercise: { id: 'ex-new', name: 'New' }, restSec: 0 })
+    w = { ...w, ...replaceItemPatch(w, 'b', repl) }
+    assert.deepEqual(w.snapshot.items.map((i) => i.routineItemId), ['a', 'b', 'b-new', 'c'])
+    assert.equal(currentWorkoutItem(w).routineItemId, 'b-new')
+  })
+  it('Skip exercise on B while C is in progress → C (the last real set), not an untouched A', () => {
+    let w = workout(items(), [set('c')])
+    w = { ...w, ...skipItemPatch(w, 'b') }
+    assert.equal(currentWorkoutItem(w).routineItemId, 'c')
+  })
+  it('a set-level Skip on an exercise in progress keeps it current', () => {
+    const w = workout(items(), [set('a'), set('c'), set('c', { reps: 'skipped', weight: 0, note: 'skipped' })])
+    assert.equal(currentWorkoutItem(w).routineItemId, 'c')
+  })
+})
+
+describe('review fix 2 — Save that changes kg re-runs the seed overrides (DEC-052)', () => {
+  it('routine 60, set 1 logged 62.5, Previous → 60 → Save → set 2 and the upcoming rows prefill 60', () => {
+    const a = item('a', { suggestedWeights: [60, 60, 60] })
+    // Complete set 1 at 62.5 (seed 60) — what completeSet records
+    const afterComplete = nextSeedOverrides({}, { exerciseId: 'ex-a', setType: 'work', weighted: true, seed: { weight: '60' }, logged: { weight: 62.5 } })
+    let w = workout([a], [set('a', { weight: 62.5, reps: '8', rpe: 3 })], { seedOverrides: afterComplete })
+    const base = { ex: { type: 'machine' }, weighted: true, hasHistory: false, historyFor: () => ({ weight: '', reps: '' }) }
+    assert.deepEqual(setListRows({ ...base, workout: w, item: a }).slice(1).map((r) => r.text), ['2 · 62.5 kg × 8', '3 · 62.5 kg × 8'])
+    // Previous shows 62.5; change to 60; Save
+    const save = viewedSetSave(
+      { weight: '60', reps: '8', effort: 3 },
+      { weighted: true, initialEffort: 3, set: w.sets[0], presentedWeight: '62.5', seedOverrides: w.seedOverrides },
+    )
+    assert.deepEqual(save.setPatch, { weight: 60, reps: '8' })
+    w = { ...w, sets: [{ ...w.sets[0], ...save.setPatch }], seedOverrides: save.seedOverrides }
+    assert.equal(w.sets[0].weight, 60)
+    assert.deepEqual(setListRows({ ...base, workout: w, item: a }).slice(1).map((r) => r.text), ['2 · 60 kg × 8', '3 · 60 kg × 8'])
+    // the current set's form seed (the same initialSetFields the log form uses)
+    const seed = initialSetFields({
+      weighted: true,
+      fromRestore: false,
+      restore: null,
+      hasHistory: false,
+      history: { weight: '', reps: '' },
+      carry: carryForSet('work', w.sets),
+      target: '8',
+      override: w.seedOverrides['ex-a::work'],
+      routineKg: 60,
+    })
+    assert.equal(seed.weight, '60')
+  })
+  it('a Save that leaves kg alone returns the same overrides map (no write)', () => {
+    const overrides = { 'ex-a::work': { weight: '62.5' } }
+    const save = viewedSetSave({ weight: '62.5', reps: '9', effort: 3 }, { weighted: true, initialEffort: 3, set: set('a', { weight: 62.5 }), presentedWeight: '62.5', seedOverrides: overrides })
+    assert.equal(save.seedOverrides, overrides)
   })
 })
 
@@ -133,16 +206,35 @@ describe('acceptance 3 / 8 — set list rows', () => {
 })
 
 describe('liveSetEditPatch (Save on a viewed set)', () => {
-  it('reads like completeSet: kg parsed, effort → rpe, hidden effort → null; bad kg → null', () => {
-    assert.deepEqual(liveSetEditPatch({ weight: '22,5', reps: '7', effort: 4 }, { weighted: true }), { weight: 22.5, reps: '7', rpe: 4 })
-    assert.deepEqual(liveSetEditPatch({ weight: '', reps: '7', effort: null }, { weighted: false }), { weight: 0, reps: '7', rpe: null })
-    assert.deepEqual(liveSetEditPatch({ weight: '', reps: '', effort: 3, durationSec: 40 }, { weighted: false, timed: true }), {
+  it('reads like completeSet: kg parsed, a changed effort → rpe, hidden effort → no rpe; bad kg → null', () => {
+    assert.deepEqual(liveSetEditPatch({ weight: '22,5', reps: '7', effort: 4 }, { weighted: true, initialEffort: 3 }), { weight: 22.5, reps: '7', rpe: 4 })
+    assert.deepEqual(liveSetEditPatch({ weight: '', reps: '7', effort: null }, { weighted: false, initialEffort: 3 }), { weight: 0, reps: '7' })
+    assert.deepEqual(liveSetEditPatch({ weight: '', reps: '', effort: 2, durationSec: 40 }, { weighted: false, timed: true, initialEffort: 3 }), {
       weight: 0,
       reps: '',
-      rpe: 3,
+      rpe: 2,
       durationSec: 40,
     })
     assert.equal(liveSetEditPatch({ weight: 'abc', reps: '7', effort: 3 }, { weighted: true }), null)
+  })
+  it('review fix 4 — a reps-only edit never rewrites rpe (stored rpe 1 shows as segment 2; untouched → not rescaled)', () => {
+    const stored = set('a', { rpe: 1 })
+    const shown = setDraftFromLoggedSet('', stored).effort
+    assert.equal(shown, 2, 'rpe 1 maps to the lowest segment')
+    const patch = liveSetEditPatch({ weight: '20', reps: '9', effort: shown }, { weighted: true, initialEffort: shown, set: stored })
+    assert.equal('rpe' in patch, false)
+    assert.equal({ ...stored, ...patch }.rpe, 1, 'stored rpe kept')
+    // changed effort → written
+    assert.equal(liveSetEditPatch({ weight: '20', reps: '9', effort: 4 }, { weighted: true, initialEffort: shown, set: stored }).rpe, 4)
+  })
+  it('review fix 3 — editing a skipped set into a real one clears its "skipped" note', () => {
+    const skipped = set('a', { weight: 0, reps: 'skipped', note: 'skipped', rpe: null })
+    const patch = liveSetEditPatch({ weight: '40', reps: '8', effort: 3 }, { weighted: true, initialEffort: 3, set: skipped })
+    assert.deepEqual(patch, { weight: 40, reps: '8', note: '' })
+    const saved = { ...skipped, ...patch }
+    assert.equal(loggedSetRowText('1', saved, true), '1 · 40 kg × 8')
+    // a non-skipped set's note is never touched
+    assert.equal('note' in liveSetEditPatch({ weight: '40', reps: '8', effort: 3 }, { weighted: true, initialEffort: 3, set: set('a', { note: 'grip' }) }), false)
   })
 })
 
@@ -210,11 +302,13 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
 
     // Previous, change reps, Save → stored, rest unchanged
     await view.click(view.button('Previous'))
+    const rpeBefore = active().sets[1].rpe
     await view.type(view.input('Reps'), '10')
     assert.equal(view.button('Next'), null)
     assert.match(view.button('Save').className, /ui-btn--primary/)
     await view.click(view.button('Save'))
     assert.equal(active().sets[1].reps, '10')
+    assert.equal(active().sets[1].rpe, rpeBefore, 'review fix 4 — reps-only Save keeps rpe')
     assert.equal(active().sets[1].weight, 27.5)
     assert.equal(active().sets.length, 2)
     assert.equal(active().restEndsAt, restEndsAt, 'Save leaves the rest alone')

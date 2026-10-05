@@ -32,7 +32,7 @@ import {
   setTargetFor,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
-import { activeSetPatch, liveSetEditPatch, liveSetWeight } from '../set-values.js'
+import { activeSetPatch, liveSetWeight, viewedSetSave } from '../set-values.js'
 import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
@@ -310,11 +310,21 @@ function WorkoutItemLive({ routineId, item }) {
   // Save (offered only once a field changed): the edited values onto that logged set via
   // updateActiveSet — the sets array only, so restEndsAt / restPausedRemaining stay as they
   // were — then back to the current set.
+  // Review fix 2 — a changed kg re-runs the seed overrides for that set (DEC-052), as the
+  // old un-log + re-Complete path did; written as seedOverrides only (rest untouched).
   function saveViewedSet(values) {
-    const patch = liveSetEditPatch(values, { weighted, timed: viewedTimed })
-    if (!patch) return
+    const save = viewedSetSave(values, {
+      weighted,
+      timed: viewedTimed,
+      initialEffort: viewedEffort,
+      set: viewedSet,
+      presentedWeight: weighted ? viewedInit.weight : '',
+      seedOverrides: active.seedOverrides,
+    })
+    if (!save) return
     recordButton('save-set')
-    store.updateActiveSet(viewIndex, patch)
+    store.updateActiveSet(viewIndex, save.setPatch)
+    if (save.seedOverrides !== active.seedOverrides) store.patchActive({ seedOverrides: save.seedOverrides })
     backToCurrentSet()
   }
 
@@ -448,6 +458,7 @@ function WorkoutItemLive({ routineId, item }) {
   // req-186 — the viewed logged set's form: its logged values (setDraftFromLoggedSet, the
   // values Previous always restored), its own target/kg notes; Effort default when none.
   const viewedInit = viewedSet ? setDraftFromLoggedSet('', viewedSet) : null
+  const viewedEffort = viewedInit && viewedInit.effort !== '' ? viewedInit.effort : 3
   const viewedTarget = viewedSet ? setTargetFor(item, viewedType, viewedWorkIndex) : ''
 
   return (
@@ -518,7 +529,7 @@ function WorkoutItemLive({ routineId, item }) {
           initialWeight={weighted ? viewedInit.weight : ''}
           initialReps={viewedInit.reps}
           initialDuration={viewedInit.durationSec ?? durationTargetFor(item, ex, viewedWorkIndex)}
-          initialEffort={viewedInit.effort !== '' ? viewedInit.effort : 3}
+          initialEffort={viewedEffort}
           routineKg={routineKgFor(item, viewedType, viewedWorkIndex)}
           lastKg={historySetPrefill(last, { setType: viewedType, workIndex: viewedWorkIndex }).weight}
           canGoBack={canGoBack}

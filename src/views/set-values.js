@@ -9,6 +9,8 @@
 // so null here is the backstop: bad text is never written as 0 or NaN.
 import { kgToSave } from '../kg-input.js'
 import { secondsToSave } from '../seconds-input.js'
+import { isSkippedSet } from '../set-rules.js'
+import { nextSeedOverrides } from '../workout-log.js'
 
 function effortValue(rpe) {
   return rpe === '' || rpe == null ? null : Number(rpe)
@@ -24,14 +26,38 @@ export function liveSetWeight(text, weighted) {
 
 // req-186 (DEC-103 §4) — Save on a logged set viewed via Previous on the live log screen:
 // the SetLogForm's values ({ weight, reps, effort, durationSec }) as the set patch, read
-// the way completeSet reads them (blank kg → 0, unweighted → 0; effort → rpe, hidden →
-// null; a timed work set keeps its seconds and no reps). Unreadable kg → null (don't save).
-export function liveSetEditPatch({ weight, reps, effort, durationSec }, { weighted, timed = false } = {}) {
+// the way completeSet reads them (blank kg → 0, unweighted → 0; a timed work set keeps its
+// seconds and no reps). Unreadable kg → null (don't save).
+// Review fixes: `initialEffort` is what the form showed — rpe is written ONLY when the
+// effort was actually changed (a reps-only edit never rescales a stored rpe, e.g. 1 → 2,
+// via the segment mapping); a hidden effort (null) never writes rpe. `set` is the stored
+// record: editing a skipped set into a real one clears its 'skipped' note.
+export function liveSetEditPatch({ weight, reps, effort, durationSec }, { weighted, timed = false, initialEffort, set } = {}) {
   const kg = liveSetWeight(weight, weighted)
   if (kg == null) return null
-  const patch = { weight: kg, reps: timed ? '' : reps || '', rpe: effort ? Number(effort) : null }
+  const patch = { weight: kg, reps: timed ? '' : reps || '' }
+  if (effort != null && effort !== '' && String(effort) !== String(initialEffort)) patch.rpe = Number(effort)
   if (timed && durationSec != null) patch.durationSec = durationSec
+  if (isSkippedSet(set) && !isSkippedSet(patch) && set.note === 'skipped') patch.note = ''
   return patch
+}
+
+// req-186 review fix 2 — everything Save on a viewed set writes: the set patch, and the
+// session seed overrides re-run for that set the way completeSet runs them (DEC-052: an
+// in-session kg change carries to the remaining sets). `presentedWeight` is the kg the
+// viewed form showed (the logged one) — the comparison base, as `seed` is for Complete.
+// `seedOverrides` is the SAME map when the kg didn't change (caller skips the write).
+export function viewedSetSave(values, { weighted, timed = false, initialEffort, set, presentedWeight, seedOverrides }) {
+  const setPatch = liveSetEditPatch(values, { weighted, timed, initialEffort, set })
+  if (!setPatch) return null
+  const overrides = nextSeedOverrides(seedOverrides, {
+    exerciseId: set.exerciseId,
+    setType: set.setType === 'wu' ? 'wu' : 'work',
+    weighted,
+    seed: { weight: presentedWeight },
+    logged: { weight: setPatch.weight },
+  })
+  return { setPatch, seedOverrides: overrides }
 }
 
 // WorkoutSetEdit's patch. `showLoad` false (cardio / bodyweight): the kg field isn't

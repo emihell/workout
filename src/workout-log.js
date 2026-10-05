@@ -819,20 +819,32 @@ export function loggedSetRowText(label, set, weighted) {
   return setPreviewText({ label, weight, reps: set?.reps != null ? String(set.reps) : '', durationSec }, weighted)
 }
 
-// req-186 (DEC-103 §3) — the workout pill's "current exercise": the item of the most
-// recently logged set (the last entry in workout.sets — completeSet appends) if it isn't
-// done; else the first not-done item in snapshot order. Nothing logged yet, or every item
-// done → null (no pill: never a "set 1/N" guess). "Done" is the overview's test: marked
-// done, or every planned set logged. A replacement (addedMidWorkout) item counts like any
-// other.
+// req-186 (DEC-103 §3) — the workout pill's "current exercise". Review fix 1 — rule:
+//   - nothing LOGGED (no non-skipped set; loggedSetCount's meaning, DEC-058 §4) → null:
+//     a Skip exercise / Swap alone writes only skipped records and shows no pill;
+//   - the item of the most recent set record (completeSet appends), if it isn't done —
+//     a set-level Skip on an exercise in progress keeps it current;
+//   - that item done AND its last record skipped AND a replacement (addedMidWorkout)
+//     sits right after it in the snapshot (replaceItemPatch inserts it there) and isn't
+//     done → the replacement: a Swap points the pill at the swapped-in exercise;
+//   - else the item of the most recent NON-skipped set, if it isn't done (a Skip
+//     exercise on B doesn't pull the pill back to an untouched A while C is in progress);
+//   - else the first not-done item in snapshot order. All done → null.
+// "Done" is the overview's test: marked done, or every planned set logged.
 export function currentWorkoutItem(workout) {
   const items = workout?.snapshot?.items || []
   const sets = workout?.sets || []
-  if (sets.length === 0) return null
+  if (!sets.some((set) => !isSkippedSet(set))) return null
   const done = (item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone
   const last = sets[sets.length - 1]
-  const owner = items.find((item) => setsForItem([last], item).length > 0) || null
+  const at = items.findIndex((item) => setsForItem([last], item).length > 0)
+  const owner = at >= 0 ? items[at] : null
   if (owner && !done(owner)) return owner
+  const next = at >= 0 ? items[at + 1] : null
+  if (owner && isSkippedSet(last) && next && isAddedMidWorkout(next) && !done(next)) return next
+  const lastReal = sets.findLast((set) => !isSkippedSet(set))
+  const realOwner = items.find((item) => setsForItem([lastReal], item).length > 0)
+  if (realOwner && !done(realOwner)) return realOwner
   return items.find((item) => !done(item)) || null
 }
 
