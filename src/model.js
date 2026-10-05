@@ -98,10 +98,12 @@ function workoutSnapshot(state, workout, origin = state, legacy = false) {
       (workout.snapshot.items || []).filter(isAddedMidWorkout).map((item) => item.routineItemId).filter(Boolean),
     )
     const items = (workout.snapshot.items || []).map((item) => {
-      // req-109 — a mid-workout item is kept exactly as written: no routine-template
-      // match (by id or exerciseId), so it keeps its own unique routineItemId and
-      // finish never writes it onto the routine; and no targets/weights backfill, so
-      // it stays blank across reloads (its prefill comes from its own history).
+      // req-109 — a mid-workout item (a Swap replacement or, req-188, an Add exercise item)
+      // is kept exactly as written: no routine-template match (by id or exerciseId), so it
+      // keeps its own unique routineItemId (and a Swap's replacesItemId) and finish never
+      // writes it onto the routine; and no targets/weights backfill from the routine, so
+      // its sets / reps / kg / rest stay what it was given (history's prescription, the
+      // user's no-history sets and rest, or req-109's 1 blank set) across reloads.
       if (isAddedMidWorkout(item)) return item
       const templateItem = foundRoutine?.exercises?.find(
         (candidate) =>

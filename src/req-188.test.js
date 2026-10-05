@@ -21,6 +21,8 @@ import {
   skipItemPatch,
 } from './workout-log.js'
 import { pickerItem } from './routine-picker.js'
+import { needsSetup, noHistoryItem, resolvePicks } from './mid-workout-pick.js'
+import { autoCompleteArmed } from './workout-log.js'
 import { routineUpdateOffer } from './routine-update-offer.js'
 import { answerConfirm, askChoice, askConfirm, getPendingConfirm } from './ui/confirm.js'
 import { parseRoute } from './route.js'
@@ -111,7 +113,7 @@ const withSets = (state, sets) => ({ ...state, activeWorkout: { ...state.activeW
 describe('req-188 add reducer (itemsAddedState / appendItemPatch)', () => {
   it('appends each pick at the END, in order, addedMidWorkout, with the picker prescription', () => {
     const state = baseState()
-    const nItem = pickerItem(state.workouts, ex('ex-n')).item // no history → starting plan
+    const nItem = noHistoryItem({ sets: '3', rest: '90' }).item // no history → the step's typed values (DEC-104)
     const hItem = pickerItem(state.workouts, ex('ex-h')).item // history
     const next = itemsAddedState(state, [
       { id: 'mid-1', exerciseId: 'ex-n', item: nItem },
@@ -123,8 +125,8 @@ describe('req-188 add reducer (itemsAddedState / appendItemPatch)', () => {
     assert.equal(isAddedMidWorkout(hh), true)
     assert.equal(n.id, 'mid-1')
     assert.equal(n.routineItemId, 'mid-1')
-    // starting plan: 3 × 10, 90 s, never a kg (DEC-097 §4)
-    assert.deepEqual([n.sets, n.targets, n.suggestedWeights, n.restSec], [3, ['10', '10', '10'], [], 90])
+    // DEC-104: the typed sets and rest; reps and kg blank — no 3 × 10 starting plan
+    assert.deepEqual([n.sets, n.targets, n.suggestedWeights, n.restSec], [3, [], [], 90])
     // history: the whole prescription — 3 × 8/8/6 @ 50/50/55, rest 75
     assert.deepEqual([hh.sets, hh.targets, hh.suggestedWeights, hh.restSec], [3, ['8', '8', '6'], [50, 50, 55], 75])
     assert.equal(hh.role, 'main')
@@ -156,7 +158,7 @@ describe('req-188 add reducer (itemsAddedState / appendItemPatch)', () => {
   })
 
   it('survives reload exactly, and Finish + recalc leave the routine as it was', () => {
-    let state = itemsAddedState(baseState(), [{ id: 'mid-1', exerciseId: 'ex-c', item: pickerItem([], ex('ex-c')).item }])
+    let state = itemsAddedState(baseState(), [{ id: 'mid-1', exerciseId: 'ex-c', item: noHistoryItem({ sets: '2', rest: '45' }).item }])
     const added = items(state)[2]
     const reloaded = reload(state)
     assert.deepEqual(items(reloaded)[2], added) // not backfilled from the routine's ex-c item
@@ -181,15 +183,16 @@ describe('req-188 add reducer (itemsAddedState / appendItemPatch)', () => {
 })
 
 describe('req-188 swap takes the picker prescription (replaceItemInState 5th argument)', () => {
-  it('no history → the starting plan (3 × 10, 90 s, no kg), not 1 set; original reads skipped', () => {
+  it('no history (DEC-104) → the typed sets, blank rest = 0, reps and kg blank; original reads skipped', () => {
     const state = baseState()
-    const prescription = pickerItem(state.workouts, ex('ex-n')).item
+    const prescription = noHistoryItem({ sets: '4', rest: '' }).item
     const next = replaceItemInState(state, 'ri-a', 'ex-n', 'mid-s', prescription)
     assert.deepEqual(items(next).map((item) => item.exerciseId), ['ex-a', 'ex-n', 'ex-c'])
     const rep = items(next)[1]
-    assert.deepEqual([rep.sets, rep.targets, rep.suggestedWeights, rep.restSec], [3, ['10', '10', '10'], [], 90])
+    assert.deepEqual([rep.sets, rep.targets, rep.suggestedWeights, rep.restSec], [4, [], [], 0])
     assert.equal(isAddedMidWorkout(rep), true)
     assert.equal(rep.role, 'main')
+    assert.equal(rep.replacesItemId, 'ri-a')
     assert.equal(itemAllSkipped(next.activeWorkout, items(next)[0]), true)
     assert.equal(itemIsMarkedDone(next.activeWorkout, items(next)[0]), true)
     assert.equal(next.routines, state.routines)
@@ -221,7 +224,7 @@ describe('req-188 the workout pill (currentWorkoutItem) after a Swap and an Add'
     const a = items(state)[0]
     state = withSets(state, [{ ...realSet(a, 20, '10'), setType: 'wu', rpe: null }, realSet(a)])
     assert.equal(itemKey(currentWorkoutItem(state.activeWorkout)), 'ri-a')
-    state = replaceItemInState(state, 'ri-a', 'ex-n', 'mid-s', pickerItem([], ex('ex-n')).item)
+    state = replaceItemInState(state, 'ri-a', 'ex-n', 'mid-s', noHistoryItem({ sets: '3' }).item)
     const current = currentWorkoutItem(state.activeWorkout)
     assert.equal(itemKey(current), 'mid-s')
     assert.equal(current.sets, 3)
@@ -234,7 +237,7 @@ describe('req-188 the workout pill (currentWorkoutItem) after a Swap and an Add'
     state = { ...state, activeWorkout: { ...state.activeWorkout, ...skipItemPatch(state.activeWorkout, 'ri-a') } }
     state = { ...state, activeWorkout: { ...state.activeWorkout, ...skipItemPatch(state.activeWorkout, itemKey(c)) } }
     assert.equal(currentWorkoutItem(state.activeWorkout), null, 'all done → no pill')
-    state = itemsAddedState(state, [{ id: 'mid-1', exerciseId: 'ex-n', item: pickerItem([], ex('ex-n')).item }])
+    state = itemsAddedState(state, [{ id: 'mid-1', exerciseId: 'ex-n', item: noHistoryItem({ sets: '3' }).item }])
     assert.equal(itemKey(currentWorkoutItem(state.activeWorkout)), 'mid-1')
     state = withSets(state, [realSet(items(state)[2])])
     assert.equal(itemKey(currentWorkoutItem(state.activeWorkout)), 'mid-1')
@@ -245,6 +248,65 @@ describe('req-188 the workout pill (currentWorkoutItem) after a Swap and an Add'
     state = withSets(state, [realSet(items(state)[0])])
     state = itemsAddedState(state, [{ id: 'mid-1', exerciseId: 'ex-n', item: { sets: 2 } }])
     assert.equal(itemKey(currentWorkoutItem(state.activeWorkout)), 'ri-a')
+  })
+})
+
+describe('req-188 / DEC-104 no-history step (mid-workout-pick.js)', () => {
+  it('Sets required, a positive whole number; Rest optional (blank = 0, no timer); reps and kg blank', () => {
+    assert.deepEqual(noHistoryItem({ sets: '3', rest: '' }).item, {
+      role: 'main', warmup: null, notes: '', sets: 3, targets: [], suggestedWeights: [], durations: [], restSec: 0,
+    })
+    assert.equal(noHistoryItem({ sets: ' 5 ', rest: '75' }).item.restSec, 75)
+    for (const sets of ['', '0', '2.5', '-1', 'three']) assert.ok(noHistoryItem({ sets, rest: '' }).errors.sets, `sets "${sets}"`)
+    for (const rest of ['1.5', '-30', 'abc']) assert.ok(noHistoryItem({ sets: '3', rest }).errors.rest, `rest "${rest}"`)
+    assert.ok(noHistoryItem().errors.sets, 'the step starts empty, so Save without typing is refused')
+  })
+
+  it('a history pick needs no step; resolvePicks keeps its item and fills only no-history picks', () => {
+    const hist = { kind: 'own', exerciseId: 'ex-h', source: 'history', item: pickerItem(HISTORY, ex('ex-h')).item }
+    const fresh = { kind: 'library', data: { name: 'New' }, source: 'starting', item: pickerItem([], ex('ex-n')).item }
+    assert.equal(needsSetup(hist), false)
+    assert.equal(needsSetup(fresh), true)
+    const ok = resolvePicks([hist, fresh], [{}, { sets: '2', rest: '' }])
+    assert.equal(ok.picks[0].item, hist.item)
+    assert.deepEqual([ok.picks[1].item.sets, ok.picks[1].item.targets, ok.picks[1].item.restSec], [2, [], 0])
+    assert.deepEqual(Object.keys(resolvePicks([hist, fresh], [{}, { sets: '' }]).errors), ['1'])
+  })
+})
+
+describe('req-188 review fixes', () => {
+  it('B repro: A, C, then Add N; log a set of A, Skip C → the pill stays on A (not the appended N)', () => {
+    let state = baseState()
+    state = itemsAddedState(state, [{ id: 'mid-n', exerciseId: 'ex-n', item: noHistoryItem({ sets: '2' }).item }])
+    state = withSets(state, [{ ...realSet(items(state)[0], 20, '10'), setType: 'wu', rpe: null }, realSet(items(state)[0])])
+    state = { ...state, activeWorkout: { ...state.activeWorkout, ...skipItemPatch(state.activeWorkout, 'ri-c') } }
+    assert.equal(itemKey(currentWorkoutItem(state.activeWorkout)), 'ri-a')
+  })
+
+  it('B: replacesItemId only on a Swap item, and it survives a reload', () => {
+    let state = replaceItemInState(baseState(), 'ri-a', 'ex-n', 'mid-s', noHistoryItem({ sets: '3' }).item)
+    state = itemsAddedState(state, [{ id: 'mid-n', exerciseId: 'ex-h', item: pickerItem(HISTORY, ex('ex-h')).item }])
+    const reloaded = reload(state)
+    const byId = (s, id) => items(s).find((item) => item.id === id)
+    assert.equal(byId(reloaded, 'mid-s').replacesItemId, 'ri-a')
+    assert.equal('replacesItemId' in byId(reloaded, 'mid-n'), false)
+    assert.deepEqual(reloaded.activeWorkout.snapshot.items, state.activeWorkout.snapshot.items)
+  })
+
+  it('C: an add clears autoFinishDismissed, so the summary arms again once the added item is done', () => {
+    let state = baseState()
+    const [a, c] = items(state)
+    state = withSets(state, [realSet(a)])
+    state = { ...state, activeWorkout: { ...state.activeWorkout, ...skipItemPatch(state.activeWorkout, itemKey(a)) } }
+    state = { ...state, activeWorkout: { ...state.activeWorkout, ...skipItemPatch(state.activeWorkout, itemKey(c)), autoFinishDismissed: true } }
+    assert.equal(autoCompleteArmed(state.activeWorkout), false, 'cancelled summary')
+    state = itemsAddedState(state, [{ id: 'mid-n', exerciseId: 'ex-n', item: noHistoryItem({ sets: '1' }).item }])
+    assert.equal('autoFinishDismissed' in state.activeWorkout, false)
+    state = withSets(state, [realSet(items(state)[2])])
+    assert.equal(autoCompleteArmed(state.activeWorkout), true)
+    // nothing added → nothing cleared (same reference)
+    const dismissed = { ...state, activeWorkout: { ...state.activeWorkout, autoFinishDismissed: true } }
+    assert.equal(itemsAddedState(dismissed, [{ id: 'x', exerciseId: 'ex-missing', item: {} }]), dismissed)
   })
 })
 

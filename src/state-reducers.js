@@ -143,7 +143,9 @@ export function replaceItemInState(s, itemId, exerciseId, id, prescription = nul
 // (item = the picker's prescription) appended to the active snapshot as a mid-workout item
 // (addedMidWorkout), in order. This workout only — the routine is never touched, no set is
 // written. An unknown exercise (or a duplicate id) is passed over; nothing added → `s`
-// unchanged (same reference), as is no active workout.
+// unchanged (same reference), as is no active workout. req-188 review — an add clears
+// `autoFinishDismissed`: a summary cancelled before the add must arm again once the added
+// exercises are done too (else it stayed dismissed for the rest of the workout).
 export function itemsAddedState(s, adds) {
   let active = s.activeWorkout
   if (!active) return s
@@ -153,7 +155,9 @@ export function itemsAddedState(s, adds) {
     const patch = appendItemPatch(active, replacementItem({ id, original: null, exercise, prescription: item || {} }))
     if (patch) active = { ...active, ...patch }
   }
-  return active === s.activeWorkout ? s : { ...s, activeWorkout: active }
+  if (active === s.activeWorkout) return s
+  const { autoFinishDismissed: _dismissed, ...rest } = active
+  return { ...s, activeWorkout: rest }
 }
 
 export function removeRoutineFromState(s, routineId, archivedAt = new Date().toISOString()) {

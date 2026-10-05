@@ -89,6 +89,7 @@ test('call sites that pass both put the retreat link in retreat and the commit i
   // plus req-180's two in ExercisePicker.jsx (the "Use your …?" question, Cancel / Add N),
   // plus req-181's plan Fill screen (Cancel / Save) in Plan.jsx,
   // minus req-188: replace.jsx's own Cancel row (the Swap screen is ExercisePicker now, whose
-  // Cancel / Swap row is already counted above)
-  assert.equal(count, 17)
+  // Cancel / Swap row is already counted above), plus req-188 / DEC-104's no-history step
+  // (Cancel / Swap or Add N) in views/workout/mid-workout-picker.jsx
+  assert.equal(count, 18)
 })

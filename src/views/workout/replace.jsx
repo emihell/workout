@@ -5,7 +5,7 @@ import { useStore } from '../../store-context'
 import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back } from '../shared'
 import { Screen, Title } from '../../ui/index.jsx'
-import { ExercisePicker } from '../ExercisePicker'
+import { MidWorkoutPicker } from './mid-workout-picker.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemLogPath } from './workout-helpers.js'
 import { WorkoutPill } from './rest'
@@ -17,10 +17,10 @@ import { WorkoutPill } from './rest'
 // be replaced (re-open it first), so a done item bounces back to the overview.
 // req-188 (DEC-103 §2) — reached from the overview row's "⋯" sheet (no longer the log screen),
 // so Back / Cancel return to the overview. The picker is the routine's (ExercisePicker,
-// DEC-097): your exercises first, then the whole library, single pick. A library pick creates
-// your exercise record first (the picker's own add path, with its near-duplicate "Use your …?"
-// guard), then swaps. The swapped-in item takes the picker's prescription — history, else the
-// shown starting plan (never a kg) — instead of 1 blank set.
+// DEC-097): your exercises first, then the whole library, single pick, its near-duplicate
+// "Use your …?" guard. DEC-104 — the swapped-in item takes history's prescription, or with no
+// history the sets / rest asked for in a step (MidWorkoutPicker); a library pick's record is
+// created only on that final confirm, then the swap.
 export function WorkoutItemReplace({ routineId, itemId }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -54,11 +54,11 @@ export function WorkoutItemReplace({ routineId, itemId }) {
       <WorkoutPill />
       <p className="ui-sub">{exerciseName(item)}</p>
       <Title>Swap exercise</Title>
-      <ExercisePicker
+      <MidWorkoutPicker
         cancelTo={backTo}
         max={1}
         addLabel={() => 'Swap'}
-        onAdd={([choice]) => {
+        onDone={([choice]) => {
           if (choice) pick(choice.exerciseId, choice.item)
         }}
       />
