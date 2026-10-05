@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-10-05. **Shipped: req-01–09, req-11–23, req-25–31, req-33–108, req-110–111, req-109, req-112–113, req-115, req-114, req-120, req-118, req-116–117, req-119, req-121–130, req-133, req-139, req-138, req-140, req-143, req-145, req-147, req-148, req-151, req-150, req-142, req-141, req-24, req-152, req-153, req-154, req-155, req-156, req-157, req-158, req-159, req-160, req-161, req-162, req-163, req-165, req-164, req-166, req-167, req-168, req-169, req-170, req-171–177, req-179–181, req-178, req-182–183, req-185–187** (req-10 pending; req-32 dropped; req-77 PAUSED). **Gym-flow batch 4 LIVE 2026-09-23:** Emilio's feedback JSON
+Updated 2026-10-05. **Shipped: req-01–09, req-11–23, req-25–31, req-33–108, req-110–111, req-109, req-112–113, req-115, req-114, req-120, req-118, req-116–117, req-119, req-121–130, req-133, req-139, req-138, req-140, req-143, req-145, req-147, req-148, req-151, req-150, req-142, req-141, req-24, req-152, req-153, req-154, req-155, req-156, req-157, req-158, req-159, req-160, req-161, req-162, req-163, req-165, req-164, req-166, req-167, req-168, req-169, req-170, req-171–177, req-179–181, req-178, req-182–183, req-185–188** (req-10 pending; req-32 dropped; req-77 PAUSED). **Gym-flow batch 4 LIVE 2026-09-23:** Emilio's feedback JSON
 (F1..F10) → req-103..111, plus req-112 (Finish no longer rewrites the routine, DEC-056). DEC-052..057, L-022/023.
 `log/SHIPPED.md`; reqs `work/req-*.md`; index `work/BACKLOG.md`. ≤50 lines.
 
@@ -18,8 +18,8 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 **READY, held:**
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
-- **Batch: building req-188** (186–187 shipped; Lane ui, DEC-103 — Emilio's 2026-10-05 gym notes: pill/set list/Previous, kg confirm on
-  Complete, Swap/Skip/Add in the list). **Batch approved 2026-10-05** (Emilio: "build" → "Batch"), order 186→187→188. Then req-184 session 2 (advanced users, programs), req-10, req-146 later (DEC-091).
+- **Batch 2026-10-05 DONE: req-186–188 shipped** (DEC-103/104). Emilio's feel list: each req's "Built — calls" section. Next:
+  req-184 session 2 (advanced users, programs), req-10, req-146 later (DEC-091).
 - **Waiting (Emilio, DEC-075):** req-146 backend, req-149 progression rules. `req-10` first-time setup — rescan first. **[ux-feel]**
 - **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter → 132 → 137 → 131 → 135 → avatars.
 
