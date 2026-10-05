@@ -320,6 +320,8 @@ function WorkoutItemLive({ routineId, item }) {
       set: viewedSet,
       presentedWeight: weighted ? viewedInit.weight : '',
       seedOverrides: active.seedOverrides,
+      sets: active.sets || [],
+      setIndex: viewIndex,
     })
     if (!save) return
     recordButton('save-set')

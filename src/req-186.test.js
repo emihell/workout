@@ -98,7 +98,7 @@ describe('review fix 2 — Save that changes kg re-runs the seed overrides (DEC-
     // Previous shows 62.5; change to 60; Save
     const save = viewedSetSave(
       { weight: '60', reps: '8', effort: 3 },
-      { weighted: true, initialEffort: 3, set: w.sets[0], presentedWeight: '62.5', seedOverrides: w.seedOverrides },
+      { weighted: true, initialEffort: 3, set: w.sets[0], presentedWeight: '62.5', seedOverrides: w.seedOverrides, sets: w.sets, setIndex: 0 },
     )
     assert.deepEqual(save.setPatch, { weight: 60, reps: '8' })
     w = { ...w, sets: [{ ...w.sets[0], ...save.setPatch }], seedOverrides: save.seedOverrides }
@@ -117,6 +117,28 @@ describe('review fix 2 — Save that changes kg re-runs the seed overrides (DEC-
       routineKg: 60,
     })
     assert.equal(seed.weight, '60')
+  })
+  it('re-review fix 1 — editing an EARLIER set leaves the carry: 60, 65 (carry 65); set 1 → 61, Save → carry 65, set 3 prefills 65', () => {
+    const a = item('a') // no routine kg: the session carry decides
+    let overrides = nextSeedOverrides({}, { exerciseId: 'ex-a', setType: 'work', weighted: true, seed: { weight: '' }, logged: { weight: 60 } })
+    overrides = nextSeedOverrides(overrides, { exerciseId: 'ex-a', setType: 'work', weighted: true, seed: { weight: '60' }, logged: { weight: 65 } })
+    let w = workout([a], [set('a', { weight: 60 }), set('a', { weight: 65 })], { seedOverrides: overrides })
+    assert.deepEqual(w.seedOverrides['ex-a::work'], { weight: '65' })
+    const save = viewedSetSave(
+      { weight: '61', reps: '8', effort: 3 },
+      { weighted: true, initialEffort: 3, set: w.sets[0], presentedWeight: '60', seedOverrides: w.seedOverrides, sets: w.sets, setIndex: 0 },
+    )
+    assert.equal(save.seedOverrides, w.seedOverrides, 'carry untouched')
+    w = { ...w, sets: [{ ...w.sets[0], ...save.setPatch }, w.sets[1]], seedOverrides: save.seedOverrides }
+    assert.equal(w.sets[0].weight, 61)
+    const base = { ex: { type: 'machine' }, weighted: true, hasHistory: false, historyFor: () => ({ weight: '', reps: '' }) }
+    assert.equal(setListRows({ ...base, workout: w, item: a })[2].text, '3 · 65 kg × 8')
+    // the latest set (set 2) DOES re-run it
+    const latest = viewedSetSave(
+      { weight: '62.5', reps: '8', effort: 3 },
+      { weighted: true, initialEffort: 3, set: w.sets[1], presentedWeight: '65', seedOverrides: w.seedOverrides, sets: w.sets, setIndex: 1 },
+    )
+    assert.deepEqual(latest.seedOverrides['ex-a::work'], { weight: '62.5' })
   })
   it('a Save that leaves kg alone returns the same overrides map (no write)', () => {
     const overrides = { 'ex-a::work': { weight: '62.5' } }
@@ -230,7 +252,10 @@ describe('liveSetEditPatch (Save on a viewed set)', () => {
   it('review fix 3 — editing a skipped set into a real one clears its "skipped" note', () => {
     const skipped = set('a', { weight: 0, reps: 'skipped', note: 'skipped', rpe: null })
     const patch = liveSetEditPatch({ weight: '40', reps: '8', effort: 3 }, { weighted: true, initialEffort: 3, set: skipped })
-    assert.deepEqual(patch, { weight: 40, reps: '8', note: '' })
+    // re-review fix 2 — the shown (untouched) effort is written: Moderate → rpe 3
+    assert.deepEqual(patch, { weight: 40, reps: '8', rpe: 3, note: '' })
+    // effort hidden (warm-up / cardio) → still no rpe
+    assert.equal('rpe' in liveSetEditPatch({ weight: '40', reps: '8', effort: null }, { weighted: true, initialEffort: 3, set: skipped }), false)
     const saved = { ...skipped, ...patch }
     assert.equal(loggedSetRowText('1', saved, true), '1 · 40 kg × 8')
     // a non-skipped set's note is never touched
