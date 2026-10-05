@@ -6,18 +6,23 @@
 // true on the destructive button, false on Cancel / backdrop / Escape / navigation.
 // Only one question is open at a time: a new ask cancels (resolves false) the old one.
 // Pure JS, so `node --test` drives it with answerConfirm() — no DOM needed.
+//
+// req-187 — optional `title` (a bold first line), `cancelLabel` (default "Cancel", e.g.
+// "Keep 20 kg") and `stayOn` (a route path, e.g. '/workout/r1'): a hashchange that lands on
+// `stayOn` does NOT answer the sheet, so it can be opened alongside the navigation to that
+// screen and survive it. Any other navigation still answers false.
 
-let pending = null // { message, confirmLabel, resolve }
+let pending = null // { message, confirmLabel, cancelLabel, title, stayOn, resolve }
 const listeners = new Set()
 
 function emit() {
   for (const fn of listeners) fn()
 }
 
-export function askConfirm(message, { confirmLabel = 'OK' } = {}) {
+export function askConfirm(message, { confirmLabel = 'OK', cancelLabel = 'Cancel', title = null, stayOn = null } = {}) {
   if (pending) pending.resolve(false)
   return new Promise((resolve) => {
-    pending = { message, confirmLabel, resolve }
+    pending = { message, confirmLabel, cancelLabel, title, stayOn, resolve }
     emit()
   })
 }
@@ -37,4 +42,16 @@ export function getPendingConfirm() {
 export function subscribeConfirm(fn) {
   listeners.add(fn)
   return () => listeners.delete(fn)
+}
+
+// req-187 — does a navigation to `hash` answer (cancel) the open sheet? Yes, unless the
+// sheet was opened with `stayOn` and the new route is that path (query ignored).
+export function navigationCancels(open, hash) {
+  if (!open) return false
+  if (!open.stayOn) return true
+  const path = (value) => {
+    const raw = String(value || '').replace(/^#/, '') || '/'
+    return (raw.startsWith('/') ? raw : `/${raw}`).split('?')[0]
+  }
+  return path(hash) !== path(open.stayOn)
 }
