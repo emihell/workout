@@ -1,6 +1,6 @@
 # req-187 — new weight → a confirm on the exercise's last Complete, not a row in the list
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-103 §1 (req-184 feedback F4, F11–F13). Siblings: after **req-186**,
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-187` (`dce6dc1`…`52f0375`, 2 commits).** (2026-10-06). **Lane: ui.** From DEC-103 §1 (req-184 feedback F4, F11–F13). Siblings: after **req-186**,
 before **req-188** (all edit `views/workout/item.jsx`). Writes the routine only through the existing
 `store.applyRoutineUpdate` (no new write path, no schema change); touches `store.jsx` only if a sheet hook is needed →
 reviewer if it does.
