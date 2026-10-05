@@ -40,7 +40,7 @@ async function harness(payload, { viaImport = false } = {}) {
 }
 
 describe('req-175 — the live workout: new words on screen, stored setType / rpe unchanged', () => {
-  it('Leg Extension: Warm-up set title and preview, Swap exercise, "Max" (req-177); the finished sets deep-equal main', async () => {
+  it('Leg Extension: Warm-up set title and preview, "Max" (req-177); the finished sets deep-equal main', async () => {
     const { captured, mount } = await harness(fixture())
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     const { RPE_OPTIONS } = await import('./ids.js')
@@ -49,7 +49,10 @@ describe('req-175 — the live workout: new words on screen, stored setType / rp
     const text = view.text()
     assert.match(text, /Warm-up set/)
     assert.match(text, /Warm-up · /, 'the set preview line')
-    assert.match(text, /Swap exercise/)
+    // req-188 (test edit) — Swap exercise moved to the workout list's row sheet; the log
+    // screen's only Skip is the set one. req-175's "Swap" wording is checked there now.
+    assert.doesNotMatch(text, /Swap exercise|Skip exercise/)
+    assert.match(text, /Skip set/)
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
     await view.click(view.button('Complete')) // the warm-up, as prefilled
     const effort5 = RPE_OPTIONS.find((o) => o.value === 5).label // label-agnostic, so it runs on main too

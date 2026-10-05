@@ -36,15 +36,12 @@ import { activeSetPatch, liveSetWeight, viewedSetSave } from '../set-values.js'
 import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
-import { exerciseName, findItem, isActiveFor, itemLogPath, itemReplacePath, itemSetsPath } from './workout-helpers.js'
+import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath } from './workout-helpers.js'
 import { SkipRest, WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
 import { askConfirm } from '../../ui/confirm.js'
 import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
-
-// req-109 — how long an armed "Skip exercise" waits for its second tap.
-const SKIP_EXERCISE_ARM_MS = 3000
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
 // workout-log.js); weight step and cues stay live. Old snapshots read live as before.
@@ -238,8 +235,6 @@ function WorkoutItemLive({ routineId, item }) {
     const done = finishAfterThisSet()
     // req-125 — the set is logged: drop any pending draft write and clear its draft.
     draftWriter.cancel()
-    // req-109 (review) — logging a set disarms a pending Skip exercise.
-    setSkipArmed(false)
     // req-83 (N9) — a field entered differently from the seed becomes the seed for
     // this exercise's remaining sets this session. Compared against `seed` (what the
     // form presented, incl. any earlier override); only a changed field propagates.
@@ -285,7 +280,6 @@ function WorkoutItemLive({ routineId, item }) {
   function skipSet() {
     recordButton('skip-set')
     draftWriter.cancel()
-    setSkipArmed(false)
     const done = finishAfterThisSet()
     const setRecord = {
       routineItemId: itemKey(item),
@@ -314,7 +308,6 @@ function WorkoutItemLive({ routineId, item }) {
     const index = loggedIndexes[viewPos - 1]
     if (index == null) return
     recordButton('previous-set')
-    setSkipArmed(false)
     // The current set's typing is kept: write the pending draft now, so Next can re-read it.
     if (!viewing) draftWriter.flush()
     setViewIndex(index)
@@ -355,17 +348,6 @@ function WorkoutItemLive({ routineId, item }) {
     backToCurrentSet()
   }
 
-  // req-109 — Skip exercise needs two taps: the first arms it ("Tap again to skip"),
-  // which disarms by itself after SKIP_EXERCISE_ARM_MS; the second logs every remaining
-  // set of this exercise as skipped, marks it done and returns to the overview. No
-  // native confirm: it's a mis-tap guard, not a warning (Emilio, 2026-09-23).
-  const [skipArmed, setSkipArmed] = useState(false)
-  useEffect(() => {
-    if (!skipArmed) return undefined
-    const id = setTimeout(() => setSkipArmed(false), SKIP_EXERCISE_ARM_MS)
-    return () => clearTimeout(id)
-  }, [skipArmed])
-
   // req-117 — "Remove set": undo an "Add set" whose set hasn't been logged yet. Pops
   // the last (unlogged, added) set and recomputes done; when every remaining set is
   // logged the exercise is done again and this returns to the overview, as completing
@@ -375,22 +357,10 @@ function WorkoutItemLive({ routineId, item }) {
     const patch = removeAddedSetPatch(active, itemKey(item))
     if (!patch) return
     recordButton('remove-set')
-    setSkipArmed(false)
     store.patchActive(patch)
     if ((patch.completedItemIds || []).includes(itemKey(item))) {
       go(`/workout/${routineId}`, { replace: true })
     }
-  }
-
-  function skipExercise() {
-    if (!skipArmed) {
-      setSkipArmed(true)
-      return
-    }
-    recordButton('skip-exercise')
-    setSkipArmed(false)
-    store.skipItem(itemKey(item))
-    go(`/workout/${routineId}`, { replace: true })
   }
 
   // req-186 — Previous shows when there is a logged set before the one on screen.
@@ -606,9 +576,9 @@ function WorkoutItemLive({ routineId, item }) {
         </ul>
       ) : null}
       {/* req-109 — exercise-level lateral actions, in normal flow below the form (the
-          set-level Previous · Skip · Complete bar stays pinned at the bottom). Skip
-          exercise writes (a Button, two taps); Swap exercise only opens the picker
-          (a NavLink wearing the button look, DEC-040). */}
+          set-level Previous · Skip set · Complete bar stays pinned at the bottom).
+          req-188 (DEC-103 §2) — Skip exercise and Swap exercise moved to the workout list's
+          row "⋯" sheet; Skip rest and Remove set stay. */}
       {logging ? (
         <Actions
           className="ui-exercise-actions"
@@ -623,12 +593,6 @@ function WorkoutItemLive({ routineId, item }) {
                   Remove set
                 </Button>
               ) : null}
-              <Button variant="quiet" onClick={skipExercise}>
-                {skipArmed ? 'Tap again to skip' : 'Skip exercise'}
-              </Button>
-              <NavLink to={itemReplacePath(routineId, item)} look="quiet">
-                Swap exercise
-              </NavLink>
             </>
           }
         />

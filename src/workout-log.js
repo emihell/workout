@@ -218,16 +218,34 @@ export function skipItemPatch(workout, itemId) {
   return { sets, ...markItemDonePatch(workout, item) }
 }
 
-// req-109 — the blank replacement item for `exercise`, inserted after `original`.
-// 1 working set, no reps target, no suggested weight, no warm-up, no notes: nothing is
-// copied from the original but its ROLE (a slot value: a warm-up replacement still
-// reads as a warm-up). `restSec` is the caller's — the rest of this exercise's own last
-// finished snapshot (historyPrescription), else 0. `id` must be unique and must not be
-// a routine template item's id; it is both `id` and `routineItemId`. Prefill then comes
-// from the exercise's own history through the normal log-form rule (DEC-053).
-// req-178 — `suggestedWeights`: the replacement's routine kg, from its history's first
-// set (the DEC-096 §2 "history prefills the routine" rule, applied to a mid-workout add).
-export function replacementItem({ id, original, exercise, restSec, suggestedWeights = [] }) {
+// The mid-workout item for `exercise`: a Swap's replacement (inserted after `original`) or,
+// since req-188, an Add exercise item (`original` null, appended). Nothing is copied from the
+// original but its ROLE (a slot value: a warm-up replacement still reads as a warm-up; an added
+// item is main); no warm-up, no notes. `id` must be unique and must not be a routine template
+// item's id; it is both `id` and `routineItemId`. Prefill then comes from the exercise's own
+// history through the normal log-form rule (DEC-053).
+// - `prescription` given (req-188 / DEC-104): its sets, reps, kg, durations and rest — history's
+//   prescription (routine-picker.js pickerItem), or for a no-history exercise the sets and rest
+//   the user typed (mid-workout-pick.js noHistoryItem; reps and kg blank). Never invented.
+// - absent (req-109 / req-178, kept for its callers and tests): 1 working set, no reps target,
+//   `restSec` / `suggestedWeights` the caller's (history's rest and first kg, else 0 / []).
+// - `replacesItemId` (req-188 review): the key of the item a Swap replaced, set only on a Swap
+//   item, so the workout pill (currentWorkoutItem) tells a replacement from an appended item.
+//   Kept across reloads (migrateState passes mid-workout items through unchanged).
+function prescribed(prescription, restSec, suggestedWeights) {
+  if (!prescription) return { sets: 1, targets: [], suggestedWeights, durations: [], restSec: Number(restSec) || 0 }
+  const list = (value) => (Array.isArray(value) ? [...value] : [])
+  return {
+    sets: Math.max(1, Math.floor(Number(prescription.sets)) || 1),
+    targets: list(prescription.targets),
+    suggestedWeights: list(prescription.suggestedWeights),
+    durations: list(prescription.durations),
+    restSec: Number(prescription.restSec) || 0,
+  }
+}
+
+export function replacementItem({ id, original, exercise, restSec, suggestedWeights = [], prescription = null }) {
+  const plan = prescribed(prescription, restSec, suggestedWeights)
   return {
     id,
     routineItemId: id,
@@ -239,14 +257,15 @@ export function replacementItem({ id, original, exercise, restSec, suggestedWeig
     // req-119 — Timed frozen from the replacement's exercise, as buildPlannedWorkout does.
     hasDuration: Boolean(exercise.hasDuration),
     role: original?.role || 'main',
-    sets: 1,
-    targets: [],
-    suggestedWeights,
-    durations: [],
-    restSec: Number(restSec) || 0,
+    sets: plan.sets,
+    targets: plan.targets,
+    suggestedWeights: plan.suggestedWeights,
+    durations: plan.durations,
+    restSec: plan.restSec,
     notes: '',
     warmup: null,
     addedMidWorkout: true,
+    ...(original && itemKey(original) ? { replacesItemId: itemKey(original) } : {}),
   }
 }
 
@@ -287,6 +306,15 @@ export function replaceItemPatch(workout, itemId, replacement) {
     if (itemKey(item) === itemId) items.push(replacement)
   }
   return { ...skip, snapshot: { ...workout.snapshot, items } }
+}
+
+// req-188 (DEC-103 §2) — "Add exercise" from the workout list: `item` (a replacementItem with
+// no original) appended at the end of the snapshot. This workout only: the routine is untouched,
+// no set is written. A key already in the snapshot → null.
+export function appendItemPatch(workout, item) {
+  const items = workout?.snapshot?.items || []
+  if (!item || items.some((candidate) => itemKey(candidate) === itemKey(item))) return null
+  return { snapshot: { ...workout.snapshot, items: [...items, item] } }
 }
 
 // req-109 — the overview's "skipped" state: the item has sets and every one of them is
@@ -826,7 +854,9 @@ export function loggedSetRowText(label, set, weighted) {
 //     a set-level Skip on an exercise in progress keeps it current;
 //   - that item done AND its last record skipped AND a replacement (addedMidWorkout)
 //     sits right after it in the snapshot (replaceItemPatch inserts it there) and isn't
-//     done → the replacement: a Swap points the pill at the swapped-in exercise;
+//     done → the replacement: a Swap points the pill at the swapped-in exercise. req-188
+//     review — "replacement" means `replacesItemId` is that item's key: an Add exercise item
+//     appended after it (none) is not one, so Skip on the last routine item keeps the pill;
 //   - else the item of the most recent NON-skipped set, if it isn't done (a Skip
 //     exercise on B doesn't pull the pill back to an untouched A while C is in progress);
 //   - else the first not-done item in snapshot order. All done → null.
@@ -841,7 +871,9 @@ export function currentWorkoutItem(workout) {
   const owner = at >= 0 ? items[at] : null
   if (owner && !done(owner)) return owner
   const next = at >= 0 ? items[at + 1] : null
-  if (owner && isSkippedSet(last) && next && isAddedMidWorkout(next) && !done(next)) return next
+  if (owner && isSkippedSet(last) && next && isAddedMidWorkout(next) && next.replacesItemId === itemKey(owner) && !done(next)) {
+    return next
+  }
   const lastReal = sets.findLast((set) => !isSkippedSet(set))
   const realOwner = items.find((item) => setsForItem([lastReal], item).length > 0)
   if (realOwner && !done(realOwner)) return realOwner

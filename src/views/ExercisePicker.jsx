@@ -10,6 +10,9 @@
 //     restore, item, name } or { kind: 'library', data (catalogItemToExercise), item, name }.
 //   max — 1 makes a tap replace the selection; addLabel(n) — the primary button's text;
 //   lateral — an extra control between Cancel and the primary (a plan slot's Skip).
+//   req-188 (DEC-104) — each onPick pick also carries `source` ('history' | 'starting');
+//   startingLabel — shown on a selected no-history row instead of the starting plan (the
+//   workout's pickers don't use that plan: they ask for sets and rest next).
 import { useEffect, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog.js'
 import { libraryItemMatch } from '../exercise-names.js'
@@ -45,6 +48,7 @@ export function ExercisePicker({
   createTo = null,
   ownFilter = null,
   libraryFilter = null,
+  startingLabel = null,
   loadCatalog = loadExerciseCatalog,
 }) {
   const store = useStore()
@@ -90,8 +94,10 @@ export function ExercisePicker({
   const restDirect = found ? found.common.length === 0 : false
   const hits = found ? (restDirect || showRest ? [...found.common, ...found.rest] : found.common).filter(shown) : []
 
-  const pickPlan = (pick) =>
-    pickerItem(workouts, pick.kind === 'own' ? pick.exercise : catalogItemToExercise(pick.entry))
+  const pickPlan = (pick) => {
+    const plan = pickerItem(workouts, pick.kind === 'own' ? pick.exercise : catalogItemToExercise(pick.entry))
+    return startingLabel && plan.source === 'starting' ? { ...plan, label: startingLabel } : plan
+  }
   const ownPicked = (exercise) => picks.find((pick) => pick.kind === 'own' && pick.exercise.id === exercise.id)
   const libraryPicked = (entry) =>
     picks.find((pick) => pick.key === `lib:${entry.id}` || (pick.fromLibrary && pick.fromLibrary === entry.id))
@@ -158,10 +164,10 @@ export function ExercisePicker({
     if (onPick) {
       onPick(
         picks.map((pick) => {
-          const { item, label } = pickPlan(pick)
+          const { item, label, source } = pickPlan(pick)
           return pick.kind === 'library'
-            ? { kind: 'library', data: catalogItemToExercise(pick.entry), item, label, name: shownName(pick.entry) }
-            : { kind: 'own', exerciseId: pick.exercise.id, restore: Boolean(pick.restore), item, label, name: pick.exercise.name }
+            ? { kind: 'library', data: catalogItemToExercise(pick.entry), item, label, source, name: shownName(pick.entry) }
+            : { kind: 'own', exerciseId: pick.exercise.id, restore: Boolean(pick.restore), item, label, source, name: pick.exercise.name }
         }),
       )
       return

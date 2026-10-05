@@ -13,6 +13,7 @@ import {
   exerciseAddedState,
   exerciseUpdatedState,
   itemSkippedState,
+  itemsAddedState,
   loopWeeksState,
   removeExerciseFromState,
   removeRoutineFromState,
@@ -182,10 +183,19 @@ export function StoreProvider({ children }) {
       // from the exercise's own last finished snapshot, else none.
       // req-124 — the new item's id is generated before the updater and returned, so the
       // picker can land on the new exercise's log screen (reducer: replaceItemInState).
-      replaceItem(itemId, exerciseId) {
+      // req-188 — `prescription`: the picker's item (sets/reps/kg/rest) for the swapped-in one.
+      replaceItem(itemId, exerciseId, prescription = null) {
         const id = uid('mid')
-        setState((s) => replaceItemInState(s, itemId, exerciseId, id))
+        setState((s) => replaceItemInState(s, itemId, exerciseId, id, prescription))
         return id
+      },
+      // req-188 (DEC-103 §2) — "Add exercise" from the workout list: each `{ exerciseId, item }`
+      // appended to this workout as a mid-workout item (reducer: itemsAddedState); the routine
+      // is never touched. Ids made before the updater; returned in order.
+      addWorkoutItems(added) {
+        const adds = (added || []).map(({ exerciseId, item }) => ({ id: uid('mid'), exerciseId, item }))
+        setState((s) => itemsAddedState(s, adds))
+        return adds.map((add) => add.id)
       },
       // req-125 — `draftKey`: the set being logged; its setDraft is dropped inside this
       // update (setLoggedState → withLoggedSet), from the latest state.

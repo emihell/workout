@@ -3,5 +3,6 @@
 export { Workout, WorkoutItem } from './overview'
 export { WorkoutItemLog, WorkoutItemDone, WorkoutSetEdit } from './item'
 export { WorkoutItemReplace } from './replace'
+export { WorkoutAdd } from './add'
 export { WorkoutItemExercise, WorkoutSetup } from './setup'
 export { WorkoutFinish } from './finish'

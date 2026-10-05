@@ -4,7 +4,7 @@
 import { buildPlannedWorkout, exerciseById, planSnapshot } from './model.js'
 import { dateKey } from './schedule.js'
 import { patchExercise } from './exercise-names.js'
-import { itemKey, replaceItemPatch, replacementItem, skipItemPatch, withLoggedSet } from './workout-log.js'
+import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withLoggedSet } from './workout-log.js'
 import { historyPrescription, routinesUsingExercise } from './history-queries.js'
 
 // req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the
@@ -117,12 +117,15 @@ export function restoreExerciseInState(s, exerciseId) {
 // navigate to it. Returns `s` unchanged (same reference) when there is no active
 // workout, the exercise or the original item is unknown, or the patch fails — in that
 // case no item with `id` exists.
-export function replaceItemInState(s, itemId, exerciseId, id) {
+// req-188 — `prescription` (optional): the picker's item for the picked exercise; the
+// replacement takes its sets/reps/kg/durations/rest (replacementItem). Without it, today's
+// req-109/req-178 blank item (1 set, history's first kg, history's rest).
+export function replaceItemInState(s, itemId, exerciseId, id, prescription = null) {
   const active = s.activeWorkout
   const exercise = exerciseById(s.exercises, exerciseId)
   const original = (active?.snapshot?.items || []).find((item) => itemKey(item) === itemId)
   if (!active || !exercise || !original) return s
-  const history = historyPrescription(s.workouts, exerciseId)
+  const history = prescription ? null : historyPrescription(s.workouts, exerciseId)
   const firstKg = Number(history?.suggestedWeights?.[0]) || 0
   const replacement = replacementItem({
     id,
@@ -130,9 +133,31 @@ export function replaceItemInState(s, itemId, exerciseId, id) {
     exercise,
     restSec: history?.restSec,
     suggestedWeights: firstKg > 0 ? [firstKg] : [],
+    prescription,
   })
   const patch = replaceItemPatch(active, itemId, replacement)
   return patch ? { ...s, activeWorkout: { ...active, ...patch } } : s
+}
+
+// req-188 (DEC-103 §2) — "Add exercise" from the workout list: each `{ id, exerciseId, item }`
+// (item = the picker's prescription) appended to the active snapshot as a mid-workout item
+// (addedMidWorkout), in order. This workout only — the routine is never touched, no set is
+// written. An unknown exercise (or a duplicate id) is passed over; nothing added → `s`
+// unchanged (same reference), as is no active workout. req-188 review — an add clears
+// `autoFinishDismissed`: a summary cancelled before the add must arm again once the added
+// exercises are done too (else it stayed dismissed for the rest of the workout).
+export function itemsAddedState(s, adds) {
+  let active = s.activeWorkout
+  if (!active) return s
+  for (const { id, exerciseId, item } of adds || []) {
+    const exercise = exerciseById(s.exercises, exerciseId)
+    if (!exercise || !id) continue
+    const patch = appendItemPatch(active, replacementItem({ id, original: null, exercise, prescription: item || {} }))
+    if (patch) active = { ...active, ...patch }
+  }
+  if (active === s.activeWorkout) return s
+  const { autoFinishDismissed: _dismissed, ...rest } = active
+  return { ...s, activeWorkout: rest }
 }
 
 export function removeRoutineFromState(s, routineId, archivedAt = new Date().toISOString()) {

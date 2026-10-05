@@ -12,10 +12,30 @@ import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/in
 import { activeNote } from '../../workout-note.js'
 import { weekdayDate } from '../history/helpers'
 import { MissingItem, NotInWorkout } from './helpers'
-import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-helpers.js'
+import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, itemReplacePath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
 import { WorkoutPill } from './rest'
-import { getPendingConfirm, subscribeConfirm } from '../../ui/confirm.js'
+import { askChoice, getPendingConfirm, subscribeConfirm } from '../../ui/confirm.js'
+import { recordButton } from '../../analytics'
+
+// req-188 (DEC-103 §2) — a not-done row's "⋯": Swap exercise · Skip exercise · Cancel, in the
+// one sheet. Skip is one tap here (the sheet is the guard; the log screen's two-tap arm is
+// gone): every remaining set logged skipped, the item done (store.skipItem, unchanged). Swap
+// opens the picker (navigation, nothing written). Cancel / backdrop write nothing.
+async function rowActions(store, routineId, item) {
+  const choice = await askChoice('', {
+    title: exerciseName(item),
+    choices: [
+      { value: 'swap', label: 'Swap exercise' },
+      { value: 'skip', label: 'Skip exercise' },
+    ],
+  })
+  if (choice === 'swap') go(itemReplacePath(routineId, item))
+  else if (choice === 'skip') {
+    recordButton('skip-exercise')
+    store.skipItem(itemKey(item))
+  }
+}
 
 // req-93 — the exercise's label in the in-workout list. Main is the default and the
 // substance of the session, so it shows the name only, BOLD, with no "— Main". Non-main
@@ -164,7 +184,22 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
             // req-79 — completed exercises read muted (ui-row--done) so the eye lands
             // on what's left; not-done rows stay full emphasis. Order/meaning unchanged.
             <Fragment key={itemKey(item) || item.id}>
-              <Row to={path} className={completed ? 'ui-row--done' : ''}>
+              <Row
+                to={path}
+                className={completed ? 'ui-row--done' : ''}
+                action={
+                  completed ? null : (
+                    <Button
+                      variant="quiet"
+                      className="ui-row-menu"
+                      aria-label={`Swap or skip ${exerciseName(item)}`}
+                      onClick={() => rowActions(store, routineId, item)}
+                    >
+                      ⋯
+                    </Button>
+                  )
+                }
+              >
                 <ExerciseLabel item={item} />
                 {/* req-109 — a done row whose sets are ALL skipped reads "skipped"; one
                     logged set and it reads done (derived from the sets, no marker). */}
@@ -176,6 +211,13 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           )
         })}
       </List>
+      {/* req-188 (DEC-103 §2) — add to THIS workout from the routine's picker (whole library);
+          the routine is never touched. Navigation only, so a chevron link (DESIGN §4). */}
+      <p>
+        <NavLink to={`/workout/${routineId}/add`} chevron="forward">
+          Add exercise
+        </NavLink>
+      </p>
       {/* req-107 — a workout note, kept on the active workout (its existing overallNote,
           written through patchActive) so it survives leaving, logging and reloading.
           The Finish screen shows and edits the same note. autoFocus only when opened

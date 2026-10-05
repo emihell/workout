@@ -12,7 +12,11 @@
 // `stayOn` does NOT answer the sheet, so it can be opened alongside the navigation to that
 // screen and survive it. Any other navigation still answers false.
 
-let pending = null // { message, confirmLabel, cancelLabel, title, stayOn, resolve }
+// req-188 — `askChoice(message, { title, choices: [{ value, label }] })`: the same one sheet
+// with a button per choice (stacked) above Cancel; resolves the chosen `value`, or null on
+// Cancel / backdrop / Escape / navigation. A plain askConfirm still resolves a boolean.
+
+let pending = null // { message, confirmLabel, cancelLabel, title, stayOn, choices, resolve }
 const listeners = new Set()
 
 function emit() {
@@ -20,19 +24,28 @@ function emit() {
 }
 
 export function askConfirm(message, { confirmLabel = 'OK', cancelLabel = 'Cancel', title = null, stayOn = null } = {}) {
-  if (pending) pending.resolve(false)
+  if (pending) pending.resolve(pending.choices ? null : false)
   return new Promise((resolve) => {
     pending = { message, confirmLabel, cancelLabel, title, stayOn, resolve }
     emit()
   })
 }
 
+export function askChoice(message, { title = null, choices = [], cancelLabel = 'Cancel' } = {}) {
+  if (pending) pending.resolve(pending.choices ? null : false)
+  return new Promise((resolve) => {
+    pending = { message, confirmLabel: null, cancelLabel, title, stayOn: null, choices, resolve }
+    emit()
+  })
+}
+
 export function answerConfirm(value) {
   if (!pending) return
-  const { resolve } = pending
+  const { resolve, choices } = pending
   pending = null
   emit()
-  resolve(!!value)
+  if (choices) resolve(choices.some((choice) => choice.value === value) ? value : null)
+  else resolve(!!value)
 }
 
 export function getPendingConfirm() {
