@@ -462,3 +462,9 @@ A file with no `test()` calls reports itself as `ok 1` → `# pass 1 # fail 0` (
 `dates-tz.test.js`'s `/# pass [1-9]/` guard can't catch an emptied cases file. It has never been able to, since req-114.
 **How to apply:** a vacuous-pass guard asserts the exact count, not "≥1". Follow-up in BACKLOG §Workflow / tooling.
 Related: Node 26's non-TTY default reporter is `spec`, not TAP, so a child run the parent parses needs `--test-reporter=tap`.
+
+## L-046 — headless Chrome may report `prefers-reduced-motion: reduce`; set it before checking an animation  (build agent, req-186, 2026-10-05)
+
+On one run the GO pulse "didn't animate" because headless Chrome matched reduced motion, so the static state rendered. **How to
+apply:** a browser check of any animation calls `page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value:
+'no-preference' }])` first (and once with `reduce` to check the static fallback).
