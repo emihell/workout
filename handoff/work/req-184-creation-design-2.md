@@ -31,3 +31,28 @@ we can also fix any feedback that i have on how the setup is now".
 ## Acceptance
 Each question answered by Emilio and recorded as a `DEC-`; feedback items each fixed or turned into a numbered req; the gap
 list → READY build reqs (model gaps first). Nothing built from this req itself.
+
+## Feedback received 2026-10-05 (13 notes, app 291fb52 → cbd9a78) — triage
+Code facts from a read-only scan of main `cbd9a78`.
+- **F1 pin favourites / search whole library when building a routine** (09-24) — **already shipped** after the note: DEC-097
+  picker (req-180) searches own → whole library; no pinning by decision. `/exercises` "add from library" step stays optional.
+- **F2 history detail Back went to History from Home** (09-24) — **already shipped** (DEC-092, req-171): `Today.jsx:80,92`
+  link with `from=/`, `return-paths.js:18`. His design point kept: needing Back = a smell, inspect-info should be fast.
+- **F3 two Skips, Swap on the log page, "why not just add?"** — `item.jsx:505-515` set Skip in the bar + "Skip exercise" +
+  "Swap exercise" below; overview has no swap and no mid-workout add (`overview.jsx:106` "Add exercises" only on an empty
+  preview). → **Q-A**.
+- **F4 "What is save to sesh?"** + **F11–F13 "why didn't biceps curl save … should be a pop/confirmation when pressing
+  complete, not information in this list"** — `routine-offer.jsx:30` "Save to {routineName}", inline row under the completed
+  item (`overview.jsx:171`), shown whenever logged kg ≠ routine kg (`routine-update-offer.js:23-42`). Reverses DEC-096 §3's
+  Planner shape (inline, not popup). → **Q-B**.
+- **F5 Replace should search the whole library** — `replace.jsx:40-44` own exercises only. Fix (DEC-095): same picker as the
+  routine (`ExercisePicker`).
+- **F6 see coming sets (weights) all through the exercise** + **F9 hard to tell I'm on the next set; make "1 of 3" bigger** —
+  set list shows only before the first log (`item.jsx:407-417`); progress is a small "1/4" in the sub line (`:58-63`, `:84`).
+  Fix (DEC-094/095): keep the set list on screen the whole exercise, current set highlighted, done sets ticked.
+- **F7 "GO" glowing chip when rest ends** + **F10 timer chip owns the 1/4** + **F8b tap the timer → go to the exercise I'm
+  in** — `RestPill` (`rest.jsx:13`) hides at 0, tap = skip rest (`rest.jsx:19-22`); state persists in `activeWorkout`. → **Q-C**.
+- **F8a going back to a completed set: Complete should be a secondary Next and not restart the timer** — Previous calls
+  `store.removeActiveSet` (`item.jsx:284-298`): it **un-logs** the set and clears the rest; re-Complete re-arms it. Fix
+  (DEC-095): Previous views the logged set without un-logging; forward is "Next" (secondary) when unchanged, "Save" when
+  edited; neither touches the rest timer.
