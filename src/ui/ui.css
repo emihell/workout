@@ -621,6 +621,17 @@ html:has(.ui-picker-bar) {
 .ui-today-workout__routine + .ui-today-workout__routine {
   margin-top: var(--ui-s4);
 }
+/* req-195 — today's finished workouts inside the block, one "<routine> · Done ✓ ›" link
+ * each (≥44px tall via .ui-navlink), flush with the date line; spaced off a Start above
+ * and off Start new workout below. */
+.ui-today-workout__done {
+  list-style: none;
+  padding: 0;
+  margin: var(--ui-s2) 0 var(--ui-s3);
+}
+.ui-today-workout__done .ui-navlink {
+  padding: 0;
+}
 /* req-53 — the "in progress" marker beside the routine info in the emphasized
  * hero block (today's slot or the standalone hero). The grayscale eyebrow look,
  * inline and set off from the name so it reads as a status, not part of it. */

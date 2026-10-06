@@ -38,7 +38,8 @@ test('Today empty day: "Start new workout" is a NavLink to /routines with the pr
   assert.match(
     body,
     // req-122 — the button look is the NavLink `look`/`block` props, not hand-written classes.
-    /<NavLink to="\/routines" look="primary" block>\s*Start new workout\s*<\/NavLink>/,
+    // req-195 — primary while nothing is done today, secondary once something is.
+    /<NavLink to="\/routines" look=\{done\.length \? 'secondary' : 'primary'\} block>\s*Start new workout\s*<\/NavLink>/,
   )
 })
 

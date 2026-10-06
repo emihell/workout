@@ -33,7 +33,8 @@ test('today block prints the date line once, not once per routine', () => {
 
 test('Today renders one grouped block for all of today\'s slots', () => {
   const today = src.slice(src.indexOf('export function Today('))
-  assert.match(today, /<TodayWorkouts store=\{store\} todays=\{todays\} date=\{todayKey\} \/>/)
+  // req-195 — the block also receives today's done rows (`done`).
+  assert.match(today, /<TodayWorkouts store=\{store\} todays=\{todays\} date=\{todayKey\} done=\{done\} \/>/)
   // no per-slot block with its own date is mapped any more
   assert.doesNotMatch(today, /todays\.map\(/)
 })
@@ -70,7 +71,8 @@ test('the hero is the CURRENT workout and keeps today\'s other occurrences', () 
   const today = src.slice(src.indexOf('export function Today('))
   assert.match(today, /isCurrentWorkout\(mine, now, todayKey\)/)
   assert.match(today, /otherTodayOccurrences\(todays, hero, todayKey\)/)
-  assert.match(today, /<TodayHero store=\{store\} workout=\{hero\} others=\{others\} date=\{todayKey\} \/>/)
+  // req-195 — `done` added; the hero props are otherwise unchanged.
+  assert.match(today, /<TodayHero store=\{store\} workout=\{hero\} others=\{others\} date=\{todayKey\} done=\{done\} \/>/)
   assert.doesNotMatch(today, /dateKey\(mine\.startedAt\)/)
   const hero = fnBody('TodayHero')
   // one date line — today's, not the workout's own date
@@ -91,4 +93,30 @@ test('the hero Continue calls continueInProgress, not startOrContinue', () => {
   const hero = fnBody('HeroRoutine')
   assert.match(hero, /onClick=\{\(\) => continueInProgress\(store, workout\)\}/)
   assert.doesNotMatch(hero, /startOrContinue\(/)
+})
+
+// req-195 / DEC-108 §5 — a workout finished today lives inside today's block, never as a
+// second today-dated row in the list below.
+test('today\'s finished workouts render inside every shape of today\'s block', () => {
+  for (const name of ['TodayWorkouts', 'TodayHero', 'TodayEmpty']) {
+    assert.match(fnBody(name), /<TodayDone store=\{store\} done=\{done\} \/>/, name)
+  }
+  const done = fnBody('TodayDone')
+  assert.match(done, /if \(!done\.length\) return null/)
+  assert.match(done, /withFrom\(`\/history\/\$\{workout\.id\}`, '\/'\)/)
+  assert.match(done, / · Done ✓/)
+  const today = src.slice(src.indexOf('export function Today('))
+  assert.match(today, /doneInTodayBlock\(store\.workouts, others, todayKey\)/)
+})
+
+test('something done today: no "Nothing scheduled", and Start new workout turns secondary', () => {
+  const empty = fnBody('TodayEmpty')
+  assert.match(empty, /done\.length \? \(\s*<TodayDone[^]*\) : \(\s*<p className="ui-today-workout__name">Nothing scheduled today\.<\/p>/)
+  assert.match(empty, /look=\{done\.length \? 'secondary' : 'primary'\} block/)
+})
+
+test('the list below holds prior days only (no completed-today rows)', () => {
+  assert.doesNotMatch(src, /CompletedTodayRow/)
+  // the peek list opens straight on the prior-day rows
+  assert.match(src, /<List>\s*\{recent\.map\(/)
 })
