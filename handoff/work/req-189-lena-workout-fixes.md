@@ -1,6 +1,6 @@
 # req-189 — first-workout fixes from the Lena run, and Swap copies sets/rest
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From req-184 §Persona run (Lena, 2026-10-06) and DEC-106. Siblings: **req-190**
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-189` (`bee2be0`…`407e65c`, 2 commits).** (2026-10-06). **Lane: ui.** From req-184 §Persona run (Lena, 2026-10-06) and DEC-106. Siblings: **req-190**
 (setup) touches different screens; order 189 → 190, both off `main`. Trigger files: likely none (`mid-workout-pick.js`,
 views, `ui/`); if `workout-log.js` / `store.jsx` / `state-reducers.js` change → independent reviewer.
 
