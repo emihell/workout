@@ -1,6 +1,6 @@
 # req-194 — cardio sets: stopwatch, Level, Distance
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-108 §4 (G1 "Timer for duration only exercises?", G3 "Add level for
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-194` (`94f4bda`…`9fc7131`, 4 commits).** (2026-10-06). **Lane: ui.** From DEC-108 §4 (G1 "Timer for duration only exercises?", G3 "Add level for
 machines like stairs, row, cross fit"; Emilio picked Stopwatch, Level, Distance). After **req-193**. Set records gain optional
 fields — **no migration, no rewrite**; older sets simply lack them. Trigger files: `workout-log.js` / `model.js` /
 `exchange.js` if touched → reviewer.
