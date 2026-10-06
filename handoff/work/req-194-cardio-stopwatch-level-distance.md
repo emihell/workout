@@ -1,6 +1,6 @@
 # req-194 — cardio sets: stopwatch, Level, Distance
 
-**Status: READY** (2026-10-06). **Lane: ui.** From DEC-108 §4 (G1 "Timer for duration only exercises?", G3 "Add level for
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-194` (`94f4bda`…`9fc7131`, 4 commits).** (2026-10-06). **Lane: ui.** From DEC-108 §4 (G1 "Timer for duration only exercises?", G3 "Add level for
 machines like stairs, row, cross fit"; Emilio picked Stopwatch, Level, Distance). After **req-193**. Set records gain optional
 fields — **no migration, no rewrite**; older sets simply lack them. Trigger files: `workout-log.js` / `model.js` /
 `exchange.js` if touched → reviewer.
@@ -38,3 +38,10 @@ Pace/calories, heart rate, a running workout clock, the timed-exercise countdown
 
 ## Decisions made on Emilio's behalf `(unconfirmed)`
 Distance unit; display format; stopwatch persistence approach.
+
+## Built — calls `(unconfirmed)`
+Bare number = minutes ("20" → 20:00); distance unit m/km toggle, starts on the last-used unit; Level/Distance not prefilled;
+one stopwatch at a time (a second Start is refused with "running on X — stop it there first"); Start runs from 0:00, Resume after
+Stop; Duration prefilled from a single-time target, a range blank + required (DEC-109); zero refused; cardio History line
+"12:30 · level 8 · 1.5 km" (a timed cardio reads "0:30" not "30s"); "↑ Longer" beat-last-time win now possible for cardio;
+comma in Distance = decimal. New optional `activeWorkout.stopwatch` (stripped on Finish and on import).
