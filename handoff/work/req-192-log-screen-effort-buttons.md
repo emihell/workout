@@ -1,6 +1,6 @@
 # req-192 — the set screen: effort buttons log the set, pill skips rest, set list on top, exercise note shown
 
-**Status: READY** (2026-10-06). **Lane: ui.** From DEC-108 §1–3, §6 (Emilio's notes G4, G8–G13). Order: **192 → 193 → 194 →
+**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-108 §1–3, §6 (Emilio's notes G4, G8–G13). Order: **192 → 193 → 194 →
 195** (192–194 touch `views/workout/item.jsx` / `ui/index.jsx`). Trigger files: `workout-log.js` / `progress.js` only if touched
 → reviewer. No schema change.
 
@@ -45,3 +45,9 @@ Changing progress.js's reading of effort. Cardio fields (req-194). Weight step (
 
 ## Decisions made on Emilio's behalf `(unconfirmed)`
 Caption wording; button layout (row vs 2×2); "Done" for no-effort sets; "1:12 · skip" hint; set list on top; note placement.
+
+## Built — calls `(unconfirmed)`
+Caption "Log set — how did it feel?"; four buttons in one row (84×44 at 390); Previous / Skip set row above; "Done" for
+no-effort sets (a commit button — DESIGN §4's ban on "Done" is for navigation); pill reads "1:30 · skip" on its own exercise
+(the set count is hidden there); Enter logs nothing on effort sets; viewing a set with no rpe selects nothing. The set list
+shows no effort (unchanged). `initialSetFields` still computes an unused effort 3 (workout-log.js, left untouched).

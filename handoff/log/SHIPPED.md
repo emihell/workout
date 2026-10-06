@@ -2174,3 +2174,12 @@ reps carry when no target; "My workout", "Total lifted (all sets added up)", "Ad
 Gate (ui): `check: green — lint, skills, no import cycles, 91 test file(s), and the build all passed.` (1346/0); smoke green; Planner QA
 ("back"/"legs" lists, × clears, Add step 3/90). Reviewer (independent): 1 should-fix fixed, "No blockers."; follow-up touched
 workout-log.js comments only. `reports/req-191.md`.
+
+## req-192 — effort buttons log the set; pill skips rest on its own exercise; set list on top  (batch 2026-10-06)
+
+**req-192** (DEC-108 §1–3, §6) — Easy · Medium · Hard · Failure buttons log the set (rpe 2–5, no preselection), "Done" for
+no-effort sets; Max → Failure, Moderate → Medium; pill tap skips rest on its own exercise, opens it elsewhere (SkipRest gone);
+set list under the title; routine exercise note shown. 2 commits `e35e396`…`89d34ca`.
+Gate (ui): `check: green — lint, skills, no import cycles, 92 test file(s), and the build all passed.` (1354/0); smoke green (step 4
+now "Done"); Planner QA (warm-up Done rpe null; Hard → rpe 4; pill skip on own screen → restEndsAt null; screenshot 390×844).
+No trigger files → no reviewer; 13 test files edited Complete→Medium/Done (same stored rpe 3) — read. `reports/req-192.md`.
