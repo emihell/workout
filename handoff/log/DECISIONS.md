@@ -1750,3 +1750,23 @@ DEC-104's Sets/Rest step (nothing to copy). Kg and reps start blank (DESIGN §1)
    DEC-104 §2 ("fields start empty") — this is the shown starting plan of DEC-097 §4, visible and accepted, never kg.
 2. **Reps carry to the next set when the exercise has no reps target** for that set (like kg, DEC-052's kg carry). With a
    target, the target prefills as before. Amends DEC-052 ("reps never carry") for the no-target case only.
+
+## DEC-108 — Emilio's 2026-10-06 gym notes: one-tap effort logging, Failure, pill skips, cardio fields, one today row  (Emilio, 2026-10-06, req-184 G1–G15)
+
+Research and code facts: req-184 §Feedback received 2026-10-06.
+1. **Logging a set = tapping its effort** (Emilio: "one is good, but user must understand that this also completes the
+   exercise … a 'switch' might be devisise or confusing, as you dont think its a button"): the bottom bar becomes four real
+   buttons, **Easy · Medium · Hard · Failure**, each logging the set with that effort — styled and labelled as actions, not a
+   segmented switch. No preselected effort. Sets without effort (warm-up, cardio) keep one "Done". Supersedes the Effort
+   selector + Complete.
+2. **Labels:** "Max" → **"Failure"**, "Moderate" → **"Medium"** (Emilio: "rename max to failure, so you have easy, medium,
+   hard, failure"). Stored rpe values and the load recommendation's reading of them are unchanged.
+3. **Pill:** on the current exercise's own screen a tap **skips the rest**; elsewhere it opens that exercise (Emilio: "skip if
+   you in the exercise, go to exercise if your outside of it"). Supersedes DEC-103 §3's tap rule; the separate "Skip rest"
+   button goes.
+4. **Cardio sets get a stopwatch, Level and Distance** (all three chosen). Optional fields on the set; nothing invented.
+5. **Today: a workout completed today shows in today's block** (Emilio: "completed workouts, for same day, should be in the
+   same row"), not as a second row with today's date below it.
+6. Planner's calls (DEC-095) `(unconfirmed)`: increment renamed "Two step sizes", both editable, hidden for cardio; a
+   "Lightest weight" field that the load suggestions count from; the set list moves under the exercise name; completed sets
+   stay shown; the routine's exercise note shows on the log screen; rest tips → BACKLOG (no app does it, no evidence).
