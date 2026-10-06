@@ -13,6 +13,8 @@
 //   req-188 (DEC-104) — each onPick pick also carries `source` ('history' | 'starting');
 //   startingLabel — shown on a selected no-history row instead of the starting plan (the
 //   workout's pickers don't use that plan: they ask for sets and rest next).
+//   req-190 — onPick's second argument is the picker's own selection; passing it back as
+//   `initialSelection` reopens the picker with the same rows ticked (machines-first Back).
 import { useEffect, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog.js'
 import { libraryItemMatch } from '../exercise-names.js'
@@ -49,6 +51,7 @@ export function ExercisePicker({
   ownFilter = null,
   libraryFilter = null,
   startingLabel = null,
+  initialSelection = null,
   loadCatalog = loadExerciseCatalog,
 }) {
   const store = useStore()
@@ -57,7 +60,7 @@ export function ExercisePicker({
   const [catalog, setCatalog] = useState(null)
   const [error, setError] = useState('')
   // In tap order: { key, kind: 'own', exercise, restore?, fromLibrary? } | { key, kind: 'library', entry }.
-  const [picks, setPicks] = useState([])
+  const [picks, setPicks] = useState(() => initialSelection || [])
   // The near-duplicate question open under a library row: { entry, match } (req-180 §6).
   const [ask, setAsk] = useState(null)
 
@@ -169,6 +172,7 @@ export function ExercisePicker({
             ? { kind: 'library', data: catalogItemToExercise(pick.entry), item, label, source, name: shownName(pick.entry) }
             : { kind: 'own', exerciseId: pick.exercise.id, restore: Boolean(pick.restore), item, label, source, name: pick.exercise.name }
         }),
+        picks,
       )
       return
     }

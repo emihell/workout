@@ -5,10 +5,23 @@
 // reload starts over.
 import { useEffect, useRef, useState } from 'react'
 import { loadExerciseCatalog } from '../exerciseCatalog.js'
-import { PLAN_DAYS, PLAN_SKIP, PLAN_TEMPLATES, SLOTS, carriedFills, slotFilters } from '../plan-templates.js'
+import {
+  PLAN_DAYS,
+  PLAN_SKIP,
+  PLAN_TEMPLATES,
+  SLOTS,
+  SPLIT_AB,
+  SPLIT_SAME,
+  carriedFills,
+  emptyDaySheetText,
+  machinesPlan,
+  slotFilters,
+  startTodayWeek,
+} from '../plan-templates.js'
 import { go, useHashRoute } from '../route'
 import { useStore } from '../store-context'
-import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { askChoice } from '../ui/confirm.js'
+import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Title } from '../ui/index.jsx'
 import { ExercisePicker } from './ExercisePicker'
 import { Back } from './shared'
 
@@ -203,15 +216,165 @@ export function RoutinePlan() {
       days={days}
       fills={fills}
       saving={saving}
-      onSave={() => {
+      onSave={async () => {
         if (savedRef.current) return
         savedRef.current = true
         setSaving(true)
         const cleaned = fills.map((row) => (row || []).map((pick) => (pick && pick !== SKIP ? pick : null)))
-        const { scheduled } = store.applyPlan({ days, fills: cleaned })
+        // req-190 §4 — a day with no exercises is answered before anything is written.
+        // Back (or backdrop / Escape) leaves the fill screen as it was, nothing saved.
+        const sheet = emptyDaySheetText(days, cleaned)
+        let empty = null
+        if (sheet) {
+          empty = await askChoice(sheet.message, { title: sheet.title, choices: sheet.choices, cancelLabel: 'Back' })
+          if (!empty) {
+            savedRef.current = false
+            setSaving(false)
+            return
+          }
+        }
+        const { scheduled } = store.applyPlan({ days, fills: cleaned, empty })
         if (scheduled) go('/')
         else setDone(true)
       }}
     />
+  )
+}
+
+// ---- req-190 (DEC-105 §1) — machines first: "Which exercises do you do?" → days a week →
+// (2+ days) the same workout or A/B → Save (store.applyPlan with { days, split, picks }).
+// One component for both steps (route 'routine-machines'), choices in memory only: Cancel
+// or Back at any step, or a reload, writes nothing.
+
+const MACHINES = '/routines/new/machines'
+const WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+function Choice({ name, checked, onChange, children }) {
+  return (
+    <Row>
+      <label className="ui-check">
+        <input className="ui-check__box" type="radio" name={name} checked={checked} onChange={onChange} />
+        <span>{children}</span>
+      </label>
+    </Row>
+  )
+}
+
+function MachinesDays({ picks, schedule, saving, onSave }) {
+  const [days, setDays] = useState(null)
+  const [split, setSplit] = useState(SPLIT_SAME)
+  // A/B needs two picks (B would be empty); one day is always one workout.
+  const ab = split === SPLIT_AB && days >= 2 && picks.length >= 2
+  const choices = days ? { days, split: ab ? SPLIT_AB : SPLIT_SAME, picks } : null
+  const plan = choices ? machinesPlan(choices) : null
+  const emptySchedule = (schedule?.slots || []).length === 0
+  // The preview reads today's clock; Save's planToState gets the store's `now` (the same day).
+  const today = new Date().getDay()
+  const week = plan ? startTodayWeek(plan.week, new Date()) : []
+  const dayLabel = (weekday) => (weekday === today ? 'Today' : WEEKDAY_SHORT[weekday])
+  return (
+    <Screen>
+      <Back to={MACHINES} />
+      <Title>How many days a week?</Title>
+      <SegmentedControl
+        ariaLabel="Days a week"
+        options={PLAN_DAYS.map((n) => ({ value: n, label: String(n) }))}
+        value={days ?? ''}
+        onChange={(value) => setDays(Number(value))}
+      />
+      {days >= 2 ? (
+        <List>
+          <Choice name="split" checked={!ab} onChange={() => setSplit(SPLIT_SAME)}>
+            Same workout every time
+          </Choice>
+          {picks.length >= 2 ? (
+            <Choice name="split" checked={ab} onChange={() => setSplit(SPLIT_AB)}>
+              Two workouts, A and B
+            </Choice>
+          ) : null}
+        </List>
+      ) : null}
+      {plan
+        ? plan.routines.map((routine, r) => (
+            <section key={routine.name}>
+              <SectionHeader>{routine.name}</SectionHeader>
+              {emptySchedule ? (
+                <p className="ui-sub">
+                  {week
+                    .filter(([, at]) => at === r)
+                    .map(([weekday]) => dayLabel(weekday))
+                    .join(', ')}
+                </p>
+              ) : null}
+              <List>
+                {routine.picks.map((pick) => (
+                  <Row key={pick.kind === 'own' ? pick.exerciseId : pick.data.libraryId || pick.name}>
+                    <span className="ui-row__stack">
+                      <span>{pick.name}</span>
+                      <span className="ui-row__meta">{pick.label}</span>
+                    </span>
+                  </Row>
+                ))}
+              </List>
+            </section>
+          ))
+        : null}
+      {plan && !emptySchedule ? <p className="ui-sub">Your schedule already has days, so it stays as it is.</p> : null}
+      <Actions
+        className="ui-picker-bar"
+        retreat={<NavLink to="/routines/new" look="secondary">Cancel</NavLink>}
+        forward={
+          <Button variant="primary" disabled={!plan || saving} onClick={() => onSave(choices)}>
+            Save
+          </Button>
+        }
+      />
+    </Screen>
+  )
+}
+
+export function RoutineMachines() {
+  const store = useStore()
+  const route = useHashRoute()
+  // { picks (onPick's), selection (the picker's own, to reopen it ticked) } — memory only.
+  const [chosen, setChosen] = useState(null)
+  const [done, setDone] = useState(false)
+  // As RoutinePlan: a second Save tap in the same tick writes nothing.
+  const savedRef = useRef(false)
+  const [saving, setSaving] = useState(false)
+
+  if (done) return <Done />
+  if (route.step === 'days' && chosen?.picks.length) {
+    return (
+      <MachinesDays
+        picks={chosen.picks}
+        schedule={store.schedule}
+        saving={saving}
+        onSave={(choices) => {
+          if (savedRef.current) return
+          savedRef.current = true
+          setSaving(true)
+          const { scheduled } = store.applyPlan(choices)
+          if (scheduled) go('/')
+          else setDone(true)
+        }}
+      />
+    )
+  }
+  return (
+    <Screen>
+      <Back to="/routines/new" />
+      <Title>Which exercises do you do?</Title>
+      <p className="ui-sub">Tick the machines and exercises you use. Nothing is saved until Save.</p>
+      <ExercisePicker
+        cancelTo="/routines/new"
+        initialSelection={chosen?.selection || null}
+        addLabel={(n) => (n ? `Next (${n})` : 'Next')}
+        onPick={(picks, selection) => {
+          setChosen({ picks, selection })
+          go(`${MACHINES}/days`)
+        }}
+      />
+    </Screen>
   )
 }

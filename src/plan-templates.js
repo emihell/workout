@@ -6,7 +6,7 @@ import { exerciseFromData } from './exercise-names.js'
 import { listable } from './exerciseCatalog.js'
 import { filteredBrowse, ownRecentFirst } from './routine-picker.js'
 import { exerciseAddedState, restoreExerciseInState, routineAddedState, routineItemAdded, slotAddedState } from './state-reducers.js'
-import { withDefaultAnchor } from './schedule.js'
+import { toLocalDate, withDefaultAnchor } from './schedule.js'
 
 // Slot → the library patterns it lists (unconfirmed: plain-word names, DEC-098 §3).
 export const SLOTS = {
@@ -94,18 +94,104 @@ export function slotCandidates(patterns, exercises, library, workouts = []) {
   return { own: ownRecentFirst(exercises, workouts).filter(ownFilter), staples, rest }
 }
 
+// req-190 (DEC-105 §2) — a new plan starts today: the week keeps its spacing, shifted so its
+// first day is today's weekday (2 days: today, +3; 3: today, +2, +4; 4: today, +1, +3, +4).
+// `week`: [[weekday, routineIdx]] in day order; `today`: a Date (injected — no clock read here).
+export function startTodayWeek(week, today) {
+  if (!week?.length) return []
+  const first = week[0][0]
+  const day = toLocalDate(today).getDay()
+  return week.map(([weekday, r]) => [(((weekday - first + day) % 7) + 7) % 7, r])
+}
+
+// req-190 (DEC-105 §1) — machines-first split `(unconfirmed)`: 'same' → one workout of every
+// pick; 'ab' → two, alternating in pick order (1st → A, 2nd → B, 3rd → A, …).
+export const SPLIT_SAME = 'same'
+export const SPLIT_AB = 'ab'
+export function splitPicks(picks, split) {
+  const list = picks || []
+  if (split !== SPLIT_AB) return [list]
+  return [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)]
+}
+
+// The machines-first plan: routine names `(unconfirmed)` "Workout" / "Workout A", "Workout B";
+// the template's spacing for that many days; with A/B, days alternate A, B, A, B.
+// One day is always one workout (an A/B split needs two days).
+export function machinesPlan({ days, split, picks }) {
+  const template = PLAN_TEMPLATES[days]
+  if (!template) return null
+  const ab = split === SPLIT_AB && days >= 2
+  const groups = splitPicks(picks, ab ? SPLIT_AB : SPLIT_SAME)
+  const names = ab ? ['Workout A', 'Workout B'] : ['Workout']
+  return {
+    routines: groups.map((group, r) => ({ name: names[r], picks: group })),
+    week: template.week.map(([weekday], i) => [weekday, ab ? i % 2 : 0]),
+  }
+}
+
+// The template days whose slots are all unchosen (null / skipped) — the empty-day sheet's
+// subject (req-190 §4). → [routine index]; none when nothing at all is chosen.
+export function emptyPlanDays(choices) {
+  const template = PLAN_TEMPLATES[choices?.days]
+  if (!template) return []
+  const picked = template.routines.map((def, r) => (choices.fills?.[r] || []).slice(0, def.slots.length).some(Boolean))
+  if (!picked.some(Boolean)) return []
+  return picked.map((has, r) => (has ? -1 : r)).filter((r) => r >= 0)
+}
+
+// req-190 §4 — Save with a day that has no exercises asks first, never drops it silently:
+// [Leave it out] (the day is not made, as before) or [Same as <first chosen day>]. Wording
+// `(unconfirmed)`. → the sheet's text, or null when no day is empty.
+export function emptyDaySheetText(days, fills) {
+  const empties = emptyPlanDays({ days, fills })
+  if (!empties.length) return null
+  const routines = PLAN_TEMPLATES[days].routines
+  const names = empties.map((r) => routines[r].name)
+  const donor = routines.find((_, r) => !empties.includes(r))?.name
+  const listed = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+  return {
+    title: `${listed} ${names.length === 1 ? 'has' : 'have'} no exercises.`,
+    message: `Leave it out and your week has no ${listed} day — or give it the same exercises as ${donor}.`,
+    choices: [
+      { value: 'leave', label: 'Leave it out' },
+      { value: 'same', label: `Same as ${donor}` },
+    ],
+  }
+}
+
+// The template plan. `choices.empty` answers the empty-day sheet: 'same' → each empty day
+// gets the first chosen day's picks ("Same as Full body A"); anything else ('leave', or
+// unanswered) → the empty day is not made, nor its schedule days.
+export function templatePlan({ days, fills, empty }) {
+  const template = PLAN_TEMPLATES[days]
+  if (!template) return null
+  const picksOf = template.routines.map((def, r) => (fills?.[r] || []).slice(0, def.slots.length).filter(Boolean))
+  const donor = picksOf.find((picks) => picks.length) || []
+  return {
+    routines: template.routines.map((def, r) => ({
+      name: def.name,
+      picks: picksOf[r].length || empty !== 'same' ? picksOf[r] : donor,
+    })),
+    week: template.week,
+  }
+}
+
+function planShape(choices) {
+  return (choices?.picks ? machinesPlan(choices) : templatePlan(choices || {})) || { routines: [], week: [] }
+}
+
 // The ids Save needs, made up front (store.jsx applyPlan): enough for every pick and day,
 // drawn in order. Each call of the returned function starts a fresh cursor over the SAME ids,
 // so running planToState twice (the updater, then the result) makes the same records.
 export function planIds(choices, uid, now) {
-  const template = PLAN_TEMPLATES[choices?.days]
-  const picks = (choices?.fills || []).flat().filter(Boolean).length
+  const plan = planShape(choices)
+  const picks = plan.routines.reduce((n, routine) => n + routine.picks.length, 0)
   const pool = (prefix, n) => Array.from({ length: n }, () => uid(prefix))
   const made = {
     exercise: pool('ex', picks),
-    routine: pool('rtn', template?.routines.length || 0),
+    routine: pool('rtn', plan.routines.length),
     item: pool('si', picks),
-    slot: pool('slot', template?.week.length || 0),
+    slot: pool('slot', plan.week.length),
   }
   return () => {
     const cursor = { exercise: 0, routine: 0, item: 0, slot: 0 }
@@ -114,18 +200,19 @@ export function planIds(choices, uid, now) {
   }
 }
 
-// The one reducer Save runs. `choices`: { days, fills } — fills[r][s] is the pick for routine
-// r's slot s, or null (skipped): { kind: 'own', exerciseId, restore?, item } or
-// { kind: 'library', data (catalogItemToExercise), item }. `ids`: { exercise(), routine(),
-// item(), slot() } and `now` — the store makes ids and reads the clock, this stays pure.
+// The one reducer Save runs, for both starts. `choices` is either the template's
+// { days, fills, empty? } — fills[r][s] is the pick for routine r's slot s, or null (skipped)
+// — or the machines-first { days, split, picks }. A pick: { kind: 'own', exerciseId, restore?,
+// item } or { kind: 'library', data (catalogItemToExercise), item }. `ids`: { exercise(),
+// routine(), item(), slot() } and `now` (today) — the store makes ids and reads the clock.
 // - A library entry picked in several slots becomes ONE exercise record.
-// - A routine whose slots are all skipped is not made, nor its schedule days.
-// - The week goes on the schedule only when it has no slots (then loopWeeks 1); otherwise
-//   the schedule is left exactly as it was.
+// - A routine with no picks is not made, nor its schedule days (the template flow asks first).
+// - The week goes on the schedule only when it has no slots (then loopWeeks 1), starting
+//   today (startTodayWeek, req-190); otherwise the schedule is left exactly as it was.
 // → { state, routineIds, scheduled }
 export function planToState(state, choices, ids) {
-  const template = PLAN_TEMPLATES[choices?.days]
-  if (!template) return { state, routineIds: [], scheduled: false }
+  const plan = planShape(choices)
+  if (!plan.routines.length) return { state, routineIds: [], scheduled: false }
   let s = state
   const created = new Map() // libraryId (or data name) → new exercise id
   const exerciseFor = (pick) => {
@@ -142,11 +229,10 @@ export function planToState(state, choices, ids) {
     return created.get(key)
   }
 
-  const routineIds = template.routines.map((def, r) => {
-    const picks = (choices.fills?.[r] || []).slice(0, def.slots.length).filter(Boolean)
-    if (!picks.length) return null
+  const routineIds = plan.routines.map((def) => {
+    if (!def.picks.length) return null
     let routine = { id: ids.routine(), name: def.name, focus: 'Machines', exercises: [] }
-    for (const pick of picks) {
+    for (const pick of def.picks) {
       routine = routineItemAdded(routine, { ...pick.item, exerciseId: exerciseFor(pick) }, ids.item())
     }
     s = routineAddedState(s, routine)
@@ -156,8 +242,10 @@ export function planToState(state, choices, ids) {
   const scheduled = (state.schedule?.slots || []).length === 0 && routineIds.some(Boolean)
   if (scheduled) {
     s = { ...s, schedule: { ...withDefaultAnchor(s.schedule || { slots: [] }, ids.now), loopWeeks: 1 } }
-    for (const [weekday, r] of template.week) {
-      if (routineIds[r]) s = slotAddedState(s, { id: ids.slot(), week: 0, weekday, routineId: routineIds[r] })
+    // The first KEPT day is today (a left-out day A does not push the plan to its next day).
+    const kept = plan.week.filter(([, r]) => routineIds[r])
+    for (const [weekday, r] of startTodayWeek(kept, ids.now || new Date())) {
+      s = slotAddedState(s, { id: ids.slot(), week: 0, weekday, routineId: routineIds[r] })
     }
   }
   return { state: s, routineIds: routineIds.filter(Boolean), scheduled }

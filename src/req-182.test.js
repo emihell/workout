@@ -10,6 +10,7 @@ import { DEVICE_FILL_KEY } from './routine-kg-fill.js'
 import { offerText } from './routine-update-offer.js'
 import { PLAN_SKIP, carriedFills } from './plan-templates.js'
 import { loadExerciseCatalog } from './exerciseCatalog.js'
+import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 
 const h = React.createElement
 const work = (itemId, exerciseId, weight) => ({ routineItemId: itemId, exerciseId, setType: 'work', weight, reps: '8', rpe: 3, note: '' })
@@ -215,6 +216,11 @@ describe('req-182 AC5 — the plan fill screen (rendered, real store)', () => {
     assert.deepEqual(rows('Full body C')[0], ['Squat', 'Skipped'])
     await view.click(view.button('Save'))
     await flush()
+    // req-190 (sanctioned edit) — B and C have no exercises, so Save asks; "Leave it out" =
+    // the old behaviour this test checks.
+    assert.equal(getPendingConfirm()?.title, 'Full body B and Full body C have no exercises.')
+    answerConfirm('leave')
+    await flush()
     const saved = JSON.parse(localStorage.getItem('workout-mvp-v9')).routines
     assert.deepEqual(saved.map((r) => r.name), ['Full body A'], 'C had only the skipped Squat')
     assert.deepEqual(saved[0].exercises.map((i) => i.exerciseId), ['ex-lp'])
@@ -229,6 +235,9 @@ describe('req-182 AC5 — the plan fill screen (rendered, real store)', () => {
     assert.equal(rows('Full body C')[0][0], 'Hack Squat')
     assert.equal(rows('Full body A')[0][0], 'Leg Press')
     await view.click(view.button('Save'))
+    await flush()
+    // req-190 (sanctioned edit) — B is empty: Save asks; "Leave it out" = the old behaviour.
+    answerConfirm('leave')
     await flush()
     const saved = JSON.parse(localStorage.getItem('workout-mvp-v9')).routines
     assert.deepEqual(saved.map((r) => [r.name, r.exercises.map((i) => i.exerciseId)]), [['Full body A', ['ex-lp']], ['Full body C', ['ex-hs']]])

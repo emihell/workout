@@ -102,16 +102,23 @@ export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
   )
 }
 
-// req-181 (DEC-098 §4) — two starts: a plan (days per week → slots, views/Plan.jsx) on top,
-// or today's blank routine. Both are navigation, so NavLinks (DESIGN §4 / DEC-016).
+// req-181 (DEC-098 §4) / req-190 (DEC-105 §1) — three starts: your exercises first (then days
+// a week, views/Plan.jsx RoutineMachines), the slot plans as "Not sure?", or a blank routine.
+// All navigation, so NavLinks (DESIGN §4 / DEC-016).
 export function RoutineNew() {
   return (
     <Screen>
       <Back to="/routines" />
       <Title>Add routine</Title>
       <p>
-        <NavLink to="/routines/new/plan" look="primary" block>
-          Start from a plan
+        <NavLink to="/routines/new/machines" look="primary" block>
+          Pick your exercises
+        </NavLink>
+      </p>
+      <p className="ui-sub">Tick the machines and exercises you use, then how many days a week.</p>
+      <p>
+        <NavLink to="/routines/new/plan" look="secondary" block>
+          Not sure? Use a plan
         </NavLink>
       </p>
       <p className="ui-sub">Pick how many days a week, then an exercise for each slot.</p>
