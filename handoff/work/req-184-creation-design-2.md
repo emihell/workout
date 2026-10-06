@@ -75,3 +75,16 @@ exercise's Reps empty → browser bubble "Please fill out this field"; (10) slow
 Cancel": feared Cancel deletes; "Volume 2630 kg" meaningless; (11) minor — "⋯" not where she'd look; "skipped" for a busy
 machine; "kg" for dumbbells (one or both?); "set 1/3" on the list pill. Worked: search by her own words, the set screen,
 fixing a set via Previous/Save, saved check.
+
+## Persona run 2 — Lena again on req-190's build (2026-10-06, branch `req-190` 6333776, empty first launch)
+Setup 13 taps + 4 searches, "ok" (was 20 + 3, slow, day B lost); workout 46 taps, logging "fast"; saved check 2 taps.
+Fixed vs run 1: machines-first read as "exactly me"; plan started today; plain "Use 40 kg next time?"; "kg per dumbbell";
+Keep going; Previous → Save fixed the 150 typo. Still open, for a next fix req:
+(1) near quit-risk — searching "back" lists Kickbacks / Back Squat / Deadlift; Seated Cable Row far down (search by what a
+machine does / body part); (2) quit-risk if mis-tapped — Skip exercise on the last exercise auto-finishes at once ("Finishing
+in 9s…", req-84 auto-complete); (3) slowed — tapping a done set row in the set list does nothing (she tried it before Previous);
+(4) slowed — "Today, Fri" read as "today is Friday" (say "Tuesdays and Fridays"); (5) slowed — Add exercise's blank Sets/Rest
+("why not 3 × 10 like before?" — DEC-104 §2 vs the routine picker's shown starting plan); (6) minor — reps don't carry to the
+next set on a no-target exercise (DEC-052: reps never carry; she retyped 10); (7) minor — routine named "Workout" reads oddly in
+"Workout will start Leg Press at 40 kg"; (8) minor — "Lifted 2,510 kg" disbelieved; "Add 0" button label; no clear (×) on
+search. Home order (future dates on top, latest first) is Emilio's req-60 choice — not a bug.
