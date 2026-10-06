@@ -468,3 +468,9 @@ Related: Node 26's non-TTY default reporter is `spec`, not TAP, so a child run t
 On one run the GO pulse "didn't animate" because headless Chrome matched reduced motion, so the static state rendered. **How to
 apply:** a browser check of any animation calls `page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value:
 'no-preference' }])` first (and once with `reduce` to check the static fallback).
+
+## L-047 — a puppeteer clock shift computed inside `evaluateOnNewDocument` resets on every reload  (build agent, req-195, 2026-10-06)
+
+The shifted `Date` computes its offset from the real clock each time the page loads, so two finish times written across a
+reload can come out of order. **How to apply:** a browser check that compares times across reloads computes the offset once in
+Node and passes a fixed epoch in, or advances its own counter. `scripts/smoke.mjs` uses the per-load pattern (harmless today).

@@ -2201,3 +2201,11 @@ from durationSec; single-time target prefills Duration. 4 commits `94f4bda`…`9
 Gate (ui + workout-log.js): `check: green — lint, skills, no import cycles, 94 test file(s), and the build all passed.` (1417/0);
 smoke green; Planner QA (Stairs Start/3 s/Stop → durationSec 3, level 8). Reviewer (independent, 2 rounds): 3 should-fix +
 latent + nits fixed, "No blockers." `reports/req-194.md`.
+
+## req-195 — a workout done today shows in today's block  (batch 2026-10-06)
+
+**req-195** (DEC-108 §5) — `doneInTodayBlock` (history-queries.js, pure): today's finished workouts render under the date
+("Lower Body · Done ✓ ›" → History detail `?from=/`), "Nothing scheduled today." hidden, Start new workout secondary; a scheduled
+done slot shows once; the list below holds prior days. 2 commits `694fef3`…`2c0e72c`.
+Gate (ui): `check: green — lint, skills, no import cycles, 95 test file(s), and the build all passed.`; smoke green (Planner ran it on
+the branch build); Planner read the Home screenshot at 390×844. No trigger files → no reviewer. `reports/req-195.md`.
