@@ -87,6 +87,8 @@ export function cardioValues({ duration, level, distance, distanceUnit }, { dura
   const errors = {}
   if (d.error) errors.duration = d.error
   else if (d.empty && durationRequired) errors.duration = 'Enter duration'
+  // Review fix 4 — a zero duration is not a cardio set ("0", or Start + Stop at 0 s).
+  else if (!d.empty && d.value === 0) errors.duration = 'Duration must be more than 0.'
   if (l.error) errors.level = l.error
   if (x.error) errors.distance = x.error
   if (Object.keys(errors).length) return { errors }
@@ -120,6 +122,29 @@ export function cardioPatch(values) {
   const patch = {}
   for (const key of CARDIO_KEYS) if (key in values) patch[key] = values[key] == null ? undefined : values[key]
   return patch
+}
+
+// Review fix 3 — a routine target that is ONE time ("20 min", "12:30") as seconds, for the
+// Duration prefill (DESIGN §1: the set's target prefills it, as Reps did for cardio before);
+// a range ("5-8 min"), a zero or a blank → null (Duration starts blank and required).
+export function targetDurationSec(target) {
+  const read = readDuration(target)
+  return read.value > 0 ? read.value : null
+}
+
+// Review fix 2 — a logged cardio time as a routine target, in the targets' own words:
+// whole minutes read "13 min" (as "5-8 min" does), else the clock "12:30".
+export function durationTargetText(sec) {
+  const n = Math.floor(Number(sec) || 0)
+  if (n <= 0) return ''
+  return n % 60 === 0 ? `${n / 60} min` : clockText(n)
+}
+
+// Review fix 1 — the running stopwatch (activeWorkout.stopwatch = { draftKey, startedAt,
+// baseSec }): whole seconds shown at `now`. `baseSec` is the time it resumed from.
+export function stopwatchSeconds(stopwatch, now) {
+  if (!stopwatch) return 0
+  return Math.max(0, (Number(stopwatch.baseSec) || 0) + Math.floor((now - stopwatch.startedAt) / 1000))
 }
 
 // What the cardio form shows for a stored set (edit / Previous): blank where absent.

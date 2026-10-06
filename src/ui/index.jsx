@@ -13,7 +13,7 @@ import { answerConfirm, getPendingConfirm, navigationCancels, subscribeConfirm }
 import { kgError, readKg } from '../kg-input.js'
 import { kgHints } from '../kg-hints.js'
 import { readSeconds, secondsToSave } from '../seconds-input.js'
-import { DISTANCE_UNITS, cardioValues, clockText, readDuration } from '../cardio-set.js'
+import { DISTANCE_UNITS, cardioValues, clockText, readDuration, stopwatchSeconds } from '../cardio-set.js'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -469,15 +469,17 @@ function DurationTimer({ seconds, onSecondsChange }) {
 }
 
 // req-194 (DEC-108 §4) — a cardio set's fields: Duration with a stopwatch, an optional
-// Level, an optional Distance with its unit. The stopwatch is NOT component state: its start
-// (`startedAt`, epoch ms) is held by the form and reported through onChange into the set's
-// draft (item.jsx → activeWorkout.setDraft), so leaving the screen or reloading the tab
-// re-mounts it still running from the same start. Start continues from the Duration
-// already in the box (blank → 0:00), so Stop + Start resumes; Stop writes the elapsed time
-// into Duration, which stays editable by hand. While running the box shows the live time.
-function CardioFields({ values, errors, onEdit, onStopwatch, viewing = false, hint = '' }) {
-  const { duration, level, distance, distanceUnit, startedAt } = values
-  const running = startedAt != null
+// Level, an optional Distance with its unit. The stopwatch is NOT component state (review
+// fix 1): `stopwatch` is the active workout's own field ({ draftKey, startedAt, baseSec },
+// workout-log.js startStopwatchPatch), passed in by the caller, so leaving the screen,
+// another exercise's typing or a reload can't drop it. Start runs from 0:00 — or, after a
+// Stop (`watched`: the box holds the stopwatch's own time, not a typed or prefilled one),
+// resumes from it. Stop writes the time into Duration, which stays editable by hand. While
+// running the box shows the live time. `blockedBy`: another exercise's stopwatch is live,
+// so Start is refused here (one stopwatch at a time).
+function CardioFields({ values, errors, onEdit, stopwatch = null, onStart, onStop, blockedBy = '', viewing = false, hint = '' }) {
+  const { duration, level, distance, distanceUnit, watched } = values
+  const running = stopwatch != null
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     if (!running) return undefined
@@ -486,15 +488,10 @@ function CardioFields({ values, errors, onEdit, onStopwatch, viewing = false, hi
     const id = setInterval(tick, 250)
     return () => clearInterval(id)
   }, [running])
-  const elapsed = running ? Math.max(0, Math.floor((now - startedAt) / 1000)) : null
-  const start = () => {
-    const typed = readDuration(duration).value ?? 0
-    onStopwatch({ startedAt: Date.now() - typed * 1000 })
-  }
-  const stop = () => {
-    onStopwatch({ startedAt: null, duration: clockText(secondsSince(startedAt)) })
-  }
-  const hasTime = String(duration ?? '').trim() !== ''
+  const elapsed = running ? stopwatchSeconds(stopwatch, now) : null
+  const resumable = Boolean(watched) && (readDuration(duration).value ?? 0) > 0
+  const start = () => onStart?.(resumable ? readDuration(duration).value : 0)
+  const stop = () => onStop?.(secondsNow(stopwatch))
   return (
     <div className="ui-cardio">
       <div className="ui-cardio__timer">
@@ -512,12 +509,15 @@ function CardioFields({ values, errors, onEdit, onStopwatch, viewing = false, hi
             Stop
           </Button>
         ) : (
-          <Button variant="secondary" className="ui-cardio__watch" onClick={start}>
-            {hasTime ? 'Resume' : 'Start'}
+          <Button variant="secondary" className="ui-cardio__watch" onClick={start} disabled={Boolean(blockedBy)}>
+            {resumable ? 'Resume' : 'Start'}
           </Button>
         )}
       </div>
       {hint ? <p className="ui-field-note">{hint}</p> : null}
+      {blockedBy && !viewing && !running ? (
+        <p className="ui-field-note">The stopwatch is running on {blockedBy} — stop it there first.</p>
+      ) : null}
       {errors.duration ? (
         <p className="ui-field-error" role="alert">
           {errors.duration}
@@ -561,12 +561,12 @@ function CardioFields({ values, errors, onEdit, onStopwatch, viewing = false, hi
   )
 }
 
-// Whole seconds since `startedAt` (epoch ms) — the stopwatch's elapsed time, read at a tap.
-function secondsSince(startedAt) {
-  return Math.max(0, Math.floor((Date.now() - startedAt) / 1000))
+// The running stopwatch's whole seconds right now — read at a tap (Stop / Done).
+function secondsNow(stopwatch) {
+  return stopwatchSeconds(stopwatch, Date.now())
 }
 
-const EMPTY_CARDIO = { duration: '', level: '', distance: '', distanceUnit: 'm', startedAt: null }
+const EMPTY_CARDIO = { duration: '', level: '', distance: '', distanceUnit: 'm' }
 
 export function SetLogForm({
   weighted = true,
@@ -600,8 +600,14 @@ export function SetLogForm({
   viewing = false,
   onNext,
   // req-194 — `cardio`: the cardio form (Duration + stopwatch, Level, Distance) in place of
-  // Reps; `initialCardio` its starting text + running stopwatch (from the draft or the viewed
-  // set); `cardioHint` a quiet note under Duration (the routine target, never put in the box).
+  // Reps; `initialCardio` its starting text (draft, viewed set, or a single-time target
+  // prefill); `cardioHint` a quiet note under Duration (a range target, never put in the box).
+  // Review fix 1 — `stopwatch` (this set's running stopwatch or null), `onStopwatchStart(baseSec)`,
+  // `onStopwatchStop()`, `stopwatchBlockedBy` (the exercise whose stopwatch is live, or '').
+  stopwatch = null,
+  onStopwatchStart,
+  onStopwatchStop,
+  stopwatchBlockedBy = '',
   // onComplete then carries `cardio: { durationSec, level, distance, distanceUnit }`.
   cardio = false,
   initialCardio = null,
@@ -694,10 +700,7 @@ export function SetLogForm({
   // (blank → absent, unreadable → an inline error and nothing logged). Viewing a logged set,
   // a blank Duration is allowed (an old set had none) and its typed reps text is kept.
   function submitCardio() {
-    const running = cardioState.startedAt != null
-    const raw = running
-      ? { ...cardioState, duration: clockText(secondsSince(cardioState.startedAt)) }
-      : cardioState
+    const raw = stopwatch ? { ...cardioState, duration: clockText(secondsNow(stopwatch)) } : cardioState
     const read = cardioValues(raw, { durationRequired: !viewing })
     if (read.errors) {
       setCardioErrors(read.errors)
@@ -731,8 +734,15 @@ export function SetLogForm({
             errors={cardioErrors}
             viewing={viewing}
             hint={cardioHint}
-            onEdit={(field, value) => editCardio({ [field]: value })}
-            onStopwatch={(patch) => editCardio(patch, { now: true })}
+            stopwatch={stopwatch}
+            blockedBy={stopwatchBlockedBy}
+            // A typed Duration is the user's own number: Start then runs from 0:00.
+            onEdit={(field, value) => editCardio(field === 'duration' ? { duration: value, watched: false } : { [field]: value })}
+            onStart={(baseSec) => onStopwatchStart?.(baseSec)}
+            onStop={(secs) => {
+              editCardio({ duration: clockText(secs), watched: true }, { now: true })
+              onStopwatchStop?.()
+            }}
           />
         ) : timed ? (
           <DurationTimer seconds={duration} onSecondsChange={(value) => edit('duration', value)} />

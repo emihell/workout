@@ -116,7 +116,10 @@ export function formatSetLine(set, { cardio = false, cardioFields = false } = {}
   }
   // req-194 — a cardio set's duration / level / distance: "12:30 · level 8 · 1.5 km"
   // (cardio-set.js). An old cardio set has none of them and shows its typed reps as before.
-  if (cardioFields || hasCardioFields(set)) bits.push(...cardioBits(set))
+  // Review fix 5 — a cardio set with a logged time reads as cardio even when the caller passes
+  // only `cardio` (a timed cardio exercise's seconds then read as a clock too, "0:30").
+  const timedCardio = cardio && set.durationSec != null && set.durationSec !== ''
+  if (cardioFields || timedCardio || hasCardioFields(set)) bits.push(...cardioBits(set))
   // req-85 — a timed set logs seconds in place of reps; show it as e.g. "30s".
   else if (set.durationSec != null && set.durationSec !== '') bits.push(`${set.durationSec}s`)
   if (set.reps != null && set.reps !== '') bits.push(`${set.reps}`)

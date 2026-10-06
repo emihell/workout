@@ -182,13 +182,14 @@ export function withSkippedUnloggedSets(workout) {
 // seed-override map is transient session state, dropped so it never lands on the
 // finished-history record (which feeds history-prefill from `sets` alone). req-116 —
 // the auto-finish dismissed flag is transient in the same way and is dropped too.
-// req-125 — so is the set-form draft (`setDraft`).
+// req-125 — so is the set-form draft (`setDraft`). req-194 — and the cardio stopwatch.
 export function finishedState(state, { overallNote, overallFeel } = {}, finishedAt = new Date().toISOString()) {
   if (!state?.activeWorkout) return state
   const {
     seedOverrides: _seedOverrides,
     autoFinishDismissed: _dismissed,
     setDraft: _draft,
+    stopwatch: _stopwatch,
     progression: _progression,
     ...activeToFinish
   } = state.activeWorkout
@@ -618,9 +619,9 @@ export function setDraftFor(workout, key) {
 // The draft written as the user edits the form: the form's current values plus the
 // note (which lives beside the title, req-80). `durationSec` is the typed seconds as
 // entered (a string while editing); absent on a non-timed form.
-// req-194 — `cardio` (a cardio form only): the raw Duration / Level / Distance text, the
-// unit, and `startedAt` — the running stopwatch's start (epoch ms; null when stopped). It
-// lives in the draft, so the stopwatch survives leaving the screen and a reload (DEC-108 §4).
+// req-194 — `cardio` (a cardio form only): the raw Duration / Level / Distance text and the
+// unit (+ `watched`: Duration holds the stopwatch's time). The running stopwatch is NOT here
+// (review fix 1): it is activeWorkout.stopwatch, see startStopwatchPatch.
 export function setDraftFromForm(key, { weight, reps, effort, durationSec, cardio } = {}, note = '') {
   return {
     key,
@@ -735,7 +736,47 @@ export function createSetDraftWriter({
 export function withLoggedSet(workout, setRecord, activePatch = {}, draftKey = null) {
   const next = { ...workout, ...activePatch, sets: [...(workout?.sets || []), setRecord] }
   if (draftKey != null && next.setDraft?.key === draftKey) delete next.setDraft
+  // req-194 review fix 1 — Done / Skip set on the set the stopwatch runs for stops it.
+  if (draftKey != null && next.stopwatch?.draftKey === draftKey) delete next.stopwatch
   return next
+}
+
+// req-194 review fix 1 — the cardio stopwatch: ONE optional field on the active workout,
+// `stopwatch: { draftKey, startedAt, baseSec }` — the set it runs for (setDraftKey), its
+// start (epoch ms) and the seconds it resumed from. Separate from `setDraft` (one draft for
+// the whole workout, replaced by the next exercise's typing), so another exercise's edits
+// can't drop it. Load path: loadState → migrateState → workoutSnapshot, whose snapshotted
+// branch spreads `...workout` (kept as is); finishedState strips it; withLoggedSet clears it
+// on Done / Skip set of its own set. At most one exists: a second Start is refused while
+// the first one's set is still the current set of an exercise not done (stopwatchOwner);
+// a stale one (that exercise skipped / swapped / done elsewhere) is taken over.
+
+// The stopwatch running for the set `key`, or null.
+export function stopwatchFor(workout, key) {
+  const watch = workout?.stopwatch
+  return watch && typeof watch === 'object' && watch.draftKey === key ? watch : null
+}
+
+// The snapshot item whose CURRENT set the stopwatch runs for, while that exercise isn't
+// done — else null (no stopwatch, or a stale one).
+export function stopwatchOwner(workout) {
+  const key = workout?.stopwatch?.draftKey
+  if (!key) return null
+  for (const item of workout?.snapshot?.items || []) {
+    if (itemIsMarkedDone(workout, item)) continue
+    const state = itemLoggingState(workout, item)
+    if (state.plannedDone) continue
+    if (setDraftKey(item, state.needsWu ? 'wu' : 'work', state.currentWorkIndex) === key) return item
+  }
+  return null
+}
+
+// The patch that starts the stopwatch for the set `key` (from `baseSec`, at `now`), or
+// null when another set's stopwatch is still live (refused — stop that one first).
+export function startStopwatchPatch(workout, key, baseSec = 0, now = Date.now()) {
+  const owner = stopwatchOwner(workout)
+  if (owner && workout.stopwatch.draftKey !== key) return null
+  return { stopwatch: { draftKey: key, startedAt: now, baseSec: Math.max(0, Math.floor(Number(baseSec) || 0)) } }
 }
 
 // req-106 — the target reps a set's log form presents: the warm-up's reps for a 'wu'

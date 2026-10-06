@@ -30,6 +30,9 @@ import {
   setDraftKey,
   setListRows,
   setTargetFor,
+  startStopwatchPatch,
+  stopwatchFor,
+  stopwatchOwner,
 } from '../../workout-log'
 import { SetEditForm } from '../set-edit'
 import { activeSetPatch, liveSetWeight, viewedSetSave } from '../set-values.js'
@@ -43,7 +46,7 @@ import { unlockAudio } from '../../rest-cue'
 import { askConfirm } from '../../ui/confirm.js'
 import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
-import { cardioFormText, lastDistanceUnit, withCardioValues } from '../../cardio-set.js'
+import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
 // workout-log.js); weight step and cues stay live. Old snapshots read live as before.
@@ -393,6 +396,24 @@ function WorkoutItemLive({ routineId, item }) {
   // exercise's last finished distance used, else m.
   const cardioForm = ex?.type === 'cardio' && !timedSet
   const distanceUnit = lastDistanceUnit(last?.sets)
+  // Review fix 3 — a single-time target ("20 min", "12:30") prefills Duration (DESIGN §1, the
+  // set's target, as Reps was for cardio before); a range ("5-8 min") stays a note.
+  const targetSec = cardioForm ? targetDurationSec(target) : null
+  // Review fix 1 — the stopwatch is its own activeWorkout field (workout-log.js): this set's,
+  // or the exercise whose live stopwatch refuses a second Start here.
+  const stopwatch = cardioForm ? stopwatchFor(active, setSeedKey) : null
+  const stopwatchHolder = cardioForm && !stopwatch ? stopwatchOwner(active) : null
+  function startStopwatch(baseSec) {
+    const patch = startStopwatchPatch(active, setSeedKey, baseSec)
+    if (!patch) return
+    recordButton('stopwatch-start')
+    store.patchActive(patch)
+  }
+  function stopStopwatch() {
+    if (!stopwatchFor(active, setSeedKey)) return
+    recordButton('stopwatch-stop')
+    store.patchActive({ stopwatch: null })
+  }
   const durationTarget = durationTargetFor(item, ex, currentWorkIndex)
   // Seed the set-log fields from the same sources the app has always used —
   // carry (no-history working set), then history / target. Domain logic stays here;
@@ -604,8 +625,14 @@ function WorkoutItemLive({ routineId, item }) {
           initialReps={formInit.reps}
           initialDuration={formInit.durationSec}
           cardio={cardioForm}
-          initialCardio={cardioForm ? formInit.cardio || { distanceUnit } : null}
-          cardioHint={cardioForm && target ? `Target ${target}` : ''}
+          initialCardio={
+            cardioForm ? formInit.cardio || { distanceUnit, duration: targetSec ? clockText(targetSec) : '' } : null
+          }
+          cardioHint={cardioForm && target && !targetSec ? `Target ${target}` : ''}
+          stopwatch={stopwatch}
+          stopwatchBlockedBy={stopwatchHolder ? exerciseName(stopwatchHolder) : ''}
+          onStopwatchStart={startStopwatch}
+          onStopwatchStop={stopStopwatch}
           routineKg={routineKg}
           lastKg={historyPrefill.weight}
           kgLabel={kgLabelFor(ex)}
