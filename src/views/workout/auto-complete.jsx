@@ -53,13 +53,15 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
 
   // Auto-commit on expiry. committedRef guards the tick from firing finishWorkout
   // twice. Cancel/Edit unmount this component (clearing the interval) before it fires.
-  const commit = () => {
+  // req-191 review fix 2 — `manual` (the no-countdown summary's [Finish] tap): its own
+  // analytics id and no beep (the beep cues a finish the user didn't tap). Same finish write.
+  const commit = ({ manual = false } = {}) => {
     if (committedRef.current) return
     committedRef.current = true
-    recordButton('auto-finish-workout')
-    // Optional cue at commit — the AudioContext is already unlocked from set-complete
+    recordButton(manual ? 'summary-finish-workout' : 'auto-finish-workout')
+    // Optional cue at an auto-commit — the AudioContext is already unlocked from set-complete
     // taps; defaultBeep is fail-silent if not.
-    defaultBeep()
+    if (!manual) defaultBeep()
     store.finishWorkout(autoFinishArgs(active))
     leaveWorkoutToToday()
   }
@@ -105,7 +107,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
           Finishing in {secondsLeft}s…
         </p>
       ) : (
-        <Button variant="primary" block onClick={commit}>
+        <Button variant="primary" block onClick={() => commit({ manual: true })}>
           Finish
         </Button>
       )}

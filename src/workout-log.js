@@ -472,15 +472,16 @@ export function restoreFromLoggedSet(set) {
   }
 }
 
-// kg + reps to prefill the set-log form, in priority order (req-02 / DEC-002):
-//   restore (un-logging via "Previous")  →  session seed override (req-83)  →
-//   carried last live set (NO-history exercise only)  →  history prefill weight +
-//   target reps (has-history, and the first set of a no-history exercise).
-//   `weighted` gates kg — bodyweight / cardio never seed a weight. `carry` is
-//   expected to be null whenever the exercise has history, so the with-history path
-//   never carries; the explicit `!hasHistory` guard keeps that scope rule visible
-//   and testable. Pure so the prefill decision is inspectable, the way the
-//   history-prefill rule is.
+// kg + reps to prefill the set-log form (req-02 / DEC-002, as amended below):
+//   restore (Previous re-edit) wins outright. Otherwise:
+//   kg   — override (req-83) → a work set's routine kg (req-178) → the session carry
+//          (when the routine has no kg there; on the warm-up path only with no history,
+//          or no history set at this index, req-152) → history → blank;
+//   reps — the set's target → with no target, the carry's reps (req-191) → blank.
+//   `carry` is carryForSet: the last non-skipped WORKING set logged this session (null
+//   for a warm-up or when nothing is logged), passed whether or not the exercise has
+//   history. `weighted` gates kg — bodyweight / cardio never seed a weight. Pure so the
+//   prefill decision is inspectable, the way the history-prefill rule is.
 //
 // req-83 (N9) — `override` is the session-scoped, per-field seed override for THIS
 // exercise+setType (see nextSeedOverrides): once the user enters a value that
@@ -491,21 +492,18 @@ export function restoreFromLoggedSet(set) {
 // Previous re-edit shows the set's own logged values) and ABOVE carry/history.
 // `weighted` still gates kg, so a weight override never lands on a bodyweight set.
 //
-// req-108 / DEC-052 (+ amendment) — only WEIGHT carries. Reps never come from the
-// override or the no-history carry: every set prefills its own target for that set
-// index, else empty ("each set is separate from each other"). A `reps` still stored on
-// an active workout's override (saved before req-108) is ignored here, not migrated;
-// likewise a carry's `reps`. The no-history kg carry (DEC-002) is unchanged.
+// req-108 / DEC-052 (+ amendment), amended by req-191 / DEC-107 §2 — WEIGHT carries through
+// the override and the session carry, as below. REPS: a set with a reps target prefills that
+// target; a set with NO target prefills the carry's reps (the last non-skipped working set
+// logged this session, carryForSet), else empty. Reps never come from the override: a `reps`
+// still stored on an active workout's override (saved before req-108) is ignored here, not
+// migrated. A warm-up has no carry, so its reps are its target or empty. The no-history kg
+// carry (DEC-002) is unchanged.
 //
 // req-152 (QA-3) — `historyHasSet: false` says the history has no set at THIS index (an
 // "Add set" beyond last time's count, or a routine that grew): there is no history kg for
 // it, so the in-session carry applies, as for a no-history exercise — the kg just
-// logged carries (weight carries, reps per set). Absent = unchanged (history wins).
-//
-// req-191 §6 (DEC-107 §2) — amends the req-108 rule above for ONE case: a set with no reps
-// target starts with the carry's reps (the last non-skipped working set logged this session,
-// carryForSet). With a target, the target prefills, as before. A stale override `reps` is
-// still never read. The carry is null for a warm-up, so a warm-up is unaffected.
+// logged carries (weight carries; reps as above). Absent = unchanged (history wins).
 //
 // req-178 / DEC-096 §1 — a WORK set's kg is the routine's: `routineKg` is the snapshot
 // item's suggestedWeights[workIndex] (frozen at Start). Chain: override (DEC-052) >

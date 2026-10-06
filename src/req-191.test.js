@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
-import { groupStaples, inferExerciseType, loadExerciseCatalog, muscleGroupForQuery, searchCommonFirst, shownName } from './exerciseCatalog.js'
+import { GROUP_LEADS, groupStaples, inferExerciseType, loadExerciseCatalog, muscleGroupForQuery, searchCommonFirst, shownName } from './exerciseCatalog.js'
 import { MUSCLE_GROUPS } from './exerciseLibrary.js'
 import { machinesPlan, planDaysText, SPLIT_AB, SPLIT_SAME } from './plan-templates.js'
 import { resolvePicks, setupDefaults } from './mid-workout-pick.js'
@@ -38,22 +38,16 @@ describe('AC1 — body-part search', () => {
     for (const word of ['kickback', 'bench', 'lats', 'press', '']) assert.equal(muscleGroupForQuery(word), null)
   })
 
-  it('"back" → the first rows are Back staples, machines first (Lat Pulldown, Seated Cable Row, Machine Row …), then free weights', () => {
+  it('"back" → Back staples first, machines first with the obvious ones leading (Lat Pulldown, Seated Cable Row, Machine Row), then free weights', () => {
     const { common } = searchCommonFirst(catalog, 'back')
     const lead = groupStaples(catalog, 'Back')
     console.log('back first 12:', names(common.slice(0, 12)).join(', '))
-    assert.deepEqual(common.slice(0, lead.length), lead, 'the whole Back group leads')
+    assert.deepEqual(common, lead.slice(0, 25), 'the first section is the Back group, capped at 25')
     for (const item of lead) assert.ok(item.muscleGroups.includes('Back') && item.staple)
-    const first = names(common.slice(0, 10))
-    for (const name of ['Lat Pulldown', 'Seated Cable Row', 'Machine Row', 'Assisted Pull-Up']) assert.ok(first.includes(name), name)
+    assert.deepEqual(names(common.slice(0, 3)), ['Lat Pulldown', 'Seated Cable Row', 'Machine Row'])
     // machines (machine/cable) before free weights
-    const kinds = lead.map((item) => (item.logAs === 'cardio' ? 'cardio' : inferExerciseType(item.equipment, item.category)))
-    const lastMachine = kinds.lastIndexOf('machine')
-    const firstFree = kinds.indexOf('free')
-    assert.ok(lastMachine < firstFree, `machines ${lastMachine} before free ${firstFree}`)
-    // the old name hits are still there, after the group
-    assert.ok(names(common).includes('Back Squat'))
-    assert.ok(names(common).indexOf('Back Squat') >= lead.length)
+    const kinds = lead.map((item) => inferExerciseType(item.equipment, item.category))
+    assert.ok(kinds.lastIndexOf('machine') < kinds.indexOf('free'), 'machines before free weights')
     assert.ok(!names(common.slice(0, 5)).includes('Glute Kickback'))
   })
 
@@ -66,13 +60,44 @@ describe('AC1 — body-part search', () => {
     ])
   })
 
-  it('"legs" keeps all 72 Legs staples (the cap never cuts the group); "chest" leads with a machine', () => {
-    const legs = groupStaples(catalog, 'Legs')
-    assert.ok(legs.length > 25)
-    assert.deepEqual(searchCommonFirst(catalog, 'legs').common.slice(0, legs.length), legs)
-    const chest = searchCommonFirst(catalog, 'chest').common
-    assert.equal(inferExerciseType(chest[0].equipment, chest[0].category), 'machine')
-    assert.equal(shownName(searchCommonFirst(catalog, 'abs').common[0]), 'Ab Crunch Machine')
+  // Review fix 1 — the group path is capped like any search, the overflow behind "Show N more",
+  // and a group word is a strength search: no cardio anywhere.
+  it('group path: ≤ 25 in the first section, the overflow counted in restCount; no cardio for "legs" or "back"', () => {
+    const cardio = (item) => item.logAs === 'cardio' || inferExerciseType(item.equipment, item.category) === 'cardio'
+    for (const word of ['legs', 'back', 'chest', 'shoulders', 'arms', 'core', 'abs']) {
+      const found = searchCommonFirst(catalog, word)
+      assert.ok(found.common.length <= 25, `${word}: ${found.common.length}`)
+      assert.ok(found.rest.length <= 25)
+      assert.ok(found.restCount >= found.rest.length)
+    }
+    const legs = searchCommonFirst(catalog, 'legs')
+    const back = searchCommonFirst(catalog, 'back')
+    for (const found of [legs, back]) assert.deepEqual([...found.common, ...found.rest].filter(cardio).map(shownName), [])
+    assert.equal(names(back.common).includes('Rowing Machine'), false)
+    assert.equal(groupStaples(catalog, 'Legs').some(cardio), false)
+    // the Legs staples that don't fit lead "Show more"
+    const legsGroup = groupStaples(catalog, 'Legs')
+    assert.ok(legsGroup.length > 25)
+    assert.deepEqual(legs.rest.slice(0, legsGroup.length - 25), legsGroup.slice(25, 50))
+    assert.ok(legs.restCount >= legsGroup.length - 25)
+  })
+
+  it('"legs" leads with Leg Press; each group leads with its obvious machine', () => {
+    const first = (word) => shownName(searchCommonFirst(catalog, word).common[0])
+    assert.equal(first('legs'), 'Leg Press')
+    assert.equal(first('chest'), 'Machine Chest Press')
+    assert.equal(first('shoulders'), 'Machine Shoulder Press')
+    assert.equal(first('arms'), 'Machine Bicep Curl')
+    assert.equal(first('abs'), 'Ab Crunch Machine')
+    // every GROUP_LEADS id exists, is a listable staple, a machine, and in its group
+    for (const [group, ids] of Object.entries(GROUP_LEADS)) {
+      for (const id of ids) {
+        const entry = catalog.find((item) => item.id === id)
+        assert.ok(entry && entry.staple && !entry.hidden, id)
+        assert.equal(inferExerciseType(entry.equipment, entry.category), 'machine', id)
+        assert.ok(entry.muscleGroups.includes(group), `${id} in ${group}`)
+      }
+    }
   })
 })
 
@@ -112,6 +137,23 @@ describe('AC2 — the summary (rendered)', () => {
     view = null
     mock.timers.reset()
   })
+  // review fix 2 — count beeps: defaultBeep builds oscillators on window.AudioContext.
+  let oscillators = 0
+  class FakeAudio {
+    constructor() {
+      this.state = 'running'
+      this.currentTime = 0
+      this.destination = {}
+    }
+    createOscillator() {
+      oscillators++
+      return { frequency: {}, connect: () => {}, start: () => {}, stop: () => {} }
+    }
+    createGain() {
+      return { gain: { setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {} }, connect: () => {} }
+    }
+  }
+  window.AudioContext = FakeAudio
   const fakeStore = () => {
     const calls = { finish: 0, patch: [] }
     return { calls, store: { workouts: [], routines: [], finishWorkout: () => calls.finish++, patchActive: (p) => calls.patch.push(p) } }
@@ -132,8 +174,15 @@ describe('AC2 — the summary (rendered)', () => {
     assert.match(view.button('Finish').className, /ui-btn--primary/)
     await view.click(view.button('Keep going'))
     assert.equal(cancelled, 1)
+    // review fix 2 — the manual tap: its own analytics id, no beep
+    const { exportAnalytics } = await import('./analytics.js')
+    const before = { ...exportAnalytics().buttons }
     await view.click(view.button('Finish'))
     assert.equal(calls.finish, 1)
+    const after = exportAnalytics().buttons
+    assert.equal((after['summary-finish-workout'] || 0) - (before['summary-finish-workout'] || 0), 1)
+    assert.equal(after['auto-finish-workout'] || 0, before['auto-finish-workout'] || 0, 'not the auto-finish event')
+    assert.equal(oscillators, 0, 'no beep on the manual Finish')
   })
 
   it('countdown on (default): "Finishing in 10s…", commits at 10 s, Edit + Keep going as before', async () => {
@@ -144,8 +193,12 @@ describe('AC2 — the summary (rendered)', () => {
     view = await render(h(AutoCompleteSummary, { routineId: 'r', active: w, store, onCancel: () => {} }))
     assert.match(view.text(), /Finishing in 10s…/)
     assert.deepEqual(view.all('button').map((b) => b.textContent.trim()), ['Edit', 'Keep going'])
+    const autoBefore = (await import('./analytics.js')).exportAnalytics().buttons['auto-finish-workout'] || 0
+    const oscBefore = oscillators
     await act(async () => mock.timers.tick(10500))
     assert.equal(calls.finish, 1)
+    assert.equal((await import('./analytics.js')).exportAnalytics().buttons['auto-finish-workout'], autoBefore + 1)
+    assert.ok(oscillators > oscBefore, 'the auto-finish still beeps')
   })
 })
 
