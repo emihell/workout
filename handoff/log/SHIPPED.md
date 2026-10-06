@@ -2156,3 +2156,12 @@ focus; blank Reps → "Enter reps" (no browser bubble); sheet "Use N kg next tim
 Gate (ui): `check: green — lint, skills, no import cycles, 89 test file(s), and the build all passed.` (1298/0); smoke green; Planner
 QA 5/5 (Arnold swap sets 3/rest 90 copied, kg []; blank reps stored nothing; "· swapped"). No trigger files → no reviewer; Planner
 read the req-154/155 test edits (optional `|| missingReps` group; kg/duration locks unchanged). `reports/req-189.md`.
+
+## req-190 — first setup starts from your exercises; a new plan starts today; no silent empty day  (batch 2026-10-06)
+
+**req-190** (DEC-105) — `/routines/new`: Pick your exercises → days a week → same / A-B → "Workout" (A/B), scheduled from today;
+template flow asks on an empty day [Leave it out] [Same as …]; picker rows scroll clear of the bar. 2 commits `c4cd9d3`…`6333776`.
+Gate (ui): `check: green — lint, skills, no import cycles, 90 test file(s), and the build all passed.` (1324/0); smoke green; Planner
+QA = a fresh Lena persona run on the branch build (empty first launch): setup 13 taps + 4 searches (was 20 + 3, with day B lost),
+plan started today ("Done Tue, Oct 6"), reload kept it. No trigger files → no reviewer; req-181/182 test edits read (follow the
+new sheet/start-today). `reports/req-190.md`.

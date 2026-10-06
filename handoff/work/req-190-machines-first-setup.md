@@ -1,6 +1,6 @@
 # req-190 — first setup starts from your machines; a new plan starts today; no silent empty day
 
-**Status: READY** (2026-10-06). **Lane: ui.** From DEC-105 (Emilio, 2026-10-06) and req-184 §Persona run (Lena). After
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-190` (`c4cd9d3`…`6333776`, 2 commits).** (2026-10-06). **Lane: ui.** From DEC-105 (Emilio, 2026-10-06) and req-184 §Persona run (Lena). After
 **req-189** (independent screens; branch off `main` after 189 merges). Trigger files: none expected (`plan-templates.js`,
 `views/Plan.jsx`, `views/Routine.jsx`, `views/Today.jsx`); if `state-reducers.js` / `store.jsx` / `schedule.js` change →
 independent reviewer. Writes only through the existing routine / schedule reducers (as `planToState` does). No schema change.
@@ -63,3 +63,8 @@ independent reviewer. Writes only through the existing routine / schedule reduce
 ## Decisions made on Emilio's behalf `(unconfirmed)`
 Labels and order on `/routines/new`; routine names "Workout" / "Workout A/B"; alternate split; weekday spacing; the empty-day
 sheet's wording; machines-first uses the starting plan for no-history picks (DEC-097 §4) — routine creation, not mid-workout.
+
+## Built — calls `(unconfirmed)`
+No default day count (Save disabled until tapped); "Two workouts" hidden with one pick; several empty days → one sheet, "Same
+as" fills each from the first chosen day; day A left out → the first remaining day lands today; picker button "Next (N)"; the
+days step previews "Today, Fri" (Lena misread it once — wording candidate); scroll padding while a picker bar shows (CSS `:has`).
