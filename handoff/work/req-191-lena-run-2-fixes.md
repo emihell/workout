@@ -1,6 +1,6 @@
 # req-191 — Lena run 2 fixes: search by body part, no instant finish on a skip, tap a done set, plain days, reps carry
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From req-184 §Persona run 2 and DEC-107 (Emilio, 2026-10-06). Trigger files:
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-191` (`b603671`…`ba3f527`, 4 commits).** (2026-10-06). **Lane: ui.** From req-184 §Persona run 2 and DEC-107 (Emilio, 2026-10-06). Trigger files:
 `workout-log.js` (seed / carry, auto-complete) → **independent reviewer** before merge; no stored-record write → no backup
 reminder. No schema change, no new persisted field (if one seems needed, stop and report).
 
