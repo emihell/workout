@@ -35,7 +35,9 @@ import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedC
 //
 // Everything around the form (Screen / Back / RestPill / header / History's
 // Remove button) stays in the caller.
-export function SetEditForm({ set, showLoad, showEffort, showDuration = false, setTypeOptions, onSave, cancelTo }) {
+// req-189 — `kgLabel` ("kg per dumbbell" from the live workout's set edit; default "kg"), and
+// the number boxes select their content on focus (the first keystroke replaces the value).
+export function SetEditForm({ set, showLoad, showEffort, showDuration = false, setTypeOptions, onSave, cancelTo, kgLabel = 'kg' }) {
   const effortFor = (type) => (typeof showEffort === 'function' ? showEffort(type) : Boolean(showEffort))
   const [weight, setWeight] = useState(set?.weight ?? '')
   const [reps, setReps] = useState(set?.reps ?? '')
@@ -95,7 +97,8 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
       ) : null}
       {showLoad ? (
         <NumberField
-          label="kg"
+          label={kgLabel}
+          selectOnFocus
           value={weight}
           onChange={(event) => {
             setWeight(event.target.value)
@@ -108,10 +111,11 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
           {weightError}
         </p>
       ) : null}
-      <Field label="Reps" value={reps} onChange={(event) => setReps(event.target.value)} />
+      <Field label="Reps" selectOnFocus value={reps} onChange={(event) => setReps(event.target.value)} />
       {durationShown ? (
         <NumberField
           label="Duration (s)"
+          selectOnFocus
           value={duration}
           onChange={(event) => {
             setDuration(event.target.value)

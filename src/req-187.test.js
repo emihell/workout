@@ -63,22 +63,25 @@ describe('req-187 — offerOnFinishingSet: sheet vs no sheet on the finishing se
   })
 })
 
-describe('req-187 — the sheet words', () => {
-  it('"Update Bench Press?" · "You lifted 25 kg · Upper body says 20 kg" · [Keep 20 kg] [Update routine]', () => {
+describe('req-187 — the sheet words (req-189: plain words, [No] [Yes])', () => {
+  // req-189 edit: the req-187 wording ("Update Bench Press?" / "You lifted … says …" / [Keep 20 kg]
+  // [Update routine]) was replaced by req-189 scope 4; the same inputs now assert the new words.
+  it('"Use 25 kg next time?" · "Upper body will start Bench Press at 25 kg." · [No] [Yes]', () => {
     assert.deepEqual(offerSheetText({ routineName: 'Upper body', from: [20, 20, 20], to: [25, 25, 25] }, 'Bench Press'), {
-      title: 'Update Bench Press?',
-      body: 'You lifted 25 kg · Upper body says 20 kg',
-      keepLabel: 'Keep 20 kg',
-      updateLabel: 'Update routine',
+      title: 'Use 25 kg next time?',
+      body: 'Upper body will start Bench Press at 25 kg.',
+      keepLabel: 'No',
+      updateLabel: 'Yes',
     })
   })
-  it('per-set lists when the sets differ; a blank routine → "not in … yet" and [Keep blank]', () => {
+  it('per-set lists when the sets differ; a blank routine reads the same way', () => {
     const mixed = offerSheetText({ routineName: 'Day A', from: [20, 20, 17.5], to: [25, 25, 17.5] }, 'Row')
-    assert.equal(mixed.body, 'You lifted 25/25/17.5 kg · Day A says 20/20/17.5 kg')
-    assert.equal(mixed.keepLabel, 'Keep 20/20/17.5 kg')
-    const blank = offerSheetText({ routineName: 'Day A', from: [], to: [30, 30] }, 'Row')
-    assert.equal(blank.body, 'You lifted 30 kg · not in Day A yet')
-    assert.equal(blank.keepLabel, 'Keep blank')
+    assert.equal(mixed.title, 'Use 25/25/17.5 kg next time?')
+    assert.equal(mixed.body, 'Day A will start Row at 25/25/17.5 kg.')
+    const blank = offerSheetText({ routineName: 'Full body A', from: [], to: [40, 40] }, 'Leg Press')
+    assert.equal(blank.title, 'Use 40 kg next time?')
+    assert.equal(blank.body, 'Full body A will start Leg Press at 40 kg.')
+    assert.equal(blank.keepLabel, 'No')
   })
 })
 
@@ -164,13 +167,14 @@ describe('req-187 (rendered) — last Complete → the sheet; Update / Keep; no 
     await logAll(t, 'ia', ['25', '25', '25'])
     const sheet = view.all('[role="alertdialog"]')[0]
     assert.ok(sheet, 'the sheet is open')
-    assert.equal(sheet.querySelector('.ui-sheet__title').textContent, 'Update Bench Press?')
-    assert.equal(sheet.querySelector('.ui-sheet__message').textContent, 'You lifted 25 kg · Upper body says 20 kg')
-    assert.deepEqual([...sheet.querySelectorAll('button')].map((b) => b.textContent), ['Keep 20 kg', 'Update routine'])
+    // req-189 edit: the sheet's words are now "Use 25 kg next time?" / [No] [Yes] (req-189 scope 4).
+    assert.equal(sheet.querySelector('.ui-sheet__title').textContent, 'Use 25 kg next time?')
+    assert.equal(sheet.querySelector('.ui-sheet__message').textContent, 'Upper body will start Bench Press at 25 kg.')
+    assert.deepEqual([...sheet.querySelectorAll('button')].map((b) => b.textContent), ['No', 'Yes'])
     assert.ok(t.stored().activeWorkout.restEndsAt, 'rest armed by the Complete, sheet or not (AC6)')
     await t.mount(t.overview())
-    assert.ok(view.button('Update routine'), 'the sheet is still open over the overview')
-    await view.click(view.button('Update routine'))
+    assert.ok(view.button('Yes'), 'the sheet is still open over the overview')
+    await view.click(view.button('Yes'))
     await flush()
     assert.deepEqual(t.stored().routines[0].exercises[0].suggestedWeights, [25, 25, 25])
     assert.equal(getPendingConfirm(), null)
@@ -183,7 +187,7 @@ describe('req-187 (rendered) — last Complete → the sheet; Update / Keep; no 
     const before = JSON.stringify(t.stored().routines)
     await logAll(t, 'ia', ['25', '25', '25'])
     await t.mount(t.overview())
-    await view.click(view.button('Keep 20 kg'))
+    await view.click(view.button('No'))
     await flush()
     assert.equal(JSON.stringify(t.stored().routines), before)
     assert.equal(getPendingConfirm(), null)
@@ -203,11 +207,11 @@ describe('req-187 (rendered) — last Complete → the sheet; Update / Keep; no 
     const t = await harness([routineItem('ia', 'ex-bp', 1, [20])])
     await logAll(t, 'ia', ['25'])
     await t.mount(t.overview())
-    assert.ok(view.button('Update routine'))
+    assert.ok(view.button('Yes'))
     assert.equal(view.text().includes('Great job!'), false, 'the summary waits for the sheet')
     await act(async () => mock.timers.tick(15000))
     assert.equal(t.stored().activeWorkout != null, true, 'nothing auto-finished under the sheet')
-    await view.click(view.button('Update routine'))
+    await view.click(view.button('Yes'))
     await flush()
     assert.match(view.text(), /Great job!/)
     assert.match(view.text(), /Finishing in 10s…/)

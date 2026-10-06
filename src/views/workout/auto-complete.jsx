@@ -78,7 +78,8 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   const name = active?.snapshot?.routineName || 'Workout'
   const d = stats.deltas
   const rows = [
-    { label: 'Volume', value: `${stats.volume} kg`, delta: d ? `${signed(d.volume)} kg` : null },
+    // req-189 (unconfirmed wording) — "Lifted 2,630 kg", grouped as History's "… kg lifted".
+    { label: 'Lifted', value: `${Number(stats.volume || 0).toLocaleString('en-US')} kg`, delta: d ? `${signed(d.volume)} kg` : null },
     { label: 'Duration', value: `${stats.duration} min`, delta: d ? `${signed(d.duration)} min` : null },
     { label: 'Sets', value: String(stats.sets), delta: d ? signed(d.sets) : null },
   ]
@@ -118,7 +119,8 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
           onCancel()
         }}
       >
-        Cancel
+        {/* req-189 (unconfirmed wording) — was "Cancel"; same action (stops the countdown). */}
+        Keep going
       </Button>
     </Screen>
   )

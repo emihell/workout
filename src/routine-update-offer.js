@@ -70,17 +70,18 @@ function kgSummary(list) {
   return kgListText(list)
 }
 
-// req-187 — the sheet's words (unconfirmed wording): title "Update Bench Press?", body
-// "You lifted 25 kg · Upper body says 20 kg" (or "… · not in Upper body yet"), and the
-// buttons [Keep 20 kg] (or [Keep blank] when the routine has no kg) · [Update routine].
+// req-187 — the sheet's words. req-189 (Lena run, unconfirmed wording) — plain words: title
+// "Use 40 kg next time?", body "Full body A will start Leg Press at 40 kg.", buttons [No] (left,
+// keeps the routine) · [Yes] (right, writes it). Differing sets keep the per-set list
+// ("40/40/35 kg"). `keepLabel` / `updateLabel` keep their names: the call site maps them to the
+// sheet's cancel / confirm.
 export function offerSheetText(offer, exercise) {
-  const routineHasKg = (offer.from || []).some((kg) => Number(kg) > 0)
-  const routine = offer.routineName || 'the routine'
-  const lifted = `You lifted ${kgSummary(offer.to)} kg`
+  const routine = offer.routineName || 'The routine'
+  const kg = `${kgSummary(offer.to)} kg`
   return {
-    title: `Update ${exercise || 'exercise'}?`,
-    body: routineHasKg ? `${lifted} · ${routine} says ${kgSummary(offer.from)} kg` : `${lifted} · not in ${routine} yet`,
-    keepLabel: routineHasKg ? `Keep ${kgSummary(offer.from)} kg` : 'Keep blank',
-    updateLabel: 'Update routine',
+    title: `Use ${kg} next time?`,
+    body: `${routine} will start ${exercise || 'this exercise'} at ${kg}.`,
+    keepLabel: 'No',
+    updateLabel: 'Yes',
   }
 }

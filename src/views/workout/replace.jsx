@@ -21,6 +21,8 @@ import { WorkoutPill } from './rest'
 // "Use your …?" guard. DEC-104 — the swapped-in item takes history's prescription, or with no
 // history the sets / rest asked for in a step (MidWorkoutPicker); a library pick's record is
 // created only on that final confirm, then the swap.
+// req-189 (DEC-106) — no step on a Swap any more: a no-history pick copies this item's sets
+// and rest (reps, kg blank); history picks are unchanged.
 export function WorkoutItemReplace({ routineId, itemId }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -58,6 +60,7 @@ export function WorkoutItemReplace({ routineId, itemId }) {
         cancelTo={backTo}
         max={1}
         addLabel={() => 'Swap'}
+        copyFrom={item}
         onDone={([choice]) => {
           if (choice) pick(choice.exerciseId, choice.item)
         }}

@@ -46,3 +46,20 @@ export function resolvePicks(picks, values = []) {
   })
   return Object.keys(errors).length ? { errors } : { picks: out }
 }
+
+// req-189 / DEC-106 (Emilio, 2026-10-06; amends DEC-104 §2 for Swap only) — a Swap to an
+// exercise with no history asks nothing: the new item copies the REPLACED item's set count and
+// rest ("the probability of the exercise following the same sets as its replacement is quite
+// high"). Reps targets, kg and durations start blank (DESIGN §1 — copied plan shape, never a
+// copied or invented number). Add exercise has nothing to copy and keeps the step.
+export function swapNoHistoryItem(original) {
+  const sets = Math.max(1, Math.floor(Number(original?.sets)) || 1)
+  const restSec = Math.max(0, Math.floor(Number(original?.restSec)) || 0)
+  return { role: 'main', warmup: null, notes: '', sets, targets: [], suggestedWeights: [], durations: [], restSec }
+}
+
+// The Swap's picks with their items: a history pick keeps the picker's; a no-history pick takes
+// swapNoHistoryItem(original). Never a step.
+export function swapPicks(picks, original) {
+  return (picks || []).map((pick) => (needsSetup(pick) ? { ...pick, item: swapNoHistoryItem(original) } : pick))
+}

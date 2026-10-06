@@ -42,6 +42,7 @@ import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
 import { askConfirm } from '../../ui/confirm.js'
 import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
+import { kgLabelFor } from '../../kg-label.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
 // workout-log.js); weight step and cues stay live. Old snapshots read live as before.
@@ -529,6 +530,7 @@ function WorkoutItemLive({ routineId, item }) {
           initialEffort={viewedEffort}
           routineKg={routineKgFor(item, viewedType, viewedWorkIndex)}
           lastKg={historySetPrefill(last, { setType: viewedType, workIndex: viewedWorkIndex }).weight}
+          kgLabel={kgLabelFor(ex)}
           canGoBack={canGoBack}
           onComplete={saveViewedSet}
           onNext={nextFromViewed}
@@ -549,6 +551,7 @@ function WorkoutItemLive({ routineId, item }) {
           initialEffort={formInit.effort}
           routineKg={routineKg}
           lastKg={historyPrefill.weight}
+          kgLabel={kgLabelFor(ex)}
           canGoBack={canGoBack}
           onComplete={({ weight, reps, effort, durationSec }) =>
             completeSet({ weight, reps, rpe: effort, note, durationSec })
@@ -684,6 +687,7 @@ export function WorkoutSetEdit({ routineId, index }) {
         set={set}
         showLoad={usesLoad}
         showEffort={usesRpe}
+        kgLabel={kgLabelFor(item)}
         cancelTo={itemPath}
         onSave={(values) => {
           // req-154 — `22,5` → 22.5; unreadable kg → null (the form already shows why).

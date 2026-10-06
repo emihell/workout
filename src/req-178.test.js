@@ -446,8 +446,8 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     await view.type(view.input('kg'), '55')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'dayA' }))
-    assert.match(view.text(), /You lifted 55 kg · Day A says 50 kg/)
-    await view.click(view.button('Update routine'))
+    assert.match(view.text(), /Use 55 kg next time\?/) // req-189 edit: the sheet's new words
+    await view.click(view.button('Yes'))
     await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
     const saved = () => JSON.parse(localStorage.getItem('workout-mvp-v9')).routines[0].exercises
     assert.deepEqual(saved()[0].suggestedWeights, [55])
@@ -458,8 +458,8 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     await view.type(view.input('kg'), '32,5')
     await view.click(view.button('Complete'))
     await mount(h(Workout, { routineId: 'dayA' }))
-    assert.match(view.text(), /You lifted 32\.5 kg · Day A says 30 kg/)
-    await view.click(view.button('Update routine'))
+    assert.match(view.text(), /Use 32\.5 kg next time\?/) // req-189 edit: the sheet's new words
+    await view.click(view.button('Yes'))
     await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
     assert.match(view.text(), /Great job!/)
     assert.deepEqual(saved()[1].suggestedWeights, [32.5])
