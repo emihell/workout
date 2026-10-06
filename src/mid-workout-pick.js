@@ -1,14 +1,28 @@
+import { STARTING_REST_SEC, STARTING_SETS } from './routine-picker.js'
+
 // req-188 / DEC-104 (Emilio, 2026-10-06; amends DEC-059 §1) — what a mid-workout pick (Swap or
 // Add exercise) puts in the workout. Pure, so `node --test` drives it; the screens
 // (views/workout/mid-workout-picker.jsx) only render it.
 //   - the exercise has history → the picker's history prescription (sets, reps, kg, rest);
 //   - no history → NOT the routine picker's 3 × 10 / 90 s starting plan: a small step asks for
 //     Sets (required, a positive whole number) and Rest in seconds (optional; blank = no rest
-//     timer). Reps and kg start blank (DESIGN §1 — nothing invented; the fields start empty).
+//     timer). Reps and kg start blank (DESIGN §1 — nothing invented). req-191 / DEC-107 §1: the two
+//     fields open prefilled with the starting plan (setupDefaults), shown and editable.
 
 // A pick from ExercisePicker's onPick needs the step when it has no history.
 export function needsSetup(pick) {
   return pick?.source !== 'history'
+}
+
+// req-191 §5 (DEC-107 §1; amends DEC-104 §2's empty fields) — the step opens prefilled with the
+// shown starting plan of DEC-097 §4 (routine-picker.js pickerItem, by logging kind): 3 sets and
+// 90 s rest for reps and timed exercises; cardio 1 set, rest blank (its plan's 0 = no timer).
+// Never a kg or reps. A history pick never reaches the step. → { sets, rest } as field text.
+export function setupDefaults(pick) {
+  const item = pick?.item || {}
+  const sets = Math.floor(Number(item.sets)) >= 1 ? Math.floor(Number(item.sets)) : STARTING_SETS
+  const restSec = item.restSec === undefined ? STARTING_REST_SEC : Math.max(0, Math.floor(Number(item.restSec)) || 0)
+  return { sets: String(sets), rest: restSec ? String(restSec) : '' }
 }
 
 // The step's two fields for one pick, as typed → { item } or { errors: { sets?, rest? } }.

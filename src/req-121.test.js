@@ -81,8 +81,11 @@ test('History in-progress row: Abandon (retreat) left, Continue (forward) right'
 })
 
 test('failure case: auto-complete Edit stays a Button that sets the flag (req-116)', () => {
-  const edit = autoComplete.lastIndexOf('<Button', autoComplete.indexOf('>\n        Edit\n'))
-  const block = autoComplete.slice(edit, autoComplete.indexOf('Edit\n      </Button>', edit))
+  // req-191 (flagged in reports/req-191.md) — Edit now sits inside `{countdown ? (…) : null}`
+  // (no Edit on the after-a-skip summary), two spaces deeper; the anchors match any indent.
+  const editAt = autoComplete.search(/>\n\s*Edit\n/)
+  const edit = autoComplete.lastIndexOf('<Button', editAt)
+  const block = autoComplete.slice(edit, autoComplete.indexOf('</Button>', editAt))
   assert.match(block, /store\.patchActive\(\{ autoFinishDismissed: true \}\)/)
   assert.doesNotMatch(autoComplete, /<NavLink[^>]*>\s*Edit/)
 })

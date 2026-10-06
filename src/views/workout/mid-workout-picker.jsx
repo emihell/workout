@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../../store-context'
-import { needsSetup, resolvePicks, swapPicks } from '../../mid-workout-pick.js'
+import { needsSetup, resolvePicks, setupDefaults, swapPicks } from '../../mid-workout-pick.js'
 import { Actions, Button, Field, NavLink, SectionHeader } from '../../ui/index.jsx'
 import { ExercisePicker } from '../ExercisePicker'
 
@@ -11,7 +11,7 @@ const NO_HISTORY_SWAP = 'No history — same sets and rest'
 // req-188 / DEC-104 — the picker for Swap (max 1) and Add exercise (multi). The picker writes
 // nothing (onPick). History picks go straight through with their history prescription; when
 // any pick has no history, one step lists each of them and asks for Sets (required) and Rest
-// (optional) — fields start empty, reps and kg stay blank. Only on the step's confirm (or
+// (optional) — req-191 / DEC-107 §1: prefilled 3 and 90 (setupDefaults), reps and kg stay blank. Only on the step's confirm (or
 // straight away when nothing needs it) are records created (a library pick → a new exercise,
 // an archived "Use mine" → restored, as the routine picker's add does) and `onDone` called
 // with [{ exerciseId, item }]. Cancel / Back on either screen create, add and swap nothing.
@@ -45,7 +45,7 @@ export function MidWorkoutPicker({ max = Infinity, addLabel, cancelTo, onDone, c
           if (!picks.length) return
           if (copyFrom) commit(swapPicks(picks, copyFrom))
           else if (picks.some(needsSetup)) {
-            setValues(picks.map(() => ({ sets: '', rest: '' })))
+            setValues(picks.map(setupDefaults))
             setPending(picks)
           } else commit(picks)
         }}
@@ -63,7 +63,7 @@ export function MidWorkoutPicker({ max = Infinity, addLabel, cancelTo, onDone, c
 
   return (
     <>
-      <p className="ui-sub">No history yet. Set the sets and rest; reps and kg you enter as you log.</p>
+      <p className="ui-sub">No history yet. A starting plan is filled in — change it if you like; reps and kg you enter as you log.</p>
       {pending.map((pick, index) =>
         needsSetup(pick) ? (
           <section key={`${pick.kind}-${pick.exerciseId || pick.name}`}>

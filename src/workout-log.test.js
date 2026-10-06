@@ -389,11 +389,15 @@ describe('setLogSeed (req-02 prefill order)', () => {
   })
 
   // req-108 acceptance — "Reps separate, no history (unit)".
-  it('req-108: no history, carry of 12 reps, target 15 → reps 15; no target → empty; kg still carries', () => {
+  // req-191 (DEC-107 §2 amends DEC-052 for the no-target case; flagged in reports/req-191.md) —
+  // with a target the target still wins (req-108's case, unchanged); with NO target the carry's
+  // reps now prefill (was ''). A carry without reps still gives ''.
+  it('req-108 + req-191: carry of 12 reps, target 15 → reps 15; no target → the carried 12; kg still carries', () => {
     const base = { weighted: true, fromRestore: false, restore: null, hasHistory: false, history, carry: { weight: '30', reps: '12' } }
     assert.deepEqual(setLogSeed({ ...base, target: '15' }), { weight: '30', reps: '15' })
-    assert.deepEqual(setLogSeed({ ...base, target: '' }), { weight: '30', reps: '' })
-    assert.deepEqual(setLogSeed({ ...base, target: undefined }), { weight: '30', reps: '' })
+    assert.deepEqual(setLogSeed({ ...base, target: '' }), { weight: '30', reps: '12' })
+    assert.deepEqual(setLogSeed({ ...base, target: undefined }), { weight: '30', reps: '12' })
+    assert.deepEqual(setLogSeed({ ...base, carry: { weight: '30' }, target: '' }), { weight: '30', reps: '' })
   })
 
   it('first working set of a no-history exercise: blank kg, target reps', () => {

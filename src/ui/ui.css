@@ -352,6 +352,30 @@ html:has(.ui-picker-bar) {
   -webkit-appearance: none;
   appearance: none;
 }
+/* req-191 §7 — the picker search's clear (×): a ≥44px square over the input's right end.
+   The label's margins collapse through .ui-search, so its bottom is the input's bottom. */
+.ui-search {
+  position: relative;
+}
+.ui-input--clearable {
+  padding-right: var(--ui-tap);
+}
+.ui-search__clear {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--ui-tap);
+  height: var(--ui-tap);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--ui-text-title);
+  line-height: 1;
+  color: var(--ui-ink-2);
+  cursor: pointer;
+}
 .ui-input--num {
   font-size: var(--ui-text-display);
   font-weight: 600;
@@ -864,6 +888,20 @@ html:has(.ui-picker-bar) {
 }
 .ui-setpreview__mark {
   flex: 0 0 1.2em;
+}
+/* req-191 §3 — a done row is a button (opens the logged set) that looks like the row. */
+.ui-setpreview__tap {
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--ui-s1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .ui-setpreview__row.is-done,
 .ui-setpreview__row.is-current {

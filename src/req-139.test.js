@@ -136,9 +136,12 @@ describe('common first, the rest on request', () => {
 
   // req-143 (sanctioned edit) — "press" has 15 rough hits left after the triage; "shoulders"
   // (a muscle query) still has > 25. restCount vs the flat search, which skips hidden too.
+  // req-191 (sanctioned by its §1, flagged in reports/req-191.md) — "shoulders" is now a
+  // muscle-GROUP word (its group's staples lead, machines first), so the flat-order cap is
+  // pinned on "quadriceps", a muscle query that is not a group word (47 staple hits, 46 rest).
   it('each part is capped at 25; restCount is the untruncated count', () => {
-    const { common: hits, rest, restCount } = searchCommonFirst(library, 'shoulders')
-    const all = searchExerciseCatalog(library, 'shoulders', Infinity)
+    const { common: hits, rest, restCount } = searchCommonFirst(library, 'quadriceps')
+    const all = searchExerciseCatalog(library, 'quadriceps', Infinity)
     assert.ok(hits.length <= 25 && rest.length === 25)
     // req-140 (edit NOT on the spec's sanctioned list; flagged in reports/req-140.md) —
     // the split reads `staple` since DEC-066 §1, so the expected parts do too.

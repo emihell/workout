@@ -154,6 +154,22 @@ export function Field({ label, className, selectOnFocus = false, onFocus, onMous
   )
 }
 
+// req-191 §7 — a search Field with a clear (×) button while it holds text. The button sits
+// outside the <label> (a button inside a label would also focus the input), over the input's
+// right end; the input keeps room for it. `onClear` empties the query.
+export function SearchField({ label = 'Search', value, onClear, className, ...rest }) {
+  return (
+    <div className="ui-search">
+      <Field label={label} value={value} className={cx('ui-input--clearable', className)} {...rest} />
+      {value ? (
+        <button type="button" className="ui-search__clear" aria-label="Clear search" onClick={onClear}>
+          ×
+        </button>
+      ) : null}
+    </div>
+  )
+}
+
 // NumberField — like Field but large, gym-legible digits + numeric keypad.
 export function NumberField({ label, ...rest }) {
   return <Field label={label} className="ui-input--num" inputMode="decimal" {...rest} />

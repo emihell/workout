@@ -161,7 +161,8 @@ describe('req-180 — the picker (rendered, real store)', () => {
     const routineId = await pickerFor(captured, mount)
     const headers = view.all('h2').map((node) => node.textContent.trim())
     assert.deepEqual(headers, Object.keys(MUSCLE_GROUPS), 'empty search: staples grouped by muscle')
-    assert.equal(view.button('Add 0').disabled, true)
+    // req-191 §7 (flagged in reports/req-191.md) — nothing ticked reads "Add" (was "Add 0"), still disabled.
+    assert.equal(view.button('Add').disabled, true)
     for (const name of ['Bench Press — ', 'Plank — ', 'Rowing Machine — ']) await view.click(box(name))
     assert.match(view.text(), /Starting plan: 3 × 10, 90 s rest — change any time/)
     assert.match(view.text(), /Starting plan: 3 × 30 s, 90 s rest — change any time/)
@@ -194,7 +195,7 @@ describe('req-180 — the picker (rendered, real store)', () => {
     assert.ok(box('Bench — '), 'own list on top')
     await view.click(box('Bench Press — '))
     assert.match(view.text(), /Use your ‘Bench’\?/)
-    assert.equal(view.button('Add 0').disabled, true, 'the question selects nothing yet')
+    assert.equal(view.button('Add').disabled, true, 'the question selects nothing yet') // req-191: was 'Add 0'
     await view.click(view.button('Use mine'))
     assert.equal(box('Bench — ').checked, true)
     await view.click(view.button('Add 1'))

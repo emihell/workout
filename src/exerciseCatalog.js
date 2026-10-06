@@ -1,5 +1,5 @@
 import { libraryItemMatch } from './exercise-names.js'
-import { catalogNameKey, loadExerciseLibrary, shownName } from './exerciseLibrary.js'
+import { catalogNameKey, loadExerciseLibrary, MUSCLE_GROUPS, shownName } from './exerciseLibrary.js'
 
 // req-139 / DEC-064 §2 — search reads our library only (exerciseLibrary.js: the pinned
 // free-db copy, the extras, our own entries). History: RepDB was used until req-142; nothing
@@ -117,7 +117,66 @@ export function searchExerciseCatalog(list, query, limit = 25) {
 // entry sits behind "Show more"). The `common` key name is kept for the callers.
 // req-143 — a hidden entry matching one of `exercises` (live or archived, libraryItemMatch)
 // still shows, so owning one never turns into "No matches" (unconfirmed).
+// req-191 §1 — a query that is a muscle-group word (a MUSCLE_GROUPS name) or a plain synonym
+// of one names that group. Synonyms (unconfirmed): singulars and the everyday "abs".
+const GROUP_SYNONYMS = { arm: 'Arms', leg: 'Legs', shoulder: 'Shoulders', abs: 'Core', ab: 'Core', abdominals: 'Core', stomach: 'Core' }
+const GROUP_WORDS = new Map([
+  ...Object.keys(MUSCLE_GROUPS).map((group) => [group.toLowerCase(), group]),
+  ...Object.entries(GROUP_SYNONYMS),
+])
+
+export function muscleGroupForQuery(query) {
+  return GROUP_WORDS.get(String(query || '').trim().toLowerCase()) || null
+}
+
+// Machines first (machine and cable, as inferExerciseType types them), then free weights,
+// then bodyweight (unconfirmed). Review fix 1 — a group word is a strength search: cardio
+// (logAs or category cardio — Rowing Machine, Stationary Bike) is left out entirely.
+const EQUIPMENT_ORDER = { machine: 0, free: 1, bodyweight: 2 }
+const isCardio = (item) => item.logAs === 'cardio' || inferExerciseType(item.equipment, item.category) === 'cardio'
+const equipmentRank = (item) => EQUIPMENT_ORDER[inferExerciseType(item.equipment, item.category)] ?? 1
+
+// Review fix 1 — the library carries no commonness rank (`staple` / `common` are booleans, and
+// `difficulty` is "beginner" for nearly every machine), so the obvious machines per group are
+// named here, by library id (permanent ids, exerciseLibrary.js). They lead the machines in this
+// order; the other machines follow A→Z. Planner's call `(unconfirmed)`.
+export const GROUP_LEADS = {
+  Chest: ['Leverage_Chest_Press', 'Butterfly'],
+  Back: ['Wide-Grip_Lat_Pulldown', 'Seated_Cable_Rows', 'Leverage_Iso_Row'],
+  Shoulders: ['Machine_Shoulder_Military_Press', 'own-machine-lateral-raise'],
+  Arms: ['Machine_Bicep_Curl', 'Triceps_Pushdown'],
+  Legs: ['Leg_Press', 'Leg_Extensions', 'Seated_Leg_Curl'],
+  Core: ['Ab_Crunch_Machine', 'Cable_Crunch'],
+}
+
+// The group's listable, non-cardio staples: machines first (the group's leads, then A→Z), then
+// free weights, then bodyweight, A→Z inside each. Exported for tests.
+export function groupStaples(list, group) {
+  const leads = GROUP_LEADS[group] || []
+  const leadRank = (item) => (leads.includes(item.id) ? leads.indexOf(item.id) : leads.length)
+  return (list || [])
+    .filter((item) => item.staple && listable(item) && !isCardio(item) && (item.muscleGroups || []).includes(group))
+    .map((item) => ({ item, rank: equipmentRank(item), lead: leadRank(item), name: shownName(item) }))
+    .sort((a, b) => a.rank - b.rank || a.lead - b.lead || a.name.localeCompare(b.name))
+    .map((row) => row.item)
+}
+
 export function searchCommonFirst(list, query, limit = 25, { exercises = [] } = {}) {
+  const group = muscleGroupForQuery(query)
+  if (!group) return searchCommonFirstByName(list, query, limit, { exercises })
+  // req-191 §1 — a group word: the group's staples lead, then today's other staple hits
+  // ("Back Squat"). Review fix 1 — the first section is capped at `limit` like any search; what
+  // doesn't fit goes first into the "Show N more" part, ahead of today's non-staple hits. No
+  // cardio anywhere in the result.
+  const lead = groupStaples(list, group)
+  const leadSet = new Set(lead)
+  const byName = searchCommonFirstByName(list, query, Infinity, { exercises })
+  const ordered = [...lead, ...byName.common.filter((item) => !leadSet.has(item) && !isCardio(item))]
+  const rest = [...ordered.slice(limit), ...byName.rest.filter((item) => !leadSet.has(item) && !isCardio(item))]
+  return { common: ordered.slice(0, limit), rest: rest.slice(0, limit), restCount: rest.length }
+}
+
+function searchCommonFirstByName(list, query, limit, { exercises }) {
   const owned = exercises.length ? (item) => libraryItemMatch(exercises, item) !== null : null
   const hits = rankedHits(list, query, owned)
   // req-151 — an exact hit on a listed non-staple's own name (shown name or free-db name) leads

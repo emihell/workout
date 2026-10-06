@@ -6,7 +6,7 @@ import { dateKey, planDateFor } from '../../schedule'
 import { routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
-import { allItemsDone, autoCompleteArmed, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
+import { allItemsDone, autoCompleteArmed, endedOnSkip, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
@@ -165,6 +165,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
         routineId={routineId}
         active={active}
         store={store}
+        countdown={!endedOnSkip(active)}
         onCancel={() => store.patchActive({ autoFinishDismissed: true })}
       />
     )

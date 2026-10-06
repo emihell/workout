@@ -36,7 +36,11 @@ function signed(n) {
   return String(n)
 }
 
-export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
+// req-191 §2 — `countdown` false (the workout became all-done by a skip, endedOnSkip): no
+// timer and no "Finishing in"; [Finish] commits the same finish the countdown would, and
+// [Keep going] dismisses as before. No Edit (the spec's two buttons; Keep going → the
+// overview's Finish link reaches the Finish screen). A completed last set keeps the countdown (default).
+export function AutoCompleteSummary({ routineId, active, store, onCancel, countdown = true }) {
   // Captured once at mount so the shown duration is stable, not ticking.
   const [mountNow] = useState(() => Date.now())
   const [deadline] = useState(() => Date.now() + COUNTDOWN_MS)
@@ -49,18 +53,21 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
 
   // Auto-commit on expiry. committedRef guards the tick from firing finishWorkout
   // twice. Cancel/Edit unmount this component (clearing the interval) before it fires.
-  const commit = () => {
+  // req-191 review fix 2 — `manual` (the no-countdown summary's [Finish] tap): its own
+  // analytics id and no beep (the beep cues a finish the user didn't tap). Same finish write.
+  const commit = ({ manual = false } = {}) => {
     if (committedRef.current) return
     committedRef.current = true
-    recordButton('auto-finish-workout')
-    // Optional cue at commit — the AudioContext is already unlocked from set-complete
+    recordButton(manual ? 'summary-finish-workout' : 'auto-finish-workout')
+    // Optional cue at an auto-commit — the AudioContext is already unlocked from set-complete
     // taps; defaultBeep is fail-silent if not.
-    defaultBeep()
+    if (!manual) defaultBeep()
     store.finishWorkout(autoFinishArgs(active))
     leaveWorkoutToToday()
   }
 
   useEffect(() => {
+    if (!countdown) return undefined
     const t = setInterval(() => {
       const n = Date.now()
       setNow(n)
@@ -78,8 +85,8 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
   const name = active?.snapshot?.routineName || 'Workout'
   const d = stats.deltas
   const rows = [
-    // req-189 (unconfirmed wording) — "Lifted 2,630 kg", grouped as History's "… kg lifted".
-    { label: 'Lifted', value: `${Number(stats.volume || 0).toLocaleString('en-US')} kg`, delta: d ? `${signed(d.volume)} kg` : null },
+    // req-189 — grouped as History's "… kg lifted"; req-191 §7 (unconfirmed wording) says what it sums.
+    { label: 'Total lifted (all sets added up)', value: `${Number(stats.volume || 0).toLocaleString('en-US')} kg`, delta: d ? `${signed(d.volume)} kg` : null },
     { label: 'Duration', value: `${stats.duration} min`, delta: d ? `${signed(d.duration)} min` : null },
     { label: 'Sets', value: String(stats.sets), delta: d ? signed(d.sets) : null },
   ]
@@ -95,22 +102,30 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel }) {
           </Row>
         ))}
       </List>
-      <p className="ui-sub" aria-live="polite">
-        Finishing in {secondsLeft}s…
-      </p>
-      <Button
-        variant="primary"
-        block
-        onClick={() => {
-          recordButton('auto-finish-edit')
-          // req-116 — Edit dismisses the summary for this workout (persisted flag), so
-          // Back from Finish returns to the overview, not a fresh countdown.
-          store.patchActive({ autoFinishDismissed: true })
-          go(`/workout/${routineId}/finish`)
-        }}
-      >
-        Edit
-      </Button>
+      {countdown ? (
+        <p className="ui-sub" aria-live="polite">
+          Finishing in {secondsLeft}s…
+        </p>
+      ) : (
+        <Button variant="primary" block onClick={() => commit({ manual: true })}>
+          Finish
+        </Button>
+      )}
+      {countdown ? (
+        <Button
+          variant="primary"
+          block
+          onClick={() => {
+            recordButton('auto-finish-edit')
+            // req-116 — Edit dismisses the summary for this workout (persisted flag), so
+            // Back from Finish returns to the overview, not a fresh countdown.
+            store.patchActive({ autoFinishDismissed: true })
+            go(`/workout/${routineId}/finish`)
+          }}
+        >
+          Edit
+        </Button>
+      ) : null}
       <Button
         variant="quiet"
         block
