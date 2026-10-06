@@ -210,7 +210,13 @@ describe('req-193 scope 4 — the two-step stored form', () => {
     assert.deepEqual(weightStepToSave(f, { stored: 'Alt 4/5', touched: false }), { unchanged: true, value: 'Alt 4/5' })
     assert.deepEqual(weightStepToSave({ ...f, amount: '2,5' }, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 2.5/4' })
     assert.deepEqual(weightStepToSave({ ...f, second: '10' }, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 5/10' })
-    assert.deepEqual(weightStepToSave(f, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 5/4' })
+    // re-review: the legacy pair re-saved as 5 then 4 (touched) keeps 'Alt 4/5' — its 9, 14, 18 series;
+    // 'Steps 5/4' would silently become 5, 9, 14. Only when 'Alt 4/5' is what is stored.
+    assert.deepEqual(weightStepToSave(f, { stored: 'Alt 4/5', touched: true }), { value: 'Alt 4/5' })
+    assert.deepEqual(weightStepToSave({ ...f, amount: '5,0', second: '4 kg' }, { stored: 'Alt 4/5', touched: true }), { value: 'Alt 4/5' })
+    assert.deepEqual(weightStepToSave({ ...f, amount: '4', second: '5' }, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 4/5' })
+    assert.deepEqual(weightStepToSave(f, { stored: 'n/a', touched: true }), { value: 'Steps 5/4' })
+    assert.deepEqual(validWeights({ weightStep: weightStepToSave(f, { stored: 'Alt 4/5', touched: true }).value }).slice(0, 3), [9, 14, 18])
     assert.deepEqual(weightStepFields('Steps 2.5/5'), { amount: '2.5', second: '5', alternating: true, unreadable: null })
   })
 

@@ -102,7 +102,14 @@ export function weightStepToSave(fields, { stored, touched }) {
   if (fields.alternating) {
     const note = weightStepNote(fields, { tried: true })
     if (note) return { error: note }
-    return { value: twoStepsValue(parseWeightStep(fields.amount), parseWeightStep(fields.second)) }
+    const first = parseWeightStep(fields.amount)
+    const second = parseWeightStep(fields.second)
+    // req-193 re-review — the legacy pair re-saved (untick/re-tick, retyped 5 / 4) keeps
+    // 'Alt 4/5': 'Steps 5/4' would count from 0 (5, 9, 14) instead of the stored 9, 14, 18.
+    if (stored === ALTERNATING && first === LEGACY_TWO_STEPS[0] && second === LEGACY_TWO_STEPS[1]) {
+      return { value: ALTERNATING }
+    }
+    return { value: twoStepsValue(first, second) }
   }
   const text = String(fields.amount ?? '').trim()
   if (!text) return { value: NO_STEP }
