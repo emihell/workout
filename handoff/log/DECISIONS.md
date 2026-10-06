@@ -1728,3 +1728,11 @@ rest time, rest can be filled in during the sets".
    timer). Reps and kg start blank. No 3 × 10 starting plan mid-workout (DEC-097 §4's plan stays for routine creation only).
 3. Planner's calls `(unconfirmed)`: on Add with several no-history picks, one step lists each; editing rest during the
    exercise is a follow-up (BACKLOG), not built now.
+
+## DEC-105 — first-time setup starts from your machines; a new plan starts today  (Emilio, 2026-10-06, req-184 Lena run)
+
+From the "Lena" persona run (req-184 §Persona run): slot names confused her and her plan's first day was next Monday.
+1. **First setup = "Which machines do you use?"** — search and tick your exercises, then "How many days a week?"; the app
+   splits them across the days (all the same, or A/B). The slot templates (DEC-098) stay as the secondary "Not sure? Use a
+   plan". Amends DEC-098 §1's order, not its templates. Split rule and wording: Planner's calls `(unconfirmed)` in the req.
+2. **A newly saved plan starts today:** day A is today's workout (with Start); the following days follow from there.
