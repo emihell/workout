@@ -1,3 +1,5 @@
+import { cardioBits, hasCardioFields } from './cardio-set.js'
+
 export function uid(prefix = 'id') {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
@@ -105,14 +107,18 @@ export function greeting() {
 // label is never shown, even on an OLD set stored with rpe 3 before req-156: display only,
 // the stored value is not rewritten. `cardio` comes from the caller (the set alone doesn't
 // know its exercise's type).
-export function formatSetLine(set, { cardio = false } = {}) {
+// req-194 — `cardioFields`: a non-timed cardio exercise, whose duration reads as a clock.
+export function formatSetLine(set, { cardio = false, cardioFields = false } = {}) {
   const bits = []
   if (set.setType === 'wu') bits.push('Warm-up set')
   if (set.weight != null && set.weight !== '' && Number(set.weight) !== 0) {
     bits.push(`${set.weight} kg`)
   }
+  // req-194 — a cardio set's duration / level / distance: "12:30 · level 8 · 1.5 km"
+  // (cardio-set.js). An old cardio set has none of them and shows its typed reps as before.
+  if (cardioFields || hasCardioFields(set)) bits.push(...cardioBits(set))
   // req-85 — a timed set logs seconds in place of reps; show it as e.g. "30s".
-  if (set.durationSec != null && set.durationSec !== '') bits.push(`${set.durationSec}s`)
+  else if (set.durationSec != null && set.durationSec !== '') bits.push(`${set.durationSec}s`)
   if (set.reps != null && set.reps !== '') bits.push(`${set.reps}`)
   if (set.rpe && set.setType !== 'wu' && !cardio) bits.push(rpeLabel(set.rpe) || 'logged')
   return bits.join(' · ') || 'logged'

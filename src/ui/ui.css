@@ -791,6 +791,32 @@ html:has(.ui-picker-bar) {
   font-weight: 600;
   padding-bottom: var(--ui-s2);
 }
+/* req-194 — the cardio set form: Duration + Start/Stop on one row, then Level · Distance ·
+ * unit (m / km). Fills the nums row's width. */
+.ui-cardio {
+  flex: 1 1 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-s2);
+}
+.ui-cardio__timer,
+.ui-cardio__nums {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ui-s3);
+}
+.ui-cardio__timer .ui-field,
+.ui-cardio__nums .ui-field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.ui-cardio__watch {
+  min-width: 6em;
+}
+.ui-cardio__nums .ui-seg {
+  flex: 0 0 auto;
+}
 /* req-80 — the Previous/Skip/Complete row is pinned to the absolute bottom of the
  * viewport (thumb reach) instead of sitting mid-form. It is still inside the <form>,
  * so Complete (type=submit) and Enter-to-submit are unchanged. Aligned to the screen

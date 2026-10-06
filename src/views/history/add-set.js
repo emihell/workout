@@ -7,6 +7,7 @@
 // (the exercise record is passed in).
 
 import { historySetFields } from '../set-values.js'
+import { withCardioValues } from '../../cardio-set.js'
 
 function idOf(obj) {
   return obj?.routineItemId || obj?.id || ''
@@ -68,6 +69,8 @@ export function withHistorySet(workout, { exerciseId, itemId, exercise, values }
       ...(fields.durationSec !== undefined ? { durationSec: fields.durationSec } : {}),
     },
   ]
+  // req-194 — a cardio set's duration / level / distance, each only when entered.
+  if (fields.cardio) sets[sets.length - 1] = withCardioValues(sets[sets.length - 1], fields.cardio)
   const items = workout.snapshot?.items || []
   const snapshot = workout.snapshot
     ? {

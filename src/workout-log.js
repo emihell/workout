@@ -1,4 +1,5 @@
 import { rpeOptionValue } from './ids.js'
+import { cardioBits, hasCardioFields } from './cardio-set.js'
 // req-164 — from the leaf set-rules.js, not model.js: the model ↔ workout-log cycle is gone.
 import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 
@@ -617,13 +618,17 @@ export function setDraftFor(workout, key) {
 // The draft written as the user edits the form: the form's current values plus the
 // note (which lives beside the title, req-80). `durationSec` is the typed seconds as
 // entered (a string while editing); absent on a non-timed form.
-export function setDraftFromForm(key, { weight, reps, effort, durationSec } = {}, note = '') {
+// req-194 — `cardio` (a cardio form only): the raw Duration / Level / Distance text, the
+// unit, and `startedAt` — the running stopwatch's start (epoch ms; null when stopped). It
+// lives in the draft, so the stopwatch survives leaving the screen and a reload (DEC-108 §4).
+export function setDraftFromForm(key, { weight, reps, effort, durationSec, cardio } = {}, note = '') {
   return {
     key,
     weight: weight ?? '',
     reps: reps ?? '',
     effort: effort ?? '',
     ...(durationSec != null ? { durationSec } : {}),
+    ...(cardio != null ? { cardio: { ...cardio } } : {}),
     note: note ?? '',
   }
 }
@@ -660,6 +665,8 @@ export function formFieldsWithDraft({ seed, draft, weighted, durationTarget }) {
     effort: has(d.effort) ? d.effort : seed.effort,
     note: d.note != null ? d.note : seed.note,
     durationSec: d.durationSec != null ? d.durationSec : durationTarget,
+    // req-194 — a cardio form's drafted fields + running stopwatch; absent when not drafted.
+    ...(d.cardio && typeof d.cardio === 'object' ? { cardio: d.cardio } : {}),
   }
 }
 
@@ -841,7 +848,7 @@ export function setListRows({ workout, item, ex, weighted, hasHistory, historyFo
         key: `${slot.setType}|${slot.workIndex}`,
         status: 'done',
         setIndex,
-        text: loggedSetRowText(slot.label, logged, weighted),
+        text: loggedSetRowText(slot.label, logged, weighted, ex?.type === 'cardio' && !ex?.hasDuration),
         highlighted: viewingIndex != null && viewingIndex === setIndex,
       }
     }
@@ -858,8 +865,12 @@ export function setListRows({ workout, item, ex, weighted, hasHistory, historyFo
 }
 
 // req-186 — a done row: the logged values in the preview's own shape ("1 · 20 kg × 8").
-export function loggedSetRowText(label, set, weighted) {
+// req-194 — `cardio` (a non-timed cardio exercise) or a set carrying level / distance: its
+// cardio fields, "1 · 12:30 · level 8 · 1.5 km"; an old cardio set (none) keeps its reps text.
+export function loggedSetRowText(label, set, weighted, cardio = false) {
   if (isSkippedSet(set)) return `${label} · skipped`
+  const bits = cardio || hasCardioFields(set) ? cardioBits(set) : []
+  if (bits.length) return `${label} · ${bits.join(' · ')}`
   const durationSec = set?.durationSec != null && set.durationSec !== '' ? Number(set.durationSec) : null
   const weight = set?.weight != null && Number(set.weight) !== 0 ? String(set.weight) : ''
   return setPreviewText({ label, weight, reps: set?.reps != null ? String(set.reps) : '', durationSec }, weighted)

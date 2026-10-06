@@ -138,7 +138,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId, from = null }) {
         {items.map(({ s, index }) => (
           <Row key={index} to={childLink(`/history/${workout.id}/set/${index}`, here, from)}>
             {/* req-163 — no effort label on a warm-up or cardio set (DEC-087 §2, display only). */}
-            {formatSetLine(s, { cardio: historySetKind(snapshotItem, ex).cardio })}
+            {formatSetLine(s, { cardio: historySetKind(snapshotItem, ex).cardio, cardioFields: historySetKind(snapshotItem, ex).cardioFields })}
             {s.note ? ` — ${s.note}` : ''}
           </Row>
         ))}

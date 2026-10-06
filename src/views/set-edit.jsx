@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { RPE_OPTIONS, rpeOptionValue } from '../ids'
 import { kgError } from '../kg-input.js'
 import { secondsError } from '../seconds-input.js'
+import { DISTANCE_UNITS, cardioFormText, cardioValues } from '../cardio-set.js'
 import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedControl } from '../ui/index.jsx'
+
+const NO_ERRORS = Object.freeze({})
 
 // req-18 / DEC-021 #2 — the shared kg / reps / effort / note editor for a single
 // already-logged set, used by both WorkoutSetEdit (a set in the active workout)
@@ -37,7 +40,11 @@ import { Actions, Button, Field, NavLink, NumberField, SectionHeader, SegmentedC
 // Remove button) stays in the caller.
 // req-189 — `kgLabel` ("kg per dumbbell" from the live workout's set edit; default "kg"), and
 // the number boxes select their content on focus (the first keystroke replaces the value).
-export function SetEditForm({ set, showLoad, showEffort, showDuration = false, setTypeOptions, onSave, cancelTo, kgLabel = 'kg' }) {
+//   - req-194 — `cardio`: a non-timed cardio exercise's set shows Duration (clock text,
+//     `12:30` / `20 min`), Level and Distance + unit (cardio-set.js), all optional here (an old
+//     set had none). Reps shows only when the set has typed reps (an old cardio set's "20 min"),
+//     so it can still be read and edited. onSave gets `cardio` (parsed; null = blank → absent).
+export function SetEditForm({ set, showLoad, showEffort, showDuration = false, setTypeOptions, onSave, cancelTo, kgLabel = 'kg', cardio = false }) {
   const effortFor = (type) => (typeof showEffort === 'function' ? showEffort(type) : Boolean(showEffort))
   const [weight, setWeight] = useState(set?.weight ?? '')
   const [reps, setReps] = useState(set?.reps ?? '')
@@ -52,6 +59,13 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
   const [weightError, setWeightError] = useState(null)
   const [duration, setDuration] = useState(set?.durationSec != null && set.durationSec !== '' ? String(set.durationSec) : '')
   const [durationError, setDurationError] = useState(null)
+  const [cardioText, setCardioText] = useState(() => cardioFormText(set))
+  const [cardioErrors, setCardioErrors] = useState({})
+  const editCardio = (field, value) => {
+    setCardioText((t) => ({ ...t, [field]: value }))
+    setCardioErrors({})
+  }
+  const showReps = !cardio || String(set?.reps ?? '') !== ''
   const effortShown = effortFor(setType)
   const durationShown = typeof showDuration === 'function' ? showDuration(setType) : Boolean(showDuration)
 
@@ -61,11 +75,14 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
         event.preventDefault()
         // req-156 — a hidden Effort saves no effort ('' → rpe null), not the stored value
         // the user can't see (an old warm-up's rpe 3).
+        // req-194 — a cardio set's Duration / Level / Distance (cardio-set.js), checked with kg.
+        const cardioRead = cardio ? cardioValues(cardioText) : null
         const error = showLoad ? kgError(weight) : null
         const secondsProblem = durationShown ? secondsError(duration) : null
-        if (error || secondsProblem) {
+        if (error || secondsProblem || cardioRead?.errors) {
           setWeightError(error)
           setDurationError(secondsProblem)
+          setCardioErrors(cardioRead?.errors ?? NO_ERRORS)
           return
         }
         onSave({
@@ -74,6 +91,7 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
           rpe: effortShown ? rpe : '',
           note,
           setType,
+          ...(cardioRead ? { cardio: cardioRead.values } : {}),
           // req-167 — a warm-up saves no duration (as the live form logs a WU set): a
           // stored duration is cleared (→ null) when the set is, or is toggled to, WU.
           ...(durationShown
@@ -111,7 +129,43 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
           {weightError}
         </p>
       ) : null}
-      <Field label="Reps" selectOnFocus value={reps} onChange={(event) => setReps(event.target.value)} />
+      {showReps ? (
+        <Field label="Reps" selectOnFocus value={reps} onChange={(event) => setReps(event.target.value)} />
+      ) : null}
+      {cardio ? (
+        <>
+          <Field
+            label="Duration"
+            placeholder="mm:ss"
+            selectOnFocus
+            value={cardioText.duration}
+            onChange={(event) => editCardio('duration', event.target.value)}
+          />
+          {cardioErrors.duration ? <p className="ui-field-error" role="alert">{cardioErrors.duration}</p> : null}
+          <Field
+            label="Level"
+            inputMode="decimal"
+            selectOnFocus
+            value={cardioText.level}
+            onChange={(event) => editCardio('level', event.target.value)}
+          />
+          {cardioErrors.level ? <p className="ui-field-error" role="alert">{cardioErrors.level}</p> : null}
+          <Field
+            label="Distance"
+            inputMode="decimal"
+            selectOnFocus
+            value={cardioText.distance}
+            onChange={(event) => editCardio('distance', event.target.value)}
+          />
+          <SegmentedControl
+            options={DISTANCE_UNITS}
+            value={cardioText.distanceUnit}
+            onChange={(unit) => editCardio('distanceUnit', unit)}
+            ariaLabel="Distance unit"
+          />
+          {cardioErrors.distance ? <p className="ui-field-error" role="alert">{cardioErrors.distance}</p> : null}
+        </>
+      ) : null}
       {durationShown ? (
         <NumberField
           label="Duration (s)"
