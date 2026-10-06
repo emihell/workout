@@ -1,6 +1,6 @@
 # req-192 — the set screen: effort buttons log the set, pill skips rest, set list on top, exercise note shown
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-108 §1–3, §6 (Emilio's notes G4, G8–G13). Order: **192 → 193 → 194 →
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-192` (`e35e396`…`89d34ca`, 2 commits).** (2026-10-06). **Lane: ui.** From DEC-108 §1–3, §6 (Emilio's notes G4, G8–G13). Order: **192 → 193 → 194 →
 195** (192–194 touch `views/workout/item.jsx` / `ui/index.jsx`). Trigger files: `workout-log.js` / `progress.js` only if touched
 → reviewer. No schema change.
 
