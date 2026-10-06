@@ -119,6 +119,7 @@ export function isAssistedExercise(exercise) {
 export const HOLD_REASONS = {
   target: "Target isn't a single number — kept as is.",
   assisted: 'Assisted: kept as is.',
+  lightest: 'Already at the lightest weight — kept as is.',
 }
 
 // req-112 / DEC-056 — per set. `sets` is POSITIONAL by work-set index: sets[i] is the
@@ -181,8 +182,12 @@ export function recommendNextPrescription({ targets, weights: routineWeights, se
 
     if (missed || rpe >= 5) {
       if (hasIncrements) {
-        weights[index] = moveToValidWeight(actualWeight, exercise, -1)
-        movedDown = true
+        // req-193 — at or below the first option "down" can't move: say so (action keep, a
+        // reason), never "Load down." with the same kg. Main reported 'down' here.
+        const next = moveToValidWeight(actualWeight, exercise, -1)
+        weights[index] = next
+        if (next === actualWeight) held.add('lightest')
+        else movedDown = true
       } else {
         weights[index] = actualWeight
       }

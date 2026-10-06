@@ -4,11 +4,12 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { moveToValidWeight, NO_SERIES_TEXT, recommendNextPrescription, SAME_KG_TEXT, validWeights, weightSeriesPreview } from './progress.js'
+import { HOLD_REASONS, moveToValidWeight, NO_SERIES_TEXT, recommendNextPrescription, SAME_KG_TEXT, validWeights, weightSeriesPreview } from './progress.js'
 import {
   moveToValidWeight as mainMove,
   validWeights as mainValidWeights,
 } from './req-193.progress-main.fixture.js'
+import { recommendNextPrescription as mainRecommendFixture } from './req-150.progress-main.fixture.js'
 import { catalogItemToExercise, loadExerciseCatalog } from './exerciseCatalog.js'
 import {
   describeLightestWeight,
@@ -345,5 +346,36 @@ describe('req-193 review fixes 2 and 3', () => {
     // the same case without a lightest weight: 'Alt 4/5' from 9, a failed 5 kg set
     assert.equal(mainMove(5, { weightStep: 'Alt 4/5' }, -1), 9, 'main: a jump up to 9')
     assert.equal(moveToValidWeight(5, { weightStep: 'Alt 4/5' }, -1), 5)
+  })
+})
+
+describe('req-193 review fix 5 — a down that cannot move says so', () => {
+  const rec = (exercise, sets, weights = sets.map((x) => x.weight)) =>
+    recommendNextPrescription({ targets: sets.map(() => '10'), weights, sets, exercise })
+
+  it('failed at exactly the first option: keep, same kg, the lightest reason (main: down)', () => {
+    const exercise = { type: 'machine', weightStep: '5', lightestWeight: 20 }
+    const r = rec(exercise, [{ weight: 20, reps: '6', rpe: 5 }])
+    assert.deepEqual(r.weights, [20])
+    assert.equal(r.action, 'keep')
+    assert.equal(r.reason, `Same load. ${HOLD_REASONS.lightest}`)
+    assert.equal(HOLD_REASONS.lightest, 'Already at the lightest weight — kept as is.')
+    // main at the bottom of a series with no lightest weight: 'Alt 4/5' at 9 said 'down'
+    const legacy = rec({ type: 'machine', weightStep: 'Alt 4/5' }, [{ weight: 9, reps: '6', rpe: 5 }])
+    assert.equal(mainRecommendFixture({ targets: ['10'], weights: [9], sets: [{ weight: 9, reps: '6', rpe: 5 }], exercise: { type: 'machine', weightStep: 'Alt 4/5' } }).action, 'down')
+    assert.deepEqual([legacy.weights, legacy.action], [[9], 'keep'])
+  })
+
+  it('failed below the first option: keep at the kg lifted', () => {
+    const r = rec({ type: 'machine', weightStep: '5', lightestWeight: 20 }, [{ weight: 15, reps: '6', rpe: 5 }])
+    assert.deepEqual([r.weights, r.action, r.reason], [[15], 'keep', `Same load. ${HOLD_REASONS.lightest}`])
+  })
+
+  it('another set that does move down still reports down, with the note', () => {
+    const r = rec({ type: 'machine', weightStep: '5', lightestWeight: 20 }, [
+      { weight: 30, reps: '6', rpe: 5 },
+      { weight: 20, reps: '6', rpe: 5 },
+    ])
+    assert.deepEqual([r.weights, r.action, r.reason], [[25, 20], 'down', `Load down. ${HOLD_REASONS.lightest}`])
   })
 })
