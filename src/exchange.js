@@ -270,6 +270,12 @@ export function applyBackup(payload) {
     throw new Error('Not a workout-mvp-backup v1 document.')
   }
   const migrated = migrateState({ ...emptyState(), ...raw }, { legacy: backupIsLegacy(raw) })
+  // req-194 re-review — a restored backup never resumes a cardio stopwatch: its start time
+  // belongs to the session that exported it. The active workout itself is kept as before.
+  if (migrated.activeWorkout?.stopwatch !== undefined) {
+    const { stopwatch: _stopwatch, ...active } = migrated.activeWorkout
+    migrated.activeWorkout = active
+  }
   // req-114 (audit G) — the imported schedule replaces the default one wholesale, so
   // an anchor-less file would anchor every week on the queried date (always week 0).
   // Default it to this Monday, like a new schedule; the import's save persists it.

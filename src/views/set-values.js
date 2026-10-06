@@ -11,6 +11,7 @@ import { kgToSave } from '../kg-input.js'
 import { secondsToSave } from '../seconds-input.js'
 import { isSkippedSet } from '../set-rules.js'
 import { nextSeedOverrides } from '../workout-log.js'
+import { cardioPatch } from '../cardio-set.js'
 
 function effortValue(rpe) {
   return rpe === '' || rpe == null ? null : Number(rpe)
@@ -34,11 +35,14 @@ export function liveSetWeight(text, weighted) {
 // record: editing a skipped set into a real one clears its 'skipped' note, and writes the
 // effort the form SHOWED even if untouched (re-review fix 2: the shown value is what the
 // user confirmed; a skipped record has no rpe of its own to keep).
-export function liveSetEditPatch({ weight, reps, effort, durationSec }, { weighted, timed = false, initialEffort, set } = {}) {
+// req-194 — `cardio` (the cardio form's parsed values): each field set, or `undefined` when
+// blank (cardioPatch), so a cleared Level / Distance is absent once saved.
+export function liveSetEditPatch({ weight, reps, effort, durationSec, cardio }, { weighted, timed = false, initialEffort, set } = {}) {
   const kg = liveSetWeight(weight, weighted)
   if (kg == null) return null
   const patch = { weight: kg, reps: timed ? '' : reps || '' }
   if (timed && durationSec != null) patch.durationSec = durationSec
+  if (cardio) Object.assign(patch, cardioPatch(cardio))
   const unskipped = isSkippedSet(set) && !isSkippedSet(patch)
   const shown = effort != null && effort !== ''
   if (shown && (unskipped || String(effort) !== String(initialEffort))) patch.rpe = Number(effort)
@@ -77,8 +81,10 @@ export function viewedSetSave(values, { weighted, timed = false, initialEffort, 
 
 // WorkoutSetEdit's patch. `showLoad` false (cardio / bodyweight): the kg field isn't
 // shown, so the stored weight is left as it is rather than re-read.
-export function activeSetPatch({ weight, reps, rpe, note }, { showLoad = true } = {}) {
-  const patch = { reps, rpe: effortValue(rpe), note }
+// req-194 — `cardio` (SetEditForm's parsed cardio values, a cardio set only): merged as
+// cardioPatch (blank → undefined → absent once saved).
+export function activeSetPatch({ weight, reps, rpe, note, cardio }, { showLoad = true } = {}) {
+  const patch = { reps, rpe: effortValue(rpe), note, ...(cardio ? cardioPatch(cardio) : {}) }
   if (!showLoad) return patch
   const kg = kgToSave(weight, 0)
   return kg.error ? null : { weight: kg.value, ...patch }
@@ -89,10 +95,12 @@ export function activeSetPatch({ weight, reps, rpe, note }, { showLoad = true } 
 // exercise's work set) is saved as whole seconds (`30,5` → 31); blank → null (no
 // duration). Absent (the field wasn't shown) → no durationSec key, so the stored one is
 // left as it is.
-export function historySetFields({ weight, reps, rpe, note, setType, durationSec }) {
+// req-194 — `cardio` (a cardio set's parsed values) passes through as `fields.cardio`; the
+// callers apply it with withCardioValues (cardio-set.js), which removes a blank field's key.
+export function historySetFields({ weight, reps, rpe, note, setType, durationSec, cardio }) {
   const kg = kgToSave(weight, '')
   if (kg.error) return null
-  const fields = { setType, weight: kg.value, reps, rpe: effortValue(rpe), note }
+  const fields = { setType, weight: kg.value, reps, rpe: effortValue(rpe), note, ...(cardio ? { cardio } : {}) }
   if (durationSec === undefined) return fields
   const seconds = secondsToSave(durationSec, null)
   if (seconds.error) return null
@@ -111,5 +119,7 @@ export function historySetKind(item, exercise) {
     showEffort: (setType) => setType !== 'wu' && type !== 'cardio',
     showDuration: (setType) => Boolean(timed) && setType !== 'wu',
     cardio: type === 'cardio',
+    // req-194 — a cardio exercise that isn't timed: Duration (clock) / Level / Distance.
+    cardioFields: type === 'cardio' && !timed,
   }
 }

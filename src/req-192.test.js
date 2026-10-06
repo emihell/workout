@@ -114,6 +114,11 @@ describe('the log screen (real store)', () => {
     const t = await harness()
     await t.mount(t.item(ROWING))
     assert.equal(view.button('Medium'), null)
+    // req-194 test edit — a cardio set now logs a Duration (stopwatch or typed), required:
+    // Done with it blank logs nothing; with one typed it logs, rpe still null.
+    await view.click(view.button('Done'))
+    assert.equal((t.active().sets || []).length, 0)
+    await view.type(view.input('Duration'), '7:00')
     await view.click(view.button('Done'))
     assert.equal(t.active().sets[0].rpe, null)
   })

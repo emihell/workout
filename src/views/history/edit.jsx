@@ -4,6 +4,7 @@ import { exerciseById, routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { SetEditForm } from '../set-edit'
 import { historySetFields, historySetKind } from '../set-values.js'
+import { withCardioValues } from '../../cardio-set.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
 import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
@@ -148,6 +149,7 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId, from = null }) {
         showLoad
         showEffort={kind.showEffort}
         showDuration={kind.showDuration}
+        cardio={kind.cardioFields}
         setTypeOptions={[
           { value: 'wu', label: 'Warm-up set' },
           { value: 'work', label: 'Work' },
@@ -192,6 +194,7 @@ export function HistorySet({ workoutId, index, from = null }) {
         showLoad
         showEffort={kind.showEffort}
         showDuration={kind.showDuration}
+        cardio={kind.cardioFields}
         setTypeOptions={[
           { value: 'wu', label: 'Warm-up set' },
           { value: 'work', label: 'Work' },
@@ -201,7 +204,11 @@ export function HistorySet({ workoutId, index, from = null }) {
           // req-154 — `22,5` → 22.5; unreadable kg → null (the form already shows why).
           const fields = historySetFields(values)
           if (!fields) return
-          const sets = (workout.sets || []).map((s, i) => (i === index ? { ...s, ...fields } : s))
+          // req-194 — a cardio set's fields: set when entered, removed when cleared.
+          const { cardio, ...rest } = fields
+          const sets = (workout.sets || []).map((s, i) =>
+            i === index ? (cardio ? withCardioValues({ ...s, ...rest }, cardio) : { ...s, ...rest }) : s,
+          )
           store.updateWorkout(workout.id, { sets })
           go(recalc)
         }}

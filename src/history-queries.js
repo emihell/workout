@@ -5,6 +5,7 @@ import { exerciseById, routineById } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
 import { dateKey } from './schedule.js'
 import { isAddedMidWorkout, isSkippedSet, loggedSetCount } from './workout-log.js'
+import { durationTargetText, hasCardioFields } from './cardio-set.js'
 
 // req-28 — the workouts finished on a given calendar day (dateKey(finishedAt) ===
 // dayKey), newest-finished first. The Today page's "Completed today" section reads
@@ -221,9 +222,19 @@ export function historyPrescription(workouts, exerciseId) {
   const matches = (last.workout?.snapshot?.items || []).filter((item) => item.exerciseId === exerciseId)
   const snapshotItem = matches.find((item) => !isAddedMidWorkout(item)) || matches[0]
   const wu = last.sets.find((set) => set.setType === 'wu' && !isSkippedSet(set))
+  // req-194 review fix 2 — a cardio set logged with a time (no typed reps since req-194)
+  // keeps that time as its target ("13 min" / "12:30"); an old typed "5-8 min" is unchanged.
+  // Cardio only (the snapshot item's type, or a set carrying level / distance): a timed
+  // exercise's seconds stay in its own `durations`, never in targets.
+  const cardio = snapshotItem?.exerciseType === 'cardio' && !snapshotItem?.hasDuration
+  const target = (set) => {
+    const reps = String(set.reps ?? '')
+    if (reps !== '' || set.durationSec == null) return reps
+    return cardio || hasCardioFields(set) ? durationTargetText(set.durationSec) : reps
+  }
   return {
     sets: work.length,
-    targets: work.map((set) => String(set.reps ?? '')),
+    targets: work.map(target),
     suggestedWeights: weights.some((weight) => weight > 0) ? weights : [],
     restSec: snapshotItem?.restSec,
     notes: snapshotItem?.notes || '',
