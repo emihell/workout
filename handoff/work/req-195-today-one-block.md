@@ -1,6 +1,6 @@
 # req-195 — a workout done today shows in today's block, not as a second "today" row
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-108 §5 (G15: "I completed a workout today but can't see it in the
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-195` (`694fef3`…`2c0e72c`, 2 commits).** (2026-10-06). **Lane: ui.** From DEC-108 §5 (G15: "I completed a workout today but can't see it in the
 list?" → "i see it under todays date - its like there are two rows for todays date - i think completed workouts, for same
 day, should be in the same row"). Independent of 192–194 (`views/Today.jsx` only). No trigger files expected.
 
