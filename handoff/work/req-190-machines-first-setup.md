@@ -1,6 +1,6 @@
 # req-190 — first setup starts from your machines; a new plan starts today; no silent empty day
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-105 (Emilio, 2026-10-06) and req-184 §Persona run (Lena). After
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-190` (`c4cd9d3`…`6333776`, 2 commits).** (2026-10-06). **Lane: ui.** From DEC-105 (Emilio, 2026-10-06) and req-184 §Persona run (Lena). After
 **req-189** (independent screens; branch off `main` after 189 merges). Trigger files: none expected (`plan-templates.js`,
 `views/Plan.jsx`, `views/Routine.jsx`, `views/Today.jsx`); if `state-reducers.js` / `store.jsx` / `schedule.js` change →
 independent reviewer. Writes only through the existing routine / schedule reducers (as `planToState` does). No schema change.
