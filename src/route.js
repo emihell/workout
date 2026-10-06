@@ -288,6 +288,10 @@ function matchRoute(rawPath) {
     // req-181 — the two starts: a blank routine, or a plan (days → slots, one screen type
     // so the in-flow choices survive moving between its steps).
     if (parts[1] === 'new' && parts[2] === 'blank') return { name: 'routine-new-blank' }
+    // req-190 — machines first: the picker, then `/days` (one screen type, as the plan).
+    if (parts[1] === 'new' && parts[2] === 'machines') {
+      return { name: 'routine-machines', step: parts[3] === 'days' ? 'days' : 'pick' }
+    }
     if (parts[1] === 'new' && parts[2] === 'plan') {
       const days = parts[3] != null ? Number(parts[3]) : null
       const slot = parts[4] != null && parts[5] != null ? [Number(parts[4]), Number(parts[5])] : null

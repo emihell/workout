@@ -18,7 +18,7 @@ import {
   RoutineExerciseEdit,
 } from './views/Routine'
 import { ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
-import { RoutinePlan } from './views/Plan'
+import { RoutineMachines, RoutinePlan } from './views/Plan'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
 import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutAdd, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetAdd, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
@@ -121,6 +121,7 @@ function Screen() {
   if (route.name === 'routine-new') return <RoutineNew />
   if (route.name === 'routine-new-blank') return <RoutineNewBlank />
   if (route.name === 'routine-plan') return <RoutinePlan />
+  if (route.name === 'routine-machines') return <RoutineMachines />
   if (route.name === 'routine-edit') {
     return <RoutineEdit key={route.routineId} routineId={route.routineId} />
   }

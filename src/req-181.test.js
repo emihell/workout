@@ -11,6 +11,7 @@ import { libraryProblems } from './exerciseLibrary.js'
 import { emptyState } from './persistence.js'
 import { PLAN_DAYS, PLAN_TEMPLATES, SLOTS, planIds, planToState, slotCandidates } from './plan-templates.js'
 import { pickerItem } from './routine-picker.js'
+import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 
 const h = React.createElement
 const library = await loadExerciseCatalog()
@@ -18,7 +19,10 @@ const visible = library.filter((entry) => !entry.hidden)
 
 let counter = 0
 const uid = (prefix) => `${prefix}-${++counter}`
-const NOW = new Date(2026, 8, 26)
+// req-190 (sanctioned edit) — a new plan starts today (DEC-105 §2), so the week's weekdays
+// follow `now`. Was Sat 2026-09-26; a Monday "today" reproduces the template's own weekdays,
+// so WEEKDAYS below is unchanged. req-190.test.js covers other start days.
+const NOW = new Date(2026, 8, 28)
 const idsFor = (choices) => planIds(choices, uid, NOW)()
 
 const WEEKDAYS = { 1: [[1, 'Full body']], 2: [[1, 'Full body A'], [4, 'Full body B']], 3: [[1, 'Full body A'], [3, 'Full body B'], [5, 'Full body C']], 4: [[1, 'Upper'], [2, 'Lower'], [4, 'Upper'], [5, 'Lower']] }
@@ -221,6 +225,12 @@ describe('req-181 — the flow (rendered, real store)', () => {
 
     assert.equal(localStorage.getItem('workout-mvp-v9'), JSON.stringify(state), 'nothing written before Save')
     await visit(view.button('Save'))
+    // req-190 (sanctioned edit) — B has nothing chosen, so Save asks first (no silent drop);
+    // nothing is written until it is answered. "Leave it out" is the old behaviour.
+    assert.equal(getPendingConfirm()?.title, 'Full body B has no exercises.')
+    assert.equal(localStorage.getItem('workout-mvp-v9'), JSON.stringify(state), 'nothing written before the answer')
+    answerConfirm('leave')
+    await flush()
     assert.equal(window.location.hash, '#/')
     const after = stored()
     // req-182 (sanctioned edit) — Full body C's Squat and Chest press now carry A's picks
@@ -231,7 +241,10 @@ describe('req-181 — the flow (rendered, real store)', () => {
     assert.deepEqual(items.map((i) => i.exerciseId), [created.id, 'ex-own-bench'])
     assert.deepEqual(after.routines[1].exercises.map((i) => i.exerciseId), [created.id, 'ex-own-bench'])
     assert.equal(after.exercises.filter((ex) => ex.libraryId === squat.id).length, 1, 'one record')
-    assert.deepEqual(after.schedule.slots.map((s) => [s.week, s.weekday]), [[0, 1], [0, 5]])
+    // req-190 (sanctioned edit) — was [[0, 1], [0, 5]] (Mon, Fri): the plan now starts today
+    // and keeps A → C spacing (+4).
+    const today = new Date().getDay()
+    assert.deepEqual(after.schedule.slots.map((s) => [s.week, s.weekday]), [[0, today], [0, (today + 4) % 7]])
     assert.equal(after.schedule.loopWeeks, 1)
     assert.ok(items.every((i) => !i.suggestedWeights.some((kg) => Number(kg) > 0)), 'no kg without history')
   })
@@ -277,6 +290,9 @@ describe('req-181 — the flow (rendered, real store)', () => {
       save.click()
     })
     await flush()
+    // req-190 (sanctioned edit) — B is empty, so the one Save that got through asks first.
+    answerConfirm('leave')
+    await flush()
     const after = stored()
     assert.deepEqual(after.routines.map((r) => r.name), ['Full body A'])
     assert.equal(after.exercises.length, 1)
@@ -315,9 +331,12 @@ describe('req-181 — /routines/new offers two starts', () => {
     const { RoutineNew, RoutineNewBlank } = await importJsx('./views/Routine.jsx', import.meta.url)
     view = await render(h(StoreProvider, null, h(RoutineNew)))
     const links = view.all('a').map((a) => [a.textContent.trim(), a.getAttribute('href')])
-    const plan = links.findIndex(([text]) => text === 'Start from a plan')
+    // req-190 (sanctioned edit) — three starts now: "Pick your exercises" first (primary),
+    // the plan renamed "Not sure? Use a plan" (was "Start from a plan", primary), then blank.
+    const machines = links.findIndex(([text]) => text === 'Pick your exercises')
+    const plan = links.findIndex(([text]) => text === 'Not sure? Use a plan')
     const blank = links.findIndex(([text]) => text === 'Blank routine')
-    assert.ok(plan >= 0 && blank > plan, JSON.stringify(links))
+    assert.ok(machines >= 0 && plan > machines && blank > plan, JSON.stringify(links))
     await view.unmount()
     view = await render(h(StoreProvider, null, h(RoutineNewBlank)))
     await view.type(view.input('Name'), 'Legs')

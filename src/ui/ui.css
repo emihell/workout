@@ -292,6 +292,14 @@ a.ui-btn--quiet:active {
   padding: var(--ui-s2) 0;
   background: var(--ui-bg);
 }
+/* req-190 — a row brought into view at the bottom edge (focus, keyboard, a tap-scroll) used
+   to land under the stuck bar and the dock [measured: scrollIntoView 'nearest' put a picker
+   row's bottom at 844 with the bar's top at 696, 390×844]. Reserve the dock + the bar (its
+   offset, a tap-height button, its padding, a step of slack) as the scroll padding. At the
+   list's end the bar is in flow below the last row, so that case was already clear. */
+html:has(.ui-picker-bar) {
+  scroll-padding-bottom: calc(var(--ui-dock-clear) + var(--ui-tap) + 4 * var(--ui-s2));
+}
 /* req-179 — a routine item's Reps / Kg / Duration group: label, "Different … per set"
    switch, field(s). A clear gap between groups so a switch reads as its own group's. */
 .ui-per-set {
