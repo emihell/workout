@@ -1743,3 +1743,10 @@ Amends DEC-104 §2 for **Swap only**. Emilio: "the probability of the exercise f
 is quite high"; "the rest time can be completly ignored if one wants to, its just a helper". Planner recommended no popup:
 sets are visible in the set list (req-186) and adjustable with Add/Remove set; rest can be skipped. **Add exercise** keeps
 DEC-104's Sets/Rest step (nothing to copy). Kg and reps start blank (DESIGN §1). Editing rest mid-exercise stays on BACKLOG.
+
+## DEC-107 — Add exercise's step prefilled 3 sets / 90 s; reps carry when there's no target  (Emilio, 2026-10-06, Lena run 2)
+
+1. **Add exercise, no history:** the Sets/Rest step opens **prefilled 3 and 90** (editable; one tap to accept). Amends
+   DEC-104 §2 ("fields start empty") — this is the shown starting plan of DEC-097 §4, visible and accepted, never kg.
+2. **Reps carry to the next set when the exercise has no reps target** for that set (like kg, DEC-052's kg carry). With a
+   target, the target prefills as before. Amends DEC-052 ("reps never carry") for the no-target case only.
