@@ -543,6 +543,7 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
 - **`req-184` creation design session 2** (NEEDS DECISIONS — advanced users, programs; feedback part done 2026-10-05 → DEC-103).
 - **`req-186` / `req-187` / `req-188`** (READY, ui, DEC-103): workout pill + set list + Previous-views; kg confirm on last
   Complete; Swap/Skip exercise in the list, Add exercise, whole-library swap. Build in that order.
+- **`req-189` / `req-190`** (READY, ui, DEC-105/106 — Lena run): first-workout fixes; machines-first setup + start today.
 - **Edit rest during an exercise** (DEC-104 §3 follow-up; Emilio: "rest can be filled in during the sets") — a mid-workout item
   added with blank rest has no way to set one on the log screen today. Small ui req.
 - **req-188 review latents:** a fast double tap on the picker's Add N / the step's Swap can commit twice (masked by the

@@ -1736,3 +1736,10 @@ From the "Lena" persona run (req-184 §Persona run): slot names confused her and
    splits them across the days (all the same, or A/B). The slot templates (DEC-098) stay as the secondary "Not sure? Use a
    plan". Amends DEC-098 §1's order, not its templates. Split rule and wording: Planner's calls `(unconfirmed)` in the req.
 2. **A newly saved plan starts today:** day A is today's workout (with Start); the following days follow from there.
+
+## DEC-106 — a Swap with no history copies the replaced exercise's sets and rest, no step  (Emilio, 2026-10-06)
+
+Amends DEC-104 §2 for **Swap only**. Emilio: "the probability of the exercise following the same sets as its replacement
+is quite high"; "the rest time can be completly ignored if one wants to, its just a helper". Planner recommended no popup:
+sets are visible in the set list (req-186) and adjustable with Add/Remove set; rest can be skipped. **Add exercise** keeps
+DEC-104's Sets/Rest step (nothing to copy). Kg and reps start blank (DESIGN §1). Editing rest mid-exercise stays on BACKLOG.
