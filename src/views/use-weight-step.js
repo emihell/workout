@@ -34,6 +34,14 @@ export function useWeightStep(stored, storedLightest) {
       setLightestTouched(true)
       setLightestText(text)
     },
+    // req-193 — the settings as they stand now ({ weightStep, lightestWeight }), for the series
+    // preview; null while either box has an error (no preview of a value that won't save).
+    draft: () => {
+      const step = weightStepToSave(fields, { stored, touched })
+      const low = lightestWeightToSave(lightest, { stored: storedLightest, touched: lightestTouched })
+      if (step.error || low.error) return null
+      return { weightStep: step.value, lightestWeight: low.value }
+    },
     // { patch } to merge into the exercise (untouched fields left out), or { error } (a
     // typed value that doesn't read) to block Save.
     save: () => {

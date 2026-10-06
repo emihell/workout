@@ -51,6 +51,17 @@ function stepSeries(start, steps, max) {
   return out
 }
 
+// req-193 — the editors' preview of the series the weight-step settings produce: the first
+// `count` values of the same validWeights the recommendation reads, so the step order (and
+// the legacy 'Alt 4/5' from 9) is visible. No series → the hold, said plainly (DEC-030).
+export const NO_SERIES_TEXT = 'No step set — suggestions hold'
+export function weightSeriesPreview(exercise, count = 5) {
+  const series = validWeights(exercise)
+  if (!series.length) return NO_SERIES_TEXT
+  const more = series.length > count ? ' …' : ''
+  return `Weights: ${series.slice(0, count).join(', ')}${more}`
+}
+
 export function moveToValidWeight(weight, exercise, direction) {
   const current = Number(weight) || 0
   const options = validWeights(exercise, Math.max(250, current + 100))

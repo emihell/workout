@@ -1,4 +1,5 @@
 import { Checkbox, Field } from '../ui/index.jsx'
+import { weightSeriesPreview } from '../progress.js'
 
 // req-126 / DEC-059 §2 — the weight step, shared by the exercise editor and the in-workout
 // setup screen. The logic (parse, note, what Save writes) is pure in ../weight-step.js and
@@ -7,8 +8,10 @@ import { Checkbox, Field } from '../ui/index.jsx'
 // req-193 / DEC-108 §6 — "Weight step (kg)"; "Two step sizes" shows two editable boxes
 // (the increment box is no longer disabled); "Lightest weight (kg)" is optional. The
 // views don't render this for a cardio exercise.
+// req-193 — a preview line under the fields: the first weights the recommendation would use.
 export function WeightStepField({ step }) {
   const { fields, note, lightestNote } = step
+  const draft = step.draft()
   return (
     <>
       {fields.alternating ? (
@@ -56,6 +59,7 @@ export function WeightStepField({ step }) {
           {lightestNote}
         </p>
       ) : null}
+      {draft ? <p className="ui-field-note" data-testid="weight-series">{weightSeriesPreview(draft)}</p> : null}
     </>
   )
 }

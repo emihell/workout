@@ -4,7 +4,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { moveToValidWeight, recommendNextPrescription, validWeights } from './progress.js'
+import { moveToValidWeight, NO_SERIES_TEXT, recommendNextPrescription, validWeights, weightSeriesPreview } from './progress.js'
 import {
   moveToValidWeight as mainMove,
   validWeights as mainValidWeights,
@@ -258,5 +258,33 @@ describe('req-193 — the new field travels: update, migrateState, load, export/
       source.exercises.map(({ id, weightStep, lightestWeight }) => ({ id, weightStep, lightestWeight })),
     )
     assert.deepEqual(validWeights(state.exercises[0]).slice(0, 3), [10, 12.5, 17.5])
+  })
+})
+
+describe('req-193 — the editors\' series preview (first 5 of validWeights)', () => {
+  it('single step, with and without a lightest weight', () => {
+    assert.equal(weightSeriesPreview({ weightStep: '5' }), 'Weights: 5, 10, 15, 20, 25 …')
+    assert.equal(weightSeriesPreview({ weightStep: '5', lightestWeight: 7.5 }), 'Weights: 7.5, 12.5, 17.5, 22.5, 27.5 …')
+  })
+
+  it('two steps from a lightest weight', () => {
+    assert.equal(weightSeriesPreview({ weightStep: 'Alt 2.5/5', lightestWeight: 10 }), 'Weights: 10, 12.5, 17.5, 20, 25 …')
+  })
+
+  it("legacy 'Alt 4/5', no lightest weight → from 9, +5 first", () => {
+    assert.equal(weightSeriesPreview({ weightStep: 'Alt 4/5' }), 'Weights: 9, 14, 18, 23, 27 …')
+    assert.equal(weightSeriesPreview({ weightStep: 'Alt 4/5', lightestWeight: null }), 'Weights: 9, 14, 18, 23, 27 …')
+  })
+
+  it('no step → the hold text', () => {
+    for (const weightStep of ['n/a', '', undefined, 'abc']) {
+      assert.equal(weightSeriesPreview({ weightStep }), NO_SERIES_TEXT)
+      assert.equal(weightSeriesPreview({ weightStep, lightestWeight: 20 }), NO_SERIES_TEXT)
+    }
+    assert.equal(NO_SERIES_TEXT, 'No step set — suggestions hold')
+  })
+
+  it('a short series has no ellipsis', () => {
+    assert.equal(weightSeriesPreview({ weightStep: '10', lightestWeight: 220 }), 'Weights: 220, 230, 240, 250')
   })
 })
