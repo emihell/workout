@@ -1,10 +1,18 @@
 import { isWeightedType } from './ids.js'
-import { ALTERNATING, parseWeightStep } from './weight-step.js'
+import { ALTERNATING, parseLightestWeight, parseTwoSteps, parseWeightStep } from './weight-step.js'
 import { isSkippedSet } from './set-rules.js'
 
 export function validWeights(exercise, max = 250) {
   if (Array.isArray(exercise?.weightOptions) && exercise.weightOptions.length) {
     return [...exercise.weightOptions].map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+  }
+  // req-193 — a lightest weight set: the series counts from it (lightest, + step, …; two
+  // step sizes alternate, the first first). No readable step → [] (hold, DEC-030): the
+  // lightest weight alone never invents a step. Blank → everything below, unchanged.
+  const lightest = parseLightestWeight(exercise?.lightestWeight)
+  if (lightest != null) {
+    const steps = parseTwoSteps(exercise?.weightStep) ?? [parseWeightStep(exercise?.weightStep)]
+    return steps[0] == null ? [] : stepSeries(lightest, steps, max)
   }
   if (exercise?.weightStep === ALTERNATING) {
     const out = []
@@ -17,12 +25,27 @@ export function validWeights(exercise, max = 250) {
     }
     return out
   }
+  // req-193 — two step sizes other than the legacy 'Alt 4/5', no lightest weight: count
+  // from 0 like a single step does (0 itself is not a weight), so 'Alt 2.5/5' → 2.5, 7.5, 10 …
+  const two = parseTwoSteps(exercise?.weightStep)
+  if (two) return stepSeries(0, two, max).slice(1)
   // req-126 — the shared single-value parser: stored '2,5', '2.5 kg', '5 kg' now read
   // as their increment (they used to be [] → a silent hold). '4/5', 'abc', 'n/a' → [].
   const step = parseWeightStep(exercise?.weightStep)
   if (step == null) return []
   const out = []
   for (let weight = step; weight <= max; weight += step) {
+    out.push(Math.round(weight * 100) / 100)
+  }
+  return out
+}
+
+// req-193 — start, start + steps[0], + steps[1], … up to max, each rounded to 0.01 kg the
+// way the single-step series always was (the running sum itself is not rounded).
+function stepSeries(start, steps, max) {
+  const out = []
+  let index = 0
+  for (let weight = start; weight <= max; weight += steps[index++ % steps.length]) {
     out.push(Math.round(weight * 100) / 100)
   }
   return out

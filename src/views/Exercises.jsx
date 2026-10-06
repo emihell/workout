@@ -7,7 +7,7 @@ import { Back, Missing } from './shared'
 import { DEFAULT_DURATION_SEC, exerciseById } from '../model'
 import { deletionConfirmHead, exerciseDeletionImpact, exerciseInActiveWorkout } from '../state-reducers.js'
 import { Actions, Banner, Button, Checkbox, Field, List, NavLink, NumberField, Row, Screen, SectionHeader, Select, Textarea, Title } from '../ui/index.jsx'
-import { describeWeightStep } from '../weight-step.js'
+import { describeLightestWeight, describeWeightStep } from '../weight-step.js'
 import { defaultDurationToSave } from '../seconds-input.js'
 import { WeightStepField } from './weight-step-field.jsx'
 import { useWeightStep } from './use-weight-step.js'
@@ -369,7 +369,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
   const [type, setType] = useState(ex?.type || 'free')
   const [equipment, setEquipment] = useState(ex?.equipment || '')
   // req-126 — defaults to empty (was an invented '2.5' for a missing field).
-  const step = useWeightStep(ex?.weightStep)
+  const step = useWeightStep(ex?.weightStep, ex?.lightestWeight)
   const [muscles, setMuscles] = useState(ex?.muscles || '')
   const [cues, setCues] = useState(ex?.cues || '')
   // req-127 — the name error shows after the first Save attempt, then tracks each edit.
@@ -404,14 +404,15 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
           // req-126 — a typed increment that doesn't read blocks Save (its note is shown).
           // req-127 — an empty name is an inline error that blocks Save (was: kept the old name).
           setTried(true)
-          const saved = step.save()
+          // req-193 — cardio shows no weight-step fields, so none are saved (stored values stay).
+          const saved = type === 'cardio' ? { patch: {} } : step.save()
           if (saved.error || nameError(name) || (hasDuration && duration.error)) return
           store.updateExercise(ex.id, {
             name: name.trim(),
             type,
             equipment: equipment.trim() || 'Unknown',
-            // req-126 — untouched: the key is left out, so the stored value (or its absence) stays.
-            ...(saved.unchanged ? {} : { weightStep: saved.value }),
+            // req-126 / req-193 — untouched fields are left out, so the stored value (or its absence) stays.
+            ...saved.patch,
             muscles: muscles.trim(),
             cues: cues.trim(),
             hasDuration,
@@ -424,7 +425,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         <NameError>{editNameError}</NameError>
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
-        <WeightStepField step={step} />
+        {type === 'cardio' ? null : <WeightStepField step={step} />}
         <Checkbox label="Timed (count down a duration)" checked={hasDuration} onChange={setHasDuration} />
         {hasDuration ? (
           <NumberField
@@ -466,7 +467,7 @@ export function ExerciseDetail({ exerciseId, from = null }) {
         <NavLink to={childLink(`/exercises/${ex.id}/edit`, `/exercises/${ex.id}`, from)} chevron="forward">Edit</NavLink>
       </p>
       <p className="ui-sub">
-        {[ex.equipment, typeLabel(ex.type), describeWeightStep(ex.weightStep), ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
+        {[ex.equipment, typeLabel(ex.type), describeWeightStep(ex.weightStep), describeLightestWeight(ex.lightestWeight), ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
           .filter(Boolean)
           .join(' · ')}
       </p>

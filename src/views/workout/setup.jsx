@@ -19,7 +19,9 @@ export function WorkoutItemExercise({ routineId, itemId }) {
   const mine = isActiveFor(active, routineId)
   const item = mine ? findItem(active.snapshot?.items, itemId) : null
   const ex = item ? exerciseById(store.exercises, item.exerciseId) : null
-  const step = useWeightStep(ex?.weightStep)
+  const step = useWeightStep(ex?.weightStep, ex?.lightestWeight)
+  // req-193 — no weight-step fields for cardio (nothing about them is saved either).
+  const cardio = ex?.type === 'cardio'
   const [cues, setCues] = useState(ex?.cues || '')
 
   if (!mine) return <NotInWorkout routineId={routineId} />
@@ -51,11 +53,11 @@ export function WorkoutItemExercise({ routineId, itemId }) {
         onSubmit={(event) => {
           event.preventDefault()
           // req-126 — a typed increment that doesn't read blocks Save (its note is shown).
-          const saved = step.save()
+          const saved = cardio ? { patch: {} } : step.save()
           if (saved.error) return
           store.updateExercise(ex.id, {
-            // req-126 — untouched: the key is left out, so the stored value (or its absence) stays.
-            ...(saved.unchanged ? {} : { weightStep: saved.value }),
+            // req-126 / req-193 — untouched fields are left out, so the stored value (or its absence) stays.
+            ...saved.patch,
             cues: cues.trim(),
           })
           go(
@@ -64,7 +66,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           )
         }}
       >
-        <WeightStepField step={step} />
+        {cardio ? null : <WeightStepField step={step} />}
         <Textarea
           label="Form cues"
           value={cues}
