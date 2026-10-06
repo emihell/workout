@@ -37,7 +37,7 @@ import { Back, ExercisesLink, Missing } from '../shared'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SetLogForm, Title } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemLogPath, itemSetsPath } from './workout-helpers.js'
-import { SkipRest, WorkoutPill } from './rest'
+import { WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
 import { askConfirm } from '../../ui/confirm.js'
@@ -464,16 +464,18 @@ function WorkoutItemLive({ routineId, item }) {
       })
     : null
   // req-186 — the viewed logged set's form: its logged values (setDraftFromLoggedSet, the
-  // values Previous always restored), its own target/kg notes; Effort default when none.
+  // values Previous always restored), its own target/kg notes. req-192 — its effort shows as
+  // the selected effort button; a set with no rpe shows none selected (no preselection).
   const viewedInit = viewedSet ? setDraftFromLoggedSet('', viewedSet) : null
-  const viewedEffort = viewedInit && viewedInit.effort !== '' ? viewedInit.effort : 3
+  const viewedEffort = viewedInit && viewedInit.effort !== '' ? viewedInit.effort : ''
   const viewedTarget = viewedSet ? setTargetFor(item, viewedType, viewedWorkIndex) : ''
 
   return (
     <Screen className="ui-screen--rest">
       <ExercisesLink routineId={routineId} />
-      {/* req-186 — the workout pill (rest clock / GO + set N/M; self-hides with no current exercise). */}
-      <WorkoutPill />
+      {/* req-186 — the workout pill (rest clock / GO + set N/M; self-hides with no current exercise).
+          req-192 — told which item this screen is, so on the current exercise a tap skips the rest. */}
+      <WorkoutPill ownItemKey={itemKey(item)} />
       <ExerciseTitle
         routineId={routineId}
         item={item}
@@ -498,6 +500,35 @@ function WorkoutItemLive({ routineId, item }) {
           ) : null
         }
       />
+      {/* req-192 (DEC-108 §6) — the routine's note for this exercise (the snapshot item's
+          `notes`, set in the routine), read-only under the title. Edited in the routine. */}
+      {item.notes ? <p className="ui-sub ui-item-note">{item.notes}</p> : null}
+      {/* req-192 (DEC-108 §6) — the set list sits under the title, above kg / reps. */}
+      {setRows ? (
+        <ul className="ui-setpreview" aria-label="Sets">
+          {setRows.map((row) => (
+            <li
+              key={row.key}
+              className={`ui-setpreview__row is-${row.status}${row.highlighted ? ' is-here' : ''}`}
+              aria-current={row.highlighted ? 'step' : undefined}
+            >
+              {row.status === 'done' ? (
+                // req-191 §3 — a done row opens that logged set (openLoggedSet).
+                <button type="button" className="ui-setpreview__tap" onClick={() => openLoggedSet(row.setIndex)}>
+                  <span className="ui-setpreview__mark" aria-hidden="true">✓</span>
+                  <span className="ui-visually-hidden">Done: </span>
+                  {row.text}
+                </button>
+              ) : (
+                <>
+                  <span className="ui-setpreview__mark" aria-hidden="true" />
+                  {row.text}
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {/* req-80 — the note field the "Add note" control reveals, rendered by the
           title (not inside SetLogForm). autoFocus only when opened by tapping (no
           seeded note); an empty field submits no note (unchanged behaviour). */}
@@ -518,7 +549,7 @@ function WorkoutItemLive({ routineId, item }) {
         />
       ) : null}
       {/* req-78 — the next set's log form shows immediately on completing a set, during
-          rest included (no intermediate rest panel, no extra tap). Its Complete is live
+          rest included (no intermediate rest panel, no extra tap). Its log buttons are live
           while the pill counts down (D2, self-paced). The form remounts per set by
           `key`; rest ending doesn't change the key, so in-progress edits survive. Once
           the exercise is planned-done, completeSet has already advanced to the overview. */}
@@ -558,7 +589,6 @@ function WorkoutItemLive({ routineId, item }) {
           initialWeight={formInit.weight}
           initialReps={formInit.reps}
           initialDuration={formInit.durationSec}
-          initialEffort={formInit.effort}
           routineKg={routineKg}
           lastKg={historyPrefill.weight}
           kgLabel={kgLabelFor(ex)}
@@ -571,50 +601,18 @@ function WorkoutItemLive({ routineId, item }) {
           onChange={(values) => draftWriter.form(setSeedKey, values, note)}
         />
       )}
-      {setRows ? (
-        <ul className="ui-setpreview" aria-label="Sets">
-          {setRows.map((row) => (
-            <li
-              key={row.key}
-              className={`ui-setpreview__row is-${row.status}${row.highlighted ? ' is-here' : ''}`}
-              aria-current={row.highlighted ? 'step' : undefined}
-            >
-              {row.status === 'done' ? (
-                // req-191 §3 — a done row opens that logged set (openLoggedSet).
-                <button type="button" className="ui-setpreview__tap" onClick={() => openLoggedSet(row.setIndex)}>
-                  <span className="ui-setpreview__mark" aria-hidden="true">✓</span>
-                  <span className="ui-visually-hidden">Done: </span>
-                  {row.text}
-                </button>
-              ) : (
-                <>
-                  <span className="ui-setpreview__mark" aria-hidden="true" />
-                  {row.text}
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : null}
       {/* req-109 — exercise-level lateral actions, in normal flow below the form (the
-          set-level Previous · Skip set · Complete bar stays pinned at the bottom).
+          set-level bar stays pinned at the bottom).
           req-188 (DEC-103 §2) — Skip exercise and Swap exercise moved to the workout list's
-          row "⋯" sheet; Skip rest and Remove set stay. */}
-      {logging ? (
+          row "⋯" sheet. req-192 (DEC-108 §3) — Skip rest is gone: the pill skips it here.
+          req-117 — Remove set, only on an unlogged extra set (canRemoveAddedSet). */}
+      {logging && removable ? (
         <Actions
           className="ui-exercise-actions"
           lateral={
-            <>
-              {/* req-186 (DEC-103 §3) — skipping the rest lives here now, quietly, only
-                  while resting (was the pill's tap). */}
-              <SkipRest />
-              {/* req-117 — only on an unlogged extra set (canRemoveAddedSet). */}
-              {removable ? (
-                <Button variant="quiet" onClick={removeSet}>
-                  Remove set
-                </Button>
-              ) : null}
-            </>
+            <Button variant="quiet" onClick={removeSet}>
+              Remove set
+            </Button>
           }
         />
       ) : null}

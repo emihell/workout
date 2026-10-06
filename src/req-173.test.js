@@ -49,7 +49,8 @@ describe('SetLogForm — the "No weight entered" note', () => {
   it('Complete with blank kg still submits in one tap, with the blank kg', async () => {
     let submitted = null
     view = await render(form({ weighted: true, initialWeight: '', onComplete: (v) => (submitted = v) }))
-    await view.click(view.button('Complete'))
+    // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
+    await view.click(view.button('Medium'))
     assert.deepEqual(submitted, { weight: '', reps: '10', effort: 3, durationSec: undefined })
   })
 })
@@ -74,10 +75,11 @@ describe('live log screen — the stored set after Complete with blank kg (uncha
     await view.unmount()
     view = await render(h(StoreProvider, null, h(Screen, { started: true })))
     // WU set first: log it as prefilled, then clear the work set's kg.
-    await view.click(view.button('Complete'))
+    // req-192 test edit: the warm-up logs with "Done", the work set with Medium (rpe 3, as before)
+    await view.click(view.button('Done'))
     await view.type(view.input('kg'), '')
     assert.equal(view.text().includes(NOTE), true)
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Medium'))
     assert.equal(captured.store.activeWorkout.sets.length, 2, 'one tap logged it')
     // Pinned from main (7e1de43) by running these same steps there — the note changes
     // nothing underneath: a blank kg on a weighted set is still stored as 0.

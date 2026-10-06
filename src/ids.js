@@ -16,18 +16,20 @@ export const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0]
 
 export const LOOP_WEEKS = [1, 2, 3, 4]
 
+// req-192 (DEC-108 §2) — labels Medium / Failure (were Moderate / Max). Stored values
+// unchanged: 2 / 3 / 4 / 5, read by progress.js exactly as before.
 export const RPE_OPTIONS = [
   { value: 2, label: 'Easy' },
-  { value: 3, label: 'Moderate' },
+  { value: 3, label: 'Medium' },
   { value: 4, label: 'Hard' },
-  { value: 5, label: 'Max' },
+  { value: 5, label: 'Failure' },
 ]
 
 export function rpeLabel(value) {
   const n = Number(value)
   if (!Number.isFinite(n) || n === 0) return ''
   if (n <= 2) return 'Easy'
-  if (n >= 5) return 'Max'
+  if (n >= 5) return 'Failure'
   return RPE_OPTIONS.find((opt) => opt.value === n)?.label || ''
 }
 

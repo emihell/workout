@@ -24,10 +24,11 @@ const work = (it) => ({ routineItemId: it.routineItemId, exerciseId: it.exercise
 const workoutOf = (items, sets) => ({ id: 'w', snapshot: { routineName: 'Upper', items }, sets, completedItemIds: [] })
 
 describe('req-177 AC1 — Effort "Max" is stored rpe 5', () => {
-  it('the option labelled Max has value 5, and 5 reads back as Max', () => {
-    assert.deepEqual(RPE_OPTIONS.map((o) => o.label), ['Easy', 'Moderate', 'Hard', 'Max'])
-    assert.equal(RPE_OPTIONS.find((o) => o.label === 'Max').value, 5)
-    assert.equal(rpeLabel(5), 'Max')
+  // req-192 test edit (DEC-108 §2): the labels are now Medium / Failure; the values unchanged.
+  it('the option labelled Failure has value 5, and 5 reads back as Failure', () => {
+    assert.deepEqual(RPE_OPTIONS.map((o) => o.label), ['Easy', 'Medium', 'Hard', 'Failure'])
+    assert.equal(RPE_OPTIONS.find((o) => o.label === 'Failure').value, 5)
+    assert.equal(rpeLabel(5), 'Failure')
     assert.equal(rpeOptionValue(5), 5)
   })
 })
@@ -104,9 +105,9 @@ describe('req-177 AC1 — picking Max on the live workout stores rpe 5', () => {
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     await act(async () => captured.store.startWorkout('sess-lower'))
     await mount(h(WorkoutItemLog, { routineId: 'sess-lower', itemId: 'si-sess-lower-2-ex-leg-extension' }))
-    await view.click(view.button('Complete')) // the warm-up, as prefilled
-    await view.click(view.button('Max'))
-    await view.click(view.button('Complete'))
+    // req-192 test edit: "Done" logs the warm-up; tapping Failure (was Max + Complete) logs the set.
+    await view.click(view.button('Done')) // the warm-up, as prefilled
+    await view.click(view.button('Failure'))
     await act(async () => captured.store.finishWorkout({}))
     const worked = captured.store.workouts[0].sets.filter((s) => s.exerciseId === 'ex-leg-extension' && s.setType === 'work' && s.note !== 'skipped')
     assert.deepEqual(worked.map((s) => s.rpe), [5])

@@ -270,7 +270,7 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     view = null
   })
 
-  it('Previous shows the logged set without un-logging; Next and Save leave restEndsAt alone; Skip rest clears it', async () => {
+  it('Previous shows the logged set without un-logging; Next and Save leave restEndsAt alone; the pill skips the rest (req-192)', async () => {
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
@@ -290,9 +290,10 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     const rows = () => view.all('.ui-setpreview li').map((li) => [li.className.replace('ui-setpreview__row ', ''), li.getAttribute('aria-current'), li.textContent])
 
     // warm-up, then work set 1
-    await view.click(view.button('Complete'))
+    // req-192 test edit: "Done" logs the warm-up, Medium (rpe 3, as Complete stored) set 1.
+    await view.click(view.button('Done'))
     await view.type(view.input('kg'), '27.5')
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Medium'))
     assert.equal(active().sets.length, 2)
     assert.deepEqual(rows(), [
       ['is-done', null, '✓Done: Warm-up · 10 kg × 12'], // warm-up kg from db.json history,
@@ -303,7 +304,9 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     const restEndsAt = active().restEndsAt
     assert.ok(restEndsAt > Date.now(), 'a 90 s rest is running')
     assert.ok(view.container.querySelector('.ui-restpill'), 'the pill shows')
-    assert.match(view.container.querySelector('.ui-restpill').textContent, /set 3\/4$/)
+    // req-192 test edit (DEC-108 §3): resting on its own exercise the pill reads "1:30 · skip"
+    // (was "· set 3/4"; the set count is on the list).
+    assert.match(view.container.querySelector('.ui-restpill').textContent, /·skip$/) // the separator is its own span
     // scope 5 — the title's small "N/M" is gone
     for (const sub of view.all('.ui-sub')) assert.doesNotMatch(sub.textContent, /\d\/\d/)
 
@@ -313,7 +316,11 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     assert.equal(view.input('Reps').value, '12')
     assert.equal(active().sets.length, 2, 'sets logged count unchanged')
     assert.equal(active().restEndsAt, restEndsAt, 'rest not reset')
-    assert.equal(view.button('Complete'), null)
+    // req-192 test edit: the current set's "Skip set" (was Complete) is gone while viewing; the
+    // logged effort (Medium, rpe 3) shows as the selected effort button.
+    assert.equal(view.button('Skip set'), null)
+    assert.equal(view.button('Medium').getAttribute('aria-pressed'), 'true')
+    assert.equal(view.all('[aria-pressed="true"]').length, 1)
     assert.ok(view.button('Next'), 'Next (secondary)')
     assert.match(view.button('Next').className, /ui-btn--secondary/)
     assert.ok(view.button('Previous'), 'the warm-up is earlier, so Previous stays')
@@ -321,7 +328,7 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
 
     // Next → back on set 2, same countdown
     await view.click(view.button('Next'))
-    assert.ok(view.button('Complete'))
+    assert.ok(view.button('Skip set')) // req-192 test edit: was Complete
     assert.equal(view.input('Reps').value, '11')
     assert.equal(active().restEndsAt, restEndsAt)
 
@@ -337,12 +344,13 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     assert.equal(active().sets[1].weight, 27.5)
     assert.equal(active().sets.length, 2)
     assert.equal(active().restEndsAt, restEndsAt, 'Save leaves the rest alone')
-    assert.ok(view.button('Complete'), 'back on the current set')
+    assert.ok(view.button('Skip set'), 'back on the current set') // req-192 test edit: was Complete
 
-    // Skip rest — the pill's old write, now on the screen
-    await view.click(view.button('Skip rest'))
-    assert.equal(active().restEndsAt, null)
+    // req-192 test edit (DEC-108 §3): the "Skip rest" button is gone; a tap on the pill, on its
+    // own exercise's screen, makes the same write.
     assert.equal(view.button('Skip rest'), null)
+    await view.click(view.container.querySelector('.ui-restpill'))
+    assert.equal(active().restEndsAt, null)
     assert.match(view.container.querySelector('.ui-restpill').textContent, /^GO/)
   })
 })

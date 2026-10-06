@@ -178,27 +178,27 @@ describe('5 — req-117 b: History Add/Edit set records a duration for a timed e
 })
 
 describe('6 — DEC-087 §2: Effort in History', () => {
-  it('(a) an OLD warm-up set stored with rpe 3 shows no "Moderate"; its stored rpe is still 3 (no write)', async () => {
+  it('(a) an OLD warm-up set stored with rpe 3 shows no "Medium"; its stored rpe is still 3 (no write)', async () => {
     const sets = [wu(10, { rpe: 3 }), work(40, '8', { rpe: 3 })]
     const store = historyStore({ exercise: PRESS, items: item(PRESS), sets })
     view = await mount(store, h(HistoryWorkoutExercise, { workoutId: 'wo-h', exerciseId: 'si-a' }))
     const rows = view.all('a').map((a) => a.textContent)
     const wuRow = rows.find((t) => t.startsWith('Warm-up set'))
     const workRow = rows.find((t) => t.startsWith('40 kg'))
-    assert.doesNotMatch(wuRow, /Moderate/, 'was "WU set · 10 kg · 12 · Moderate" on main')
-    assert.match(workRow, /Moderate/, 'a work set keeps its effort')
+    assert.doesNotMatch(wuRow, /Medium/, 'was "WU set · 10 kg · 12 · Medium" on main')
+    assert.match(workRow, /Medium/, 'a work set keeps its effort')
     assert.equal(store.workouts[0].sets[0].rpe, 3, 'display only')
     assert.equal(store.writes.length, 0)
   })
-  it('(a) an old cardio work set with rpe 3 shows no "Moderate" either', async () => {
+  it('(a) an old cardio work set with rpe 3 shows no "Medium" either', async () => {
     const store = historyStore({ exercise: ROW, items: item(ROW), sets: [work('', '6 min', { rpe: 3 })] })
     view = await mount(store, h(HistoryWorkoutExercise, { workoutId: 'wo-h', exerciseId: 'si-a' }))
-    assert.doesNotMatch(view.text(), /Moderate/)
+    assert.doesNotMatch(view.text(), /Medium/)
   })
   it('(a) formatSetLine: WU / cardio never labelled; a work set is', () => {
     assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12', rpe: 3 }), 'Warm-up set · 10 kg · 12')
     assert.equal(formatSetLine({ setType: 'work', reps: '6 min', rpe: 3 }, { cardio: true }), '6 min')
-    assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 3 }), '40 kg · 8 · Moderate')
+    assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 3 }), '40 kg · 8 · Medium')
   })
   it('(b) editing a WU set: no Effort control, and Save writes rpe null', async () => {
     const store = historyStore({ exercise: PRESS, items: item(PRESS), sets: [wu(10, { rpe: 3 })] })

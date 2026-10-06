@@ -226,9 +226,11 @@ describe('AC3 — a done row opens the logged set (render, real store)', () => {
     await view.unmount()
     view = await render(h(StoreProvider, null, h(Screen, { open: true })))
     const a = () => captured.store.activeWorkout
-    await view.click(view.button('Complete')) // warm-up
+    // req-192 test edit: "Done" logs the warm-up, Medium (rpe 3, as Complete stored) set 1;
+    // the current set is told apart by its "Skip set" (viewing has Next, no Skip set).
+    await view.click(view.button('Done')) // warm-up
     await view.type(view.input('kg'), '27.5')
-    await view.click(view.button('Complete')) // set 1
+    await view.click(view.button('Medium')) // set 1
     const restEndsAt = a().restEndsAt
     const length = a().sets.length
     const taps = view.all('.ui-setpreview li').map((li) => Boolean(li.querySelector('button.ui-setpreview__tap')))
@@ -238,7 +240,7 @@ describe('AC3 — a done row opens the logged set (render, real store)', () => {
     assert.match(view.text(), /Set 1 · logged/)
     assert.equal(view.input('kg').value, '27.5')
     assert.ok(view.button('Next'))
-    assert.equal(view.button('Complete'), null)
+    assert.equal(view.button('Skip set'), null)
     assert.equal(a().sets.length, length, 'sets.length unchanged')
     assert.equal(a().restEndsAt, restEndsAt, 'restEndsAt unchanged')
     assert.equal(view.all('.ui-setpreview li')[1].getAttribute('aria-current'), 'step')
@@ -246,7 +248,7 @@ describe('AC3 — a done row opens the logged set (render, real store)', () => {
     await view.click(view.all('.ui-setpreview li')[0].querySelector('button'))
     assert.match(view.text(), /Warm-up set · logged/)
     await view.click(view.button('Next'))
-    assert.ok(view.button('Complete'), 'back on the current set')
+    assert.ok(view.button('Skip set'), 'back on the current set')
     assert.equal(a().restEndsAt, restEndsAt)
   })
 })

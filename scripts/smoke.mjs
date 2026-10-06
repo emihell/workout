@@ -145,14 +145,16 @@ async function main() {
     })
     await step(`open ${LOG_EXERCISE}`, async () => {
       await clickLink(page, LOG_EXERCISE)
-      await waitText(page, 'Complete')
+      // req-192 (DEC-108 §1) — no Complete any more: the effort buttons log a work set, and
+      // a set without effort (Chest Press opens on its warm-up) has one "Done".
+      await waitText(page, 'Done')
     })
-    await step(`type "${TYPED_WEIGHT}" kg and Complete the set`, async () => {
+    await step(`type "${TYPED_WEIGHT}" kg and log the set (Done)`, async () => {
       const kg = await page.waitForSelector('input[inputmode="decimal"]', { timeout: STEP_TIMEOUT })
       await kg.click({ clickCount: 3 })
       await page.keyboard.press('Backspace')
       await kg.type(TYPED_WEIGHT)
-      await clickButton(page, 'Complete')
+      await clickButton(page, 'Done')
       await page.waitForFunction(
         (key) => (JSON.parse(localStorage.getItem(key) || '{}').activeWorkout?.sets || []).some((s) => s.reps !== 'skipped'),
         { timeout: STEP_TIMEOUT },

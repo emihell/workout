@@ -10,7 +10,10 @@ import { act, importJsx, render } from './test-support/render.js'
 
 const h = React.createElement
 const fixture = () => JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
-const OLD = ['WU set', 'WU ·', 'Failure', 'Replace exercise']
+// req-192 test edit (DEC-108 §2): "Failure" is the effort word again (rpe 5), so it leaves the
+// old-words list; the retired "Max" takes its place as " · Max" (the set-line form; a bare
+// "Max" could match other text).
+const OLD = ['WU set', 'WU ·', ' · Max', 'Replace exercise']
 
 let view
 afterEach(async () => {
@@ -40,7 +43,7 @@ async function harness(payload, { viaImport = false } = {}) {
 }
 
 describe('req-175 — the live workout: new words on screen, stored setType / rpe unchanged', () => {
-  it('Leg Extension: Warm-up set title and preview, "Max" (req-177); the finished sets deep-equal main', async () => {
+  it('Leg Extension: Warm-up set title and preview, "Failure" (req-192; "Max" in req-177); the finished sets deep-equal main', async () => {
     const { captured, mount } = await harness(fixture())
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     const { RPE_OPTIONS } = await import('./ids.js')
@@ -54,13 +57,14 @@ describe('req-175 — the live workout: new words on screen, stored setType / rp
     assert.doesNotMatch(text, /Swap exercise|Skip exercise/)
     assert.match(text, /Skip set/)
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
-    await view.click(view.button('Complete')) // the warm-up, as prefilled
+    // req-192 test edit: the warm-up logs with "Done"; rpe 5 reads "Failure" (was "Max"), and
+    // tapping it logs the set (no separate Complete).
+    await view.click(view.button('Done')) // the warm-up, as prefilled
     const effort5 = RPE_OPTIONS.find((o) => o.value === 5).label // label-agnostic, so it runs on main too
-    assert.equal(effort5, 'Max')
+    assert.equal(effort5, 'Failure')
     assert.ok(view.button(effort5), 'the Effort control shows the new word')
-    assert.equal(view.text().includes('Failure'), false)
+    assert.equal(view.button('Max'), null)
     await view.click(view.button(effort5))
-    await view.click(view.button('Complete'))
     await act(async () => captured.store.finishWorkout({}))
     const finished = captured.store.workouts[0]
     const logged = finished.sets.filter((s) => s.exerciseId === 'ex-leg-extension')
@@ -83,7 +87,7 @@ const EXPECTED_MAIN = [
 ]
 
 describe('req-175 — an imported old (v8) backup displays with the new words', () => {
-  it('History: "Warm-up set" rows, "Max" effort (req-177), "{n} kg lifted" with a thousands separator', async () => {
+  it('History: "Warm-up set" rows, "Failure" effort (req-192; "Max" in req-177), "{n} kg lifted" with a thousands separator', async () => {
     const { captured, mount } = await harness(fixture(), { viaImport: true })
     const { HistoryDetail, HistoryWorkoutExercise } = await importJsx('./views/history/index.jsx', import.meta.url)
     const { workoutVolume } = await import('./history-queries.js')
@@ -99,7 +103,7 @@ describe('req-175 — an imported old (v8) backup displays with the new words', 
     await mount(h(HistoryWorkoutExercise, { workoutId: workout.id, exerciseId: 'ex-chest-press' }))
     let text = view.text()
     assert.match(text, /Warm-up set · /)
-    assert.match(text, / · Max\b/)
+    assert.match(text, / · Failure\b/) // req-192 test edit: was " · Max"
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
 
     await mount(h(HistoryDetail, { workoutId: workout.id }))

@@ -92,7 +92,7 @@ describe('SetLogForm — the notes as rendered', () => {
     let submitted = null
     view = await render(form({ initialWeight: '500', routineKg: 50, onComplete: (v) => (submitted = v) }))
     assert.equal(view.text().includes('big change from 50 kg'), true)
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
     assert.equal(submitted?.weight, '500')
   })
 })
@@ -132,12 +132,12 @@ describe('live log screen — real store, routine kg blanked on Leg Extension', 
     const { captured, lastKg } = await start({ blank: true })
     assert.ok(Number(lastKg) > 0, `history has a set-1 kg (${lastKg})`)
     assert.equal(/last time|big change/i.test(view.text()), false, 'warm-up set')
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Done')) // req-192 test edit: the warm-up logs with "Done"
     assert.equal(view.input('kg').value, '', 'routine blank → box blank, no prefill')
     assert.equal(view.text().includes(`No weight entered · last time ${Number(lastKg)} kg`), true)
     await view.type(view.input('kg'), '500')
     assert.equal(view.text().includes(`That's a big change from ${Number(lastKg)} kg`), true)
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
     const sets = captured.store.activeWorkout.sets
     assert.equal(sets.length, 2, 'one tap logged it, no dialog')
     assert.equal(sets[1].weight, 500)
@@ -145,7 +145,7 @@ describe('live log screen — real store, routine kg blanked on Leg Extension', 
   })
   it('routine kg present → no last-time hint on set 1', async () => {
     await start({ blank: false })
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Done')) // req-192 test edit: the warm-up logs with "Done"
     assert.notEqual(view.input('kg').value, '')
     assert.equal(/last time|big change/i.test(view.text()), false)
   })

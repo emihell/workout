@@ -19,12 +19,12 @@ describe('req-44 isWeightedType (unifies usesWeight/usesLoad/weighted/bodyweight
 })
 
 describe('effort labels', () => {
-  it('maps stored numbers to Easy Moderate Hard Max', () => {
+  it('maps stored numbers to Easy Medium Hard Failure (req-192 labels)', () => {
     assert.equal(rpeLabel(1), 'Easy')
     assert.equal(rpeLabel(2), 'Easy')
-    assert.equal(rpeLabel(3), 'Moderate')
+    assert.equal(rpeLabel(3), 'Medium')
     assert.equal(rpeLabel(4), 'Hard')
-    assert.equal(rpeLabel(5), 'Max')
+    assert.equal(rpeLabel(5), 'Failure')
     assert.equal(rpeLabel(''), '')
   })
 
@@ -36,7 +36,7 @@ describe('effort labels', () => {
   })
 
   it('shows the label on set lines, not a number', () => {
-    assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 3 }), '20 kg · 10 · Moderate')
+    assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 3 }), '20 kg · 10 · Medium')
     assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 1 }), '20 kg · 10 · Easy')
   })
 })
