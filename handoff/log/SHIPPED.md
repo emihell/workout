@@ -2183,3 +2183,12 @@ set list under the title; routine exercise note shown. 2 commits `e35e396`…`89
 Gate (ui): `check: green — lint, skills, no import cycles, 92 test file(s), and the build all passed.` (1354/0); smoke green (step 4
 now "Done"); Planner QA (warm-up Done rpe null; Hard → rpe 4; pill skip on own screen → restEndsAt null; screenshot 390×844).
 No trigger files → no reviewer; 13 test files edited Complete→Medium/Done (same stored rpe 3) — read. `reports/req-192.md`.
+
+## req-193 — weight steps you can set: two step sizes, lightest weight, a weights preview  (batch 2026-10-06)
+
+**req-193** (DEC-108 §6) — "Two step sizes" both editable (`Steps A/B`; legacy 'Alt 4/5' unchanged), "Lightest weight (kg)"
+(`lightestWeight`, optional, no migration), suggestions count from it; preview line; hidden for cardio. Behaviour changes: a failed
+set below the series start holds; a down that can't move reads keep + reason. 6 commits `1912a54`…`8944f54`.
+Gate (ui + progress.js): `check: green — lint, skills, no import cycles, 93 test file(s), and the build all passed.`; smoke green;
+golden vs main's validWeights/moveToValidWeight (exact, two declared exclusions); Planner QA (editor + preview at 390×844).
+Reviewer (independent, 3 rounds): 2 should-fix + 1 latent + 2 nits fixed, "No blockers." `reports/req-193.md`.
