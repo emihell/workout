@@ -18,7 +18,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 **READY, held:**
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
-- **Next: req-192 → 193 → 194 → 195** (READY, ui; DEC-108 — Emilio's 2026-10-06 gym notes: effort buttons log the set,
+- **Batch: building req-193 → 194 → 195** (192 shipped; ui; DEC-108 — Emilio's 2026-10-06 gym notes: effort buttons log the set,
   pill skips rest, weight steps + lightest weight, cardio stopwatch/level/distance, one today block). **Batch approved 2026-10-06** (Emilio: "build"). Lena fixes 189–191 shipped.
   Then req-184 session 2, req-10, req-146 later.
 - **Waiting (Emilio, DEC-075):** req-146 backend, req-149 progression rules. `req-10` first-time setup — rescan first. **[ux-feel]**
