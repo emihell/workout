@@ -101,3 +101,22 @@ effort" · G13 "Should you be able to add notes all the time during an exercise?
 questions, use the user data and external searches and how other apps do it and your own logic" · G15 "I completed a
 workout today but can't see it in the list?" (Home).
 Triage in progress: code scan + prior-art research (Strong, Hevy, JEFIT, Fitbod…).
+Triage (code scan main `4da90e1`; prior-art research 2026-10-06 — Strong/Hevy/Fitbod/MacroFactor/Garmin help pages, Zourdos 2016,
+Helms 2016, Halperin 2022, Wulf 2013):
+- G15 — in code a record saved with today's `finishedAt` always shows (`completedOnDayKey`, history-queries.js:14-18; Today.jsx
+  287/407). Likely causes: (A) never committed — auto-complete commits only while the summary stays mounted (10 s interval,
+  auto-complete.jsx); leaving / closing / old "Cancel" → still `activeWorkout` (Home shows it in progress); (B) started from a
+  future-dated row → that row reads "Done", today shows "Nothing scheduled today"; (C) another tab/PWA clobbered it
+  (persistence.js:61-62; Safari and home-screen app have separate storage). Asked Emilio what Home shows.
+- G1 cardio (Stairs, type cardio, no hasDuration) logs a typed "Duration" into `reps`; timed exercises get a countdown
+  `DurationTimer` (ui/index.jsx:414-462). G3 no level/distance field (distance lives in notes, "1500/6:50"); apps: duration
+  (+distance); "level" uncommon. G2/G6 "Alternating (4/5)" checkbox disables the increment box (weight-step-field.jsx:15);
+  shown for cardio too. G7 no start weight: `validWeights` starts a single step at the step itself, Alternating at a fixed
+  9 kg (progress.js:9-27). MacroFactor / Alpha Progression model stacks as start–end–step ranges.
+- G8 order: title → kg/reps → Effort → bar (fixed) → set list → Skip rest (item.jsx:472-624). G9 all major apps show the full
+  set table, done sets ticked and editable. G10/11 no mainstream app combines effort with completion; Fitbod prompts RIR right
+  after the tap; Hevy/Strong keep RPE as an optional column. G12 RPE 10 / 0 RIR = failure is the standard top anchor; ours:
+  Max = rpe 5, progress.js:129/140 treats rpe ≥ 5 like a missed set (weight down). G13 per-set note anytime ("Add note");
+  the routine item's exercise note is NOT shown on the live log screen (only the done view); apps: per-exercise + per-workout
+  notes, per-set rare. G4 pill tap opens the exercise; Skip rest is a separate button (rest.jsx:14-48); Hevy puts Skip on the
+  timer. G5 no app shows rest tips; no evidence for in-rest content; external-focus cues (Wulf) are the science if built.
