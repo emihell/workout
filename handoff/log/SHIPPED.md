@@ -2147,3 +2147,12 @@ adding clears autoFinishDismissed. 4 commits `a0f583f`…`b064c71`.
 Gate (ui): `check: green — lint, skills, no import cycles, 88 test file(s), and the build all passed.`; branch smoke green; Planner QA
 5/5 (⋯ Skip → "· skipped"; Landmine swap → new record, sets 3, rest 0, kg []; Add history pick appended, routines byte-identical).
 Reviewer (independent, 2 rounds): 1 should-fix + 1 latent fixed, "No blockers." `reports/req-188.md`.
+
+## req-189 — first-workout fixes from the Lena run; Swap copies sets/rest  (batch 2026-10-06)
+
+**req-189** (DEC-106, req-184 Lena run) — no-history Swap copies the original's sets/rest (no step); number boxes select on
+focus; blank Reps → "Enter reps" (no browser bubble); sheet "Use N kg next time?" [No] [Yes]; auto-complete [Keep going],
+"Lifted 2,630 kg"; "kg per dumbbell"; "· swapped". 2 commits `bee2be0`…`407e65c`.
+Gate (ui): `check: green — lint, skills, no import cycles, 89 test file(s), and the build all passed.` (1298/0); smoke green; Planner
+QA 5/5 (Arnold swap sets 3/rest 90 copied, kg []; blank reps stored nothing; "· swapped"). No trigger files → no reviewer; Planner
+read the req-154/155 test edits (optional `|| missingReps` group; kg/duration locks unchanged). `reports/req-189.md`.

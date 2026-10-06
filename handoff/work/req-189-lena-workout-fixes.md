@@ -1,6 +1,6 @@
 # req-189 — first-workout fixes from the Lena run, and Swap copies sets/rest
 
-**Status: READY** (2026-10-06). **Lane: ui.** From req-184 §Persona run (Lena, 2026-10-06) and DEC-106. Siblings: **req-190**
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-189` (`bee2be0`…`407e65c`, 2 commits).** (2026-10-06). **Lane: ui.** From req-184 §Persona run (Lena, 2026-10-06) and DEC-106. Siblings: **req-190**
 (setup) touches different screens; order 189 → 190, both off `main`. Trigger files: likely none (`mid-workout-pick.js`,
 views, `ui/`); if `workout-log.js` / `store.jsx` / `state-reducers.js` change → independent reviewer.
 
@@ -54,3 +54,8 @@ views, `ui/`); if `workout-log.js` / `store.jsx` / `state-reducers.js` change �
 
 ## Decisions made on Emilio's behalf `(unconfirmed)`
 All wording in 3–7; select-on-focus everywhere numeric on the set screens; "swapped" label.
+
+## Built — calls `(unconfirmed)`
+Swap picker row for a never-done exercise: "No history — same sets and rest"; blank Duration → "Enter duration"; Swap copies
+the original's current set count (incl. added sets), not its warm-up; "kg per dumbbell" keyed on "dumbbell(s)" in equipment
+(hand-typed "DB" reads "kg"); also on live set-edit, not History edit; select-on-focus may leave a cursor on iOS (real device).
