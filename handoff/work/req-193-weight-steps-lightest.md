@@ -1,6 +1,6 @@
 # req-193 — weight steps you can set: two step sizes, and the lightest weight
 
-**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui** (+ load-recommendation logic). From DEC-108 §6 (G2 "What does alternating
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-193` (`1912a54`…`8944f54`, 8 commits).** (2026-10-06). **Lane: ui** (+ load-recommendation logic). From DEC-108 §6 (G2 "What does alternating
 mean?", G6 "I can't change the increment?", G7 "The increment should also have a starting weight"). After **req-192**.
 Trigger files: **`progress.js`** → independent reviewer before merge. Exercise records gain optional fields; **no migration,
 no rewrite** — every stored value reads exactly as today.
