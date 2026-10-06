@@ -3,7 +3,7 @@
 // previous same-routine workouts and the summary stats, grouping for History/Today.
 import { exerciseById, routineById } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
-import { dateKey } from './schedule.js'
+import { coveringWorkout, dateKey } from './schedule.js'
 import { isAddedMidWorkout, isSkippedSet, loggedSetCount } from './workout-log.js'
 import { durationTargetText, hasCardioFields } from './cardio-set.js'
 
@@ -16,6 +16,23 @@ export function completedOnDayKey(workouts, dayKey) {
   return (workouts || [])
     .filter((workout) => workout.finishedAt && dateKey(workout.finishedAt) === dayKey)
     .sort((a, b) => new Date(b.finishedAt).getTime() - new Date(a.finishedAt).getTime())
+}
+
+// req-195 / DEC-108 §5 — the workouts finished today that today's block lists as their
+// own "· Done ✓" rows: today's finished workouts (completedOnDayKey) minus any that a
+// slot rendered in the block already shows as Done (coveringWorkout for that slot on
+// todayKey), so a scheduled-and-done slot reads once. `slots` is [{ slot, routine }] —
+// exactly the slots the block renders. Oldest-finished first (the day reads down in
+// order). Pure.
+export function doneInTodayBlock(workouts, slots, todayKey) {
+  const shown = new Set(
+    (slots || [])
+      .map(({ slot, routine }) => coveringWorkout(workouts, routine.id, todayKey, slot.id)?.id)
+      .filter(Boolean),
+  )
+  return completedOnDayKey(workouts, todayKey)
+    .filter((workout) => !shown.has(workout.id))
+    .reverse()
 }
 
 // req-55 / DEC-038 — the unfinished in-progress workouts to surface for resolution
