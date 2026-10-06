@@ -1,6 +1,6 @@
 # req-195 — a workout done today shows in today's block, not as a second "today" row
 
-**Status: READY** (2026-10-06). **Lane: ui.** From DEC-108 §5 (G15: "I completed a workout today but can't see it in the
+**Status: BUILT, NOT merged** (2026-10-06). **Lane: ui.** From DEC-108 §5 (G15: "I completed a workout today but can't see it in the
 list?" → "i see it under todays date - its like there are two rows for todays date - i think completed workouts, for same
 day, should be in the same row"). Independent of 192–194 (`views/Today.jsx` only). No trigger files expected.
 
@@ -28,3 +28,7 @@ day, should be in the same row"). Independent of 192–194 (`views/Today.jsx` on
 
 ## Decisions made on Emilio's behalf `(unconfirmed)`
 Row wording; Start new workout styling after a done workout.
+
+## Built — calls `(unconfirmed)`
+Row "Lower Body · Done ✓ ›" (chevron per DESIGN §4); Start new workout secondary once something is done; done rows after the
+day's slots, oldest first; done rows also inside the in-progress hero block.
