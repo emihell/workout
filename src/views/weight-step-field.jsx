@@ -8,8 +8,10 @@ import { weightSeriesPreview } from '../progress.js'
 // req-193 / DEC-108 §6 — "Weight step (kg)"; "Two step sizes" shows two editable boxes
 // (the increment box is no longer disabled); "Lightest weight (kg)" is optional. The
 // views don't render this for a cardio exercise.
-// req-193 — a preview line under the fields: the first weights the recommendation would use.
-export function WeightStepField({ step }) {
+// req-193 — a preview line under the fields: what the recommendation would move through.
+// `exercise` is the exercise as the recommendation will read it (type, name, weightOptions …);
+// the draft step / lightest weight are laid over it.
+export function WeightStepField({ step, exercise }) {
   const { fields, note, lightestNote } = step
   const draft = step.draft()
   return (
@@ -59,7 +61,7 @@ export function WeightStepField({ step }) {
           {lightestNote}
         </p>
       ) : null}
-      {draft ? <p className="ui-field-note" data-testid="weight-series">{weightSeriesPreview(draft)}</p> : null}
+      {draft ? <p className="ui-field-note" data-testid="weight-series">{weightSeriesPreview({ ...exercise, ...draft })}</p> : null}
     </>
   )
 }

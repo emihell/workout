@@ -25,8 +25,8 @@ export function validWeights(exercise, max = 250) {
     }
     return out
   }
-  // req-193 — two step sizes other than the legacy 'Alt 4/5', no lightest weight: count
-  // from 0 like a single step does (0 itself is not a weight), so 'Alt 2.5/5' → 2.5, 7.5, 10 …
+  // req-193 — 'Steps A/B', no lightest weight: count from 0 like a single step does (0
+  // itself is not a weight), so 'Steps 4/5' → 4, 9, 13 … (the legacy 'Alt 4/5' returned above).
   const two = parseTwoSteps(exercise?.weightStep)
   if (two) return stepSeries(0, two, max).slice(1)
   // req-126 — the shared single-value parser: stored '2,5', '2.5 kg', '5 kg' now read
@@ -51,11 +51,15 @@ function stepSeries(start, steps, max) {
   return out
 }
 
-// req-193 — the editors' preview of the series the weight-step settings produce: the first
-// `count` values of the same validWeights the recommendation reads, so the step order (and
-// the legacy 'Alt 4/5' from 9) is visible. No series → the hold, said plainly (DEC-030).
+// req-193 — the editors' preview of what the recommendation would move through, from the
+// same inputs recommendNextPrescription reads: a bodyweight (or cardio) type or an assisted
+// exercise never moves kg; otherwise the first `count` values of validWeights (weightOptions
+// included), so the step order (and the legacy 'Alt 4/5' from 9) is visible. No series →
+// the hold, said plainly (DEC-030).
 export const NO_SERIES_TEXT = 'No step set — suggestions hold'
+export const SAME_KG_TEXT = 'Suggestions keep the same kg'
 export function weightSeriesPreview(exercise, count = 5) {
+  if (!isWeightedType(exercise?.type) || isAssistedExercise(exercise)) return SAME_KG_TEXT
   const series = validWeights(exercise)
   if (!series.length) return NO_SERIES_TEXT
   const more = series.length > count ? ' …' : ''
@@ -70,6 +74,10 @@ export function moveToValidWeight(weight, exercise, direction) {
   // *valid* increments; a 0.5 kg default is a load the config never defines.
   if (!options.length) return current
   if (direction > 0) return options.find((option) => option > current) ?? options.at(-1)
+  // req-193 — below the lightest weight there is no lighter option: hold at the current kg.
+  // On main this returned options[0], so a failed set below the stack's first weight
+  // suggested a jump UP (reachable once a lightest weight is set).
+  if (current < options[0]) return current
   return [...options].reverse().find((option) => option < current) ?? options[0]
 }
 

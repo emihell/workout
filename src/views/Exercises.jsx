@@ -425,7 +425,7 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         <NameError>{editNameError}</NameError>
         <Select label="Type" options={TYPE_OPTIONS} value={type} onChange={(e) => setType(e.target.value)} />
         <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
-        {type === 'cardio' ? null : <WeightStepField step={step} />}
+        {type === 'cardio' ? null : <WeightStepField step={step} exercise={{ ...ex, name, type }} />}
         <Checkbox label="Timed (count down a duration)" checked={hasDuration} onChange={setHasDuration} />
         {hasDuration ? (
           <NumberField

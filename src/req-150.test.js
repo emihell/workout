@@ -3,7 +3,7 @@
 // reason. No new rule: everything else is identical to main (property test vs a frozen copy).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { HOLD_REASONS, isAssistedExercise, recommendNextPrescription, unreadableTarget } from './progress.js'
+import { HOLD_REASONS, isAssistedExercise, recommendNextPrescription, unreadableTarget, validWeights } from './progress.js'
 import { recommendNextPrescription as mainRecommend } from './req-150.progress-main.fixture.js'
 
 const machine = { type: 'machine', weightStep: '5', name: 'Leg Press' }
@@ -114,6 +114,7 @@ describe('unchanged otherwise (property test vs main)', () => {
 
   it('5,000 generated items with whole-number or blank targets and non-assisted exercises: identical output', () => {
     const r = rng(150)
+    let belowFirst = 0
     for (let n = 0; n < 5000; n += 1) {
       const count = 1 + Math.floor(r() * 5)
       const exercise = { type: pick(r, TYPES), weightStep: pick(r, STEPS), name: pick(r, NAMES), libraryId: pick(r, IDS) }
@@ -127,7 +128,23 @@ describe('unchanged otherwise (property test vs main)', () => {
         return { weight: pick(r, [0, 5, 18, 20, 23, 40, 60, 100]), reps: String(Math.floor(r() * 20)), rpe: pick(r, [null, 1, 2, 3, 4, 5]) }
       })
       const input = { targets, weights, sets, exercise }
-      assert.deepEqual(recommendNextPrescription(input), mainRecommend(input), JSON.stringify(input))
+      // req-193 edit (review fix 3): a load moved DOWN from below the first valid option now
+      // holds at the set's kg (main returned options[0], a jump up). Only that set's weight may
+      // differ from main, and it must equal what was lifted; everything else stays identical.
+      const ours = recommendNextPrescription(input)
+      const main = mainRecommend(input)
+      sets.forEach((set, index) => {
+        const kg = Number(set?.weight) || 0
+        const first = validWeights(exercise, Math.max(250, kg + 100))[0]
+        if (kg > 0 && first != null && kg < first && ours.weights[index] !== main.weights[index]) {
+          assert.equal(main.weights[index], first, JSON.stringify(input))
+          assert.equal(ours.weights[index], kg, JSON.stringify(input))
+          belowFirst += 1
+          ours.weights[index] = main.weights[index]
+        }
+      })
+      assert.deepEqual(ours, main, JSON.stringify(input))
     }
+    assert.ok(belowFirst > 0, `the req-193 below-first-option case was exercised (${belowFirst})`)
   })
 })

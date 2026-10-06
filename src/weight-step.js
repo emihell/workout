@@ -2,9 +2,9 @@
 // alternating 4/5 machine series. The STORED form is unchanged ('2.5', 'Alt 4/5',
 // 'n/a'); nothing on disk is rewritten. Pure (no imports): progress.js reads it and
 // both editors (Exercises.jsx, workout/setup.jsx) build their fields from it.
-// req-193 / DEC-108 §6 — "Two step sizes": any two increments, stored 'Alt A/B' (A is
-// added first, then B, alternating). The legacy 'Alt 4/5' is that form too and stays
-// valid; with no lightest weight it keeps its old series (from 9, +5 first, progress.js).
+// req-193 / DEC-108 §6 — "Two step sizes": any two increments, stored 'Steps A/B' (A is
+// added first, then B, alternating). The legacy 'Alt 4/5' stays valid and keeps its
+// meaning: 5 first, then 4 (from 9 with no lightest weight, progress.js).
 // The optional `lightestWeight` (kg, a number) is the stack's first weight.
 
 import { normalizeKgText } from './kg-input.js'
@@ -27,18 +27,23 @@ export function parseWeightStep(text) {
   return Number.isFinite(n) && n > 0 ? n : null
 }
 
-// req-193 — the two step sizes of a stored 'Alt A/B' as [A, B], or null. Only the exact
-// form this editor writes (and the legacy 'Alt 4/5') reads; 'alt 4/5', '4/5' stay null.
-const TWO_STEPS = /^Alt (\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/
+// req-193 — the two step sizes in the order they are ADDED, or null. Two stored forms:
+// - 'Steps A/B' (what the editor writes): A first, then B. Comma decimals read ('Steps 2,5/5').
+// - the exact legacy 'Alt 4/5' (ALTERNATING): 5 first, then 4 — the series main always ran
+//   (9, 14, 18 …), so it reads [5, 4]. Anything else ('alt 4/5', 'Alt 2.5/5', '4/5') → null.
+const STEP_TOKEN = '(\\d+(?:[.,]\\d+)?)'
+const TWO_STEPS = new RegExp(`^Steps ${STEP_TOKEN}/${STEP_TOKEN}$`)
+export const LEGACY_TWO_STEPS = [5, 4]
 export function parseTwoSteps(stored) {
+  if (stored === ALTERNATING) return [...LEGACY_TWO_STEPS]
   const match = typeof stored === 'string' ? TWO_STEPS.exec(stored) : null
   if (!match) return null
-  const steps = [Number(match[1]), Number(match[2])]
-  return steps.every((n) => Number.isFinite(n) && n > 0) ? steps : null
+  const steps = [parseWeightStep(match[1]), parseWeightStep(match[2])]
+  return steps.every((n) => n != null) ? steps : null
 }
 
 export function twoStepsValue(first, second) {
-  return `Alt ${first}/${second}`
+  return `Steps ${first}/${second}`
 }
 
 export const MAX_LIGHTEST_WEIGHT = 250
@@ -106,7 +111,7 @@ export function weightStepToSave(fields, { stored, touched }) {
   return { value: String(n) }
 }
 
-// The exercise detail line: "Increment 2.5 kg" / "Two steps 4/5 kg"; nothing for no
+// The exercise detail line: "Increment 2.5 kg" / "Two steps 5/4 kg" (in the order added); nothing for no
 // step; an unreadable value shows as stored (never hidden).
 export function describeWeightStep(stored) {
   const two = parseTwoSteps(stored)

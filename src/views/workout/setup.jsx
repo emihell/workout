@@ -66,7 +66,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
           )
         }}
       >
-        {cardio ? null : <WeightStepField step={step} />}
+        {cardio ? null : <WeightStepField step={step} exercise={ex} />}
         <Textarea
           label="Form cues"
           value={cues}

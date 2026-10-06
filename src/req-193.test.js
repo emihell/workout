@@ -4,7 +4,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { moveToValidWeight, NO_SERIES_TEXT, recommendNextPrescription, validWeights, weightSeriesPreview } from './progress.js'
+import { moveToValidWeight, NO_SERIES_TEXT, recommendNextPrescription, SAME_KG_TEXT, validWeights, weightSeriesPreview } from './progress.js'
 import {
   moveToValidWeight as mainMove,
   validWeights as mainValidWeights,
@@ -52,6 +52,14 @@ function assertSameAsMain(exercise, label) {
   assert.deepEqual(validWeights(exercise, 400), mainValidWeights(exercise, 400), `${label} validWeights max 400`)
   for (const w of PROBE_WEIGHTS) {
     for (const dir of [1, -1]) {
+      // req-193 review fix 3 — the ONE deliberate change from main: moving down from below the
+      // first option now holds at the current kg (main returned options[0], a jump up).
+      // Excluded here, asserted as a hold, and tested on its own below.
+      const options = mainValidWeights(exercise, Math.max(250, w + 100))
+      if (dir < 0 && options.length && w < options[0]) {
+        assert.equal(moveToValidWeight(w, exercise, dir), w, `${label} move ${w} down holds`)
+        continue
+      }
       assert.equal(moveToValidWeight(w, exercise, dir), mainMove(w, exercise, dir), `${label} move ${w} ${dir}`)
     }
   }
@@ -96,11 +104,11 @@ describe('req-193 acceptance 2 — series from the lightest weight', () => {
   })
 
   it('two steps 2.5/5 from 10 → 10, 12.5, 17.5, 20, 25', () => {
-    assert.deepEqual(validWeights({ weightStep: 'Alt 2.5/5', lightestWeight: 10 }).slice(0, 5), [10, 12.5, 17.5, 20, 25])
+    assert.deepEqual(validWeights({ weightStep: 'Steps 2.5/5', lightestWeight: 10 }).slice(0, 5), [10, 12.5, 17.5, 20, 25])
   })
 
   it('one step up from 12.5 on that stack → 17.5; down from 17.5 → 12.5', () => {
-    const exercise = { type: 'machine', weightStep: 'Alt 2.5/5', lightestWeight: 10 }
+    const exercise = { type: 'machine', weightStep: 'Steps 2.5/5', lightestWeight: 10 }
     assert.equal(moveToValidWeight(12.5, exercise, 1), 17.5)
     assert.equal(moveToValidWeight(17.5, exercise, -1), 12.5)
     const r = recommendNextPrescription({
@@ -113,12 +121,22 @@ describe('req-193 acceptance 2 — series from the lightest weight', () => {
     assert.equal(r.action, 'up')
   })
 
-  it('a lightest weight on the legacy Alt 4/5 counts 4 first from it (the boxes read 4, 5)', () => {
-    assert.deepEqual(validWeights({ weightStep: 'Alt 4/5', lightestWeight: 10 }).slice(0, 4), [10, 14, 19, 23])
+  // req-193 review fix 1 — one order rule: the legacy 'Alt 4/5' always adds 5 first.
+  it("legacy 'Alt 4/5' + lightest 9 → 9, 14, 18, 23 (5 first, as without a lightest weight)", () => {
+    assert.deepEqual(validWeights({ weightStep: 'Alt 4/5', lightestWeight: 9 }).slice(0, 4), [9, 14, 18, 23])
+    assert.deepEqual(validWeights({ weightStep: 'Alt 4/5', lightestWeight: 10 }).slice(0, 4), [10, 15, 19, 24])
+  })
+
+  it("typed 4 then 5 ('Steps 4/5') → 4, 9, 13 … from 0; L, L+4, L+9 … from a lightest weight", () => {
+    const f = { ...weightStepFields('n/a'), amount: '4', second: '5', alternating: true }
+    const saved = weightStepToSave(f, { stored: 'n/a', touched: true })
+    assert.deepEqual(saved, { value: 'Steps 4/5' })
+    assert.deepEqual(validWeights({ weightStep: saved.value }).slice(0, 4), [4, 9, 13, 18])
+    assert.deepEqual(validWeights({ weightStep: saved.value, lightestWeight: 10 }).slice(0, 4), [10, 14, 19, 23])
   })
 
   it('new two steps with no lightest weight count from 0 like a single step (0 itself left out)', () => {
-    assert.deepEqual(validWeights({ weightStep: 'Alt 2.5/5' }).slice(0, 4), [2.5, 7.5, 10, 15])
+    assert.deepEqual(validWeights({ weightStep: 'Steps 2.5/5' }).slice(0, 4), [2.5, 7.5, 10, 15])
   })
 
   it('a stored string lightest weight reads (lenient, like the step)', () => {
@@ -173,21 +191,26 @@ describe('req-193 acceptance 3 — failure case', () => {
 })
 
 describe('req-193 scope 4 — the two-step stored form', () => {
-  it("parseTwoSteps reads exactly 'Alt A/B'; 'Alt 4/5' stays valid", () => {
-    assert.deepEqual(parseTwoSteps('Alt 4/5'), [4, 5])
-    assert.deepEqual(parseTwoSteps('Alt 2.5/5'), [2.5, 5])
-    for (const text of ['alt 4/5', '4/5', 'Alt 4 / 5', 'Alt 0/5', 'Alt 4/5/6', 'Alt -4/5', 'Alt 4/', undefined, null, 5]) {
+  it("parseTwoSteps reads 'Steps A/B' (comma decimals too); the legacy 'Alt 4/5' reads 5 then 4", () => {
+    assert.deepEqual(parseTwoSteps('Alt 4/5'), [5, 4])
+    assert.deepEqual(parseTwoSteps('Steps 2.5/5'), [2.5, 5])
+    assert.deepEqual(parseTwoSteps('Steps 2,5/5'), [2.5, 5])
+    assert.deepEqual(validWeights({ weightStep: 'Steps 2,5/5', lightestWeight: 10 }).slice(0, 3), [10, 12.5, 17.5])
+    for (const text of ['alt 4/5', '4/5', 'Alt 2.5/5', 'Alt 4 / 5', 'Steps 0/5', 'Steps 4/5/6', 'Steps -4/5', 'Steps 4/', 'steps 4/5', 'Steps 2,5,5/5', undefined, null, 5]) {
       assert.equal(parseTwoSteps(text), null, String(text))
     }
   })
 
   it('both boxes are editable and save as typed (comma decimals)', () => {
+    // req-193 review fix 1 — legacy opens as First 5, Second 4; untouched keeps 'Alt 4/5' byte-identical;
+    // any typed change saves 'Steps A/B'.
     const f = weightStepFields('Alt 4/5')
-    assert.deepEqual(f, { amount: '4', second: '5', alternating: true, unreadable: null })
-    assert.deepEqual(weightStepToSave({ ...f, amount: '2,5' }, { stored: 'Alt 4/5', touched: true }), { value: 'Alt 2.5/5' })
-    assert.deepEqual(weightStepToSave({ ...f, second: '10' }, { stored: 'Alt 4/5', touched: true }), { value: 'Alt 4/10' })
+    assert.deepEqual(f, { amount: '5', second: '4', alternating: true, unreadable: null })
     assert.deepEqual(weightStepToSave(f, { stored: 'Alt 4/5', touched: false }), { unchanged: true, value: 'Alt 4/5' })
-    assert.deepEqual(weightStepFields('Alt 2.5/5'), { amount: '2.5', second: '5', alternating: true, unreadable: null })
+    assert.deepEqual(weightStepToSave({ ...f, amount: '2,5' }, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 2.5/4' })
+    assert.deepEqual(weightStepToSave({ ...f, second: '10' }, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 5/10' })
+    assert.deepEqual(weightStepToSave(f, { stored: 'Alt 4/5', touched: true }), { value: 'Steps 5/4' })
+    assert.deepEqual(weightStepFields('Steps 2.5/5'), { amount: '2.5', second: '5', alternating: true, unreadable: null })
   })
 
   it('a bad box blocks Save', () => {
@@ -199,7 +222,8 @@ describe('req-193 scope 4 — the two-step stored form', () => {
   })
 
   it('detail line', () => {
-    assert.equal(describeWeightStep('Alt 2.5/5'), 'Two steps 2.5/5 kg')
+    assert.equal(describeWeightStep('Steps 2.5/5'), 'Two steps 2.5/5 kg')
+    assert.equal(describeWeightStep('Alt 4/5'), 'Two steps 5/4 kg')
     assert.equal(describeLightestWeight(7.5), 'Lightest 7.5 kg')
     assert.equal(describeLightestWeight(null), null)
     assert.equal(describeLightestWeight(undefined), null)
@@ -209,7 +233,7 @@ describe('req-193 scope 4 — the two-step stored form', () => {
 
 describe('req-193 — the new field travels: update, migrateState, load, export/import', () => {
   const exercises = [
-    { id: 'e1', name: 'Chest press', type: 'machine', weightStep: 'Alt 2.5/5', lightestWeight: 10 },
+    { id: 'e1', name: 'Chest press', type: 'machine', weightStep: 'Steps 2.5/5', lightestWeight: 10 },
     { id: 'e2', name: 'Squat', type: 'free', weightStep: '2.5' },
     { id: 'e3', name: 'Row', type: 'machine', weightStep: '5', lightestWeight: null },
   ]
@@ -226,7 +250,7 @@ describe('req-193 — the new field travels: update, migrateState, load, export/
   it('migrateState passes it through and adds it to no exercise that lacks it', () => {
     const migrated = migrateState({ ...emptyState(), exercises: structuredClone(exercises) })
     assert.equal(migrated.exercises[0].lightestWeight, 10)
-    assert.equal(migrated.exercises[0].weightStep, 'Alt 2.5/5')
+    assert.equal(migrated.exercises[0].weightStep, 'Steps 2.5/5')
     assert.equal('lightestWeight' in migrated.exercises[1], false)
     assert.equal(migrated.exercises[2].lightestWeight, null)
   })
@@ -243,7 +267,7 @@ describe('req-193 — the new field travels: update, migrateState, load, export/
     try {
       const state = loadState()
       assert.equal(state.exercises[0].lightestWeight, 10)
-      assert.equal(state.exercises[0].weightStep, 'Alt 2.5/5')
+      assert.equal(state.exercises[0].weightStep, 'Steps 2.5/5')
     } finally {
       globalThis.localStorage = previous
     }
@@ -268,7 +292,7 @@ describe('req-193 — the editors\' series preview (first 5 of validWeights)', (
   })
 
   it('two steps from a lightest weight', () => {
-    assert.equal(weightSeriesPreview({ weightStep: 'Alt 2.5/5', lightestWeight: 10 }), 'Weights: 10, 12.5, 17.5, 20, 25 …')
+    assert.equal(weightSeriesPreview({ weightStep: 'Steps 2.5/5', lightestWeight: 10 }), 'Weights: 10, 12.5, 17.5, 20, 25 …')
   })
 
   it("legacy 'Alt 4/5', no lightest weight → from 9, +5 first", () => {
@@ -286,5 +310,40 @@ describe('req-193 — the editors\' series preview (first 5 of validWeights)', (
 
   it('a short series has no ellipsis', () => {
     assert.equal(weightSeriesPreview({ weightStep: '10', lightestWeight: 220 }), 'Weights: 220, 230, 240, 250')
+  })
+})
+
+describe('req-193 review fixes 2 and 3', () => {
+  it('the preview reads weightOptions, exactly as the recommendation does', () => {
+    const exercise = { type: 'machine', weightStep: '5', lightestWeight: 7.5, weightOptions: [30, 10, 20] }
+    assert.equal(weightSeriesPreview(exercise), 'Weights: 10, 20, 30')
+    assert.equal(moveToValidWeight(10, exercise, 1), 20)
+  })
+
+  it('bodyweight and assisted exercises: the recommendation never moves kg, the preview says so', () => {
+    for (const exercise of [
+      { type: 'bodyweight', weightStep: '5' },
+      { type: 'machine', name: 'Assisted Pull-Up', weightStep: '5' },
+      { type: 'machine', libraryId: 'own-assisted-dip', weightStep: 'Alt 4/5' },
+    ]) {
+      assert.equal(weightSeriesPreview(exercise), SAME_KG_TEXT, JSON.stringify(exercise))
+      const r = recommendNextPrescription({ targets: ['10'], weights: [20], sets: [{ weight: 20, reps: '10', rpe: 1 }], exercise })
+      assert.deepEqual(r.weights, [20])
+    }
+    assert.equal(SAME_KG_TEXT, 'Suggestions keep the same kg')
+  })
+
+  it('a failed set below the lightest weight holds (main jumped up to the lightest)', () => {
+    const exercise = { type: 'machine', weightStep: '5', lightestWeight: 20 }
+    assert.equal(moveToValidWeight(15, exercise, -1), 15)
+    assert.equal(mainMove(15, exercise, -1), 10, 'main ignored lightestWeight (5, 10, 15 …)')
+    const r = recommendNextPrescription({ targets: ['10'], weights: [15], sets: [{ weight: 15, reps: '6', rpe: 5 }], exercise })
+    assert.deepEqual(r.weights, [15])
+    // at or above the first option, down moves as before
+    assert.equal(moveToValidWeight(20, exercise, -1), 20)
+    assert.equal(moveToValidWeight(30, exercise, -1), 25)
+    // the same case without a lightest weight: 'Alt 4/5' from 9, a failed 5 kg set
+    assert.equal(mainMove(5, { weightStep: 'Alt 4/5' }, -1), 9, 'main: a jump up to 9')
+    assert.equal(moveToValidWeight(5, { weightStep: 'Alt 4/5' }, -1), 5)
   })
 })
