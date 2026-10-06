@@ -68,9 +68,10 @@ describe('req-182 AC1 (req-187) — the offer, rendered against the real store',
     await mount(h(Workout, { routineId: 'fba' }))
     const sheet = view.all('[role="alertdialog"]')[0]
     assert.ok(sheet, 'the sheet')
-    assert.equal(sheet.querySelector('.ui-sheet__title').textContent, 'Update Chest Press?', 'names the exercise')
-    assert.equal(sheet.querySelector('.ui-sheet__message').textContent, 'You lifted 32.5 kg · Full body A says 30 kg')
-    await view.click(view.button('Update routine'))
+    // req-189 edit: the sheet's new words (title the kg, body names routine and exercise; [No] [Yes]).
+    assert.equal(sheet.querySelector('.ui-sheet__title').textContent, 'Use 32.5 kg next time?')
+    assert.equal(sheet.querySelector('.ui-sheet__message').textContent, 'Full body A will start Chest Press at 32.5 kg.', 'names the routine and exercise')
+    await view.click(view.button('Yes'))
     await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
     assert.equal(view.all('li').some((li) => li.textContent.includes('You lifted')), false, 'no overview offer row')
     assert.deepEqual(JSON.parse(localStorage.getItem('workout-mvp-v9')).routines[0].exercises[0].suggestedWeights, [32.5])

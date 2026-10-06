@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useStore } from '../../store-context'
-import { needsSetup, resolvePicks } from '../../mid-workout-pick.js'
+import { needsSetup, resolvePicks, swapPicks } from '../../mid-workout-pick.js'
 import { Actions, Button, Field, NavLink, SectionHeader } from '../../ui/index.jsx'
 import { ExercisePicker } from '../ExercisePicker'
 
 const NO_HISTORY = 'No history — you set sets and rest next'
+// req-189 (DEC-106) — on a Swap a no-history pick takes the replaced exercise's sets and rest.
+const NO_HISTORY_SWAP = 'No history — same sets and rest'
 
 // req-188 / DEC-104 — the picker for Swap (max 1) and Add exercise (multi). The picker writes
 // nothing (onPick). History picks go straight through with their history prescription; when
@@ -13,7 +15,9 @@ const NO_HISTORY = 'No history — you set sets and rest next'
 // straight away when nothing needs it) are records created (a library pick → a new exercise,
 // an archived "Use mine" → restored, as the routine picker's add does) and `onDone` called
 // with [{ exerciseId, item }]. Cancel / Back on either screen create, add and swap nothing.
-export function MidWorkoutPicker({ max = Infinity, addLabel, cancelTo, onDone }) {
+// req-189 (DEC-106) — `copyFrom` (Swap passes the replaced item): no step at all; a no-history
+// pick copies that item's sets and rest (mid-workout-pick.js swapPicks). Add passes none.
+export function MidWorkoutPicker({ max = Infinity, addLabel, cancelTo, onDone, copyFrom = null }) {
   const store = useStore()
   const [pending, setPending] = useState(null) // the picks awaiting the step
   const [values, setValues] = useState([])
@@ -36,10 +40,11 @@ export function MidWorkoutPicker({ max = Infinity, addLabel, cancelTo, onDone })
         cancelTo={cancelTo}
         max={max}
         addLabel={addLabel}
-        startingLabel={NO_HISTORY}
+        startingLabel={copyFrom ? NO_HISTORY_SWAP : NO_HISTORY}
         onPick={(picks) => {
           if (!picks.length) return
-          if (picks.some(needsSetup)) {
+          if (copyFrom) commit(swapPicks(picks, copyFrom))
+          else if (picks.some(needsSetup)) {
             setValues(picks.map(() => ({ sets: '', rest: '' })))
             setPending(picks)
           } else commit(picks)

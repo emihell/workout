@@ -123,11 +123,33 @@ export function FileButton({ label = 'Import', accept, onFiles, variant = 'secon
 // ---- Inputs ----
 
 // Field — labeled text input: caption label above, ≥44px input.
-export function Field({ label, className, ...rest }) {
+// req-189 — `selectOnFocus`: focusing the box selects its content, so the first keystroke
+// replaces the value ("12" into "10" reads 12, not 1012). The mouseup right after a click-focus
+// would collapse that selection to a caret in some browsers, so that one mouseup is ignored.
+export function Field({ label, className, selectOnFocus = false, onFocus, onMouseUp, onBlur, ...rest }) {
+  const fresh = useRef(false)
+  const handlers = selectOnFocus
+    ? {
+        onFocus: (e) => {
+          onFocus?.(e)
+          e.target.select()
+          fresh.current = true
+        },
+        onMouseUp: (e) => {
+          onMouseUp?.(e)
+          if (fresh.current) e.preventDefault()
+          fresh.current = false
+        },
+        onBlur: (e) => {
+          onBlur?.(e)
+          fresh.current = false
+        },
+      }
+    : { onFocus, onMouseUp, onBlur }
   return (
     <label className="ui-field">
       {label ? <span className="ui-field__label">{label}</span> : null}
-      <input className={cx('ui-input', className)} {...rest} />
+      <input className={cx('ui-input', className)} {...rest} {...handlers} />
     </label>
   )
 }
@@ -409,6 +431,7 @@ function DurationTimer({ seconds, onSecondsChange }) {
       <NumberField
         label="Duration (s)"
         min="1"
+        selectOnFocus
         value={seconds}
         onChange={(e) => onSecondsChange(e.target.value)}
       />
@@ -439,6 +462,8 @@ export function SetLogForm({
   initialEffort = 3,
   routineKg,
   lastKg = '',
+  // req-189 — "kg per dumbbell" on a dumbbell exercise (kg-label.js); the caller decides.
+  kgLabel = 'kg',
   canGoBack = true,
   onComplete,
   onSkip,
@@ -459,6 +484,9 @@ export function SetLogForm({
   const [weightError, setWeightError] = useState(null)
   // req-155 — the same for a timed set's Duration (`30,5` is 31 s; `abc` is refused).
   const [durationError, setDurationError] = useState(null)
+  // req-189 — Reps blank on Complete: an inline "Enter reps" (no browser bubble — the box is no
+  // longer `required`); cleared by the next reps edit. Nothing is prefilled (DESIGN §1).
+  const [repsError, setRepsError] = useState(null)
   // req-125 — `onChange` (optional) hears every user edit with the form's full current
   // values, so the caller can keep a draft of the un-logged set. It fires from the edit
   // itself (not an effect), so mounting or remounting writes nothing. `durationSec` is the
@@ -471,7 +499,10 @@ export function SetLogForm({
     if (field === 'weight') {
       setWeight(value)
       setWeightError(null)
-    } else if (field === 'reps') setReps(value)
+    } else if (field === 'reps') {
+      setReps(value)
+      setRepsError(null)
+    }
     else if (field === 'effort') setEffort(value)
     else {
       setDuration(value)
@@ -495,11 +526,14 @@ export function SetLogForm({
           onNext?.()
           return
         }
+        // req-189 — what `required` blocked before, the same cases (a non-timed set, blank box).
+        const missingReps = !timed && String(reps ?? '').trim() === '' ? `Enter ${repsLabel.toLowerCase()}` : null
         const error = weighted ? kgError(weight) : null
         // req-155 — a blank Duration logs 0 s, as before; unreadable text logs nothing.
         const seconds = timed ? secondsToSave(duration, 0) : null
-        if (error || seconds?.error) {
+        if (error || seconds?.error || missingReps) {
           setWeightError(error)
+          setRepsError(missingReps)
           setDurationError(seconds?.error ?? null)
           return
         }
@@ -515,7 +549,7 @@ export function SetLogForm({
     >
       <div className="ui-setlog__nums">
         {weighted ? (
-          <NumberField label="kg" value={weight} onChange={(e) => edit('weight', e.target.value)} />
+          <NumberField label={kgLabel} selectOnFocus value={weight} onChange={(e) => edit('weight', e.target.value)} />
         ) : null}
         {timed ? (
           <DurationTimer seconds={duration} onSecondsChange={(value) => edit('duration', value)} />
@@ -523,12 +557,17 @@ export function SetLogForm({
           <Field
             label={repsLabel}
             className="ui-input--num"
+            selectOnFocus
             value={reps}
             onChange={(e) => edit('reps', e.target.value)}
-            required
           />
         )}
       </div>
+      {repsError ? (
+        <p className="ui-field-error" role="alert">
+          {repsError}
+        </p>
+      ) : null}
       {/* req-173 (DEC-093) — a weighted set with an empty kg box says so, quietly. Not a
           block or a confirm: Complete still logs it in one tap, as 0 (set-values.js
           liveSetWeight), exactly as before. Never a default weight (DESIGN core rule). */}

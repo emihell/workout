@@ -6,7 +6,7 @@ import { dateKey, planDateFor } from '../../schedule'
 import { routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
-import { allItemsDone, autoCompleteArmed, itemAllSkipped, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
+import { allItemsDone, autoCompleteArmed, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
 import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
@@ -14,6 +14,7 @@ import { weekdayDate } from '../history/helpers'
 import { MissingItem, NotInWorkout } from './helpers'
 import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, itemReplacePath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
+import { doneRowSuffix } from './row-label.js'
 import { WorkoutPill } from './rest'
 import { askChoice, getPendingConfirm, subscribeConfirm } from '../../ui/confirm.js'
 import { recordButton } from '../../analytics'
@@ -203,7 +204,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
                 <ExerciseLabel item={item} />
                 {/* req-109 — a done row whose sets are ALL skipped reads "skipped"; one
                     logged set and it reads done (derived from the sets, no marker). */}
-                {completed ? (itemAllSkipped(active, item) ? ' · skipped' : ' · done') : ''}
+                {/* req-189 — one swapped away reads "swapped" (derived: row-label.js). */}
+                {completed ? doneRowSuffix(active, item) : ''}
               </Row>
               {/* req-187 — no inline routine-kg offer here any more: it is a sheet on the
                   exercise's last Complete (item.jsx askRoutineUpdate). */}
