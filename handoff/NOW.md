@@ -18,7 +18,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 **READY, held:**
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
-- **Next: req-189 → req-190** (READY, ui; Lena persona run 2026-10-06 → DEC-105/106): first-workout fixes + Swap copies
+- **Batch: building req-190** (189 shipped; ui; Lena persona run 2026-10-06 → DEC-105/106): first-workout fixes + Swap copies
   sets/rest; machines-first setup, plan starts today, no silent empty day. **Batch approved 2026-10-06** (Emilio: "build"). Then req-184 session 2, req-10, req-146 later.
 - **Waiting (Emilio, DEC-075):** req-146 backend, req-149 progression rules. `req-10` first-time setup — rescan first. **[ux-feel]**
 - **Later (BACKLOG §Exercise library):** req-134 browse + muscle filter → 132 → 137 → 131 → 135 → avatars.
