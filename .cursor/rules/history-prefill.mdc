@@ -16,7 +16,7 @@ A **work set's kg**, highest first:
 4. the kg just logged this session (DEC-002 / req-152 carry), only when the routine has no kg there;
 5. blank. History does **not** seed a work set's kg.
 
-A **warm-up set's kg** stays on history (`historySetPrefill`) — the routine holds no warm-up kg. **Reps** prefill from that set's target and never carry (DEC-052). **Effort** defaults to Moderate only where Effort is shown (req-156).
+A **warm-up set's kg** stays on history (`historySetPrefill`) — the routine holds no warm-up kg. **Reps** prefill from that set's target and never carry (DEC-052). **Effort** is never prefilled: the set is logged by tapping its effort button (req-192, DEC-108 §1; was a preselected Moderate); warm-up and cardio sets carry none (req-156).
 
 ## Never invented
 

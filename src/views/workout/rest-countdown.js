@@ -4,7 +4,7 @@ import { restRemaining } from '../../workout-log'
 
 // Reads the workout-level rest state (restEndsAt / restPausedRemaining, both
 // already persisted on activeWorkout) and ticks a display clock while a rest is
-// running. Used by the WorkoutPill / SkipRest for display; the countdown logic lives in one place.
+// running. Used by the WorkoutPill and the log screen for display; the countdown logic lives in one place.
 export function useRestCountdown(active) {
   const restEndsAt = active?.restEndsAt ?? null
   const restPausedRemaining = active?.restPausedRemaining ?? null

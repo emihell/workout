@@ -25,9 +25,9 @@ import {
 
 const EFFORT = [
   { value: 2, label: 'Easy' },
-  { value: 3, label: 'Moderate' },
+  { value: 3, label: 'Medium' },
   { value: 4, label: 'Hard' },
-  { value: 5, label: 'Max' },
+  { value: 5, label: 'Failure' },
 ]
 
 // The block label is a small eyebrow caption (e.g. "BUTTON"), not a section

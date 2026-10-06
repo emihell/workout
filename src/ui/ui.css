@@ -802,11 +802,55 @@ html:has(.ui-picker-bar) {
   margin: 0 auto;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   gap: var(--ui-s2);
   padding: var(--ui-s2) var(--ui-s3) 0;
+  background: var(--ui-bg);
 }
-.ui-setlog__actions .ui-btn {
-  flex: 1 1 0;
+/* req-192 (DEC-108 §1) — the bar is two tiers: a quiet Previous · Skip set row (viewing:
+ * Previous · Next / Save), then the caption and the effort buttons that log the set (or one
+ * "Done"). Retreat left, the other control right (margin-left: auto keeps it right when
+ * Previous is absent). */
+.ui-setlog__nav {
+  display: flex;
+  gap: var(--ui-s2);
+}
+.ui-setlog__nav > .ui-btn:last-child {
+  margin-left: auto;
+  min-width: 7em;
+}
+.ui-setlog__caption {
+  margin: 0;
+  font-size: var(--ui-text-caption);
+  line-height: 1.2;
+  color: var(--ui-ink-2);
+}
+/* Four equal buttons in one row with full labels; under 360px wide they wrap 2×2 rather
+ * than clip "Medium" / "Failure". Bold and outlined so they read as actions, never a
+ * segmented switch; the selected one (viewing a logged set) is the ink-filled primary. */
+.ui-effort {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ui-s2);
+}
+@media (max-width: 359px) {
+  .ui-effort {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.ui-effort__btn {
+  padding: 0 var(--ui-s1);
+  font-weight: 600;
+  border-color: var(--ui-ink);
+  white-space: nowrap;
+}
+/* The log screen's content clears the taller bar: the dock offset + the two tap rows, the
+ * caption line, the bar's padding and gaps, and one step of slack. */
+.ui-main:has(.ui-setlog__actions) {
+  padding-bottom: calc(
+    var(--ui-dock-bottom) + env(safe-area-inset-bottom, 0px) + 2 * var(--ui-tap) + 1.2 * var(--ui-text-caption) +
+      3 * var(--ui-s2) + var(--ui-s3)
+  );
 }
 
 /* req-80 — the exercise title row: the name takes the space, a small control (the

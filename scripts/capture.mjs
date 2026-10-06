@@ -180,11 +180,11 @@ async function buildActiveSeed(browser, base, idleSeed) {
     location.hash = '#/workout/sess-upper/item/si-sess-upper-1-ex-chest-press'
   })
   await wait(SETTLE_MS)
-  await clickText(page, 'Complete')
+  await clickText(page, 'Done') // req-192 — the warm-up's log button (Complete is gone)
   const state = await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY)
   await page.close()
   const doc = JSON.parse(state)
-  if (!doc.activeWorkout) throw new Error('active seed: no activeWorkout after Start + Complete')
+  if (!doc.activeWorkout) throw new Error('active seed: no activeWorkout after Start + Done')
   return state
 }
 

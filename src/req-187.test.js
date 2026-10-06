@@ -158,7 +158,7 @@ describe('req-187 (rendered) — last Complete → the sheet; Update / Keep; no 
     for (const kg of kgs) {
       await view.type(view.input('kg'), kg)
       assert.equal(view.all('[role="alertdialog"]').length, 0, 'no sheet before the last Complete')
-      await view.click(view.button('Complete'))
+      await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
     }
   }
 

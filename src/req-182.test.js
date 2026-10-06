@@ -65,7 +65,7 @@ describe('req-182 AC1 (req-187) — the offer, rendered against the real store',
     await act(async () => captured.store.startWorkout('fba'))
     await mount(h(WorkoutItemLog, { routineId: 'fba', itemId: 'ia' }))
     await view.type(view.input('kg'), '32,5')
-    await view.click(view.button('Complete'))
+    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
     await mount(h(Workout, { routineId: 'fba' }))
     const sheet = view.all('[role="alertdialog"]')[0]
     assert.ok(sheet, 'the sheet')

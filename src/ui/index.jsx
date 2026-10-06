@@ -6,7 +6,7 @@
 // the #/components showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
 import { NavLink as BaseNavLink } from '../views/shared'
 import { defaultBeep, unlockAudio } from '../rest-cue.js'
 import { answerConfirm, getPendingConfirm, navigationCancels, subscribeConfirm } from './confirm.js'
@@ -57,7 +57,7 @@ export function Actions({ retreat, lateral, forward, className }) {
 }
 
 // SegmentedControl — radio group as equal-width segments; selected set apart by
-// fill/weight (grayscale). Covers effort (Easy/Moderate/Hard/Max) and feel.
+// fill/weight (grayscale). Covers effort on set edit (Easy/Medium/Hard/Failure) and feel.
 // `clearable` prepends a leading "none" segment (`—`, value `''`) that resets the
 // control to empty — the idiom three call sites used to hand-roll. Off by default,
 // so non-clearable controls are unchanged. The `—` label / `''` value are the
@@ -367,28 +367,34 @@ export function ConfirmSheet() {
 // whole pill is one tap-target that opens the current exercise — it no longer skips the
 // rest (that moved to "Skip rest" on the exercise screen). Presentational: the real
 // screen wires onOpen; the showcase passes a stub.
-export function WorkoutPill({ clock = null, setText = '', go = false, onOpen }) {
+// req-192 (DEC-108 §3) — `skip`: resting, on the current exercise's own log screen, a tap
+// skips the rest; the pill then reads "1:12 · skip" in place of the set count.
+export function WorkoutPill({ clock = null, setText = '', go = false, skip = false, onOpen }) {
   const lead = go ? 'GO' : clock
+  const label = skip
+    ? `Rest ${clock} — skip the rest`
+    : `${go ? 'Go' : `Rest ${clock}`}, ${setText} — open the exercise`
   return (
     <button
       type="button"
       className={cx('ui-restpill', go && 'ui-restpill--go')}
       onClick={onOpen}
-      aria-label={`${go ? 'Go' : `Rest ${clock}`}, ${setText} — open the exercise`}
+      aria-label={label}
     >
       <span className="ui-restpill__time">{lead}</span>
       <span className="ui-restpill__sep" aria-hidden="true">
         ·
       </span>
-      <span className="ui-restpill__set">{setText}</span>
+      <span className="ui-restpill__set">{skip ? 'skip' : setText}</span>
     </button>
   )
 }
 
 // SetLogForm — the single most important gym surface: a kg NumberField, a big reps
-// field, an effort SegmentedControl, and Previous/Skip/Complete Buttons pinned to
-// the absolute bottom of the screen (req-80; DESIGN §4 order: retreat left, forward
-// right, the lateral Skip between).
+// field, and a bar pinned to the absolute bottom of the screen (req-80): a quiet
+// Previous · Skip set row over four effort buttons that LOG the set (req-192,
+// DEC-108 §1: Easy · Medium · Hard · Failure → onComplete with that effort), or one
+// "Done" where effort isn't shown.
 // Presentational: it owns only the in-progress field values (local state, seeded
 // from the `initial*` props), remounted per-set by the caller with a `key`. All
 // the domain logic — history prefill, carry, restore, targets, the effort→RPE
@@ -401,7 +407,7 @@ export function WorkoutPill({ clock = null, setText = '', go = false, onOpen }) 
 //
 // Props: `weighted` shows the kg field; `showEffort` shows the effort control
 // (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
-// "Duration"; `effortOptions` overrides the segments; `onChange` (req-125) hears
+// "Duration"; `effortOptions` overrides the effort buttons; `onChange` (req-125) hears
 // edits. The reps field is a full keyboard (not decimal-only) so durations like
 // "30 min" can be typed.
 // req-85 — the in-set count-down for a timed exercise. A SECOND, concurrent timer
@@ -468,14 +474,16 @@ export function SetLogForm({
   repsLabel = 'Reps',
   effortOptions = [
     { value: 2, label: 'Easy' },
-    { value: 3, label: 'Moderate' },
+    { value: 3, label: 'Medium' },
     { value: 4, label: 'Hard' },
-    { value: 5, label: 'Max' },
+    { value: 5, label: 'Failure' },
   ],
   initialWeight = '',
   initialReps = '',
   initialDuration = 0,
-  initialEffort = 3,
+  // req-192 — read only while `viewing` (the logged set's effort, shown selected). The current
+  // set has no preselected effort: tapping an effort button IS the answer (DEC-108 §1).
+  initialEffort = '',
   routineKg,
   lastKg = '',
   // req-189 — "kg per dumbbell" on a dumbbell exercise (kg-label.js); the caller decides.
@@ -509,6 +517,7 @@ export function SetLogForm({
   // typed seconds as entered, present only on a timed form.
   // req-186 — any edit while `viewing` a logged set turns Next into Save.
   const [edited, setEdited] = useState(false)
+  const captionId = useId()
   function edit(field, value) {
     const next = { weight, reps, effort, duration, [field]: value }
     setEdited(true)
@@ -532,6 +541,30 @@ export function SetLogForm({
     })
   }
   const hints = kgHints({ weighted, kg: weight, routineKg, lastKg })
+  // req-192 — the one logging path: validation (kg error, "Enter reps", duration) first, then
+  // onComplete. `chosen` is the effort button tapped (current set), the selected effort (Save on
+  // a viewed set), or null where effort isn't shown ("Done").
+  function submit(chosen) {
+    // req-189 — what `required` blocked before, the same cases (a non-timed set, blank box).
+    const missingReps = !timed && String(reps ?? '').trim() === '' ? `Enter ${repsLabel.toLowerCase()}` : null
+    const error = weighted ? kgError(weight) : null
+    // req-155 — a blank Duration logs 0 s, as before; unreadable text logs nothing.
+    const seconds = timed ? secondsToSave(duration, 0) : null
+    if (error || seconds?.error || missingReps) {
+      setWeightError(error)
+      setRepsError(missingReps)
+      setDurationError(seconds?.error ?? null)
+      return
+    }
+    onComplete?.({
+      weight,
+      reps: timed ? '' : reps,
+      // req-156 (audit F-TRUST-2) — a hidden Effort (warm-up / cardio) is not an answer:
+      // null. req-192 — otherwise the effort button tapped (or, viewing, the one selected).
+      effort: showEffort ? chosen : null,
+      durationSec: timed ? seconds.value : undefined,
+    })
+  }
   return (
     <form
       className="ui-setlog"
@@ -542,25 +575,10 @@ export function SetLogForm({
           onNext?.()
           return
         }
-        // req-189 — what `required` blocked before, the same cases (a non-timed set, blank box).
-        const missingReps = !timed && String(reps ?? '').trim() === '' ? `Enter ${repsLabel.toLowerCase()}` : null
-        const error = weighted ? kgError(weight) : null
-        // req-155 — a blank Duration logs 0 s, as before; unreadable text logs nothing.
-        const seconds = timed ? secondsToSave(duration, 0) : null
-        if (error || seconds?.error || missingReps) {
-          setWeightError(error)
-          setRepsError(missingReps)
-          setDurationError(seconds?.error ?? null)
-          return
-        }
-        onComplete?.({
-          weight,
-          reps: timed ? '' : reps,
-          // req-156 (audit F-TRUST-2) — a hidden Effort (warm-up / cardio) is not an answer:
-          // null, never the seeded default the user never saw ("Moderate", rpe 3).
-          effort: showEffort ? effort : null,
-          durationSec: timed ? seconds.value : undefined,
-        })
+        // req-192 (DEC-108 §1) — the current set with effort shown is logged only by tapping an
+        // effort button: Enter in a field has no effort to log with, so it logs nothing.
+        if (!viewing && showEffort) return
+        submit(showEffort ? effort : null)
       }}
     >
       <div className="ui-setlog__nums">
@@ -610,35 +628,57 @@ export function SetLogForm({
           {durationError}
         </p>
       ) : null}
-      {showEffort ? (
-        <>
-          <SectionHeader>Effort</SectionHeader>
-          <SegmentedControl options={effortOptions} value={effort} onChange={(value) => edit('effort', value)} ariaLabel="Effort" />
-        </>
-      ) : null}
       {/* req-80 — pinned to the absolute bottom (thumb reach) via .ui-setlog__actions.
-          DESIGN §4 order: retreat (Previous) left, forward (Complete) right, Skip
-          between (it neither logs nor retreats). Markup order = visual/focus order. */}
+          req-192 (DEC-108 §1) — two tiers. Top, a quiet row: Previous (retreat, left) and Skip
+          set (lateral) — or, viewing a logged set, Previous · Next / Save as req-186. Bottom: the
+          set is LOGGED by tapping its effort, Easy · Medium · Hard · Failure (real buttons, a
+          caption so they read as actions, nothing preselected); a set without effort (warm-up,
+          cardio) gets one "Done". Viewing, the effort buttons select (the logged one shown
+          selected) and Save commits. Markup order = visual/focus order (DESIGN §4). */}
       <div className="ui-setlog__actions">
-        {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
-        {viewing ? (
-          edited ? (
-            <Button type="submit" variant="primary">
-              Save
-            </Button>
+        <div className="ui-setlog__nav">
+          {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
+          {viewing ? (
+            edited ? (
+              <Button type="submit" variant="primary">
+                Save
+              </Button>
+            ) : (
+              <Button variant="secondary" onClick={onNext}>
+                Next
+              </Button>
+            )
           ) : (
-            <Button variant="secondary" onClick={onNext}>
-              Next
-            </Button>
-          )
-        ) : (
+            /* req-188 — the screen's only Skip: this set (Skip exercise is on the list). */
+            <Button variant="quiet" onClick={onSkip}>Skip set</Button>
+          )}
+        </div>
+        {showEffort ? (
           <>
-            {/* req-188 — the screen's only Skip: this set (Skip exercise is on the list). */}
-            <Button onClick={onSkip}>Skip set</Button>
-            <Button type="submit" variant="primary">
-              Complete
-            </Button>
+            <p className="ui-setlog__caption" id={captionId}>
+              {viewing ? 'Effort' : 'Log set \u2014 how did it feel?'}
+            </p>
+            <div className="ui-effort" role="group" aria-labelledby={captionId}>
+              {effortOptions.map((opt) => {
+                const selected = viewing && String(opt.value) === String(effort)
+                return (
+                  <Button
+                    key={opt.value}
+                    variant={selected ? 'primary' : 'secondary'}
+                    className={cx('ui-effort__btn', selected && 'is-selected')}
+                    aria-pressed={viewing ? selected : undefined}
+                    onClick={() => (viewing ? edit('effort', opt.value) : submit(opt.value))}
+                  >
+                    {opt.label}
+                  </Button>
+                )
+              })}
+            </div>
           </>
+        ) : viewing ? null : (
+          <Button type="submit" variant="primary" block className="ui-setlog__done">
+            Done
+          </Button>
         )}
       </div>
     </form>
