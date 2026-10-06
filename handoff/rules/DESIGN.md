@@ -40,11 +40,11 @@ This is the one that decides the hard cases.
   user's own input rather than invented data: (1) the live set-log screen prefills Reps from that set's target, and Effort Moderate
   **only where Effort is shown** (warm-up/cardio carry no effort, req-156); (2) the **kg** the user just entered this
   session carries to the next working set when the routine has **no kg at that index** — a no-history exercise (DEC-002),
-  an Add set, or a routine that grew (req-152); reps never carry (DEC-052); (3) an in-session kg change carries to the
+  an Add set, or a routine that grew (req-152); reps carry only when the set has no reps target — the reps the user just logged this session (DEC-107 §2; else never, DEC-052); (3) an in-session kg change carries to the
   remaining sets (DEC-052); (4) an unsaved draft restores what was typed (req-125). Nowhere else does a library cue, a
   recommendation, or a type default become a prefilled value.
 - **Never invent warmup (e.g. 50% / 12 reps), rest (e.g. 90s), or notes (a copy of
-  cues).** Absent is absent. One exception (DEC-097 §4): adding a no-history exercise to a routine shows a
+  cues).** Absent is absent. One exception (DEC-097 §4; mid-workout Add too, DEC-107 §1): adding a no-history exercise to a routine shows a
   **starting plan** ("3 × 10, 90 s rest — change any time"), visible and accepted by adding — never a kg. Editing an existing record may show that record's saved
   values — that's history, not invention.
 

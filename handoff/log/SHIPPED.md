@@ -2165,3 +2165,12 @@ Gate (ui): `check: green — lint, skills, no import cycles, 90 test file(s), an
 QA = a fresh Lena persona run on the branch build (empty first launch): setup 13 taps + 4 searches (was 20 + 3, with day B lost),
 plan started today ("Done Tue, Oct 6"), reload kept it. No trigger files → no reviewer; req-181/182 test edits read (follow the
 new sheet/start-today). `reports/req-190.md`.
+
+## req-191 — Lena run 2 fixes: body-part search, no instant finish on a skip, tap a done set, reps carry  (2026-10-06)
+
+**req-191** (DEC-107) — group-word search (staples, machines first, no cardio, ≤25); a workout ending on a skip shows the summary
+without countdown; done set rows open the logged-set view; "Starts today (Tue), then every Tue and Fri"; Add step prefilled 3/90;
+reps carry when no target; "My workout", "Total lifted (all sets added up)", "Add" at 0, search ×. 4 commits `b603671`…`ba3f527`.
+Gate (ui): `check: green — lint, skills, no import cycles, 91 test file(s), and the build all passed.` (1346/0); smoke green; Planner QA
+("back"/"legs" lists, × clears, Add step 3/90). Reviewer (independent): 1 should-fix fixed, "No blockers."; follow-up touched
+workout-log.js comments only. `reports/req-191.md`.

@@ -1,6 +1,6 @@
 # req-191 — Lena run 2 fixes: search by body part, no instant finish on a skip, tap a done set, plain days, reps carry
 
-**Status: READY** (2026-10-06). **Lane: ui.** From req-184 §Persona run 2 and DEC-107 (Emilio, 2026-10-06). Trigger files:
+**Status: BUILT AND MERGED, 2026-10-06 — branch `req-191` (`b603671`…`ba3f527`, 4 commits).** (2026-10-06). **Lane: ui.** From req-184 §Persona run 2 and DEC-107 (Emilio, 2026-10-06). Trigger files:
 `workout-log.js` (seed / carry, auto-complete) → **independent reviewer** before merge; no stored-record write → no backup
 reminder. No schema change, no new persisted field (if one seems needed, stop and report).
 
@@ -56,3 +56,10 @@ Home order (req-60, Emilio's). Rest editing mid-exercise (BACKLOG). Exercise des
 ## Decisions made on Emilio's behalf `(unconfirmed)`
 Group-word list and machines-first order; the no-countdown summary after a skip; days wording; "My workout" names; "Total
 lifted (all sets added up)"; clear (×).
+
+## Built — calls `(unconfirmed)`
+Group words (+ arm, leg, shoulder, abs, ab, abdominals, stomach) → that group's staples, no cardio, ≤25 then "Show N more";
+named lead machines (Legs: Leg Press, Leg Extension, Seated Leg Curl; Back: Lat Pulldown, Seated Cable Row, Machine Row; …),
+other machines A→Z, then free weights, bodyweight. Set-level Skip on the very last set also skips the countdown. Reps carry
+from the last non-skipped set (as kg). A cardio Add pick gets 1 set, blank rest. **Done set row tap target stays 19.5 px**
+(a 44 px hit area overlapped the next row and opened the wrong set; Previous stays the large target) — real-device feel.
