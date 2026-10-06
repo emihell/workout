@@ -28,7 +28,7 @@ export const ASSISTANT = {
     summary:
       'Browser-only gym log. Exercises are the library. Routines are reusable templates with the full prescription (state.routines). Schedule is only the calendar. A live workout is a snapshot of a routine at Start. History is finished snapshots. Extra sets stay on today only until Finish; then skipped unlogged planned sets are recorded. Each working set starts at the routine kg (suggestedWeights) next time.',
     exercises:
-      'Library of movements. type is machine | free | bodyweight | cardio. weightStep is a kg step, Alt 4/5, or n/a. Routines point at exercises by exerciseId.',
+      'Library of movements. type is machine | free | bodyweight | cardio. weightStep is a kg step, Steps A/B (two step sizes that alternate, A added first), Alt 4/5 (legacy: 5 then 4, from 9 when no lightestWeight), or n/a. lightestWeight (optional, kg) is the first weight of the stack; suggestions count from it. Routines point at exercises by exerciseId.',
     routines:
       'Reusable templates. Ordered list of routine exercises. This is the source of truth for next time. Schedule does not store kg or reps. JSON field is state.routines.',
     routineExercise: {

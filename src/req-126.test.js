@@ -99,8 +99,13 @@ describe('req-126 editor fields and Save', () => {
     const f = weightStepFields('n/a')
     assert.deepEqual(weightStepToSave({ ...f, amount: '2,5' }, { stored: 'n/a', touched: true }), { value: '2.5' })
     assert.deepEqual(weightStepToSave({ ...f, amount: '5 kg' }, { stored: 'n/a', touched: true }), { value: '5' })
+    // req-193 edit: the checkbox is now "Two step sizes" with two editable boxes, so ticking it
+    // saves the two typed steps as 'Steps A/B' (A added first); one box blank blocks Save.
+    assert.deepEqual(weightStepToSave({ ...f, amount: '4', second: '5', alternating: true }, { stored: 'n/a', touched: true }), {
+      value: 'Steps 4/5',
+    })
     assert.deepEqual(weightStepToSave({ ...f, amount: '2,5', alternating: true }, { stored: 'n/a', touched: true }), {
-      value: 'Alt 4/5',
+      error: 'Enter both step sizes',
     })
     assert.deepEqual(weightStepToSave({ ...weightStepFields('5'), amount: '' }, { stored: '5', touched: true }), {
       value: 'n/a',
@@ -120,7 +125,8 @@ describe('req-126 editor fields and Save', () => {
   })
 
   it("'4/5' is offered as Alternating", () => {
-    assert.match(weightStepNote(weightStepFields('4/5')), /Alternating \(4\/5\)\?/)
+    // req-193 edit: the option is renamed "Two step sizes" (DEC-108 §6).
+    assert.match(weightStepNote(weightStepFields('4/5')), /Two step sizes\?/)
     assert.deepEqual(weightStepToSave(weightStepFields('4/5'), { stored: '4/5', touched: false }), {
       unchanged: true,
       value: '4/5',
@@ -130,10 +136,12 @@ describe('req-126 editor fields and Save', () => {
   // Review loop-back (edit to this branch's own test): an untouched Save of a missing / '' /
   // null step is now `unchanged` (the field is left as stored), no longer { value: 'n/a' }.
   it('stored values open as expected; a missing field opens empty (not an invented 2.5)', () => {
-    assert.deepEqual(weightStepFields('Alt 4/5'), { amount: '', alternating: true, unreadable: null })
-    assert.deepEqual(weightStepFields(undefined), { amount: '', alternating: false, unreadable: null })
-    assert.deepEqual(weightStepFields('n/a'), { amount: '', alternating: false, unreadable: null })
-    assert.deepEqual(weightStepFields('2,5'), { amount: '2,5', alternating: false, unreadable: null })
+    // req-193 edit: fields gain `second`; 'Alt 4/5' opens with both step boxes filled in the
+    // order its series adds them (5, then 4).
+    assert.deepEqual(weightStepFields('Alt 4/5'), { amount: '5', second: '4', alternating: true, unreadable: null })
+    assert.deepEqual(weightStepFields(undefined), { amount: '', second: '', alternating: false, unreadable: null })
+    assert.deepEqual(weightStepFields('n/a'), { amount: '', second: '', alternating: false, unreadable: null })
+    assert.deepEqual(weightStepFields('2,5'), { amount: '2,5', second: '', alternating: false, unreadable: null })
     for (const stored of [undefined, null, '']) {
       assert.deepEqual(weightStepToSave(weightStepFields(stored), { stored, touched: false }), {
         unchanged: true,
@@ -149,7 +157,8 @@ describe('req-126 editor fields and Save', () => {
   it('detail line wording', () => {
     assert.equal(describeWeightStep('2.5'), 'Increment 2.5 kg')
     assert.equal(describeWeightStep('2,5'), 'Increment 2.5 kg')
-    assert.equal(describeWeightStep('Alt 4/5'), 'Alternating 4/5')
+    // req-193 edit: "Alternating" → "Two steps" (DEC-108 §6 rename), in the order added (5, then 4).
+    assert.equal(describeWeightStep('Alt 4/5'), 'Two steps 5/4 kg')
     assert.equal(describeWeightStep('n/a'), null)
     assert.equal(describeWeightStep('abc'), 'abc')
   })

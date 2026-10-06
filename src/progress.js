@@ -1,10 +1,18 @@
 import { isWeightedType } from './ids.js'
-import { ALTERNATING, parseWeightStep } from './weight-step.js'
+import { ALTERNATING, parseLightestWeight, parseTwoSteps, parseWeightStep } from './weight-step.js'
 import { isSkippedSet } from './set-rules.js'
 
 export function validWeights(exercise, max = 250) {
   if (Array.isArray(exercise?.weightOptions) && exercise.weightOptions.length) {
     return [...exercise.weightOptions].map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+  }
+  // req-193 — a lightest weight set: the series counts from it (lightest, + step, …; two
+  // step sizes alternate, the first first). No readable step → [] (hold, DEC-030): the
+  // lightest weight alone never invents a step. Blank → everything below, unchanged.
+  const lightest = parseLightestWeight(exercise?.lightestWeight)
+  if (lightest != null) {
+    const steps = parseTwoSteps(exercise?.weightStep) ?? [parseWeightStep(exercise?.weightStep)]
+    return steps[0] == null ? [] : stepSeries(lightest, steps, max)
   }
   if (exercise?.weightStep === ALTERNATING) {
     const out = []
@@ -17,6 +25,10 @@ export function validWeights(exercise, max = 250) {
     }
     return out
   }
+  // req-193 — 'Steps A/B', no lightest weight: count from 0 like a single step does (0
+  // itself is not a weight), so 'Steps 4/5' → 4, 9, 13 … (the legacy 'Alt 4/5' returned above).
+  const two = parseTwoSteps(exercise?.weightStep)
+  if (two) return stepSeries(0, two, max).slice(1)
   // req-126 — the shared single-value parser: stored '2,5', '2.5 kg', '5 kg' now read
   // as their increment (they used to be [] → a silent hold). '4/5', 'abc', 'n/a' → [].
   const step = parseWeightStep(exercise?.weightStep)
@@ -28,6 +40,32 @@ export function validWeights(exercise, max = 250) {
   return out
 }
 
+// req-193 — start, start + steps[0], + steps[1], … up to max, each rounded to 0.01 kg the
+// way the single-step series always was (the running sum itself is not rounded).
+function stepSeries(start, steps, max) {
+  const out = []
+  let index = 0
+  for (let weight = start; weight <= max; weight += steps[index++ % steps.length]) {
+    out.push(Math.round(weight * 100) / 100)
+  }
+  return out
+}
+
+// req-193 — the editors' preview of what the recommendation would move through, from the
+// same inputs recommendNextPrescription reads: a bodyweight (or cardio) type or an assisted
+// exercise never moves kg; otherwise the first `count` values of validWeights (weightOptions
+// included), so the step order (and the legacy 'Alt 4/5' from 9) is visible. No series →
+// the hold, said plainly (DEC-030).
+export const NO_SERIES_TEXT = 'No step set — suggestions hold'
+export const SAME_KG_TEXT = 'Suggestions keep the same kg'
+export function weightSeriesPreview(exercise, count = 5) {
+  if (!isWeightedType(exercise?.type) || isAssistedExercise(exercise)) return SAME_KG_TEXT
+  const series = validWeights(exercise)
+  if (!series.length) return NO_SERIES_TEXT
+  const more = series.length > count ? ' …' : ''
+  return `Weights: ${series.slice(0, count).join(', ')}${more}`
+}
+
 export function moveToValidWeight(weight, exercise, direction) {
   const current = Number(weight) || 0
   const options = validWeights(exercise, Math.max(250, current + 100))
@@ -36,6 +74,10 @@ export function moveToValidWeight(weight, exercise, direction) {
   // *valid* increments; a 0.5 kg default is a load the config never defines.
   if (!options.length) return current
   if (direction > 0) return options.find((option) => option > current) ?? options.at(-1)
+  // req-193 — below the lightest weight there is no lighter option: hold at the current kg.
+  // On main this returned options[0], so a failed set below the stack's first weight
+  // suggested a jump UP (reachable once a lightest weight is set).
+  if (current < options[0]) return current
   return [...options].reverse().find((option) => option < current) ?? options[0]
 }
 
@@ -77,6 +119,7 @@ export function isAssistedExercise(exercise) {
 export const HOLD_REASONS = {
   target: "Target isn't a single number — kept as is.",
   assisted: 'Assisted: kept as is.',
+  lightest: 'Already at the lightest weight — kept as is.',
 }
 
 // req-112 / DEC-056 — per set. `sets` is POSITIONAL by work-set index: sets[i] is the
@@ -139,8 +182,12 @@ export function recommendNextPrescription({ targets, weights: routineWeights, se
 
     if (missed || rpe >= 5) {
       if (hasIncrements) {
-        weights[index] = moveToValidWeight(actualWeight, exercise, -1)
-        movedDown = true
+        // req-193 — at or below the first option "down" can't move: say so (action keep, a
+        // reason), never "Load down." with the same kg. Main reported 'down' here.
+        const next = moveToValidWeight(actualWeight, exercise, -1)
+        weights[index] = next
+        if (next === actualWeight) held.add('lightest')
+        else movedDown = true
       } else {
         weights[index] = actualWeight
       }

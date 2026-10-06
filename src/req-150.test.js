@@ -3,7 +3,7 @@
 // reason. No new rule: everything else is identical to main (property test vs a frozen copy).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { HOLD_REASONS, isAssistedExercise, recommendNextPrescription, unreadableTarget } from './progress.js'
+import { HOLD_REASONS, isAssistedExercise, recommendNextPrescription, unreadableTarget, validWeights } from './progress.js'
 import { recommendNextPrescription as mainRecommend } from './req-150.progress-main.fixture.js'
 
 const machine = { type: 'machine', weightStep: '5', name: 'Leg Press' }
@@ -114,6 +114,7 @@ describe('unchanged otherwise (property test vs main)', () => {
 
   it('5,000 generated items with whole-number or blank targets and non-assisted exercises: identical output', () => {
     const r = rng(150)
+    let belowFirst = 0
     for (let n = 0; n < 5000; n += 1) {
       const count = 1 + Math.floor(r() * 5)
       const exercise = { type: pick(r, TYPES), weightStep: pick(r, STEPS), name: pick(r, NAMES), libraryId: pick(r, IDS) }
@@ -127,7 +128,47 @@ describe('unchanged otherwise (property test vs main)', () => {
         return { weight: pick(r, [0, 5, 18, 20, 23, 40, 60, 100]), reps: String(Math.floor(r() * 20)), rpe: pick(r, [null, 1, 2, 3, 4, 5]) }
       })
       const input = { targets, weights, sets, exercise }
-      assert.deepEqual(recommendNextPrescription(input), mainRecommend(input), JSON.stringify(input))
+      // req-193 edit (review fixes 3 + 5): a set judged DOWN at or below the first valid option
+      // now holds at its kg with action 'keep' and the 'lightest' hold reason (main moved it to
+      // options[0] — a jump up when below — and reported 'down'). Exactly those sets are
+      // excluded: main's weight there must be options[0] and ours the kg lifted; main's action
+      // and reason are re-derived without them; everything else is compared exactly.
+      const ours = recommendNextPrescription(input)
+      const main = mainRecommend(input)
+      const weighted = exercise.type !== 'bodyweight' && exercise.type !== 'cardio'
+      const options = validWeights(exercise)
+      let bottomHolds = 0
+      let otherDown = false
+      let anyUp = false
+      sets.forEach((set, index) => {
+        if (!set || set.reps === 'skipped' || !weighted || !options.length) return
+        const kg = Number(set.weight) || 0
+        if (kg <= 0) return
+        const target = targets?.[index] ?? targets?.at(-1)
+        const targetReps = target == null || String(target).trim() === '' ? null : Number(target)
+        const reps = Number(set.reps)
+        const rpe = set.rpe == null ? null : Number(set.rpe)
+        const missed = targetReps != null && reps < targetReps
+        if (missed || rpe >= 5) {
+          if (kg <= options[0]) {
+            assert.equal(main.weights[index], options[0], JSON.stringify(input))
+            assert.equal(ours.weights[index], kg, JSON.stringify(input))
+            ours.weights[index] = main.weights[index]
+            bottomHolds += 1
+          } else otherDown = true
+        } else if (rpe != null && rpe <= 2) anyUp = true
+      })
+      if (bottomHolds) {
+        belowFirst += bottomHolds
+        const action = otherDown ? 'down' : anyUp ? 'up' : 'keep'
+        const base = { down: 'Load down.', up: 'Load up.', keep: 'Same load.' }[action]
+        assert.equal(ours.action, action, JSON.stringify(input))
+        assert.equal(ours.reason, `${base} ${HOLD_REASONS.lightest}`, JSON.stringify(input))
+        ours.action = main.action
+        ours.reason = main.reason
+      }
+      assert.deepEqual(ours, main, JSON.stringify(input))
     }
+    assert.ok(belowFirst > 0, `the req-193 bottom-of-series case was exercised (${belowFirst})`)
   })
 })
