@@ -58,3 +58,20 @@ Code facts from a read-only scan of main `cbd9a78`.
   edited; neither touches the rest timer.
 
 Build: **req-186** (pill, set list, Previous), **req-187** (kg confirm), **req-188** (Swap/Skip/Add in the list) — DEC-103. Feedback list done; the open questions above remain for session 2.
+
+## Persona run 2026-10-06 — "Lena" (41, teacher, non-technical, 2 weeks in a machine gym), main `1b9165f`, empty first launch
+Agent-driven, 390×844, screenshots in the session scratchpad. Taps: routine setup 20 + 3 searches (slow); workout 46 (ok);
+"did it save?" 5 (fast). Verified by Planner from screenshots: **2-day plan with day B left on "Choose" saved as Monday-only**
+(Schedule: Monday — Full body A, other days Rest), no message; Home after Save: "Mon, Oct 12 · Full body A" + "Tue, Oct 6 ·
+Nothing scheduled today".
+Findings (severity): (1) quit-risk — empty day B silently dropped, 2-a-week plan became 1; (2) quit-risk — slot names
+(Squat/Deadlift/Row/Core) vs "my machines": she only got hers via search, unsure Leg Press "is allowed" under Squat;
+(3) slowed — rows hidden under the sticky Cancel/Skip/Use bar (BACKLOG req-180 follow-up); (4) slowed — plan saved today
+but first workout next Monday ("Can I train today?"); (5) slowed — a tapped number box keeps its value, typing appends
+("1120") [partly the harness's mid-field tap]; (6) slowed — 150 kg (meant 15) accepted on a no-history exercise: DEC-102's
+big-change note needs a reference, none existed; (7) slowed — "Keep blank / Update routine" not understood, tapped the dark
+button; (8) slowed — Swap's Sets/Rest step: "why ask now?", wanted the busy machine's sets/rest copied; (9) minor — swapped
+exercise's Reps empty → browser bubble "Please fill out this field"; (10) slowed — auto-finish "Finishing in 9s… Edit /
+Cancel": feared Cancel deletes; "Volume 2630 kg" meaningless; (11) minor — "⋯" not where she'd look; "skipped" for a busy
+machine; "kg" for dumbbells (one or both?); "set 1/3" on the list pill. Worked: search by her own words, the set screen,
+fixing a set via Previous/Save, saved check.
