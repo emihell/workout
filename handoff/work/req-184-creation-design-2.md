@@ -88,3 +88,16 @@ in 9s…", req-84 auto-complete); (3) slowed — tapping a done set row in the s
 next set on a no-target exercise (DEC-052: reps never carry; she retyped 10); (7) minor — routine named "Workout" reads oddly in
 "Workout will start Leg Press at 40 kg"; (8) minor — "Lifted 2,510 kg" disbelieved; "Add 0" button label; no clear (×) on
 search. Home order (future dates on top, latest first) is Emilio's req-60 choice — not a bug.
+
+## Feedback received 2026-10-06 (15 notes, Lower body workout, app 957c2c6 — before req-189..191)
+G1 "Timer for duration only exercises?" (Stairs log) · G2 "What does alternating mean?" (Stairs exercise edit) · G3 "Add level
+for machines like stairs, row, cross fit" · G4 "Skip rest should be within the timer chip - skip if you in the exercise, go to
+exercise if your outside of it" · G5 tips during rest (form, exercise, motivation, routine, general; science-based; more
+advanced with more workouts) · G6 "I can't change the increment?" (Leg extension, exercise edit) · G7 "The increment should
+also have a starting weight" · G8 review the log screen's layout ("should the sets list be under effort?") · G9 "Do we need
+to see the completed sets? Or only the remaining ones?" · G10 "Can effort and complete be combined somehow?" · G11
+"complete is a bit much for just a set - maybe another word? … connected to effort" · G12 "Maybe Max should be failure in
+effort" · G13 "Should you be able to add notes all the time during an exercise? Or only at the end?" · G14 "For the
+questions, use the user data and external searches and how other apps do it and your own logic" · G15 "I completed a
+workout today but can't see it in the list?" (Home).
+Triage in progress: code scan + prior-art research (Strong, Hevy, JEFIT, Fitbod…).
