@@ -120,7 +120,7 @@ describe('req-189 rendered — the set form', () => {
     }
   })
 
-  it('a dumbbell exercise reads "kg per dumbbell"; a machine reads "kg"', async () => {
+  it('a dumbbell exercise reads "kg per dumbbell"', async () => {
     const { captured, mount } = await harness()
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     await act(async () => captured.store.startWorkout('sess-push-pull'))
