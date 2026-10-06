@@ -314,6 +314,16 @@ function WorkoutItemLive({ routineId, item }) {
     setViewIndex(index)
   }
 
+  // req-191 §3 — a tap on a done row of the set list opens that logged set: the same view
+  // Previous reaches (view state only; nothing written, the rest untouched). Upcoming rows
+  // stay inert. The current set's typing is flushed first, as Previous does.
+  function openLoggedSet(index) {
+    if (!loggedIndexes.includes(index) || (viewing && index === viewIndex)) return
+    recordButton('open-logged-set')
+    if (!viewing) draftWriter.flush()
+    setViewIndex(index)
+  }
+
   // Next: back to the current set, nothing written, the rest untouched. The current set's
   // form remounts, so re-read its draft (flushed by Previous) the way a set change does.
   function backToCurrentSet() {
@@ -569,11 +579,19 @@ function WorkoutItemLive({ routineId, item }) {
               className={`ui-setpreview__row is-${row.status}${row.highlighted ? ' is-here' : ''}`}
               aria-current={row.highlighted ? 'step' : undefined}
             >
-              <span className="ui-setpreview__mark" aria-hidden="true">
-                {row.status === 'done' ? '✓' : ''}
-              </span>
-              {row.status === 'done' ? <span className="ui-visually-hidden">Done: </span> : null}
-              {row.text}
+              {row.status === 'done' ? (
+                // req-191 §3 — a done row opens that logged set (openLoggedSet).
+                <button type="button" className="ui-setpreview__tap" onClick={() => openLoggedSet(row.setIndex)}>
+                  <span className="ui-setpreview__mark" aria-hidden="true">✓</span>
+                  <span className="ui-visually-hidden">Done: </span>
+                  {row.text}
+                </button>
+              ) : (
+                <>
+                  <span className="ui-setpreview__mark" aria-hidden="true" />
+                  {row.text}
+                </>
+              )}
             </li>
           ))}
         </ul>

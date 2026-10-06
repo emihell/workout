@@ -378,6 +378,15 @@ export function autoCompleteArmed(workout) {
   return allItemsDone(workout) && !workout?.autoFinishDismissed && anythingLogged(workout)
 }
 
+// req-191 §2 — the workout became all-done by a skip: its newest set record is a skipped
+// one (Skip exercise, or a set-level Skip of the last set). Derived from the records, no
+// stored flag. The auto-complete summary then shows without its countdown, so a mis-tapped
+// Skip never finishes the workout on its own; a completed last set keeps the countdown.
+export function endedOnSkip(workout) {
+  const sets = workout?.sets || []
+  return sets.length > 0 && isSkippedSet(sets[sets.length - 1])
+}
+
 // req-11 / DEC-013, refined by req-25 — the activeWorkout patch that marks an
 // exercise done. Since req-11 this fires on completing the last set (was: the
 // review screen's "Done" button), so the mark-done transition is a pure, testable
@@ -431,13 +440,19 @@ export function carriedWorkingSet(workLogged) {
 
 // req-02 / DEC-002 — the kg carried onto the next working set: the most recent
 // non-skipped working set logged this session. Null for a warm-up or when nothing is
-// logged yet. Kg only (req-108: reps don't carry). setLogSeed decides whether it is used
-// (no history, or no history set at this index — req-152); moved here from item.jsx.
+// logged yet. setLogSeed decides whether the kg is used (no history, or no history set at
+// this index — req-152); moved here from item.jsx.
+// req-191 §6 (DEC-107 §2; amends req-108 / DEC-052 "reps never carry") — the same set's
+// logged reps ride along; setLogSeed uses them only on a set with NO reps target. A skipped
+// set is never the source (carriedWorkingSet), so a skip carries nothing.
 export function carryForSet(currentType, workLogged) {
   if (currentType !== 'work') return null
   const src = carriedWorkingSet(workLogged)
   if (!src) return null
-  return { weight: src.weight != null && Number(src.weight) !== 0 ? String(src.weight) : '' }
+  return {
+    weight: src.weight != null && Number(src.weight) !== 0 ? String(src.weight) : '',
+    reps: src.reps != null ? String(src.reps).trim() : '',
+  }
 }
 
 // req-117 — the log form's values for a set being un-logged by "Previous" (moved here
@@ -487,6 +502,11 @@ export function restoreFromLoggedSet(set) {
 // it, so the in-session carry applies, as for a no-history exercise — the kg just
 // logged carries (weight carries, reps per set). Absent = unchanged (history wins).
 //
+// req-191 §6 (DEC-107 §2) — amends the req-108 rule above for ONE case: a set with no reps
+// target starts with the carry's reps (the last non-skipped working set logged this session,
+// carryForSet). With a target, the target prefills, as before. A stale override `reps` is
+// still never read. The carry is null for a warm-up, so a warm-up is unaffected.
+//
 // req-178 / DEC-096 §1 — a WORK set's kg is the routine's: `routineKg` is the snapshot
 // item's suggestedWeights[workIndex] (frozen at Start). Chain: override (DEC-052) >
 // routine kg (> 0) > session carry (DEC-002 / req-152, only when the routine has no kg
@@ -507,7 +527,7 @@ export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history
   }
   return {
     weight: weighted ? (ov.weight != null ? ov.weight : baseWeight) : '',
-    reps: target || '',
+    reps: target || carry?.reps || '',
   }
 }
 

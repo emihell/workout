@@ -1,5 +1,5 @@
 import { libraryItemMatch } from './exercise-names.js'
-import { catalogNameKey, loadExerciseLibrary, shownName } from './exerciseLibrary.js'
+import { catalogNameKey, loadExerciseLibrary, MUSCLE_GROUPS, shownName } from './exerciseLibrary.js'
 
 // req-139 / DEC-064 §2 — search reads our library only (exerciseLibrary.js: the pinned
 // free-db copy, the extras, our own entries). History: RepDB was used until req-142; nothing
@@ -117,7 +117,47 @@ export function searchExerciseCatalog(list, query, limit = 25) {
 // entry sits behind "Show more"). The `common` key name is kept for the callers.
 // req-143 — a hidden entry matching one of `exercises` (live or archived, libraryItemMatch)
 // still shows, so owning one never turns into "No matches" (unconfirmed).
+// req-191 §1 — a query that is a muscle-group word (a MUSCLE_GROUPS name) or a plain synonym
+// of one names that group. Synonyms (unconfirmed): singulars and the everyday "abs".
+const GROUP_SYNONYMS = { arm: 'Arms', leg: 'Legs', shoulder: 'Shoulders', abs: 'Core', ab: 'Core', abdominals: 'Core', stomach: 'Core' }
+const GROUP_WORDS = new Map([
+  ...Object.keys(MUSCLE_GROUPS).map((group) => [group.toLowerCase(), group]),
+  ...Object.entries(GROUP_SYNONYMS),
+])
+
+export function muscleGroupForQuery(query) {
+  return GROUP_WORDS.get(String(query || '').trim().toLowerCase()) || null
+}
+
+// Machines first (machine and cable, as inferExerciseType types them), then free weights,
+// then bodyweight, then cardio (unconfirmed); A→Z by the shown name inside each.
+const EQUIPMENT_ORDER = { machine: 0, free: 1, bodyweight: 2, cardio: 3 }
+const equipmentRank = (item) =>
+  EQUIPMENT_ORDER[item.logAs === 'cardio' ? 'cardio' : inferExerciseType(item.equipment, item.category)] ?? 1
+
+// The group's listable staples, machines first. Exported for tests.
+export function groupStaples(list, group) {
+  return (list || [])
+    .filter((item) => item.staple && listable(item) && (item.muscleGroups || []).includes(group))
+    .map((item) => ({ item, rank: equipmentRank(item), name: shownName(item) }))
+    .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name))
+    .map((row) => row.item)
+}
+
 export function searchCommonFirst(list, query, limit = 25, { exercises = [] } = {}) {
+  const found = searchCommonFirstByName(list, query, limit, { exercises })
+  const group = muscleGroupForQuery(query)
+  if (!group) return found
+  // req-191 §1 — a group word: the group's staples lead (all of them, so "legs" doesn't lose
+  // its bodyweight rows), then today's staple hits ("Back Squat"), those capped at `limit`.
+  const lead = groupStaples(list, group)
+  const leadSet = new Set(lead)
+  const byName = searchCommonFirstByName(list, query, Infinity, { exercises })
+  const after = byName.common.filter((item) => !leadSet.has(item)).slice(0, limit)
+  return { ...found, common: [...lead, ...after] }
+}
+
+function searchCommonFirstByName(list, query, limit, { exercises }) {
   const owned = exercises.length ? (item) => libraryItemMatch(exercises, item) !== null : null
   const hits = rankedHits(list, query, owned)
   // req-151 — an exact hit on a listed non-staple's own name (shown name or free-db name) leads

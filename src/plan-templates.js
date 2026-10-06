@@ -104,6 +104,20 @@ export function startTodayWeek(week, today) {
   return week.map(([weekday, r]) => [(((weekday - first + day) % 7) + 7) % 7, r])
 }
 
+// req-191 §4 `(unconfirmed)` — a workout's days in plain words, for the days step: weekdays in the
+// week's order (startTodayWeek: today first). Today among them → "Starts today (Tue), then every
+// Tue and Fri"; otherwise "Every Fri". `today` is a weekday number (0 = Sun).
+export const WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+function andList(words) {
+  return words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`
+}
+export function planDaysText(weekdays, today) {
+  const list = [...new Set(weekdays || [])]
+  if (!list.length) return ''
+  const every = andList(list.map((weekday) => WEEKDAY_SHORT[weekday]))
+  return list.includes(today) ? `Starts today (${WEEKDAY_SHORT[today]}), then every ${every}` : `Every ${every}`
+}
+
 // req-190 (DEC-105 §1) — machines-first split `(unconfirmed)`: 'same' → one workout of every
 // pick; 'ab' → two, alternating in pick order (1st → A, 2nd → B, 3rd → A, …).
 export const SPLIT_SAME = 'same'
@@ -114,7 +128,8 @@ export function splitPicks(picks, split) {
   return [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)]
 }
 
-// The machines-first plan: routine names `(unconfirmed)` "Workout" / "Workout A", "Workout B";
+// The machines-first plan: routine names `(unconfirmed)` "My workout" / "My workout A", "My workout B"
+// (req-191 §7; were "Workout" / "Workout A/B");
 // the template's spacing for that many days; with A/B, days alternate A, B, A, B.
 // One day is always one workout (an A/B split needs two days).
 export function machinesPlan({ days, split, picks }) {
@@ -122,7 +137,7 @@ export function machinesPlan({ days, split, picks }) {
   if (!template) return null
   const ab = split === SPLIT_AB && days >= 2
   const groups = splitPicks(picks, ab ? SPLIT_AB : SPLIT_SAME)
-  const names = ab ? ['Workout A', 'Workout B'] : ['Workout']
+  const names = ab ? ['My workout A', 'My workout B'] : ['My workout']
   return {
     routines: groups.map((group, r) => ({ name: names[r], picks: group })),
     week: template.week.map(([weekday], i) => [weekday, ab ? i % 2 : 0]),

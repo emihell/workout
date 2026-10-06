@@ -15,6 +15,7 @@ import {
   carriedFills,
   emptyDaySheetText,
   machinesPlan,
+  planDaysText,
   slotFilters,
   startTodayWeek,
 } from '../plan-templates.js'
@@ -247,7 +248,6 @@ export function RoutinePlan() {
 // or Back at any step, or a reload, writes nothing.
 
 const MACHINES = '/routines/new/machines'
-const WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function Choice({ name, checked, onChange, children }) {
   return (
@@ -271,7 +271,6 @@ function MachinesDays({ picks, schedule, saving, onSave }) {
   // The preview reads today's clock; Save's planToState gets the store's `now` (the same day).
   const today = new Date().getDay()
   const week = plan ? startTodayWeek(plan.week, new Date()) : []
-  const dayLabel = (weekday) => (weekday === today ? 'Today' : WEEKDAY_SHORT[weekday])
   return (
     <Screen>
       <Back to={MACHINES} />
@@ -300,10 +299,11 @@ function MachinesDays({ picks, schedule, saving, onSave }) {
               <SectionHeader>{routine.name}</SectionHeader>
               {emptySchedule ? (
                 <p className="ui-sub">
-                  {week
-                    .filter(([, at]) => at === r)
-                    .map(([weekday]) => dayLabel(weekday))
-                    .join(', ')}
+                  {/* req-191 §4 — "Starts today (Tue), then every Tue and Fri" (was "Today, Fri"). */}
+                  {planDaysText(
+                    week.filter(([, at]) => at === r).map(([weekday]) => weekday),
+                    today,
+                  )}
                 </p>
               ) : null}
               <List>

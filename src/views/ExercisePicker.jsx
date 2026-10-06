@@ -20,7 +20,7 @@ import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownNam
 import { libraryItemMatch } from '../exercise-names.js'
 import { filteredBrowse, looseOwnMatch, ownRecentFirst, pickerItem, staplesByMuscle } from '../routine-picker.js'
 import { useStore } from '../store-context'
-import { Actions, Button, Checkbox, Field, List, NavLink, Row, SectionHeader } from '../ui/index.jsx'
+import { Actions, Button, Checkbox, List, NavLink, Row, SearchField, SectionHeader } from '../ui/index.jsx'
 
 function PickRow({ name, checked, plan, onToggle }) {
   return (
@@ -44,7 +44,8 @@ export function ExercisePicker({
   onAdd,
   onPick = null,
   max = Infinity,
-  addLabel = (n) => `Add ${n}`,
+  // req-191 §7 — "Add" (disabled) with nothing ticked, "Add N" otherwise (was "Add 0").
+  addLabel = (n) => (n ? `Add ${n}` : 'Add'),
   lateral = null,
   cancelTo,
   createTo = null,
@@ -196,11 +197,14 @@ export function ExercisePicker({
           <NavLink to={createTo} chevron="forward">Create exercise</NavLink>
         </p>
       ) : null}
-      <Field
-        label="Search"
+      <SearchField
         value={query}
         onChange={(e) => {
           setQuery(e.target.value)
+          setShowRest(false)
+        }}
+        onClear={() => {
+          setQuery('')
           setShowRest(false)
         }}
       />

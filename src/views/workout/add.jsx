@@ -27,7 +27,7 @@ export function WorkoutAdd({ routineId }) {
       <Title>Add exercise</Title>
       <MidWorkoutPicker
         cancelTo={backTo}
-        addLabel={(n) => `Add ${n}`}
+        addLabel={(n) => (n ? `Add ${n}` : 'Add')}
         onDone={(added) => {
           recordButton('add-workout-exercise')
           store.addWorkoutItems(added)
