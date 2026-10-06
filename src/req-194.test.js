@@ -371,7 +371,8 @@ describe('the log screen (real store)', () => {
     // Once Rowing's set is logged its stopwatch is gone and another may start.
     await withClock(watch.startedAt + 5_000, async () => view.click(view.button('Done')))
     assert.equal(t.active().sets.at(-1).durationSec, 5)
-    assert.equal(t.active().stopwatch, undefined, 'Done clears it')
+    // re-review: Done on the last set also marks the item done (markItemDonePatch → null).
+    assert.equal(t.active().stopwatch ?? null, null, 'Done clears it')
     assert.ok(startStopwatchPatch(t.active(), setDraftKey(lower, 'work', 0), 0, 5))
   })
 
@@ -394,13 +395,62 @@ describe('the log screen (real store)', () => {
     assert.ok(t.active().stopwatch.draftKey.startsWith(STAIRS))
   })
 
+  it('re-review: Start → ⋯ Skip exercise → Add set → no running stopwatch (reviewer scenario)', async () => {
+    const t = await harness()
+    await t.mount(t.item(ROWING))
+    await view.click(view.button('Start'))
+    const key = rowingKey(t.active())
+    assert.ok(stopwatchFor(t.active(), key))
+    await act(async () => t.captured.store.skipItem(ROWING))
+    assert.equal(t.active().stopwatch, null, 'Skip exercise (markItemDonePatch) clears it')
+    // "Add set" on the done exercise (WorkoutItemDone, the screen Skip leads to): reopen and add
+    // a working set in one tap, then the log screen.
+    await t.mount(null)
+    const { reopenItemPatch } = await import('./workout-log.js')
+    const item = t.active().snapshot.items.find((i) => i.routineItemId === ROWING)
+    await act(async () => {
+      t.captured.store.patchActive(reopenItemPatch(t.active(), item))
+      t.captured.store.addWorkingSet(ROWING)
+    })
+    await t.mount(t.item(ROWING))
+    assert.equal(view.button('Stop'), null, 'nothing shows as running')
+    assert.ok(view.button('Start'), 'the new set starts with a stopped stopwatch')
+    // Even a stopwatch left behind (pre-fix data) for a set whose item is done never shows:
+    const done = { ...t.active(), completedItemIds: [ROWING], stopwatch: { draftKey: key, startedAt: 1, baseSec: 0 } }
+    assert.equal(stopwatchFor(done, key), null)
+  })
+
+  it('re-review: Swap (replaceItem) clears the stopwatch', async () => {
+    const t = await harness()
+    await t.mount(t.item(ROWING))
+    await view.click(view.button('Start'))
+    await act(async () => t.captured.store.replaceItem(ROWING, 'ex-stairs'))
+    assert.equal(t.active().stopwatch, null)
+  })
+
+  it('re-review: an imported backup never resumes a stopwatch', () => {
+    const state = migrateState(JSON.parse(JSON.stringify({ ...DB, activeWorkout: null })))
+    const active = {
+      id: 'w1',
+      routineId: 'sess-upper',
+      snapshot: { routineId: 'sess-upper', routineName: 'Upper Body', items: [] },
+      sets: [],
+      stopwatch: { draftKey: 'k', startedAt: 123, baseSec: 0 },
+    }
+    const file = JSON.parse(JSON.stringify(buildBackup({ ...state, activeWorkout: active })))
+    assert.equal(file.state.activeWorkout.stopwatch.startedAt, 123, 'exported as stored')
+    const back = applyBackup(file).state.activeWorkout
+    assert.equal(back.id, 'w1', 'the active workout itself is restored')
+    assert.equal('stopwatch' in back, false)
+  })
+
   it('fix 1: Skip set clears the stopwatch', async () => {
     const t = await harness()
     await t.mount(t.item(ROWING))
     await view.click(view.button('Start'))
     assert.ok(t.active().stopwatch)
     await view.click(view.button('Skip set'))
-    assert.equal(t.active().stopwatch, undefined)
+    assert.equal(t.active().stopwatch ?? null, null)
   })
 
   it('fix 3: a single-time target ("20 min") prefills Duration as 20:00; Start still runs from 0:00', async () => {
@@ -442,6 +492,6 @@ describe('the log screen (real store)', () => {
       { durationSec: set.durationSec, distance: set.distance, distanceUnit: set.distanceUnit, level: set.level },
       { durationSec: 125, distance: 1.5, distanceUnit: 'km', level: undefined },
     )
-    assert.equal(t.active().stopwatch, undefined)
+    assert.equal(t.active().stopwatch ?? null, null)
   })
 })

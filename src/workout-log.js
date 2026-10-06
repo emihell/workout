@@ -404,7 +404,17 @@ export function markItemDonePatch(workout, item) {
     completedItemIds: [
       ...new Set([...(workout?.completedItemIds || []), key]),
     ],
+    // req-194 re-review — a stopwatch running for one of THIS item's sets stops when the item
+    // is marked done (its last set logged, Skip exercise, Swap via skipItemPatch, Remove set),
+    // so a later "Add set" can't reopen it with all the minutes since. Only present then.
+    ...(stopwatchItemKey(workout) === key ? { stopwatch: null } : {}),
   }
+}
+
+// The item key a stopwatch's draftKey (`<itemKey>|<wu|work>|<n>`, setDraftKey) belongs to.
+function stopwatchItemKey(workout) {
+  const draftKey = workout?.stopwatch?.draftKey
+  return typeof draftKey === 'string' ? draftKey.slice(0, draftKey.lastIndexOf('|', draftKey.lastIndexOf('|') - 1)) : null
 }
 
 // req-11 / DEC-013 — the inverse patch: "Add set" on an already-done exercise
@@ -751,10 +761,14 @@ export function withLoggedSet(workout, setRecord, activePatch = {}, draftKey = n
 // the first one's set is still the current set of an exercise not done (stopwatchOwner);
 // a stale one (that exercise skipped / swapped / done elsewhere) is taken over.
 
-// The stopwatch running for the set `key`, or null.
+// The stopwatch running for the set `key`, or null. req-194 re-review — only while it is
+// live (stopwatchOwner: its set is still the current set of an exercise not done), so a
+// stale one (its item skipped / swapped / done) never shows as running, even if that set's
+// key comes back (Add set after Skip exercise).
 export function stopwatchFor(workout, key) {
   const watch = workout?.stopwatch
-  return watch && typeof watch === 'object' && watch.draftKey === key ? watch : null
+  if (!watch || typeof watch !== 'object' || watch.draftKey !== key) return null
+  return stopwatchOwner(workout) ? watch : null
 }
 
 // The snapshot item whose CURRENT set the stopwatch runs for, while that exercise isn't
