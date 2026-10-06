@@ -2192,3 +2192,12 @@ set below the series start holds; a down that can't move reads keep + reason. 6 
 Gate (ui + progress.js): `check: green — lint, skills, no import cycles, 93 test file(s), and the build all passed.`; smoke green;
 golden vs main's validWeights/moveToValidWeight (exact, two declared exclusions); Planner QA (editor + preview at 390×844).
 Reviewer (independent, 3 rounds): 2 should-fix + 1 latent + 2 nits fixed, "No blockers." `reports/req-193.md`.
+
+## req-194 — cardio sets: stopwatch, Level, Distance  (batch 2026-10-06)
+
+**req-194** (DEC-108 §4, DEC-109) — cardio Duration with a Start/Stop stopwatch (`activeWorkout.stopwatch`, survives reload and
+other exercises' edits; cleared on done/skip/swap/finish/import), optional Level and Distance (+unit) on the set; history targets
+from durationSec; single-time target prefills Duration. 4 commits `94f4bda`…`9fc7131`.
+Gate (ui + workout-log.js): `check: green — lint, skills, no import cycles, 94 test file(s), and the build all passed.` (1417/0);
+smoke green; Planner QA (Stairs Start/3 s/Stop → durationSec 3, level 8). Reviewer (independent, 2 rounds): 3 should-fix +
+latent + nits fixed, "No blockers." `reports/req-194.md`.

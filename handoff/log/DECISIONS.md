@@ -1770,3 +1770,11 @@ Research and code facts: req-184 §Feedback received 2026-10-06.
 6. Planner's calls (DEC-095) `(unconfirmed)`: increment renamed "Two step sizes", both editable, hidden for cardio; a
    "Lightest weight" field that the load suggestions count from; the set list moves under the exercise name; completed sets
    stay shown; the routine's exercise note shows on the log screen; rest tips → BACKLOG (no app does it, no evidence).
+
+## DEC-109 — cardio Duration prefills from a single-time target; a range stays blank and required  (Planner, req-194 review, 2026-10-06)
+
+DESIGN §1 exception (1) ("the live set-log screen prefills Reps from that set's target") applied to cardio's amount field:
+a single-time target ("20 min", "12:30") prefills Duration; a range ("5-8 min") or blank leaves it blank and required (typed or
+the stopwatch). Recorded because a one-tap Done now stores `durationSec: 1200` — a number that reads as measured — where it
+used to store the text "20 min" (reviewer's nit). Source is the routine value the user set, so the §1 test holds. `(unconfirmed)`
+— on Emilio's end-of-batch list.
