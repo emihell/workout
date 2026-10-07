@@ -1,6 +1,6 @@
 # req-201 — UI vocabulary: routines are "Workouts"; a session is named by its workout and date
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-110 §2 and review F9/F13/F18. Last of the structure reqs (after
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-201` (`a26eece`…`3bb5392`, 2 commits).** (2026-10-07). **Lane: ui.** From DEC-110 §2 and review F9/F13/F18. Last of the structure reqs (after
 req-200), so the strings are counted on the settled screens.
 
 ## Code today
@@ -56,3 +56,17 @@ req-200 delete and move some of these.
 3. **Failure case:** the import summary on a backup with 3 routines and 13 workouts reads "3 workouts … 13 sessions", never
    "workouts" twice.
 4. `./check` green. The smoke test passes (update its text selectors, and name them).
+
+## Built — calls `(unconfirmed)`
+- **Name and date** ("Upper Body · Oct 13, 2025", the app's existing date format) on History delete and History's abandon.
+- **Name only** on the in-workout Abandon.
+- **"Session"** everywhere else: the abandon-on-new warning, the delete-confirm wording, the import counts, "This session",
+  Finish's "No set in this session…", the crash screen, and **Home's rest-day "Start a session"**.
+- **Kept "routine":** `model.js` "Deleted routine" is a stored legacy-migration string. `store.jsx` default name → "Workout"
+  (new records only).
+- A multi-week loop delete names "Mon (week 1) and Mon (week 2)".
+- `greeting()` is removed.
+- The static test scans the views, ui, `App.jsx` and 6 root modules.
+- **Follow-ups into req-202:**
+  - "Start a session" → "Start a workout" (it picks one of your workouts).
+  - The import summary's "slots" → "scheduled days".
