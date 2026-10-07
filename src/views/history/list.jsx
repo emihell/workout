@@ -107,14 +107,19 @@ export function History({ month = null }) {
           </List>
         </>
       ) : null}
-      {months.length === 0 ? <p className="ui-sub">None.</p> : null}
-      <List>
-        {months.map((group) => (
-          <Row key={group.key} to={`/history/month/${group.key}`} value={String(group.workouts.length)}>
-            {monthLabel(group.key)}
-          </Row>
-        ))}
-      </List>
+      {/* req-198 — no empty month list when there are none, so its hairline doesn't
+          double up with Backup & data's below. */}
+      {months.length === 0 ? (
+        <p className="ui-sub">None.</p>
+      ) : (
+        <List>
+          {months.map((group) => (
+            <Row key={group.key} to={`/history/month/${group.key}`} value={String(group.workouts.length)}>
+              {monthLabel(group.key)}
+            </Row>
+          ))}
+        </List>
+      )}
       <List>
         <Row to="/settings">Backup &amp; data</Row>
       </List>

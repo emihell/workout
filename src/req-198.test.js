@@ -84,8 +84,9 @@ test('AC3 failure case: History always shows "Backup & data ›", outside every 
   // unconditional: the row is not inside the months / inProgress conditionals
   const row = main.indexOf('<Row to="/settings">')
   const before = main.slice(0, row)
-  const opens = (before.match(/\{[^{}]*\?\s*\(/g) || []).length
-  const closes = (before.match(/\)\s*:\s*null\}/g) || []).length
+  // every JSX expression before it is closed: balanced braces = not inside any {cond ? … }
+  const opens = (before.match(/\{/g) || []).length
+  const closes = (before.match(/\}/g) || []).length
   assert.equal(opens, closes, 'Backup & data must not sit inside a conditional')
   // and it is the last thing on the screen
   assert.match(main.slice(row), /^<Row to="\/settings">Backup &amp; data<\/Row>\s*<\/List>\s*<\/Screen>/)
