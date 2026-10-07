@@ -123,5 +123,6 @@ test('the list below holds prior days only (no completed-today rows)', () => {
   // list below today's block is the History link alone (was: it opens on `recent.map(`).
   assert.doesNotMatch(src, /recent\.map\(|HistoryPeekRow/)
   // req-205 test edit (DEC-115): that last row is now "Schedule ›" (History moved under it).
-  assert.match(src, /<List>\s*<Row to="\/schedule">Schedule<\/Row>\s*<\/List>/)
+  // req-206 test edit: it is the same NavLink as "Workouts ›" now, not a Row in a List.
+  assert.match(src, /<p>\s*<NavLink to="\/schedule" chevron="forward">Schedule<\/NavLink>\s*<\/p>/)
 })

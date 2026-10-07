@@ -90,7 +90,7 @@ const squash = (text) => text.replace(/\s+/g, '')
 const link = (text) => view.all('a').find((a) => squash(a.textContent) === squash(text)) ?? null
 const buttons = (label) => [...document.querySelectorAll('button')].filter((b) => b.textContent.trim() === label)
 const section = (name) => [...view.all('.ui-section')].find((n) => n.textContent === name) ?? null
-const comingUp = () => view.all('.ui-section + .ui-list a.ui-row__link')
+const comingUp = () => view.all('.ui-home-bottom > p + .ui-list a.ui-row__link') // req-206 test edit: no "Coming up" header; the rows' list follows the "Workouts ›" paragraph
 const label = (a) => a.textContent.replace(/›$/, '')
 async function tap(node) {
   await view.click(node)
@@ -131,7 +131,8 @@ describe('AC2 Home', () => {
     assert.ok(block.compareDocumentPosition(cont[0]) & 4)
     // req-205 test edit (DEC-115): Home's last row is "Schedule ›" (was "History ›").
     assert.ok(cont[0].compareDocumentPosition(link('Schedule›')) & 4)
-    assert.ok(section('Coming up').compareDocumentPosition(block) & 4)
+    // req-206 test edit: the "Coming up" header is gone, so the nearest day row is the anchor above today's block.
+    assert.ok(comingUp().at(-1).compareDocumentPosition(block) & 4)
   })
 
   it('bottom-aligned: Home\'s lower part takes the free space above it (CSS)', async () => {
@@ -189,7 +190,7 @@ describe('AC5 no schedule at all', () => {
   // is 6 Rest rows (was: hidden). Today's block is unchanged; the last row is Schedule (DEC-115).
   it('"Coming up" is 6 Rest rows; today\'s block and the last row still render', async () => {
     await open('/', withSlots([]))
-    assert.ok(section('Coming up'))
+    assert.equal(section('Coming up'), null, 'req-206 test edit: the header is gone (was: present)')
     assert.deepEqual(comingUp().map(label), [6, 5, 4, 3, 2, 1].map((n) => `${weekdayDate(IN(n))} · Rest`))
     assert.ok(view.container.querySelector('.ui-today-workout'))
     assert.match(view.text(), /Nothing scheduled today\./)

@@ -9,7 +9,7 @@ import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { withFrom } from '../route'
 import { routineStartable } from '../exercise-names.js'
-import { Banner, Button, FileButton, List, NavLink, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { Banner, Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
 import { weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 // req-114 — the Start names its occurrence (slot@date), so startOrContinue only
@@ -335,14 +335,15 @@ export function Today() {
         {importError ? <Banner role="alert">{importError}</Banner> : null}
         {/* req-198 — Schedule and Settings rows dropped (DEC-110 §1); Import is above. */}
         <List>
+          {/* req-206 — "History" became "Schedule", as on the main Home (DEC-115). */}
           <Row to="/routines">Workouts</Row>
-          <Row to="/history">History</Row>
+          <Row to="/schedule">Schedule</Row>
         </List>
       </Screen>
     )
   }
 
-  // req-205 (DEC-114) — top to bottom: "Workouts ›", "Coming up" (6 days, furthest first),
+  // req-205 (DEC-114) — top to bottom: "Workouts ›", the 6 coming days (furthest first; req-206: no header),
   // today's block (+ its stale Continue row), "Schedule ›" (DEC-115: History moved under the
   // Schedule; nothing else here links History but today's done links to a workout's detail). There is no visible title (a
   // visually hidden h1 keeps the page's heading for screen readers). The whole column is
@@ -364,8 +365,8 @@ export function Today() {
           <NavLink to="/routines" chevron="forward">Workouts</NavLink>
         </p>
 
-        {/* req-205 — always the next 6 days, Rest included; no Start on these rows. */}
-        <SectionHeader>Coming up</SectionHeader>
+        {/* req-205 — always the next 6 days, Rest included; no Start on these rows.
+            req-206 — no "Coming up" header: the rows follow "Workouts ›" directly. */}
         <List>
           {[...upcoming].reverse().map((row) => (
             <UpcomingRow key={row.dateKey} routines={routines} row={row} />
@@ -394,10 +395,11 @@ export function Today() {
           </List>
         ) : null}
 
-        {/* req-205 (DEC-115) — was "History ›"; History is now reached from the Schedule. */}
-        <List>
-          <Row to="/schedule">Schedule</Row>
-        </List>
+        {/* req-205 (DEC-115) — was "History ›"; History is now reached from the Schedule.
+            req-206 — the same small link as "Workouts ›" at the top, not a list row. */}
+        <p>
+          <NavLink to="/schedule" chevron="forward">Schedule</NavLink>
+        </p>
       </div>
     </Screen>
   )

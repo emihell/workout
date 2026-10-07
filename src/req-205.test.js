@@ -113,7 +113,7 @@ async function open(hash, data = seed) {
 }
 const squash = (text) => text.replace(/\s+/g, '')
 const link = (text) => view.all('a').find((a) => squash(a.textContent) === squash(text)) ?? null
-const comingUp = () => view.all('.ui-section + .ui-list a.ui-row__link')
+const comingUp = () => view.all('.ui-home-bottom > p + .ui-list a.ui-row__link') // req-206 test edit: no "Coming up" header; the rows' list follows the "Workouts ›" paragraph
 const label = (a) => a.textContent.replace(/›$/, '')
 const withSlots = (slots) => ({ ...seed, schedule: { loopWeeks: 1, anchor: seed.schedule.anchor, slots } })
 const slot = (id, weekday, routineId) => ({ id, week: 0, weekday, routineId })
@@ -180,7 +180,9 @@ describe('DEC-115 Home → Schedule → History', () => {
 
   it('(a) Home\'s last row is "Schedule ›"; nothing on Home links the History list', async () => {
     await open('/', withSlots([slot('s-t', TODAY_WD, 'sess-upper')]))
-    const lastRow = [...view.container.querySelectorAll('.ui-home-bottom > .ui-list')].at(-1)
+    // req-206 test edit: the last row is now a "Schedule ›" NavLink in a <p>, like "Workouts ›" (was a Row in a List).
+    const lastRow = view.container.querySelector('.ui-home-bottom').lastElementChild
+    assert.equal(lastRow.tagName, 'P')
     assert.equal(lastRow.querySelectorAll('a').length, 1)
     assert.equal(squash(lastRow.textContent), 'Schedule›')
     assert.equal(lastRow.querySelector('a').getAttribute('href'), '#/schedule')
