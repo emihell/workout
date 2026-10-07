@@ -3,13 +3,14 @@
 // what finished on it, whether a slot still offers Start now, and the plain copy for
 // the loop line and the Remove confirm.
 import { weekdayName } from '../ids.js'
-import { addDays, coveringWorkout, dateKey, loopWeekIndex, mondayOf } from '../schedule.js'
+import { addDays, coveringWorkout, dateKey, loopWeekIndex, mondayOf, toLocalDate } from '../schedule.js'
 import { completedOnDayKey } from '../history-queries.js'
 
-// The date a day screen stands for. Home's "This week" rows link `/schedule/:week/:weekday`
-// with `?from=/`, and every one of them is a day of `now`'s Mon–Sun week (weekRows). So
-// from Home the date is that week's day with this weekday — provided its loop week is the
-// one in the path (a stale link from last week's Home names another loop week: no date).
+// The date a day screen stands for when its link carries none (req-203). Home's old
+// "This week" rows (req-200, gone in req-204) linked `/schedule/:week/:weekday?from=/`,
+// every one a day of `now`'s Mon–Sun week. So from Home the date is that week's day with
+// this weekday — provided its loop week is the one in the path (a stale link from last
+// week's Home names another loop week: no date). Kept as the no-`?date=` fallback.
 // Entered any other way (Whole plan, a slot page) the screen is the recurring loop day and
 // has no date: null.
 export function homeDayDate(schedule, week, weekday, from, now = new Date()) {
@@ -21,7 +22,20 @@ export function homeDayDate(schedule, week, weekday, from, now = new Date()) {
   return dateKey(date)
 }
 
-// The workouts finished on `date` (the finish date — weekRows' rule, never slot id),
+// req-204 — the date a day screen stands for. Home's "Coming up" rows link the date
+// itself (`?date=`, parsed by route.js), since it can be next week or later. It is used
+// when it really is a day of this path's loop week and weekday; a date that doesn't fit
+// (hand-edited, or a schedule changed since) is ignored. Without a usable date the screen
+// behaves as before: homeDayDate (this week's day when entered from Home), else none.
+export function dayScreenDate(schedule, week, weekday, from, date, now = new Date()) {
+  if (date && dateKey(date) === date) {
+    const day = toLocalDate(date)
+    if (day.getDay() === Number(weekday) && loopWeekIndex(schedule, day) === Number(week)) return date
+  }
+  return homeDayDate(schedule, week, weekday, from, now)
+}
+
+// The workouts finished on `date` (the finish date, never slot id),
 // oldest first so the day reads down in order. None without a date.
 export function doneOnDay(workouts, date) {
   if (!date) return []

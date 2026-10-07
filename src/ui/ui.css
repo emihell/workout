@@ -482,10 +482,21 @@ html:has(.ui-picker-bar) {
 .ui-row--done {
   opacity: 0.45;
 }
-/* req-200 — today's row in Home's "This week" reads bold (its value also says "Today"),
- * so the eye finds today in the seven. Emphasis only. */
-.ui-row--today .ui-row__label {
-  font-weight: 600;
+/* req-204 (DEC-113) — Home is a screen-tall column: the title + "Workouts ›" at the top,
+ * and "Coming up" → today's block → "History ›" pushed to the bottom when the content is
+ * shorter than the viewport, so today's Start sits near the thumb. The min-height is the
+ * viewport less .ui-main's own top/bottom padding and the body's margin (the browser's 8px
+ * top and bottom; the app never resets it), so a short Home does not scroll; a taller one
+ * grows past it and scrolls as normal. (Replaces req-200's .ui-row--today.) */
+.ui-screen--home {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 16px - env(safe-area-inset-top, 0px) - var(--ui-bottom-clear) - var(--ui-s3));
+  min-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - var(--ui-bottom-clear) - var(--ui-s3));
+}
+.ui-home-bottom {
+  margin-top: auto;
 }
 /* req-93 — the small role tag on a non-main exercise row (warm-up / finisher /
  * cardio). Main rows show just a bold name with no tag; this is the lighter,

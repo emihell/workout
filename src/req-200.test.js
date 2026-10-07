@@ -1,7 +1,8 @@
 // req-200 (DEC-110 §4) — Home shows this week: today's block first, then Mon–Sun with rest
 // days; a day opens its ScheduleDay (Start now, an honest loop title, Back to where it came
-// from). `weekRows` (schedule.js) is pure and tested directly; the screens are rendered as
-// the whole App under happy-dom (test-support/render.js), as in req-198/199.
+// from). The screens are rendered as the whole App under happy-dom (test-support/render.js),
+// as in req-198/199. req-204 (DEC-113) replaced Home's week list; what remains here is the
+// stale Continue row and the day screen.
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import React from 'react'
@@ -9,8 +10,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
-import { addDays, dateKey, mondayOf, weekRows } from './schedule.js'
-import { slotAddedState, slotRemovedState } from './state-reducers.js'
+import { dateKey } from './schedule.js'
 import { withFrom } from './route.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -18,82 +18,12 @@ const read = (path) => readFileSync(join(here, path), 'utf8')
 const h = React.createElement
 const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
 
-// ── weekRows (pure) ──────────────────────────────────────────────────────────────────
-// A 2-week loop anchored on Mon 2026-10-12: that week is loop week 0 ("week 1"), so Sat
-// 10-17 is week 0 and Sat 10-10 is week 1 ("week 2"). Week 1's Saturday holds A, week 2's
-// holds B (the review B1 probe's shape). Monday of week 1 holds two slots.
-const TWO_WEEK = {
-  loopWeeks: 2,
-  anchor: '2026-10-12',
-  slots: [
-    { id: 's-a', week: 0, weekday: 6, routineId: 'A' },
-    { id: 's-b', week: 1, weekday: 6, routineId: 'B' },
-    { id: 's-m1', week: 0, weekday: 1, routineId: 'A' },
-    { id: 's-m2', week: 0, weekday: 1, routineId: 'B' },
-  ],
-}
-
-describe('weekRows', () => {
-  it('returns 7 rows Mon–Sun of the given date\'s calendar week, rest days included', () => {
-    const rows = weekRows(TWO_WEEK, [], new Date(2026, 9, 8, 12)) // Thu 2026-10-08
-    assert.deepEqual(rows.map((r) => r.dateKey), ['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'])
-    assert.deepEqual(rows.map((r) => r.weekday), [1, 2, 3, 4, 5, 6, 0])
-    assert.deepEqual(rows[1].slots, [], 'Tuesday is a rest day: a row with no slots')
-  })
-
-  it('AC1: a Sunday today still gets the Mon–Sun week it ends', () => {
-    const rows = weekRows(TWO_WEEK, [], new Date(2026, 9, 11, 9)) // Sun 2026-10-11
-    assert.equal(rows[0].dateKey, '2026-10-05')
-    assert.equal(rows[6].dateKey, '2026-10-11')
-  })
-
-  it('AC1: 2-week loop (Sat A in week 1, Sat B in week 2) → B on Sat 2026-10-10, A on 2026-10-17', () => {
-    // anchor 2026-10-12 → 10-05's week is loop week 1 (week 2 of 2), 10-12's is week 0.
-    const first = weekRows(TWO_WEEK, [], new Date(2026, 9, 10, 12))
-    const sat1 = first.find((r) => r.dateKey === '2026-10-10')
-    assert.equal(sat1.week, 1)
-    assert.deepEqual(sat1.slots.map((s) => s.routineId), ['B'])
-    const second = weekRows(TWO_WEEK, [], new Date(2026, 9, 17, 12))
-    const sat2 = second.find((r) => r.dateKey === '2026-10-17')
-    assert.equal(sat2.week, 0)
-    assert.deepEqual(sat2.slots.map((s) => s.routineId), ['A'])
-  })
-
-  it('AC1: a day with 2 slots returns both, in schedule order', () => {
-    const rows = weekRows(TWO_WEEK, [], new Date(2026, 9, 14, 12)) // week of 10-12 = loop week 0
-    assert.deepEqual(rows[0].slots.map((s) => s.id), ['s-m1', 's-m2'])
-  })
-
-  it('done is by finish date: any workout finished that day, a rest day included', () => {
-    const workouts = [
-      { id: 'w1', routineId: 'Z', finishedAt: new Date(2026, 9, 6, 18).toISOString() }, // Tue, unscheduled
-      { id: 'w2', routineId: 'A', startedAt: new Date(2026, 9, 7, 9).toISOString() }, // not finished
-    ]
-    const rows = weekRows(TWO_WEEK, workouts, new Date(2026, 9, 8, 12))
-    assert.deepEqual(rows.map((r) => r.done), [false, true, false, false, false, false, false])
-  })
-
-  it('AC2: Monday done, then Monday\'s slot removed and re-added → Monday is still done (by date)', () => {
-    const today = new Date(2026, 9, 14, 12) // Wed; Monday 10-12 is loop week 0
-    let state = { schedule: TWO_WEEK, workouts: [
-      { id: 'w1', routineId: 'A', scheduleSlotId: 's-m1', scheduledFor: '2026-10-12', finishedAt: new Date(2026, 9, 12, 19).toISOString() },
-    ] }
-    assert.equal(weekRows(state.schedule, state.workouts, today)[0].done, true)
-    state = slotRemovedState(state, 's-m1')
-    state = slotAddedState(state, { id: 's-new', week: 0, weekday: 1, routineId: 'A' })
-    const monday = weekRows(state.schedule, state.workouts, today)[0]
-    assert.ok(monday.slots.some((s) => s.id === 's-new') && !monday.slots.some((s) => s.id === 's-m1'), 'the slot has a new id')
-    assert.equal(monday.done, true, 'still Done after the slot id changed')
-  })
-})
+// req-204 test edit: the weekRows describe (6 tests) is deleted with weekRows itself —
+// req-204 §3 removed Home's "This week" and its only caller. Its successor,
+// upcomingWorkouts, is tested in req-204.test.js (loop-aware names, 2 slots, rest skipped).
 
 // ── Screens (the whole App) ──────────────────────────────────────────────────────────
 const seed = JSON.parse(read('db.json'))
-const NOW = new Date()
-const TODAY = dateKey(NOW)
-// the seed's 1-week loop; the anchor's Monday makes this week loop week 0
-const WEEK = Array.from({ length: 7 }, (_, i) => addDays(mondayOf(NOW), i))
-const OTHER = WEEK.find((d) => dateKey(d) !== TODAY) // a day of this week that is not today
 
 let view = null
 afterEach(async () => {
@@ -119,64 +49,33 @@ async function tap(node) {
   await flush()
 }
 const stored = () => JSON.parse(localStorage.getItem('workout-mvp-v9'))
-const weekLinks = () => view.all('.ui-section + .ui-list a.ui-row__link')
+const comingUpLinks = () => view.all('.ui-section + .ui-list a.ui-row__link')
 
+// req-204 test edit (DEC-113): three Home tests are deleted with the "This week" list they
+// tested — "order … This week (7 rows)", "each row: date · names or Rest; today marked"
+// and "Done ✓ on that row (by date)". Home's new order, rows and links are tested in
+// req-204.test.js. The F6 test below is kept; only its anchor changed (see there).
 describe('req-200 — Home', () => {
-  it('order: Workouts › → today\'s block → "This week" (7 rows) → History; no upcoming rows', async () => {
-    await open('/')
-    const text = view.text()
-    const at = (needle) => text.indexOf(needle)
-    assert.ok(at('Workouts') < at('This week'))
-    const block = view.container.querySelector('.ui-today-workout')
-    const header = [...view.all('.ui-section')].find((n) => n.textContent === 'This week')
-    assert.ok(block && header, 'today block and the week header both render')
-    assert.ok(block.compareDocumentPosition(header) & 4, 'the week follows today\'s block')
-    assert.equal(weekLinks().length, 7)
-    // only today's block carries Start: no Start button outside it
-    const outside = view.all('button').filter((b) => b.textContent.trim() === 'Start' && !block.contains(b))
-    assert.equal(outside.length, 0, 'no Start on week rows (the upcoming rows are gone)')
-    assert.ok(at('This week') < text.lastIndexOf('History'))
-  })
-
-  it('each row: date · routine names or "Rest"; today marked; tapping opens that day with ?from=/', async () => {
-    await open('/')
-    const rows = weekLinks()
-    const names = { 1: 'Upper Body', 4: 'Lower Body', 5: 'Push / Pull' }
-    rows.forEach((a, i) => {
-      const weekday = WEEK[i].getDay()
-      assert.match(a.textContent, new RegExp(names[weekday] ? names[weekday].replace('/', '\\/') : 'Rest'))
-      assert.equal(a.getAttribute('href'), `#/schedule/0/${weekday}?from=%2F`)
-    })
-    const todayRow = rows[WEEK.findIndex((d) => dateKey(d) === TODAY)]
-    assert.match(todayRow.textContent, /Today/)
-    assert.ok(todayRow.closest('li').classList.contains('ui-row--today'))
-    assert.equal(view.all('.ui-row--today').length, 1)
-  })
-
-  it('a workout finished on a day of this week shows "Done ✓" on that row (by date)', async () => {
-    const finishedAt = new Date(OTHER.getFullYear(), OTHER.getMonth(), OTHER.getDate(), 12).toISOString()
-    const w = { ...seed.workouts[0], id: 'w-this-week', finishedAt, startedAt: finishedAt, performedOn: dateKey(OTHER), scheduleSlotId: 'gone', scheduledFor: null }
-    await open('/', { ...seed, workouts: [...seed.workouts, w] })
-    const row = weekLinks()[WEEK.indexOf(OTHER)]
-    assert.match(row.textContent, /Done ✓/)
-  })
-
-  it('review F6: a stale in-progress workout keeps its Continue row on Home, above the week', async () => {
+  it('review F6: a stale in-progress workout keeps its Continue row on Home, under today\'s block', async () => {
     // older than every seeded workout: the old 2-row recent peek (merged by date) dropped it
     const old = '2026-01-05T10:00:00.000Z'
     const active = { ...seed.workouts[0], id: 'w-stale', finishedAt: null, startedAt: old, performedOn: dateKey(old), scheduleSlotId: null, scheduledFor: null }
     await open('/', { ...seed, activeWorkout: active })
     const cont = buttons('Continue')
     assert.equal(cont.length, 1, 'the Continue row is there')
-    const header = [...view.all('.ui-section')].find((n) => n.textContent === 'This week')
-    assert.ok(cont[0].compareDocumentPosition(header) & 4, 'Continue sits above the week')
+    // req-204 test edit: was "above the week" (the "This week" header is gone). The row
+    // keeps its place: after today's block, before the History link.
+    const block = view.container.querySelector('.ui-today-workout')
+    assert.ok(block.compareDocumentPosition(cont[0]) & 4, 'Continue follows today\'s block')
+    assert.ok(cont[0].compareDocumentPosition(link('History›')) & 4, 'and sits above History')
   })
 })
 
 describe('req-200 — the day screen', () => {
   it('from Home: Back → "/", no Today link; 1-week loop title is the bare weekday; no "Whole plan"', async () => {
-    await open('/')
-    await tap(weekLinks()[5]) // Saturday
+    // req-204 test edit: Home has no week row to tap any more, so this opens the link the
+    // Saturday row had (`/schedule/0/6?from=/`) directly. Assertions unchanged.
+    await open('/schedule/0/6?from=%2F')
     assert.equal(window.location.hash, '#/schedule/0/6?from=%2F')
     assert.equal(backHref(), '#/')
     assert.equal(link('Today'), null, 'Back already goes home')
@@ -201,10 +100,12 @@ describe('req-200 — the day screen', () => {
     // req-203 test edit: Start now no longer shows on a past date, so the seed's Friday is
     // not usable on a Saturday or Sunday. Push / Pull on every day, and Sunday's row (index
     // 6: today or later on any day of the week) is the one tapped. Same assertions.
+    // req-204 test edit: the tapped row is now the nearest "Coming up" row (tomorrow, the
+    // last row: furthest first), always a future date, so Start now shows. Same assertions.
     const slots = [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({ id: `s-pp-${weekday}`, week: 0, weekday, routineId: 'sess-push-pull' }))
     await open('/', { ...seed, schedule: { ...seed.schedule, loopWeeks: 1, slots } })
-    const sunday = weekLinks()[6] // Push / Pull
-    await tap(sunday)
+    const nearest = comingUpLinks().at(-1) // Push / Pull, tomorrow
+    await tap(nearest)
     assert.equal(stored().activeWorkout, null)
     await tap(buttons('Start now')[0])
     assert.equal(stored().activeWorkout?.routineId, 'sess-push-pull')

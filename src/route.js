@@ -187,20 +187,33 @@ function rawQueryValue(rawQuery, key) {
 // req-171 — `?from=` on any route (was exercise-edit only, req-99): the path of the
 // screen the user came from, for a screen with more than one way in. Present on the
 // parsed route only when valid (returnPathOf).
+//
+// req-204 — a day screen may also carry `?date=YYYY-MM-DD` (Home's "Coming up" rows link
+// the day they stand for, which can be next week). Read only on `schedule-day`, and only
+// in that shape; whether it fits the path's week/weekday is the screen's call
+// (schedule-day.js dayScreenDate). Workout routes keep their own path-segment `date`.
+const DAY_DATE = /^\d{4}-\d{2}-\d{2}$/
+
 export function parseRoute(path) {
   const [rawPath, rawQuery] = String(path).split('?')
-  const route = matchRoute(rawPath) || { name: 'today' }
+  let route = matchRoute(rawPath) || { name: 'today' }
+  if (route.name === 'schedule-day') {
+    const date = rawQueryValue(rawQuery, 'date')
+    if (date && DAY_DATE.test(date)) route = { ...route, date }
+  }
   const from = returnPathOf(rawQuery)
   return from ? { ...route, from } : route
 }
 
 // `?from=` for a link: `path` carrying `from` (as given — a path, not yet encoded), or
-// `path` unchanged when there is none.
+// `path` unchanged when there is none. req-204: a path that already has a query (a day
+// screen's `?date=`) gets `&from=`, so the query stays one string with `from` last.
 export function withFrom(path, from) {
-  return from ? `${path}?from=${encodeURIComponent(from)}` : path
+  if (!from) return path
+  return `${path}${String(path).includes('?') ? '&' : '?'}from=${encodeURIComponent(from)}`
 }
 
-// A link from the screen at `here` (its own path, without query) down to `child`,
+// A link from the screen at `here` (its own path, without `from`) down to `child`,
 // whose fixed parent IS `here`. When `here` was itself entered with a `from`, the link
 // carries `here?from=…` so the child's Back returns to this exact screen and this
 // screen's Back still returns to where it was entered from — the chain unwinds.

@@ -131,28 +131,26 @@ export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlot
   return done.find((w) => !w.scheduledFor && dateKey(w.finishedAt) === scheduledDate) || null
 }
 
-// req-200 (DEC-110 §4) — Home's "This week": the 7 days Mon–Sun of `today`'s calendar
-// week, one row each, rest days included. Each row names its loop week (0-based) and
-// weekday (0=Sun..6=Sat, getDay — the ScheduleDay route's own pair, so a tap opens
-// exactly that day's slots), its slots in schedule order, and `done`: did ANY workout
-// finish on that date. Done is BY DATE (the finish date, as completedOnDayKey reads it),
-// never by slot id — a slot removed and re-added gets a new id, and a past day must not
-// lose its Done (review F2). Inlined rather than imported: history-queries imports this
-// module, so importing it back would be a cycle. Pure.
-export function weekRows(schedule, workouts, today = new Date()) {
-  const monday = mondayOf(today)
-  const finished = new Set(
-    (workouts || []).filter((workout) => workout.finishedAt).map((workout) => dateKey(workout.finishedAt)),
-  )
-  return Array.from({ length: 7 }, (_, i) => {
-    const date = addDays(monday, i)
-    const key = dateKey(date)
-    return {
-      dateKey: key,
-      week: loopWeekIndex(schedule, date),
-      weekday: date.getDay(),
-      slots: slotsOn(schedule, date),
-      done: finished.has(key),
-    }
-  })
+// req-204 (DEC-113) — Home's "Coming up": the next `n` dates AFTER today (today is
+// excluded — today's block owns it) that hold at least one slot whose routine is active
+// (present and not archived). One row per date, so a day with two workouts is one row.
+// Each row names its loop week (0-based) and weekday (0=Sun..6=Sat, getDay — the
+// ScheduleDay route's own pair), and only the slots with an active routine, in schedule
+// order. Nearest first; Home reverses it (furthest on top).
+//
+// The scan is bounded: every date with a workout recurs once per loop (loopWeeks × 7
+// days), so a loop with none in its first `loop × 7` days has none at all and returns []
+// after that one pass; otherwise `n` loops always hold `n` hits. Pure.
+export function upcomingWorkouts(schedule, routines, today = new Date(), n = 3) {
+  const period = clampLoopWeeks(schedule?.loopWeeks) * 7
+  const active = new Set((routines || []).filter((routine) => routine && !routine.archivedAt).map((routine) => routine.id))
+  const rows = []
+  for (let i = 1; i <= period * n && rows.length < n; i += 1) {
+    if (i > period && rows.length === 0) break
+    const date = addDays(today, i)
+    const slots = slotsOn(schedule, date).filter((slot) => active.has(slot.routineId))
+    if (!slots.length) continue
+    rows.push({ dateKey: dateKey(date), week: loopWeekIndex(schedule, date), weekday: date.getDay(), slots })
+  }
+  return rows
 }
