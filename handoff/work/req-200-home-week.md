@@ -58,3 +58,16 @@
    weekday's slot in v9 (receipt: `schedule.slots`).
 5. Browser: Home → tomorrow's row → Start now → a workout starts. Receipt: `activeWorkout.routineId`.
 6. `./check` green. The smoke test passes; update it if it used the upcoming rows.
+
+## Built — calls `(unconfirmed)`
+- **"Start now"** is an untagged start (`startOrContinue`), the same as the Workouts list's Start. Thursday trained on
+  Wednesday shows "Done" on Wednesday (by date) and leaves Thursday open. Tagging the slot would claim an occurrence that isn't
+  one.
+- "Whole plan ›" is hidden when Back is `/schedule`.
+- **Today's row** is bold, with "Today"; when done it reads "Today · Done ✓".
+- Week rows are one line each, under a "This week" header.
+- **The stale Continue row** is always shown right under today's block.
+- **`ScheduleDayAdd`** follows `from`.
+- `remainingInLoop` is deleted (no callers).
+- **Loose end:** a slot detail page opened from the day screen goes Back to the plain day path, whose Back is `/schedule`,
+  not Home. It goes into req-202.
