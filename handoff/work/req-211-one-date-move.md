@@ -1,6 +1,6 @@
 # req-211 — "Change day" from Home moves one date only; the Schedule view moves every week
 
-**Status: READY** (2026-10-07). **Lane: data** (a persisted-schema addition, DEC-117 §2).
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-211` (`f0ee25d`…`b4592fa`, 4 commits).** (2026-10-07). **Lane: data** (a persisted-schema addition, DEC-117 §2).
 
 **Gate before merge:**
 - round-trip and legacy-key tests;
