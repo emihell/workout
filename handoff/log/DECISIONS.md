@@ -1846,3 +1846,29 @@ you can quiclky go back?"
   Removing the dock also removes content hidden under it (review F4, s07).
 
 `(unconfirmed)`: the link's label and placement (top row vs a floating button). Applied to req-198 mid-build.
+
+## DEC-113 — Home: the next 3 workouts above, today at the bottom, no past days or rest rows  (Emilio, 2026-10-07, supersedes DEC-110 §4's Home layout)
+
+Emilio: "the front screen is now very busy, i did not mean that you just force merge everything … keep it as it was before
+… maybe … all 6 days forward, and no backwards day". Then: "i am not a super fan of today being top, i like that its on the
+bottom, ergonomically its closer to your thumb and if we are showing the future and none of the past, then it also make
+sense that the future is above".
+
+Planner's miss, recorded: his original question ("that list is essentially a 5 days slot in the schedule? maybe it should be
+the schedule?") was built as a full Mon–Sun calendar. That was over-reach, merged without his look.
+
+**Home, top to bottom:**
+1. Title, then "Workouts ›".
+2. **Coming up:** the next 3 scheduled workouts after today, rolling and loop-aware, skipping rest days. Furthest is on top,
+   so the nearest sits just above today.
+   - Each row reads "{date} · {name} ›" and opens that day's screen with its date.
+   - No Start on these rows. Start-ahead is on the day screen.
+3. **Today's block**, unchanged: Start / Continue / done-today rows / "Done ✓ — see your sets ›" / the empty state.
+4. "History ›".
+
+Gone: the "This week" Mon–Sun list, rest-day rows, and the recent-past rows.
+
+This restores req-60's order (future on top, today below, history last; DEC-093 "Kept"), minus the past rows. DEC-110 §4's
+day screen, Start now and loop-honest titles stay.
+
+`(unconfirmed)`: 3 rows; content bottom-aligned on a tall screen so today sits near the thumb.

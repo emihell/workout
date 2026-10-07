@@ -1,3 +1,5 @@
+> **Layout superseded by DEC-113 / req-204** (Emilio: "the front screen is now very busy"). The day screen stays.
+
 # req-200 — Home shows this week: today first, then Mon–Sun with rest days; a day opens its schedule screen
 
 **Status: BUILT AND MERGED, 2026-10-07 — branch `req-200` (`a630477`…`433f384`, 2 commits).** (2026-10-07). **Lane: ui.** From DEC-110 §4 and review B1/F2–F6. Builds after req-199. Touches
