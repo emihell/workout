@@ -70,8 +70,10 @@ test('/settings is titled "Backup & data", Back → /history, Export then Import
     assert.ok(i > 0, needle)
     return i
   }
-  const exp = at('Export\n')
-  const imp = at('label="Import"')
+  // req-203 test edit (§4): the buttons read "Back up now" (was "Export") and "Restore from
+  // a backup" (was "Import"); the order check is unchanged.
+  const exp = at('Back up now\n')
+  const imp = at('label="Restore from a backup"')
   const dev = at('<SectionHeader>Developer</SectionHeader>')
   assert.ok(exp < imp && imp < dev, 'Export, then Import, then the Developer group')
   // the Developer group holds the four developer tools, after the header

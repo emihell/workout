@@ -987,13 +987,20 @@ export function restClockText(seconds) {
 
 // req-186 — everything the workout pill shows, pure: null when there's no current
 // exercise; else the item, "set N/M", and either the rest clock (resting) or GO.
+// req-203 §7 (Lena s20) — once the last set of an exercise is logged the pill moves on to
+// the next exercise, which has nothing logged yet; "set 1/3" there read as the exercise
+// just finished. So an item with no logged (non-skipped) set carries no set count:
+// `setText` is '' and the label is the clock or GO alone. The count returns with its
+// first logged set.
 export function workoutPillState(workout, now) {
   const item = currentWorkoutItem(workout)
   if (!item) return null
   const { current, total } = itemSetPosition(workout, item)
   const { remainingMs, resting } = restRemaining(workout, now)
-  const setText = `set ${current}/${total}`
+  const started = setsForItem(workout?.sets || [], item).some((set) => !isSkippedSet(set))
+  const setText = started ? `set ${current}/${total}` : ''
   const clock = resting ? restClockText(remainingMs / 1000) : null
+  const lead = resting ? clock : 'GO'
   return {
     item,
     current,
@@ -1002,7 +1009,7 @@ export function workoutPillState(workout, now) {
     go: !resting,
     clock,
     setText,
-    label: resting ? `${clock} · ${setText}` : `GO · ${setText}`,
+    label: setText ? `${lead} · ${setText}` : lead,
   }
 }
 

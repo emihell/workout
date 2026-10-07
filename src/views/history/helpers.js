@@ -145,3 +145,23 @@ export function groupWorkoutsByMonth(workouts) {
     })
     .map(([key, items]) => ({ key, workouts: items }))
 }
+
+// req-203 §5 (Lena s48) — History › By exercise: a date row's numbers, the session's
+// heaviest WORKING set of that exercise as "25 kg × 10". Working = not a warm-up and not
+// skipped, with a kg above 0. A tie on kg goes to the most reps (20×12, 25×10, 25×8 →
+// "25 kg × 10"). No reps logged → "25 kg". No such set (bodyweight, cardio, all skipped)
+// → null, and the row keeps its "N sets". Logged values only (DESIGN §1). Pure.
+export function topSetText(sets, exerciseId) {
+  let top = null
+  for (const set of sets || []) {
+    if (set?.exerciseId !== exerciseId || set.setType === 'wu' || isSkippedSet(set)) continue
+    const kg = Number(set.weight)
+    if (set.weight == null || set.weight === '' || !Number.isFinite(kg) || kg <= 0) continue
+    const reps = Number(set.reps)
+    const repsRank = Number.isFinite(reps) ? reps : -1
+    if (!top || kg > top.kg || (kg === top.kg && repsRank > top.repsRank)) top = { kg, repsRank, set }
+  }
+  if (!top) return null
+  const reps = top.set.reps != null && top.set.reps !== '' ? String(top.set.reps) : ''
+  return reps ? `${top.set.weight} kg × ${reps}` : `${top.set.weight} kg`
+}

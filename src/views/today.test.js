@@ -44,7 +44,9 @@ test('each routine gets its own Start with its own slot, or Done once covered', 
   assert.match(routine, /coveringWorkout\(store\.workouts, routine\.id, date, slot\.id\)/)
   assert.match(routine, /<StartButton store=\{store\} routine=\{routine\} slot=\{slot\} date=\{date\} variant="primary" block \/>/)
   // req-114 — `Done` now prints the shared weekdayDate format (was the raw ISO key).
-  assert.match(routine, /Done \{weekdayDate\(dateKey\(done\.finishedAt\)\)\}/)
+  // req-203 test edit (§2): the done line is now a link to that workout's History detail,
+  // "Done ✓ — see your sets ›", Back → Home. Still keyed off the same `done` (coveringWorkout).
+  assert.match(routine, /<NavLink to=\{withFrom\(`\/history\/\$\{done\.id\}`, '\/'\)\} chevron="forward">\s*Done ✓ — see your sets\s*<\/NavLink>/)
   // StartButton threads the slot through to the workout (scheduleSlotId)
   assert.match(fnBody('StartButton'), /scheduleSlotId: slot\.id/)
 })

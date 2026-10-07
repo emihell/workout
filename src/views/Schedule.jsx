@@ -1,5 +1,8 @@
 import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
-import { clampLoopWeeks, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
+import { clampLoopWeeks, dateKey, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
+import { routineById } from '../model.js'
+import { workoutRoutineId, workoutRoutineName } from './history/helpers'
+import { dayEveryText, doneOnDay, homeDayDate, longWeekdayDate, removeSlotText, startNowShown } from './schedule-day.js'
 import { childLink, go } from '../route'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
@@ -116,9 +119,16 @@ export function ScheduleLoop() {
 // or from a row of Home's "This week" (`?from=/`, so Back → Home and the Today link is
 // absent). Each slot has **Start now**: that routine, today, through the same off-schedule
 // start the Routines list uses (startOrContinue) — the 2-tap start-ahead the upcoming rows
-// had (review F5). The title is honest about the loop ("Saturday · week 2 of 2", review
-// B1), and in a longer loop "Whole plan ›" reaches the other weeks — unless Back already
+// had (review F5). The screen is honest about the loop (review B1; req-203: the sub line
+// "Every Saturday in week 2 of 2", was the title's " · week 2 of 2"), and in a longer loop "Whole plan ›" reaches the other weeks — unless Back already
 // goes there. Remove edits THIS loop week's slot only (removeSlot; no schema change).
+//
+// req-203 §1 / §3 (Lena run 3, s33: "Where are my sets? Start now — did it not save?") —
+// entered from Home the screen is a DATE (homeDayDate): the title reads "Wednesday, Oct 7",
+// the workouts finished that date head the screen as "{name} · Done ✓ ›" links to their
+// History detail (Back returns here), and Start now shows only on today (until a finished
+// workout covers the slot) and later — never on a past date. A sub line says the slots
+// repeat ("Every Wednesday [in week N of M]"), and Remove's confirm says what it does.
 export function ScheduleDay({ week, weekday, from = null }) {
   const store = useStore()
   const routines = activeRoutines(store)
@@ -126,29 +136,45 @@ export function ScheduleDay({ week, weekday, from = null }) {
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
   const backTo = from || '/schedule'
   const here = dayPathOf(week, weekday)
+  const now = new Date()
+  const todayKey = dateKey(now)
+  const date = homeDayDate(store.schedule, week, weekday, from, now)
+  const done = doneOnDay(store.workouts, date)
 
   return (
     <Screen>
       <Back to={backTo} />
-      <Title>
-        {weekdayName(weekday)}
-        {loop > 1 ? ` · week ${week + 1} of ${loop}` : ''}
+      <Title subtitle={dayEveryText(weekday, week, loop)}>
+        {date ? longWeekdayDate(date, now) : weekdayName(weekday)}
       </Title>
+      {done.length ? (
+        <List>
+          {done.map((workout) => (
+            <Row key={workout.id} to={childLink(`/history/${workout.id}`, here, from)}>
+              {workoutRoutineName(workout, routineById(store.routines, workoutRoutineId(workout)))} · Done ✓
+            </Row>
+          ))}
+        </List>
+      ) : null}
       {slots.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {slots.map((slot) => {
           const { routine } = resolveSlot(routines, slot)
+          const startable =
+            routine &&
+            routineStartable(routine) &&
+            startNowShown({ workouts: store.workouts, routineId: routine.id, slotId: slot.id, date, todayKey })
           return (
             <Row
               key={slot.id}
               action={
                 <>
-                  {routine && routineStartable(routine) ? (
+                  {startable ? (
                     <Button onClick={() => startOrContinue(store, routine.id)}>Start now</Button>
                   ) : null}
                   <Button
                     onClick={async () => {
-                      if (!(await askConfirm(`Remove ${slotLabel(routines, slot)}?`, { confirmLabel: 'Remove' }))) return
+                      if (!(await askConfirm(removeSlotText(slotLabel(routines, slot), weekday, week, loop), { confirmLabel: 'Remove' }))) return
                       store.removeSlot(slot.id)
                     }}
                   >

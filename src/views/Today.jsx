@@ -121,7 +121,13 @@ function TodayRoutine({ store, routine, slot, date }) {
         {routine.name}
       </p>
       {done ? (
-        <p className="ui-sub">Done {weekdayDate(dateKey(done.finishedAt))}</p>
+        // req-203 §2 — the done line opens the sets (Lena run 3 took 5 taps to see them);
+        // Back returns Home, as req-195's done-today rows.
+        <p className="ui-sub">
+          <NavLink to={withFrom(`/history/${done.id}`, '/')} chevron="forward">
+            Done ✓ — see your sets
+          </NavLink>
+        </p>
       ) : (
         <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
       )}
