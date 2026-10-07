@@ -37,8 +37,12 @@ export function Routines() {
   const store = useStore()
   const routines = (store.routines || []).filter((routine) => !routine.archivedAt)
 
+  // req-199 (DEC-110 §3, DEC-112) — the Library toggle is gone: this is the plain list,
+  // reached from Home's "Workouts ›", so Back goes home. Exercises and the schedule sit
+  // below it as two rows; their screens and routes are unchanged (review F14).
   return (
     <Screen>
+      <Back to="/" />
       <Title>Routines</Title>
       <p>
         <NavLink to="/routines/new" chevron="forward">Add routine</NavLink>
@@ -46,30 +50,29 @@ export function Routines() {
       {routines.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
         {routines.map((routine) => (
-          // req-56 — each row carries two actions. Edit is navigation to the
-          // routine detail/manage screen, so per DEC-016 it's a link (styled as a
-          // button, like the tab-bar links / Back); Start is a state change, so a
-          // <Button>. DESIGN §4: retreat/secondary (Edit) left, primary (Start)
-          // right. Start reuses the req-55 one-in-progress / abandon-on-new path.
+          // req-56 / req-199 — the name is the link to the routine (navigation, DEC-016);
+          // Start is a state change, so a <Button> beside it. The row's Edit button went
+          // in req-199: it duplicated the name link. Start reuses the req-55
+          // one-in-progress / abandon-on-new path.
           <Row
             key={routine.id}
+            to={routinePath(routine.id)}
             action={
-              <>
-                <NavLink to={routinePath(routine.id)} look="secondary">
-                  Edit
-                </NavLink>
-                {/* req-127 — no Start on an empty routine (it made an empty workout), as in the preview. */}
-                {routineStartable(routine) ? (
-                  <Button variant="secondary" onClick={() => startOrContinue(store, routine.id)}>
-                    Start
-                  </Button>
-                ) : null}
-              </>
+              // req-127 — no Start on an empty routine (it made an empty workout), as in the preview.
+              routineStartable(routine) ? (
+                <Button variant="secondary" onClick={() => startOrContinue(store, routine.id)}>
+                  Start
+                </Button>
+              ) : null
             }
           >
             {routine.name}
           </Row>
         ))}
+      </List>
+      <List>
+        <Row to="/exercises">Your exercises</Row>
+        <Row to="/schedule">Whole plan</Row>
       </List>
     </Screen>
   )
