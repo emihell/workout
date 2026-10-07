@@ -16,9 +16,20 @@ function gitSha() {
   }
 }
 
-export default defineConfig({
+// req-197 — the build id analytics counts screen events by: the short sha on `vite build`,
+// "dev" under `vite` (npm run dev) or when the sha can't be read.
+function buildId(command) {
+  if (command !== 'build') return 'dev'
+  const sha = gitSha()
+  return sha === 'unknown' ? 'dev' : sha
+}
+
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  define: { __APP_VERSION__: JSON.stringify(gitSha()) },
+  define: {
+    __APP_VERSION__: JSON.stringify(gitSha()),
+    __BUILD_ID__: JSON.stringify(buildId(command)),
+  },
   base: process.env.GITHUB_PAGES === 'true' ? '/workout/' : '/',
   // req-165 (F-BUNDLE-1) — the one chunk over Vite's 500 kB default is the LAZY exercise
   // library (exerciseLibrary.js loadExerciseLibrary → library/exercises.json), measured
@@ -33,4 +44,4 @@ export default defineConfig({
   // Applied to both servers so `npm run dev -- --host` behind Tailscale works too.
   server: { allowedHosts: ['.ts.net'] },
   preview: { allowedHosts: ['.ts.net'] },
-})
+}))

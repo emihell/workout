@@ -175,11 +175,11 @@ describe('AC2 — the summary (rendered)', () => {
     await view.click(view.button('Keep going'))
     assert.equal(cancelled, 1)
     // review fix 2 — the manual tap: its own analytics id, no beep
-    const { exportAnalytics } = await import('./analytics.js')
-    const before = { ...exportAnalytics().buttons }
+    const { exportAnalytics, sumDays } = await import('./analytics.js')
+    const before = { ...sumDays(exportAnalytics()).buttons }
     await view.click(view.button('Finish'))
     assert.equal(calls.finish, 1)
-    const after = exportAnalytics().buttons
+    const after = sumDays(exportAnalytics()).buttons
     assert.equal((after['summary-finish-workout'] || 0) - (before['summary-finish-workout'] || 0), 1)
     assert.equal(after['auto-finish-workout'] || 0, before['auto-finish-workout'] || 0, 'not the auto-finish event')
     assert.equal(oscillators, 0, 'no beep on the manual Finish')
@@ -193,11 +193,12 @@ describe('AC2 — the summary (rendered)', () => {
     view = await render(h(AutoCompleteSummary, { routineId: 'r', active: w, store, onCancel: () => {} }))
     assert.match(view.text(), /Finishing in 10s…/)
     assert.deepEqual(view.all('button').map((b) => b.textContent.trim()), ['Edit', 'Keep going'])
-    const autoBefore = (await import('./analytics.js')).exportAnalytics().buttons['auto-finish-workout'] || 0
+    const { exportAnalytics, sumDays } = await import('./analytics.js')
+    const autoBefore = sumDays(exportAnalytics()).buttons['auto-finish-workout'] || 0
     const oscBefore = oscillators
     await act(async () => mock.timers.tick(10500))
     assert.equal(calls.finish, 1)
-    assert.equal((await import('./analytics.js')).exportAnalytics().buttons['auto-finish-workout'], autoBefore + 1)
+    assert.equal(sumDays(exportAnalytics()).buttons['auto-finish-workout'], autoBefore + 1)
     assert.ok(oscillators > oscBefore, 'the auto-finish still beeps')
   })
 })

@@ -46,7 +46,10 @@ const validState = () => ({
 
 describe('req-115 commitBackup — failure cases throw, state unchanged', () => {
   // A real analytics export (Settings → Export analytics) is the measured repro.
-  const analyticsExport = { ...emptyAnalytics(), screens: { today: 3, settings: 1 }, buttons: { import: 1 } }
+  const analyticsExport = {
+    ...emptyAnalytics(),
+    days: { '2026-10-07': { screens: { today: 3, settings: 1 }, transitions: {}, buttons: { import: 1 }, builds: { abc1234: 4 } } },
+  }
   const cases = {
     'the analytics export': analyticsExport,
     '{workouts:[null]}': wrap({ workouts: [null] }),
