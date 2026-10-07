@@ -1872,3 +1872,15 @@ This restores req-60's order (future on top, today below, history last; DEC-093 
 day screen, Start now and loop-honest titles stay.
 
 `(unconfirmed)`: 3 rows; content bottom-aligned on a tall screen so today sits near the thumb.
+
+## DEC-114 — Home: the next 6 days, rest days included; no "Today" title; no gap  (Emilio, 2026-10-07, amends DEC-113)
+
+Emilio, after req-204 shipped: "why not show all 6 days forward? remove the empty space, remove top today title".
+
+- **"Coming up" becomes the next 6 calendar days after today**, furthest first, every day shown.
+  - A rest day reads "{date} · Rest" in muted text and still opens its day screen, where a workout can be added.
+  - A day with 2 workouts is one row.
+- **No "Today" title.** Home starts with "Workouts ›". The page keeps a visually hidden heading for screen readers.
+- **No gap between sections.** The whole column (Workouts › … History ›) sits together at the bottom of a tall screen, so any
+  spare space is above the first line, never between sections. `(unconfirmed)`
+- Today's block and History are unchanged.
