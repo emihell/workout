@@ -92,9 +92,11 @@ export function History({ month = null }) {
   // req-198 / DEC-110 §1 — "Backup & data" closes the screen always, even with zero
   // workouts, so Import is reachable on a device that has routines but no history
   // (review F11).
+  // req-205 (DEC-115) — History is reached from the Schedule's "History ›", so Back goes there
+  // (was "/"); not being "/", the Today link shows beside it (showsTodayLink).
   return (
     <Screen>
-      <Back to="/" />
+      <Back to="/schedule" />
       <Title>History</Title>
       <p>
         <NavLink to="/history/exercises" chevron="forward">By exercise</NavLink>

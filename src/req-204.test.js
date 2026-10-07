@@ -129,7 +129,8 @@ describe('AC2 Home', () => {
     const cont = buttons('Continue')
     assert.equal(cont.length, 1)
     assert.ok(block.compareDocumentPosition(cont[0]) & 4)
-    assert.ok(cont[0].compareDocumentPosition(link('History›')) & 4)
+    // req-205 test edit (DEC-115): Home's last row is "Schedule ›" (was "History ›").
+    assert.ok(cont[0].compareDocumentPosition(link('Schedule›')) & 4)
     assert.ok(section('Coming up').compareDocumentPosition(block) & 4)
   })
 
@@ -185,13 +186,13 @@ describe('AC3 the nearest row, next week', () => {
 
 describe('AC5 no schedule at all', () => {
   // req-205 test edit (DEC-114): "Coming up" is always the next 6 days, so with no schedule it
-  // is 6 Rest rows (was: hidden). Today's block and History assertions are unchanged.
-  it('"Coming up" is 6 Rest rows; today\'s block and History still render', async () => {
+  // is 6 Rest rows (was: hidden). Today's block is unchanged; the last row is Schedule (DEC-115).
+  it('"Coming up" is 6 Rest rows; today\'s block and the last row still render', async () => {
     await open('/', withSlots([]))
     assert.ok(section('Coming up'))
     assert.deepEqual(comingUp().map(label), [6, 5, 4, 3, 2, 1].map((n) => `${weekdayDate(IN(n))} · Rest`))
     assert.ok(view.container.querySelector('.ui-today-workout'))
     assert.match(view.text(), /Nothing scheduled today\./)
-    assert.ok(link('History›'))
+    assert.ok(link('Schedule›'), 'req-205 test edit (DEC-115): the last row is Schedule (was History)')
   })
 })

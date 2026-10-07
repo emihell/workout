@@ -1,5 +1,7 @@
 // req-205 (DEC-114) — Home: "Coming up" is the next 6 calendar days (rest days included,
 // furthest first), no visible "Today" title, and the whole column is one bottom-aligned block.
+// DEC-115 — Home's last row is "Schedule ›"; History hangs off the Schedule (Back → /schedule),
+// the Schedule's Back is Home, and the Workouts list loses "Whole plan ›".
 // `comingDays` (schedule.js) is pure and tested directly; Home and the day screen render as
 // the whole App under happy-dom, as in req-204.
 import { describe, it, afterEach } from 'node:test'
@@ -136,7 +138,7 @@ describe('AC1/AC2 Home', () => {
     assert.match(read('ui/ui.css'), /\.ui-row--rest \.ui-row__label \{\s*color: var\(--ui-ink-2\);/)
   })
 
-  it('no visible "Today" title; a visually hidden h1 stays; order Workouts › → rows → today → History in one block', async () => {
+  it('no visible "Today" title; a visually hidden h1 stays; order Workouts › → rows → today → Schedule in one block', async () => {
     await open('/', withSlots([slot('s-t', TODAY_WD, 'sess-upper')]))
     assert.equal(view.container.querySelector('.ui-title'), null, 'no visible title')
     const h1 = view.all('h1')
@@ -148,7 +150,7 @@ describe('AC1/AC2 Home', () => {
     const workouts = link('Workouts›')
     const rows = comingUp()
     const block = view.container.querySelector('.ui-today-workout')
-    const history = link('History›')
+    const history = link('Schedule›')
     for (const node of [workouts, ...rows, block, history]) assert.ok(column.contains(node))
     const before = (a, b) => Boolean(a.compareDocumentPosition(b) & 4)
     assert.ok(before(workouts, rows[0]) && before(rows.at(-1), block) && before(block, history))
@@ -167,6 +169,59 @@ describe('AC4 a Rest row opens its dated day screen', () => {
     assert.equal(view.container.querySelector('.ui-title')?.textContent, longWeekdayDate(IN(1), NOW))
     assert.match(view.text(), /None\./)
     assert.ok(link('Add workout ›'))
+    await tap(link('‹ Back'))
+    assert.equal(window.location.hash, '#/')
+  })
+})
+
+describe('DEC-115 Home → Schedule → History', () => {
+  const backHref = () => view.all('a').find((a) => a.textContent.trim() === '‹ Back')?.getAttribute('href') ?? null
+  const todayLink = () => view.all('a').filter((a) => a.textContent.trim() === 'Today')
+
+  it('(a) Home\'s last row is "Schedule ›"; nothing on Home links the History list', async () => {
+    await open('/', withSlots([slot('s-t', TODAY_WD, 'sess-upper')]))
+    const lastRow = [...view.container.querySelectorAll('.ui-home-bottom > .ui-list')].at(-1)
+    assert.equal(lastRow.querySelectorAll('a').length, 1)
+    assert.equal(squash(lastRow.textContent), 'Schedule›')
+    assert.equal(lastRow.querySelector('a').getAttribute('href'), '#/schedule')
+    assert.equal(view.all('a').filter((a) => /^#\/history(\?|$)/.test(a.getAttribute('href') || '')).length, 0)
+  })
+
+  it('(b) Schedule → "History ›" opens History; History\'s Back → Schedule; Schedule\'s Back → Home', async () => {
+    await open('/')
+    await tap(link('Schedule›'))
+    assert.equal(window.location.hash, '#/schedule')
+    assert.equal(backHref(), '#/')
+    assert.equal(todayLink().length, 0, 'Back is "/": no Today link')
+    // "History ›" is the last row on the Schedule, below the plan
+    const lists = view.container.querySelectorAll('.ui-screen .ui-list')
+    assert.equal(squash([...lists].at(-1).textContent), 'History›')
+    await tap(link('History›'))
+    assert.equal(window.location.hash, '#/history')
+    assert.ok(view.all('h1').some((n) => n.textContent === 'History'))
+    assert.ok(link('By exercise ›') && link('Backup & data›'), 'History\'s contents unchanged')
+    assert.equal(backHref(), '#/schedule')
+    assert.equal(todayLink()[0]?.getAttribute('href'), '#/', 'History now carries the Today link')
+    await tap(link('‹ Back'))
+    assert.equal(window.location.hash, '#/schedule')
+    await tap(link('‹ Back'))
+    assert.equal(window.location.hash, '#/')
+  })
+
+  it('(c) the Workouts list has no "Whole plan ›"; "Your exercises ›" stays', async () => {
+    await open('/routines')
+    assert.equal(link('Whole plan ›'), null)
+    assert.equal(view.all('a').filter((a) => a.getAttribute('href') === '#/schedule').length, 0)
+    assert.equal(link('Your exercises ›')?.getAttribute('href'), '#/exercises')
+  })
+
+  it('(d) failure case: Home\'s "Done ✓ — see your sets ›" → History detail → Back lands on Home, not Schedule', async () => {
+    const at = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate(), 0, 30).toISOString()
+    const done = { ...seed.workouts[0], id: 'w-today', routineId: 'sess-upper', finishedAt: at, startedAt: at, performedOn: dateKey(NOW), scheduleSlotId: 's-t', scheduledFor: dateKey(NOW), occurrenceId: `s-t@${dateKey(NOW)}` }
+    await open('/', { ...withSlots([slot('s-t', TODAY_WD, 'sess-upper')]), workouts: [...seed.workouts, done] })
+    await tap(link('Done ✓ — see your sets ›'))
+    assert.equal(window.location.hash, `#${withFrom('/history/w-today', '/')}`)
+    assert.equal(backHref(), '#/')
     await tap(link('‹ Back'))
     assert.equal(window.location.hash, '#/')
   })

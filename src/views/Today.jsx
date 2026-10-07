@@ -343,7 +343,8 @@ export function Today() {
   }
 
   // req-205 (DEC-114) — top to bottom: "Workouts ›", "Coming up" (6 days, furthest first),
-  // today's block (+ its stale Continue row), "History ›". There is no visible title (a
+  // today's block (+ its stale Continue row), "Schedule ›" (DEC-115: History moved under the
+  // Schedule; nothing else here links History but today's done links to a workout's detail). There is no visible title (a
   // visually hidden h1 keeps the page's heading for screen readers). The whole column is
   // one block, `.ui-home-bottom`, pushed to the bottom of a screen-tall Home when the
   // content is shorter than the viewport: any spare space is above "Workouts ›", never
@@ -393,8 +394,9 @@ export function Today() {
           </List>
         ) : null}
 
+        {/* req-205 (DEC-115) — was "History ›"; History is now reached from the Schedule. */}
         <List>
-          <Row to="/history">History</Row>
+          <Row to="/schedule">Schedule</Row>
         </List>
       </div>
     </Screen>

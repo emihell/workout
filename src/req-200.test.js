@@ -67,7 +67,8 @@ describe('req-200 — Home', () => {
     // keeps its place: after today's block, before the History link.
     const block = view.container.querySelector('.ui-today-workout')
     assert.ok(block.compareDocumentPosition(cont[0]) & 4, 'Continue follows today\'s block')
-    assert.ok(cont[0].compareDocumentPosition(link('History›')) & 4, 'and sits above History')
+    // req-205 test edit (DEC-115): Home's last row is "Schedule ›" (was "History ›").
+    assert.ok(cont[0].compareDocumentPosition(link('Schedule›')) & 4, 'and sits above Schedule')
   })
 })
 

@@ -42,11 +42,13 @@ export function Schedule() {
   const todayWeekday = new Date().getDay()
   const routines = activeRoutines(store)
 
-  // req-199 — no Library toggle: reached from the Routines list's "Whole plan ›", so
-  // Back goes there. Every /schedule/* route is unchanged.
+  // req-199 — no Library toggle. req-205 (DEC-115): reached from Home's "Schedule ›" (the
+  // Routines list's "Whole plan ›" is gone), so Back goes Home — and, Back being "/", no
+  // Today link (showsTodayLink). History hangs off the bottom ("History ›"; its Back returns
+  // here). Every /schedule/* route is unchanged.
   return (
     <Screen>
-      <Back to="/routines" />
+      <Back to="/" />
       <Title>Schedule</Title>
       <p>
         <NavLink to="/schedule/loop" chevron="forward">
@@ -76,6 +78,9 @@ export function Schedule() {
         </div>
       ))}
       {routines.length === 0 ? <p className="ui-sub">No workouts.</p> : null}
+      <List>
+        <Row to="/history">History</Row>
+      </List>
     </Screen>
   )
 }

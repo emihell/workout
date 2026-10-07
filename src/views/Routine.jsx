@@ -71,8 +71,8 @@ export function Routines() {
         ))}
       </List>
       <List>
+        {/* req-205 (DEC-115) — "Whole plan ›" removed: the Schedule is reached from Home. */}
         <Row to="/exercises">Your exercises</Row>
-        <Row to="/schedule">Whole plan</Row>
       </List>
     </Screen>
   )
