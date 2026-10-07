@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
-import { beatLastTimeLine, beatLastTimeWins, improvementList } from '../../beat-last-time'
+import { improvementList } from '../../beat-last-time'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { Back } from '../shared'
@@ -46,14 +46,12 @@ function FinishScreen({ routineId }) {
   // req-158 (DEC-085 §3) — Finish computes and stores no progression record; the
   // recommendation is computed only by History recalc (progressionFromWorkout).
 
-  // req-96 — a quiet "you beat last time" line: any exercise heavier / more reps /
-  // longer than the previous same-routine workout. Pure + inspectable; silent when
-  // there's no prior or nothing improved (never a "you did worse"). Same prior-workout
-  // selection the auto-complete summary uses (req-84). req-111 — the whole prior list,
-  // so an exercise entirely skipped last time compares against the one before (DEC-053).
+  // The previous same-routine workouts (req-111: the whole list, so an exercise entirely
+  // skipped last time compares against the one before, DEC-053).
   const priors = previousSameRoutineWorkouts(active, store.workouts, store.routines)
-  const beatLine = beatLastTimeLine(beatLastTimeWins(active, priors, store.exercises))
-  // req-210 (DEC-117 §1) — per exercise, the small "↑ N%" on the same axis and source.
+  // req-210 (DEC-117 §1) — per exercise, the small "↑ N%" on DEC-050's axis; silent when
+  // there's no prior or nothing improved. The req-96 one-line celebration it replaced is gone
+  // (req-210 follow-up, product owner).
   const improvements = improvementList(active, priors, store.exercises)
 
   const name = active?.snapshot?.routineName
@@ -71,12 +69,6 @@ function FinishScreen({ routineId }) {
           {line}
         </p>
       ))}
-      {beatLine ? (
-        <p className="ui-beat">
-          <span className="ui-beat__mark" aria-hidden="true">↑</span>
-          {beatLine}
-        </p>
-      ) : null}
       <ImprovementLines list={improvements} />
       {empty ? (
         <p className="ui-sub" role="status">

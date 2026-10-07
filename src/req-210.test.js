@@ -5,6 +5,7 @@ import { describe, it, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import React from 'react'
 import { importJsx, render } from './test-support/render.js'
+import * as beatLastTime from './beat-last-time.js'
 import { exerciseImprovementPct, improvementList, improvementPct, improvementText } from './beat-last-time.js'
 import { carryForSet, setListRows, setLogSeed, setTargetFor, uniformRepsTargets } from './workout-log.js'
 import * as historyQueries from './history-queries.js'
@@ -118,10 +119,17 @@ describe('AC2 — reps carry only on a uniform plan', () => {
     // A warm-up's own seed has no carry, even after working sets with other reps.
     assert.equal(seedFor(it, [logged()], 'wu', 0).reps, '12')
   })
-  it('one set, or targets all empty, is not "uniform" (the no-target carry of DEC-107 §2 stands)', () => {
+  it('one set is uniform; targets all empty are not (the no-target carry of DEC-107 §2 stands)', () => {
     assert.equal(uniformRepsTargets(item({ sets: 1, targets: ['10'] })), true)
     assert.equal(uniformRepsTargets(item({ targets: [] })), false)
     assert.equal(seedFor(item({ targets: [] }), [logged()]).reps, '15')
+  })
+})
+
+describe('follow-up — the req-96 one-line celebration is gone', () => {
+  it('beatLastTimeLine is removed; beatLastTimeWins (the axis) stays', () => {
+    assert.equal('beatLastTimeLine' in beatLastTime, false)
+    assert.equal(typeof beatLastTime.beatLastTimeWins, 'function')
   })
 })
 
@@ -160,5 +168,6 @@ describe('AC3/AC4 — the auto-complete summary (rendered)', () => {
     const lines = view.all('.ui-improvement').map((p) => p.textContent)
     assert.deepEqual(lines, ['Bench press↑ 17%'])
     assert.equal(/lifted/i.test(view.text()), false)
+    assert.equal(/Heavier on|More reps on|than last time/.test(view.text()), false)
   })
 })

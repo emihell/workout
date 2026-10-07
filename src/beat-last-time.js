@@ -220,19 +220,6 @@ export function improvementText(pct) {
   return pct == null ? '' : `↑ ${pct}%`
 }
 
-const PHRASE = {
-  heavier: (name) => `Heavier on ${name}`,
-  'more-reps': (name) => `More reps on ${name}`,
-  longer: (name) => `Longer ${name} than last time`,
-}
-
-// The one quiet line naming the win. Multiple wins name the first (workout order) plus
-// a light "+N more". Returns null when there is nothing to celebrate (caller renders
-// nothing). The leading ↑ accent is added by the view, not here.
-export function beatLastTimeLine(wins) {
-  if (!wins?.length) return null
-  const phrase = PHRASE[wins[0].kind]?.(wins[0].name)
-  if (!phrase) return null
-  const extra = wins.length - 1
-  return extra > 0 ? `${phrase} · +${extra} more` : phrase
-}
+// req-210 follow-up (product owner) — the req-96 one-line celebration ("Heavier on X ·
+// +N more", beatLastTimeLine) was removed from the Finish screen; the per-exercise
+// "↑ N%" lines replace it. beatLastTimeWins / compareExercise stay (improvementPct's axis).
