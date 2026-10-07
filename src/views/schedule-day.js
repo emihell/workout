@@ -2,7 +2,7 @@
 // them: which calendar date the screen is about (only when entered from Home's week),
 // what finished on it, whether a slot still offers Start now, and the plain copy for
 // the loop line and the Remove confirm.
-import { weekdayName } from '../ids.js'
+import { WEEKDAY_ORDER, weekdayName } from '../ids.js'
 import { addDays, coveringWorkout, dateKey, loopWeekIndex, mondayOf, toLocalDate } from '../schedule.js'
 import { completedOnDayKey } from '../history-queries.js'
 
@@ -72,4 +72,31 @@ export function longWeekdayDate(key, now = new Date()) {
   const opts = { weekday: 'long', month: 'short', day: 'numeric' }
   if (year !== now.getFullYear()) opts.year = 'numeric'
   return new Date(year, month - 1, day).toLocaleDateString(undefined, opts)
+}
+
+// req-207 (DEC-116) — "Change day": the sheet that moves a slot to another weekday of the
+// same loop week (removeSlot + addSlot). The 7 weekdays Mon–Sun, the current one marked
+// (picking it changes nothing); a day that already has this workout in this loop week is
+// left out (a second slot of it there is what Add workout refuses too). `taken`: weekdays.
+export function changeDaySheet(name, weekday, week, loop, taken = []) {
+  const current = Number(weekday)
+  const already = new Set(taken.map(Number))
+  return {
+    title: `Move ${name} to which day?`,
+    message: `It moves ${loop > 1 ? `in week ${Number(week) + 1} of ${loop}` : 'for every week'}. Your history is kept.`,
+    choices: WEEKDAY_ORDER.filter((day) => day === current || !already.has(day)).map((day) => ({
+      value: String(day),
+      label: day === current ? `${weekdayName(day)} (now)` : weekdayName(day),
+    })),
+  }
+}
+
+// Where Change day lands: the new day's screen in the same loop week. A dated screen stays
+// dated — the same Mon–Sun week's day with the new weekday (dayScreenDate re-checks it fits,
+// else the screen falls back as usual). The caller adds `from`.
+export function changedDayPath(week, weekday, date) {
+  const path = `/schedule/${week}/${weekday}`
+  if (!date) return path
+  const moved = addDays(mondayOf(date), (Number(weekday) + 6) % 7)
+  return `${path}?date=${dateKey(moved)}`
 }

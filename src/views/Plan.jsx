@@ -12,9 +12,12 @@ import {
   SLOTS,
   SPLIT_AB,
   SPLIT_SAME,
+  WEEKDAYS_MON_FIRST,
+  WEEKDAY_SHORT,
   carriedFills,
   emptyDaySheetText,
   machinesPlan,
+  nextWorkoutNames,
   planDaysText,
   slotFilters,
   startTodayWeek,
@@ -22,7 +25,7 @@ import {
 import { go, useHashRoute } from '../route'
 import { useStore } from '../store-context'
 import { askChoice } from '../ui/confirm.js'
-import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Title } from '../ui/index.jsx'
+import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Title } from '../ui/index.jsx'
 import { ExercisePicker } from './ExercisePicker'
 import { Back } from './shared'
 
@@ -260,17 +263,59 @@ function Choice({ name, checked, onChange, children }) {
   )
 }
 
-function MachinesDays({ picks, schedule, saving, onSave }) {
+// req-207 (DEC-116) — the days the plan suggests for `n` days a week, starting today (DEC-105):
+// the template's spacing shifted to today's weekday. The chips start ticked on these.
+function suggestedWeekdays(n, now) {
+  const template = PLAN_TEMPLATES[n]
+  return template ? startTodayWeek(template.week, now).map(([weekday]) => weekday) : []
+}
+
+// req-207 — the 7 weekday chips, Mon–Sun: each a toggle (aria-pressed), styled as the
+// segmented control's segments.
+function WeekdayChips({ value, onToggle }) {
+  return (
+    <div className="ui-seg ui-seg--days" role="group" aria-label="Days">
+      {WEEKDAYS_MON_FIRST.map((weekday) => {
+        const on = value.includes(weekday)
+        return (
+          <button
+            key={weekday}
+            type="button"
+            aria-pressed={on}
+            className={`ui-seg__item${on ? ' is-selected' : ''}`}
+            onClick={() => onToggle(weekday)}
+          >
+            {WEEKDAY_SHORT[weekday]}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function MachinesDays({ picks, routines, schedule, saving, onSave }) {
   const [days, setDays] = useState(null)
   const [split, setSplit] = useState(SPLIT_SAME)
+  const [weekdays, setWeekdays] = useState([])
+  // req-207 (DEC-116) — the name boxes' prefill, "New workout #N" (and the next free one),
+  // fixed when the step opens; an emptied box saves its prefill.
+  const [prefill] = useState(() => nextWorkoutNames(routines, 2))
+  const [typed, setTyped] = useState(prefill)
   // A/B needs two picks (B would be empty); one day is always one workout.
   const ab = split === SPLIT_AB && days >= 2 && picks.length >= 2
-  const choices = days ? { days, split: ab ? SPLIT_AB : SPLIT_SAME, picks } : null
-  const plan = choices ? machinesPlan(choices) : null
   const emptySchedule = (schedule?.slots || []).length === 0
-  // The preview reads today's clock; Save's planToState gets the store's `now` (the same day).
+  const names = prefill.map((name, r) => typed[r].trim() || name)
+  // The preview reads today's clock; it also orders A/B from today (req-207 fix, DEC-105 §2) and
+  // travels in `choices`, so Save's plan is the one previewed.
   const today = new Date().getDay()
-  const week = plan ? startTodayWeek(plan.week, new Date()) : []
+  // The days are picked only when they go on the schedule (an empty one); otherwise the
+  // schedule stays as it is and there is nothing to pick.
+  const choices = days
+    ? { days, split: ab ? SPLIT_AB : SPLIT_SAME, picks, names, ...(emptySchedule ? { weekdays, today } : {}) }
+    : null
+  const plan = choices ? machinesPlan(choices) : null
+  const daysOk = !emptySchedule || weekdays.length === days
+  const week = plan ? plan.week : []
   return (
     <Screen>
       <Back to={MACHINES} />
@@ -279,8 +324,22 @@ function MachinesDays({ picks, schedule, saving, onSave }) {
         ariaLabel="Days a week"
         options={PLAN_DAYS.map((n) => ({ value: n, label: String(n) }))}
         value={days ?? ''}
-        onChange={(value) => setDays(Number(value))}
+        onChange={(value) => {
+          setDays(Number(value))
+          setWeekdays(suggestedWeekdays(Number(value), new Date()))
+        }}
       />
+      {days && emptySchedule ? (
+        <>
+          <WeekdayChips
+            value={weekdays}
+            onToggle={(weekday) =>
+              setWeekdays((list) => (list.includes(weekday) ? list.filter((d) => d !== weekday) : [...list, weekday]))
+            }
+          />
+          {daysOk ? null : <p className="ui-sub">{`Pick ${days} ${days === 1 ? 'day' : 'days'}`}</p>}
+        </>
+      ) : null}
       {days >= 2 ? (
         <List>
           <Choice name="split" checked={!ab} onChange={() => setSplit(SPLIT_SAME)}>
@@ -295,9 +354,9 @@ function MachinesDays({ picks, schedule, saving, onSave }) {
       ) : null}
       {plan
         ? plan.routines.map((routine, r) => (
-            <section key={routine.name}>
+            <section key={r}>
               <SectionHeader>{routine.name}</SectionHeader>
-              {emptySchedule ? (
+              {emptySchedule && daysOk ? (
                 <p className="ui-sub">
                   {/* req-191 §4 — "Starts today (Tue), then every Tue and Fri" (was "Today, Fri"). */}
                   {planDaysText(
@@ -320,11 +379,25 @@ function MachinesDays({ picks, schedule, saving, onSave }) {
           ))
         : null}
       {plan && !emptySchedule ? <p className="ui-sub">Your schedule already has days, so it stays as it is.</p> : null}
+      {/* req-207 (DEC-116) — the name last, just above Save. */}
+      {plan
+        ? plan.routines.map((_, r) => (
+            <Field
+              key={r}
+              label={ab ? `Name ${r === 0 ? 'A' : 'B'}` : 'Name'}
+              value={typed[r]}
+              onChange={(e) => {
+                const value = e.target.value
+                setTyped((list) => list.map((old, at) => (at === r ? value : old)))
+              }}
+            />
+          ))
+        : null}
       <Actions
         className="ui-picker-bar"
         retreat={<NavLink to="/routines/new" look="secondary">Cancel</NavLink>}
         forward={
-          <Button variant="primary" disabled={!plan || saving} onClick={() => onSave(choices)}>
+          <Button variant="primary" disabled={!plan || !daysOk || saving} onClick={() => onSave(choices)}>
             Save
           </Button>
         }
@@ -348,6 +421,7 @@ export function RoutineMachines() {
     return (
       <MachinesDays
         picks={chosen.picks}
+        routines={store.routines}
         schedule={store.schedule}
         saving={saving}
         onSave={(choices) => {

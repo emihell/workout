@@ -35,7 +35,7 @@ import {
 } from './state-reducers.js'
 import { StoreContext } from './store-context'
 import { exerciseFromData } from './exercise-names.js'
-import { planIds, planToState } from './plan-templates.js'
+import { nextWorkoutName, planIds, planToState } from './plan-templates.js'
 import { addWorkingSetToState, finishedState } from './workout-log'
 
 export function StoreProvider({ children }) {
@@ -62,7 +62,8 @@ export function StoreProvider({ children }) {
       addRoutine({ name, focus }) {
         const routine = {
           id: uid('rtn'),
-          name: name.trim() || 'Workout',
+          // req-207 (DEC-116) — no typed name → "New workout #N" (was "Workout").
+          name: name.trim() || nextWorkoutName(state.routines),
           focus: focus || 'Machines',
           exercises: [],
         }

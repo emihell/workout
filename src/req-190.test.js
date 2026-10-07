@@ -231,12 +231,15 @@ describe('req-190 — machines-first flow (rendered)', () => {
     await tap(radio('Two workouts, A and B'))
     await tap(view.button('Save'))
     const after = stored()
+    // req-207 test edit: the names are the setup's prefilled "New workout #1/#2" (DEC-116, were
+    // "Workout A/B"), and the days are the preselected chips (today, +3), stored in Mon–Sun order
+    // (req-207 §1) — so compared as a set, not in today-first order.
     assert.deepEqual(after.routines.map((r) => [r.name, r.exercises.map((i) => i.exerciseId)]), [
-      ['Workout A', ['ex-lp', 'ex-lat']],
-      ['Workout B', ['ex-cp']],
+      ['New workout #1', ['ex-lp', 'ex-lat']],
+      ['New workout #2', ['ex-cp']],
     ])
     const today = new Date().getDay()
-    assert.deepEqual(after.schedule.slots.map((s) => s.weekday), [today, (today + 3) % 7])
+    assert.deepEqual(after.schedule.slots.map((s) => s.weekday).sort(), [today, (today + 3) % 7].sort())
     assert.equal(window.location.hash, '#/')
   })
 

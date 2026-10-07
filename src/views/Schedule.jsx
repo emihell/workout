@@ -2,8 +2,18 @@ import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
 import { clampLoopWeeks, dateKey, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
 import { routineById } from '../model.js'
 import { workoutRoutineId, workoutRoutineName } from './history/helpers'
-import { dayEveryText, dayScreenDate, doneOnDay, longWeekdayDate, removeSlotText, startNowShown } from './schedule-day.js'
-import { childLink, go } from '../route'
+import {
+  changeDaySheet,
+  changedDayPath,
+  dayEveryText,
+  dayScreenDate,
+  doneOnDay,
+  longWeekdayDate,
+  removeSlotText,
+  startNowShown,
+} from './schedule-day.js'
+import { childLink, go, withFrom } from '../route'
+import { nextWorkoutName } from '../plan-templates.js'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { routineStartable } from '../exercise-names.js'
@@ -11,7 +21,7 @@ import { RoutineNewForm, RoutineScreens } from './Routine'
 import { navForBase } from './routine-nav.js'
 import { Back, Missing } from './shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, Select, Title } from '../ui/index.jsx'
-import { askConfirm } from '../ui/confirm.js'
+import { askChoice, askConfirm } from '../ui/confirm.js'
 
 function dayPathOf(week, weekday, extra = '') {
   return `/schedule/${week}/${weekday}${extra}`
@@ -176,11 +186,29 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
           return (
             <Row
               key={slot.id}
+              className="ui-row--wrap"
               action={
                 <>
                   {startable ? (
                     <Button onClick={() => startOrContinue(store, routine.id)}>Start now</Button>
                   ) : null}
+                  {/* req-207 (DEC-116) — move this slot to another weekday of the same loop week:
+                      removeSlot + addSlot (same week, same routine), no confirm (reversible). */}
+                  <Button
+                    onClick={async () => {
+                      const taken = (store.schedule?.slots || [])
+                        .filter((other) => Number(other.week) === Number(week) && other.routineId === slot.routineId)
+                        .map((other) => other.weekday)
+                      const sheet = changeDaySheet(slotLabel(routines, slot), weekday, week, loop, taken)
+                      const picked = await askChoice(sheet.message, { title: sheet.title, choices: sheet.choices })
+                      if (picked == null || Number(picked) === Number(weekday)) return
+                      store.removeSlot(slot.id)
+                      store.addSlot({ week, weekday: Number(picked), routineId: slot.routineId })
+                      go(withFrom(changedDayPath(week, Number(picked), date), from))
+                    }}
+                  >
+                    Change day
+                  </Button>
                   <Button
                     onClick={async () => {
                       if (!(await askConfirm(removeSlotText(slotLabel(routines, slot), weekday, week, loop), { confirmLabel: 'Remove' }))) return
@@ -222,6 +250,7 @@ export function ScheduleDayAdd({ week, weekday, from = null }) {
       <Title>Add workout</Title>
       {routines.length === 0 ? (
         <RoutineNewForm
+          defaultName={nextWorkoutName(store.routines)}
           onSave={({ name }) => {
             const id = store.addRoutine({ name })
             store.addSlot({ week, weekday, routineId: id })

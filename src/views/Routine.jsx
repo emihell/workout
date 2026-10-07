@@ -9,6 +9,7 @@ import { deletionConfirmHead, routineDeletionImpact, routineInActiveWorkout, rou
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
+import { nextWorkoutName } from '../plan-templates.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { ExercisePicker } from './ExercisePicker'
 import { Back, Missing } from './shared'
@@ -80,19 +81,22 @@ export function Routines() {
 
 // req-121 — Cancel only navigates, so it's a NavLink to `cancelTo` (DEC-040), not a
 // Button calling go(); callers pass the path instead of an onCancel handler.
-export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next' }) {
-  const [name, setName] = useState('')
+// req-207 (DEC-116) — `defaultName` ("New workout #N"): the box starts with it, and an
+// emptied box saves it (as the setup's name boxes) instead of the empty-name error.
+export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next', defaultName = '' }) {
+  const [name, setName] = useState(defaultName)
   // req-127 — trimmed; empty is an inline error that blocks Save (after the first try).
   const [tried, setTried] = useState(false)
-  const error = tried ? nameError(name) : null
+  const typed = name.trim() || defaultName
+  const error = tried ? nameError(typed) : null
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
         setTried(true)
-        if (nameError(name)) return
-        onSave({ name: name.trim() })
+        if (nameError(typed)) return
+        onSave({ name: typed.trim() })
       }}
     >
       <Field label="Name" value={name} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
@@ -142,6 +146,7 @@ export function RoutineNewBlank() {
       <Back to="/routines/new" />
       <Title>Blank workout</Title>
       <RoutineNewForm
+        defaultName={nextWorkoutName(store.routines)}
         onSave={({ name }) => {
           const id = store.addRoutine({ name })
           go(routinePath(id))
