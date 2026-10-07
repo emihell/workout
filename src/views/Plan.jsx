@@ -305,15 +305,16 @@ function MachinesDays({ picks, routines, schedule, saving, onSave }) {
   const ab = split === SPLIT_AB && days >= 2 && picks.length >= 2
   const emptySchedule = (schedule?.slots || []).length === 0
   const names = prefill.map((name, r) => typed[r].trim() || name)
+  // The preview reads today's clock; it also orders A/B from today (req-207 fix, DEC-105 §2) and
+  // travels in `choices`, so Save's plan is the one previewed.
+  const today = new Date().getDay()
   // The days are picked only when they go on the schedule (an empty one); otherwise the
   // schedule stays as it is and there is nothing to pick.
   const choices = days
-    ? { days, split: ab ? SPLIT_AB : SPLIT_SAME, picks, names, ...(emptySchedule ? { weekdays } : {}) }
+    ? { days, split: ab ? SPLIT_AB : SPLIT_SAME, picks, names, ...(emptySchedule ? { weekdays, today } : {}) }
     : null
   const plan = choices ? machinesPlan(choices) : null
   const daysOk = !emptySchedule || weekdays.length === days
-  // The preview reads today's clock; Save's planToState gets the store's `now` (the same day).
-  const today = new Date().getDay()
   const week = plan ? plan.week : []
   return (
     <Screen>

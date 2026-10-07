@@ -29,11 +29,18 @@ const uid = (prefix) => `${prefix}-${++counter}`
 const own = (id) => ({ kind: 'own', exerciseId: id, item: pickerItem([], { type: 'free' }).item, name: id })
 
 describe('AC1 machinesPlan — chosen days and names', () => {
-  it('2 days, Tue + Fri, A/B → week [[2,0],[5,1]] and the provided names', () => {
-    const plan = machinesPlan({ days: 2, split: SPLIT_AB, picks: ['a', 'b'], names: ['Legs', 'New workout #2'], weekdays: [5, 2] })
+  it('2 days, Tue + Fri, A/B, today Tue → week [[2,0],[5,1]] and the provided names', () => {
+    const plan = machinesPlan({ days: 2, split: SPLIT_AB, picks: ['a', 'b'], names: ['Legs', 'New workout #2'], weekdays: [5, 2], today: 2 })
     assert.deepEqual(plan.week, [[2, 0], [5, 1]])
     assert.deepEqual(plan.routines.map((r) => r.name), ['Legs', 'New workout #2'])
     assert.equal(plan.fixedDays, true)
+  })
+  it('DEC-105 §2: A is the first chosen day on or after today, then wrap (today not first in Mon–Sun)', () => {
+    const ab = (weekdays, today) => machinesPlan({ days: weekdays.length, split: SPLIT_AB, picks: ['a', 'b'], weekdays, today }).week
+    assert.deepEqual(ab([6, 2], 3), [[6, 0], [2, 1]], 'Sat + Tue, today Wed → Sat = A, Tue = B')
+    assert.deepEqual(ab([2, 5], 3), [[5, 0], [2, 1]], 'Tue + Fri, today Wed → Fri = A')
+    assert.deepEqual(ab([2, 5], 5), [[5, 0], [2, 1]], 'today chosen → today is A')
+    assert.deepEqual(ab([1, 3, 5], 0), [[1, 0], [3, 1], [5, 0]], 'today Sun → Mon first')
   })
   it('Mon–Sun order (Sunday last); A/B alternates over that order; Same → one workout', () => {
     assert.deepEqual(mondayFirst([0, 3, 1, 3]), [1, 3, 0])
@@ -57,6 +64,11 @@ describe('AC1 machinesPlan — chosen days and names', () => {
     // Today (Wed) chosen → today has a slot (DEC-105: it starts today).
     const today = { days: 2, split: SPLIT_SAME, picks, names: ['X'], weekdays: [3, 6] }
     assert.deepEqual(planToState(emptyState(), today, planIds(today, uid, WED)()).state.schedule.slots.map((s) => s.weekday), [3, 6])
+    // Today (Wed) in `choices` orders A/B from today: Sat + Tue → Sat is A; the days stay as chosen.
+    const wed = { days: 2, split: SPLIT_AB, picks, names: ['A1', 'B1'], weekdays: [2, 6], today: 3 }
+    const ws = planToState(emptyState(), wed, planIds(wed, uid, WED)()).state
+    const wn = Object.fromEntries(ws.routines.map((x) => [x.id, x.name]))
+    assert.deepEqual(ws.schedule.slots.map((s) => [s.weekday, wn[s.routineId]]), [[6, 'A1'], [2, 'B1']])
     const old = { days: 2, split: SPLIT_SAME, picks }
     assert.deepEqual(planToState(emptyState(), old, planIds(old, uid, WED)()).state.schedule.slots.map((s) => s.weekday), [3, 6], 'Mon/Thu shifted to Wed/Sat')
   })
@@ -163,7 +175,12 @@ describe('AC2/AC3 the days and name step (rendered)', () => {
     const after = stored()
     const name = Object.fromEntries(after.routines.map((r) => [r.id, r.name]))
     assert.deepEqual(after.routines.map((r) => r.name), ['Legs', 'New workout #2'])
-    assert.deepEqual(after.schedule.slots.map((s) => [s.weekday, name[s.routineId]]), [[2, 'Legs'], [5, 'New workout #2']])
+    // A ("Legs") is the first of Tue/Fri on or after today (DEC-105 §2).
+    const firstA = (5 - today + 7) % 7 < (2 - today + 7) % 7 ? 5 : 2
+    assert.deepEqual(
+      after.schedule.slots.map((s) => [s.weekday, name[s.routineId]]).sort((x, y) => x[0] - y[0]),
+      [[2, firstA === 2 ? 'Legs' : 'New workout #2'], [5, firstA === 5 ? 'Legs' : 'New workout #2']],
+    )
   })
 
   it('failure case: 3 days ticked for a 2-day plan → Save disabled + "Pick 2 days"; 1 ticked → the same', async () => {

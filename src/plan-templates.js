@@ -131,19 +131,23 @@ export function splitPicks(picks, split) {
 // The machines-first plan: routine names `names` (req-207, DEC-116: the setup's name boxes,
 // "New workout #N" prefilled; an emptied box → the caller's prefill); without them the old
 // defaults "Workout" / "Workout A", "Workout B".
-// `weekdays` (req-207): the days the user picked (0 = Sun) — the week is those, in Mon–Sun
-// order, taken as given (`fixedDays`: planToState does not shift them; with today among them
+// `weekdays` (req-207): the days the user picked (0 = Sun) — the week is those, ordered from
+// `today` (below), taken as given (`fixedDays`: planToState does not shift them; with today among them
 // the plan still starts today, DEC-105). Without them, the template's spacing, which
 // planToState shifts to start today. With A/B, days alternate A, B, A, B in that order.
 // One day is always one workout (an A/B split needs two days).
-export function machinesPlan({ days, split, picks, names, weekdays }) {
+// req-207 fix (DEC-105 §2 kept): A/B alternates over the chosen days ordered from `today` (a
+// weekday number, 0 = Sun): the first chosen day on or after today is A, then wrap around —
+// so day A is the first workout you do. No `today` → Mon–Sun order.
+export function machinesPlan({ days, split, picks, names, weekdays, today = 1 }) {
   const template = PLAN_TEMPLATES[days]
   if (!template) return null
   const ab = split === SPLIT_AB && days >= 2
   const groups = splitPicks(picks, ab ? SPLIT_AB : SPLIT_SAME)
   const fallback = ab ? ['Workout A', 'Workout B'] : ['Workout']
   const nameOf = (r) => String(names?.[r] ?? '').trim() || fallback[r]
-  const chosen = weekdays ? mondayFirst(weekdays) : null
+  const from = Number(today)
+  const chosen = weekdays ? mondayFirst(weekdays).sort((a, b) => ((a - from + 7) % 7) - ((b - from + 7) % 7)) : null
   const week = (chosen || template.week.map(([weekday]) => weekday)).map((weekday, i) => [weekday, ab ? i % 2 : 0])
   return {
     routines: groups.map((group, r) => ({ name: nameOf(r), picks: group })),
