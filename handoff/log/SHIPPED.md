@@ -2348,3 +2348,15 @@ Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 101
 branch's own smoke is green (Planner, throwaway worktree). Emilio OK'd the screenshot ("lets try it").
 
 No trigger files. `reports/req-204.md`.
+
+## req-205 — Home: 6 days with Rest, no title, no gap; "Schedule ›" on Home, History inside Schedule  (2026-10-07)
+
+**req-205** (DEC-114, DEC-115).
+- The next 6 days, furthest first, with grey Rest rows. A hidden h1; one bottom-aligned block.
+- Home ends in "Schedule ›"; Schedule ends in "History ›"; History Back → Schedule. The Workouts list drops "Whole plan ›".
+- 3 commits, `bc47f17`…`a406313`. Test edits are named in the report.
+
+Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 102 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok" on the screenshot.
+
+No trigger files. `reports/req-205.md`.
