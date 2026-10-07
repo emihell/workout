@@ -1827,3 +1827,22 @@ Planner agreed. The evidence was his own analytics (History 6 visits, history-de
 
 Applied to req-198 mid-build. `(unconfirmed)`: the question has the reply "agreed, done", and it reverses with a one-line
 bar change.
+
+## DEC-112 — no bottom bar: Home is the hub; deep screens get a "Today" link  (Emilio, 2026-10-07, supersedes DEC-110 §1 / DEC-111's bar)
+
+Emilio: "could workouts also be accessed from main page? but at the top instead of bottom? this way we get rid of the whole
+bottom menu". Then, on the deep-tap cost: "maybe a remedy to the deeptap is a workout button when you are in other menus, so
+you can quiclky go back?"
+
+- **The bottom dock is gone everywhere.** This retires DEC-036's form.
+- **Home links out:** "Workouts ›" at the top (under the title, above today's block) and "History ›" at the bottom. Today's
+  Start stays the dominant control.
+- **Every non-Home screen has Back** (DEC-015 applies to all of them now).
+- **Deep screens add a right-aligned "Today" link** in the Back row → "/". It appears only where Back does not already go
+  to "/", and never on in-workout screens.
+  - The link reads "Today", not "Workout": after req-201, "workout" means the plan, and Home is "Today" (DEC-110 §2).
+  - A workout in progress is reached from Home's hero (Continue).
+- **Why:** Home is the hub in Emilio's analytics (Home ↔ Library 46/42, Home ↔ Settings 32/25), and Lena never used the bar.
+  Removing the dock also removes content hidden under it (review F4, s07).
+
+`(unconfirmed)`: the link's label and placement (top row vs a floating button). Applied to req-198 mid-build.

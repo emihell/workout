@@ -19,8 +19,7 @@ before req-200 (Home week).
    - Below the list, two rows: **"Your exercises ›"** → `/exercises`, and **"Whole plan ›"** → `/schedule`.
 2. **`/schedule` and `/exercises`** render as normal screens with a Back to `/routines`. Today they are segments.
 3. **Every `/exercises/*` and `/schedule/*` route stays** (review F14). Only the segment UI goes.
-4. **The bar's left circle:** a list icon, label "Routines" `(unconfirmed)`, which req-201 renames to "Workouts".
-   - `activeTab` still maps routine/exercise/schedule routes to it.
+4. **No bar (DEC-112).** `/routines` is reached from Home's top "Workouts ›" link (req-198) and has Back → "/".
 5. **History › By exercise › exercise:** add **"Exercise settings ›"** → `/exercises/:id/edit?from=<this page>`.
 6. **Home's "Start new workout"** still → `/routines`. Starting from the list stays 2 taps.
 
@@ -31,9 +30,9 @@ before req-200 (Home week).
 - Moving exercise Delete.
 
 ## Acceptance
-1. Browser: bar → Routines tab shows no segment control, the list with Start, and both rows. "Your exercises ›" opens the
+1. Browser: Home → Workouts › shows no segment control, the list with Start, and both rows. "Your exercises ›" opens the
    Exercises list. Back returns to `/routines`.
-2. Browser: a routine that is on **no schedule** starts in ≤2 taps from the bar. Receipt: `activeWorkout` set in v9.
+2. Browser: a routine that is on **no schedule** starts in ≤2 taps from Home. Receipt: `activeWorkout` set in v9.
 3. **Failure case:** Routine item → "Edit exercise settings ›" → Save lands back on the routine item, not Today. The same
    from History › By exercise › "Exercise settings ›" back to that page.
 4. `./check` green, and the smoke test passes.

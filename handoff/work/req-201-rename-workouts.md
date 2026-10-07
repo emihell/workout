@@ -31,8 +31,7 @@ req-200 delete and move some of these.
 ## Scope
 1. **Every user-visible "routine" → "workout".** Examples:
    - "Add workout", "Update workout?", "Not in this workout yet".
-   - The bar's left label → "Workouts".
-   - The Home oval → "Today".
+   - Home's top link → "Workouts ›" (already from req-198); the Home title → "Today".
    - Default plan names → "Workout A" / "Workout B" (no "My").
 2. **Every user-visible generic "workout" meaning the session** becomes:
    - its name and date, where one is in hand ("Abandon Upper Body?", "Delete Upper Body · 6 Oct?");
