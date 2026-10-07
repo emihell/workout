@@ -1812,3 +1812,18 @@ Emilio, 2026-10-07: "do an external review and implement if it agrees". The inde
    - Any backup-nudge counter lives in its own key.
 
 **Build:** req-198 (bar + Backup & data) → req-199 (Library → Workouts list) → req-200 (Home week) → req-201 (the rename, last, once the screens have settled) → req-202 (small cuts). A Lena persona re-run follows the batch.
+
+## DEC-111 — History stays on Home, not on the bar; the bar is Workouts · Today  (Emilio, 2026-10-07, amends DEC-110 §1)
+
+Emilio: "do we need history easely accessable like this? can it not just be part of the today screen? like it is today?"
+Planner agreed. The evidence was his own analytics (History 6 visits, history-detail 4) and Lena's runs, where she checked
+"did it save?" from Home.
+
+- The bar has two controls: the left circle (Library, which becomes "Workouts" in req-199/201) and the oval (Today).
+  Settings leaves the bar, and History does not take its place.
+- History keeps its link from Home and its Back (DEC-015). "Backup & data ›" stays at the bottom of History.
+- Export goes from 2 taps to 4: Today → History → Backup & data → Export. The save-failed banner's own Export button covers
+  the urgent case.
+
+Applied to req-198 mid-build. `(unconfirmed)`: the question has the reply "agreed, done", and it reverses with a one-line
+bar change.
