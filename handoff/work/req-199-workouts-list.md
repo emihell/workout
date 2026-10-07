@@ -1,6 +1,6 @@
 # req-199 — Library goes: the bar's left tab is the plain workouts list, with "Your exercises ›" and "Whole plan ›"
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-110 §3. Builds after req-198 (same `BottomMenu.jsx` / `route.js`) and
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-199` (`88b3cde`…`89b085b`, 2 commits).** (2026-10-07). **Lane: ui.** From DEC-110 §3. Builds after req-198 (same `BottomMenu.jsx` / `route.js`) and
 before req-200 (Home week).
 
 ## Code today (main `166266a`)
@@ -36,3 +36,9 @@ before req-200 (Home week).
 3. **Failure case:** Routine item → "Edit exercise settings ›" → Save lands back on the routine item, not Today. The same
    from History › By exercise › "Exercise settings ›" back to that page.
 4. `./check` green, and the smoke test passes.
+
+## Built — calls `(unconfirmed)`
+- The two rows sit in their own list, with no header.
+- Titles stay "Routines" and "Schedule" until req-201.
+- "Exercise settings ›" sits under the history exercise's title, and is hidden for an archived exercise.
+- `Library.jsx` is deleted.
