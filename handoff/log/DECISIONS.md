@@ -1898,3 +1898,22 @@ behind). Emilio: "go".
 - History costs 2 taps from Home instead of 1. Today's "Done ✓ — see your sets ›" still opens a session directly.
 
 Folded into req-205 mid-build.
+
+## DEC-116 — a new workout is named "New workout #N"; setup asks for the name last; setup lets you pick the days; "Change day"  (Emilio, 2026-10-07)
+
+- **Name.** Emilio: "why not New workout #1 (then #2 and so on) - user should change it themselves, maybe its the last thing
+  they fill in?"
+  - First setup names its workouts **"New workout #N"**, where N is the next number not already used by an active workout's
+    name. With A/B it creates #N and #N+1.
+  - The setup's **last field, just above Save,** is the name box, prefilled with that name and editable. With A/B there are
+    two boxes.
+  - "Blank workout" uses the same default.
+- **Days.** Emilio approved earlier: "sounds good". The days step shows the template's suggested weekdays as tappable chips,
+  preselected, and the user can change them. The count is still fixed by "How many days a week". The plan still starts
+  today if today is one of the chosen days (DEC-105).
+- **Change day.** Emilio: "you can edit a day and there change the date of it - that is enough".
+  - On a day screen each workout gets **"Change day"**. It picks another weekday in the same loop week, and the workout
+    moves there for every week.
+  - Under the hood it is the existing remove + add. History is untouched, and Done shows by date (req-200), so nothing is
+    lost.
+  - It doesn't apply to just one date: that would be a schema change (DEC-110 §5).
