@@ -1,6 +1,6 @@
 # req-202 — small cuts from the organisation review
 
-**Status: READY** (2026-10-07). **Lane: ui.** From req-196 Q6 and review F17. After req-201. Each item is independent.
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-202` (`4e6171b`…`a6d0f92`, 5 commits).** (2026-10-07). **Lane: ui.** From req-196 Q6 and review F17. After req-201. Each item is independent.
 
 ## Scope
 1. **Routine detail** (`Routine.jsx`): the Up/Down buttons (18 for 9 exercises, review s07) hide behind a **"Reorder"** toggle.
