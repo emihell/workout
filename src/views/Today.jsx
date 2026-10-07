@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
-import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, resolveSlot, slotsOn } from '../schedule'
+import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, loopWeekIndex, moveInto, occurrenceId, resolveSlot, slotsOn } from '../schedule'
+import { movedFromText } from './schedule-day.js'
 import { routineById } from '../model.js'
 import { doneInTodayBlock, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
 import { useStore } from '../store-context'
@@ -71,12 +72,23 @@ function WorkoutInfo({ when, name, today }) {
 // day with no workout. A day with two workouts is one row, names joined ", ". No Start:
 // starting ahead lives on the day's screen ("Start now"). Every row, Rest included, links
 // its dated day screen (`?date=` + `from=/`, req-204), where a workout can be added.
-function UpcomingRow({ routines, row }) {
+// req-211 — a workout moved onto this one date carries "moved from Fri" (named, when the
+// day has two workouts).
+function UpcomingRow({ schedule, routines, row }) {
   const rest = row.slots.length === 0
   const names = row.slots.map((slot) => resolveSlot(routines, slot).routine?.name).join(', ')
+  const moved = row.slots
+    .map((slot) => ({ slot, move: moveInto(schedule, slot.id, row.dateKey) }))
+    .filter(({ move }) => move)
+    .map(({ slot, move }) =>
+      row.slots.length > 1 ? `${resolveSlot(routines, slot).routine?.name} ${movedFromText(move.from)}` : movedFromText(move.from),
+    )
   return (
     <Row to={withFrom(`/schedule/${row.week}/${row.weekday}?date=${row.dateKey}`, '/')} className={rest ? 'ui-row--rest' : ''}>
       {weekdayDate(row.dateKey)} · {rest ? 'Rest' : names}
+      {moved.map((text) => (
+        <span key={text} className="ui-moved">{text}</span>
+      ))}
     </Row>
   )
 }
@@ -97,10 +109,12 @@ function UpcomingRow({ routines, row }) {
 // routine); `__routine` only spaces the routines apart under the shared date.
 function TodayRoutine({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
+  const moved = moveInto(store.schedule, slot.id, date)
   return (
     <>
       <p className="ui-today-workout__name">
         {routine.name}
+        {moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null}
       </p>
       {done ? (
         // req-203 §2 — the done line opens the sets (Lena run 3 took 5 taps to see them);
@@ -369,7 +383,7 @@ export function Today() {
             req-206 — no "Coming up" header: the rows follow "Workouts ›" directly. */}
         <List>
           {[...upcoming].reverse().map((row) => (
-            <UpcomingRow key={row.dateKey} routines={routines} row={row} />
+            <UpcomingRow key={row.dateKey} schedule={schedule} routines={routines} row={row} />
           ))}
         </List>
 

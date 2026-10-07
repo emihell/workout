@@ -14,7 +14,7 @@ import { loadExerciseCatalog } from './exerciseCatalog.js'
 import { emptyState } from './persistence.js'
 import { SPLIT_AB, SPLIT_SAME, machinesPlan, mondayFirst, nextWorkoutName, nextWorkoutNames, planIds, planToState } from './plan-templates.js'
 import { pickerItem } from './routine-picker.js'
-import { addDays, dateKey, mondayOf } from './schedule.js'
+// req-211 test edit: the schedule.js import went with the dated landing assertion (AC4 below).
 import { changeDaySheet, changedDayPath } from './views/schedule-day.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 
@@ -248,9 +248,13 @@ async function openChangeDay() {
   await tap(button('Change day'))
 }
 
+// req-211 test edit (DEC-117 §2): a DATED day screen (from Home, `from=/`) now moves one date
+// only; the every-week move below lives on the Schedule's undated day, so these two tests open
+// `/schedule/0/1` (no `from=/`). The landing is that undated day; the dated landing is
+// req-211.test.js's. Every other assertion is unchanged.
 describe('AC4 Change day (rendered)', () => {
   it('Monday → Saturday: removeSlot + addSlot, same count, history untouched, lands on Saturday', async () => {
-    await open('/schedule/0/1?from=%2F')
+    await open('/schedule/0/1')
     const before = stored()
     await openChangeDay()
     const pending = getPendingConfirm()
@@ -263,14 +267,13 @@ describe('AC4 Change day (rendered)', () => {
     assert.deepEqual(after.schedule.slots.filter((s) => s.routineId === 'sess-upper').map((s) => [s.week, s.weekday]), [[0, 6]])
     assert.equal(after.workouts.length, before.workouts.length)
     assert.deepEqual(after.workouts, before.workouts)
-    const sat = dateKey(addDays(mondayOf(new Date()), 5))
-    assert.equal(window.location.hash, `#/schedule/0/6?date=${sat}&from=%2F`)
+    assert.equal(window.location.hash, '#/schedule/0/6')
     assert.match(view.text(), /Every Saturday/)
     assert.match(view.text(), /Upper Body/)
   })
 
   it('Cancel or the current day writes nothing', async () => {
-    await open('/schedule/0/1?from=%2F')
+    await open('/schedule/0/1')
     const before = localStorage.getItem('workout-mvp-v9')
     await openChangeDay()
     await act(async () => answerConfirm(false))
@@ -279,7 +282,7 @@ describe('AC4 Change day (rendered)', () => {
     await act(async () => answerConfirm('1'))
     await flush()
     assert.equal(localStorage.getItem('workout-mvp-v9'), before)
-    assert.equal(window.location.hash, '#/schedule/0/1?from=%2F')
+    assert.equal(window.location.hash, '#/schedule/0/1')
   })
 
   it('in a 2-week loop it stays in that loop week', async () => {

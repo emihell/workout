@@ -273,7 +273,9 @@ describe('req-181 — the flow (rendered, real store)', () => {
     await visit(view.button('Save'))
     assert.match(view.text(), /Add them to your schedule/)
     const after = stored()
-    assert.deepEqual(after.schedule, state.schedule)
+    // req-211 test edit: a saved schedule now carries the additive `moves` (normalised to []);
+    // slots, loop and anchor are still exactly the ones it had.
+    assert.deepEqual(after.schedule, { ...state.schedule, moves: [] })
     assert.deepEqual(after.routines.map((r) => r.name), ['Mine', 'Full body'])
   })
 

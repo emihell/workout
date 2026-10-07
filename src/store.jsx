@@ -27,6 +27,7 @@ import {
   routinePatchedState,
   setLoggedState,
   slotAddedState,
+  slotMovedOnDateState,
   slotRemovedState,
   startedWorkoutState,
   workoutAbandonedState,
@@ -130,6 +131,11 @@ export function StoreProvider({ children }) {
       },
       removeSlot(slotId) {
         setState((s) => slotRemovedState(s, slotId))
+      },
+      // req-211 — one date only: the slot shown on `date` moves to `to` (schedule.moves).
+      moveSlotOnDate({ slotId, date, to }) {
+        const id = uid('move')
+        setState((s) => slotMovedOnDateState(s, { id, slotId, date, to }))
       },
       addExercise(data) {
         // req-127 — the record is built by exerciseFromData (exercise-names.js), unchanged.

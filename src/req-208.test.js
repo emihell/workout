@@ -96,6 +96,10 @@ describe('the slot row', () => {
     assert.deepEqual(stored().schedule.slots, [])
   })
 
+  // req-211 test edit (DEC-117 §2): this screen is dated (`?date=` from Home), and a dated
+  // Change day now moves that one date. The sheet's values are that week's date keys, so the
+  // answer is the next date in the past date's Mon–Sun week (the previous one on a Sunday),
+  // and the check is that it moved: the slot stays, one move names it. Was: the slot's weekday.
   it('failure case: a past date (no Start now) shows the name and ⋯ only, and ⋯ → Change day still moves it', async () => {
     const past = dateKey(addDays(NOW, -7))
     await open(`/schedule/0/${TODAY_WD}?date=${past}&from=%2F`, oneSlot())
@@ -103,9 +107,10 @@ describe('the slot row', () => {
     assert.deepEqual(rowButtons(), ['⋯'])
     await tap(button('⋯'))
     await tap(button('Change day'))
-    const target = (TODAY_WD + 1) % 7
-    await act(async () => answerConfirm(String(target)))
+    const target = dateKey(addDays(past, TODAY_WD === 0 ? -1 : 1))
+    await act(async () => answerConfirm(target))
     await flush()
-    assert.deepEqual(stored().schedule.slots.map((s) => [s.week, s.weekday, s.routineId]), [[0, target, 'sess-upper']])
+    assert.deepEqual(stored().schedule.slots.map((s) => [s.week, s.weekday, s.routineId]), [[0, TODAY_WD, 'sess-upper']])
+    assert.deepEqual(stored().schedule.moves.map(({ slotId, from, to }) => [slotId, from, to]), [['s-1', past, target]])
   })
 })

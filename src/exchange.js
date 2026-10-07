@@ -45,7 +45,7 @@ export const ASSISTANT = {
       notes: 'Free text cues.',
     },
     schedule:
-      'loopWeeks 1–4. anchor is the YYYY-MM-DD Monday of loop week 1 (keep it when editing; if absent, the app sets it to the Monday of the import week). slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history.',
+      'loopWeeks 1–4. anchor is the YYYY-MM-DD Monday of loop week 1 (keep it when editing; if absent, the app sets it to the Monday of the import week). slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history. moves (optional): one-date moves { id, slotId, from, to } (YYYY-MM-DD, same Mon–Sun week) — that slot is on to instead of from for that one date only; keep them, and drop any whose slot you remove.',
     workout:
       'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, and stores the snapshot in workouts. Finish never changes the routine; it changes only when the user edits it, confirms the "Use … kg next time?" offer after an exercise (the kg of that one routine), or applies a History recalculation (suggestedWeights/targets). Do not invent completed workouts.',
     ids: 'Reuse existing ids. New ones: ex-…, rtn-…, si-…, slot-…, wo-… Existing routine ids may still be sess-….',

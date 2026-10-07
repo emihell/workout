@@ -12,6 +12,9 @@ import { migrateState as migrateStateMain } from './req-158.model-main.fixture.j
 import { finishedState } from './workout-log.js'
 import { loadState, saveState } from './storage.js'
 import { filledLike } from './test-support/fill.js'
+// req-211 test edit: main's frozen model predates the additive `schedule.moves`; withEmptyMoves
+// adds exactly `moves: []` to its schedule, so the rest still deep-equals main.
+import { withEmptyMoves } from './test-support/moves.js'
 
 const v8 = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
 const count = (state) => Object.keys(state.legacyRecommendations || {}).length
@@ -35,7 +38,7 @@ describe('1 — legacy (v8) migration is identical to main', () => {
   it('migrateState(v8 fixture, { legacy: true }) deep-equals main', () => {
     const branch = migrateState(structuredClone(v8), { legacy: true })
     const main = migrateStateMain(structuredClone(v8), { legacy: true })
-    assert.deepEqual(branch, main)
+    assert.deepEqual(branch, withEmptyMoves(main))
     assert.equal(count(branch), count(main))
     assert.ok(count(branch) > 0, 'legacy input still records its baselines')
   })

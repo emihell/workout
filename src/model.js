@@ -1,4 +1,5 @@
 import { isWeightedType } from './ids.js'
+import { dateKey, mondayOf } from './schedule.js'
 import { recommendNextPrescription } from './progress.js'
 import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 
@@ -275,6 +276,37 @@ export function exerciseById(exercises, id) {
   return (exercises || []).find((exercise) => exercise.id === id) ?? null
 }
 
+// req-211 (DEC-117 §2) — `schedule.moves`: `[{ id, slotId, from, to }]`, dates 'YYYY-MM-DD'.
+// Additive and optional (no version bump): a store without it reads as []. An entry is kept
+// only when it is a plain object with a string id, a slotId naming an existing slot, and
+// two real, different calendar dates in the same Mon–Sun week (cross-week is out of scope);
+// its four fields are what is kept, and of several for one (slotId, from) the last wins.
+function isDateKey(value) {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && dateKey(value) === value
+}
+
+export function normaliseMoves(moves, slots) {
+  if (!Array.isArray(moves)) return []
+  const slotIds = new Set((slots || []).map((slot) => slot.id))
+  return moves
+    .filter(
+      (move) =>
+        move !== null &&
+        typeof move === 'object' &&
+        !Array.isArray(move) &&
+        typeof move.id === 'string' &&
+        move.id !== '' &&
+        slotIds.has(move.slotId) &&
+        isDateKey(move.from) &&
+        isDateKey(move.to) &&
+        move.from !== move.to &&
+        dateKey(mondayOf(move.from)) === dateKey(mondayOf(move.to)),
+    )
+    .map(({ id, slotId, from, to }) => ({ id, slotId, from, to }))
+    // req-211 review — at most one move per (slotId, from): the last one wins, in its place.
+    .filter((move, index, all) => !all.slice(index + 1).some((later) => later.slotId === move.slotId && later.from === move.from))
+}
+
 // req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from
 // the RAW stored value, before any `{ ...emptyState(), ...raw }` merge (which injects
 // schemaVersion 9). Only legacy input gets the plan backfill/baseline; the default is
@@ -285,6 +317,16 @@ export function migrateState(input, { legacy = false } = {}) {
   const exercises = Array.isArray(source.exercises) ? source.exercises : []
   const legacyRecommendations = { ...(source.legacyRecommendations || {}) }
   const routines = flattenRoutines(source, exercises, legacyRecommendations, legacy)
+
+  const slots = (source.schedule?.slots || []).map((slot, index) => {
+    const routineId = slot.routineId || slot.sessionId
+    return {
+      id: slot.id || `slot-${Number(slot.week) || 0}-${Number(slot.weekday) || 0}-${routineId}-${index}`,
+      week: Number(slot.week) || 0,
+      weekday: Number(slot.weekday),
+      routineId,
+    }
+  })
 
   const interim = {
     ...source,
@@ -300,15 +342,10 @@ export function migrateState(input, { legacy = false } = {}) {
     routines,
     schedule: {
       ...(source.schedule || {}),
-      slots: (source.schedule?.slots || []).map((slot, index) => {
-        const routineId = slot.routineId || slot.sessionId
-        return {
-          id: slot.id || `slot-${Number(slot.week) || 0}-${Number(slot.weekday) || 0}-${routineId}-${index}`,
-          week: Number(slot.week) || 0,
-          weekday: Number(slot.weekday),
-          routineId,
-        }
-      }),
+      slots,
+      // req-211 — the one-date moves: absent/non-array → [], and only well-formed entries for
+      // a slot that exists survive (a hand-edited or stale entry is dropped, never repaired).
+      moves: normaliseMoves(source.schedule?.moves, slots),
     },
     plannedWorkouts: (Array.isArray(source.plannedWorkouts) ? source.plannedWorkouts : []).map((plan) => {
       const items = (plan.items || []).map((item) => {

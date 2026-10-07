@@ -5,6 +5,7 @@
 import { WEEKDAY_ORDER, weekdayName } from '../ids.js'
 import { addDays, coveringWorkout, dateKey, loopWeekIndex, mondayOf, toLocalDate } from '../schedule.js'
 import { completedOnDayKey } from '../history-queries.js'
+import { WEEKDAY_SHORT } from '../plan-templates.js'
 
 // The date a day screen stands for when its link carries none (req-203). Home's old
 // "This week" rows (req-200, gone in req-204) linked `/schedule/:week/:weekday?from=/`,
@@ -123,4 +124,36 @@ export function scheduleRowText({ names = '', isToday = false, doneNames = [] } 
     label: names || (done ? doneNames.join(', ') : 'Rest'),
     value: isToday ? (done ? 'Today · Done ✓' : 'Today') : null,
   }
+}
+
+// req-211 (DEC-117 §2) — "Change day" on a DATED day screen (from Home) moves that one date
+// (schedule.moves); the Schedule's undated day keeps req-207's every-week move. The sheet
+// lists the 7 dates of `date`'s Mon–Sun week, the current one marked; a date that already
+// has this workout on it (`taken`: date keys, from slotsOn) is left out, as req-207 leaves
+// out a taken weekday. Values are the date keys.
+export function oneDateSheet(name, date, taken = []) {
+  const monday = mondayOf(date)
+  const already = new Set(taken)
+  const days = Array.from({ length: 7 }, (_, k) => dateKey(addDays(monday, k)))
+  return {
+    title: `Move ${name} to which day?`,
+    message: 'Only this week — the Schedule stays as it is.',
+    choices: days
+      .filter((key) => key === date || !already.has(key))
+      .map((key) => {
+        const label = weekdayName(toLocalDate(key).getDay())
+        return { value: key, label: key === date ? `${label} (now)` : label }
+      }),
+  }
+}
+
+// req-211 — where a one-date move lands: the chosen date's own day screen (its loop week and
+// weekday, the date in `?date=`). The caller adds `from`.
+export function dateDayPath(schedule, key) {
+  return `/schedule/${loopWeekIndex(schedule, key)}/${toLocalDate(key).getDay()}?date=${key}`
+}
+
+// req-211 — the small sub-line on a moved slot's row: "moved from Fri".
+export function movedFromText(from) {
+  return `moved from ${WEEKDAY_SHORT[toLocalDate(from).getDay()]}`
 }
