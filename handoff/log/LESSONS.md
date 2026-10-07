@@ -481,3 +481,17 @@ Node and passes a fixed epoch in, or advances its own counter. `scripts/smoke.mj
 package 'happy-dom'". `npm install` had run only in the code worktree. With the code worktree's `node_modules` it was green.
 **How to apply:** symlink `../workout-codebase/node_modules` for gate runs and build agents. PLANNING.md and the agent
 prompts still say "the planning worktree's"; fix them there.
+
+## L-049 — a smoke receipt counts only from the branch's own script, run on the committed ref  (Planner, req-202, 2026-10-07)
+
+req-202's agent reported "smoke: green". It had run `node scripts/smoke.mjs` before committing, so the build was of main. The
+branch renamed "‹ Exercises", which smoke clicks, so CI's deploy would have gone red.
+
+Planner caught it by re-running, but first ran **main's** `scripts/smoke.mjs` against the branch build. That is a second
+mismatch: it showed red even after the branch fixed its own smoke.
+
+**How to apply:**
+- The smoke receipt names the sha.
+- It comes from that sha's own `scripts/smoke.mjs`: a throwaway worktree of the branch, or a no-argument run after the commit.
+- Agent prompts say so.
+- Planner's merge gate runs the branch's script, not the code worktree's.
