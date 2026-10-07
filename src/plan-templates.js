@@ -128,20 +128,53 @@ export function splitPicks(picks, split) {
   return [list.filter((_, i) => i % 2 === 0), list.filter((_, i) => i % 2 === 1)]
 }
 
-// The machines-first plan: routine names `(unconfirmed)` "My workout" / "My workout A", "My workout B"
-// (req-191 §7; were "Workout" / "Workout A/B");
-// the template's spacing for that many days; with A/B, days alternate A, B, A, B.
+// The machines-first plan: routine names `names` (req-207, DEC-116: the setup's name boxes,
+// "New workout #N" prefilled; an emptied box → the caller's prefill); without them the old
+// defaults "Workout" / "Workout A", "Workout B".
+// `weekdays` (req-207): the days the user picked (0 = Sun) — the week is those, in Mon–Sun
+// order, taken as given (`fixedDays`: planToState does not shift them; with today among them
+// the plan still starts today, DEC-105). Without them, the template's spacing, which
+// planToState shifts to start today. With A/B, days alternate A, B, A, B in that order.
 // One day is always one workout (an A/B split needs two days).
-export function machinesPlan({ days, split, picks }) {
+export function machinesPlan({ days, split, picks, names, weekdays }) {
   const template = PLAN_TEMPLATES[days]
   if (!template) return null
   const ab = split === SPLIT_AB && days >= 2
   const groups = splitPicks(picks, ab ? SPLIT_AB : SPLIT_SAME)
-  const names = ab ? ['Workout A', 'Workout B'] : ['Workout']
+  const fallback = ab ? ['Workout A', 'Workout B'] : ['Workout']
+  const nameOf = (r) => String(names?.[r] ?? '').trim() || fallback[r]
+  const chosen = weekdays ? mondayFirst(weekdays) : null
+  const week = (chosen || template.week.map(([weekday]) => weekday)).map((weekday, i) => [weekday, ab ? i % 2 : 0])
   return {
-    routines: groups.map((group, r) => ({ name: names[r], picks: group })),
-    week: template.week.map(([weekday], i) => [weekday, ab ? i % 2 : 0]),
+    routines: groups.map((group, r) => ({ name: nameOf(r), picks: group })),
+    week,
+    ...(chosen ? { fixedDays: true } : {}),
   }
+}
+
+// req-207 — weekdays (0 = Sun), deduplicated, in Mon–Sun order (Sunday last).
+export const WEEKDAYS_MON_FIRST = [1, 2, 3, 4, 5, 6, 0]
+export function mondayFirst(weekdays) {
+  const set = new Set((weekdays || []).map(Number))
+  return WEEKDAYS_MON_FIRST.filter((weekday) => set.has(weekday))
+}
+
+// req-207 (DEC-116) — the default name of a new workout: "New workout #N", N the smallest
+// integer ≥ 1 that no active (not archived) workout is already named. `count` → the next
+// `count` free numbers in order (A/B: #N, then the next free one after it).
+export function nextWorkoutNames(routines, count = 1) {
+  const taken = new Set(
+    (routines || []).filter((routine) => routine && !routine.archivedAt).map((routine) => String(routine.name ?? '').trim()),
+  )
+  const out = []
+  for (let n = 1; out.length < count; n += 1) {
+    const name = `New workout #${n}`
+    if (!taken.has(name)) out.push(name)
+  }
+  return out
+}
+export function nextWorkoutName(routines) {
+  return nextWorkoutNames(routines, 1)[0]
 }
 
 // The template days whose slots are all unchosen (null / skipped) — the empty-day sheet's
@@ -259,7 +292,8 @@ export function planToState(state, choices, ids) {
     s = { ...s, schedule: { ...withDefaultAnchor(s.schedule || { slots: [] }, ids.now), loopWeeks: 1 } }
     // The first KEPT day is today (a left-out day A does not push the plan to its next day).
     const kept = plan.week.filter(([, r]) => routineIds[r])
-    for (const [weekday, r] of startTodayWeek(kept, ids.now || new Date())) {
+    // req-207 — days the user picked are the days (no shift); the template's start today.
+    for (const [weekday, r] of plan.fixedDays ? kept : startTodayWeek(kept, ids.now || new Date())) {
       s = slotAddedState(s, { id: ids.slot(), week: 0, weekday, routineId: routineIds[r] })
     }
   }
