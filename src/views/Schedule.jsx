@@ -10,6 +10,7 @@ import {
   doneOnDay,
   longWeekdayDate,
   removeSlotText,
+  slotMenuSheet,
   startNowShown,
 } from './schedule-day.js'
 import { childLink, go, withFrom } from '../route'
@@ -130,6 +131,30 @@ export function ScheduleLoop() {
   )
 }
 
+// req-208 — the slot row's "⋯": one sheet (Change day · Remove · Cancel), then the chosen
+// action's own sheet, unchanged from req-207 / req-203:
+// - Change day (DEC-116): removeSlot + addSlot (same week, same routine), no confirm (reversible).
+// - Remove: the "Take X off {Day}s?" confirm, then removeSlot (this loop week's slot only).
+async function slotActions(store, { routines, slot, week, weekday, loop, date, from }) {
+  const name = slotLabel(routines, slot)
+  const menu = slotMenuSheet(name)
+  const choice = await askChoice('', { title: menu.title, choices: menu.choices })
+  if (choice === 'change') {
+    const taken = (store.schedule?.slots || [])
+      .filter((other) => Number(other.week) === Number(week) && other.routineId === slot.routineId)
+      .map((other) => other.weekday)
+    const sheet = changeDaySheet(name, weekday, week, loop, taken)
+    const picked = await askChoice(sheet.message, { title: sheet.title, choices: sheet.choices })
+    if (picked == null || Number(picked) === Number(weekday)) return
+    store.removeSlot(slot.id)
+    store.addSlot({ week, weekday: Number(picked), routineId: slot.routineId })
+    go(withFrom(changedDayPath(week, Number(picked), date), from))
+  } else if (choice === 'remove') {
+    if (!(await askConfirm(removeSlotText(name, weekday, week, loop), { confirmLabel: 'Remove' }))) return
+    store.removeSlot(slot.id)
+  }
+}
+
 // req-200 (DEC-110 §4) — a day of the loop, reached from the Schedule (Back → /schedule)
 // or from a row of Home's "This week" (`?from=/`, so Back → Home and the Today link is
 // absent). Each slot has **Start now**: that routine, today, through the same off-schedule
@@ -192,30 +217,15 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
                   {startable ? (
                     <Button onClick={() => startOrContinue(store, routine.id)}>Start now</Button>
                   ) : null}
-                  {/* req-207 (DEC-116) — move this slot to another weekday of the same loop week:
-                      removeSlot + addSlot (same week, same routine), no confirm (reversible). */}
+                  {/* req-208 — Change day and Remove sit behind the row's "⋯" (req-188's row-menu
+                      pattern): the row is the name, Start now and ⋯ on one line at 375 px. */}
                   <Button
-                    onClick={async () => {
-                      const taken = (store.schedule?.slots || [])
-                        .filter((other) => Number(other.week) === Number(week) && other.routineId === slot.routineId)
-                        .map((other) => other.weekday)
-                      const sheet = changeDaySheet(slotLabel(routines, slot), weekday, week, loop, taken)
-                      const picked = await askChoice(sheet.message, { title: sheet.title, choices: sheet.choices })
-                      if (picked == null || Number(picked) === Number(weekday)) return
-                      store.removeSlot(slot.id)
-                      store.addSlot({ week, weekday: Number(picked), routineId: slot.routineId })
-                      go(withFrom(changedDayPath(week, Number(picked), date), from))
-                    }}
+                    variant="quiet"
+                    className="ui-row-menu"
+                    aria-label={`Change day or remove ${slotLabel(routines, slot)}`}
+                    onClick={() => slotActions(store, { routines, slot, week, weekday, loop, date, from })}
                   >
-                    Change day
-                  </Button>
-                  <Button
-                    onClick={async () => {
-                      if (!(await askConfirm(removeSlotText(slotLabel(routines, slot), weekday, week, loop), { confirmLabel: 'Remove' }))) return
-                      store.removeSlot(slot.id)
-                    }}
-                  >
-                    Remove
+                    ⋯
                   </Button>
                 </>
               }

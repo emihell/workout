@@ -231,11 +231,18 @@ describe('§3 Blank workout uses the same default', () => {
   })
 })
 
+// req-208 test edit: Change day sits behind the slot row's "⋯" — every `tap(button('Change
+// day'))` below became `openChangeDay()` (⋯, then the menu's Change day). Assertions unchanged.
+async function openChangeDay() {
+  await tap(button('⋯'))
+  await tap(button('Change day'))
+}
+
 describe('AC4 Change day (rendered)', () => {
   it('Monday → Saturday: removeSlot + addSlot, same count, history untouched, lands on Saturday', async () => {
     await open('/schedule/0/1?from=%2F')
     const before = stored()
-    await tap(button('Change day'))
+    await openChangeDay()
     const pending = getPendingConfirm()
     assert.equal(pending.title, 'Move Upper Body to which day?')
     assert.equal(pending.choices[0].label, 'Monday (now)')
@@ -255,10 +262,10 @@ describe('AC4 Change day (rendered)', () => {
   it('Cancel or the current day writes nothing', async () => {
     await open('/schedule/0/1?from=%2F')
     const before = localStorage.getItem('workout-mvp-v9')
-    await tap(button('Change day'))
+    await openChangeDay()
     await act(async () => answerConfirm(false))
     await flush()
-    await tap(button('Change day'))
+    await openChangeDay()
     await act(async () => answerConfirm('1'))
     await flush()
     assert.equal(localStorage.getItem('workout-mvp-v9'), before)
@@ -268,7 +275,7 @@ describe('AC4 Change day (rendered)', () => {
   it('in a 2-week loop it stays in that loop week', async () => {
     const two = { ...seed, schedule: { loopWeeks: 2, anchor: seed.schedule.anchor, slots: [{ id: 's-w2', week: 1, weekday: 3, routineId: 'sess-lower' }] } }
     await open('/schedule/1/3', two)
-    await tap(button('Change day'))
+    await openChangeDay()
     assert.equal(getPendingConfirm().message, 'It moves in week 2 of 2. Your history is kept.')
     await act(async () => answerConfirm('5'))
     await flush()
