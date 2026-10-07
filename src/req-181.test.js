@@ -300,7 +300,9 @@ describe('req-181 — the flow (rendered, real store)', () => {
     assert.equal(window.location.hash, '#/', 'went Home (scheduled), not the Done screen')
   })
 
-  it('QA: the Fill screen\'s Cancel / Save row is pinned above the dock (the picker bar\'s class)', async () => {
+  // req-198 (DEC-112) — the dock is gone; the bar is pinned to the bottom clearance
+  // (was --ui-dock-clear).
+  it('QA: the Fill screen\'s Cancel / Save row is pinned to the bottom (the picker bar\'s class)', async () => {
     await harness(emptyState())
     await visit(link('1 day a week'))
     const bar = view.button('Save').closest('.ui-actions')
@@ -309,7 +311,7 @@ describe('req-181 — the flow (rendered, real store)', () => {
     const css = readFileSync(new URL('./ui/ui.css', import.meta.url), 'utf8')
     const rule = css.slice(css.indexOf('.ui-picker-bar {'), css.indexOf('}', css.indexOf('.ui-picker-bar {')))
     assert.match(rule, /position: sticky/)
-    assert.match(rule, /bottom: calc\(var\(--ui-dock-clear\)/)
+    assert.match(rule, /bottom: calc\(var\(--ui-bottom-clear\)/)
   })
 
   it('abandon mid-flow: v9 unchanged', async () => {

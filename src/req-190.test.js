@@ -165,9 +165,11 @@ describe('req-190 AC1 — planToState, template with an empty day', () => {
 })
 
 describe('req-190 AC6 — the picker bar never covers the last row (CSS)', () => {
-  it('a page holding a sticky picker bar reserves the dock + bar as scroll padding', () => {
+  // req-198 (DEC-112) — the dock is gone: the reserve is the bottom safe area + the bar
+  // (was --ui-dock-clear + the bar).
+  it('a page holding a sticky picker bar reserves the bottom clearance + bar as scroll padding', () => {
     const css = readFileSync(new URL('./ui/ui.css', import.meta.url), 'utf8')
-    assert.match(css, /html:has\(\.ui-picker-bar\)\s*\{\s*scroll-padding-bottom: calc\(var\(--ui-dock-clear\) \+ var\(--ui-tap\)/)
+    assert.match(css, /html:has\(\.ui-picker-bar\)\s*\{\s*scroll-padding-bottom: calc\(var\(--ui-bottom-clear\) \+ var\(--ui-tap\)/)
   })
 })
 

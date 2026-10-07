@@ -44,14 +44,15 @@ test('failure case: no hardcoded pixel bump for the top inset', () => {
 })
 
 test('bottom chrome still clears the home indicator via env()', () => {
-  // req-52 / DEC-036 — the flush --ui-tabbar-h bar became a floating dock. The
-  // dock itself sits above the home indicator (its `bottom` offset carries the
-  // safe-area term), and content clears the dock via --ui-dock-clear, which also
-  // carries the safe-area term. Same env()-driven guarantee, new names.
-  assert.match(ruleBody('.ui-dock'), /bottom:[^;]*env\(safe-area-inset-bottom/)
-  assert.match(css, /--ui-dock-clear:\s*calc\([^;]*env\(safe-area-inset-bottom/)
-  // <main> reserves that clearance so no screen hides behind the dock.
-  assert.match(ruleBody('.ui-main'), /padding-bottom:[^;]*var\(--ui-dock-clear\)/)
+  // req-52 / DEC-036 — the flush --ui-tabbar-h bar became a floating dock.
+  // req-198 (DEC-112) — the dock is gone (sanctioned edit: its `.ui-dock` assertion is
+  // removed with it). Content still clears the home indicator via --ui-bottom-clear,
+  // which carries the safe-area term, and the set-log bar keeps its env() offset.
+  assert.doesNotMatch(css, /\.ui-dock\b/)
+  assert.match(css, /--ui-bottom-clear:\s*env\(safe-area-inset-bottom/)
+  // <main> reserves that clearance so no screen hides behind the home indicator.
+  assert.match(ruleBody('.ui-main'), /padding-bottom:[^;]*var\(--ui-bottom-clear\)/)
+  assert.match(ruleBody('.ui-setlog__actions'), /bottom:[^;]*env\(safe-area-inset-bottom/)
 })
 
 test('a11y: "in progress" status text uses an AA-passing token (ink-2, not ink-3)', () => {

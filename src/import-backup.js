@@ -22,6 +22,14 @@ export function downloadJson(filename, data) {
   downloadBlob(filename, new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
 }
 
+// req-198 — the one Export: Backup & data's button and the save-failed banner's both call
+// this, so the banner's download is the same file. `download` is injectable for tests.
+export function exportBackup(store, { includeAssistant = false, now = new Date(), download = downloadJson } = {}) {
+  const filename = `workout-database-${dateKey(now)}.json`
+  download(filename, buildBackup(store, { includeAssistant }))
+  return filename
+}
+
 // req-157 — a string saved as-is (no JSON re-serialising). A Blob is UTF-8, so an unpaired
 // surrogate becomes U+FFFD here; the on-device copy (keepUnreadableCopy) keeps it exactly.
 export function downloadText(filename, text) {

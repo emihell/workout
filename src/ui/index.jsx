@@ -1,8 +1,7 @@
 // req-13 / DEC-017 — the minimal, colorless, Apple-inspired component library.
 //
 // First iteration: as little code as possible, grayscale only, every interactive
-// target ≥44px. These are bare primitives. The global shell's bottom menu lives in
-// its own file (ui/BottomMenu.jsx, req-52); every other component lives here + in
+// target ≥44px. These are bare primitives. Every component lives here + in
 // the #/components showcase until the per-screen styling pass migrates screens onto it.
 //
 // The one stylesheet (./ui.css) is imported once at the app root (main.jsx).
@@ -273,10 +272,9 @@ export function Row({ children, value, action, to, className = '' }) {
   )
 }
 
-// The global bottom menu lives in its own file now (req-52 / DEC-036):
-// ui/BottomMenu.jsx, wired into App.jsx. It replaced the old three-text-tab
-// `TabBar` that used to sit here. `activeTab` (route.js) still drives which control
-// is selected.
+// req-198 (DEC-112) — the global bottom menu (req-52 / DEC-036, ui/BottomMenu.jsx) is no
+// longer rendered: Home is the hub, and a deep screen's Back row carries a "Today" link
+// (views/shared.jsx Back).
 
 // Banner — a full-width grayscale notice strip (save-failed, error fallback).
 export function Banner({ children, role = 'status' }) {

@@ -1,5 +1,6 @@
 import { go } from '../route'
 import { SegmentedControl } from '../ui/index.jsx'
+import { Back } from './shared'
 import { Exercises } from './Exercises'
 import { Routines } from './Routine'
 import { Schedule } from './Schedule'
@@ -33,7 +34,10 @@ const SEGMENT_ROUTES = {
 export function Library({ tab }) {
   return (
     <>
+      {/* req-198 (DEC-112) — no bottom bar: the lists are reached from Home, so they are
+          not top-level any more (DEC-015) and get a Back home. */}
       <div className="ui-library-toggle">
+        <Back to="/" />
         <SegmentedControl
           options={SEGMENTS}
           value={tab}

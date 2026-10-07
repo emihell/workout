@@ -87,6 +87,9 @@ export function History({ month = null }) {
     )
   }
 
+  // req-198 / DEC-110 §1 — "Backup & data" closes the screen always, even with zero
+  // workouts, so Import is reachable on a device that has routines but no history
+  // (review F11).
   return (
     <Screen>
       <Back to="/" />
@@ -104,13 +107,21 @@ export function History({ month = null }) {
           </List>
         </>
       ) : null}
-      {months.length === 0 ? <p className="ui-sub">None.</p> : null}
+      {/* req-198 — no empty month list when there are none, so its hairline doesn't
+          double up with Backup & data's below. */}
+      {months.length === 0 ? (
+        <p className="ui-sub">None.</p>
+      ) : (
+        <List>
+          {months.map((group) => (
+            <Row key={group.key} to={`/history/month/${group.key}`} value={String(group.workouts.length)}>
+              {monthLabel(group.key)}
+            </Row>
+          ))}
+        </List>
+      )}
       <List>
-        {months.map((group) => (
-          <Row key={group.key} to={`/history/month/${group.key}`} value={String(group.workouts.length)}>
-            {monthLabel(group.key)}
-          </Row>
-        ))}
+        <Row to="/settings">Backup &amp; data</Row>
       </List>
     </Screen>
   )

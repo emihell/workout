@@ -364,11 +364,10 @@ export function Today() {
           />
         </div>
         {importError ? <Banner role="alert">{importError}</Banner> : null}
+        {/* req-198 — Schedule and Settings rows dropped (DEC-110 §1); Import is above. */}
         <List>
           <Row to="/routines">Routines</Row>
-          <Row to="/schedule">Schedule</Row>
           <Row to="/history">History</Row>
-          <Row to="/settings">Settings</Row>
         </List>
       </Screen>
     )
@@ -382,6 +381,11 @@ export function Today() {
           Week {week + 1} of {loop}
         </p>
       ) : null}
+      {/* req-198 (DEC-112) — no bottom bar: Home is the hub. A small link to the
+          routines list; today's Start stays the dominant control. */}
+      <p>
+        <NavLink to="/routines" chevron="forward">Workouts</NavLink>
+      </p>
 
       {/* Section order: upcoming items → Today (emphasized; req-195: with
           today's finished workouts inside it) → prior-day recent items → Previous› (plain link, the last Row of the recent list) →

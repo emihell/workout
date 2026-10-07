@@ -1,22 +1,29 @@
+// req-198 (DEC-112) — NOT RENDERED. The bar was removed (App.jsx no longer mounts it) and
+// its .ui-dock CSS is gone. This file, its test and activeTab (route.js) are left only
+// because deleting them was not permitted in the req-198 build; delete all three together.
+//
 // req-52 / DEC-036 — the global bottom menu, extracted from ui/index.jsx's old
 // TabBar (req-14/DEC-024). A floating dock (inset from the edges, NOT a flush
-// full-width bar), solid — no translucency, no shadow — with three controls,
-// left→right: Library · Workout · Settings.
+// full-width bar), solid — no translucency, no shadow — with two controls,
+// left→right: Library · Workout. req-198: the Settings circle left the bar; its
+// contents are "Backup & data" at the bottom of History (DEC-110 §1). History stays
+// reached from Home (Emilio, mid-build: no History circle).
 //
 // - Workout is a wide text-only oval/capsule (flex:1, takes the remaining width) —
 //   the deliberate focus.
-// - Library / Settings are icon-only circles (grid + sliders, inline stroke SVG on
-//   a 24px grid, grayscale via currentColor). Each carries an aria-label since it
-//   has no visible text.
+// - Library is a circle (grid icon, inline stroke SVG on a 24px grid, grayscale via
+//   currentColor) with a small visible text label under its icon (req-198, review
+//   F10: icon-only failed the beginner test). The label is the accessible name, so
+//   there is no aria-label.
 // - Selection model A: the control for the CURRENT screen is ink-filled
-//   (.is-current → --ui-ink bg / --ui-bg icon); the other two carry a faint
+//   (.is-current → --ui-ink bg / --ui-bg icon); the other carries a faint
 //   hairline border (--ui-line, --ui-bg fill, --ui-ink icon). The fill MOVES with
 //   the active tab. Which one is current comes from activeTab(route.name)
 //   (route.js) — the same shared, unit-tested helper the old TabBar used; no new
 //   grouping. aria-current="page" marks the selected one.
 // - Still NavLink/<a> nav, not <button> (DEC-016): these navigate, they don't act,
 //   and they reuse the one shared nav-link primitive (views/shared.jsx).
-// - Targets unchanged: Workout → /, Library → /routines, Settings → /settings.
+// - Targets: Workout → /, Library → /routines.
 // - Hidden during the in-workout flow (route name starts with `workout`): the
 //   in-gym screens are focused single-task surfaces; a persistent nav that could
 //   jump you to Library mid-set fights them (unchanged from the old TabBar).
@@ -25,10 +32,11 @@
 // in ui.css), which is env(safe-area-inset-bottom)-driven so a no-notch device
 // gets no dead gap.
 //
-// Selection (model A) reads from activeTab (route.js), whose three-group mapping is
+// Selection (model A) reads from activeTab (route.js), whose grouping is
 // unit-tested in route.test.js. The JSX render itself — the null-on-workout guard,
-// the aria-labels, the targets — is locked by a static-source check in
+// the visible labels, the targets — is locked by a static-source check in
 // BottomMenu.test.js (node --test can't parse JSX) and confirmed in the browser.
+// The labels change again in req-199/req-201.
 import { NavLink as BaseNavLink } from '../views/shared'
 import { activeTab, useHashRoute } from '../route'
 
@@ -59,37 +67,6 @@ function GridIcon() {
   )
 }
 
-// Sliders (Settings). Three vertical tracks, each with a horizontal handle mark —
-// the Feather "sliders" idiom. Stroke-only, no fills, so it flips cleanly with
-// currentColor and needs no cut-out knob.
-function SlidersIcon() {
-  return (
-    <svg
-      className="ui-dock__icon"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <line x1="5" y1="21" x2="5" y2="14" />
-      <line x1="5" y1="10" x2="5" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12" y2="3" />
-      <line x1="19" y1="21" x2="19" y2="16" />
-      <line x1="19" y1="12" x2="19" y2="3" />
-      <line x1="2.5" y1="14" x2="7.5" y2="14" />
-      <line x1="9.5" y1="8" x2="14.5" y2="8" />
-      <line x1="16.5" y1="16" x2="21.5" y2="16" />
-    </svg>
-  )
-}
-
 export function BottomMenu() {
   const route = useHashRoute()
   if (String(route.name).startsWith('workout')) return null
@@ -99,10 +76,10 @@ export function BottomMenu() {
       <BaseNavLink
         to="/routines"
         className={cx('ui-dock__btn', 'ui-dock__circle', current === 'library' && 'is-current')}
-        aria-label="Library"
         aria-current={current === 'library' ? 'page' : undefined}
       >
         <GridIcon />
+        <span className="ui-dock__label">Library</span>
       </BaseNavLink>
       <BaseNavLink
         to="/"
@@ -110,14 +87,6 @@ export function BottomMenu() {
         aria-current={current === 'workouts' ? 'page' : undefined}
       >
         Workout
-      </BaseNavLink>
-      <BaseNavLink
-        to="/settings"
-        className={cx('ui-dock__btn', 'ui-dock__circle', current === 'settings' && 'is-current')}
-        aria-label="Settings"
-        aria-current={current === 'settings' ? 'page' : undefined}
-      >
-        <SlidersIcon />
       </BaseNavLink>
     </nav>
   )

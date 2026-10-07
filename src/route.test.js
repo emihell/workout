@@ -230,10 +230,14 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
     'history-recalculate',
     'history-routine',
     'history-set',
+    'history-set-add',
     'history-set-new',
     'history-exercises',
     'history-exercise',
     'history-workout-exercise',
+    // req-198 — Settings left the bar; as "Backup & data" under History it lights the
+    // Workout oval, as History does.
+    'settings',
     'workout',
     'workout-preview',
     'workout-setup',
@@ -253,12 +257,13 @@ describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)',
     assert.equal(activeTab('schedule-slot'), 'library')
   })
 
-  it('maps today, history/* and the workout flow to Workouts', () => {
+  it('maps today, history/*, settings and the workout flow to Workouts', () => {
     for (const name of WORKOUTS) assert.equal(activeTab(name), 'workouts', name)
   })
 
-  it('maps settings to Settings and the dev showcase to no tab', () => {
-    assert.equal(activeTab('settings'), 'settings')
+  it('req-198: no route lights a Settings tab any more; the dev showcase lights none', () => {
+    for (const name of [...LIBRARY, ...WORKOUTS]) assert.notEqual(activeTab(name), 'settings', name)
+    assert.equal(activeTab('settings'), 'workouts')
     assert.equal(activeTab('components'), null)
   })
 
