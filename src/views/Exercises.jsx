@@ -92,8 +92,11 @@ export function Exercises({ type = null }) {
     ? all.filter((ex) => matchesQuery(ex, q)).sort((a, b) => a.name.localeCompare(b.name))
     : []
 
+  // req-199 — no Library toggle: the list is reached from the Routines list's
+  // "Your exercises ›", so Back goes there.
   return (
     <Screen>
+      <Back to="/routines" />
       <Title>Exercises</Title>
       <p>
         <NavLink to="/exercises/new" chevron="forward">Add exercise</NavLink>

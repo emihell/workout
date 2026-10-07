@@ -158,6 +158,16 @@ export function HistoryExercise({ exerciseId }) {
     <Screen>
       <Back to="/history/exercises" />
       <Title>{ex?.name || exerciseId}</Title>
+      {/* req-199 (DEC-110 §3) — the exercise's settings, one tap from its history. `?from=`
+          brings Save / Cancel / Back back to this page. A deleted (archived) exercise has
+          no settings to edit, so no link. */}
+      {ex && !ex.archivedAt ? (
+        <p>
+          <NavLink to={withFrom(`/exercises/${ex.id}/edit`, `/history/exercise/${ex.id}`)} chevron="forward">
+            Exercise settings
+          </NavLink>
+        </p>
+      ) : null}
       {groups.length === 0 ? <p className="ui-sub">None.</p> : null}
       {groups.map((group) => (
         <div key={group.groupId || group.routineId}>

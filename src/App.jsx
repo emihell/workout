@@ -11,6 +11,7 @@ import { Banner, Button } from './ui/index.jsx'
 import { ConfirmSheet } from './ui/index.jsx'
 import { Today } from './views/Today'
 import {
+  Routines,
   RoutineNew,
   RoutineNewBlank,
   RoutineDetail,
@@ -19,13 +20,12 @@ import {
   RoutineExerciseNew,
   RoutineExerciseEdit,
 } from './views/Routine'
-import { ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
+import { Schedule, ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
 import { RoutineMachines, RoutinePlan } from './views/Plan'
 import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseDetail, ExerciseEdit } from './views/Exercises'
 import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutAdd, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetAdd, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { Settings } from './views/Settings'
-import { Library } from './views/Library'
 import { Showcase } from './ui/Showcase.jsx'
 // req-86 (N8) / req-87 — the "note on this page" feedback capture. req-87 flipped
 // its gating from build-time (DCE'd out of prod) to RUNTIME: it ships in the
@@ -100,7 +100,7 @@ function FeedbackNotesGate() {
 
 function Screen() {
   const route = useHashRoute()
-  if (route.name === 'schedule') return <Library tab="schedule" />
+  if (route.name === 'schedule') return <Schedule />
   if (route.name === 'schedule-loop') return <ScheduleLoop />
   if (route.name === 'schedule-day') {
     return <ScheduleDay key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} />
@@ -121,7 +121,7 @@ function Screen() {
       />
     )
   }
-  if (route.name === 'routines') return <Library tab="routines" />
+  if (route.name === 'routines') return <Routines />
   if (route.name === 'routine-new') return <RoutineNew />
   if (route.name === 'routine-new-blank') return <RoutineNewBlank />
   if (route.name === 'routine-plan') return <RoutinePlan />
@@ -162,7 +162,7 @@ function Screen() {
   if (route.name === 'routine') {
     return <RoutineDetail key={route.routineId} routineId={route.routineId} />
   }
-  if (route.name === 'exercises') return <Library tab="exercises" />
+  if (route.name === 'exercises') return <Exercises />
   if (route.name === 'exercises-type') {
     return <Exercises key={route.type} type={route.type} />
   }

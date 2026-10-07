@@ -37,8 +37,11 @@ export function Schedule() {
   const todayWeekday = new Date().getDay()
   const routines = activeRoutines(store)
 
+  // req-199 — no Library toggle: reached from the Routines list's "Whole plan ›", so
+  // Back goes there. Every /schedule/* route is unchanged.
   return (
     <Screen>
+      <Back to="/routines" />
       <Title>Schedule</Title>
       <p>
         <NavLink to="/schedule/loop" chevron="forward">
