@@ -77,7 +77,7 @@ function FinishScreen({ routineId }) {
       ) : null}
       {empty ? (
         <p className="ui-sub" role="status">
-          <strong>Nothing logged.</strong> No set in this workout was logged — abandon it, or save it anyway.
+          <strong>Nothing logged.</strong> No set in this session was logged — abandon it, or save it anyway.
         </p>
       ) : null}
       <SectionHeader>Feel</SectionHeader>

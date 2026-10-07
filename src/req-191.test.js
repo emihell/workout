@@ -263,9 +263,9 @@ describe('AC4 — the days step in plain words', () => {
     assert.equal(planDaysText([6, 1, 3], 6), 'Starts today (Sat), then every Sat, Mon and Wed')
     assert.equal(planDaysText([], 2), '')
   })
-  it('routine names "My workout" / "My workout A/B"', () => {
-    assert.deepEqual(machinesPlan({ days: 2, split: SPLIT_SAME, picks: ['a'] }).routines.map((r) => r.name), ['My workout'])
-    assert.deepEqual(machinesPlan({ days: 2, split: SPLIT_AB, picks: ['a', 'b'] }).routines.map((r) => r.name), ['My workout A', 'My workout B'])
+  it('routine names "Workout" / "Workout A/B"', () => {
+    assert.deepEqual(machinesPlan({ days: 2, split: SPLIT_SAME, picks: ['a'] }).routines.map((r) => r.name), ['Workout'])
+    assert.deepEqual(machinesPlan({ days: 2, split: SPLIT_AB, picks: ['a', 'b'] }).routines.map((r) => r.name), ['Workout A', 'Workout B'])
   })
 })
 

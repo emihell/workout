@@ -324,7 +324,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
               const match = libraryItemMatch(store.exercises, item)
               const action = match?.kind === 'live' ? (
                 <NavLink to={pickedExercisePath(paths, returnBase, match.exercise.id)} look="secondary">
-                  {returnBase ? 'Add to routine' : 'Already added'}
+                  {returnBase ? 'Add to workout' : 'Already added'}
                 </NavLink>
               ) : match?.kind === 'archived' ? (
                 <Button
@@ -488,7 +488,7 @@ export function ExerciseDetail({ exerciseId, from = null }) {
           const impact = exerciseDeletionImpact(store, ex.id)
           const removes =
             impact.routines > 0
-              ? ` This removes it from ${impact.routines} routine${impact.routines === 1 ? '' : 's'}.`
+              ? ` This removes it from ${impact.routines} workout${impact.routines === 1 ? '' : 's'}.`
               : ''
           // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
           // req-169 (DEC-089) — and a legacy unfinished (draft) workout, worded as such.

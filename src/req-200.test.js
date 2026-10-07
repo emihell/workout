@@ -204,10 +204,10 @@ describe('req-200 — the day screen', () => {
     assert.equal(window.location.hash, '#/workout/sess-push-pull')
   })
 
-  it('Add routine from Home\'s day keeps the way back: day → add → day (?from=/) → Home', async () => {
+  it('Add workout from Home\'s day keeps the way back: day → add → day (?from=/) → Home', async () => {
     await open('/schedule/0/2?from=%2F')
-    assert.equal(link('Add routine ›')?.getAttribute('href'), `#${withFrom('/schedule/0/2/add', withFrom('/schedule/0/2', '/'))}`)
-    await tap(link('Add routine ›'))
+    assert.equal(link('Add workout ›')?.getAttribute('href'), `#${withFrom('/schedule/0/2/add', withFrom('/schedule/0/2', '/'))}`)
+    await tap(link('Add workout ›'))
     assert.equal(backHref(), `#/schedule/0/2?from=%2F`)
     await tap(buttons('Upper Body')[0])
     assert.equal(window.location.hash, '#/schedule/0/2?from=%2F')

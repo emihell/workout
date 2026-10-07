@@ -31,7 +31,7 @@ function fnBody(src, name) {
 // A <Button …> whose only handler is a go() call — the pattern this req removes.
 const NAV_BUTTON = /<Button\b[^>]*onClick=\{\(\) =>\s*go\(/
 
-test('Today empty day: "Start new workout" is a NavLink to /routines with the primary block look', () => {
+test('Today empty day: "Start a session" is a NavLink to /routines with the primary block look', () => {
   const body = fnBody(today, 'TodayEmpty')
   assert.doesNotMatch(body, NAV_BUTTON)
   assert.doesNotMatch(body, /<Button\b/)
@@ -39,7 +39,7 @@ test('Today empty day: "Start new workout" is a NavLink to /routines with the pr
     body,
     // req-122 — the button look is the NavLink `look`/`block` props, not hand-written classes.
     // req-195 — primary while nothing is done today, secondary once something is.
-    /<NavLink to="\/routines" look=\{done\.length \? 'secondary' : 'primary'\} block>\s*Start new workout\s*<\/NavLink>/,
+    /<NavLink to="\/routines" look=\{done\.length \? 'secondary' : 'primary'\} block>\s*Start a session\s*<\/NavLink>/,
   )
 })
 

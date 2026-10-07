@@ -51,7 +51,7 @@ export function kgListText(list) {
 export function offerText(offer) {
   const routineHasKg = (offer.from || []).some((kg) => Number(kg) > 0)
   const lifted = `You lifted ${kgListText(offer.to)} kg`
-  return routineHasKg ? `${lifted} · routine says ${kgListText(offer.from)} kg` : `${lifted} · not in the routine yet`
+  return routineHasKg ? `${lifted} · workout says ${kgListText(offer.from)} kg` : `${lifted} · not in the workout yet`
 }
 
 // req-187 (DEC-103 §1) — the call site's decision: on the set that FINISHES an exercise,
@@ -76,7 +76,7 @@ function kgSummary(list) {
 // ("40/40/35 kg"). `keepLabel` / `updateLabel` keep their names: the call site maps them to the
 // sheet's cancel / confirm.
 export function offerSheetText(offer, exercise) {
-  const routine = offer.routineName || 'The routine'
+  const routine = offer.routineName || 'The workout'
   const kg = `${kgSummary(offer.to)} kg`
   return {
     title: `Use ${kg} next time?`,

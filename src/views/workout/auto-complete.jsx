@@ -94,7 +94,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
   return (
     <Screen>
       <Title subtitle={name}>Great job!</Title>
-      <SectionHeader>{d ? 'vs last time' : 'This workout'}</SectionHeader>
+      <SectionHeader>{d ? 'vs last time' : 'This session'}</SectionHeader>
       <List>
         {rows.map((r) => (
           <Row key={r.label} value={r.delta ? `${r.value}  (${r.delta})` : r.value}>

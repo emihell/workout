@@ -96,13 +96,6 @@ export function weekdayName(value) {
   return WEEKDAYS.find((d) => d.value === Number(value))?.label ?? ''
 }
 
-export function greeting() {
-  const h = new Date().getHours()
-  if (h < 12) return 'Good morning'
-  if (h < 18) return 'Good afternoon'
-  return 'Good evening'
-}
-
 // req-163 (DEC-087 §2) — a warm-up or cardio set carries no effort (req-156), so its
 // label is never shown, even on an OLD set stored with rpe 3 before req-156: display only,
 // the stored value is not rewritten. `cardio` comes from the caller (the set alone doesn't

@@ -135,11 +135,11 @@ describe('req-119 delete during a workout archives (DEC-058 §5)', () => {
   it('the confirm says it is in the current workout', () => {
     assert.equal(
       deletionConfirmHead('Push', { hasHistory: false, inCurrentWorkout: true }),
-      'Push is in the current workout and will be archived (the workout keeps it).',
+      'Push is in the session in progress and will be archived (the session keeps it).',
     )
     assert.equal(
       deletionConfirmHead('Push', { hasHistory: true, inCurrentWorkout: false }),
-      'Push has past workouts and will be archived (kept in your history).',
+      'Push has past sessions and will be archived (kept in your history).',
     )
     assert.equal(deletionConfirmHead('Push', { hasHistory: false, inCurrentWorkout: false }), 'Delete Push?')
   })

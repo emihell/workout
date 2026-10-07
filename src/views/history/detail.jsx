@@ -11,6 +11,7 @@ import {
   historyGroupRowMeta,
   itemIdOf,
   routineTitle,
+  sessionLabel,
   whenLabel,
   workoutRoutineId,
   workoutRoutineName,
@@ -92,7 +93,7 @@ export function HistoryDetail({ workoutId, from = null }) {
           line — it's a past record, not a forward celebration (decided). */}
       <Button
         onClick={async () => {
-          if (!(await askConfirm(`Delete ${workoutRoutineName(workout, routine)}?`, { confirmLabel: 'Delete' }))) return
+          if (!(await askConfirm(`Delete ${sessionLabel(workout, routine)}?`, { confirmLabel: 'Delete' }))) return
           store.removeWorkout(workout.id)
           go(historyDetailBack(from))
         }}

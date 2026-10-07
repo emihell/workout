@@ -9,7 +9,7 @@ import { itemCurrentPath } from './workout-paths.js'
 // discarded. There is exactly one in-progress workout; starting a different one, or
 // continuing a legacy draft while another is active, abandons the current active.
 export const ABANDON_ON_NEW_WARNING =
-  'Starting a new workout will abandon the workout in progress. Continue?'
+  'Starting a new session will abandon the one in progress. Continue?'
 
 function workoutRoutineId(workout) {
   return workout?.routineId
@@ -94,8 +94,10 @@ export async function continueInProgress(store, workout) {
 // req-55 — Abandon an unfinished in-progress workout from History. Discards
 // entirely: no finished-history record (DESIGN §1). The stale active workout goes
 // through abandonWorkout(); a legacy draft through abandonDraft().
-export async function abandonInProgress(store, workout) {
-  if (!(await askConfirm('Abandon this workout? It will not be saved.', { confirmLabel: 'Abandon' }))) return
+// req-201 — `label` names the session ("Upper Body · Oct 6, 2026", history/helpers
+// sessionLabel); without one the confirm says "this session".
+export async function abandonInProgress(store, workout, label = 'this session') {
+  if (!(await askConfirm(`Abandon ${label}? It will not be saved.`, { confirmLabel: 'Abandon' }))) return
   const active = store.activeWorkout
   if (active && active.id === workout.id) {
     store.abandonWorkout()

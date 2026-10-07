@@ -74,7 +74,7 @@ describe('1 — a legacy draft workout is a reference: delete archives, never ha
   it('the confirm names it the same way the delete treats it (both read the impact)', () => {
     const s = state()
     const impact = routineDeletionImpact(s, 'r-only-draft')
-    assert.match(deletionConfirmHead('Old', { ...impact, inCurrentWorkout: false }), /is in an unfinished workout and will be archived/)
+    assert.match(deletionConfirmHead('Old', { ...impact, inCurrentWorkout: false }), /is in an unfinished session and will be archived/)
   })
   it('control: unreferenced setup is still hard-deleted', () => {
     const s = state()

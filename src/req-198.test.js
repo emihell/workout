@@ -104,11 +104,11 @@ test('History keeps its Back to "/" (not top-level, DEC-015)', () => {
 
 test('first-run Home drops the Schedule and Settings rows; Import stays', () => {
   const start = today.indexOf('if (isFirstRun(store)) {')
-  const end = today.indexOf('<Title>{greeting()}</Title>')
+  const end = today.indexOf('<Title>Today</Title>\n      {loop > 1')
   const firstRun = today.slice(start, end)
   assert.doesNotMatch(firstRun, /<Row to="\/settings">/)
   assert.doesNotMatch(firstRun, /<Row to="\/schedule">/)
-  assert.match(firstRun, /<Row to="\/routines">Routines<\/Row>/)
+  assert.match(firstRun, /<Row to="\/routines">Workouts<\/Row>/)
   assert.match(firstRun, /<Row to="\/history">History<\/Row>/)
   assert.match(firstRun, /<FileButton\s+label="Import"/)
 })

@@ -163,7 +163,7 @@ function Fill({ days, fills, onSave, saving }) {
 function Done() {
   return (
     <Screen>
-      <Title>Routines made</Title>
+      <Title>Workouts made</Title>
       <p>Your schedule already has days, so it was left as it is.</p>
       <p>
         <NavLink to="/schedule" look="primary" block>

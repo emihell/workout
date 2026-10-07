@@ -327,7 +327,7 @@ describe('req-181 — the flow (rendered, real store)', () => {
 })
 
 describe('req-181 — /routines/new offers two starts', () => {
-  it('"Start from a plan" (primary, first) and "Blank routine" links; the blank form still makes a routine', async () => {
+  it('"Start from a plan" (primary, first) and "Blank workout" links; the blank form still makes a routine', async () => {
     localStorage.clear()
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { RoutineNew, RoutineNewBlank } = await importJsx('./views/Routine.jsx', import.meta.url)
@@ -337,7 +337,7 @@ describe('req-181 — /routines/new offers two starts', () => {
     // the plan renamed "Not sure? Use a plan" (was "Start from a plan", primary), then blank.
     const machines = links.findIndex(([text]) => text === 'Pick your exercises')
     const plan = links.findIndex(([text]) => text === 'Not sure? Use a plan')
-    const blank = links.findIndex(([text]) => text === 'Blank routine')
+    const blank = links.findIndex(([text]) => text === 'Blank workout')
     assert.ok(machines >= 0 && plan > machines && blank > plan, JSON.stringify(links))
     await view.unmount()
     view = await render(h(StoreProvider, null, h(RoutineNewBlank)))

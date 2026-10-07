@@ -48,14 +48,14 @@ describe('req-190 AC1 — the split rule', () => {
   it('machinesPlan: names, spacing, A/B alternating days; one day is always one workout', () => {
     const picks = ['a', 'b', 'c']
     assert.deepEqual(machinesPlan({ days: 2, split: SPLIT_SAME, picks }), {
-      routines: [{ name: 'My workout', picks }],
+      routines: [{ name: 'Workout', picks }],
       week: [[1, 0], [4, 0]],
     })
     assert.deepEqual(machinesPlan({ days: 4, split: SPLIT_AB, picks }), {
-      routines: [{ name: 'My workout A', picks: ['a', 'c'] }, { name: 'My workout B', picks: ['b'] }],
+      routines: [{ name: 'Workout A', picks: ['a', 'c'] }, { name: 'Workout B', picks: ['b'] }],
       week: [[1, 0], [2, 1], [4, 0], [5, 1]],
     })
-    assert.deepEqual(machinesPlan({ days: 1, split: SPLIT_AB, picks }).routines.map((r) => r.name), ['My workout'])
+    assert.deepEqual(machinesPlan({ days: 1, split: SPLIT_AB, picks }).routines.map((r) => r.name), ['Workout'])
   })
 })
 
@@ -78,17 +78,17 @@ describe('req-190 AC1 — a new plan starts today (today injected)', () => {
 })
 
 describe('req-190 — planToState, machines first', () => {
-  it('2 days, same: one "My workout" with the picks, Tue + Fri; a library pick becomes one record', () => {
+  it('2 days, same: one "Workout" with the picks, Tue + Fri; a library pick becomes one record', () => {
     const legPress = library.find((e) => e.id === 'Leg_Press') || library.find((e) => /leg press/i.test(e.name))
     const data = catalogItemToExercise(legPress)
     const picks = [{ kind: 'library', data, item: pickerItem([], data).item }, own('ex-chest'), own('ex-lat')]
     const choices = { days: 2, split: SPLIT_SAME, picks }
     const { state, scheduled } = planToState(base(), choices, idsFor(choices))
     assert.equal(scheduled, true)
-    assert.deepEqual(state.routines.map((r) => r.name), ['My workout'])
+    assert.deepEqual(state.routines.map((r) => r.name), ['Workout'])
     const created = state.exercises.find((ex) => ex.libraryId === legPress.id)
     assert.deepEqual(state.routines[0].exercises.map((i) => i.exerciseId), [created.id, 'ex-chest', 'ex-lat'])
-    assert.deepEqual(week(state), [[2, 'My workout'], [5, 'My workout']])
+    assert.deepEqual(week(state), [[2, 'Workout'], [5, 'Workout']])
     assert.equal(state.schedule.loopWeeks, 1)
   })
 
@@ -96,16 +96,16 @@ describe('req-190 — planToState, machines first', () => {
     const choices = { days: 2, split: SPLIT_AB, picks: [own('lp'), own('cp'), own('lat')] }
     const { state } = planToState(base(), choices, idsFor(choices))
     assert.deepEqual(state.routines.map((r) => [r.name, r.exercises.map((i) => i.exerciseId)]), [
-      ['My workout A', ['lp', 'lat']],
-      ['My workout B', ['cp']],
+      ['Workout A', ['lp', 'lat']],
+      ['Workout B', ['cp']],
     ])
-    assert.deepEqual(week(state), [[2, 'My workout A'], [5, 'My workout B']])
+    assert.deepEqual(week(state), [[2, 'Workout A'], [5, 'Workout B']])
   })
 
   it('4 days A/B from Saturday: Sat A, Sun B, Tue A, Wed B', () => {
     const choices = { days: 4, split: SPLIT_AB, picks: [own('a'), own('b')] }
     const { state } = planToState(base(), choices, idsFor(choices, SATURDAY))
-    assert.deepEqual(week(state), [[6, 'My workout A'], [0, 'My workout B'], [2, 'My workout A'], [3, 'My workout B']])
+    assert.deepEqual(week(state), [[6, 'Workout A'], [0, 'Workout B'], [2, 'Workout A'], [3, 'Workout B']])
   })
 
   it('a schedule with days: routines added, schedule deep-equal to before', () => {
@@ -114,7 +114,7 @@ describe('req-190 — planToState, machines first', () => {
     const { state, scheduled } = planToState(before, choices, idsFor(choices))
     assert.equal(scheduled, false)
     assert.deepEqual(state.schedule, before.schedule)
-    assert.deepEqual(state.routines.map((r) => r.name), ['My workout'])
+    assert.deepEqual(state.routines.map((r) => r.name), ['Workout'])
   })
 
   it('no picks → state unchanged', () => {
@@ -220,7 +220,7 @@ const radio = (text) => view.all('label.ui-check').find((node) => node.textConte
 const segment = (text) => view.all('.ui-seg__item').find((node) => node.textContent.trim() === text)
 
 describe('req-190 — machines-first flow (rendered)', () => {
-  it('pick 3 → 2 days → A/B → Save: My workout A (LP, Lat), My workout B (CP); today first', async () => {
+  it('pick 3 → 2 days → A/B → Save: Workout A (LP, Lat), Workout B (CP); today first', async () => {
     await harness('RoutineMachines', '#/routines/new/machines')
     assert.match(view.text(), /Which exercises do you do\?/)
     await tickThree()
@@ -232,8 +232,8 @@ describe('req-190 — machines-first flow (rendered)', () => {
     await tap(view.button('Save'))
     const after = stored()
     assert.deepEqual(after.routines.map((r) => [r.name, r.exercises.map((i) => i.exerciseId)]), [
-      ['My workout A', ['ex-lp', 'ex-lat']],
-      ['My workout B', ['ex-cp']],
+      ['Workout A', ['ex-lp', 'ex-lat']],
+      ['Workout B', ['ex-cp']],
     ])
     const today = new Date().getDay()
     assert.deepEqual(after.schedule.slots.map((s) => s.weekday), [today, (today + 3) % 7])

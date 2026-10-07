@@ -34,8 +34,10 @@ export function itemSetsPath(routineId, item, workout) {
 
 // Discard the active workout (confirm first). Shared by the overview's Abandon and, since
 // req-116, the Finish screen's "Nothing logged" Abandon.
+// req-201 — the confirm names the session's workout ("Abandon Upper Body?").
 export async function abandonWorkout(store) {
-  if (!(await askConfirm('Abandon?', { confirmLabel: 'Abandon' }))) return
+  const name = store.activeWorkout?.snapshot?.routineName || 'this session'
+  if (!(await askConfirm(`Abandon ${name}?`, { confirmLabel: 'Abandon' }))) return
   recordButton('abandon-workout')
   store.abandonWorkout()
   leaveWorkoutToToday()
