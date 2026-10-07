@@ -1,7 +1,8 @@
 # req-205 — Home: 6 days forward with rest days, no title, no gap between sections
 
 **Status: READY** (2026-10-07). **Lane: ui.** From DEC-114 (amends DEC-113 / req-204). **Emilio sees a screenshot before
-merge (L-050).**
+merge (L-050).** **+ DEC-115, added mid-build:** Home's last row is "Schedule ›"; Schedule ends with "History ›";
+History's Back → /schedule; the Workouts list drops "Whole plan ›".
 
 ## Code today (main, after req-204)
 - **`views/Today.jsx`:** title "Today" → "Workouts ›" → bottom-aligned group (Coming up via `upcomingWorkouts(schedule,

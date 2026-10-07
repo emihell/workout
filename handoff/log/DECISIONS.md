@@ -1884,3 +1884,17 @@ Emilio, after req-204 shipped: "why not show all 6 days forward? remove the empt
 - **No gap between sections.** The whole column (Workouts › … History ›) sits together at the bottom of a tall screen, so any
   spare space is above the first line, never between sections. `(unconfirmed)`
 - Today's block and History are unchanged.
+
+## DEC-115 — "Schedule ›" on Home; History lives inside Schedule  (Emilio, 2026-10-07, amends DEC-112/113)
+
+Emilio: "where did schedule go? … schedule should replace history and history can live within schedule or workouts or be
+its own thing on the main screen". Planner recommended History inside Schedule (Schedule is time: the plan ahead, the record
+behind). Emilio: "go".
+
+- Home's bottom row is **"Schedule ›"** → `/schedule`, with Back → "/".
+- The Schedule screen ends with **"History ›"**. History's Back → `/schedule`. Its contents are unchanged, Backup & data
+  included.
+- The Workouts list drops "Whole plan ›" and keeps "Your exercises ›".
+- History costs 2 taps from Home instead of 1. Today's "Done ✓ — see your sets ›" still opens a session directly.
+
+Folded into req-205 mid-build.
