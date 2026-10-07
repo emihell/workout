@@ -1,5 +1,5 @@
 import { isWeightedType } from './ids.js'
-import { dateKey } from './schedule.js'
+import { dateKey, mondayOf } from './schedule.js'
 import { recommendNextPrescription } from './progress.js'
 import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 
@@ -279,7 +279,8 @@ export function exerciseById(exercises, id) {
 // req-211 (DEC-117 §2) — `schedule.moves`: `[{ id, slotId, from, to }]`, dates 'YYYY-MM-DD'.
 // Additive and optional (no version bump): a store without it reads as []. An entry is kept
 // only when it is a plain object with a string id, a slotId naming an existing slot, and
-// two real, different calendar dates; its four fields are what is kept.
+// two real, different calendar dates in the same Mon–Sun week (cross-week is out of scope);
+// its four fields are what is kept, and of several for one (slotId, from) the last wins.
 function isDateKey(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && dateKey(value) === value
 }
@@ -298,9 +299,12 @@ export function normaliseMoves(moves, slots) {
         slotIds.has(move.slotId) &&
         isDateKey(move.from) &&
         isDateKey(move.to) &&
-        move.from !== move.to,
+        move.from !== move.to &&
+        dateKey(mondayOf(move.from)) === dateKey(mondayOf(move.to)),
     )
     .map(({ id, slotId, from, to }) => ({ id, slotId, from, to }))
+    // req-211 review — at most one move per (slotId, from): the last one wins, in its place.
+    .filter((move, index, all) => !all.slice(index + 1).some((later) => later.slotId === move.slotId && later.from === move.from))
 }
 
 // req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from

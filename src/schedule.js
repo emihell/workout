@@ -92,18 +92,35 @@ export function slotsOn(schedule, date) {
   const key = dateKey(date)
   const week = loopWeekIndex(schedule, date)
   const weekday = toLocalDate(date).getDay()
-  const moves = scheduleMoves(schedule)
+  const slots = schedule?.slots || []
+  const moves = liveMoves(schedule, slots)
   const away = new Set(moves.filter((move) => move.from === key).map((move) => move.slotId))
   const into = new Set(moves.filter((move) => move.to === key).map((move) => move.slotId))
-  return (schedule?.slots || []).filter(
+  return slots.filter(
     (s) => into.has(s.id) || (Number(s.week) === week && Number(s.weekday) === weekday && !away.has(s.id)),
   )
+}
+
+// req-211 review — a move counts only while its slot is genuinely on `move.from` (that date's
+// loop week and weekday are the slot's). After a loop resize or a weekday change a stored move
+// can point at a date the slot is no longer on: it is ignored (not rewritten), so it can't put
+// a stray workout on `to`.
+function liveMoves(schedule, slots) {
+  const byId = new Map(slots.map((slot) => [slot.id, slot]))
+  return scheduleMoves(schedule).filter((move) => {
+    const slot = byId.get(move.slotId)
+    return (
+      slot &&
+      loopWeekIndex(schedule, move.from) === Number(slot.week) &&
+      toLocalDate(move.from).getDay() === Number(slot.weekday)
+    )
+  })
 }
 
 // req-211 — the move that put `slotId` on `date`, or null (the slot is on its own day).
 export function moveInto(schedule, slotId, date) {
   const key = dateKey(date)
-  return scheduleMoves(schedule).find((move) => move.slotId === slotId && move.to === key) || null
+  return liveMoves(schedule, schedule?.slots || []).find((move) => move.slotId === slotId && move.to === key) || null
 }
 
 export function slotsForWeekDay(schedule, week, weekday) {

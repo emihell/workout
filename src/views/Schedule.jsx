@@ -331,7 +331,8 @@ function slotOnDay(schedule, week, weekday, slotId) {
     (move) =>
       move.slotId === slotId &&
       toLocalDate(move.to).getDay() === Number(weekday) &&
-      loopWeekIndex(schedule, move.to) === Number(week),
+      loopWeekIndex(schedule, move.to) === Number(week) &&
+      moveInto(schedule, slotId, move.to) !== null, // a live move only (slotsOn's rule)
   )
   return movedHere ? (schedule.slots || []).find((s) => s.id === slotId) || null : null
 }

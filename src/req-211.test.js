@@ -10,12 +10,12 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
-import { addDays, comingDays, coveringWorkout, dateKey, mondayOf, moveInto, slotsOn } from './schedule.js'
+import { addDays, comingDays, coveringWorkout, dateKey, loopWeekIndex, mondayOf, moveInto, slotsOn } from './schedule.js'
 import { migrateState, normaliseMoves } from './model.js'
 import { migrateState as migrateStateMain } from './req-158.model-main.fixture.js'
 import { withEmptyMoves } from './test-support/moves.js'
 import { applyBackup, buildBackup } from './exchange.js'
-import { slotMovedOnDateState, slotRemovedState } from './state-reducers.js'
+import { loopWeeksState, slotMovedOnDateState, slotRemovedState } from './state-reducers.js'
 import { dateDayPath, movedFromText, oneDateSheet } from './views/schedule-day.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 import { withFrom } from './route.js'
@@ -51,6 +51,22 @@ describe('AC1 slotsOn applies one-date moves', () => {
       ['2026-10-16', 5, []],
       ['2026-10-17', 6, []],
     ])
+  })
+  it('review repro: after setLoopWeeks(2) the slot is no longer on `from`, so the move is ignored (stored moves untouched)', () => {
+    const s = { schedule: schedule([MOVE]) }
+    const resized = loopWeeksState(s, 2).schedule
+    // anchor 2026-08-24: Oct 12–18 is 7 weeks on → loop week 1 of 2, which has no slots
+    assert.equal(loopWeekIndex(resized, '2026-10-15'), 1)
+    assert.deepEqual(slotsOn(resized, '2026-10-15'), [], 'no stray workout on Thu Oct 15')
+    assert.deepEqual(slotsOn(resized, '2026-10-16'), [], 'Fri Oct 16 is week 1 too: nothing')
+    assert.equal(moveInto(resized, 's-fri', '2026-10-15'), null)
+    assert.deepEqual(slotsOn(resized, '2026-10-23').map((x) => x.id), ['s-fri'], 'week 0 Fri still has it')
+    assert.deepEqual(resized.moves, [MOVE], 'the stored move is not rewritten')
+  })
+  it('a move whose slot changed weekday is ignored on both dates', () => {
+    const s = { ...schedule([MOVE]), slots: [{ ...FRI_SLOT, weekday: 3 }] }
+    assert.deepEqual(slotsOn(s, '2026-10-15'), [])
+    assert.deepEqual(slotsOn(s, '2026-10-14').map((x) => x.id), ['s-fri'], 'its own Wed is untouched')
   })
   it('moveInto names the move that put a slot on a date', () => {
     assert.deepEqual(moveInto(schedule([MOVE]), 's-fri', '2026-10-15'), MOVE)
@@ -111,6 +127,18 @@ describe('AC2 migrateState normalises moves (legacy and v9)', () => {
       ),
       [MOVE],
     )
+  })
+  it('review: at most one move per (slotId, from) — the last one wins', () => {
+    const first = { ...MOVE, id: 'a', to: '2026-10-13' }
+    const last = { ...MOVE, id: 'b', to: '2026-10-14' }
+    const otherFrom = { ...MOVE, id: 'c', from: '2026-10-23', to: '2026-10-22' }
+    assert.deepEqual(normaliseMoves([first, otherFrom, last], [FRI_SLOT]), [otherFrom, last])
+  })
+  it('review: a move whose `to` is outside `from`\'s Mon–Sun week is dropped', () => {
+    const nextWeek = { ...MOVE, id: 'x', to: '2026-10-19' } // Mon of the next week
+    const lastWeek = { ...MOVE, id: 'y', to: '2026-10-11' } // Sun of the week before
+    const sunday = { ...MOVE, id: 'z', to: '2026-10-18' } // same week's Sunday: kept
+    assert.deepEqual(normaliseMoves([nextWeek, lastWeek, sunday], [FRI_SLOT]), [sunday])
   })
 })
 
