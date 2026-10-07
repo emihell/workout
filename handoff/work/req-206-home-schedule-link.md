@@ -1,6 +1,6 @@
 # req-206 — Home: "Schedule ›" uses the same link as "Workouts ›"; no "Coming up" header; first-run says Schedule
 
-**Status: READY** (2026-10-07). **Lane: ui.** Emilio, after req-205: "can the bttom schedule be similar as workout? same
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-206` (`8ef0729`…`9ecbf00`, 2 commits).** (2026-10-07). **Lane: ui.** Emilio, after req-205: "can the bttom schedule be similar as workout? same
 component? why use another component? … can we remove coming up title? i think one gets it". Also the req-205 follow-up:
 first-run Home still shows History instead of Schedule (DEC-115).
 
