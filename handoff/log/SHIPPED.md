@@ -2248,3 +2248,21 @@ Planner QA at 390×844, on the seeded build:
 - No dialogs were raised.
 
 No trigger files, so no reviewer. `reports/req-198.md`.
+
+## req-199 — Library goes: a plain workouts list with "Your exercises ›" and "Whole plan ›"  (batch 2026-10-07)
+
+**req-199** (DEC-110 §3, DEC-112).
+- `Library.jsx` is deleted. `/routines` lists routines: tap the name to open, Start beside it.
+- Below the list: "Your exercises ›" and "Whole plan ›". `/exercises` and `/schedule` have Back → `/routines`, plus Today.
+- History's exercise page has "Exercise settings ›".
+- 2 commits, `88b3cde`…`89b085b`. No test edits.
+
+Gate (ui): `check: green — lint, skills, no import cycles, 97 test file(s), and the build all passed.` Smoke green on the
+branch build.
+
+Planner QA:
+- Back and Today targets checked on routines, exercises, schedule and schedule/loop.
+- Screenshot of the list read.
+- No dialogs were raised.
+
+No trigger files, so no reviewer. `reports/req-199.md`.

@@ -36,3 +36,9 @@ before req-200 (Home week).
 3. **Failure case:** Routine item → "Edit exercise settings ›" → Save lands back on the routine item, not Today. The same
    from History › By exercise › "Exercise settings ›" back to that page.
 4. `./check` green, and the smoke test passes.
+
+## Built — calls `(unconfirmed)`
+- The two rows sit in their own list, with no header.
+- Titles stay "Routines" and "Schedule" until req-201.
+- "Exercise settings ›" sits under the history exercise's title, and is hidden for an archived exercise.
+- `Library.jsx` is deleted.
