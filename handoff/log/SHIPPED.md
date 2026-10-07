@@ -2416,3 +2416,21 @@ Gate (ui + `workout-log.js`): `check: green — lint, skills, no import cycles, 
 branch's own smoke is green (Planner, throwaway worktree).
 
 Reviewer (independent): "No blockers.", 1 nit fixed. Emilio: "do what you recommend". `reports/req-210.md`.
+
+## req-211 — "Change day" from Home moves one date only (`schedule.moves`)  (2026-10-07)
+
+**req-211** (DEC-117 §2, data lane).
+- An optional `schedule.moves` `[{id, slotId, from, to}]`, normalised in `migrateState`: valid entries, one per (slot, from),
+  same week only.
+- `slotsOn` honours a move only while the slot is on `from`. Export/import carry moves, and bad ones are dropped.
+- No version bump. 0 records rewritten; loading writes nothing.
+- 4 commits, `f0ee25d`…`b4592fa`.
+
+Gate (data): `check: green — lint, skills, no import cycles, 108 test file(s), and the build all passed.` This branch's own
+smoke is green (Planner, throwaway worktree).
+
+Reviewer (independent, 2 rounds):
+- the should-fix and the latent were fixed; "No blockers.";
+- the real-export probe on 13 files and the 3-time-zone byte-identical load passed.
+
+Emilio's eyes on the stored shape. Backup reminded twice (DEC-046). Emilio: "merge". `reports/req-211.md`.
