@@ -157,12 +157,24 @@ export function Field({ label, className, selectOnFocus = false, onFocus, onMous
 // req-191 §7 — a search Field with a clear (×) button while it holds text. The button sits
 // outside the <label> (a button inside a label would also focus the input), over the input's
 // right end; the input keeps room for it. `onClear` empties the query.
+// req-203 §6 — × puts the focus back in the input (it was left on BODY once the button
+// unmounted), so the next search is typed straight away. Focused before the clear
+// re-renders, while the input is still the one in the DOM.
 export function SearchField({ label = 'Search', value, onClear, className, ...rest }) {
+  const box = useRef(null)
   return (
-    <div className="ui-search">
+    <div className="ui-search" ref={box}>
       <Field label={label} value={value} className={cx('ui-input--clearable', className)} {...rest} />
       {value ? (
-        <button type="button" className="ui-search__clear" aria-label="Clear search" onClick={onClear}>
+        <button
+          type="button"
+          className="ui-search__clear"
+          aria-label="Clear search"
+          onClick={(e) => {
+            box.current?.querySelector('input')?.focus()
+            onClear?.(e)
+          }}
+        >
           ×
         </button>
       ) : null}
@@ -372,7 +384,9 @@ export function WorkoutPill({ clock = null, setText = '', go = false, skip = fal
   const lead = go ? 'GO' : clock
   const label = skip
     ? `Rest ${clock} — skip the rest`
-    : `${go ? 'Go' : `Rest ${clock}`}, ${setText} — open the exercise`
+    : `${go ? 'Go' : `Rest ${clock}`}${setText ? `, ${setText}` : ''} — open the exercise`
+  // req-203 §7 — no set count (the next exercise, nothing logged yet): no separator either.
+  const tail = skip ? 'skip' : setText
   return (
     <button
       type="button"
@@ -381,10 +395,14 @@ export function WorkoutPill({ clock = null, setText = '', go = false, skip = fal
       aria-label={label}
     >
       <span className="ui-restpill__time">{lead}</span>
-      <span className="ui-restpill__sep" aria-hidden="true">
-        ·
-      </span>
-      <span className="ui-restpill__set">{skip ? 'skip' : setText}</span>
+      {tail ? (
+        <>
+          <span className="ui-restpill__sep" aria-hidden="true">
+            ·
+          </span>
+          <span className="ui-restpill__set">{tail}</span>
+        </>
+      ) : null}
     </button>
   )
 }

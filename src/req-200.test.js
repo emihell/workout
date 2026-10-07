@@ -180,7 +180,10 @@ describe('req-200 — the day screen', () => {
     assert.equal(window.location.hash, '#/schedule/0/6?from=%2F')
     assert.equal(backHref(), '#/')
     assert.equal(link('Today'), null, 'Back already goes home')
-    assert.equal(view.container.querySelector('.ui-title')?.textContent, 'Saturday')
+    // req-203 test edit (§1/§3): from Home the title carries the date ("Saturday, Oct 10"),
+    // and the 1-week loop shows in the sub line ("Every Saturday"), not in the title.
+    assert.match(view.container.querySelector('.ui-title')?.textContent, /^Saturday, /)
+    assert.equal(view.container.querySelector('.ui-title + .ui-sub')?.textContent, 'Every Saturday')
     assert.equal(link('Whole plan ›'), null)
     await tap(link('‹ Back'))
     assert.equal(window.location.hash, '#/')
@@ -195,9 +198,13 @@ describe('req-200 — the day screen', () => {
   })
 
   it('AC5: Home → a day row → Start now → a workout starts (activeWorkout.routineId)', async () => {
-    await open('/')
-    const friday = weekLinks()[4] // Push / Pull
-    await tap(friday)
+    // req-203 test edit: Start now no longer shows on a past date, so the seed's Friday is
+    // not usable on a Saturday or Sunday. Push / Pull on every day, and Sunday's row (index
+    // 6: today or later on any day of the week) is the one tapped. Same assertions.
+    const slots = [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({ id: `s-pp-${weekday}`, week: 0, weekday, routineId: 'sess-push-pull' }))
+    await open('/', { ...seed, schedule: { ...seed.schedule, loopWeeks: 1, slots } })
+    const sunday = weekLinks()[6] // Push / Pull
+    await tap(sunday)
     assert.equal(stored().activeWorkout, null)
     await tap(buttons('Start now')[0])
     assert.equal(stored().activeWorkout?.routineId, 'sess-push-pull')
@@ -225,7 +232,10 @@ describe('req-200 — the day screen', () => {
       ],
     }
     await open('/schedule/1/6?from=%2F', { ...seed, schedule })
-    assert.equal(view.container.querySelector('.ui-title')?.textContent, 'Saturday · week 2 of 2')
+    // req-203 test edit (§3): "week 2 of 2" moved from the title to the sub line. The title
+    // is "Saturday" or, in the weeks when loop week 2 is this week, "Saturday, <date>".
+    assert.match(view.container.querySelector('.ui-title')?.textContent, /^Saturday/)
+    assert.equal(view.container.querySelector('.ui-title + .ui-sub')?.textContent, 'Every Saturday in week 2 of 2')
     assert.equal(link('Whole plan ›')?.getAttribute('href'), '#/schedule', 'B1: the other weeks are one tap away')
     await tap(buttons('Remove')[0])
     await tap(buttons('Remove').at(-1)) // the confirm sheet's Remove

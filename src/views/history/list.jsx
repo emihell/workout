@@ -13,6 +13,7 @@ import {
   routineTitle,
   sessionLabel,
   sortWorkoutsByDate,
+  topSetText,
   whenLabel,
   workoutDateKey,
   workoutRoutineId,
@@ -176,9 +177,11 @@ export function HistoryExercise({ exerciseId }) {
           <List>
             {sortWorkoutsByDate(group.workouts).map((w) => {
               const count = (w.sets || []).filter((s) => s.exerciseId === exerciseId).length
+              // req-203 §5 — "{date} · {top set}"; a row with no kg keeps "N sets".
+              const top = topSetText(w.sets, exerciseId)
               return (
-                <Row key={w.id} to={withFrom(`/history/${w.id}/exercise/${exerciseId}`, `/history/exercise/${exerciseId}`)} value={`${count} set${count === 1 ? '' : 's'}`}>
-                  {whenLabel(w)}
+                <Row key={w.id} to={withFrom(`/history/${w.id}/exercise/${exerciseId}`, `/history/exercise/${exerciseId}`)} value={top ? null : `${count} set${count === 1 ? '' : 's'}`}>
+                  {top ? `${whenLabel(w)} · ${top}` : whenLabel(w)}
                 </Row>
               )
             })}

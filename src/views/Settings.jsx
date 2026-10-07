@@ -11,6 +11,10 @@ function backupLines(summary) {
   return `${summary.routines} workouts, ${summary.exercises} exercises, ${summary.workouts} sessions, ${summary.scheduledDays} scheduled days.`
 }
 
+// req-203 §4 — the one line above "Back up now" (Lena run 3: "Export" / "Import" did not
+// say what they do). Wording as specced.
+export const BACKUP_LINE = 'Saves all your workouts and history to a file on this device. Open it with Import to restore.'
+
 export function Settings() {
   const store = useStore()
   const [message, setMessage] = useState('')
@@ -31,6 +35,8 @@ export function Settings() {
     <Screen>
       <Back to="/history" />
       <Title>Backup &amp; data</Title>
+      {/* req-203 §4 — plain words: what the backup is, where it goes, how it comes back. */}
+      <p className="ui-sub">{BACKUP_LINE}</p>
       {/* req-122 — peer actions: lateral. */}
       <Actions
         lateral={
@@ -38,15 +44,15 @@ export function Settings() {
             <Button
               onClick={() => {
                 recordButton('export-database')
-                exportBackup(store, { includeAssistant })
+                const filename = exportBackup(store, { includeAssistant })
                 setError('')
-                setMessage(includeAssistant ? 'Downloaded with prompt.' : 'Downloaded.')
+                setMessage(`Backup saved — ${filename}${includeAssistant ? ' (with the assistant prompt)' : ''}`)
               }}
             >
-              Export
+              Back up now
             </Button>
             <FileButton
-              label="Import"
+              label="Restore from a backup"
               accept="application/json,.json"
               onFiles={(files) => {
                 // req-153 — a new pick clears the last outcome (as on Today).
