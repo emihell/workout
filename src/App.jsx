@@ -5,6 +5,8 @@ import { ErrorBoundary } from './error-boundary'
 import { WakeLock } from './wake-lock'
 import { RestEndCue } from './rest-cue'
 import { useHashRoute } from './route'
+import { useStore } from './store-context'
+import { exportBackup } from './import-backup'
 import { Banner, Button } from './ui/index.jsx'
 import { ConfirmSheet } from './ui/index.jsx'
 import { Today } from './views/Today'
@@ -36,11 +38,14 @@ import { getFeedbackEnabled, subscribeFeedbackEnabled } from './dev/dev-notes.js
 // req-121 — the three app banners use the library Banner (role="alert" kept) and
 // Reload the library Button, instead of raw unstyled div/button elements.
 function SaveFailedBanner() {
+  const store = useStore()
   const failed = useSyncExternalStore(subscribeSaveFailed, getSaveFailed, getSaveFailed)
   if (!failed) return null
   return (
     <Banner role="alert">
-      Couldn't save your last change. Your data may not persist — export a backup from Settings.
+      Couldn't save your last change. Your data may not persist — export a backup now.{' '}
+      {/* req-198 — Export in place: the same download as Backup & data's Export. */}
+      <Button onClick={() => exportBackup(store)}>Export</Button>
     </Banner>
   )
 }

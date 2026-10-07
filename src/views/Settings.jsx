@@ -1,11 +1,11 @@
 import { useState, useSyncExternalStore } from 'react'
 import { exportAndResetAnalytics, recordButton } from '../analytics'
 import { getFeedbackEnabled, setFeedbackEnabled, subscribeFeedbackEnabled } from '../dev/dev-notes.js'
-import { buildBackup } from '../exchange.js'
-import { downloadJson, importWithBackup } from '../import-backup'
+import { downloadJson, exportBackup, importWithBackup } from '../import-backup'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
-import { Actions, Banner, Button, Checkbox, FileButton, List, Row, Screen, Title } from '../ui/index.jsx'
+import { Actions, Banner, Button, Checkbox, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
+import { Back } from './shared'
 
 function backupLines(summary) {
   return `${summary.routines} routines, ${summary.exercises} exercises, ${summary.workouts} workouts, ${summary.slots} slots.`
@@ -25,38 +25,25 @@ export function Settings() {
     getFeedbackEnabled,
   )
 
+  // req-198 / DEC-110 §1 — Settings left the bar: this is "Backup & data", reached from the
+  // bottom of History. Export and Import first; the developer tools below, set apart.
   return (
     <Screen>
-      <Title>Settings</Title>
-      <Checkbox label="Assistant prompt" checked={includeAssistant} onChange={setIncludeAssistant} />
-      {/* req-122 — three peer actions (export / export / import): all lateral. */}
+      <Back to="/history" />
+      <Title>Backup &amp; data</Title>
+      {/* req-122 — peer actions: lateral. */}
       <Actions
         lateral={
           <>
             <Button
               onClick={() => {
                 recordButton('export-database')
-                downloadJson(
-                  `workout-database-${dateKey(new Date())}.json`,
-                  buildBackup(store, { includeAssistant }),
-                )
+                exportBackup(store, { includeAssistant })
                 setError('')
                 setMessage(includeAssistant ? 'Downloaded with prompt.' : 'Downloaded.')
               }}
             >
               Export
-            </Button>
-            <Button
-              onClick={() => {
-                // req-197 — download, then reset; this press is counted in the new data.
-                exportAndResetAnalytics((analytics) =>
-                  downloadJson(`workout-analytics-${dateKey(new Date())}.json`, analytics),
-                )
-                setError('')
-                setMessage('Analytics downloaded. Counting starts again.')
-              }}
-            >
-              Export analytics
             </Button>
             <FileButton
               label="Import"
@@ -87,13 +74,32 @@ export function Settings() {
       />
       {message ? <Banner>{message}</Banner> : null}
       {error ? <Banner role="alert">{error}</Banner> : null}
+      <SectionHeader>Developer</SectionHeader>
+      {/* Adds the assistant prompt to the Export above. */}
+      <Checkbox label="Assistant prompt" checked={includeAssistant} onChange={setIncludeAssistant} />
+      <Actions
+        lateral={
+          <Button
+            onClick={() => {
+              // req-197 — download, then reset; this press is counted in the new data.
+              exportAndResetAnalytics((analytics) =>
+                downloadJson(`workout-analytics-${dateKey(new Date())}.json`, analytics),
+              )
+              setError('')
+              setMessage('Analytics downloaded. Counting starts again.')
+            }}
+          >
+            Export analytics
+          </Button>
+        }
+      />
+      {/* req-87 — turn the on-page feedback-note capture button on/off. Default off;
+          persisted in its own key (never the workout data). */}
+      <Checkbox label="Feedback notes" checked={feedbackEnabled} onChange={setFeedbackEnabled} />
       {/* req-13 — entry to the component-library showcase (iteration surface). */}
       <List>
         <Row to="/components">Components</Row>
       </List>
-      {/* req-87 — turn the on-page feedback-note capture button on/off. Default off;
-          persisted in its own key (never the workout data). */}
-      <Checkbox label="Feedback notes" checked={feedbackEnabled} onChange={setFeedbackEnabled} />
     </Screen>
   )
 }

@@ -116,24 +116,24 @@ export function go(path, { replace = false } = {}) {
   }
 }
 
-// req-14 / DEC-024 — the bottom tab bar has three tabs (Workouts / Library /
-// Settings). `activeTab` maps any route name (as returned by parseRoute) to the
-// tab that should be highlighted, so a deep route — editing a routine, opening a
-// schedule slot, mid-workout — still lights the correct tab. Pure and unit-tested
-// (route.test.js). Grouping (DEC-024): routines/* + exercises/* → Library;
-// today, schedule/*, history/*, the in-workout flow + start → Workouts; settings
-// → Settings. 'components' is the dev showcase and belongs to no tab (null).
+// req-14 / DEC-024, req-198 — the bottom bar has two controls: Library · Workout.
+// `activeTab` maps any route name (as returned by parseRoute) to the control that
+// should be highlighted, so a deep route — editing a routine, opening a schedule slot,
+// a past workout's set — still lights the correct one. Pure and unit-tested
+// (route.test.js). Grouping: routines/* + exercises/* + schedule/* → Library;
+// everything else (today, history/*, settings, the in-workout flow) → Workouts.
+// 'components' is the dev showcase and belongs to no tab (null).
 export function activeTab(routeName) {
   const name = String(routeName || '')
-  if (name === 'settings') return 'settings'
   if (name === 'components') return null
   // req-56: schedule* moved to Library — Schedule is now the first Library
   // segment, so every schedule screen lights the Library circle (was Workouts).
   if (name.startsWith('routine') || name.startsWith('exercise') || name.startsWith('schedule')) {
     return 'library'
   }
-  // today, history*, workout* (in-workout) — and any future route that falls
-  // through — land on Workouts, the default surface.
+  // today, history*, settings (req-198: "Backup & data", under History), workout*
+  // (in-workout) — and any future route that falls through — land on Workouts, the
+  // default surface.
   return 'workouts'
 }
 

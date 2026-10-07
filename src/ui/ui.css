@@ -587,6 +587,21 @@ html:has(.ui-picker-bar) {
 .ui-dock__icon {
   display: block;
 }
+/* req-198 — a circle carries a small visible label under its icon (review F10). The
+ * icon shrinks to 20px so icon + label fit inside the 56px circle. */
+.ui-dock__circle {
+  flex-direction: column;
+  gap: 2px;
+}
+.ui-dock__circle .ui-dock__icon {
+  width: 20px;
+  height: 20px;
+}
+.ui-dock__label {
+  font-size: var(--ui-text-caption);
+  line-height: 1;
+  font-weight: 600;
+}
 
 /* ---- Library toggle (req-14) — the [Routines|Exercises] segmented control
  * above the hosted list. Matches the .ui-screen gutter/width so it lines up with

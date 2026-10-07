@@ -364,11 +364,10 @@ export function Today() {
           />
         </div>
         {importError ? <Banner role="alert">{importError}</Banner> : null}
+        {/* req-198 — Schedule and Settings rows dropped (DEC-110 §1); Import is above. */}
         <List>
           <Row to="/routines">Routines</Row>
-          <Row to="/schedule">Schedule</Row>
           <Row to="/history">History</Row>
-          <Row to="/settings">Settings</Row>
         </List>
       </Screen>
     )

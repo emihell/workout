@@ -219,7 +219,7 @@ export function Showcase() {
       </Block>
 
       <Block heading="Banner">
-        <Banner role="alert">Couldn't save your last change — export a backup from Settings.</Banner>
+        <Banner role="alert">Couldn't save your last change — export a backup now.</Banner>
       </Block>
 
       <Block heading="Workout pill">
