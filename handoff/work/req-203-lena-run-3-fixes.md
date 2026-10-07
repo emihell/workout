@@ -59,3 +59,14 @@ These go to Emilio's list or the backlog:
 6. Unit or browser: after the last set of an exercise, the pill text has no "set 1/" for that exercise.
 7. `./check` green. **The branch's own** `scripts/smoke.mjs` is green on the committed sha (L-049); update it if a selector
    moved.
+
+## Built — calls `(unconfirmed)`
+- **The day screen knows its date only when entered from Home** (`from=/`): that weekday of the current week, if it is in
+  the path's loop week. From Whole plan there is no date, no done rows, and Start now as before.
+- "Week N of M" moved from the title into the sub line.
+- **The pill shows no set count** for an exercise with nothing logged yet. That includes the very start of a workout (clock
+  or GO only).
+- The backup line was changed by Planner to "…Use Restore from a backup to bring it back."
+- **Seen, not changed:**
+  - `workout/overview.jsx:106` still shows a plain "Done {date}".
+  - An all-skipped exercise reads "3 sets" in By exercise.

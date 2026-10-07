@@ -2318,3 +2318,18 @@ Gate (ui): `check: green — lint, skills, no import cycles, 99 test file(s), an
 `scripts/smoke.mjs` is green (Planner, in a throwaway worktree). The first agent receipt was false (L-049).
 
 No trigger files, so no reviewer. `reports/req-202.md`.
+
+## req-203 — Lena run 3 fixes: a done day opens its sets, Home done link, plain backup, By-exercise kg  (2026-10-07)
+
+**req-203**.
+- A day opened from Home is dated and lists "{name} · Done ✓ ›" (→ its sets). There is no Start now on past or done days.
+- Home's done line links to the sets. Remove says "Take X off {Day}s? Your history is kept."
+- "Back up now" / "Restore from a backup". By exercise shows the top set. The search × keeps focus. No set count on an
+  unstarted pill.
+- 3 commits, `f192f2f`…`fd28cb7`. 5 test edits, named in the report.
+
+Gate (ui): `check: green — lint, skills, no import cycles, 100 test file(s), and the build all passed.` This branch's own
+smoke is green (Planner, throwaway worktree, L-049).
+
+Agent browser receipts on an empty origin cover all 7 items. `workout-log.js` changed only in `workoutPillState`, a pure
+display string with no stored write, so `--no-reviewer`. `reports/req-203.md`.
