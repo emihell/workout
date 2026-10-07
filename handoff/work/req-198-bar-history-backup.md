@@ -47,3 +47,13 @@ touch `BottomMenu.jsx` / `route.js` after this one.
    completes. Receipt: `workout-mvp-v9` workouts count after import.
 4. Unit: the banner renders an Export button. Edits to `route.test.js` and `BottomMenu.test.js` are named in the report.
 5. `./check` green. The smoke test passes. Update `scripts/smoke.mjs` if it navigates via Settings.
+
+## Built — calls `(unconfirmed)`
+- "Today" is a plain link on the right of the Back row, with no chevron. The rule lives in `showsTodayLink` (`route.js`).
+- Home's "Workouts ›" sits under the title, above the upcoming rows.
+- `/schedule` and `/exercises` get Back → "/" above the Library toggle (until req-199).
+- The banner's Export never includes the assistant prompt.
+- Both Exports call one `exportBackup`.
+- The set-log bar keeps its 22 px gap (`--ui-bar-bottom`).
+- **Loose end:** `ui/BottomMenu.jsx`, its test and `activeTab` are unrendered dead code. The agent's `git rm` was refused by
+  the permission system, so their removal is folded into req-202.
