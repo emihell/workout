@@ -1,5 +1,5 @@
 import { useState, useSyncExternalStore } from 'react'
-import { exportAnalytics, recordButton } from '../analytics'
+import { exportAndResetAnalytics, recordButton } from '../analytics'
 import { getFeedbackEnabled, setFeedbackEnabled, subscribeFeedbackEnabled } from '../dev/dev-notes.js'
 import { buildBackup } from '../exchange.js'
 import { downloadJson, importWithBackup } from '../import-backup'
@@ -48,10 +48,12 @@ export function Settings() {
             </Button>
             <Button
               onClick={() => {
-                recordButton('export-analytics')
-                downloadJson(`workout-analytics-${dateKey(new Date())}.json`, exportAnalytics())
+                // req-197 — download, then reset; this press is counted in the new data.
+                exportAndResetAnalytics((analytics) =>
+                  downloadJson(`workout-analytics-${dateKey(new Date())}.json`, analytics),
+                )
                 setError('')
-                setMessage('Analytics downloaded.')
+                setMessage('Analytics downloaded. Counting starts again.')
               }}
             >
               Export analytics

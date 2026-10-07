@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { importWithBackup } from './import-backup.js'
 import { applyBackup as applyBackupFn } from './exchange.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
-import { applyScreen, emptyAnalytics } from './analytics.js'
+import { applyScreenEvent, emptyAnalytics } from './analytics.js'
 
 // A stand-in for the real store: its applyBackup mirrors store.jsx — it runs the
 // exchange applyBackup (which throws on a malformed payload) and only then
@@ -126,7 +126,7 @@ describe('importWithBackup (req-07 / DEC-004)', () => {
 
   it('a non-backup file (the analytics export) never opens the sheet', async () => {
     const store = makeStore(oldState())
-    await assert.rejects(importWithBackup({ store, payload: applyScreen(emptyAnalytics(), 'today') }))
+    await assert.rejects(importWithBackup({ store, payload: applyScreenEvent(emptyAnalytics(), 'today', null, '2026-10-07', 'abc1234') }))
     assert.equal(getPendingConfirm(), null)
   })
 })
