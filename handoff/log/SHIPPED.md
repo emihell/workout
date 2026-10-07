@@ -2385,3 +2385,14 @@ branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
 `store.jsx` changed by one line: the default name → `nextWorkoutName`. Diff read, so `--no-reviewer`. `reports/req-207.md`.
 
 No independent reviewer (`plan closeout --no-reviewer`): store.jsx: one line, default-name fallback 'Workout' -> nextWorkoutName(state.routines); no stored-shape change; diff read by Planner
+
+## req-208 — day screen: Change day and Remove behind "⋯"  (2026-10-07)
+
+**req-208**.
+- The row shows the name, Start now and ⋯. ⋯ opens Change day · Remove · Cancel, with the same copy and writes.
+- 2 commits, `ceee538`…`717025e`. 4 test edits (tap ⋯ first).
+
+Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 105 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
+
+`reports/req-208.md`.

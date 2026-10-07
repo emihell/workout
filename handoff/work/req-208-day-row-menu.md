@@ -1,6 +1,6 @@
 # req-208 — day screen: Change day and Remove behind "⋯"; the row shows the name and Start now
 
-**Status: READY** (2026-10-07). **Lane: ui.** Emilio said "ok" to Planner's recommendation after seeing `r207-day.png`.
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-208` (`ceee538`…`717025e`, 2 commits).** (2026-10-07). **Lane: ui.** Emilio said "ok" to Planner's recommendation after seeing `r207-day.png`.
 There, at 390 px, "Start now / Change day / Remove" wrapped each label onto 2 lines.
 
 ## Code today (main, after req-207)
@@ -22,3 +22,10 @@ There, at 390 px, "Start now / Change day / Remove" wrapped each label onto 2 li
 3. **Failure case:** a past date (no Start now) shows the name and ⋯ only. ⋯ still works.
 4. Screenshot to `/private/tmp/claude-501/-Users-emiliohellberg-projects-workout-workout-planning/a2f9aeb8-ef44-4bb9-9b4b-171a32f002ca/scratchpad/r208-day.png`.
 5. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio saw the screenshot and said "ok"** (L-050).
+- **The menu** reuses req-188's `askChoice` sheet. It is titled with the workout name, and the aria-label reads "Change day
+  or remove {name}" `(unconfirmed)`.
+- **AC1 wording:** "button height = one line" can't hold, because of the 44 px tap minimum. It was measured as one-line
+  labels instead.
