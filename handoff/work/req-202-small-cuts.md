@@ -12,6 +12,10 @@
 4. **Hide the bar during first setup** (the plan / machines steps from first-run Home), as it hides in a workout.
 5. **Routine detail's "Edit ›"** (renames only) stays named "Edit" (DEC-042, F17) but moves next to the title.
 
+6. **Delete the dead bottom bar** (DEC-112, left over from req-198): `src/ui/BottomMenu.jsx`, `src/ui/BottomMenu.test.js`, `activeTab`
+   in `route.js` and its block in `route.test.js`, and any CSS left for `.ui-dock`. If deleting the files is refused by the
+   permission system, stop and report it. Don't work around it.
+
 ## Out of scope
 - History month buckets.
 - "Total lifted".

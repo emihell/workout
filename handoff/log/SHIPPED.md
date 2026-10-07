@@ -2229,3 +2229,22 @@ Planner QA at 390×844:
 - No dialogs were raised.
 
 No trigger files, so no reviewer. `reports/req-197.md`.
+
+## req-198 — no bottom bar: Home is the hub; Settings becomes Backup & data under History  (batch 2026-10-07)
+
+**req-198** (DEC-110 §1 → DEC-111 → DEC-112).
+- The dock is gone. Home has "Workouts ›" at the top; deep screens get a "Today" link (`showsTodayLink`).
+- History ends with "Backup & data ›", also when empty. `/settings` is retitled, with a Developer group.
+- The banner has its own Export. First-run Home drops its duplicate rows.
+- 4 commits, `f96669d`…`f7be85f`.
+
+Gate (ui): `check: green — lint, skills, no import cycles, 96 test file(s), and the build all passed.` Smoke green on the
+branch build.
+
+Planner QA at 390×844, on the seeded build:
+- `.ui-dock` count is 0 on Home, routines, history, settings and exercises.
+- The Today link shows only on `/settings` and the routine screens, and lands on `#/`.
+- Screenshots of Home and History read.
+- No dialogs were raised.
+
+No trigger files, so no reviewer. `reports/req-198.md`.
