@@ -2333,3 +2333,5 @@ smoke is green (Planner, throwaway worktree, L-049).
 
 Agent browser receipts on an empty origin cover all 7 items. `workout-log.js` changed only in `workoutPillState`, a pure
 display string with no stored write, so `--no-reviewer`. `reports/req-203.md`.
+
+No independent reviewer (`plan closeout --no-reviewer`): workout-log.js: only workoutPillState's display string changed (pure, no stored write); diff read by Planner

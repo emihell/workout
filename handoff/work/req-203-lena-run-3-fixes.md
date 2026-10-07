@@ -1,6 +1,6 @@
 # req-203 — Lena run 3 fixes: a done day opens its sets; Home links the session; plain backup; clearer day screen
 
-**Status: READY** (2026-10-07). **Lane: ui.** From the Lena run on the reorganised app (DEC-110 to DEC-112), main
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-203` (`f192f2f`…`fd28cb7`, 3 commits).** (2026-10-07). **Lane: ui.** From the Lena run on the reorganised app (DEC-110 to DEC-112), main
 `e26b697`. Screenshots are in the session scratchpad `lena3/`, and Planner viewed s32 and s33. Each item is a binary fix of
 something the reorganisation broke or left unclear (DEC-091/095: Planner fixes, then reports).
 
