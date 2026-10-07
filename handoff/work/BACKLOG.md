@@ -34,6 +34,8 @@ the logic layer is sound — the state machine, rest timing, snapshot-on-start,
 skipped-at-finish and draft-on-switch all work. "Flawless" is mostly a **design/UX
 pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
 
+- **`req-196` app organisation** (NEEDS DECISIONS, design) — where things live, Settings/Schedule/Exercises/naming. `work/req-196-app-organisation.md`.
+
 > Historical list (2026-09-07). All shipped since: req-01, the styling reqs, the rest cue/wake-lock, req-24.
 
 - **`req-01` guard `saveState`** (SHIPPED) — the persist path can throw and
