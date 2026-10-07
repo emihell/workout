@@ -267,7 +267,7 @@ function TodayEmpty({ store, date, done }) {
       )}
       {/* req-121 — navigation only, so a NavLink with the button look (DEC-040). */}
       <NavLink to="/routines" look={done.length ? 'secondary' : 'primary'} block>
-        Start a session
+        Start a workout
       </NavLink>
     </div>
   )

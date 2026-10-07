@@ -71,12 +71,16 @@ export function roleLabel(role) {
 // callers filtering by Boolean drop it). roleLabel itself is unchanged (req-179: the
 // item editor has no role picker now, but stored finisher/cardio still read); req-103 extends the rule to the
 // routine editor's exercise rows via routineItemMeta below.
+// req-202 — an item's warm-up flag (the exercise starts with a warm-up set), as a tag on an
+// item line. "Warm-up set" stays for a set that IS one (formatSetLine, the set type).
+export const WITH_WARMUP = 'with warm-up'
+
 export function roleTag(role) {
   return (role || 'main') === 'main' ? '' : roleLabel(role)
 }
 
 // req-103 — the muted second line of a routine-editor exercise row:
-// `[role tag] · Warm-up set · N sets · kg`. Main is unlabelled (roleTag); empty parts are
+// `[role tag] · with warm-up · N sets · kg` (req-202: was "Warm-up set", which read as one set). Main is unlabelled (roleTag); empty parts are
 // dropped so a minimal item reads just `1 set` with no stray separators. kg shows
 // only when some suggested weight is > 0, joined by a no-break space so `kg` never
 // wraps alone. req-113 — a weight that is 0, empty or missing means "no weight" (DESIGN
@@ -87,7 +91,7 @@ export function routineItemMeta(item) {
   const kg = weights.some((weight) => Number(weight) > 0)
     ? `${Array.from(weights, (weight) => (Number(weight) > 0 ? weight : '—')).join('/')}\u00a0kg`
     : ''
-  return [roleTag(item.role), item.warmup ? 'Warm-up set' : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
+  return [roleTag(item.role), item.warmup ? WITH_WARMUP : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
     .filter(Boolean)
     .join(' · ')
 }

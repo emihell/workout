@@ -64,10 +64,12 @@ export function Back({ to = '/' }) {
 // One clear exit; "Previous" stays as the set-level undo. Now built on NavLink
 // (req-12) so there is a single nav-link primitive. req-122: the ‹ is
 // `chevron="back"` (it was typed into the label), the same as Back.
-export function ExercisesLink({ routineId }) {
+// req-202 (review e09) — it reads the workout's name ("‹ Upper Body"), not "Exercises";
+// "Workout" when the snapshot has no name.
+export function ExercisesLink({ routineId, name }) {
   return (
     <p>
-      <NavLink to={`/workout/${routineId}`} look="link" chevron="back">Exercises</NavLink>
+      <NavLink to={`/workout/${routineId}`} look="link" chevron="back">{name || 'Workout'}</NavLink>
     </p>
   )
 }

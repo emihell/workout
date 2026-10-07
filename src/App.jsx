@@ -118,6 +118,7 @@ function Screen() {
         screen={route.screen}
         itemId={route.itemId}
         exerciseId={route.exerciseId}
+        from={route.from}
       />
     )
   }

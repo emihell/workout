@@ -1,4 +1,4 @@
-import { formatSetLine, roleTag } from '../../ids'
+import { formatSetLine, roleTag, WITH_WARMUP } from '../../ids'
 import { childLink, go } from '../../route'
 import { exerciseById, routineById } from '../../model.js'
 import { durationLabel, groupSetsByExercise, workoutVolume } from '../../history-queries.js'
@@ -130,7 +130,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId, from = null }) {
       <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
       <p className="ui-sub">
         {/* req-128 — req-93 rule: main unlabelled (roleTag), non-main tagged. */}
-        {[roleTag(snapshotItem?.role), snapshotItem?.warmup ? 'Warm-up set' : null, whenLabel(workout)]
+        {[roleTag(snapshotItem?.role), snapshotItem?.warmup ? WITH_WARMUP : null, whenLabel(workout)]
           .filter(Boolean)
           .join(' · ')}
       </p>

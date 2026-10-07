@@ -501,7 +501,7 @@ function WorkoutItemLive({ routineId, item }) {
 
   return (
     <Screen className="ui-screen--rest">
-      <ExercisesLink routineId={routineId} />
+      <ExercisesLink routineId={routineId} name={active.snapshot?.routineName} />
       {/* req-186 — the workout pill (rest clock / GO + set N/M; self-hides with no current exercise).
           req-192 — told which item this screen is, so on the current exercise a tap skips the rest. */}
       <WorkoutPill ownItemKey={itemKey(item)} />
@@ -689,7 +689,7 @@ export function WorkoutItemDone({ routineId, itemId }) {
 
   return (
     <Screen className="ui-screen--rest">
-      <ExercisesLink routineId={routineId} />
+      <ExercisesLink routineId={routineId} name={active.snapshot?.routineName} />
       <WorkoutPill />
       <SectionHeader>Today</SectionHeader>
       {today.length ? (

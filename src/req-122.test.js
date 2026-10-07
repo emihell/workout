@@ -59,8 +59,9 @@ test('library NavLink defaults to the link look; the base keeps none', () => {
   assert.match(ui, /export function NavLink\(\{ look = 'link', \.\.\.rest \}\) \{\n\s*return <BaseNavLink look=\{look\} \{\.\.\.rest\} \/>/)
   const shared = read('views/shared.jsx')
   assert.match(shared, /export function NavLink\(\{ to, children, className, chevron, look, block = false, \.\.\.rest \}\)/)
-  // ExercisesLink's ‹ is the chevron prop now, not typed into the label
-  assert.match(shared, /<NavLink to=\{`\/workout\/\$\{routineId\}`\} look="link" chevron="back">Exercises<\/NavLink>/)
+  // ExercisesLink's ‹ is the chevron prop now, not typed into the label.
+  // req-202 test edit: the label is the workout's name (was the literal "Exercises").
+  assert.match(shared, /<NavLink to=\{`\/workout\/\$\{routineId\}`\} look="link" chevron="back">\{name \|\| 'Workout'\}<\/NavLink>/)
   assert.doesNotMatch(shared, /‹ Exercises/)
 })
 
