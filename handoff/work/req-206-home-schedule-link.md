@@ -1,6 +1,6 @@
 # req-206 — Home: "Schedule ›" uses the same link as "Workouts ›"; no "Coming up" header; first-run says Schedule
 
-**Status: READY** (2026-10-07). **Lane: ui.** Emilio, after req-205: "can the bttom schedule be similar as workout? same
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-206` (`8ef0729`…`9ecbf00`, 2 commits).** (2026-10-07). **Lane: ui.** Emilio, after req-205: "can the bttom schedule be similar as workout? same
 component? why use another component? … can we remove coming up title? i think one gets it". Also the req-205 follow-up:
 first-run Home still shows History instead of Schedule (DEC-115).
 
@@ -29,3 +29,8 @@ first-run Home still shows History instead of Schedule (DEC-115).
    scrollY 0.
 3. First-run Home (empty origin) shows "Schedule", not "History".
 4. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio saw the screenshot and said "ok"** (L-050).
+- First-run's Schedule stays a `Row`, matching its Workouts row.
+- The gap from "Workouts ›" to the rows is 16 px. The spare space above is 147 px at 390×844.
