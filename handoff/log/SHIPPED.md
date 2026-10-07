@@ -2396,3 +2396,11 @@ Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 105
 branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
 
 `reports/req-208.md`.
+
+## req-209 — Noa run fixes: dev tools hidden, sets inline, one set format, last time, plan row, labels, today done  (2026-10-07)
+
+**req-209**. 2 commits, `43bdaf7`…`33952e7`. The agent hit the usage limit, so there is no `reports/req-209.md`. Planner
+read the test edits (format swaps only).
+
+Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 106 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree). Screenshots `r209-*.png`; Emilio: "yes".
