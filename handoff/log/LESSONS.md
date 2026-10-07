@@ -495,3 +495,15 @@ mismatch: it showed red even after the branch fixed its own smoke.
 - It comes from that sha's own `scripts/smoke.mjs`: a throwaway worktree of the branch, or a no-argument run after the commit.
 - Agent prompts say so.
 - Planner's merge gate runs the branch's script, not the code worktree's.
+
+## L-050 — "implement if it agrees" is not a licence to merge a redesign of Home unseen  (Planner, 2026-10-07)
+
+Emilio asked for an external review of the reorganisation and to "implement if it agrees". Planner built and merged 5 reqs
+straight through, and turned his question about Home's 5-day list into a full Mon–Sun calendar. His response: "the front
+screen is now very busy, i did not mean that you just force merge everything".
+
+**How to apply:**
+- A change to what Home or another main screen *looks like* gets a screenshot to Emilio **before** merge (the ux-feel gate),
+  even inside a batch he approved.
+- Mechanical fixes still merge on Planner's own testing (DEC-035).
+- When turning his question into a spec, build the smallest reading of it, not the largest.
