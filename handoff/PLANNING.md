@@ -210,7 +210,7 @@ session, e.g. `workout-codebase-a4`), it builds and reports back, you verify and
   is none; the fix is not reusing a session). It builds branch `req-N` off `main`, runs
   `./check`, writes `reports/req-N.md`, reports to you; you test by your own hand, run the
   independent reviewer for shared code, close out, and give Emilio **one test list at the
-  end**. Agent setup gotcha: symlink the planning worktree's `node_modules`; agent must not
+  end**. Agent setup gotcha: symlink the code worktree's `node_modules` (L-048); agent must not
   merge/push.
 - **Unsettled design/feel → Emilio + code CC live.** Code CC reports to *Emilio*; they
   iterate on screen; fold the result in when it lands. Ephemeral batches free code CC for

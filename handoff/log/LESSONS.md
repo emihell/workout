@@ -474,3 +474,10 @@ apply:** a browser check of any animation calls `page.emulateMediaFeatures([{ na
 The shifted `Date` computes its offset from the real clock each time the page loads, so two finish times written across a
 reload can come out of order. **How to apply:** a browser check that compares times across reloads computes the offset once in
 Node and passes a fixed epoch in, or advances its own counter. `scripts/smoke.mjs` uses the per-load pattern (harmless today).
+
+## L-048 — the planning worktree's node_modules is stale; borrow the code worktree's for a gate run  (Planner, req-197, 2026-10-07)
+
+`./check` in a throwaway worktree with the planning `node_modules` symlinked went red: 22 test files failed with "Cannot find
+package 'happy-dom'". `npm install` had run only in the code worktree. With the code worktree's `node_modules` it was green.
+**How to apply:** symlink `../workout-codebase/node_modules` for gate runs and build agents. PLANNING.md and the agent
+prompts still say "the planning worktree's"; fix them there.

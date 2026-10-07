@@ -2209,3 +2209,23 @@ latent + nits fixed, "No blockers." `reports/req-194.md`.
 done slot shows once; the list below holds prior days. 2 commits `694fef3`…`2c0e72c`.
 Gate (ui): `check: green — lint, skills, no import cycles, 95 test file(s), and the build all passed.`; smoke green (Planner ran it on
 the branch build); Planner read the Home screenshot at 390×844. No trigger files → no reviewer. `reports/req-195.md`.
+
+## req-197 — analytics counted per day and per build; Export analytics resets  (2026-10-07)
+
+**req-197** (Emilio 2026-10-07) — `workout-mvp-analytics` → `{v:2, days:{date:{screens,transitions,buttons,builds}}}`.
+- No transition is counted across midnight.
+- A v1 blob is kept as `days["before-dates"]`.
+- Export analytics downloads, then resets; the press is counted in the new data.
+- `__BUILD_ID__` comes from the sha in vite.config.
+- 2 commits, `da17cf2`…`928b16a`.
+
+Gate (tooling): `check: green — lint, skills, no import cycles, 95 test file(s), and the build all passed.` Planner ran it in a
+throwaway worktree. Smoke green on the branch build.
+
+Planner QA at 390×844:
+- A v1 blob was migrated into `before-dates` with its counts unchanged.
+- After Export analytics, the key held only `{"export-analytics":1}`.
+- The message showed. The workout Export left the day's screens unchanged.
+- No dialogs were raised.
+
+No trigger files, so no reviewer. `reports/req-197.md`.
