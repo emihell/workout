@@ -45,6 +45,15 @@ freindly is the best base".
 **Lena cross-check [measured]:** "settings" appears 0 times in req-184, 189, 190 and 191. Her runs show no visit to Settings,
 Library or the Exercises tab. She lived on Home → setup → workout → "did it save?".
 
+**Emilio's own analytics, 2026-10-07 (all-time totals, no dates, gym use mixed with build-checking):**
+- Screens: Home 113, Library 64, Settings 43, set-log 30, History 6, Schedule 1, Exercises tab 3+2+4.
+- Buttons: complete-set 77, finish 2, export 2, import 2.
+- Bar-hopping pairs: Home ↔ Library 46/42, Home ↔ Settings 32/25, Library ↔ Settings 15/10.
+- Library visits rarely go deeper: routine 7, schedule-day 1.
+
+Read: Schedule and the Exercises tab are barely used, which backs Q2 and Q5. Settings at 43 is likely build-checking, not
+gym use. These totals can't separate the two; req-197 adds dates and build ids.
+
 ## Open questions (each → a DEC-)
 1. **Settings off the bar?**
    - **Tester:** yes. Settings holds no actual settings, only Export, Import, Export analytics, the Assistant-prompt checkbox,
@@ -85,7 +94,7 @@ Library or the Exercises tab. She lived on Home → setup → workout → "did i
    - Routine page: tap the name to open it, "Edit ›" → "Rename", Up/Down behind a "Reorder" mode.
    - History: a flat list under month headers instead of month buckets.
    - Hide the bar during first setup.
-   - Drop the "Warm-up set ·" prefix leak in the history header (s04: a bug, can be built now).
+   - Reword the "Warm-up set ·" header tag. It is the item's warm-up flag (`history/detail.jsx:132`, `helpers.js:21`), not a bug, but it reads as if the page shows one warm-up set (s04).
    - "‹ Exercises" → the routine's name.
    - "Loop ›" hidden until needed.
    - "Total lifted" on the summary (Lena disbelieved it).
