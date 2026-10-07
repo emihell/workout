@@ -274,7 +274,7 @@ function suggestedWeekdays(n, now) {
 // segmented control's segments.
 function WeekdayChips({ value, onToggle }) {
   return (
-    <div className="ui-seg" role="group" aria-label="Days">
+    <div className="ui-seg ui-seg--days" role="group" aria-label="Days">
       {WEEKDAYS_MON_FIRST.map((weekday) => {
         const on = value.includes(weekday)
         return (

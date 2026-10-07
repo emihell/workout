@@ -186,6 +186,7 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
           return (
             <Row
               key={slot.id}
+              className="ui-row--wrap"
               action={
                 <>
                   {startable ? (
