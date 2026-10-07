@@ -1,6 +1,6 @@
 # req-203 — Lena run 3 fixes: a done day opens its sets; Home links the session; plain backup; clearer day screen
 
-**Status: READY** (2026-10-07). **Lane: ui.** From the Lena run on the reorganised app (DEC-110 to DEC-112), main
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-203` (`f192f2f`…`fd28cb7`, 3 commits).** (2026-10-07). **Lane: ui.** From the Lena run on the reorganised app (DEC-110 to DEC-112), main
 `e26b697`. Screenshots are in the session scratchpad `lena3/`, and Planner viewed s32 and s33. Each item is a binary fix of
 something the reorganisation broke or left unclear (DEC-091/095: Planner fixes, then reports).
 
@@ -59,3 +59,14 @@ These go to Emilio's list or the backlog:
 6. Unit or browser: after the last set of an exercise, the pill text has no "set 1/" for that exercise.
 7. `./check` green. **The branch's own** `scripts/smoke.mjs` is green on the committed sha (L-049); update it if a selector
    moved.
+
+## Built — calls `(unconfirmed)`
+- **The day screen knows its date only when entered from Home** (`from=/`): that weekday of the current week, if it is in
+  the path's loop week. From Whole plan there is no date, no done rows, and Start now as before.
+- "Week N of M" moved from the title into the sub line.
+- **The pill shows no set count** for an exercise with nothing logged yet. That includes the very start of a workout (clock
+  or GO only).
+- The backup line was changed by Planner to "…Use Restore from a backup to bring it back."
+- **Seen, not changed:**
+  - `workout/overview.jsx:106` still shows a plain "Done {date}".
+  - An all-skipped exercise reads "3 sets" in By exercise.
