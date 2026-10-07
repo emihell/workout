@@ -246,7 +246,7 @@ The full cycle:
 **The merge gate — you merge on your own testing (DEC-035; see it for the full model, both
 carve-outs, and the throwaway-worktree method).** Operationally: test everything reachable by your
 own hand — `node --test` / `./check`, a **throwaway git worktree of the branch** (symlink the
-planning worktree's `node_modules`, stays inside DEC-005), the acceptance checks, browser where
+code worktree's `node_modules` (L-048), stays inside DEC-005), the acceptance checks, browser where
 reachable — don't trust CC's pasted `./check`. All green → merge, persisted-data and ux-feel
 included (persisted-data *thoroughly* — migration round-trips, anti-clobber/corruption tests). Only
 the genuinely-untestable (real-device gym feel) is left for Emilio after, and it does not block.
