@@ -1,6 +1,6 @@
 # req-196 — app organisation: where things live, what goes
 
-**Status: NEEDS DECISIONS** (2026-10-07). **Lane: design**: no code. Output is `DEC-`s plus build reqs.
+**Status: DECIDED 2026-10-07 → DEC-110, req-198..202** (Emilio: "do an external review and implement if it agrees"; review in `review.md`, all five agreed with changes). **Lane: design**: no code. Output is `DEC-`s plus build reqs.
 Emilio, 2026-10-07: "how we can remove clutter, and non logical organisation … do we need a button for settings that is always
 easy access? … merge in the schedule in the existing list? … should rutines be rutines? or workouts instead? … do we need
 access to excercises? could thay be baked into rutines/workouts? … lena is the most imrpotant user, becouse to be beginner

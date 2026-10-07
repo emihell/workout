@@ -1778,3 +1778,37 @@ a single-time target ("20 min", "12:30") prefills Duration; a range ("5-8 min") 
 the stopwatch). Recorded because a one-tap Done now stores `durationSec: 1200` — a number that reads as measured — where it
 used to store the text "20 min" (reviewer's nit). Source is the routine value the user set, so the §1 test holds. `(unconfirmed)`
 — on Emilio's end-of-batch list.
+
+## DEC-110 — app organisation: bar Workouts · Today · History; Home is this week; routines are "Workouts"  (Emilio + independent review, 2026-10-07, req-196)
+
+Emilio, 2026-10-07: "do an external review and implement if it agrees". The independent review (`work/req-196-app-organisation/review.md`) agreed with all five points, each with changes. This DEC records the five points with those changes folded in. Planner's choices on what the review left open are marked `(unconfirmed)`, and all of them are on Emilio's list.
+
+1. **The bar is Workouts · Today · History.**
+   - Settings leaves the bar. Its contents become **"Backup & data ›"**, a row at the bottom of History that shows even when History is empty.
+   - Inside Backup & data: Export and Import first; Export analytics, Feedback notes and Components at the bottom.
+   - The save-failed banner gets its own Export button.
+   - The circles get visible text labels `(unconfirmed)`.
+   - **Reverses** DEC-024 ("Settings always one tap"), DEC-036's three controls and grid icon, and DEC-046's "Settings → Export" path.
+2. **Routines are called "Workouts" in the UI. Internals, routes and the README entity keep "routine".**
+   - A logged session is named by its workout's name and date ("Upper Body · Mon 6 Oct"). Where a generic word is unavoidable it is "session" `(unconfirmed)`.
+   - The bar's oval reads "Today".
+   - A static test keeps "routine" out of UI copy.
+   - Never rename the route `routines` → `workouts`: `BottomMenu.jsx:95` hides the bar for any route starting with `workout` (review F13).
+3. **Library goes.**
+   - The Workouts tab is the plain list. Each row keeps **Start**.
+   - Two rows sit below the list: **"Your exercises ›"** (today's Exercises screens, unchanged) and **"Whole plan ›"** (today's Schedule screen).
+   - Exercises stay with the workouts, not History, so setup and history stay separate (DESIGN §3, review counter-argument 5) `(unconfirmed; differs from the proposal's "under History")`.
+   - History › By exercise links to the exercise's settings.
+4. **Home is this week.**
+   - Today's block comes first, as now. Below it, **this week's 7 days** (Mon–Sun) as compact rows, rest days included, today marked. Then the recent list.
+   - Only today's block carries Start.
+   - Tapping a day opens that day's existing schedule screen. It gets **Start now** (Start-ahead kept at 2 taps) and a title that is honest about the loop ("Saturday", or "Saturday · week 2 of 2" when the loop is longer than 1 week).
+   - Past days show "Done" from history by date, not by slot id (review F2).
+   - The stale Continue row stays on Home.
+   - **Reverses** DEC-025 (the light peek), DEC-093's kept req-60 order (future on top), and the Start on upcoming rows (DEC-024/req-59) `(unconfirmed)`.
+5. **No schema change.**
+   - Slot edits use the existing add/remove reducers.
+   - "Just this date" overrides stay out. Adding them would mean a schema change and Emilio's eyes.
+   - Any backup-nudge counter lives in its own key.
+
+**Build:** req-198 (bar + Backup & data) → req-199 (Library → Workouts list) → req-200 (Home week) → req-201 (the rename, last, once the screens have settled) → req-202 (small cuts). A Lena persona re-run follows the batch.

@@ -34,7 +34,7 @@ the logic layer is sound — the state machine, rest timing, snapshot-on-start,
 skipped-at-finish and draft-on-switch all work. "Flawless" is mostly a **design/UX
 pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
 
-- **`req-196` app organisation** (NEEDS DECISIONS, design) — where things live, Settings/Schedule/Exercises/naming. `work/req-196-app-organisation.md`.
+- **`req-196` app organisation** (DECIDED → DEC-110, req-198..202: bar+backup, workouts list, Home week, rename, small cuts) — where things live, Settings/Schedule/Exercises/naming. `work/req-196-app-organisation/`.
 - **`req-197` analytics per day + build, reset on export** (READY, tooling). `work/req-197-analytics-by-day.md`.
 
 > Historical list (2026-09-07). All shipped since: req-01, the styling reqs, the rest cue/wake-lock, req-24.
