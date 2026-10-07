@@ -1,6 +1,6 @@
 # req-205 — Home: 6 days forward with rest days, no title, no gap between sections
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-114 (amends DEC-113 / req-204). **Emilio sees a screenshot before
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-205` (`bc47f17`…`a406313`, 3 commits).** (2026-10-07). **Lane: ui.** From DEC-114 (amends DEC-113 / req-204). **Emilio sees a screenshot before
 merge (L-050).** **+ DEC-115, added mid-build:** Home's last row is "Schedule ›"; Schedule ends with "History ›";
 History's Back → /schedule; the Workouts list drops "Whole plan ›".
 
