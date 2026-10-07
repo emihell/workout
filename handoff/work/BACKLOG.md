@@ -36,6 +36,8 @@ pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
 
 - **`req-196` app organisation** (DECIDED → DEC-110, req-198..202: bar+backup, workouts list, Home week, rename, small cuts) — where things live, Settings/Schedule/Exercises/naming. `work/req-196-app-organisation/`.
 - **`req-203` Lena run 3 fixes** (READY, ui) — done day opens its sets, Home done link, plain backup, By-exercise kg. `work/req-203-lena-run-3-fixes.md`.
+- **`req-209` Noa run fixes** (READY, ui). `work/req-209-noa-run-fixes/`.
+- **Open from Noa run (Emilio):** per-exercise progress, last time on the set screen, a one-date move, reps carry when changed, Total lifted, CSV export, the 2-day default; plank/timer layout; a design-system pass (destructive style, Edit placement, sheet titles).
 - **Open from Lena run 3 (Emilio's list):** a day "Move to…"; choosing days in setup; a default plan name other than "Workout"; a 400 kg sanity note with no history.
 - **`req-197` analytics per day + build, reset on export** (READY, tooling). `work/req-197-analytics-by-day.md`.
 
