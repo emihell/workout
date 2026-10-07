@@ -1,6 +1,6 @@
 # req-210 — progress arrow "↑ N%"; reps carry on uniform plans; Total lifted removed; setup days start empty
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-117 §1, §3, §4 and §6.
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-210` (`e1291ba`…`4cc7d67`, 4 commits).** (2026-10-07). **Lane: ui.** From DEC-117 §1, §3, §4 and §6.
 
 **Trigger file:** `workout-log.js` (the reps prefill). An independent reviewer runs before merge (DEC-057). Emilio sees
 screenshots before merge (L-050).
