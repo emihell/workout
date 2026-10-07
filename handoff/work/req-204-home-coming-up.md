@@ -53,3 +53,12 @@ req-203 stays.
    Receipt: the bounding box vs the viewport.
 5. **Failure case:** with no schedule at all, Home shows no "Coming up" header, and today's block plus History render.
 6. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio saw the 390×844 screenshot and said "lets try it"** (L-050 gate).
+- The date travels as `?date=`, and `withFrom` appends `&from=`. `dayScreenDate` trusts it only if the weekday and loop week
+  match.
+- **Bottom-aligned:** Coming up → today → History. The gap sits under "Workouts ›".
+- "No history yet." is removed. Archived routines make no row.
+- **The scan** covers up to n loops, stopping after one empty loop. The spec's "loopWeeks × 7" contradicted its own AC1.
+- **Seen, not changed:** Start now on a future day starts an untagged workout today (req-200).

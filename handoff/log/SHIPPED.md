@@ -2335,3 +2335,16 @@ Agent browser receipts on an empty origin cover all 7 items. `workout-log.js` ch
 display string with no stored write, so `--no-reviewer`. `reports/req-203.md`.
 
 No independent reviewer (`plan closeout --no-reviewer`): workout-log.js: only workoutPillState's display string changed (pure, no stored write); diff read by Planner
+
+## req-204 — Home: next 3 workouts above, today at the bottom  (2026-10-07)
+
+**req-204** (DEC-113).
+- Home: Workouts › → Coming up (`upcomingWorkouts`, the next 3, furthest first, dated links) → today's block → History ›,
+  bottom-aligned.
+- "This week", `weekRows` and the recent peek are gone.
+- 3 commits, `ed01774`…`6407cf2`. Test edits are named in the report.
+
+Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 101 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree). Emilio OK'd the screenshot ("lets try it").
+
+No trigger files. `reports/req-204.md`.
