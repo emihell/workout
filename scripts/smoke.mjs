@@ -161,8 +161,9 @@ async function main() {
         STORAGE_KEY,
       )
     })
-    await step('back to the exercise list (‹ Exercises)', async () => {
-      await clickLink(page, '‹ Exercises')
+    // req-202 — the in-workout back link reads the workout's name, not "Exercises".
+    await step(`back to the exercise list (‹ ${ROUTINE})`, async () => {
+      await clickLink(page, `‹ ${ROUTINE}`)
       await waitHash(page, /^#\/workout\/[^/]+$/)
       await waitText(page, SKIP_EXERCISE)
     })
