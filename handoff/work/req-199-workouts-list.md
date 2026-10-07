@@ -1,6 +1,6 @@
 # req-199 — Library goes: the bar's left tab is the plain workouts list, with "Your exercises ›" and "Whole plan ›"
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-110 §3. Builds after req-198 (same `BottomMenu.jsx` / `route.js`) and
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-199` (`88b3cde`…`89b085b`, 2 commits).** (2026-10-07). **Lane: ui.** From DEC-110 §3. Builds after req-198 (same `BottomMenu.jsx` / `route.js`) and
 before req-200 (Home week).
 
 ## Code today (main `166266a`)
