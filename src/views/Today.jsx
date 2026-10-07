@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
-import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, resolveSlot, slotsOn, upcomingWorkouts } from '../schedule'
+import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, resolveSlot, slotsOn } from '../schedule'
 import { routineById } from '../model.js'
 import { doneInTodayBlock, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
 import { useStore } from '../store-context'
@@ -66,17 +66,17 @@ function WorkoutInfo({ when, name, today }) {
   )
 }
 
-// req-204 (DEC-113) — one row of "Coming up": a future date with at least one workout
-// (upcomingWorkouts: rest days are skipped), "{weekday short}, {date} · {names} ›". A day
-// with two workouts is one row, names joined ", ". No Start: starting ahead lives on the
-// day's screen ("Start now"). The link carries the date (`?date=`, it can be next week or
-// later) and `from=/`, so the day screen is that dated day and its Back returns Home.
-// (Replaces req-200's "This week" WeekRow and the req-14 recent-history peek row.)
+// req-205 (DEC-114) — one row of "Coming up": one of the next 6 dates (comingDays, every
+// day shown), "{weekday short}, {date} · {names} ›", or "{…} · Rest ›" in muted text on a
+// day with no workout. A day with two workouts is one row, names joined ", ". No Start:
+// starting ahead lives on the day's screen ("Start now"). Every row, Rest included, links
+// its dated day screen (`?date=` + `from=/`, req-204), where a workout can be added.
 function UpcomingRow({ routines, row }) {
+  const rest = row.slots.length === 0
   const names = row.slots.map((slot) => resolveSlot(routines, slot).routine?.name).join(', ')
   return (
-    <Row to={withFrom(`/schedule/${row.week}/${row.weekday}?date=${row.dateKey}`, '/')}>
-      {weekdayDate(row.dateKey)} · {names}
+    <Row to={withFrom(`/schedule/${row.week}/${row.weekday}?date=${row.dateKey}`, '/')} className={rest ? 'ui-row--rest' : ''}>
+      {weekdayDate(row.dateKey)} · {rest ? 'Rest' : names}
     </Row>
   )
 }
@@ -272,10 +272,10 @@ export function Today() {
   const todays = slotsOn(schedule, now)
     .map((slot) => resolveSlot(routines, slot))
     .filter((x) => x.routine)
-  // req-204 (DEC-113) — the next 3 dates after today with a workout, rolling and
-  // loop-aware, rest days skipped. Nearest first from upcomingWorkouts; rendered
-  // furthest first so the nearest sits just above today's block.
-  const upcoming = upcomingWorkouts(schedule, routines, now, 3)
+  // req-205 (DEC-114) — the next 6 calendar dates after today, rest days included,
+  // loop-aware. Nearest first from comingDays; rendered furthest first so the nearest
+  // sits just above today's block.
+  const upcoming = comingDays(schedule, routines, now, 6)
   // req-114 — clamp like Schedule does (an imported 6 read "Week 1 of 6").
   const loop = clampLoopWeeks(schedule?.loopWeeks)
   const week = loopWeekIndex(schedule, now)
@@ -342,15 +342,16 @@ export function Today() {
     )
   }
 
-  // req-204 (DEC-113) — top to bottom: title + "Workouts ›", "Coming up" (furthest first),
-  // today's block (+ its stale Continue row), "History ›". Everything from "Coming up" down
-  // sits in `.ui-home-bottom`, pushed to the bottom of a screen-tall column when the content
-  // is shorter than the viewport, so today's block is near the thumb; a taller Home scrolls
-  // as normal. The "This week" list (req-200) and the recent-past peek rows are gone.
+  // req-205 (DEC-114) — top to bottom: "Workouts ›", "Coming up" (6 days, furthest first),
+  // today's block (+ its stale Continue row), "History ›". There is no visible title (a
+  // visually hidden h1 keeps the page's heading for screen readers). The whole column is
+  // one block, `.ui-home-bottom`, pushed to the bottom of a screen-tall Home when the
+  // content is shorter than the viewport: any spare space is above "Workouts ›", never
+  // between sections. A taller Home scrolls as normal.
   return (
     <Screen className="ui-screen--home">
-      <div className="ui-home-top">
-        <Title>Today</Title>
+      <h1 className="ui-visually-hidden">Today</h1>
+      <div className="ui-home-bottom">
         {loop > 1 ? (
           <p className="ui-sub">
             Week {week + 1} of {loop}
@@ -361,21 +362,14 @@ export function Today() {
         <p>
           <NavLink to="/routines" chevron="forward">Workouts</NavLink>
         </p>
-      </div>
 
-      <div className="ui-home-bottom">
-        {/* req-204 — hidden whole when nothing is coming up (no schedule, or no slot with
-            an active workout in the loop). No Start on these rows. */}
-        {upcoming.length ? (
-          <>
-            <SectionHeader>Coming up</SectionHeader>
-            <List>
-              {[...upcoming].reverse().map((row) => (
-                <UpcomingRow key={row.dateKey} routines={routines} row={row} />
-              ))}
-            </List>
-          </>
-        ) : null}
+        {/* req-205 — always the next 6 days, Rest included; no Start on these rows. */}
+        <SectionHeader>Coming up</SectionHeader>
+        <List>
+          {[...upcoming].reverse().map((row) => (
+            <UpcomingRow key={row.dateKey} routines={routines} row={row} />
+          ))}
+        </List>
 
         {/* req-55 / DEC-038 — a current in-progress workout IS the single hero. No second
             hero. req-114 / DEC-058 §3: it heads today's block (today's date), and the

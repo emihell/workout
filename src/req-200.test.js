@@ -20,7 +20,7 @@ const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve,
 
 // req-204 test edit: the weekRows describe (6 tests) is deleted with weekRows itself —
 // req-204 §3 removed Home's "This week" and its only caller. Its successor,
-// upcomingWorkouts, is tested in req-204.test.js (loop-aware names, 2 slots, rest skipped).
+// upcomingWorkouts, was tested in req-204.test.js; req-205 replaced it with comingDays (req-205.test.js).
 
 // ── Screens (the whole App) ──────────────────────────────────────────────────────────
 const seed = JSON.parse(read('db.json'))

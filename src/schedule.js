@@ -131,26 +131,18 @@ export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlot
   return done.find((w) => !w.scheduledFor && dateKey(w.finishedAt) === scheduledDate) || null
 }
 
-// req-204 (DEC-113) — Home's "Coming up": the next `n` dates AFTER today (today is
-// excluded — today's block owns it) that hold at least one slot whose routine is active
-// (present and not archived). One row per date, so a day with two workouts is one row.
-// Each row names its loop week (0-based) and weekday (0=Sun..6=Sat, getDay — the
-// ScheduleDay route's own pair), and only the slots with an active routine, in schedule
-// order. Nearest first; Home reverses it (furthest on top).
-//
-// The scan is bounded: every date with a workout recurs once per loop (loopWeeks × 7
-// days), so a loop with none in its first `loop × 7` days has none at all and returns []
-// after that one pass; otherwise `n` loops always hold `n` hits. Pure.
-export function upcomingWorkouts(schedule, routines, today = new Date(), n = 3) {
-  const period = clampLoopWeeks(schedule?.loopWeeks) * 7
+// req-205 (DEC-114) — Home's "Coming up": the next `n` calendar dates AFTER today (today
+// is excluded — today's block owns it), every day shown, rest days included. Each row
+// names its loop week (0-based) and weekday (0=Sun..6=Sat, getDay — the ScheduleDay
+// route's own pair) and the slots on that date whose routine is active (present and not
+// archived), in schedule order; `slots` is empty on a rest day (or a day whose only
+// workouts are archived/missing). Nearest first; Home reverses it (furthest on top).
+// Replaces req-204's `upcomingWorkouts` (the next 3 workout dates, rest days skipped). Pure.
+export function comingDays(schedule, routines, today = new Date(), n = 6) {
   const active = new Set((routines || []).filter((routine) => routine && !routine.archivedAt).map((routine) => routine.id))
-  const rows = []
-  for (let i = 1; i <= period * n && rows.length < n; i += 1) {
-    if (i > period && rows.length === 0) break
-    const date = addDays(today, i)
+  return Array.from({ length: n }, (_, k) => {
+    const date = addDays(today, k + 1)
     const slots = slotsOn(schedule, date).filter((slot) => active.has(slot.routineId))
-    if (!slots.length) continue
-    rows.push({ dateKey: dateKey(date), week: loopWeekIndex(schedule, date), weekday: date.getDay(), slots })
-  }
-  return rows
+    return { dateKey: dateKey(date), week: loopWeekIndex(schedule, date), weekday: date.getDay(), slots }
+  })
 }

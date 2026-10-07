@@ -106,7 +106,11 @@ test('History keeps its Back to "/" (not top-level, DEC-015)', () => {
 
 test('first-run Home drops the Schedule and Settings rows; Import stays', () => {
   const start = today.indexOf('if (isFirstRun(store)) {')
-  const end = today.indexOf('<Title>Today</Title>\n      {loop > 1')
+  // req-205 test edit: the normal Home's visible `<Title>Today</Title>` is gone (DEC-114), so
+  // the end anchor is its hidden h1. Without this the anchor was -1 and the slice ran to the end
+  // of the file. Assertions unchanged.
+  const end = today.indexOf('<h1 className="ui-visually-hidden">Today</h1>')
+  assert.ok(end > start)
   const firstRun = today.slice(start, end)
   assert.doesNotMatch(firstRun, /<Row to="\/settings">/)
   assert.doesNotMatch(firstRun, /<Row to="\/schedule">/)
