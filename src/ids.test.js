@@ -36,8 +36,8 @@ describe('effort labels', () => {
   })
 
   it('shows the label on set lines, not a number', () => {
-    assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 3 }), '20 kg · 10 · Medium')
-    assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 1 }), '20 kg · 10 · Easy')
+    assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 3 }), '20 kg × 10 · Medium') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
+    assert.equal(formatSetLine({ weight: 20, reps: '10', rpe: 1 }), '20 kg × 10 · Easy') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
   })
 })
 

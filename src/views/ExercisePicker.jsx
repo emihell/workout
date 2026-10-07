@@ -18,6 +18,7 @@
 import { useEffect, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog.js'
 import { libraryItemMatch } from '../exercise-names.js'
+import { equipmentLabel } from '../equipment-label.js'
 import { filteredBrowse, looseOwnMatch, ownRecentFirst, pickerItem, staplesByMuscle } from '../routine-picker.js'
 import { useStore } from '../store-context'
 import { Actions, Button, Checkbox, List, NavLink, Row, SearchField, SectionHeader } from '../ui/index.jsx'
@@ -139,7 +140,7 @@ export function ExercisePicker({
     const rows = [
       <PickRow
         key={entry.id || entry.name}
-        name={`${shownName(entry)} — ${entry.equipment || 'bodyweight'}`}
+        name={`${shownName(entry)} — ${equipmentLabel(entry.equipment, 'Bodyweight')}`}
         checked={Boolean(picked)}
         plan={picked ? pickPlan(picked).label : ''}
         onToggle={() => toggleLibrary(entry)}
@@ -218,7 +219,7 @@ export function ExercisePicker({
               return (
                 <PickRow
                   key={ex.id}
-                  name={`${ex.name} — ${ex.equipment}`}
+                  name={[ex.name, equipmentLabel(ex.equipment)].filter(Boolean).join(' — ')}
                   checked={Boolean(picked)}
                   plan={picked ? pickPlan(picked).label : ''}
                   onToggle={() => toggleOwn(ex)}

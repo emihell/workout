@@ -217,7 +217,7 @@ export function RoutineDetail({ routineId, paths }) {
               {/* req-103 — two lines: name (link to the item editor), then a muted meta line. */}
               <span className="ui-row__stack">
                 <NavLink to={nav.item(item.id)}>{ex?.name || item.exerciseId}</NavLink>
-                <span className="ui-row__meta">{routineItemMeta(item)}</span>
+                <span className="ui-row__meta">{routineItemMeta(item, { timed: Boolean(ex?.hasDuration) })}</span>
               </span>
             </Row>
           )

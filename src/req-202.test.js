@@ -97,7 +97,7 @@ describe('item 3 — an item\'s warm-up flag reads "with warm-up"', () => {
     assert.equal(WITH_WARMUP, 'with warm-up')
     assert.equal(routineItemMeta({ warmup: { reps: 12 }, sets: 3 }), 'with warm-up · 3 sets')
     assert.equal(historyGroupMeta({ role: 'main', warmup: { reps: 12 } }, 4), 'with warm-up · 4 sets')
-    assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12' }), 'Warm-up set · 10 kg · 12')
+    assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12' }), 'Warm-up set · 10 kg × 12') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
   })
 
   it('History exercise header: "with warm-up · {date}"', async () => {
@@ -110,7 +110,7 @@ describe('item 3 — an item\'s warm-up flag reads "with warm-up"', () => {
 
   it('routine detail and the workout overview rows', async () => {
     await open('/routines/sess-upper')
-    assert.match(view.text(), /with warm-up · 3 sets/)
+    assert.match(view.text(), /with warm-up · 3 × /) // req-209 test edit: the row shows the plan (§5), was '3 sets'
     assert.doesNotMatch(view.text(), /Warm-up set/)
     await open('/workout/sess-upper')
     assert.match(view.text(), / · with warm-up/)

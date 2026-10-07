@@ -107,7 +107,7 @@ describe('req-118 readers of the parser output still hold', () => {
     assert.deepEqual([0, 1, 2].map((i) => setTargetFor(item, 'work', i)), ['8', '10', '10'])
   })
   it('routineItemMeta prints the decimal weight', () => {
-    assert.equal(routineItemMeta(item), '3 sets · 20/22.5/22.5 kg')
+    assert.equal(routineItemMeta(item), '3 × 8/10/10 · 20/22.5/22.5 kg') // req-209 test edit: the row shows the plan (§5), was '3 sets · …'
   })
   it('buildPlannedWorkout carries sets/targets/weights/durations and needs no calibration', () => {
     const state = { exercises: [{ id: 'ex-1', name: 'Press', type: 'machine' }], routines: [{ id: 'r-1', exercises: [item] }] }

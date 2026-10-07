@@ -201,6 +201,11 @@ export function parseRoute(path) {
     const date = rawQueryValue(rawQuery, 'date')
     if (date && DAY_DATE.test(date)) route = { ...route, date }
   }
+  // req-209 — `#/settings?dev=1` turns the device's developer-tools flag on (`dev=0` off).
+  if (route.name === 'settings') {
+    const dev = rawQueryValue(rawQuery, 'dev')
+    if (dev === '1' || dev === '0') route = { ...route, dev }
+  }
   const from = returnPathOf(rawQuery)
   return from ? { ...route, from } : route
 }

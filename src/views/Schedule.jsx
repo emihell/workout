@@ -10,6 +10,7 @@ import {
   doneOnDay,
   longWeekdayDate,
   removeSlotText,
+  scheduleRowText,
   slotMenuSheet,
   startNowShown,
 } from './schedule-day.js'
@@ -52,6 +53,10 @@ export function Schedule() {
   // convention `slotsOn`/`WEEKDAY_ORDER` use, so it lines up with the rows below.
   const todayWeekday = new Date().getDay()
   const routines = activeRoutines(store)
+  // req-209 §7 — today's row reads "Today · Done ✓" once a workout finished today.
+  const doneTodayNames = doneOnDay(store.workouts, dateKey(new Date())).map((workout) =>
+    workoutRoutineName(workout, routineById(store.routines, workoutRoutineId(workout))),
+  )
 
   // req-199 — no Library toggle. req-205 (DEC-115): reached from Home's "Schedule ›" (the
   // Routines list's "Whole plan ›" is gone), so Back goes Home — and, Back being "/", no
@@ -79,9 +84,10 @@ export function Schedule() {
               const slots = slotsForWeekDay(schedule, week, weekday)
               const names = slots.map((slot) => slotLabel(routines, slot)).join(', ')
               const isToday = week === currentWeek && weekday === todayWeekday
+              const row = scheduleRowText({ names, isToday, doneNames: isToday ? doneTodayNames : [] })
               return (
-                <Row key={weekday} to={dayPathOf(week, weekday)} value={isToday ? 'Today' : null}>
-                  {weekdayName(weekday)} — {names || 'Rest'}
+                <Row key={weekday} to={dayPathOf(week, weekday)} value={row.value}>
+                  {weekdayName(weekday)} — {row.label}
                 </Row>
               )
             })}

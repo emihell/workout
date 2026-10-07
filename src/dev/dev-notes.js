@@ -173,3 +173,60 @@ export function setFeedbackEnabled(value) {
   feedbackEnabled = next
   for (const listener of feedbackEnabledListeners) listener()
 }
+
+// ---- req-209 developer-tools flag (own key, pure + subscribable) ----
+//
+// Backup & data hides its Developer group (Assistant prompt, Export analytics, Feedback
+// notes, Components) unless this device flag is on. Opening `#/settings?dev=1` turns it
+// on and it stays on for the device; `#/settings?dev=0` turns it off again. Like the
+// feedback flag above: its OWN key, never `workout-mvp-v9`; default OFF is the absence of
+// the key. It gates only what Backup & data shows: the ✎ capture button keeps its own
+// toggle (FEEDBACK_ENABLED_KEY), so capture keeps working wherever it is enabled.
+export const DEV_TOOLS_KEY = 'workout-dev-tools-v1'
+
+export function readDevTools(storage) {
+  if (!storage) return false
+  try {
+    return storage.getItem(DEV_TOOLS_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+export function writeDevTools(storage, value) {
+  if (!storage) return false
+  try {
+    if (value) storage.setItem(DEV_TOOLS_KEY, 'true')
+    else storage.removeItem(DEV_TOOLS_KEY)
+    return true
+  } catch {
+    return false
+  }
+}
+
+// The settings route's `dev` query value → the flag to write, or null (leave it as is).
+export function devToolsFromQuery(value) {
+  if (value === '1') return true
+  if (value === '0') return false
+  return null
+}
+
+let devTools = readDevTools(browserStorage())
+const devToolsListeners = new Set()
+
+export function getDevTools() {
+  return devTools
+}
+
+export function subscribeDevTools(listener) {
+  devToolsListeners.add(listener)
+  return () => devToolsListeners.delete(listener)
+}
+
+export function setDevTools(value) {
+  const next = Boolean(value)
+  writeDevTools(browserStorage(), next)
+  if (devTools === next) return
+  devTools = next
+  for (const listener of devToolsListeners) listener()
+}

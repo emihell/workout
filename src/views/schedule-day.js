@@ -112,3 +112,15 @@ export function changedDayPath(week, weekday, date) {
   const moved = addDays(mondayOf(date), (Number(weekday) + 6) % 7)
   return `${path}?date=${dateKey(moved)}`
 }
+
+// req-209 §7 (Noa: "Rest · Today" on a day she trained) — a Schedule row: the planned
+// names, else "Rest"; today's row is marked "Today", or "Today · Done ✓" once a workout
+// finished today (doneOnDay, by finish date). A finished workout on an unplanned day names
+// the row instead of "Rest". `doneNames`: today's finished workouts' names. Pure.
+export function scheduleRowText({ names = '', isToday = false, doneNames = [] } = {}) {
+  const done = isToday && doneNames.length > 0
+  return {
+    label: names || (done ? doneNames.join(', ') : 'Rest'),
+    value: isToday ? (done ? 'Today · Done ✓' : 'Today') : null,
+  }
+}

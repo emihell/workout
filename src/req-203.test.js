@@ -266,7 +266,7 @@ describe('§4 Backup & data is plain', () => {
       else anchorClick.call(this)
     }
     try {
-      await open('/settings')
+      await open('/settings?dev=1') // req-209 test edit: the Developer group shows only with the device flag on (§1); its default-off case is in req-209.test.js
       const text = view.text()
       // req-203 copy fix (Planner): the line names the button ("Restore from a backup"), was "Open it with Import to restore."
       assert.match(text, /Saves all your workouts and history to a file on this device\. Use Restore from a backup to bring it back\./)
@@ -278,6 +278,7 @@ describe('§4 Backup & data is plain', () => {
       assert.match(view.text(), new RegExp(`Backup saved — ${file.replace(/\./g, '\\.')}`))
       assert.ok(text.indexOf('Back up now') < text.indexOf('Developer'), 'the Developer group stays below')
     } finally {
+      ;(await importJsx('./dev/dev-notes.js', import.meta.url)).setDevTools(false) // req-209 test edit: put the flag back off
       URL.createObjectURL = saved.create
       URL.revokeObjectURL = saved.revoke
       window.HTMLAnchorElement.prototype.click = anchorClick

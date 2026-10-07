@@ -47,6 +47,7 @@ import { askConfirm } from '../../ui/confirm.js'
 import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
 import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
+import { equipmentLabel } from '../../equipment-label.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
 // workout-log.js); weight step and cues stay live. Old snapshots read live as before.
@@ -85,7 +86,7 @@ function ExerciseTitle({ routineId, item, ex, bits, aside }) {
 function ExerciseSetupHeader({ item, ex, showNotes = true }) {
   return (
     <>
-      {ex?.equipment ? <p className="ui-sub">{ex.equipment}</p> : null}
+      {ex?.equipment ? <p className="ui-sub">{equipmentLabel(ex.equipment)}</p> : null}
       {showNotes && item?.notes ? <p className="ui-sub">{item.notes}</p> : null}
     </>
   )

@@ -242,16 +242,17 @@ async function main() {
       const detail = `/history/${workout.id}?from=${encodeURIComponent(month)}`
       await clickSelector(page, `a[href="#${detail}"]`)
       await waitHash(page, new RegExp(`^#/history/${workout.id}\\?`))
-      // req-202 — an exercise's warm-up flag reads "with warm-up" (was "Warm-up set").
-      await waitText(page, `${LOG_EXERCISE} — with warm-up · 1 set`)
-      await waitText(page, `${SKIP_EXERCISE} — with warm-up · skipped`)
+      // req-209 smoke edit — the row shows its sets inline (was req-202's "with warm-up · 1 set"):
+      // the logged warm-up set, then the work sets Finish marked skipped.
+      await waitText(page, `${LOG_EXERCISE} — warm-up 22.5 kg × `)
+      await waitText(page, `${SKIP_EXERCISE} — skipped`)
       // The per-exercise sets screen shows the logged value as the app displays it.
       await clickSelector(page, `a[href="#/history/${workout.id}/exercise/${logKey}?from=${encodeURIComponent(detail)}"]`)
       await waitText(page, '22.5')
     })
     await step('Back → Back from the exercise returns to the month list (req-171)', async () => {
       await clickLink(page, '‹ Back')
-      await waitText(page, `${LOG_EXERCISE} — with warm-up · 1 set`)
+      await waitText(page, `${LOG_EXERCISE} — warm-up 22.5 kg × `) // req-209 smoke edit
       await clickLink(page, '‹ Back')
       await waitHash(page, new RegExp(`^#/history/month/${workout.performedOn.slice(0, 7)}$`))
     })

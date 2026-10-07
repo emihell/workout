@@ -85,15 +85,25 @@ export function roleTag(role) {
 // only when some suggested weight is > 0, joined by a no-break space so `kg` never
 // wraps alone. req-113 — a weight that is 0, empty or missing means "no weight" (DESIGN
 // §1), so it prints as `—`, never `0`: [0, 40] → `—/40 kg`.
-export function routineItemMeta(item) {
+//
+// req-209 §5 — the plan reads "{sets} × {reps} · {kg} kg" ("4 × 15 · 14 kg"), or
+// "{sets} × {duration}" for a timed exercise (`timed`: the exercise's hasDuration), so an
+// edit to reps shows on the row. kg prints once when every set shares it; the slash form
+// stays only when kg differ per set. Reps that differ per set read "12/10/8". An item
+// without a target for every set keeps "N sets" (never invented).
+export function routineItemMeta(item, { timed = false } = {}) {
   const sets = item.sets || 1
-  const weights = item.suggestedWeights || []
-  const kg = weights.some((weight) => Number(weight) > 0)
-    ? `${Array.from(weights, (weight) => (Number(weight) > 0 ? weight : '—')).join('/')}\u00a0kg`
+  const perSetOf = (list) => Array.from({ length: sets }, (_, i) => list?.[i])
+  const kgValues = perSetOf(item.suggestedWeights).map((weight) => (Number(weight) > 0 ? String(weight) : '\u2014'))
+  const kg = (item.suggestedWeights || []).slice(0, sets).some((weight) => Number(weight) > 0)
+    ? `${new Set(kgValues).size === 1 ? kgValues[0] : kgValues.join('/')}\u00a0kg`
     : ''
-  return [roleTag(item.role), item.warmup ? WITH_WARMUP : '', `${sets} ${sets === 1 ? 'set' : 'sets'}`, kg]
-    .filter(Boolean)
-    .join(' · ')
+  const perSet = timed
+    ? perSetOf(item.durations).map((value) => (Number(value) > 0 ? `${Number(value)}s` : ''))
+    : perSetOf(item.targets).map((value) => (value == null ? '' : String(value).trim()))
+  const amount = perSet.every(Boolean) ? (new Set(perSet).size === 1 ? perSet[0] : perSet.join('/')) : ''
+  const plan = amount ? `${sets} \u00d7 ${amount}` : `${sets} ${sets === 1 ? 'set' : 'sets'}`
+  return [roleTag(item.role), item.warmup ? WITH_WARMUP : '', plan, kg].filter(Boolean).join(' · ')
 }
 
 export function weekdayName(value) {
@@ -105,21 +115,41 @@ export function weekdayName(value) {
 // the stored value is not rewritten. `cardio` comes from the caller (the set alone doesn't
 // know its exercise's type).
 // req-194 — `cardioFields`: a non-timed cardio exercise, whose duration reads as a clock.
+//
+// req-209 §3 — ONE set format, "{kg} kg × {reps}" ("14 kg × 15 · Easy"), used by the History
+// exercise page, History › By exercise (topSetText) and the in-workout log list; the
+// History detail's inline rows (historyGroupSetsText) build on setParts below.
 export function formatSetLine(set, { cardio = false, cardioFields = false } = {}) {
   const bits = []
   if (set.setType === 'wu') bits.push('Warm-up set')
-  if (set.weight != null && set.weight !== '' && Number(set.weight) !== 0) {
-    bits.push(`${set.weight} kg`)
-  }
+  const value = setValueText(set, { cardio, cardioFields })
+  if (value) bits.push(value)
+  if (set.rpe && set.setType !== 'wu' && !cardio) bits.push(rpeLabel(set.rpe) || 'logged')
+  return bits.join(' · ') || 'logged'
+}
+
+// req-209 — a set's logged values, split: `kg` ("14 kg", or '' with no weight), `amount`
+// (reps "15", a timed set's "30s", or a cardio set's "12:30 · level 8") and whether it is
+// cardio (whose parts join with " · ", never "×"). Logged values only. Pure.
+export function setParts(set, { cardio = false, cardioFields = false } = {}) {
+  const kg = set.weight != null && set.weight !== '' && Number(set.weight) !== 0 ? `${set.weight} kg` : ''
+  const amount = []
   // req-194 — a cardio set's duration / level / distance: "12:30 · level 8 · 1.5 km"
   // (cardio-set.js). An old cardio set has none of them and shows its typed reps as before.
   // Review fix 5 — a cardio set with a logged time reads as cardio even when the caller passes
   // only `cardio` (a timed cardio exercise's seconds then read as a clock too, "0:30").
   const timedCardio = cardio && set.durationSec != null && set.durationSec !== ''
-  if (cardioFields || timedCardio || hasCardioFields(set)) bits.push(...cardioBits(set))
+  const isCardio = Boolean(cardioFields || timedCardio || hasCardioFields(set))
+  if (isCardio) amount.push(...cardioBits(set))
   // req-85 — a timed set logs seconds in place of reps; show it as e.g. "30s".
-  else if (set.durationSec != null && set.durationSec !== '') bits.push(`${set.durationSec}s`)
-  if (set.reps != null && set.reps !== '') bits.push(`${set.reps}`)
-  if (set.rpe && set.setType !== 'wu' && !cardio) bits.push(rpeLabel(set.rpe) || 'logged')
-  return bits.join(' · ') || 'logged'
+  else if (set.durationSec != null && set.durationSec !== '') amount.push(`${set.durationSec}s`)
+  if (set.reps != null && set.reps !== '') amount.push(`${set.reps}`)
+  return { kg, amount: amount.join(' · '), cardio: isCardio }
+}
+
+// req-209 §3 — "{kg} kg × {reps}"; either part alone when the other is absent.
+export function setValueText(set, options) {
+  const { kg, amount, cardio } = setParts(set, options)
+  if (kg && amount) return cardio ? `${kg} · ${amount}` : `${kg} × ${amount}`
+  return kg || amount
 }
