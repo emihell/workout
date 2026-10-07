@@ -16,6 +16,9 @@
    in `route.js` and its block in `route.test.js`, and any CSS left for `.ui-dock`. If deleting the files is refused by the
    permission system, stop and report it. Don't work around it.
 
+7. **Slot detail Back from a Home-opened day** (req-200 loose end): a slot page reached from `/schedule/W/D?from=/` returns to
+   that same day URL (keeping `from`), so the chain ends on Home.
+
 ## Out of scope
 - History month buckets.
 - "Total lifted".

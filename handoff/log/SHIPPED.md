@@ -2266,3 +2266,23 @@ Planner QA:
 - No dialogs were raised.
 
 No trigger files, so no reviewer. `reports/req-199.md`.
+
+## req-200 — Home shows this week; a day opens its schedule screen with Start now  (batch 2026-10-07)
+
+**req-200** (DEC-110 §4, review B1/F2–F6).
+- Home order: Workouts › → today's block → stale Continue → "This week" (7 rows Mon–Sun, Rest shown, Done by date) →
+  recent → History.
+- The upcoming rows are gone. A day row → `/schedule/W/D?from=/`, which has Start now, a loop-honest title and Whole plan ›.
+- Pure `weekRows` in `schedule.js`.
+- 2 commits, `a630477`…`433f384`. No test edits.
+
+Gate (ui): `check: green — lint, skills, no import cycles, 98 test file(s), and the build all passed.` Smoke green on the
+branch build.
+
+Planner QA at 375×667:
+- Home text and screenshot read.
+- Thursday row → day screen with Start now and Back to Home.
+- No dialogs were raised.
+- The agent's receipts cover the 2-week loop, done-by-date and the Sunday fold.
+
+No trigger files (`schedule.js` and the views are outside DEC-057 §1), so no reviewer. `reports/req-200.md`.
