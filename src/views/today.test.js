@@ -122,5 +122,6 @@ test('the list below holds prior days only (no completed-today rows)', () => {
   // req-204 test edit (DEC-113): the prior-day peek rows are gone from Home entirely, so the
   // list below today's block is the History link alone (was: it opens on `recent.map(`).
   assert.doesNotMatch(src, /recent\.map\(|HistoryPeekRow/)
-  assert.match(src, /<List>\s*<Row to="\/history">History<\/Row>\s*<\/List>/)
+  // req-205 test edit (DEC-115): that last row is now "Schedule ›" (History moved under it).
+  assert.match(src, /<List>\s*<Row to="\/schedule">Schedule<\/Row>\s*<\/List>/)
 })

@@ -8,7 +8,7 @@
 //
 // The loop: Start today's routine → log a set typed "22,5" → skip an exercise →
 // Finish → Save → the stored workout has 22.5 kg and the skipped sets → Back never
-// renders "Not found." → History shows the workout → Back, Back unwinds to its month
+// renders "Not found." → Home → Schedule → History shows the workout → Back, Back unwinds to its month
 // (req-171). Exit 0 green, 1 on the first failed
 // step (the step, the reason and the screen's text are printed), 2 on a setup error.
 //
@@ -223,11 +223,15 @@ async function main() {
         if (text.includes('Not found.') || flashed.length) throw new StepFailure(`Back #${i + 1} (${before} → ${page.url()}) rendered "Not found."`)
       }
     })
-    await step('History shows the workout (reopen the app → History → the row)', async () => {
+    await step('History shows the workout (reopen the app → Schedule → History → the row)', async () => {
       // There is no bottom bar (req-198), and where the Backs land varies; reopening the
       // app (a fresh load of the same origin, storage kept) is the user's way back to Today.
       await page.goto(url, { waitUntil: 'networkidle0' })
       await waitHash(page, /^#\/$/)
+      // req-205 smoke edit (DEC-115): Home's last row is "Schedule ›" and History hangs off the
+      // Schedule, so the way in is Home → Schedule → History (was Home → History).
+      await clickLink(page, 'Schedule')
+      await waitHash(page, /^#\/schedule$/)
       await clickLink(page, 'History')
       await waitHash(page, /^#\/history$/)
       // History lists months; the workout is under its own (performedOn's YYYY-MM).

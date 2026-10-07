@@ -482,9 +482,10 @@ html:has(.ui-picker-bar) {
 .ui-row--done {
   opacity: 0.45;
 }
-/* req-204 (DEC-113) — Home is a screen-tall column: the title + "Workouts ›" at the top,
- * and "Coming up" → today's block → "History ›" pushed to the bottom when the content is
- * shorter than the viewport, so today's Start sits near the thumb. The min-height is the
+/* req-204 (DEC-113) / req-205 (DEC-114) — Home is a screen-tall column, and its whole
+ * content ("Workouts ›" → "Coming up" → today's block → "History ›") is ONE block pushed to
+ * the bottom when it is shorter than the viewport, so today's Start sits near the thumb and
+ * any spare space is above "Workouts ›", never between sections. The min-height is the
  * viewport less .ui-main's own top/bottom padding and the body's margin (the browser's 8px
  * top and bottom; the app never resets it), so a short Home does not scroll; a taller one
  * grows past it and scrolls as normal. (Replaces req-200's .ui-row--today.) */
@@ -497,6 +498,11 @@ html:has(.ui-picker-bar) {
 }
 .ui-home-bottom {
   margin-top: auto;
+}
+/* req-205 (DEC-114) — a rest day in Home's "Coming up" ("{date} · Rest ›") reads muted;
+ * it is still a link to its day screen. */
+.ui-row--rest .ui-row__label {
+  color: var(--ui-ink-2);
 }
 /* req-93 — the small role tag on a non-main exercise row (warm-up / finisher /
  * cardio). Main rows show just a bold name with no tag; this is the lighter,

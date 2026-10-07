@@ -85,7 +85,9 @@ test('/settings is titled "Backup & data", Back → /history, Export then Import
 test('AC3 failure case: History always shows "Backup & data ›", outside every empty/month branch', () => {
   const body = fnBody(list, 'History')
   // the main (non-month) screen: after the month early return
-  const main = body.slice(body.indexOf('  return (\n    <Screen>\n      <Back to="/" />'))
+  // req-205 test edit (DEC-115): History's Back is now "/schedule", so the main screen's
+  // anchor is that Back. Assertions unchanged.
+  const main = body.slice(body.indexOf('  return (\n    <Screen>\n      <Back to="/schedule" />'))
   assert.ok(main.length > 0, 'History main screen not found')
   assert.match(main, /<Row to="\/settings">Backup &amp; data<\/Row>/)
   // unconditional: the row is not inside the months / inProgress conditionals
@@ -99,14 +101,20 @@ test('AC3 failure case: History always shows "Backup & data ›", outside every 
   assert.match(main.slice(row), /^<Row to="\/settings">Backup &amp; data<\/Row>\s*<\/List>\s*<\/Screen>/)
 })
 
-test('History keeps its Back to "/" (not top-level, DEC-015)', () => {
+// req-205 test edit (DEC-115): History's parent is now the Schedule, so its Back is "/schedule"
+// (was "/"). Still a Back (not top-level, DEC-015).
+test('History keeps a Back, now to "/schedule" (not top-level, DEC-015)', () => {
   const body = fnBody(list, 'History')
-  assert.match(body, /<Screen>\n\s*<Back to="\/" \/>\n\s*<Title>History<\/Title>/)
+  assert.match(body, /<Screen>\n\s*<Back to="\/schedule" \/>\n\s*<Title>History<\/Title>/)
 })
 
 test('first-run Home drops the Schedule and Settings rows; Import stays', () => {
   const start = today.indexOf('if (isFirstRun(store)) {')
-  const end = today.indexOf('<Title>Today</Title>\n      {loop > 1')
+  // req-205 test edit: the normal Home's visible `<Title>Today</Title>` is gone (DEC-114), so
+  // the end anchor is its hidden h1. Without this the anchor was -1 and the slice ran to the end
+  // of the file. Assertions unchanged.
+  const end = today.indexOf('<h1 className="ui-visually-hidden">Today</h1>')
+  assert.ok(end > start)
   const firstRun = today.slice(start, end)
   assert.doesNotMatch(firstRun, /<Row to="\/settings">/)
   assert.doesNotMatch(firstRun, /<Row to="\/schedule">/)
@@ -161,7 +169,10 @@ describe('rendered App — no dock; Today link on deep screens (DEC-112)', () =>
   const SCREENS = [
     ['/', 'Home', 0],
     ['/routines', 'the Workouts list', 0],
-    ['/history', 'History', 0],
+    // req-205 test edit (DEC-115): History's Back is "/schedule" now, so it gets the Today
+    // link (was 0); the Schedule's Back is "/", so it has none (new row).
+    ['/history', 'History', 1],
+    ['/schedule', 'the Schedule', 0],
     ['/routines/sess-upper', 'a routine detail', 1],
     ['/settings', 'Backup & data', 1],
   ]
@@ -174,10 +185,12 @@ describe('rendered App — no dock; Today link on deep screens (DEC-112)', () =>
     })
   }
 
-  it('the Workouts list and History have a Back to "/" (no longer top-level, DEC-015)', async () => {
-    for (const hash of ['/routines', '/history']) {
+  // req-205 test edit (DEC-115): History's Back is "/schedule" (was "/"), and the Schedule's
+  // is "/" (was "/routines"). The Workouts list is unchanged.
+  it('the Workouts list and the Schedule have a Back to "/", History to "/schedule" (DEC-015, DEC-115)', async () => {
+    for (const [hash, back] of [['/routines', '#/'], ['/schedule', '#/'], ['/history', '#/schedule']]) {
       await open(hash)
-      assert.equal(backLink()?.getAttribute('href'), '#/', hash)
+      assert.equal(backLink()?.getAttribute('href'), back, hash)
       await view.unmount()
       view = null
     }

@@ -20,7 +20,7 @@ const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve,
 
 // req-204 test edit: the weekRows describe (6 tests) is deleted with weekRows itself —
 // req-204 §3 removed Home's "This week" and its only caller. Its successor,
-// upcomingWorkouts, is tested in req-204.test.js (loop-aware names, 2 slots, rest skipped).
+// upcomingWorkouts, was tested in req-204.test.js; req-205 replaced it with comingDays (req-205.test.js).
 
 // ── Screens (the whole App) ──────────────────────────────────────────────────────────
 const seed = JSON.parse(read('db.json'))
@@ -67,7 +67,8 @@ describe('req-200 — Home', () => {
     // keeps its place: after today's block, before the History link.
     const block = view.container.querySelector('.ui-today-workout')
     assert.ok(block.compareDocumentPosition(cont[0]) & 4, 'Continue follows today\'s block')
-    assert.ok(cont[0].compareDocumentPosition(link('History›')) & 4, 'and sits above History')
+    // req-205 test edit (DEC-115): Home's last row is "Schedule ›" (was "History ›").
+    assert.ok(cont[0].compareDocumentPosition(link('Schedule›')) & 4, 'and sits above Schedule')
   })
 })
 

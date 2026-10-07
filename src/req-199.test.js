@@ -65,7 +65,9 @@ describe('req-199 — /routines is the plain list (no segmented control)', () =>
     assert.match(view.text(), /Upper Body/)
     assert.ok(view.all('button').filter((b) => b.textContent.trim() === 'Start').length >= 4, 'Start on every startable row')
     assert.equal(link('Your exercises ›')?.getAttribute('href'), '#/exercises')
-    assert.equal(link('Whole plan ›')?.getAttribute('href'), '#/schedule')
+    // req-205 test edit (DEC-115): "Whole plan ›" is removed from this list (was: links
+    // /schedule). Every other assertion unchanged.
+    assert.equal(link('Whole plan ›'), null)
     assert.equal(backHref(), '#/', 'Back home')
   })
 
@@ -90,13 +92,15 @@ describe('req-199 — /routines is the plain list (no segmented control)', () =>
     assert.equal(window.location.hash, '#/routines')
   })
 
-  it('"Whole plan ›" opens the Schedule screen; its Back returns to /routines', async () => {
-    await open('/routines')
-    await tap(link('Whole plan ›'))
+  // req-205 test edit (DEC-115): the Schedule is now reached from Home's "Schedule ›" (was
+  // "Whole plan ›" here), so its Back returns Home and there is no Today link (Back is "/").
+  it('Home\'s "Schedule ›" opens the Schedule screen; its Back returns Home (no Today link)', async () => {
+    await open('/')
+    await tap(link('Schedule›'))
     assert.equal(window.location.hash, '#/schedule')
     assert.match(view.text(), /Loop · 1 week/)
-    assert.equal(backHref(), '#/routines')
-    assert.equal(link('Today')?.getAttribute('href'), '#/')
+    assert.equal(backHref(), '#/')
+    assert.equal(link('Today'), null)
   })
 
   it('AC2: a routine on no schedule starts in 2 taps from Home (activeWorkout set in v9)', async () => {
