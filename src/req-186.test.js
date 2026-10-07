@@ -191,8 +191,9 @@ describe('acceptance 3 / 8 — set list rows', () => {
       rows.map((r) => [r.status, r.text, r.highlighted]),
       [
         ['done', '1 · 22.5 kg × 9', false],
-        ['current', '2 · 20 kg × 8', true],
-        ['upcoming', '3 · 25 kg × 8', false],
+        // req-210 test edit: was × 8 — a uniform 8/8/8 plan now carries set 1's logged 9 reps (DEC-117 §3).
+        ['current', '2 · 20 kg × 9', true],
+        ['upcoming', '3 · 25 kg × 9', false],
       ],
     )
     assert.equal(rows[0].setIndex, 0)

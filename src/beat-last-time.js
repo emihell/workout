@@ -6,8 +6,8 @@
 // have (DESIGN §1): no prior workout, no match for an exercise (newly added), or an
 // unparseable axis all contribute no win rather than a guess.
 //
-// This is a NEW sibling to workoutVolume/workoutSummaryStats, not a change to them —
-// req-84's auto-complete "vs last time" volume summary still uses those untouched.
+// req-210 (DEC-117 §1) — improvementPct puts a number on the same axis: the small "↑ N%"
+// on the in-workout list and the finish screens. Never in History (DEC-050).
 import { isWeightedType } from './ids.js'
 import { isSkippedSet } from './workout-log.js'
 import { exerciseById } from './model.js'
@@ -22,7 +22,7 @@ function num(value) {
 }
 
 // The working sets logged for one exercise in a workout — warm-up sets excluded, the
-// same rule workoutVolume applies (setType === 'wu'). Matched by exercise id, not name
+// warm-up rule the summary stats use (setType === 'wu'). Matched by exercise id, not name
 // or position, so an exercise that moved in the routine still matches.
 // req-111 / DEC-053 — skipped sets (weight 0, reps 'skipped') are excluded on both
 // sides: they hold no data, so a skipped week can't hand today a false "heavier", and an
@@ -158,6 +158,66 @@ export function beatLastTimeWins(current, prior, exercises = []) {
     if (kind) wins.push({ exerciseId, name: exerciseNameFor(current, exerciseId, exercises), kind })
   }
   return wins
+}
+
+// req-210 / DEC-117 §1 — the small "↑ N%" per exercise: how much better this time than last,
+// on the SAME axis compareExercise uses (DEC-050):
+//   timed     → best duration;
+//   weighted  → top-set kg, or — when the top kg is the same — the reps at that kg;
+//   otherwise → best reps (bodyweight).
+// (this − last) / last, rounded to a whole number; a real gain that rounds to 0 reads 1, so
+// a shown arrow never says "↑ 0%". Null on no improvement (equal or worse — never a down
+// arrow), on no sets either side, or when last's axis value is 0 (no base to divide by).
+// Pure: the inputs are the two sides' WORK sets (warm-ups and skipped sets already out, as
+// workSetsFor gives them) and the exercise type.
+export function improvementPct(thisSets, lastSets, type) {
+  const kind = compareExercise(thisSets || [], lastSets || [], type)
+  if (!kind) return null
+  let cur
+  let prev
+  if (kind === 'longer') {
+    cur = maxBy(thisSets, (s) => num(s.durationSec))
+    prev = maxBy(lastSets, (s) => num(s.durationSec))
+  } else if (isWeightedType(type)) {
+    const a = bestWeighted(thisSets)
+    const b = bestWeighted(lastSets)
+    ;[cur, prev] = kind === 'heavier' ? [a.w, b.w] : [a.r, b.r]
+  } else {
+    cur = maxBy(thisSets, (s) => num(s.reps))
+    prev = maxBy(lastSets, (s) => num(s.reps))
+  }
+  if (!(prev > 0)) return null
+  return Math.max(1, Math.round(((cur - prev) / prev) * 100))
+}
+
+// req-210 — improvementPct for one exercise of a workout, against the same prior source as
+// beatLastTimeWins (the previous finished same-routine workout(s), same exercise id,
+// DEC-050 / DEC-053). Null when there is no prior or no improvement.
+export function exerciseImprovementPct(current, prior, exerciseId, exercises = []) {
+  const priors = (Array.isArray(prior) ? prior : [prior]).filter(Boolean)
+  if (!current || !priors.length) return null
+  return improvementPct(
+    workSetsFor(current, exerciseId),
+    priorWorkSetsFor(priors, exerciseId),
+    exerciseTypeFor(current, exerciseId, exercises),
+  )
+}
+
+// req-210 — every improved exercise in workout order: [{ exerciseId, name, pct }]. The
+// finish screens list these; an exercise that did not beat last time is absent.
+export function improvementList(current, prior, exercises = []) {
+  if (!current) return []
+  const out = []
+  for (const exerciseId of orderedExerciseIds(current)) {
+    const pct = exerciseImprovementPct(current, prior, exerciseId, exercises)
+    if (pct != null) out.push({ exerciseId, name: exerciseNameFor(current, exerciseId, exercises), pct })
+  }
+  return out
+}
+
+// req-210 — the arrow's text: "↑ 17%".
+export function improvementText(pct) {
+  return pct == null ? '' : `↑ ${pct}%`
 }
 
 const PHRASE = {

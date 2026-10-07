@@ -156,10 +156,11 @@ async function setup(state = seeded()) {
 }
 
 describe('AC2/AC3 the days and name step (rendered)', () => {
-  it('2 days preselect today and +3; A/B names prefilled #1/#2; Tue/Fri + "Legs" saves as picked', async () => {
+  // req-210 test edit: was "2 days preselect today and +3" — no day is pre-picked now (DEC-117 §6).
+  it('2 days pick nothing; A/B names prefilled #1/#2; Tue/Fri + "Legs" saves as picked', async () => {
     await setup()
     const today = new Date().getDay()
-    assert.deepEqual(pressed().sort(), [SHORT[today], SHORT[(today + 3) % 7]].sort())
+    assert.deepEqual(pressed(), [])
     await tap(view.all('label.ui-check').find((n) => n.textContent.trim() === 'Two workouts, A and B').querySelector('input'))
     assert.equal(field('Name A').value, 'New workout #1')
     assert.equal(field('Name B').value, 'New workout #2')
@@ -183,8 +184,14 @@ describe('AC2/AC3 the days and name step (rendered)', () => {
     )
   })
 
+  // req-210 test edit: the chips start empty (DEC-117 §6), so the test ticks its own 2 first;
+  // the 3-ticked / 1-ticked failure half is unchanged.
   it('failure case: 3 days ticked for a 2-day plan → Save disabled + "Pick 2 days"; 1 ticked → the same', async () => {
     await setup()
+    assert.equal(button('Save').disabled, true)
+    assert.match(view.text(), /Pick 2 days/)
+    await tap(chip('Mon'))
+    await tap(chip('Thu'))
     const extra = SHORT.find((label) => !pressed().includes(label))
     await tap(chip(extra))
     assert.equal(pressed().length, 3)
@@ -204,6 +211,9 @@ describe('AC2/AC3 the days and name step (rendered)', () => {
     await setup(seeded([{ id: 'r1', name: 'New workout #1', focus: 'Machines', exercises: [] }]))
     assert.equal(field('Name').value, 'New workout #2')
     await type(field('Name'), '')
+    // req-210 test edit: tick the 2 days first — nothing is pre-picked any more (DEC-117 §6).
+    await tap(chip('Tue'))
+    await tap(chip('Fri'))
     await tap(button('Save'))
     assert.deepEqual(stored().routines.map((r) => r.name), ['New workout #1', 'New workout #2'])
   })

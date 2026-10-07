@@ -40,7 +40,8 @@ describe('req-128 2: the summary compares against the latest prior with anything
     const prior = summaryPriorWorkout(active, [skipped, logged], [])
     assert.equal(prior.id, 'w2')
     const s = workoutSummaryStats(active, prior, Date.now())
-    assert.equal(s.deltas.volume, 500 - 800)
+    // req-210 test edit: the volume delta is gone (DEC-117 §4); the prior choice is still pinned by sets.
+    assert.equal(s.deltas.volume, undefined)
     assert.equal(s.deltas.sets, 1 - 2)
   })
   it('only all-skipped priors → null prior → no deltas', () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
-import { beatLastTimeLine, beatLastTimeWins } from '../../beat-last-time'
+import { beatLastTimeLine, beatLastTimeWins, improvementList } from '../../beat-last-time'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { Back } from '../shared'
@@ -9,7 +9,7 @@ import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from
 import { anythingLogged, loggedSetCount } from '../../workout-log'
 import { finishSkippedLines } from '../../finish-unfinished.js'
 import { activeFeel, activeNote } from '../../workout-note.js'
-import { NotInWorkout } from './helpers'
+import { ImprovementLines, NotInWorkout } from './helpers'
 import { abandonWorkout, isActiveFor } from './workout-helpers.js'
 import { WorkoutPill } from './rest'
 
@@ -53,6 +53,8 @@ function FinishScreen({ routineId }) {
   // so an exercise entirely skipped last time compares against the one before (DEC-053).
   const priors = previousSameRoutineWorkouts(active, store.workouts, store.routines)
   const beatLine = beatLastTimeLine(beatLastTimeWins(active, priors, store.exercises))
+  // req-210 (DEC-117 §1) — per exercise, the small "↑ N%" on the same axis and source.
+  const improvements = improvementList(active, priors, store.exercises)
 
   const name = active?.snapshot?.routineName
 
@@ -75,6 +77,7 @@ function FinishScreen({ routineId }) {
           {beatLine}
         </p>
       ) : null}
+      <ImprovementLines list={improvements} />
       {empty ? (
         <p className="ui-sub" role="status">
           <strong>Nothing logged.</strong> No set in this session was logged — abandon it, or save it anyway.

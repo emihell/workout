@@ -1,7 +1,7 @@
 import { formatSetLine, roleTag, WITH_WARMUP } from '../../ids'
 import { childLink, go } from '../../route'
 import { exerciseById, routineById } from '../../model.js'
-import { durationLabel, groupSetsByExercise, workoutVolume } from '../../history-queries.js'
+import { durationLabel, groupSetsByExercise } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-log'
 import { Back, Missing } from '../shared'
@@ -54,7 +54,7 @@ export function HistoryDetail({ workoutId, from = null }) {
           // req-116 — skipped sets aren't counted, matching Finish and the summary.
           // req-177 — "1 set" / "N sets".
           `${loggedSetCount(workout)} ${loggedSetCount(workout) === 1 ? 'set' : 'sets'}`,
-          `${workoutVolume(workout).toLocaleString('en-US')} kg lifted`,
+          // req-210 (DEC-117 §4) — no "… kg lifted" here any more.
         ]
           .filter(Boolean)
           .join(' · ')}

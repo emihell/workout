@@ -167,7 +167,8 @@ describe('AC2 — the summary (rendered)', () => {
     const w = active([item('a')], [logged('a'), logged('a', { reps: 'skipped' })])
     view = await render(h(AutoCompleteSummary, { routineId: 'r', active: w, store, countdown: false, onCancel: () => cancelled++ }))
     assert.equal(view.text().includes('Finishing in'), false)
-    assert.match(view.text(), /Total lifted \(all sets added up\)/)
+    // req-210 test edit: was a match on "Total lifted (all sets added up)" — the row is removed (DEC-117 §4).
+    assert.equal(/lifted/i.test(view.text()), false)
     await act(async () => mock.timers.tick(12000))
     assert.equal(calls.finish, 0, 'nothing finished after 12 s')
     assert.deepEqual(view.all('button').map((b) => b.textContent.trim()), ['Finish', 'Keep going'])

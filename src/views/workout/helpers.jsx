@@ -4,6 +4,7 @@ import { go, hashPath } from '../../route'
 import { routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { Missing } from '../shared'
+import { improvementText } from '../../beat-last-time.js'
 
 // The in-workout screens' shared COMPONENTS. req-165 (F-LINT-1) — their shared plain
 // helpers moved to ./workout-helpers.js, so this file exports components only (Fast
@@ -31,4 +32,17 @@ export function NotInWorkout({ routineId }) {
     }
   })
   return outcome === 'missing' ? <MissingItem /> : null
+}
+
+// req-210 (DEC-117 §1) — the finish screens' per-exercise "↑ N%": one quiet line per exercise
+// that beat last time (improvementList); nothing for one that didn't, nothing at all when
+// none did.
+export function ImprovementLines({ list }) {
+  if (!list?.length) return null
+  return list.map((entry) => (
+    <p key={entry.exerciseId} className="ui-sub ui-improvement">
+      {entry.name}
+      <span className="ui-arrow">{improvementText(entry.pct)}</span>
+    </p>
+  ))
 }

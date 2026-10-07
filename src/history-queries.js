@@ -259,16 +259,7 @@ export function historyPrescription(workouts, exerciseId) {
   }
 }
 
-export function workoutVolume(workout) {
-  let total = 0
-  for (const s of workout.sets || []) {
-    if (s.setType === 'wu') continue
-    const w = Number(s.weight) || 0
-    const r = Number(s.reps) || 0
-    total += w * r
-  }
-  return total
-}
+// req-210 (DEC-117 §4) — workoutVolume (Σ kg × reps) was removed with Total lifted.
 
 
 export function durationLabel(startedAt, finishedAt) {
@@ -294,17 +285,15 @@ function workoutMinutes(startedAt, end) {
 // of `prior` (summaryPriorWorkout, req-128) is separate and equally testable.
 // req-116 — `sets` counts only non-skipped sets (loggedSetCount), on both sides of the
 // delta, so the summary matches the Finish screen and compares like with like.
+// req-210 (DEC-117 §4) — no volume any more (Total lifted removed): duration and sets.
 export function workoutSummaryStats(active, prior, now) {
-  const volume = workoutVolume(active)
   const duration = workoutMinutes(active?.startedAt, now)
   const sets = loggedSetCount(active)
-  if (!prior) return { volume, duration, sets, deltas: null }
+  if (!prior) return { duration, sets, deltas: null }
   return {
-    volume,
     duration,
     sets,
     deltas: {
-      volume: volume - workoutVolume(prior),
       duration: duration - workoutMinutes(prior.startedAt, new Date(prior.finishedAt).getTime()),
       sets: sets - loggedSetCount(prior),
     },

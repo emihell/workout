@@ -531,6 +531,16 @@ html:has(.ui-picker-bar) {
   color: var(--ui-ink-2);
 }
 
+/* req-210 (DEC-117 §1) — the small muted "↑ N%" beside an exercise that beat last time
+ * (in-workout list, finish screens). Same quiet caption treatment as the role tag. */
+.ui-arrow {
+  font-size: var(--ui-text-caption);
+  font-weight: 400;
+  color: var(--ui-ink-2);
+  margin-left: var(--ui-s1);
+  white-space: nowrap;
+}
+
 /* req-103 — a two-line row label: primary line (e.g. the exercise name link) over a
  * small muted meta line. Used by the routine editor's exercise rows; the action slot
  * (Up/Down) stays to the right via the row's space-between. */

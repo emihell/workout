@@ -3,12 +3,14 @@ import { go } from '../../route'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { defaultBeep } from '../../rest-cue.js'
-import { summaryPriorWorkout, workoutSummaryStats } from '../../history-queries.js'
+import { previousSameRoutineWorkouts, summaryPriorWorkout, workoutSummaryStats } from '../../history-queries.js'
+import { improvementList } from '../../beat-last-time.js'
+import { ImprovementLines } from './helpers'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
 
 // req-84 — auto-complete a finished routine. When every exercise is done the overview
-// mounts this instead of the list: a "great job" summary (volume/duration/sets, each
+// mounts this instead of the list: a "great job" summary (duration/sets — req-210 dropped volume — each
 // with a delta vs the previous SAME-routine workout when one exists) and a ~10s
 // countdown that auto-commits the finish. The finish it writes is identical to the
 // manual Finish screen's (the active Note and Feel), so this adds no new
@@ -50,6 +52,11 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
     const prior = summaryPriorWorkout(active, store.workouts, store.routines)
     return workoutSummaryStats(active, prior, mountNow)
   })
+  // req-210 (DEC-117 §1) — per exercise "↑ N%" vs the previous same-routine workout(s), the
+  // Finish screen's source (DEC-050). Captured at mount like the stats.
+  const [improvements] = useState(() =>
+    improvementList(active, previousSameRoutineWorkouts(active, store.workouts, store.routines), store.exercises),
+  )
 
   // Auto-commit on expiry. committedRef guards the tick from firing finishWorkout
   // twice. Cancel/Edit unmount this component (clearing the interval) before it fires.
@@ -85,8 +92,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
   const name = active?.snapshot?.routineName || 'Workout'
   const d = stats.deltas
   const rows = [
-    // req-189 — grouped as History's "… kg lifted"; req-191 §7 (unconfirmed wording) says what it sums.
-    { label: 'Total lifted (all sets added up)', value: `${Number(stats.volume || 0).toLocaleString('en-US')} kg`, delta: d ? `${signed(d.volume)} kg` : null },
+    // req-210 (DEC-117 §4) — the Total lifted row and its delta are gone.
     { label: 'Duration', value: `${stats.duration} min`, delta: d ? `${signed(d.duration)} min` : null },
     { label: 'Sets', value: String(stats.sets), delta: d ? signed(d.sets) : null },
   ]
@@ -102,6 +108,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
           </Row>
         ))}
       </List>
+      <ImprovementLines list={improvements} />
       {countdown ? (
         <p className="ui-sub" aria-live="polite">
           Finishing in {secondsLeft}s…

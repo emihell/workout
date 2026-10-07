@@ -131,7 +131,8 @@ describe('req-177 AC5 — "1 set" in the Finish summary and History', () => {
     assert.equal(view.text().includes('1 sets'), false)
     await act(async () => captured.store.finishWorkout({}))
     await mount(h(HistoryDetail, { workoutId: captured.store.workouts[0].id }))
-    assert.match(view.text(), / · 1 set · /)
+    // req-210 test edit: was / · 1 set · / — "… kg lifted" no longer follows the set count (DEC-117 §4).
+    assert.match(view.text(), / · 1 set(?!s)/)
     assert.equal(view.text().includes('1 sets'), false)
   })
 
