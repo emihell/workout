@@ -248,7 +248,9 @@ async function main() {
       await waitText(page, `${SKIP_EXERCISE} — skipped`)
       // The per-exercise sets screen shows the logged value as the app displays it.
       await clickSelector(page, `a[href="#/history/${workout.id}/exercise/${logKey}?from=${encodeURIComponent(detail)}"]`)
-      await waitText(page, '22.5')
+      // req-209 smoke edit — was '22.5', which the detail now shows inline too (so it matched
+      // before the exercise screen opened); the exercise screen's own set line.
+      await waitText(page, 'Warm-up set · 22.5 kg × ')
     })
     await step('Back → Back from the exercise returns to the month list (req-171)', async () => {
       await clickLink(page, '‹ Back')
