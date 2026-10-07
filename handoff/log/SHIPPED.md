@@ -2404,3 +2404,15 @@ read the test edits (format swaps only).
 
 Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 106 test file(s), and the build all passed.` This
 branch's own smoke is green (Planner, throwaway worktree). Screenshots `r209-*.png`; Emilio: "yes".
+
+## req-210 — "↑ N%" progress arrow; reps carry on uniform plans; Total lifted removed; setup days start empty  (2026-10-07)
+
+**req-210** (DEC-117 §1/3/4/6, DEC-118).
+- `improvementPct` uses DEC-050's axis. The arrow shows on done list rows and the finish/auto-complete screens.
+- `setLogSeed` gains `uniformReps`. `workoutVolume`, the old Heavier line and the pre-picked days are gone.
+- 4 commits, `e1291ba`…`4cc7d67`. Test edits are named in the report.
+
+Gate (ui + `workout-log.js`): `check: green — lint, skills, no import cycles, 107 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree).
+
+Reviewer (independent): "No blockers.", 1 nit fixed. Emilio: "do what you recommend". `reports/req-210.md`.
