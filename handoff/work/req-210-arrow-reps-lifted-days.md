@@ -1,6 +1,6 @@
 # req-210 — progress arrow "↑ N%"; reps carry on uniform plans; Total lifted removed; setup days start empty
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-117 §1, §3, §4 and §6.
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-210` (`e1291ba`…`4cc7d67`, 4 commits).** (2026-10-07). **Lane: ui.** From DEC-117 §1, §3, §4 and §6.
 
 **Trigger file:** `workout-log.js` (the reps prefill). An independent reviewer runs before merge (DEC-057). Emilio sees
 screenshots before merge (L-050).
@@ -66,3 +66,14 @@ screenshots before merge (L-050).
 4. **Browser:** no "lifted" text on the finish screen or the History detail.
 5. **Browser:** setup → 2 days → no chip selected → Save disabled → tap Tue, Fri → Save enabled.
 6. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio approved the screenshots** ("do what you recommend").
+- **DEC-118:** the old "↑ Heavier on X" line is removed (`beatLastTimeLine` and `.ui-beat` deleted).
+- **A real gain that rounds to 0** shows "↑ 1%".
+- **No arrow** when the prior is 0.
+- **Changing the day count** clears the chips.
+- **Independent reviewer (DEC-057, `workout-log.js`):** "No blockers."
+  - It probed warm-ups, Previous, skipped sets, timed and cardio, and look-alike targets.
+  - The 1 title nit is fixed.
+  - **Latent:** the same exercise in two items shares one %.

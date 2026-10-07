@@ -1941,3 +1941,13 @@ Folded into req-205 mid-build.
 6. **Setup days are not pre-picked.** Emilio: "why prepick days? sounds irritating, let user choose days, we have no idea when
    a user wants to train". The chips start empty, and Save unlocks at exactly N. **Amends DEC-116.** DEC-105's "starts today
    if today is chosen" stays.
+
+## DEC-118 — the finish screen's "↑ Heavier on X" line goes; the per-exercise "X ↑ N%" lines replace it  (Emilio, 2026-10-07, amends DEC-050's surface)
+
+The req-210 screenshot showed both lines saying the same thing. Planner recommended keeping only the new arrow lines, so the
+finish screen matches the list. Emilio: "do what you recommend". DEC-050's comparison rule (`compareExercise`) stays: the
+arrow is computed with it.
+
+**DEC-050 cross-reference (Planner, 2026-10-07):** DEC-050's sentence "req-84's total-volume 'vs last time' on the auto-complete
+screen … stays" is overridden by DEC-117 §4 (Total lifted removed), and its finish-screen line by DEC-118. The comparison rule
+itself stands.
