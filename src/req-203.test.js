@@ -264,7 +264,8 @@ describe('§4 Backup & data is plain', () => {
     try {
       await open('/settings')
       const text = view.text()
-      assert.match(text, /Saves all your workouts and history to a file on this device\. Open it with Import to restore\./)
+      // req-203 copy fix (Planner): the line names the button ("Restore from a backup"), was "Open it with Import to restore."
+      assert.match(text, /Saves all your workouts and history to a file on this device\. Use Restore from a backup to bring it back\./)
       assert.ok(text.indexOf('Saves all') < text.indexOf('Back up now'), 'the line sits above the button')
       assert.ok(view.all('label').some((l) => l.textContent.trim() === 'Restore from a backup'))
       await tap(buttons('Back up now')[0])

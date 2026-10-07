@@ -12,8 +12,8 @@ function backupLines(summary) {
 }
 
 // req-203 §4 — the one line above "Back up now" (Lena run 3: "Export" / "Import" did not
-// say what they do). Wording as specced.
-export const BACKUP_LINE = 'Saves all your workouts and history to a file on this device. Open it with Import to restore.'
+// say what they do). Names the restore button as it reads (Planner, req-203 copy fix).
+export const BACKUP_LINE = 'Saves all your workouts and history to a file on this device. Use Restore from a backup to bring it back.'
 
 export function Settings() {
   const store = useStore()
