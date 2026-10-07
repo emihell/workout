@@ -108,7 +108,7 @@ test('History keeps a Back, now to "/schedule" (not top-level, DEC-015)', () => 
   assert.match(body, /<Screen>\n\s*<Back to="\/schedule" \/>\n\s*<Title>History<\/Title>/)
 })
 
-test('first-run Home drops the Schedule and Settings rows; Import stays', () => {
+test('first-run Home drops the Settings row; Import stays; Schedule replaces History (req-206)', () => {
   const start = today.indexOf('if (isFirstRun(store)) {')
   // req-205 test edit: the normal Home's visible `<Title>Today</Title>` is gone (DEC-114), so
   // the end anchor is its hidden h1. Without this the anchor was -1 and the slice ran to the end
@@ -117,9 +117,11 @@ test('first-run Home drops the Schedule and Settings rows; Import stays', () => 
   assert.ok(end > start)
   const firstRun = today.slice(start, end)
   assert.doesNotMatch(firstRun, /<Row to="\/settings">/)
-  assert.doesNotMatch(firstRun, /<Row to="\/schedule">/)
+  // req-206 test edit: first-run's "History" row became "Schedule" (DEC-115, as on the main Home),
+  // so the Schedule row is now asserted present and the History row absent (was: the reverse).
+  assert.match(firstRun, /<Row to="\/schedule">Schedule<\/Row>/)
   assert.match(firstRun, /<Row to="\/routines">Workouts<\/Row>/)
-  assert.match(firstRun, /<Row to="\/history">History<\/Row>/)
+  assert.doesNotMatch(firstRun, /<Row to="\/history">/)
   assert.match(firstRun, /<FileButton\s+label="Import"/)
 })
 

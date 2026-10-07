@@ -49,7 +49,7 @@ async function tap(node) {
   await flush()
 }
 const stored = () => JSON.parse(localStorage.getItem('workout-mvp-v9'))
-const comingUpLinks = () => view.all('.ui-section + .ui-list a.ui-row__link')
+const comingUpLinks = () => view.all('.ui-home-bottom > p + .ui-list a.ui-row__link') // req-206 test edit: no "Coming up" header; the rows' list follows the "Workouts ›" paragraph
 
 // req-204 test edit (DEC-113): three Home tests are deleted with the "This week" list they
 // tested — "order … This week (7 rows)", "each row: date · names or Rest; today marked"
