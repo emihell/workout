@@ -1,7 +1,8 @@
 # req-205 — Home: 6 days forward with rest days, no title, no gap between sections
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-114 (amends DEC-113 / req-204). **Emilio sees a screenshot before
-merge (L-050).**
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-205` (`bc47f17`…`a406313`, 3 commits).** (2026-10-07). **Lane: ui.** From DEC-114 (amends DEC-113 / req-204). **Emilio sees a screenshot before
+merge (L-050).** **+ DEC-115, added mid-build:** Home's last row is "Schedule ›"; Schedule ends with "History ›";
+History's Back → /schedule; the Workouts list drops "Whole plan ›".
 
 ## Code today (main, after req-204)
 - **`views/Today.jsx`:** title "Today" → "Workouts ›" → bottom-aligned group (Coming up via `upcomingWorkouts(schedule,
@@ -34,3 +35,12 @@ merge (L-050).**
    has no horizontal scroll, and nothing overlaps. Report whether Start is visible at scrollY 0.
 4. Browser: a Rest row opens its dated day screen showing "None." and "Add workout ›".
 5. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio saw the screenshot and said "ok"** (L-050 gate).
+- The "Coming up" header is kept.
+- **No schedule:** 6 grey Rest rows; req-204 hid the section.
+- **A 2-week loop** keeps a "Week x of y" line above "Workouts ›". At 375×667 Start is then 16 px below the fold.
+- A day whose only workouts are archived reads "Rest".
+- **Follow-up:** first-run Home still has a visible "Today" title and a "History" row. It should become "Schedule" (DEC-115),
+  in req-206.
