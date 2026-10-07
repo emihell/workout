@@ -82,3 +82,5 @@ Emilio: "yes, you have to change it in the actual schedule view for permanent ch
   - every-week Change day drops that slot's moves;
   - the sheet copy "Only this week — the Schedule stays as it is.";
   - the "moved from Fri" sub-line.
+
+- **Emilio: "merge"** (after two backup reminders; whether a backup was made isn't confirmed).
