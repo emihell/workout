@@ -2360,3 +2360,13 @@ Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 102
 branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok" on the screenshot.
 
 No trigger files. `reports/req-205.md`.
+
+## req-206 — Home: "Schedule ›" is the same link as "Workouts ›"; no "Coming up" header; first-run says Schedule  (2026-10-07)
+
+**req-206**.
+- `Today.jsx` only. 2 commits, `8ef0729`…`9ecbf00`. 6 test edits, named in the report.
+
+Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 103 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
+
+`reports/req-206.md`.

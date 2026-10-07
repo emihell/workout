@@ -29,3 +29,8 @@ first-run Home still shows History instead of Schedule (DEC-115).
    scrollY 0.
 3. First-run Home (empty origin) shows "Schedule", not "History".
 4. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio saw the screenshot and said "ok"** (L-050).
+- First-run's Schedule stays a `Row`, matching its Workouts row.
+- The gap from "Workouts ›" to the rows is 16 px. The spare space above is 147 px at 390×844.
