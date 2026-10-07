@@ -1,6 +1,6 @@
 # req-202 — small cuts from the organisation review
 
-**Status: READY** (2026-10-07). **Lane: ui.** From req-196 Q6 and review F17. After req-201. Each item is independent.
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-202` (`4e6171b`…`a6d0f92`, 5 commits).** (2026-10-07). **Lane: ui.** From req-196 Q6 and review F17. After req-201. Each item is independent.
 
 ## Scope
 1. **Routine detail** (`Routine.jsx`): the Up/Down buttons (18 for 9 exercises, review s07) hide behind a **"Reorder"** toggle.
@@ -34,3 +34,15 @@
 3. **Failure case:** first setup's steps show no bar. Leaving setup through its own Back still works, and the bar returns on
    Home.
 4. `./check` green, and the smoke test passes.
+
+## Built — calls `(unconfirmed)`
+- **Item 4 was not built.** My spec was stale: DEC-112 had already removed the bar. The setup steps show Back plus the Today
+  link.
+- **The Reorder toggle** sits right of "Add exercise ›", hidden for fewer than 2 exercises. It reads "Done" while active,
+  which is an off-vocabulary verb (DEC-042), but it ends a mode and commits nothing.
+- "Edit ›" is right-aligned in the title row.
+- The back link falls back to "Workout".
+- The in-workout overview row also reads "with warm-up".
+- **"N scheduled days"** counts distinct days (`summary.scheduledDays`).
+- **Item 7** keeps `from` on the slot page only; its sub-screens go back to the bare slot page.
+- **Loose end:** a warm-up-role row reads "Warm-up · 1 set" just above rows reading "with warm-up · 3 sets".

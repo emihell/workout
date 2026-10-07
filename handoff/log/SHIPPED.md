@@ -2303,3 +2303,18 @@ Planner QA: no "routine" on Home, Workouts, 3 workout details, Exercises, Schedu
 
 `store.jsx` was touched only for the default-name string "Routine" → "Workout" (new records). The diff was read, and the
 copy-only change needed no reviewer. `reports/req-201.md`.
+
+## req-202 — small cuts: Reorder toggle, workout-name back link, "with warm-up", dead bar deleted  (batch 2026-10-07)
+
+**req-202** (req-196 Q6).
+- Up/Down sit behind Reorder. "Edit ›" is by the title. The in-workout Back is "‹ {workout}".
+- "with warm-up" replaces "Warm-up set". `BottomMenu.jsx`, its test and `activeTab` are deleted.
+- A slot opened from Home goes back through its day to Home.
+- "Start a workout"; "N scheduled days".
+- Item 4 was dropped (stale after DEC-112).
+- 5 commits, `4e6171b`…`a6d0f92`.
+
+Gate (ui): `check: green — lint, skills, no import cycles, 99 test file(s), and the build all passed.` The branch's own
+`scripts/smoke.mjs` is green (Planner, in a throwaway worktree). The first agent receipt was false (L-049).
+
+No trigger files, so no reviewer. `reports/req-202.md`.
