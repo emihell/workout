@@ -183,7 +183,8 @@ describe('§1 the day screen from Home', () => {
     assert.equal(view.container.querySelector('.ui-title')?.textContent, longWeekdayDate(TODAY, NOW))
     const done = link('Upper Body · Done ✓ ›')
     assert.ok(done, 'the done row')
-    assert.ok(done.compareDocumentPosition(view.all('button').find((b) => b.textContent === 'Remove')) & 4, 'above the slots')
+    // req-208 test edit: the slot row's control is its "⋯" now (Remove sits behind it).
+    assert.ok(done.compareDocumentPosition(view.all('button').find((b) => b.textContent === '⋯')) & 4, 'above the slots')
     assert.equal(buttons('Start now').length, 0)
     const dayPath = withFrom(`/schedule/0/${TODAY_WD}`, '/')
     assert.equal(done.getAttribute('href'), `#${withFrom('/history/w-today', dayPath)}`)
@@ -229,6 +230,8 @@ describe('§1 the day screen from Home', () => {
     }
     await open('/schedule/1/6?from=%2F', { ...seed, schedule })
     assert.equal(view.container.querySelector('.ui-title + .ui-sub')?.textContent, 'Every Saturday in week 2 of 2')
+    // req-208 test edit: "⋯" → the menu's Remove opens the same confirm. Assertions unchanged.
+    await tap(buttons('⋯')[0])
     await tap(buttons('Remove')[0])
     assert.match(document.body.textContent, /Take Lower Body off Saturdays in week 2\? Your history is kept\./)
     await tap(buttons('Remove').at(-1))

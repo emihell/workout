@@ -74,6 +74,18 @@ export function longWeekdayDate(key, now = new Date()) {
   return new Date(year, month - 1, day).toLocaleDateString(undefined, opts)
 }
 
+// req-208 — the slot row's "⋯" menu (the in-workout row menu's pattern, req-188): the
+// workout's name as the title, then Change day and Remove. Each opens its own sheet as before.
+export function slotMenuSheet(name) {
+  return {
+    title: name,
+    choices: [
+      { value: 'change', label: 'Change day' },
+      { value: 'remove', label: 'Remove' },
+    ],
+  }
+}
+
 // req-207 (DEC-116) — "Change day": the sheet that moves a slot to another weekday of the
 // same loop week (removeSlot + addSlot). The 7 weekdays Mon–Sun, the current one marked
 // (picking it changes nothing); a day that already has this workout in this loop week is

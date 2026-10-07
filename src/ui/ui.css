@@ -475,14 +475,18 @@ html:has(.ui-picker-bar) {
 .ui-row__chev {
   overflow-wrap: normal;
 }
-/* req-207 — a row with several actions (the day screen's Start now · Change day · Remove):
- * when they don't fit beside the name, they wrap to their own line (right-aligned) instead
- * of squeezing the name to a letter per line [measured: "Lowe/r/Body" at 390px]. */
+/* req-207 — a row with several actions (the day screen's Start now · ⋯, req-208): when they
+ * don't fit beside the name, they wrap to their own line (right-aligned) instead of squeezing
+ * the name to a letter per line [measured: "Lowe/r/Body" at 390px]. req-208: a button label
+ * never wraps inside its button ("Start / now"). */
 .ui-row--wrap {
   flex-wrap: wrap;
 }
 .ui-row--wrap > .ui-row__action {
   margin-left: auto;
+}
+.ui-row--wrap > .ui-row__action .ui-btn {
+  white-space: nowrap;
 }
 /* req-207 — the setup's weekday chips sit a step below the days-a-week control. */
 .ui-seg.ui-seg--days {

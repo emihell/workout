@@ -139,6 +139,9 @@ describe('req-200 — the day screen', () => {
     assert.match(view.container.querySelector('.ui-title')?.textContent, /^Saturday/)
     assert.equal(view.container.querySelector('.ui-title + .ui-sub')?.textContent, 'Every Saturday in week 2 of 2')
     assert.equal(link('Whole plan ›')?.getAttribute('href'), '#/schedule', 'B1: the other weeks are one tap away')
+    // req-208 test edit: Remove sits behind the slot row's "⋯" — open it, pick Remove, then
+    // the confirm sheet's Remove as before. Assertion unchanged.
+    await tap(buttons('⋯')[0])
     await tap(buttons('Remove')[0])
     await tap(buttons('Remove').at(-1)) // the confirm sheet's Remove
     assert.deepEqual(stored().schedule.slots.map((s) => s.id), ['slot-w1-sat'])
