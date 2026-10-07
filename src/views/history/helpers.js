@@ -1,4 +1,4 @@
-import { roleTag } from '../../ids.js'
+import { roleTag, WITH_WARMUP } from '../../ids.js'
 import { isSkippedSet } from '../../workout-log.js'
 import { dateKey } from '../../schedule.js'
 import { compareWorkoutsNewestFirst } from '../../history-queries.js'
@@ -18,7 +18,7 @@ import { compareWorkoutsNewestFirst } from '../../history-queries.js'
 export function historyGroupMeta(snapshotItem, setCount, { skipped = false } = {}) {
   return [
     roleTag(snapshotItem?.role),
-    snapshotItem?.warmup ? 'Warm-up set' : '',
+    snapshotItem?.warmup ? WITH_WARMUP : '',
     skipped ? 'skipped' : `${setCount} set${setCount === 1 ? '' : 's'}`,
   ]
     .filter(Boolean)

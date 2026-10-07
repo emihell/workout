@@ -272,8 +272,8 @@ export function Row({ children, value, action, to, className = '' }) {
   )
 }
 
-// req-198 (DEC-112) — the global bottom menu (req-52 / DEC-036, ui/BottomMenu.jsx) is no
-// longer rendered: Home is the hub, and a deep screen's Back row carries a "Today" link
+// req-198 (DEC-112) — the global bottom menu (req-52 / DEC-036) is gone (its file was
+// deleted in req-202): Home is the hub, and a deep screen's Back row carries a "Today" link
 // (views/shared.jsx Back).
 
 // Banner — a full-width grayscale notice strip (save-failed, error fallback).

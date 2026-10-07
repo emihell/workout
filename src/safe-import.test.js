@@ -94,7 +94,7 @@ describe('req-115 lenient nested nulls still import (same counts as main)', () =
     mutate(state)
     return wrap(state)
   }
-  const full = { routines: 1, exercises: 1, workouts: 1, slots: 1 }
+  const full = { routines: 1, exercises: 1, workouts: 1, slots: 1, scheduledDays: 1 } // req-202 test edit: + scheduledDays
   const cases = {
     'workouts[0].sets: null': edit((s) => { s.workouts[0].sets = null }),
     'workouts[0].snapshot.items: null': edit((s) => { s.workouts[0].snapshot = { routineId: 'rtn-1', items: null } }),
@@ -126,7 +126,7 @@ describe('req-115 commitBackup — success', () => {
     assert.equal(store.calls, 1)
     assert.equal(store.state, result.state)
     assert.deepEqual(store.state, source)
-    assert.deepEqual(result.summary, { routines: 1, exercises: 1, workouts: 1, slots: 1 })
+    assert.deepEqual(result.summary, { routines: 1, exercises: 1, workouts: 1, slots: 1, scheduledDays: 1 }) // req-202 test edit: + scheduledDays
     // and a second export → import is stable
     assert.deepEqual(commitBackup(buildBackup(store.state), fakeStore(null).setState).state, source)
   })

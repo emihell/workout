@@ -63,7 +63,7 @@ describe('req-103 routineItemMeta (routine editor row meta line)', () => {
   })
   it('main is unlabelled; warm-up set, set count and kg join with " · "', () => {
     const meta = routineItemMeta({ role: 'main', warmup: true, sets: 3, suggestedWeights: [20, 22, 24] })
-    assert.equal(meta, 'Warm-up set · 3 sets · 20/22/24\u00a0kg')
+    assert.equal(meta, 'with warm-up · 3 sets · 20/22/24\u00a0kg') // req-202 test edit: was 'Warm-up set'
     assert.ok(!meta.includes('Main'))
   })
   it('non-main roles keep their tag first', () => {

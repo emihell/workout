@@ -156,25 +156,34 @@ export function RoutineDetail({ routineId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
   const nav = pathsFor(routineId, paths)
+  const [reordering, setReordering] = useState(false)
 
   if (!routine) {
     return <Missing>Not found.</Missing>
   }
 
   const meta = nav.extra || ''
+  const canReorder = routine.exercises.length > 1
+  const showMoves = reordering && canReorder
 
   return (
     <Screen>
       <Back to={nav.done} />
-      <Title>{routine.name}</Title>
-      <p className="ui-sub">
-        {meta}
-        {meta ? ' · ' : ''}
+      {/* req-202 (F17, DEC-042) — "Edit" (the name) sits in the title row, opposite the name. */}
+      <div className="ui-split-row ui-split-row--title">
+        <Title>{routine.name}</Title>
         <NavLink to={nav.edit} chevron="forward">Edit</NavLink>
-      </p>
+      </div>
+      {meta ? <p className="ui-sub">{meta}</p> : null}
       <SectionHeader>Exercises</SectionHeader>
-      <p>
+      {/* req-202 (review s07) — Up/Down hide behind "Reorder"; the toggle reads "Done" while they show. */}
+      <p className="ui-split-row">
         <NavLink to={nav.pick} chevron="forward">Add exercise</NavLink>
+        {canReorder ? (
+          <Button aria-pressed={showMoves} onClick={() => setReordering(!showMoves)}>
+            {showMoves ? 'Done' : 'Reorder'}
+          </Button>
+        ) : null}
       </p>
       {routine.exercises.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -184,18 +193,20 @@ export function RoutineDetail({ routineId, paths }) {
             <Row
               key={item.id || `${item.exerciseId}-${index}`}
               action={
-                <>
-                  {/* req-127 — edge moves did nothing; now disabled. */}
-                  <Button disabled={index === 0} onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>
-                    Up
-                  </Button>
-                  <Button
-                    disabled={index === routine.exercises.length - 1}
-                    onClick={() => store.moveRoutineExercise(routine.id, index, 1)}
-                  >
-                    Down
-                  </Button>
-                </>
+                showMoves ? (
+                  <>
+                    {/* req-127 — edge moves did nothing; now disabled. */}
+                    <Button disabled={index === 0} onClick={() => store.moveRoutineExercise(routine.id, index, -1)}>
+                      Up
+                    </Button>
+                    <Button
+                      disabled={index === routine.exercises.length - 1}
+                      onClick={() => store.moveRoutineExercise(routine.id, index, 1)}
+                    >
+                      Down
+                    </Button>
+                  </>
+                ) : null
               }
             >
               {/* req-103 — two lines: name (link to the item editor), then a muted meta line. */}

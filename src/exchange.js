@@ -287,6 +287,9 @@ export function applyBackup(payload) {
       exercises: (state.exercises || []).length,
       workouts: (state.workouts || []).length,
       slots: (state.schedule?.slots || []).length,
+      // req-202 — the import summary reads "N scheduled days": distinct week/weekday pairs,
+      // so a day holding two workouts counts once.
+      scheduledDays: new Set((state.schedule?.slots || []).map((slot) => `${slot.week}-${slot.weekday}`)).size,
     },
   }
 }

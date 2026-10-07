@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, useSyncExternalStore } from 'react'
-import { roleTag } from '../../ids'
+import { roleTag, WITH_WARMUP } from '../../ids'
 import { go, withFrom } from '../../route'
 import { finishedForPlan } from '../../current-workout'
 import { dateKey, planDateFor } from '../../schedule'
@@ -97,7 +97,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
           {plan.items.map((item) => (
             <Row key={item.id} value={`${item.sets} ${item.sets === 1 ? 'set' : 'sets'}`}>
               <ExerciseLabel item={item} />
-              {item.warmup ? ' · Warm-up set' : ''}
+              {item.warmup ? ` · ${WITH_WARMUP}` : ''}
             </Row>
           ))}
         </List>

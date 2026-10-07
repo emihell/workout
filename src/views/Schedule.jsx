@@ -157,7 +157,7 @@ export function ScheduleDay({ week, weekday, from = null }) {
                 </>
               }
             >
-              <NavLink to={dayPathOf(week, weekday, `/${slot.id}`)}>{slotLabel(routines, slot)}</NavLink>
+              <NavLink to={childLink(dayPathOf(week, weekday, `/${slot.id}`), here, from)}>{slotLabel(routines, slot)}</NavLink>
             </Row>
           )
         })}
@@ -227,7 +227,11 @@ function slotOnDay(schedule, week, weekday, slotId) {
   return slotsForWeekDay(schedule, week, weekday).find((s) => s.id === slotId) || null
 }
 
-export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId, exerciseId }) {
+// req-202 — `from` is the day screen as it was entered (childLink from ScheduleDay, e.g.
+// `/schedule/0/6?from=/` from Home's week): the slot page's Back returns there, so the day's
+// own Back still ends on Home. Only the slot page itself reads it; its sub-screens keep
+// their fixed parents.
+export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId, exerciseId, from = null }) {
   const store = useStore()
   const slot = slotOnDay(store.schedule, week, weekday, slotId)
 
@@ -242,7 +246,8 @@ export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId,
 
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
   const extra = `${weekdayName(weekday)}${loop > 1 ? ` · week ${week + 1}` : ''}`
-  const paths = navForBase(`/schedule/${week}/${weekday}/${slotId}`, `/schedule/${week}/${weekday}`, {
+  const dayPath = `/schedule/${week}/${weekday}`
+  const paths = navForBase(`${dayPath}/${slotId}`, from && from.split('?')[0] === dayPath ? from : dayPath, {
     extra,
     showDelete: false,
   })

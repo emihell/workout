@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import * as route from './route.js'
-import { activeTab, hashPath, parseRoute, visitChange } from './route.js'
+import { hashPath, parseRoute, visitChange } from './route.js'
 
 // req-49 — Back returns to a screen's logical PARENT (a `to` prop passed at each
 // call site), never the last-visited screen. The visit-stack "go back" primitive
@@ -190,89 +190,6 @@ describe('stable workflow routes', () => {
   })
 })
 
-describe('activeTab maps every route name to its bottom tab (req-14 / DEC-024)', () => {
-  // The full inventory of route names parseRoute can return, each asserted
-  // against the tab DEC-024 groups it under. Deep routes must light the group's
-  // tab, not fall through: editing a routine is still Library, a schedule slot is
-  // still Workouts. If parseRoute grows a route name, add it here.
-  // req-56: schedule/* moved from Workouts to Library — Schedule is now the first
-  // Library segment, so every schedule screen lights the Library circle.
-  const LIBRARY = [
-    'routines',
-    'routine',
-    'routine-new',
-    'routine-edit',
-    'routine-exercise',
-    'routine-exercise-pick',
-    'routine-exercise-new',
-    'routine-exercise-create',
-    'routine-exercise-create-manual',
-    'routine-exercise-create-search',
-    'exercises',
-    'exercises-type',
-    'exercise',
-    'exercise-edit',
-    'exercise-new',
-    'exercise-new-manual',
-    'exercise-new-search',
-    'schedule',
-    'schedule-loop',
-    'schedule-day',
-    'schedule-day-add',
-    'schedule-slot',
-  ]
-  const WORKOUTS = [
-    'today',
-    'history',
-    'history-month',
-    'history-detail',
-    'history-edit',
-    'history-recalculate',
-    'history-routine',
-    'history-set',
-    'history-set-add',
-    'history-set-new',
-    'history-exercises',
-    'history-exercise',
-    'history-workout-exercise',
-    // req-198 — Settings left the bar; as "Backup & data" under History it lights the
-    // Workout oval, as History does.
-    'settings',
-    'workout',
-    'workout-preview',
-    'workout-setup',
-    'workout-set',
-    'workout-item',
-    'workout-item-log',
-    'workout-item-done',
-    'workout-item-exercise',
-    'workout-finish',
-  ]
-
-  it('maps routines/*, exercises/* and schedule/* to Library', () => {
-    for (const name of LIBRARY) assert.equal(activeTab(name), 'library', name)
-    // req-56 — the schedule screens specifically light Library, not Workouts.
-    assert.equal(activeTab('schedule'), 'library')
-    assert.equal(activeTab('schedule-day'), 'library')
-    assert.equal(activeTab('schedule-slot'), 'library')
-  })
-
-  it('maps today, history/*, settings and the workout flow to Workouts', () => {
-    for (const name of WORKOUTS) assert.equal(activeTab(name), 'workouts', name)
-  })
-
-  it('req-198: no route lights a Settings tab any more; the dev showcase lights none', () => {
-    for (const name of [...LIBRARY, ...WORKOUTS]) assert.notEqual(activeTab(name), 'settings', name)
-    assert.equal(activeTab('settings'), 'workouts')
-    assert.equal(activeTab('components'), null)
-  })
-
-  it('defaults an unknown route to Workouts (the fallback surface)', () => {
-    assert.equal(activeTab('some-future-route'), 'workouts')
-    assert.equal(activeTab(undefined), 'workouts')
-  })
-})
-
 // req-99 — the routine per-exercise editor links to the exercise's own Details
 // editor carrying a `?from=` return target, so Save/Cancel/Back land back on the
 // routine screen (in any of the flows that reuse ExerciseFields) instead of the
@@ -315,14 +232,6 @@ describe('req-99 — exercise-edit carries an optional ?from= return path', () =
   it('does not let the query string leak into path parsing', () => {
     // parts must be split off the path only — the `?from=` must not corrupt the id.
     assert.equal(parseRoute('/exercises/ex-plank/edit?from=%2Fx').id, 'ex-plank')
-  })
-
-  it('exercise-edit still lights the Library tab whether or not from is present', () => {
-    assert.equal(activeTab(parseRoute('/exercises/ex-plank/edit').name), 'library')
-    assert.equal(
-      activeTab(parseRoute('/exercises/ex-plank/edit?from=%2Froutines%2Fr').name),
-      'library',
-    )
   })
 })
 

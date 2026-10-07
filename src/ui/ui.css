@@ -531,6 +531,25 @@ html:has(.ui-picker-bar) {
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: calc(var(--ui-bottom-clear) + var(--ui-s3));
 }
+/* req-202 — a row with its main thing left and one control right: Routine detail's title +
+ * "Edit", and "Add exercise" + "Reorder". The title wraps; the control never shrinks. */
+.ui-split-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ui-s2);
+}
+.ui-split-row--title {
+  align-items: baseline;
+}
+.ui-split-row .ui-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ui-split-row > :not(.ui-title) {
+  flex: 0 0 auto;
+}
 /* req-198 (DEC-112) — a deep screen's top row: Back left, "Today" right (both plain
  * links). Only rendered with the class when Today shows (views/shared.jsx Back). */
 .ui-back-row {
