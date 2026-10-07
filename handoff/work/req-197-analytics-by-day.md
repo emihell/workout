@@ -1,6 +1,6 @@
 # req-197 — analytics counted per day and per build; Export analytics resets them
 
-**Status: READY** (2026-10-07). **Lane: tooling** (settled, mechanical → throwaway build agent). **Gate: functional.**
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-197` (`da17cf2`…`928b16a`, 2 commits).** (2026-10-07). **Lane: tooling** (settled, mechanical → throwaway build agent). **Gate: functional.**
 Not persisted-data: the analytics key is separate from the workout history (DEC-011).
 
 Emilio, 2026-10-07, after sending an export: "have in mind that its used during chages as well, so might have to update
@@ -19,7 +19,8 @@ builds.
 - `recordScreen` is called from `route.js:55`.
 - The Settings "Export analytics" button is at `views/Settings.jsx:49-57`. It calls `recordButton('export-analytics')` and
   then `downloadJson`.
-- The app has no build id today: no vite `define`, no version string.
+- ~~The app has no build id today~~ **Wrong (build agent):** `vite.config.js` already defines `__APP_VERSION__`, the short sha
+  added in req-86 and read by dev-notes. It is the sha under dev too, so a separate `__BUILD_ID__` was added.
 
 ## Scope
 1. **Shape:** `{ v: 2, days: { "YYYY-MM-DD": { screens, transitions, buttons, builds: { "<sha>": n } } } }`.
@@ -53,3 +54,13 @@ builds.
    into navigation or a button. Same test style as today.
 5. `buildBackup` output contains no analytics. Use the existing test, kept.
 6. The production build exposes a non-`"dev"` build id. Receipt: grep `dist/` for the sha after `npm run build`.
+
+## Built — calls `(unconfirmed)`
+- `__BUILD_ID__` is its own define: the sha on `vite build`, `"dev"` under `vite` or when there is no `.git`. A `./plan qa`
+  build is a `git archive` with no `.git`, so it reads "dev" there; Pages checks out the repo, so it gets the sha.
+- An empty old-format blob is dropped rather than kept as an empty `before-dates`.
+- `builds` counts screen events only.
+- The reset keeps the last screen, so the move after Export counts in the new data.
+- A throwing download resets nothing.
+- An unknown `v` loads as empty.
+- The workout Export still counts its own press (`export-database`). It never resets.
