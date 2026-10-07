@@ -20,7 +20,6 @@ import {
   nextWorkoutNames,
   planDaysText,
   slotFilters,
-  startTodayWeek,
 } from '../plan-templates.js'
 import { go, useHashRoute } from '../route'
 import { useStore } from '../store-context'
@@ -263,13 +262,6 @@ function Choice({ name, checked, onChange, children }) {
   )
 }
 
-// req-207 (DEC-116) — the days the plan suggests for `n` days a week, starting today (DEC-105):
-// the template's spacing shifted to today's weekday. The chips start ticked on these.
-function suggestedWeekdays(n, now) {
-  const template = PLAN_TEMPLATES[n]
-  return template ? startTodayWeek(template.week, now).map(([weekday]) => weekday) : []
-}
-
 // req-207 — the 7 weekday chips, Mon–Sun: each a toggle (aria-pressed), styled as the
 // segmented control's segments.
 function WeekdayChips({ value, onToggle }) {
@@ -326,7 +318,9 @@ function MachinesDays({ picks, routines, schedule, saving, onSave }) {
         value={days ?? ''}
         onChange={(value) => {
           setDays(Number(value))
-          setWeekdays(suggestedWeekdays(Number(value), new Date()))
+          // req-210 (DEC-117 §6, amends DEC-116) — no day is pre-picked: choosing (or changing)
+          // the count clears the chips; Save unlocks at exactly N.
+          setWeekdays([])
         }}
       />
       {days && emptySchedule ? (

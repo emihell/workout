@@ -18,6 +18,8 @@ import { doneRowSuffix } from './row-label.js'
 import { WorkoutPill } from './rest'
 import { askChoice, getPendingConfirm, subscribeConfirm } from '../../ui/confirm.js'
 import { recordButton } from '../../analytics'
+import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
+import { previousSameRoutineWorkouts } from '../../history-queries.js'
 
 // req-188 (DEC-103 §2) — a not-done row's "⋯": Swap exercise · Skip exercise · Cancel, in the
 // one sheet. Skip is one tap here (the sheet is the guard; the log screen's two-tap arm is
@@ -171,6 +173,10 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     )
   }
 
+  // req-210 (DEC-117 §1) — the prior same-routine workouts the "↑ N%" compares against
+  // (DEC-050's source, as the Finish line uses).
+  const priors = previousSameRoutineWorkouts(active, store.workouts, store.routines)
+
   return (
     <Screen className="ui-screen--rest">
       {/* req-49 — Back steps out of the in-workout hub to Today; the workout stays
@@ -182,6 +188,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
         {items.map((item) => {
           const completed = itemIsMarkedDone(active, item) || itemLoggingState(active, item).plannedDone
           const path = itemCurrentPath(routineId, item, completed)
+          // req-210 — "↑ N%" once the exercise is done and beat last time; else nothing.
+          const pct = completed ? exerciseImprovementPct(active, priors, item.exerciseId, store.exercises) : null
           return (
             // req-79 — completed exercises read muted (ui-row--done) so the eye lands
             // on what's left; not-done rows stay full emphasis. Order/meaning unchanged.
@@ -207,6 +215,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
                     logged set and it reads done (derived from the sets, no marker). */}
                 {/* req-189 — one swapped away reads "swapped" (derived: row-label.js). */}
                 {completed ? doneRowSuffix(active, item) : ''}
+                {pct != null ? <span className="ui-arrow">{improvementText(pct)}</span> : null}
               </Row>
               {/* req-187 — no inline routine-kg offer here any more: it is a sheet on the
                   exercise's last Complete (item.jsx askRoutineUpdate). */}

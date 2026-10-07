@@ -674,7 +674,8 @@ describe('req-84 workoutSummaryStats', () => {
 
   it('no prior workout → stats with no delta (no-invent)', () => {
     const s = workoutSummaryStats(active, null, now)
-    assert.deepEqual(s, { volume: 1000, duration: 30, sets: 3, deltas: null })
+    // req-210 test edit: no `volume` any more (DEC-117 §4).
+    assert.deepEqual(s, { duration: 30, sets: 3, deltas: null })
   })
 
   it('with a prior → per-number deltas', () => {
@@ -684,15 +685,16 @@ describe('req-84 workoutSummaryStats', () => {
       sets: [workSet(100, 5)], // vol 500, 1 set
     }
     const s = workoutSummaryStats(active, prior, now)
-    assert.equal(s.volume, 1000)
+    // req-210 test edit: volume and its delta removed (DEC-117 §4).
+    assert.equal(s.volume, undefined)
     assert.equal(s.duration, 30)
     assert.equal(s.sets, 3)
-    assert.deepEqual(s.deltas, { volume: 500, duration: 10, sets: 2 })
+    assert.deepEqual(s.deltas, { duration: 10, sets: 2 })
   })
 
-  it('warmup sets excluded from volume, counted in set total', () => {
+  // req-210 test edit: was "warmup sets excluded from volume, counted in set total" — volume is gone.
+  it('warmup sets counted in set total', () => {
     const s = workoutSummaryStats(active, null, now)
-    assert.equal(s.volume, 1000) // wu 40x5 not counted
     assert.equal(s.sets, 3) // wu counted
   })
 })

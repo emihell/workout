@@ -522,7 +522,13 @@ export function restoreFromLoggedSet(set) {
 // routine kg (> 0) > session carry (DEC-002 / req-152, only when the routine has no kg
 // there) > blank. History no longer seeds a work set's kg. `routineKg` undefined = the
 // warm-up path (the routine holds no warm-up kg), which keeps history as before.
-export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg }) {
+//
+// req-210 / DEC-117 §3 (amends DEC-052) — `uniformReps: true` says every working set of the
+// item has the SAME reps target (3 × 10, uniformRepsTargets): then the carry's reps (the last
+// working set logged this session) win over the target, so a changed rep count rides to the
+// remaining sets. Per-set targets that differ (12/10/8) pass false and keep their own target.
+// A warm-up has no carry (carryForSet), so its reps are never carried.
+export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps = false }) {
   if (fromRestore) {
     return { weight: weighted ? restore.weight : '', reps: restore.reps }
   }
@@ -537,8 +543,20 @@ export function setLogSeed({ weighted, fromRestore, restore, hasHistory, history
   }
   return {
     weight: weighted ? (ov.weight != null ? ov.weight : baseWeight) : '',
-    reps: target || carry?.reps || '',
+    reps: (uniformReps && carry?.reps) || target || carry?.reps || '',
   }
+}
+
+// req-210 / DEC-117 §3 — true when the item's working sets all share one non-empty reps
+// target (3 × 10). Read through setTargetFor so an "Add set" beyond the targets list counts
+// with the last target, as its form does.
+export function uniformRepsTargets(item) {
+  const first = setTargetFor(item, 'work', 0)
+  if (first === '') return false
+  for (let i = 1; i < workCountFor(item); i++) {
+    if (String(setTargetFor(item, 'work', i)) !== String(first)) return false
+  }
+  return true
 }
 
 // req-83 (N9) — the key a seed override is stored under on `activeWorkout.seedOverrides`.
@@ -592,8 +610,9 @@ export function nextSeedOverrides(overrides, { exerciseId, setType, weighted, se
 // the editable surface during rest, so the weight seed comes from restore/carry/history
 // alone. (The pure pendingWeightFor helper went with it.)
 // req-178 — `routineKg` as setLogSeed (a work set's routine kg; undefined for a warm-up).
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg }) {
-  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg })
+// req-210 — `uniformReps` as setLogSeed.
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps }) {
+  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps })
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe
@@ -835,6 +854,7 @@ export function durationTargetFor(item, ex, workIndex) {
 // start-of-exercise preview (nothing logged, no carry), as before.
 export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides, workLogged = null }) {
   const overrides = seedOverrides || {}
+  const uniformReps = uniformRepsTargets(item)
   const slots = []
   if (item?.warmup) slots.push({ setType: 'wu', workIndex: 0 })
   for (let i = 0; i < workCountFor(item); i++) slots.push({ setType: 'work', workIndex: i })
@@ -849,6 +869,7 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
       target: setTargetFor(item, setType, workIndex),
       override: overrides[seedOverrideKey(item.exerciseId, setType)],
       routineKg: routineKgFor(item, setType, workIndex),
+      uniformReps,
     })
     const timed = Boolean(ex?.hasDuration) && setType === 'work'
     const entry = {

@@ -10,6 +10,7 @@ import { useStore } from '../../store-context'
 import {
   canRemoveAddedSet,
   carryForSet,
+  uniformRepsTargets,
   createSetDraftWriter,
   durationTargetFor,
   formFieldsWithDraft,
@@ -443,6 +444,8 @@ function WorkoutItemLive({ routineId, item }) {
     override,
     // req-178 / DEC-096 §1 — a work set's kg is the routine's (the snapshot item's).
     routineKg,
+    // req-210 / DEC-117 §3 — a changed rep count carries only on a uniform plan (3 × 10).
+    uniformReps: uniformRepsTargets(item),
   })
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise

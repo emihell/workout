@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { beatLastTimeWins, beatLastTimeLine } from './beat-last-time.js'
+import { beatLastTimeWins } from './beat-last-time.js'
 
 // Build a workout from a compact spec. `items` is [{ id, type }] (display order);
 // `sets` is [{ ex, weight?, reps?, durationSec?, setType? }].
@@ -143,29 +143,8 @@ describe('req-96 per-exercise, not aggregate', () => {
   })
 })
 
-describe('req-96 beatLastTimeLine', () => {
-  it('names a single win, no accent (view adds ↑)', () => {
-    assert.equal(beatLastTimeLine([{ name: 'Bench press', kind: 'heavier' }]), 'Heavier on Bench press')
-    assert.equal(beatLastTimeLine([{ name: 'Pull-ups', kind: 'more-reps' }]), 'More reps on Pull-ups')
-    assert.equal(beatLastTimeLine([{ name: 'Plank', kind: 'longer' }]), 'Longer Plank than last time')
-  })
-
-  it('names the first + "+N more" for multiple wins', () => {
-    assert.equal(
-      beatLastTimeLine([
-        { name: 'Bench press', kind: 'heavier' },
-        { name: 'Pull-ups', kind: 'more-reps' },
-        { name: 'Plank', kind: 'longer' },
-      ]),
-      'Heavier on Bench press · +2 more',
-    )
-  })
-
-  it('returns null for no wins', () => {
-    assert.equal(beatLastTimeLine([]), null)
-    assert.equal(beatLastTimeLine(null), null)
-  })
-})
+// req-210 follow-up test edit: the three req-96 beatLastTimeLine tests were deleted with the
+// function (the Finish line is gone; the per-exercise "↑ N%" replaces it, src/req-210.test.js).
 
 // req-111 / DEC-053 — skipped sets never count on either side; a prior where the
 // exercise was entirely skipped is looked past to the one before.

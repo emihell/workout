@@ -87,10 +87,10 @@ const EXPECTED_MAIN = [
 ]
 
 describe('req-175 — an imported old (v8) backup displays with the new words', () => {
-  it('History: "Warm-up set" rows, "Failure" effort (req-192; "Max" in req-177), "{n} kg lifted" with a thousands separator', async () => {
+  // req-210 test edit: the "{n} kg lifted" half is now its absence (DEC-117 §4; workoutVolume removed).
+  it('History: "Warm-up set" rows, "Failure" effort (req-192; "Max" in req-177), no "kg lifted"', async () => {
     const { captured, mount } = await harness(fixture(), { viaImport: true })
     const { HistoryDetail, HistoryWorkoutExercise } = await importJsx('./views/history/index.jsx', import.meta.url)
-    const { workoutVolume } = await import('./history-queries.js')
     const workout = captured.store.workouts.find((w) => w.id === 'wo-w42-sess-upper')
     const stored = workout.sets.filter((s) => s.exerciseId === 'ex-chest-press').map(({ setType, rpe }) => ({ setType, rpe }))
     assert.deepEqual(stored, [
@@ -108,10 +108,7 @@ describe('req-175 — an imported old (v8) backup displays with the new words', 
 
     await mount(h(HistoryDetail, { workoutId: workout.id }))
     text = view.text()
-    const volume = workoutVolume(workout)
-    assert.ok(volume >= 1000, `fixture volume ${volume} exercises the separator`)
-    assert.ok(text.includes(`${volume.toLocaleString('en-US')} kg lifted`), text)
-    assert.match(text, /\d,\d{3} kg lifted/)
+    assert.equal(/lifted/i.test(text), false, text)
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
   })
 })

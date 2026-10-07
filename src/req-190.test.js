@@ -227,6 +227,13 @@ describe('req-190 — machines-first flow (rendered)', () => {
     assert.equal(window.location.hash, '#/routines/new/machines/days')
     assert.equal(view.button('Save').disabled, true, 'no days chosen yet')
     await tap(segment('2'))
+    // req-210 test edit: no chip is pre-picked (DEC-117 §6) — Save stays disabled until the test
+    // ticks today and today + 3 itself (the days this test used to get preselected).
+    assert.equal(view.button('Save').disabled, true, 'no day pre-picked')
+    const SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const now = new Date().getDay()
+    await tap(segment(SHORT[now]))
+    await tap(segment(SHORT[(now + 3) % 7]))
     assert.equal(radio('Same workout every time').checked, true, 'Same is the default')
     await tap(radio('Two workouts, A and B'))
     await tap(view.button('Save'))
