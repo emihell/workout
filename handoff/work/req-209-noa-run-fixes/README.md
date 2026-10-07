@@ -1,6 +1,6 @@
 # req-209 — Noa run fixes: hide developer tools, sets inline, one set format, last time on the exercise page, labels
 
-**Status: READY** (2026-10-07). **Lane: ui.** From the "Noa" persona run on main `daaa957`: 27, designer, runner, new to the
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-209` (`43bdaf7`…`33952e7`, 2 commits).** (2026-10-07). **Lane: ui.** From the "Noa" persona run on main `daaa957`: 27, designer, runner, new to the
 gym, from an empty first launch. The findings are in `noa-run.md`. Planner viewed screenshots `65-backup-full` and
 `43-done-detail`. Every item here is a binary fix (DEC-091/095). Behaviour questions went to Emilio separately.
 
