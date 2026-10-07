@@ -119,6 +119,8 @@ test('something done today: no "Nothing scheduled", and Start new workout turns 
 
 test('the list below holds prior days only (no completed-today rows)', () => {
   assert.doesNotMatch(src, /CompletedTodayRow/)
-  // the peek list opens straight on the prior-day rows
-  assert.match(src, /<List>\s*\{recent\.map\(/)
+  // req-204 test edit (DEC-113): the prior-day peek rows are gone from Home entirely, so the
+  // list below today's block is the History link alone (was: it opens on `recent.map(`).
+  assert.doesNotMatch(src, /recent\.map\(|HistoryPeekRow/)
+  assert.match(src, /<List>\s*<Row to="\/history">History<\/Row>\s*<\/List>/)
 })

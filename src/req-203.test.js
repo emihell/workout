@@ -176,9 +176,10 @@ function doneTodayData() {
 
 describe('§1 the day screen from Home', () => {
   it('AC1: today, finished → "Upper Body · Done ✓ ›" first, no Start now; tap → History detail; Back → the day', async () => {
-    await open('/', doneTodayData())
-    const todayRow = view.all('.ui-section + .ui-list a.ui-row__link').find((a) => a.getAttribute('href') === `#/schedule/0/${TODAY_WD}?from=%2F`)
-    await tap(todayRow)
+    // req-204 test edit: Home has no "This week" row for today any more (DEC-113), so the
+    // test opens the same link that row had (`/schedule/0/<today>?from=/`) directly; the
+    // screen still dates it today through the no-`?date=` fallback. Assertions unchanged.
+    await open(`/schedule/0/${TODAY_WD}?from=%2F`, doneTodayData())
     assert.equal(view.container.querySelector('.ui-title')?.textContent, longWeekdayDate(TODAY, NOW))
     const done = link('Upper Body · Done ✓ ›')
     assert.ok(done, 'the done row')

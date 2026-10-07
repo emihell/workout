@@ -2,7 +2,7 @@ import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
 import { clampLoopWeeks, dateKey, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
 import { routineById } from '../model.js'
 import { workoutRoutineId, workoutRoutineName } from './history/helpers'
-import { dayEveryText, doneOnDay, homeDayDate, longWeekdayDate, removeSlotText, startNowShown } from './schedule-day.js'
+import { dayEveryText, dayScreenDate, doneOnDay, longWeekdayDate, removeSlotText, startNowShown } from './schedule-day.js'
 import { childLink, go } from '../route'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
@@ -129,16 +129,20 @@ export function ScheduleLoop() {
 // History detail (Back returns here), and Start now shows only on today (until a finished
 // workout covers the slot) and later — never on a past date. A sub line says the slots
 // repeat ("Every Wednesday [in week N of M]"), and Remove's confirm says what it does.
-export function ScheduleDay({ week, weekday, from = null }) {
+//
+// req-204 — Home's "Coming up" rows link the date itself (`?date=`, any upcoming date,
+// not only this week's): dayScreenDate. The screen's own path then carries it (`here`), so
+// a child's Back (slot, add, a done row's History) returns to this same dated screen.
+export function ScheduleDay({ week, weekday, from = null, date: linkDate = null }) {
   const store = useStore()
   const routines = activeRoutines(store)
   const slots = slotsForWeekDay(store.schedule, week, weekday)
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
   const backTo = from || '/schedule'
-  const here = dayPathOf(week, weekday)
   const now = new Date()
   const todayKey = dateKey(now)
-  const date = homeDayDate(store.schedule, week, weekday, from, now)
+  const date = dayScreenDate(store.schedule, week, weekday, from, linkDate, now)
+  const here = date && linkDate === date ? `${dayPathOf(week, weekday)}?date=${date}` : dayPathOf(week, weekday)
   const done = doneOnDay(store.workouts, date)
 
   return (

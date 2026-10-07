@@ -17,7 +17,9 @@ const today = readFileSync(join(here, 'views/Today.jsx'), 'utf8')
 
 // The first-run early return: from `if (isFirstRun(store))` to the normal layout's title.
 const start = today.indexOf('if (isFirstRun(store)) {')
-const end = today.indexOf('<Title>Today</Title>\n      {loop > 1')
+// req-204 test edit: the normal layout now opens `<Screen className="ui-screen--home">` and
+// its title moved into a wrapper div (new indentation), so the end anchor is that Screen.
+const end = today.indexOf('<Screen className="ui-screen--home">')
 const firstRun = today.slice(start, end)
 const label = 'Create your first workout'
 
