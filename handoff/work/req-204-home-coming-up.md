@@ -1,6 +1,6 @@
 # req-204 — Home: next 3 workouts above, today at the bottom; the week list and past rows go
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-113. Replaces req-200's Home layout. The day screen from req-200 and
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-204` (`ed01774`…`6407cf2`, 3 commits).** (2026-10-07). **Lane: ui.** From DEC-113. Replaces req-200's Home layout. The day screen from req-200 and
 req-203 stays.
 
 ## Code today (main, after req-203)
