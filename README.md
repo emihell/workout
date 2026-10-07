@@ -10,6 +10,8 @@ This browser-only MVP supports one trustworthy loop: set up exercises and reusab
 - Live workout: a snapshot of the routine at Start, plus logged and skipped sets. Extra sets stay on this snapshot only until Finish.
 - Completed workout: the snapshot plus actual sets. Unopened planned sets are recorded as skipped at Finish. Finish never changes the routine (DEC-056); the routine only changes when you edit it, when you tap the "Update routine" offer after an exercise, or when you Apply a recalculation.
 
+UI: Workout = routine (the plan); a logged session is shown by name and date.
+
 ## Recommendation rules
 
 Completed history supplies the next load. Easy completed work moves one valid equipment step up; missed reps or failure move one step down; moderate work holds. Alternating 4/5 kg stacks use their real sequence rather than a rounded 5 kg increment. A target the app can't read as a single number (a range like 8–12, AMRAP, a duration, text) and any assisted exercise hold — the same kg and target — until the progression rules are defined.

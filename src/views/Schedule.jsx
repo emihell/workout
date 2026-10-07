@@ -72,7 +72,7 @@ export function Schedule() {
           </List>
         </div>
       ))}
-      {routines.length === 0 ? <p className="ui-sub">No routines.</p> : null}
+      {routines.length === 0 ? <p className="ui-sub">No workouts.</p> : null}
     </Screen>
   )
 }
@@ -90,7 +90,7 @@ export function ScheduleLoop() {
           e.preventDefault()
           const value = Number(new FormData(e.target).get('loop'))
           const removed = (store.schedule?.slots || []).filter((slot) => Number(slot.week) >= value).length
-          if (removed && !(await askConfirm(`Remove ${removed} scheduled routine${removed === 1 ? '' : 's'}?`, { confirmLabel: 'Remove' }))) {
+          if (removed && !(await askConfirm(`Remove ${removed} scheduled workout${removed === 1 ? '' : 's'}?`, { confirmLabel: 'Remove' }))) {
             return
           }
           store.setLoopWeeks(value)
@@ -163,7 +163,7 @@ export function ScheduleDay({ week, weekday, from = null }) {
         })}
       </List>
       <p>
-        <NavLink to={childLink(dayPathOf(week, weekday, '/add'), here, from)} chevron="forward">Add routine</NavLink>
+        <NavLink to={childLink(dayPathOf(week, weekday, '/add'), here, from)} chevron="forward">Add workout</NavLink>
       </p>
       {loop > 1 && backTo.split('?')[0] !== '/schedule' ? (
         <p>
@@ -184,7 +184,7 @@ export function ScheduleDayAdd({ week, weekday, from = null }) {
   return (
     <Screen>
       <Back to={dayPath} />
-      <Title>Add routine</Title>
+      <Title>Add workout</Title>
       {routines.length === 0 ? (
         <RoutineNewForm
           onSave={({ name }) => {

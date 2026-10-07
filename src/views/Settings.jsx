@@ -8,7 +8,7 @@ import { Actions, Banner, Button, Checkbox, FileButton, List, Row, Screen, Secti
 import { Back } from './shared'
 
 function backupLines(summary) {
-  return `${summary.routines} routines, ${summary.exercises} exercises, ${summary.workouts} workouts, ${summary.slots} slots.`
+  return `${summary.routines} workouts, ${summary.exercises} exercises, ${summary.workouts} sessions, ${summary.slots} slots.`
 }
 
 export function Settings() {

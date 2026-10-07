@@ -62,7 +62,7 @@ export function StoreProvider({ children }) {
       addRoutine({ name, focus }) {
         const routine = {
           id: uid('rtn'),
-          name: name.trim() || 'Routine',
+          name: name.trim() || 'Workout',
           focus: focus || 'Machines',
           exercises: [],
         }

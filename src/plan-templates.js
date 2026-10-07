@@ -137,7 +137,7 @@ export function machinesPlan({ days, split, picks }) {
   if (!template) return null
   const ab = split === SPLIT_AB && days >= 2
   const groups = splitPicks(picks, ab ? SPLIT_AB : SPLIT_SAME)
-  const names = ab ? ['My workout A', 'My workout B'] : ['My workout']
+  const names = ab ? ['Workout A', 'Workout B'] : ['Workout']
   return {
     routines: groups.map((group, r) => ({ name: names[r], picks: group })),
     week: template.week.map(([weekday], i) => [weekday, ab ? i % 2 : 0]),

@@ -5,7 +5,7 @@ import { perSetCount, perSetStart, perSetText, perSetValues, savedRole } from '.
 import { go } from '../route'
 import { exerciseById, routineById } from '../model.js'
 import { historyPrescription } from '../history-queries.js'
-import { deletionConfirmHead, routineDeletionImpact, routineInActiveWorkout } from '../state-reducers.js'
+import { deletionConfirmHead, routineDeletionImpact, routineInActiveWorkout, routineScheduledDaysText } from '../state-reducers.js'
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
@@ -43,9 +43,9 @@ export function Routines() {
   return (
     <Screen>
       <Back to="/" />
-      <Title>Routines</Title>
+      <Title>Workouts</Title>
       <p>
-        <NavLink to="/routines/new" chevron="forward">Add routine</NavLink>
+        <NavLink to="/routines/new" chevron="forward">Add workout</NavLink>
       </p>
       {routines.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
@@ -112,7 +112,7 @@ export function RoutineNew() {
   return (
     <Screen>
       <Back to="/routines" />
-      <Title>Add routine</Title>
+      <Title>Add workout</Title>
       <p>
         <NavLink to="/routines/new/machines" look="primary" block>
           Pick your exercises
@@ -127,7 +127,7 @@ export function RoutineNew() {
       <p className="ui-sub">Pick how many days a week, then an exercise for each slot.</p>
       <p>
         <NavLink to="/routines/new/blank" look="secondary" block>
-          Blank routine
+          Blank workout
         </NavLink>
       </p>
     </Screen>
@@ -140,7 +140,7 @@ export function RoutineNewBlank() {
   return (
     <Screen>
       <Back to="/routines/new" />
-      <Title>Blank routine</Title>
+      <Title>Blank workout</Title>
       <RoutineNewForm
         onSave={({ name }) => {
           const id = store.addRoutine({ name })
@@ -212,11 +212,10 @@ export function RoutineDetail({ routineId, paths }) {
           onClick={async () => {
             // req-43 / DEC-031 — name the blast radius (store still archives-vs-
             // deletes on history; this only describes it). Counts only when > 0.
+            // req-201 (F18) — name the days, not "N schedule slots".
             const impact = routineDeletionImpact(store, routine.id)
-            const parts = []
-            if (impact.slots > 0)
-              parts.push(`${impact.slots} schedule slot${impact.slots === 1 ? '' : 's'}`)
-            const removes = parts.length ? ` This removes ${parts.join(' and ')}.` : ''
+            const days = impact.slots > 0 ? routineScheduledDaysText(store, routine.id) : ''
+            const removes = days ? ` This removes it from ${days}.` : ''
             // req-119 / DEC-058 §5 — the live workout is a reference too (archived, named).
             // req-169 (DEC-089) — and a legacy unfinished (draft) workout, worded as such.
             const head = deletionConfirmHead(routine.name, {

@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component {
         React.createElement(
           'p',
           null,
-          'Your data is saved. Your logged sets and workouts are stored on this device and were not lost.',
+          'Your data is saved. Your logged sets and sessions are stored on this device and were not lost.',
         ),
         React.createElement(
           'button',

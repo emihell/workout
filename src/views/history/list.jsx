@@ -11,6 +11,7 @@ import {
   groupWorkoutsByMonth,
   monthLabel,
   routineTitle,
+  sessionLabel,
   sortWorkoutsByDate,
   whenLabel,
   workoutDateKey,
@@ -44,7 +45,7 @@ function InProgressHistoryRow({ store, workout }) {
       action={
         <>
           {/* req-121 — DESIGN §4: retreat (Abandon) left, forward (Continue) right. */}
-          <Button variant="quiet" onClick={() => abandonInProgress(store, workout)}>
+          <Button variant="quiet" onClick={() => abandonInProgress(store, workout, sessionLabel(workout, routine))}>
             Abandon
           </Button>
           <Button onClick={() => continueInProgress(store, workout)}>Continue</Button>

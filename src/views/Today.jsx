@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
-import { greeting } from '../ids'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
 import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, resolveSlot, slotsOn, weekRows } from '../schedule'
 import { routineById } from '../model.js'
@@ -268,7 +267,7 @@ function TodayEmpty({ store, date, done }) {
       )}
       {/* req-121 — navigation only, so a NavLink with the button look (DEC-040). */}
       <NavLink to="/routines" look={done.length ? 'secondary' : 'primary'} block>
-        Start new workout
+        Start a session
       </NavLink>
     </div>
   )
@@ -329,7 +328,7 @@ export function Today() {
         {/* req-177 — the two actions stack with the app's standard gap (.ui-first-run-actions). */}
         <div className="ui-first-run-actions">
           <NavLink to="/routines/new" look="primary" block>
-            Create your first routine
+            Create your first workout
           </NavLink>
           <FileButton
             label="Import"
@@ -356,7 +355,7 @@ export function Today() {
         {importError ? <Banner role="alert">{importError}</Banner> : null}
         {/* req-198 — Schedule and Settings rows dropped (DEC-110 §1); Import is above. */}
         <List>
-          <Row to="/routines">Routines</Row>
+          <Row to="/routines">Workouts</Row>
           <Row to="/history">History</Row>
         </List>
       </Screen>
@@ -365,7 +364,7 @@ export function Today() {
 
   return (
     <Screen>
-      <Title>{greeting()}</Title>
+      <Title>Today</Title>
       {loop > 1 ? (
         <p className="ui-sub">
           Week {week + 1} of {loop}

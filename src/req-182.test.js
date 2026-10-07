@@ -25,10 +25,10 @@ afterEach(async () => {
 })
 
 describe('req-182 §1 — the offer text', () => {
-  it('AC1/AC2 wording: routine has kg → "routine says"; blank → "not in the routine yet"', () => {
-    assert.equal(offerText({ from: [30], to: [32.5] }), 'You lifted 32.5 kg · routine says 30 kg')
-    assert.equal(offerText({ from: [], to: [30, 35, 35] }), 'You lifted 30/35/35 kg · not in the routine yet')
-    assert.equal(offerText({ from: [0, 0], to: [20, 20] }), 'You lifted 20/20 kg · not in the routine yet')
+  it('AC1/AC2 wording: routine has kg → "workout says"; blank → "not in the workout yet"', () => {
+    assert.equal(offerText({ from: [30], to: [32.5] }), 'You lifted 32.5 kg · workout says 30 kg')
+    assert.equal(offerText({ from: [], to: [30, 35, 35] }), 'You lifted 30/35/35 kg · not in the workout yet')
+    assert.equal(offerText({ from: [0, 0], to: [20, 20] }), 'You lifted 20/20 kg · not in the workout yet')
   })
 })
 

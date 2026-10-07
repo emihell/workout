@@ -36,6 +36,19 @@ export function routineDeletionImpact(state, routineId) {
   }
 }
 
+// req-201 (review F18) — the days a routine is scheduled on, for its delete confirm: "Mon and
+// Thu" (was "2 schedule slots"). Mon-first; a loop longer than one week names the week
+// ("Mon (week 2)"). '' when it is on no day.
+const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+export function routineScheduledDaysText(state, routineId) {
+  const loop = Number(state?.schedule?.loopWeeks) || 1
+  const slots = (state?.schedule?.slots || []).filter((slot) => slot.routineId === routineId)
+  const mondayFirst = (weekday) => (Number(weekday) + 6) % 7
+  const sorted = [...slots].sort((a, b) => (a.week || 0) - (b.week || 0) || mondayFirst(a.weekday) - mondayFirst(b.weekday))
+  const words = [...new Set(sorted.map((slot) => `${DAY_SHORT[slot.weekday]}${loop > 1 ? ` (week ${(slot.week || 0) + 1})` : ''}`))]
+  return words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`
+}
+
 // req-43 / DEC-031 — the blast radius of deleting an exercise. removeExercise strips
 // it from every routine and archives-vs-deletes on
 // finished history (a set with this exerciseId). Reuses routinesUsingExercise for
@@ -181,9 +194,9 @@ export function removeRoutineFromState(s, routineId, archivedAt = new Date().toI
 // finished history, then a legacy unfinished (draft) workout, then a plain delete; the
 // same three references the reducers archive on.
 export function deletionConfirmHead(name, { hasHistory, inCurrentWorkout, inDraft = false }) {
-  if (inCurrentWorkout) return `${name} is in the current workout and will be archived (the workout keeps it).`
-  if (hasHistory) return `${name} has past workouts and will be archived (kept in your history).`
-  if (inDraft) return `${name} is in an unfinished workout and will be archived (kept).`
+  if (inCurrentWorkout) return `${name} is in the session in progress and will be archived (the session keeps it).`
+  if (hasHistory) return `${name} has past sessions and will be archived (kept in your history).`
+  if (inDraft) return `${name} is in an unfinished session and will be archived (kept).`
   return `Delete ${name}?`
 }
 

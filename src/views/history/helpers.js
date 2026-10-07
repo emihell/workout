@@ -49,7 +49,7 @@ export function workoutRoutineName(workout, routine) {
 export function routineTitle(program, routine) {
   if (program && routine) return `${program.name} — ${routine.name}`
   if (routine) return routine.name
-  return 'Routine'
+  return 'Workout'
 }
 
 export function workoutDateKey(workout) {
@@ -76,6 +76,12 @@ export function compactDate(key) {
 
 export function whenLabel(workout) {
   return compactDate(workoutDateKey(workout))
+}
+
+// req-201 (DEC-110 §2) — a logged session is named by its workout's name and date
+// ("Upper Body · Oct 6, 2026"), never the generic "workout" (which means the plan in the UI).
+export function sessionLabel(workout, routine) {
+  return `${workoutRoutineName(workout, routine)} · ${whenLabel(workout)}`
 }
 
 // req-14 (Emilio review iter 6) — the ONE shared `when` format for the Workout

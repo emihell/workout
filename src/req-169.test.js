@@ -68,30 +68,30 @@ describe('1 — finished history names a reference by its snapshot too (DEC-089 
 describe('2 — the delete confirm, in DEC-089 order: current → past → unfinished (draft) → plain', () => {
   const head = (name, refs) => deletionConfirmHead(name, { hasHistory: false, inCurrentWorkout: false, inDraft: false, ...refs })
   it('in the current workout', () => {
-    assert.equal(head('Bench', { inCurrentWorkout: true }), 'Bench is in the current workout and will be archived (the workout keeps it).')
+    assert.equal(head('Bench', { inCurrentWorkout: true }), 'Bench is in the session in progress and will be archived (the session keeps it).')
   })
-  it('past workouts', () => {
-    assert.equal(head('Bench', { hasHistory: true }), 'Bench has past workouts and will be archived (kept in your history).')
+  it('past sessions', () => {
+    assert.equal(head('Bench', { hasHistory: true }), 'Bench has past sessions and will be archived (kept in your history).')
   })
   it('draft-only: "is in an unfinished workout" (was: "has past workouts")', () => {
-    assert.equal(head('Bench', { inDraft: true }), 'Bench is in an unfinished workout and will be archived (kept).')
+    assert.equal(head('Bench', { inDraft: true }), 'Bench is in an unfinished session and will be archived (kept).')
   })
   it('no reference: a plain delete', () => {
     assert.equal(head('Bench', {}), 'Delete Bench?')
   })
   it('the order: current beats past beats draft', () => {
-    assert.match(head('B', { inCurrentWorkout: true, hasHistory: true, inDraft: true }), /current workout/)
-    assert.match(head('B', { hasHistory: true, inDraft: true }), /past workouts/)
+    assert.match(head('B', { inCurrentWorkout: true, hasHistory: true, inDraft: true }), /session in progress/)
+    assert.match(head('B', { hasHistory: true, inDraft: true }), /past sessions/)
   })
 })
 
 describe('the confirm and the reducer read the same impact: "archived" wording ⇔ archived', () => {
   const live = { id: 'live', routineId: 'r-free', snapshot: { routineId: 'r-free', routineName: 'Free', items: [{ routineItemId: 'l1', exerciseId: 'ex-live' }] }, sets: [] }
   const exerciseCases = [
-    ['ex-past', 'past workouts'],
-    ['ex-zero', 'past workouts'],
-    ['ex-draft', 'unfinished workout'],
-    ['ex-live', 'current workout'],
+    ['ex-past', 'past sessions'],
+    ['ex-zero', 'past sessions'],
+    ['ex-draft', 'unfinished session'],
+    ['ex-live', 'session in progress'],
     ['ex-free', null],
   ]
   for (const [id, wording] of exerciseCases) {
@@ -110,8 +110,8 @@ describe('the confirm and the reducer read the same impact: "archived" wording �
     })
   }
   const routineCases = [
-    ['r1', 'past workouts'],
-    ['r-free', 'current workout'],
+    ['r1', 'past sessions'],
+    ['r-free', 'session in progress'],
     ['r-slot', null],
   ]
   for (const [id, wording] of routineCases) {
@@ -132,7 +132,7 @@ describe('the confirm and the reducer read the same impact: "archived" wording �
   it('a routine referenced only by a draft: unfinished-workout wording, archived', () => {
     const s = doc({ workouts: [], draftWorkouts: [{ id: 'd2', routineId: 'r-free', startedAt: '2025-01-01T10:00:00Z', snapshot: { routineId: 'r-free', routineName: 'Free', items: [] }, sets: [] }] })
     const impact = routineDeletionImpact(s, 'r-free')
-    assert.equal(deletionConfirmHead('Free', { ...impact, inCurrentWorkout: false }), 'Free is in an unfinished workout and will be archived (kept).')
+    assert.equal(deletionConfirmHead('Free', { ...impact, inCurrentWorkout: false }), 'Free is in an unfinished session and will be archived (kept).')
     assert.equal(removeRoutineFromState(s, 'r-free', AT).routines.find((r) => r.id === 'r-free')?.archivedAt, AT)
   })
 })

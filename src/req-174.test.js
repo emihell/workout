@@ -1,4 +1,4 @@
-// req-174 — an empty home offers "Create your first routine" (primary, -> /routines/new)
+// req-174 — an empty home offers "Create your first workout" (primary, -> /routines/new)
 // with Import as the secondary action; the subtitle drops "start empty".
 //
 // Today.jsx is JSX, so plain `node --test` can't render it; the first-run block is locked
@@ -17,9 +17,9 @@ const today = readFileSync(join(here, 'views/Today.jsx'), 'utf8')
 
 // The first-run early return: from `if (isFirstRun(store))` to the normal layout's title.
 const start = today.indexOf('if (isFirstRun(store)) {')
-const end = today.indexOf('<Title>{greeting()}</Title>')
+const end = today.indexOf('<Title>Today</Title>\n      {loop > 1')
 const firstRun = today.slice(start, end)
-const label = 'Create your first routine'
+const label = 'Create your first workout'
 
 test('req-174: the button lives only inside the unchanged isFirstRun(store) gate', () => {
   assert.ok(start > 0 && end > start, 'first-run block not found')
@@ -31,7 +31,7 @@ test('req-174: the button lives only inside the unchanged isFirstRun(store) gate
 test('req-174: primary first-routine link to /routines/new, Import secondary beside it', () => {
   assert.match(firstRun, /<Title subtitle="Nothing here yet\.">Today<\/Title>/)
   assert.doesNotMatch(firstRun, /subtitle="[^"]*start empty/)
-  assert.match(firstRun, /<NavLink to="\/routines\/new" look="primary" block>\s*Create your first routine\s*<\/NavLink>\s*<FileButton\s+label="Import"/)
+  assert.match(firstRun, /<NavLink to="\/routines\/new" look="primary" block>\s*Create your first workout\s*<\/NavLink>\s*<FileButton\s+label="Import"/)
   assert.doesNotMatch(firstRun, /<FileButton[^>]*variant=/) // Import keeps FileButton's secondary default
   assert.match(firstRun, /importWithBackup\(\{ store, payload \}\)/) // Import behaviour unchanged
 })
