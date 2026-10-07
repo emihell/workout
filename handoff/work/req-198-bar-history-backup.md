@@ -1,6 +1,6 @@
 # req-198 — bar: History replaces Settings; Settings becomes "Backup & data" under History
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-110 §1, **amended by DEC-111 then DEC-112**: the bottom bar is removed; Home gets "Workouts ›" at the top; deep screens get a "Today" link in the Back row (not where Back is already "/", not in a workout). Scope 1–2 below are superseded by DEC-112; 3–6 stand. First of req-198 to req-202, built in order. req-199 and req-200
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-198` (`f96669d`…`f7be85f`, 4 commits).** (2026-10-07). **Lane: ui.** From DEC-110 §1, **amended by DEC-111 then DEC-112**: the bottom bar is removed; Home gets "Workouts ›" at the top; deep screens get a "Today" link in the Back row (not where Back is already "/", not in a workout). Scope 1–2 below are superseded by DEC-112; 3–6 stand. First of req-198 to req-202, built in order. req-199 and req-200
 touch `BottomMenu.jsx` / `route.js` after this one.
 
 ## Code today (main `166266a`)
