@@ -62,3 +62,23 @@ Emilio: "yes, you have to change it in the actual schedule view for permanent ch
    - Screenshot `scratchpad/r211-home.png`.
 6. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
 7. **For Emilio before merge:** a plain list of the stored shape and an example record, plus "export a backup first".
+
+## Built — review (merge waits for Emilio's "go" and his backup, DEC-046)
+- **Commits:** `f0ee25d` (code), `25b2194` (report), `466e324` (review fixes), `b4592fa` (report).
+- **Independent reviewer, round 1:** 1 should-fix and 1 latent, both fixed:
+  - a stale move after a loop resize put a stray workout on a date;
+  - `normaliseMoves` now dedupes per (slotId, from) and keeps moves within the same week only.
+- **Round 2:** "No blockers."
+  - **Real data:** `migrateState` on all 13 of Emilio's exports and `db.json` is equal except `moves: []`.
+  - **Load writes nothing:** byte-identical in 3 time zones.
+  - **Brute force:** 1680 valid moves × 3 time zones, 0 bad.
+  - **Latent:** a stale move counts again if the loop is changed back. That is the user's own choice, so it is accepted.
+- **Gate:** `check: green — lint, skills, no import cycles, 108 test file(s), and the build all passed.` This branch's own
+  smoke is green (Planner, throwaway worktree, at b4592fa).
+- **Calls `(unconfirmed)`:**
+  - any dated day screen moves one date;
+  - the sheet skips dates that already hold the workout;
+  - a past date can be moved;
+  - every-week Change day drops that slot's moves;
+  - the sheet copy "Only this week — the Schedule stays as it is.";
+  - the "moved from Fri" sub-line.
