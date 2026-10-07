@@ -1,6 +1,6 @@
 # req-197 — analytics counted per day and per build; Export analytics resets them
 
-**Status: READY** (2026-10-07). **Lane: batch** (settled, mechanical). **Gate: functional.**
+**Status: READY** (2026-10-07). **Lane: tooling** (settled, mechanical → throwaway build agent). **Gate: functional.**
 Not persisted-data: the analytics key is separate from the workout history (DEC-011).
 
 Emilio, 2026-10-07, after sending an export: "have in mind that its used during chages as well, so might have to update
