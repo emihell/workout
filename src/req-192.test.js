@@ -48,7 +48,7 @@ describe('labels (DEC-108 §2) — values unchanged', () => {
     assert.deepEqual(RPE_OPTIONS.map((o) => [o.label, o.value]), [['Easy', 2], ['Medium', 3], ['Hard', 4], ['Failure', 5]])
     assert.equal(rpeLabel(3), 'Medium')
     assert.equal(rpeLabel(5), 'Failure')
-    assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 5 }), '40 kg · 8 · Failure')
+    assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 5 }), '40 kg × 8 · Failure') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
   })
 })
 

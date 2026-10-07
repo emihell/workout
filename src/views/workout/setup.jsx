@@ -12,6 +12,7 @@ import { exerciseName, findItem, isActiveFor, itemCurrentPath } from './workout-
 import { WorkoutPill } from './rest'
 import { WeightStepField } from '../weight-step-field.jsx'
 import { useWeightStep } from '../use-weight-step.js'
+import { equipmentLabel } from '../../equipment-label.js'
 
 export function WorkoutItemExercise({ routineId, itemId }) {
   const store = useStore()
@@ -48,7 +49,7 @@ export function WorkoutItemExercise({ routineId, itemId }) {
       <Back to={backTo} />
       <WorkoutPill />
       <Title>{exerciseName(item)}</Title>
-      <p className="ui-sub">{ex.equipment}</p>
+      <p className="ui-sub">{equipmentLabel(ex.equipment)}</p>
       <form
         onSubmit={(event) => {
           event.preventDefault()

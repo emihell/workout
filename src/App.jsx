@@ -211,7 +211,7 @@ function Screen() {
   if (route.name === 'history') return <History />
   if (route.name === 'history-month') return <History key={route.month} month={route.month} />
   if (route.name === 'history-exercises') return <HistoryExercises />
-  if (route.name === 'history-exercise') return <HistoryExercise key={route.id} exerciseId={route.id} />
+  if (route.name === 'history-exercise') return <HistoryExercise key={route.id} exerciseId={route.id} from={route.from} />
   if (route.name === 'history-workout-exercise') {
     return (
       <HistoryWorkoutExercise
@@ -250,7 +250,7 @@ function Screen() {
   if (route.name === 'history-set-new') return <HistorySetNew key={route.id} workoutId={route.id} from={route.from} />
   if (route.name === 'history-set') return <HistorySet key={`${route.id}-${route.index}`} workoutId={route.id} index={route.index} from={route.from} />
   if (route.name === 'history-detail') return <HistoryDetail key={route.id} workoutId={route.id} from={route.from} />
-  if (route.name === 'settings') return <Settings />
+  if (route.name === 'settings') return <Settings dev={route.dev ?? null} />
   if (route.name === 'components') return <Showcase />
   return <Today />
 }

@@ -1,6 +1,14 @@
-import { useState, useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { exportAndResetAnalytics, recordButton } from '../analytics'
-import { getFeedbackEnabled, setFeedbackEnabled, subscribeFeedbackEnabled } from '../dev/dev-notes.js'
+import {
+  devToolsFromQuery,
+  getDevTools,
+  getFeedbackEnabled,
+  setDevTools,
+  setFeedbackEnabled,
+  subscribeDevTools,
+  subscribeFeedbackEnabled,
+} from '../dev/dev-notes.js'
 import { downloadJson, exportBackup, importWithBackup } from '../import-backup'
 import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
@@ -15,7 +23,7 @@ function backupLines(summary) {
 // say what they do). Names the restore button as it reads (Planner, req-203 copy fix).
 export const BACKUP_LINE = 'Saves all your workouts and history to a file on this device. Use Restore from a backup to bring it back.'
 
-export function Settings() {
+export function Settings({ dev = null }) {
   const store = useStore()
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -28,6 +36,13 @@ export function Settings() {
     getFeedbackEnabled,
     getFeedbackEnabled,
   )
+  // req-209 — the Developer group shows only on a device whose dev-tools flag is on (its
+  // own key, never workout-mvp-v9). `#/settings?dev=1` sets it, and it stays on.
+  const devTools = useSyncExternalStore(subscribeDevTools, getDevTools, getDevTools)
+  useEffect(() => {
+    const next = devToolsFromQuery(dev)
+    if (next != null) setDevTools(next)
+  }, [dev])
 
   // req-198 / DEC-110 §1 — Settings left the bar: this is "Backup & data", reached from the
   // bottom of History. Export and Import first; the developer tools below, set apart.
@@ -80,6 +95,26 @@ export function Settings() {
       />
       {message ? <Banner>{message}</Banner> : null}
       {error ? <Banner role="alert">{error}</Banner> : null}
+      {devTools ? (
+        <DeveloperTools
+          includeAssistant={includeAssistant}
+          setIncludeAssistant={setIncludeAssistant}
+          feedbackEnabled={feedbackEnabled}
+          onAnalytics={() => {
+            setError('')
+            setMessage('Analytics downloaded. Counting starts again.')
+          }}
+        />
+      ) : null}
+    </Screen>
+  )
+}
+
+// req-209 — the developer tools, shown only with the device flag on (Noa: developer copy
+// beside the backup read as a trust-breaker).
+function DeveloperTools({ includeAssistant, setIncludeAssistant, feedbackEnabled, onAnalytics }) {
+  return (
+    <>
       <SectionHeader>Developer</SectionHeader>
       {/* Adds the assistant prompt to the Export above. */}
       <Checkbox label="Assistant prompt" checked={includeAssistant} onChange={setIncludeAssistant} />
@@ -91,8 +126,7 @@ export function Settings() {
               exportAndResetAnalytics((analytics) =>
                 downloadJson(`workout-analytics-${dateKey(new Date())}.json`, analytics),
               )
-              setError('')
-              setMessage('Analytics downloaded. Counting starts again.')
+              onAnalytics()
             }}
           >
             Export analytics
@@ -106,6 +140,6 @@ export function Settings() {
       <List>
         <Row to="/components">Components</Row>
       </List>
-    </Screen>
+    </>
   )
 }

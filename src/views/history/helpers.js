@@ -1,7 +1,7 @@
-import { roleTag, WITH_WARMUP } from '../../ids.js'
+import { roleTag, setParts, setValueText, WITH_WARMUP } from '../../ids.js'
 import { isSkippedSet } from '../../workout-log.js'
 import { dateKey } from '../../schedule.js'
-import { compareWorkoutsNewestFirst } from '../../history-queries.js'
+import { compareWorkoutsNewestFirst, lastSetsForExercise } from '../../history-queries.js'
 
 // Shared helpers for the history screens (req-19 split of History.jsx): id/name
 // resolution, date formatting + grouping. Used by more than one history/ screen module. `workoutMonthKey` stays
@@ -162,6 +162,62 @@ export function topSetText(sets, exerciseId) {
     if (!top || kg > top.kg || (kg === top.kg && repsRank > top.repsRank)) top = { kg, repsRank, set }
   }
   if (!top) return null
-  const reps = top.set.reps != null && top.set.reps !== '' ? String(top.set.reps) : ''
-  return reps ? `${top.set.weight} kg × ${reps}` : `${top.set.weight} kg`
+  // req-209 §3 — the one set format (ids.js setValueText): "25 kg × 10", or "25 kg".
+  return setValueText({ weight: top.set.weight, reps: top.set.reps })
+}
+
+// req-209 §2 — a History detail exercise row's sets, inline after the name:
+// "14 kg × 15, × 15, × 15" (kg once when every logged work set shares it), else each set
+// with its own kg ("12 kg × 10, 14 kg × 8"). A set without kg reads "× 15"; a timed set its
+// duration ("30s"), a cardio set its time/level/distance; a skipped set "skipped"; a
+// warm-up set "warm-up 10 kg × 12". Every set skipped → just "skipped". A non-main role
+// keeps its tag first ("Finisher · …", req-93). Logged values only (DESIGN §1). Pure.
+export function historyGroupSetsText(snapshotItem, groupItems, kind = {}) {
+  const sets = (groupItems || []).map(({ s }) => s)
+  const tag = roleTag(snapshotItem?.role)
+  const withTag = (text) => [tag, text].filter(Boolean).join(' · ')
+  if (sets.length === 0) return withTag('0 sets')
+  if (sets.every((s) => isSkippedSet(s))) return withTag('skipped')
+  const work = sets.filter((s) => s.setType !== 'wu' && !isSkippedSet(s))
+  const workParts = work.map((s) => setParts(s, kind))
+  const sharedKg =
+    workParts.length > 1 && workParts.every((p) => p.kg && !p.cardio && p.kg === workParts[0].kg) ? workParts[0].kg : null
+  let firstWork = true
+  const texts = sets.map((s) => {
+    if (isSkippedSet(s)) return s.setType === 'wu' ? 'warm-up skipped' : 'skipped'
+    const parts = setParts(s, kind)
+    const bare = parts.cardio || (s.durationSec != null && s.durationSec !== '')
+    const tail = parts.amount ? (bare ? parts.amount : `× ${parts.amount}`) : ''
+    let text
+    if (s.setType !== 'wu' && sharedKg && !firstWork) text = tail
+    else if (parts.kg) text = parts.amount ? `${parts.kg} ${parts.cardio ? '· ' : '× '}${parts.amount}` : parts.kg
+    else text = tail
+    if (s.setType !== 'wu') firstWork = false
+    text = text || 'logged'
+    return s.setType === 'wu' ? `warm-up ${text}` : text
+  })
+  return withTag(texts.join(', '))
+}
+
+// req-209 §4 — a short date, "Oct 7" (the year added when it isn't `now`'s). Pure.
+export function shortDate(key, now = new Date()) {
+  if (!key || key === 'unknown') return 'Unknown'
+  const [year, month, day] = key.split('-').map(Number)
+  const opts = { month: 'short', day: 'numeric' }
+  if (year !== now.getFullYear()) opts.year = 'numeric'
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, opts)
+}
+
+// req-209 §4 — the exercise page's "Last time: Oct 7 · 14 kg × 15": the most recent
+// FINISHED workout with a done set of this exercise (lastSetsForExercise, the same "last
+// time" the set screen uses — never the live workout), its heaviest working set
+// (topSetText, as By exercise). No kg in it → its set count. No history → null (the page
+// shows nothing). Pure.
+export function exerciseLastTimeText(workouts, exerciseId, now = new Date()) {
+  const last = lastSetsForExercise(workouts, exerciseId)
+  if (!last) return null
+  const top = topSetText(last.workout.sets, exerciseId)
+  const count = last.sets.filter((s) => !isSkippedSet(s)).length
+  const detail = top || `${count} ${count === 1 ? 'set' : 'sets'}`
+  return `Last time: ${shortDate(workoutDateKey(last.workout), now)} · ${detail}`
 }

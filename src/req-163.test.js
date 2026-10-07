@@ -196,9 +196,9 @@ describe('6 — DEC-087 §2: Effort in History', () => {
     assert.doesNotMatch(view.text(), /Medium/)
   })
   it('(a) formatSetLine: WU / cardio never labelled; a work set is', () => {
-    assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12', rpe: 3 }), 'Warm-up set · 10 kg · 12')
+    assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12', rpe: 3 }), 'Warm-up set · 10 kg × 12') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
     assert.equal(formatSetLine({ setType: 'work', reps: '6 min', rpe: 3 }, { cardio: true }), '6 min')
-    assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 3 }), '40 kg · 8 · Medium')
+    assert.equal(formatSetLine({ setType: 'work', weight: 40, reps: '8', rpe: 3 }), '40 kg × 8 · Medium') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
   })
   it('(b) editing a WU set: no Effort control, and Save writes rpe null', async () => {
     const store = historyStore({ exercise: PRESS, items: item(PRESS), sets: [wu(10, { rpe: 3 })] })

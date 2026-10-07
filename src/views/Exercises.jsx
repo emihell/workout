@@ -13,6 +13,8 @@ import { WeightStepField } from './weight-step-field.jsx'
 import { useWeightStep } from './use-weight-step.js'
 import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } from '../exercise-names.js'
 import { askConfirm } from '../ui/confirm.js'
+import { exerciseLastTimeText } from './history/helpers.js'
+import { equipmentLabel } from '../equipment-label.js'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -59,7 +61,7 @@ function ExerciseList({ exercises, showType = false, from = null }) {
     <List>
       {exercises.map((ex) => (
         <Row key={ex.id} to={withFrom(`/exercises/${ex.id}`, from)}>
-          {ex.name} — {ex.equipment}
+          {[ex.name, equipmentLabel(ex.equipment)].filter(Boolean).join(' — ')}
           {showType ? ` · ${typeLabel(ex.type)}` : ''}
         </Row>
       ))}
@@ -349,7 +351,7 @@ export function ExerciseNewSearch({ returnBase = null }) {
               )
               return (
                 <Row key={item.id || item.name} action={action}>
-                  {shownName(item)} — {item.equipment || 'bodyweight'}
+                  {shownName(item)} — {equipmentLabel(item.equipment, 'Bodyweight')}
                 </Row>
               )
             })}
@@ -462,6 +464,7 @@ export function ExerciseDetail({ exerciseId, from = null }) {
   }
 
   const back = from || '/exercises'
+  const lastTime = exerciseLastTimeText(store.workouts, ex.id)
   return (
     <Screen>
       <Back to={back} />
@@ -470,11 +473,21 @@ export function ExerciseDetail({ exerciseId, from = null }) {
         <NavLink to={childLink(`/exercises/${ex.id}/edit`, `/exercises/${ex.id}`, from)} chevron="forward">Edit</NavLink>
       </p>
       <p className="ui-sub">
-        {[ex.equipment, typeLabel(ex.type), describeWeightStep(ex.weightStep), describeLightestWeight(ex.lightestWeight), ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
+        {[equipmentLabel(ex.equipment), typeLabel(ex.type), describeWeightStep(ex.weightStep), describeLightestWeight(ex.lightestWeight), ex.hasDuration ? `Timed ${ex.durationSec}s` : null]
           .filter(Boolean)
           .join(' · ')}
       </p>
       {ex.muscles ? <p className="ui-sub">{ex.muscles}</p> : null}
+      {/* req-209 §4 — the last finished session with this exercise, and its full history.
+          Nothing when there is none (DESIGN §1). */}
+      {lastTime ? (
+        <p className="ui-sub">
+          {lastTime} ·{' '}
+          <NavLink to={withFrom(`/history/exercise/${ex.id}`, withFrom(`/exercises/${ex.id}`, from))} chevron="forward">
+            History
+          </NavLink>
+        </p>
+      ) : null}
       {ex.cues ? (
         <>
           <SectionHeader>Form cues</SectionHeader>

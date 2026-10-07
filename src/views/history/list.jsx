@@ -152,22 +152,25 @@ export function HistoryExercises() {
   )
 }
 
-export function HistoryExercise({ exerciseId }) {
+export function HistoryExercise({ exerciseId, from = null }) {
   const store = useStore()
   const ex = exerciseById(store.exercises, exerciseId)
   const visits = (store.workouts || []).filter((w) => (w.sets || []).some((s) => s.exerciseId === exerciseId))
   const groups = groupWorkoutsByRoutine(visits, store.routines)
+  // req-209 §4 — also opened from the exercise page (`?from=`): Back returns there, and the
+  // links below carry this page (with that from) so their Back unwinds to it.
+  const here = `/history/exercise/${exerciseId}`
 
   return (
     <Screen>
-      <Back to="/history/exercises" />
+      <Back to={from || '/history/exercises'} />
       <Title>{ex?.name || exerciseId}</Title>
       {/* req-199 (DEC-110 §3) — the exercise's settings, one tap from its history. `?from=`
           brings Save / Cancel / Back back to this page. A deleted (archived) exercise has
           no settings to edit, so no link. */}
       {ex && !ex.archivedAt ? (
         <p>
-          <NavLink to={withFrom(`/exercises/${ex.id}/edit`, `/history/exercise/${ex.id}`)} chevron="forward">
+          <NavLink to={withFrom(`/exercises/${ex.id}/edit`, withFrom(here, from))} chevron="forward">
             Exercise settings
           </NavLink>
         </p>
@@ -182,7 +185,7 @@ export function HistoryExercise({ exerciseId }) {
               // req-203 §5 — "{date} · {top set}"; a row with no kg keeps "N sets".
               const top = topSetText(w.sets, exerciseId)
               return (
-                <Row key={w.id} to={withFrom(`/history/${w.id}/exercise/${exerciseId}`, `/history/exercise/${exerciseId}`)} value={top ? null : `${count} set${count === 1 ? '' : 's'}`}>
+                <Row key={w.id} to={withFrom(`/history/${w.id}/exercise/${exerciseId}`, withFrom(here, from))} value={top ? null : `${count} set${count === 1 ? '' : 's'}`}>
                   {top ? `${whenLabel(w)} · ${top}` : whenLabel(w)}
                 </Row>
               )

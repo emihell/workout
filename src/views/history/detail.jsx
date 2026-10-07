@@ -8,7 +8,7 @@ import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { historyAddSetPath } from './add-set'
 import {
-  historyGroupRowMeta,
+  historyGroupSetsText,
   itemIdOf,
   routineTitle,
   sessionLabel,
@@ -75,7 +75,8 @@ export function HistoryDetail({ workoutId, from = null }) {
           return (
             <Row key={group.routineItemId} to={childLink(historyExercisePath(workout.id, group.routineItemId), here, from)}>
               {snapshotItem?.exerciseName || ex?.name || group.exerciseId}
-              {` — ${historyGroupRowMeta(snapshotItem, group.items)}`}
+              {/* req-209 §2 — the sets inline ("14 kg × 15, × 15, × 15"), not "— 3 sets". */}
+              {` — ${historyGroupSetsText(snapshotItem, group.items, historySetKind(snapshotItem, ex))}`}
             </Row>
           )
         })}

@@ -84,9 +84,11 @@ describe('Add set prefill (QA-3)', () => {
 // ---- QA-4 — History detail says "skipped" ----
 describe('History detail exercise meta (QA-4)', () => {
   // req-153 review — a source pin that stays: detail.jsx is .jsx (node can't load it), and
-  // this is the only link between the screen and the behaviour-tested historyGroupRowMeta.
-  it('detail.jsx renders each row through historyGroupRowMeta', () => {
-    assert.match(read('./views/history/detail.jsx'), /historyGroupRowMeta\(snapshotItem, group\.items\)/)
+  // this is the only link between the screen and the behaviour-tested row text.
+  // req-209 test edit: the row now renders its sets inline (§2) through historyGroupSetsText,
+  // whose all-skipped case keeps "skipped" (req-209.test.js); was historyGroupRowMeta.
+  it('detail.jsx renders each row through historyGroupSetsText', () => {
+    assert.match(read('./views/history/detail.jsx'), /historyGroupSetsText\(snapshotItem, group\.items, /)
   })
   it('all sets skipped → "· skipped" (the overview word), no count', () => {
     assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 0, { skipped: true }), 'with warm-up · skipped') // req-202 test edit: was 'Warm-up set'
