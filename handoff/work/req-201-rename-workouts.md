@@ -1,6 +1,6 @@
 # req-201 — UI vocabulary: routines are "Workouts"; a session is named by its workout and date
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-110 §2 and review F9/F13/F18. Last of the structure reqs (after
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-201` (`a26eece`…`3bb5392`, 2 commits).** (2026-10-07). **Lane: ui.** From DEC-110 §2 and review F9/F13/F18. Last of the structure reqs (after
 req-200), so the strings are counted on the settled screens.
 
 ## Code today
