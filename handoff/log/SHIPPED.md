@@ -2370,3 +2370,18 @@ Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 103
 branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
 
 `reports/req-206.md`.
+
+## req-207 — first setup: pick your days, name last ("New workout #N"); "Change day"  (2026-10-07)
+
+**req-207** (DEC-116).
+- Mon–Sun chips, preselected. Save only with exactly N days.
+- A/B starts from today. Name boxes sit last, prefilled "New workout #N" (also Blank workout and the store fallback).
+- Change day = removeSlot + addSlot within the loop week.
+- 5 commits, `f46c4fb`…`f090d8b`. 1 test edit (`req-190`, names and set compare).
+
+Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 103 test file(s), and the build all passed.` This
+branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
+
+`store.jsx` changed by one line: the default name → `nextWorkoutName`. Diff read, so `--no-reviewer`. `reports/req-207.md`.
+
+No independent reviewer (`plan closeout --no-reviewer`): store.jsx: one line, default-name fallback 'Workout' -> nextWorkoutName(state.routines); no stored-shape change; diff read by Planner

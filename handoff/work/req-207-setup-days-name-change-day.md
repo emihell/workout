@@ -1,6 +1,6 @@
 # req-207 — first setup: pick your days, name it last ("New workout #N"); a day's workout can "Change day"
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-116 and Lena run 3 (setup picked Wed/Sat; she wanted Tue/Fri;
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-207` (`f46c4fb`…`f090d8b`, 5 commits).** (2026-10-07). **Lane: ui.** From DEC-116 and Lena run 3 (setup picked Wed/Sat; she wanted Tue/Fri;
 "Workout" collided everywhere). **Emilio sees screenshots before merge (L-050):** the days/name step and a day screen.
 
 ## Code today (main `8d9e676`)
@@ -57,3 +57,15 @@
      day, the slot count is unchanged, and the History count is unchanged.
    - Screenshot of the day screen to `.../scratchpad/r207-day.png`.
 5. `./check` green. **This branch's own** smoke is green on the committed sha (L-049).
+
+## Built — calls
+- **Emilio saw the screenshots and said "ok"** (L-050).
+- **A/B order** starts from today, so the first chosen day on or after today is A (DEC-105 §2). Planner sent the build back
+  for this.
+- Chips show only when the schedule is empty.
+- B takes the next free number.
+- Change day leaves out weekdays that already hold this workout.
+- **Sheet copy:** "Move {name} to which day? It moves for every week. Your history is kept."
+- **An emptied name box** saves its default.
+- **AC2's written steps** (untick Wed, tick Tue) contradicted its receipt (Tue/Fri). The agent ticked through to Tue/Fri.
+- **Follow-up req-208:** Change day and Remove go behind "⋯" on the day row (the three buttons wrapped at 390 px).
