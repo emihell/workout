@@ -56,3 +56,17 @@ req-200 delete and move some of these.
 3. **Failure case:** the import summary on a backup with 3 routines and 13 workouts reads "3 workouts … 13 sessions", never
    "workouts" twice.
 4. `./check` green. The smoke test passes (update its text selectors, and name them).
+
+## Built — calls `(unconfirmed)`
+- **Name and date** ("Upper Body · Oct 13, 2025", the app's existing date format) on History delete and History's abandon.
+- **Name only** on the in-workout Abandon.
+- **"Session"** everywhere else: the abandon-on-new warning, the delete-confirm wording, the import counts, "This session",
+  Finish's "No set in this session…", the crash screen, and **Home's rest-day "Start a session"**.
+- **Kept "routine":** `model.js` "Deleted routine" is a stored legacy-migration string. `store.jsx` default name → "Workout"
+  (new records only).
+- A multi-week loop delete names "Mon (week 1) and Mon (week 2)".
+- `greeting()` is removed.
+- The static test scans the views, ui, `App.jsx` and 6 root modules.
+- **Follow-ups into req-202:**
+  - "Start a session" → "Start a workout" (it picks one of your workouts).
+  - The import summary's "slots" → "scheduled days".

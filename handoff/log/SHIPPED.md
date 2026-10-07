@@ -2286,3 +2286,20 @@ Planner QA at 375×667:
 - The agent's receipts cover the 2-week loop, done-by-date and the Sunday fold.
 
 No trigger files (`schedule.js` and the views are outside DEC-057 §1), so no reviewer. `reports/req-200.md`.
+
+## req-201 — UI vocabulary: routines are "Workouts"; a session is named by its workout and date  (batch 2026-10-07)
+
+**req-201** (DEC-110 §2).
+- Every user-visible "routine" reads "workout". The Home title is "Today". Defaults are "Workout A/B".
+- Sessions are named by name and date, otherwise "session". The delete confirm names its days.
+- A static test (`req-201.test.js`) parses the UI modules. Planted/reverted receipt is in the report.
+- The README has a glossary line. Identifiers, routes, keys and export fields are unchanged.
+- 2 commits, `a26eece`…`3bb5392`. 12 test files edited, all string swaps (listed in the report).
+
+Gate (ui): `check: green — lint, skills, no import cycles, 99 test file(s), and the build all passed.` (1498/0). Smoke green
+on the branch build.
+
+Planner QA: no "routine" on Home, Workouts, 3 workout details, Exercises, Schedule, History, By exercise or Backup & data.
+
+`store.jsx` was touched only for the default-name string "Routine" → "Workout" (new records). The diff was read, and the
+copy-only change needed no reviewer. `reports/req-201.md`.

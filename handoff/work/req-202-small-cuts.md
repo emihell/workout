@@ -19,6 +19,10 @@
 7. **Slot detail Back from a Home-opened day** (req-200 loose end): a slot page reached from `/schedule/W/D?from=/` returns to
    that same day URL (keeping `from`), so the chain ends on Home.
 
+8. **Wording from req-201:**
+   - Home's "Start a session" → **"Start a workout"** (it opens your workouts).
+   - The import summary's "N slots" → "N scheduled days". `(unconfirmed)`
+
 ## Out of scope
 - History month buckets.
 - "Total lifted".
