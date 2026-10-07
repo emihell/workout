@@ -131,18 +131,28 @@ export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlot
   return done.find((w) => !w.scheduledFor && dateKey(w.finishedAt) === scheduledDate) || null
 }
 
-export function remainingInLoop(routines, schedule, fromDate = new Date()) {
-  const loop = clampLoopWeeks(schedule?.loopWeeks)
-  const start = toLocalDate(fromDate)
-  start.setHours(0, 0, 0, 0)
-  const items = []
-  for (let i = 1; i <= loop * 7; i++) {
-    const d = addDays(start, i)
-    const week = loopWeekIndex(schedule, d)
-    const found = slotsOn(schedule, d)
-      .map((slot) => resolveSlot(routines, slot))
-      .filter((x) => x.routine)
-    for (const x of found) items.push({ date: d, week, ...x })
-  }
-  return items
+// req-200 (DEC-110 §4) — Home's "This week": the 7 days Mon–Sun of `today`'s calendar
+// week, one row each, rest days included. Each row names its loop week (0-based) and
+// weekday (0=Sun..6=Sat, getDay — the ScheduleDay route's own pair, so a tap opens
+// exactly that day's slots), its slots in schedule order, and `done`: did ANY workout
+// finish on that date. Done is BY DATE (the finish date, as completedOnDayKey reads it),
+// never by slot id — a slot removed and re-added gets a new id, and a past day must not
+// lose its Done (review F2). Inlined rather than imported: history-queries imports this
+// module, so importing it back would be a cycle. Pure.
+export function weekRows(schedule, workouts, today = new Date()) {
+  const monday = mondayOf(today)
+  const finished = new Set(
+    (workouts || []).filter((workout) => workout.finishedAt).map((workout) => dateKey(workout.finishedAt)),
+  )
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = addDays(monday, i)
+    const key = dateKey(date)
+    return {
+      dateKey: key,
+      week: loopWeekIndex(schedule, date),
+      weekday: date.getDay(),
+      slots: slotsOn(schedule, date),
+      done: finished.has(key),
+    }
+  })
 }

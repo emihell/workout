@@ -482,6 +482,11 @@ html:has(.ui-picker-bar) {
 .ui-row--done {
   opacity: 0.45;
 }
+/* req-200 — today's row in Home's "This week" reads bold (its value also says "Today"),
+ * so the eye finds today in the seven. Emphasis only. */
+.ui-row--today .ui-row__label {
+  font-weight: 600;
+}
 /* req-93 — the small role tag on a non-main exercise row (warm-up / finisher /
  * cardio). Main rows show just a bold name with no tag; this is the lighter,
  * secondary treatment that makes a non-main row read as clearly distinct. Sits

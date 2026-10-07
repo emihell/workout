@@ -1,7 +1,9 @@
 import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
 import { clampLoopWeeks, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
-import { go } from '../route'
+import { childLink, go } from '../route'
 import { useStore } from '../store-context'
+import { startOrContinue } from '../workout-actions'
+import { routineStartable } from '../exercise-names.js'
 import { RoutineNewForm, RoutineScreens } from './Routine'
 import { navForBase } from './routine-nav.js'
 import { Back, Missing } from './shared'
@@ -110,50 +112,74 @@ export function ScheduleLoop() {
   )
 }
 
-export function ScheduleDay({ week, weekday }) {
+// req-200 (DEC-110 §4) — a day of the loop, reached from the Schedule (Back → /schedule)
+// or from a row of Home's "This week" (`?from=/`, so Back → Home and the Today link is
+// absent). Each slot has **Start now**: that routine, today, through the same off-schedule
+// start the Routines list uses (startOrContinue) — the 2-tap start-ahead the upcoming rows
+// had (review F5). The title is honest about the loop ("Saturday · week 2 of 2", review
+// B1), and in a longer loop "Whole plan ›" reaches the other weeks — unless Back already
+// goes there. Remove edits THIS loop week's slot only (removeSlot; no schema change).
+export function ScheduleDay({ week, weekday, from = null }) {
   const store = useStore()
   const routines = activeRoutines(store)
   const slots = slotsForWeekDay(store.schedule, week, weekday)
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
+  const backTo = from || '/schedule'
+  const here = dayPathOf(week, weekday)
 
   return (
     <Screen>
-      <Back to="/schedule" />
+      <Back to={backTo} />
       <Title>
         {weekdayName(weekday)}
-        {loop > 1 ? ` · week ${week + 1}` : ''}
+        {loop > 1 ? ` · week ${week + 1} of ${loop}` : ''}
       </Title>
       {slots.length === 0 ? <p className="ui-sub">None.</p> : null}
       <List>
-        {slots.map((slot) => (
-          <Row
-            key={slot.id}
-            action={
-              <Button
-                onClick={async () => {
-                  if (!(await askConfirm(`Remove ${slotLabel(routines, slot)}?`, { confirmLabel: 'Remove' }))) return
-                  store.removeSlot(slot.id)
-                }}
-              >
-                Remove
-              </Button>
-            }
-          >
-            <NavLink to={dayPathOf(week, weekday, `/${slot.id}`)}>{slotLabel(routines, slot)}</NavLink>
-          </Row>
-        ))}
+        {slots.map((slot) => {
+          const { routine } = resolveSlot(routines, slot)
+          return (
+            <Row
+              key={slot.id}
+              action={
+                <>
+                  {routine && routineStartable(routine) ? (
+                    <Button onClick={() => startOrContinue(store, routine.id)}>Start now</Button>
+                  ) : null}
+                  <Button
+                    onClick={async () => {
+                      if (!(await askConfirm(`Remove ${slotLabel(routines, slot)}?`, { confirmLabel: 'Remove' }))) return
+                      store.removeSlot(slot.id)
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </>
+              }
+            >
+              <NavLink to={dayPathOf(week, weekday, `/${slot.id}`)}>{slotLabel(routines, slot)}</NavLink>
+            </Row>
+          )
+        })}
       </List>
       <p>
-        <NavLink to={dayPathOf(week, weekday, '/add')} chevron="forward">Add routine</NavLink>
+        <NavLink to={childLink(dayPathOf(week, weekday, '/add'), here, from)} chevron="forward">Add routine</NavLink>
       </p>
+      {loop > 1 && backTo.split('?')[0] !== '/schedule' ? (
+        <p>
+          <NavLink to="/schedule" chevron="forward">Whole plan</NavLink>
+        </p>
+      ) : null}
     </Screen>
   )
 }
 
-export function ScheduleDayAdd({ week, weekday }) {
+// req-200 — `from` is the day screen as it was entered (childLink: `/schedule/w/d?from=/`
+// from Home's week), so Back and the add both land there and its Back still goes Home.
+export function ScheduleDayAdd({ week, weekday, from = null }) {
   const store = useStore()
   const routines = activeRoutines(store)
-  const dayPath = `/schedule/${week}/${weekday}`
+  const dayPath = from || `/schedule/${week}/${weekday}`
 
   return (
     <Screen>

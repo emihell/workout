@@ -103,10 +103,10 @@ function Screen() {
   if (route.name === 'schedule') return <Schedule />
   if (route.name === 'schedule-loop') return <ScheduleLoop />
   if (route.name === 'schedule-day') {
-    return <ScheduleDay key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} />
+    return <ScheduleDay key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} from={route.from} />
   }
   if (route.name === 'schedule-day-add') {
-    return <ScheduleDayAdd key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} />
+    return <ScheduleDayAdd key={`${route.week}-${route.weekday}`} week={route.week} weekday={route.weekday} from={route.from} />
   }
   if (route.name === 'schedule-slot') {
     return (

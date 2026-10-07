@@ -3,14 +3,14 @@ import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { greeting } from '../ids'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
-import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, remainingInLoop, resolveSlot, slotsOn } from '../schedule'
+import { clampLoopWeeks, coveringWorkout, dateKey, loopWeekIndex, occurrenceId, resolveSlot, slotsOn, weekRows } from '../schedule'
 import { routineById } from '../model.js'
 import { completedOnDayKey, doneInTodayBlock, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
 import { withFrom } from '../route'
 import { routineStartable } from '../exercise-names.js'
-import { Banner, Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
+import { Banner, Button, FileButton, List, NavLink, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 // req-114 — the Start names its occurrence (slot@date), so startOrContinue only
@@ -19,7 +19,7 @@ import { sortWorkoutsByDate, weekdayDate, workoutDateKey, workoutRoutineId, work
 // occurrence; now it goes through the one-active rule (DEC-038 abandon-on-new confirm).
 // req-127 — no Start on an empty routine (it made an empty active workout and could
 // abandon a real one); the preview already hides it (overview.jsx). Covers today's
-// block and the upcoming rows.
+// block (req-200: the upcoming rows that also used it are gone).
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   if (!routineStartable(routine)) return null
   return (
@@ -37,10 +37,6 @@ function StartButton({ store, routine, slot, date, label = 'Start', variant, blo
       {label}
     </Button>
   )
-}
-
-function activeRoutineId(workout) {
-  return workout?.routineId
 }
 
 // req-53 — the "in progress" marker that sits next to the routine info in the
@@ -83,25 +79,23 @@ function HistoryPeekRow({ store, workout, todayKey }) {
   )
 }
 
-// req-14 (Emilio review iter 2) — an upcoming (future) scheduled workout in the
-// peek, with an inline Start so you can start ahead directly from Workouts (the
-// behaviour the old Today "Next" section had; Emilio restored it). Today's big
-// primary Start stays the main CTA — upcoming items get a smaller secondary Start.
-// Guards like the today row: already-covered shows `Done …`, in-progress shows no
-// Start (the top-of-screen Continue owns it). Same startOrContinue path. Info via
-// the shared format (iter 5); `when` is the weekday. The Done status stays in the
-// row's value slot; only the weekday moved into the info line.
-function UpcomingRow({ store, date, slot, routine, todayKey }) {
-  const dk = dateKey(date)
-  const done = coveringWorkout(store.workouts, routine.id, dk, slot.id)
-  const mine = store.activeWorkout
-  const inProgress =
-    activeRoutineId(mine) === routine.id && mine?.scheduleSlotId === slot.id && mine.scheduledFor === dk
-  const startAction =
-    !done && !inProgress ? <StartButton store={store} routine={routine} slot={slot} date={dk} /> : null
+// req-200 (DEC-110 §4) — one day of "This week": weekday + date · its routines (or
+// "Rest") · "Done ✓" when any workout finished that date (weekRows: by date, never by
+// slot id — review F2). No Start on any row: today's block above owns today's Start,
+// and starting another day's routine ahead lives on the day's screen ("Start now").
+// Today's row is marked ("Today", bold). A tap opens that date's ScheduleDay — its loop
+// week and weekday from weekRows — with `?from=/` so its Back returns Home.
+function WeekRow({ routines, row, todayKey }) {
+  const names = row.slots.map((slot) => resolveSlot(routines, slot).routine?.name || 'Missing').join(', ')
+  const today = row.dateKey === todayKey
+  const status = [today ? 'Today' : null, row.done ? 'Done ✓' : null].filter(Boolean).join(' · ')
   return (
-    <Row value={done ? `Done ${weekdayDate(dateKey(done.finishedAt))}` : null} action={startAction}>
-      <WorkoutInfo when={weekdayDate(dk)} name={routine.name} today={dk === todayKey} />
+    <Row
+      to={withFrom(`/schedule/${row.week}/${row.weekday}`, '/')}
+      value={status || null}
+      className={today ? 'ui-row--today' : ''}
+    >
+      {weekdayDate(row.dateKey)} · {names || 'Rest'}
     </Row>
   )
 }
@@ -291,13 +285,9 @@ export function Today() {
   const todays = slotsOn(schedule, now)
     .map((slot) => resolveSlot(routines, slot))
     .filter((x) => x.routine)
-  // Upcoming schedule peek (tomorrow onward) — a small preview of what's next, each
-  // with an inline Start (req-14 review; the interim before req-32's unified scroll).
-  // req-60 — the shown list is REVERSED so the column reads chronologically top→bottom
-  // (dates decreasing): the furthest of the two soonest workouts sits at the top and
-  // the nearest just above the today hero. `remainingInLoop` is ascending (nearest
-  // first) and stays that way for its other callers — the flip is render-time only.
-  const upcoming = remainingInLoop(routines, schedule, now).slice(0, 2).reverse()
+  // req-200 (DEC-110 §4) — this calendar week, Mon–Sun, rest days included (replaces
+  // the 2 upcoming rows and their Start; Start-ahead moved to the day screen).
+  const week7 = weekRows(schedule, store.workouts, now)
   // req-114 — clamp like Schedule does (an imported 6 read "Week 1 of 6").
   const loop = clampLoopWeeks(schedule?.loopWeeks)
   const week = loopWeekIndex(schedule, now)
@@ -318,15 +308,15 @@ export function Today() {
   // already shows as Done is not repeated (`others` is exactly the slots rendered: all
   // of today's without a hero, the hero's others with one).
   const done = doneInTodayBlock(store.workouts, others, todayKey)
-  // req-55 — the recent peek shows finished history AND any stale/unfinished
-  // in-progress workout (started a prior day, or a legacy draft) as a Continue row,
-  // merged by date so a stale one appears only when it falls in the recent window.
-  // req-81 — today's finished workouts are excluded here; they live in today's block
-  // above (stale in-progress are never finished, so none are in that set).
-  const recent = sortWorkoutsByDate([
-    ...staleInProgressWorkouts(store, todayKey, now),
-    ...(store.workouts || []).filter((workout) => !completedTodayIds.has(workout.id)),
-  ]).slice(0, 2)
+  // req-55 — a stale/unfinished in-progress workout (started a prior day, or a legacy
+  // draft) is a Continue row. req-200 (review F6): it sits with today's block, above the
+  // week, ALWAYS shown — it was merged by date into the 2-row recent peek, where an old
+  // one fell off the bottom. The recent peek is now finished, prior-day history only.
+  // req-81 — today's finished workouts are excluded there; they live in today's block.
+  const stale = staleInProgressWorkouts(store, todayKey, now)
+  const recent = sortWorkoutsByDate(
+    (store.workouts || []).filter((workout) => !completedTodayIds.has(workout.id)),
+  ).slice(0, 2)
 
   // req-119 — first run is no routines AND no workouts AND no active workout (was
   // `!routines.length`, which showed "No data" mid-workout and with history).
@@ -387,26 +377,16 @@ export function Today() {
         <NavLink to="/routines" chevron="forward">Workouts</NavLink>
       </p>
 
-      {/* Section order: upcoming items → Today (emphasized; req-195: with
-          today's finished workouts inside it) → prior-day recent items → Previous› (plain link, the last Row of the recent list) →
-          gap → Routines› (pinned to the viewport bottom, above the tab bar). req-59
-          restored the upcoming preview (the "what's next" items with inline Start);
-          req-57's Schedule nav link stays gone — Schedule lives in the Library
-          segment (req-56). The upcoming list is headerless. Interim peeks until
-          req-32's unified scroll. */}
-      <List>
-        {upcoming.map(({ date, slot, routine }) => (
-          <UpcomingRow key={`${dateKey(date)}-${slot.id}`} store={store} date={date} slot={slot} routine={routine} todayKey={todayKey} />
-        ))}
-      </List>
-      {upcoming.length === 0 ? <p className="ui-sub">Nothing scheduled.</p> : null}
-
+      {/* req-200 (DEC-110 §4) — section order: today's block (with today's finished
+          workouts inside it, req-195) → the stale Continue row (review F6) → this week
+          Mon–Sun → prior-day recent items → History. The 2 upcoming rows (req-14/59/60) are gone:
+          only today's block carries Start. */}
       {/* req-55 / DEC-038 — a current in-progress workout IS the single hero. No second
           hero. req-114 / DEC-058 §3: it heads today's block (today's date), and the
           day's other occurrences stay below it with their own Start/Done. On
           finish/abandon it is gone and the block is the plain scheduled one. A stale
           in-progress is not the hero — today shows normally; it appears as a Continue
-          row in the recent peek below. */}
+          row right under this block (req-200). */}
       {hero ? (
         <TodayHero store={store} workout={hero} others={others} date={todayKey} done={done} />
       ) : todays.length ? (
@@ -414,6 +394,21 @@ export function Today() {
       ) : (
         <TodayEmpty store={store} date={todayKey} done={done} />
       )}
+
+      {stale.length ? (
+        <List>
+          {stale.map((workout) => (
+            <InProgressPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
+          ))}
+        </List>
+      ) : null}
+
+      <SectionHeader>This week</SectionHeader>
+      <List>
+        {week7.map((row) => (
+          <WeekRow key={row.dateKey} routines={routines} row={row} todayKey={todayKey} />
+        ))}
+      </List>
 
       {/* req-195 / DEC-108 §5 — the list below today's block holds PRIOR days only (the
           recent peek, then the History link). Today's finished workouts moved into
@@ -424,13 +419,9 @@ export function Today() {
         <p className="ui-sub">No history yet.</p>
       ) : null}
       <List>
-        {recent.map((workout) =>
-          workout.finishedAt ? (
-            <HistoryPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
-          ) : (
-            <InProgressPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
-          ),
-        )}
+        {recent.map((workout) => (
+          <HistoryPeekRow key={workout.id} store={store} workout={workout} todayKey={todayKey} />
+        ))}
         <Row to="/history">History</Row>
       </List>
     </Screen>
