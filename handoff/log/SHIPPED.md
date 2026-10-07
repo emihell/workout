@@ -2383,3 +2383,5 @@ Gate (ui + Emilio's look): `check: green — lint, skills, no import cycles, 103
 branch's own smoke is green (Planner, throwaway worktree). Emilio: "ok".
 
 `store.jsx` changed by one line: the default name → `nextWorkoutName`. Diff read, so `--no-reviewer`. `reports/req-207.md`.
+
+No independent reviewer (`plan closeout --no-reviewer`): store.jsx: one line, default-name fallback 'Workout' -> nextWorkoutName(state.routines); no stored-shape change; diff read by Planner

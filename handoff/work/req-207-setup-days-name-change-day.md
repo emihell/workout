@@ -1,6 +1,6 @@
 # req-207 — first setup: pick your days, name it last ("New workout #N"); a day's workout can "Change day"
 
-**Status: READY** (2026-10-07). **Lane: ui.** From DEC-116 and Lena run 3 (setup picked Wed/Sat; she wanted Tue/Fri;
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-207` (`f46c4fb`…`f090d8b`, 5 commits).** (2026-10-07). **Lane: ui.** From DEC-116 and Lena run 3 (setup picked Wed/Sat; she wanted Tue/Fri;
 "Workout" collided everywhere). **Emilio sees screenshots before merge (L-050):** the days/name step and a day screen.
 
 ## Code today (main `8d9e676`)
