@@ -1,14 +1,17 @@
 import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
-import { clampLoopWeeks, dateKey, loopWeekIndex, resolveSlot, slotsForWeekDay } from '../schedule'
+import { addDays, clampLoopWeeks, dateKey, loopWeekIndex, mondayOf, moveInto, resolveSlot, slotsForWeekDay, slotsOn, toLocalDate } from '../schedule'
 import { routineById } from '../model.js'
 import { workoutRoutineId, workoutRoutineName } from './history/helpers'
 import {
   changeDaySheet,
   changedDayPath,
+  dateDayPath,
   dayEveryText,
   dayScreenDate,
   doneOnDay,
   longWeekdayDate,
+  movedFromText,
+  oneDateSheet,
   removeSlotText,
   scheduleRowText,
   slotMenuSheet,
@@ -145,7 +148,18 @@ async function slotActions(store, { routines, slot, week, weekday, loop, date, f
   const name = slotLabel(routines, slot)
   const menu = slotMenuSheet(name)
   const choice = await askChoice('', { title: menu.title, choices: menu.choices })
-  if (choice === 'change') {
+  if (choice === 'change' && date) {
+    // req-211 (DEC-117 §2) — a dated screen (from Home) moves this one date only.
+    const monday = mondayOf(date)
+    const taken = Array.from({ length: 7 }, (_, k) => dateKey(addDays(monday, k))).filter((key) =>
+      slotsOn(store.schedule, key).some((other) => other.id !== slot.id && other.routineId === slot.routineId),
+    )
+    const sheet = oneDateSheet(name, date, taken)
+    const picked = await askChoice(sheet.message, { title: sheet.title, choices: sheet.choices })
+    if (picked == null || picked === date) return
+    store.moveSlotOnDate({ slotId: slot.id, date, to: picked })
+    go(withFrom(dateDayPath(store.schedule, picked), from))
+  } else if (choice === 'change') {
     const taken = (store.schedule?.slots || [])
       .filter((other) => Number(other.week) === Number(week) && other.routineId === slot.routineId)
       .map((other) => other.weekday)
@@ -156,7 +170,8 @@ async function slotActions(store, { routines, slot, week, weekday, loop, date, f
     store.addSlot({ week, weekday: Number(picked), routineId: slot.routineId })
     go(withFrom(changedDayPath(week, Number(picked), date), from))
   } else if (choice === 'remove') {
-    if (!(await askConfirm(removeSlotText(name, weekday, week, loop), { confirmLabel: 'Remove' }))) return
+    // req-211 — a slot moved onto this date still repeats on its own day: name that one.
+    if (!(await askConfirm(removeSlotText(name, slot.weekday, slot.week, loop), { confirmLabel: 'Remove' }))) return
     store.removeSlot(slot.id)
   }
 }
@@ -182,12 +197,14 @@ async function slotActions(store, { routines, slot, week, weekday, loop, date, f
 export function ScheduleDay({ week, weekday, from = null, date: linkDate = null }) {
   const store = useStore()
   const routines = activeRoutines(store)
-  const slots = slotsForWeekDay(store.schedule, week, weekday)
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
   const backTo = from || '/schedule'
   const now = new Date()
   const todayKey = dateKey(now)
   const date = dayScreenDate(store.schedule, week, weekday, from, linkDate, now)
+  // req-211 — a dated screen is that date's slots (one-date moves applied); the undated loop
+  // day is the recurring weekday, as before.
+  const slots = date ? slotsOn(store.schedule, date) : slotsForWeekDay(store.schedule, week, weekday)
   const here = date && linkDate === date ? `${dayPathOf(week, weekday)}?date=${date}` : dayPathOf(week, weekday)
   const done = doneOnDay(store.workouts, date)
 
@@ -210,6 +227,7 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
       <List>
         {slots.map((slot) => {
           const { routine } = resolveSlot(routines, slot)
+          const moved = date ? moveInto(store.schedule, slot.id, date) : null
           const startable =
             routine &&
             routineStartable(routine) &&
@@ -237,6 +255,7 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
               }
             >
               <NavLink to={childLink(dayPathOf(week, weekday, `/${slot.id}`), here, from)}>{slotLabel(routines, slot)}</NavLink>
+              {moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null}
             </Row>
           )
         })}
@@ -303,8 +322,18 @@ export function ScheduleDayAdd({ week, weekday, from = null }) {
   )
 }
 
+// req-211 — a slot moved for one date onto this week/weekday (its row on that dated day screen
+// links here) is on this day too.
 function slotOnDay(schedule, week, weekday, slotId) {
-  return slotsForWeekDay(schedule, week, weekday).find((s) => s.id === slotId) || null
+  const own = slotsForWeekDay(schedule, week, weekday).find((s) => s.id === slotId)
+  if (own) return own
+  const movedHere = (Array.isArray(schedule?.moves) ? schedule.moves : []).some(
+    (move) =>
+      move.slotId === slotId &&
+      toLocalDate(move.to).getDay() === Number(weekday) &&
+      loopWeekIndex(schedule, move.to) === Number(week),
+  )
+  return movedHere ? (schedule.slots || []).find((s) => s.id === slotId) || null : null
 }
 
 // req-202 — `from` is the day screen as it was entered (childLink from ScheduleDay, e.g.

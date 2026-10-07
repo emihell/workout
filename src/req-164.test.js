@@ -13,6 +13,9 @@ import { loadState, saveState } from './storage.js'
 import { finishedState } from './workout-log.js'
 import { OLD_V8, OLD_V9_WITH_PLAN } from './req-165.old-docs.js'
 import { DEVICE_FILL_KEY, diskValue, filledLike, loadFilledLike } from './test-support/fill.js'
+// req-211 test edit: main's golden predates the additive `schedule.moves`; withEmptyMoves adds
+// exactly `moves: []` to each of its schedules, so the rest still deep-equals main.
+import { withEmptyMoves } from './test-support/moves.js'
 
 const golden = JSON.parse(gunzipSync(readFileSync(new URL('./req-164.golden.json.gz', import.meta.url))).toString('utf8'))
 const DB = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
@@ -44,7 +47,7 @@ const snapshotDisk = () => Object.fromEntries([...disk].map(([k, v]) => [k, disk
 describe(`req-164 — migrate, load, save round-trip and finish deep-equal main (${golden.mainSha})`, () => {
   for (const [name, [key, doc, legacy]] of Object.entries(DOCS)) {
     it(`${name}: migrateState`, () => {
-      assert.deepEqual(plain(migrateState(structuredClone(doc), { legacy })), golden[name].migrate)
+      assert.deepEqual(plain(migrateState(structuredClone(doc), { legacy })), withEmptyMoves(golden[name].migrate))
     })
     it(`${name}: loadState, saveState → loadState, finishedState`, () => {
       disk.set(key, JSON.stringify(doc))
@@ -53,16 +56,16 @@ describe(`req-164 — migrate, load, save round-trip and finish deep-equal main 
       // (test-support/fill.js); everything else still deep-equals main.
       const marker = disk.get(DEVICE_FILL_KEY)
       assert.ok(marker, 'the fill ran and marked the device')
-      assert.deepEqual({ state: plain(loaded), disk: snapshotDisk() }, loadFilledLike(golden[name].load, marker))
+      assert.deepEqual({ state: plain(loaded), disk: snapshotDisk() }, withEmptyMoves(loadFilledLike(golden[name].load, marker)))
       saveState(loaded)
       const reloaded = loadState()
       assert.equal(disk.get(DEVICE_FILL_KEY), marker, 'the fill runs once')
-      assert.deepEqual({ state: plain(reloaded), disk: snapshotDisk() }, loadFilledLike(golden[name].roundTrip, marker))
+      assert.deepEqual({ state: plain(reloaded), disk: snapshotDisk() }, withEmptyMoves(loadFilledLike(golden[name].roundTrip, marker)))
       const finish = loaded.activeWorkout ? plain(finishedState(loaded, { overallFeel: 'Good' }, FINISHED_AT)) : null
       // Finish never touches routines (DEC-056): main's finish, with the loaded (filled) routines.
       const mainFinish = golden[name].finish
       const filledRoutines = filledLike(golden[name].load.state).routines
-      assert.deepEqual(finish, mainFinish && { ...mainFinish, routines: filledRoutines })
+      assert.deepEqual(finish, mainFinish && withEmptyMoves({ ...mainFinish, routines: filledRoutines }))
     })
   }
   it('the golden has teeth: db.json migrated (13 workouts, v8 key removed after the round-trip) and both finishes wrote sets', () => {

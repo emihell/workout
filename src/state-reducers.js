@@ -298,11 +298,30 @@ export function slotAddedState(s, slot) {
   return { ...s, schedule: { ...s.schedule, slots: [...(s.schedule?.slots || []), slot] } }
 }
 
+// req-211 — a removed slot takes its one-date moves with it (they name it by id).
 export function slotRemovedState(s, slotId) {
   return {
     ...s,
-    schedule: { ...s.schedule, slots: (s.schedule?.slots || []).filter((slot) => slot.id !== slotId) },
+    schedule: {
+      ...s.schedule,
+      slots: (s.schedule?.slots || []).filter((slot) => slot.id !== slotId),
+      moves: (Array.isArray(s.schedule?.moves) ? s.schedule.moves : []).filter((move) => move.slotId !== slotId),
+    },
   }
+}
+
+// req-211 (DEC-117 §2) — "Change day" on a dated day screen: move the slot shown on `date` to
+// `to` for that one date. A slot already moved onto `date` keeps its original `from` (the move
+// is replaced); moving it back to that original date removes the move. Same date → the same
+// state. `id` is made by the caller (store.jsx), so a re-run updater writes the same record.
+export function slotMovedOnDateState(s, { id, slotId, date, to }) {
+  if (date === to) return s
+  const moves = Array.isArray(s.schedule?.moves) ? s.schedule.moves : []
+  const current = moves.find((move) => move.slotId === slotId && move.to === date)
+  const from = current ? current.from : date
+  const rest = moves.filter((move) => !(move.slotId === slotId && (move.to === date || move.from === from)))
+  const next = to === from ? rest : [...rest, { id, slotId, from, to }]
+  return { ...s, schedule: { ...s.schedule, moves: next } }
 }
 
 export function exerciseAddedState(s, exercise) {

@@ -79,10 +79,31 @@ export function planDateFor(date, now = new Date()) {
   return date || dateKey(now)
 }
 
+// req-211 (DEC-117 §2) — `schedule.moves` (optional, normalised by migrateState): a one-date
+// move `{ id, slotId, from, to }` ('YYYY-MM-DD') takes that slot off `from` and puts it on `to`
+// (the same Mon–Sun week). Every other date of the slot is untouched. Absent → no moves.
+export function scheduleMoves(schedule) {
+  return Array.isArray(schedule?.moves) ? schedule.moves : []
+}
+
+// The slots on a calendar date: the loop week's weekday slots, minus any moved away FROM this
+// date, plus any moved TO it (whatever their own weekday). Schedule order kept.
 export function slotsOn(schedule, date) {
+  const key = dateKey(date)
   const week = loopWeekIndex(schedule, date)
   const weekday = toLocalDate(date).getDay()
-  return (schedule?.slots || []).filter((s) => Number(s.week) === week && Number(s.weekday) === weekday)
+  const moves = scheduleMoves(schedule)
+  const away = new Set(moves.filter((move) => move.from === key).map((move) => move.slotId))
+  const into = new Set(moves.filter((move) => move.to === key).map((move) => move.slotId))
+  return (schedule?.slots || []).filter(
+    (s) => into.has(s.id) || (Number(s.week) === week && Number(s.weekday) === weekday && !away.has(s.id)),
+  )
+}
+
+// req-211 — the move that put `slotId` on `date`, or null (the slot is on its own day).
+export function moveInto(schedule, slotId, date) {
+  const key = dateKey(date)
+  return scheduleMoves(schedule).find((move) => move.slotId === slotId && move.to === key) || null
 }
 
 export function slotsForWeekDay(schedule, week, weekday) {
