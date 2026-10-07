@@ -1,6 +1,6 @@
 # req-209 — Noa run fixes: hide developer tools, sets inline, one set format, last time on the exercise page, labels
 
-**Status: READY** (2026-10-07). **Lane: ui.** From the "Noa" persona run on main `daaa957`: 27, designer, runner, new to the
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-209` (`43bdaf7`…`33952e7`, 2 commits).** (2026-10-07). **Lane: ui.** From the "Noa" persona run on main `daaa957`: 27, designer, runner, new to the
 gym, from an empty first launch. The findings are in `noa-run.md`. Planner viewed screenshots `65-backup-full` and
 `43-done-detail`. Every item here is a binary fix (DEC-091/095). Behaviour questions went to Emilio separately.
 
@@ -41,3 +41,10 @@ gym, from an empty first launch. The findings are in `noa-run.md`. Planner viewe
 6. Unit: the label map gives "Bodyweight" for both "body only" and "bodyweight".
 7. `./check` green. **This branch's own** smoke is green on the committed sha (L-049). Screenshots go to
    `scratchpad/r209-*.png` for Emilio's look (L-050).
+
+## Built — calls
+- **Emilio saw the screenshot list and said "yes"** (L-050).
+- **The build agent hit the usage limit after committing** (`43bdaf7`, `33952e7`) and wrote no report. Planner ran the gate,
+  read the 7 existing-test edits (all format swaps: " · " → " × ", "3 sets" → "3 × …", and opening `/settings?dev=1`, none
+  weakened), and took the screenshots itself.
+- **The dev flag** is enabled by `#/settings?dev=1`.

@@ -1917,3 +1917,27 @@ Folded into req-205 mid-build.
   - Under the hood it is the existing remove + add. History is untouched, and Done shows by date (req-200), so nothing is
     lost.
   - It doesn't apply to just one date: that would be a schema change (DEC-110 §5).
+
+## DEC-117 — Noa-run calls: a small progress arrow, reps carry on uniform plans, no pre-picked days, Total lifted goes, a one-date move from Home, CSV later  (Emilio, 2026-10-07)
+
+1. **Progress, small.** Emilio: "dont show all previous lifts, just show a small arrow up with a precentage of how much better
+   this time than last instead, keep it small, we will work on progress later on".
+   - The arrow is "↑ N%" per exercise, on DEC-050's axis from `beat-last-time.js`:
+     - weighted: the top-set kg, or reps when the kg is the same;
+     - bodyweight: reps;
+     - timed: duration.
+   - It shows only on an improvement, never a down arrow (DEC-050).
+   - **Where:** the in-workout exercise list once that exercise is done, and the finish screen. Not in History (DEC-050).
+   - The % is computed on that axis: (this − last) / last, rounded to a whole number. `(unconfirmed)`
+2. **One-date move.** Emilio: "yes, you have to change it in the actual schedule view for permanent change".
+   - "Change day" on a day screen opened **from Home** moves that one date only.
+   - On the Schedule (Whole plan) it moves every week, as now.
+   - **This is a persisted-schema change** (data lane): a new optional record. Emilio's eyes and a backup before merge.
+3. **Reps carry only on uniform plans.** Emilio: "as u recommend". A changed reps value carries to the remaining sets only
+   when every working set of that item has the same reps target (3 × 10). Per-set targets (12/10/8) stay as planned.
+   **Amends DEC-052** (the push-ups case keeps working when its targets differ).
+4. **Total lifted is removed** from the finish summary, the "vs last time" box and the History header. Emilio: "remove".
+5. **CSV export:** yes, later. Backlog.
+6. **Setup days are not pre-picked.** Emilio: "why prepick days? sounds irritating, let user choose days, we have no idea when
+   a user wants to train". The chips start empty, and Save unlocks at exactly N. **Amends DEC-116.** DEC-105's "starts today
+   if today is chosen" stays.
