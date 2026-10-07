@@ -137,6 +137,17 @@ export function activeTab(routeName) {
   return 'workouts'
 }
 
+// req-198 (DEC-112) — the bottom bar is gone and Home is the hub, so a deep screen's top
+// row carries a "Today" link opposite its Back. It shows only where Back does NOT already
+// go home (Back's target, query dropped, is not "/"), and never in the in-workout flow
+// (route names starting with `workout`, where the old dock was hidden too) or on Home.
+// Pure, so the rule is unit-tested (route.test.js); the shared Back renders from it.
+export function showsTodayLink(backTo, routeName) {
+  const name = String(routeName || '')
+  if (name === 'today' || name.startsWith('workout')) return false
+  return String(backTo || '/').split('?')[0] !== '/'
+}
+
 function parseRoutineNested(rest) {
   if (!rest.length) return { screen: 'detail' }
   if (rest[0] === 'plan') return null

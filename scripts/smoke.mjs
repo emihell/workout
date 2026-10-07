@@ -223,7 +223,7 @@ async function main() {
       }
     })
     await step('History shows the workout (reopen the app → History → the row)', async () => {
-      // In-workout screens hide the dock, and where the Backs land varies; reopening the
+      // There is no bottom bar (req-198), and where the Backs land varies; reopening the
       // app (a fresh load of the same origin, storage kept) is the user's way back to Today.
       await page.goto(url, { waitUntil: 'networkidle0' })
       await waitHash(page, /^#\/$/)

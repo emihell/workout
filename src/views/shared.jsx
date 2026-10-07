@@ -1,4 +1,4 @@
-import { toHash } from '../route'
+import { showsTodayLink, toHash, useHashRoute } from '../route'
 import { lookClass } from './nav-look.js'
 
 // req-12 / DEC-016 — the one nav-link primitive. Pure route navigation ("go to
@@ -40,10 +40,21 @@ export function NavLink({ to, children, className, chevron, look, block = false,
 // <a href>), not a button — the same `‹`-chevron link treatment as `ExercisesLink`
 // and the counterpart of the forward `›` nav links. One component, so every Back
 // site reads as navigation consistently.
+//
+// req-198 (DEC-112) — with no bottom bar, a deep screen's Back row also carries "Today"
+// (right-aligned, link look) so Home is one tap away. Shown only where Back doesn't
+// already go home and never in the in-workout flow (showsTodayLink, route.js).
 export function Back({ to = '/' }) {
+  const route = useHashRoute()
+  const today = showsTodayLink(to, route.name)
   return (
-    <p>
+    <p className={today ? 'ui-back-row' : undefined}>
       <NavLink to={to} look="link" chevron="back">Back</NavLink>
+      {today ? (
+        <NavLink to="/" look="link">
+          Today
+        </NavLink>
+      ) : null}
     </p>
   )
 }

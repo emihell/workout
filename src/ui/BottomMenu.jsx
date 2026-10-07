@@ -1,3 +1,7 @@
+// req-198 (DEC-112) — NOT RENDERED. The bar was removed (App.jsx no longer mounts it) and
+// its .ui-dock CSS is gone. This file, its test and activeTab (route.js) are left only
+// because deleting them was not permitted in the req-198 build; delete all three together.
+//
 // req-52 / DEC-036 — the global bottom menu, extracted from ui/index.jsx's old
 // TabBar (req-14/DEC-024). A floating dock (inset from the edges, NOT a flush
 // full-width bar), solid — no translucency, no shadow — with two controls,

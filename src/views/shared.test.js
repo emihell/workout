@@ -27,7 +27,9 @@ test('req-62 — Back is a NavLink to `to` (DEC-016 nav = link), a ‹ back-chev
 })
 
 test('Back navigates via the route hash (toHash), never the removed stack-back primitive', () => {
-  assert.match(src, /import \{ toHash \} from '\.\.\/route'/)
+  // req-198 (sanctioned edit) — the import also brings showsTodayLink / useHashRoute for the
+  // Today link; toHash must still be among them (was an exact `{ toHash }` match).
+  assert.match(src, /import \{[^}]*\btoHash\b[^}]*\} from '\.\.\/route'/)
   assert.doesNotMatch(src, /onClick=\{\(\) => back\(\)\}/)
 })
 

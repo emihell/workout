@@ -25,7 +25,6 @@ import { Exercises, ExerciseNew, ExerciseNewManual, ExerciseNewSearch, ExerciseD
 import { Workout, WorkoutItem, WorkoutItemLog, WorkoutItemDone, WorkoutItemExercise, WorkoutItemReplace, WorkoutAdd, WorkoutSetEdit, WorkoutFinish, WorkoutSetup } from './views/workout'
 import { History, HistoryDetail, HistoryEdit, HistorySet, HistorySetAdd, HistorySetNew, HistoryExercises, HistoryExercise, HistoryWorkoutExercise, HistoryRecalculate, HistoryRoutine } from './views/history'
 import { Settings } from './views/Settings'
-import { BottomMenu } from './ui/BottomMenu.jsx'
 import { Library } from './views/Library'
 import { Showcase } from './ui/Showcase.jsx'
 // req-86 (N8) / req-87 — the "note on this page" feedback capture. req-87 flipped
@@ -273,7 +272,6 @@ export default function App() {
             <Screen />
           </ErrorBoundary>
         </main>
-        <BottomMenu />
         <FeedbackNotesGate />
         <ConfirmSheet />
       </StoreProvider>
