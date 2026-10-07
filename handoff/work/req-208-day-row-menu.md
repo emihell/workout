@@ -1,6 +1,6 @@
 # req-208 — day screen: Change day and Remove behind "⋯"; the row shows the name and Start now
 
-**Status: READY** (2026-10-07). **Lane: ui.** Emilio said "ok" to Planner's recommendation after seeing `r207-day.png`.
+**Status: BUILT AND MERGED, 2026-10-07 — branch `req-208` (`ceee538`…`717025e`, 2 commits).** (2026-10-07). **Lane: ui.** Emilio said "ok" to Planner's recommendation after seeing `r207-day.png`.
 There, at 390 px, "Start now / Change day / Remove" wrapped each label onto 2 lines.
 
 ## Code today (main, after req-207)
