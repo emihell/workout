@@ -269,6 +269,7 @@ describe('AC3 / AC8 — the exercise review (render, real store)', () => {
     assert.equal(window.location.hash, doneHash(CHEST))
     assert.equal(navigationCancels(pending, window.location.hash), false, 'landing on the review keeps it open')
     assert.equal(navigationCancels(pending, '#/workout/sess-upper'), true, 'any other screen answers it')
+    await act(async () => answerConfirm(false))
   })
 })
 
