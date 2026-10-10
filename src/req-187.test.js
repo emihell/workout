@@ -143,9 +143,20 @@ describe('req-187 (rendered) — last Complete → the sheet; Update / Keep; no 
       captured.store = useStore()
       return child
     }
+    // req-217 test edit — one StoreProvider for the whole test, the screen swapped inside it
+    // (as the app's router does). It was a fresh provider per screen, so Yes on the sheet opened
+    // from the log screen wrote through the unmounted provider's store, and that only saved by
+    // React's eager-state quirk — an extra render on the log screen (req-217's library load)
+    // turned it off. Same assertions; nothing about the behaviour under test changed.
+    function Host() {
+      const [child, setChild] = React.useState(null)
+      // oxlint-disable-next-line react/immutability
+      captured.setChild = setChild
+      return h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet))
+    }
     const mount = async (child) => {
-      await view?.unmount()
-      view = await render(h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet)))
+      if (!view) view = await render(h(Host))
+      await act(async () => captured.setChild(child))
     }
     await mount(null)
     await act(async () => captured.store.startWorkout('up'))
