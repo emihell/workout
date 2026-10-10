@@ -2007,3 +2007,14 @@ some kind of API that we can do essentially the same thing but without user expo
    excercise is one hand at the time, we tell the user that somehow, so there is no confusin and we are clear". Matches the
    current "kg per dumbbell" label (`kg-label.js:11`) and req-217's "each side"; the req adds a plain one-arm instruction where
    the library marks the exercise unilateral. Spec pending (with the "Last time" hint, req-10, the AI round-trip).
+
+## DEC-123 — first-time setup asks once after set 1; AI import keeps history by default; "Export for your AI" on Backup & data  (Emilio, 2026-10-10)
+
+Planner's recommendations; Emilio: "your picks".
+1. **req-10:** after the **first set only** of a no-history exercise in setup, "How was that? Easy · Medium · Hard" → set 2's kg
+   one valid step up / same / one step down (`moveToValidWeight`), an editable prefill with its reason; later sets carry as usual.
+   Amends DEC-012's per-set effort loop (DEC-119 §1 made effort per exercise).
+2. **req-220 import:** a preview of what changed before anything is replaced; if logged history changed, **Keep my history**
+   (default: plan, exercises and schedule from the file, current `workouts` kept) or **Replace everything**. Applies to every
+   import.
+3. **req-220 button:** "Export for your AI" on Backup & data under "Back up now", with a 3-line how-to; the dev checkbox goes.

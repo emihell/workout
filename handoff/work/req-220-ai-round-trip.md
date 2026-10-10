@@ -1,4 +1,4 @@
-**Status: NEEDS DECISIONS** **Lane: data** — import replaces stored state (a bulk write): independent reviewer, backup reminder,
+**Status: READY** **Lane: data** — import replaces stored state (a bulk write): independent reviewer, backup reminder,
 Emilio's eyes before merge (DEC-035 carve-out).
 
 # req-220 — "Export for your AI": a current, self-describing export, and an import that shows what changed
@@ -6,7 +6,7 @@ Emilio's eyes before merge (DEC-035 carve-out).
 DEC-121 §1 (Emilio, 2026-10-10: "the export should have the rules for import and data structure, so users can export the data,
 and chat with their prefered ai to upgrade the plan, then import it in again"). Builder: Builder session or throwaway agent.
 
-## Open questions — answer before build
+## Decided (DEC-123 §2–3, Emilio "your picks") — Q1 (a), Q2 recommended
 
 1. **When the AI's file changes logged history** (a workout edited or removed), what does import do?
    - **(a) Recommended:** the preview says so ("2 logged workouts changed") and offers **Keep my history** (default; take the

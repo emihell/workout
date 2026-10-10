@@ -1,16 +1,28 @@
-**Status: NEEDS DECISIONS** **Lane: ui** — rescanned 2026-10-10 after req-212; the per-set effort loop below no longer has an input.
+**Status: READY** **Lane: ui** — rescanned 2026-10-10; decided DEC-123 §1. Builder: Builder session or throwaway agent (ux-feel).
 
-## Open question (2026-10-10) — answer before build
+## Decided build (DEC-123 §1, 2026-10-10) — supersedes the per-set effort steps in the original text below
 
-DEC-012's "Set it up" logs each set **with an effort rating** and suggests the next set's kg from it. Since req-212 (DEC-119 §1) a
-set logs with one **Done** and no effort (`src/ui/index.jsx:769-778`, `views/workout/item.jsx:280-284`); effort is picked once on
-the exercise review. How should setup suggest the next set?
-- **(a) One question after the first set only (recommended):** "How was that? Easy · Medium · Hard" → set 2's kg moves one valid
-  step up / stays / one step down (`moveToValidWeight`, `progress.js:69-82`), shown as an editable prefill with its reason; later
-  sets carry as usual. One extra tap, once per new exercise.
-- **(b) A quick effort tap after every setup set** — closest to DEC-012, but brings back per-set effort for setup sets only.
-- **(c) No suggestion:** a short guide line only ("start light — a weight you could lift ~15 times; adjust each set"), the carry
-  does the rest, the review's effort drives next time.
+1. On reaching the **first work set of a weighted or bodyweight exercise with no finished history** (`lastSetsForExercise` null,
+   `history-queries.js:192`), show a prompt above the form: **"First time — [Set it up] [I'll enter it]"**. Dismiss = I'll enter
+   it. Cardio / timed: no prompt. Once answered, it doesn't show again for that exercise in this workout.
+2. **I'll enter it** = today's form, unchanged (routine kg → carry → blank, `workout-log.js:531-548`).
+3. **Set it up** = a short guide line under the kg box: "Pick a weight you could lift about 15 times. Log the set, then tell us
+   how it felt." The kg box stays as today (routine kg or blank) — **never an invented number** (DEC-012, DESIGN §1).
+4. After set 1's **Done**, a one-time sheet: **"How was that? Easy · Medium · Hard"** (+ Skip). The pick writes set 1's `rpe`
+   (2/3/4) and seeds set 2's kg: Easy → `moveToValidWeight(kg, ex, +1)`, Medium/Hard → same kg, and a set 1 with **missed reps**
+   → one step down (`progress.js:69-82`; same thresholds as `recommendNextPrescription`, Hard holds). Weighted only; bodyweight
+   moves reps ±1 the same way. Shown as an editable prefill with a reason line ("Up one step — set 1 felt easy"). Skip → normal
+   carry. No valid step (`weightStep` n/a) → same kg, reason "No weight steps set for this exercise".
+5. Sets 3+ carry as usual. The exercise review's effort works as today (a set-1 pick counts as already picked only if it matches
+   — it does not pre-select the review).
+
+**Acceptance (in addition to the original criteria still valid):** unit tests for the set-2 seed (Easy / Medium / Hard / missed /
+no step / Alt 4/5 / Steps A/B / lightest-weight floor); browser: no-history exercise → prompt → Set it up → Done → sheet → Easy →
+set 2 kg = one valid step up with the reason; **failure case:** an exercise with history shows no prompt; Skip on the sheet
+leaves set 2 at the plain carry; nothing is ever prefilled on set 1 that the routine didn't have.
+
+**`(unconfirmed)`:** the wording of the prompt, guide line and reason; "about 15 times"; the prompt shows only once per exercise
+per workout.
 
 ## Rescan 2026-10-10 — what changed under this req [measured, Explore agent on `main` 98f94cf]
 
