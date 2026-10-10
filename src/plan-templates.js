@@ -139,7 +139,9 @@ export function splitPicks(picks, split) {
 // req-207 fix (DEC-105 §2 kept): A/B alternates over the chosen days ordered from `today` (a
 // weekday number, 0 = Sun): the first chosen day on or after today is A, then wrap around —
 // so day A is the first workout you do. No `today` → Mon–Sun order.
-export function machinesPlan({ days, split, picks, names, weekdays, today = 1 }) {
+// req-215 (DEC-119 §4) — `schedule: false`: a later workout (exercises + name only) — no week,
+// so planToState leaves the schedule exactly as it was, even an empty one.
+export function machinesPlan({ days, split, picks, names, weekdays, today = 1, schedule = true }) {
   const template = PLAN_TEMPLATES[days]
   if (!template) return null
   const ab = split === SPLIT_AB && days >= 2
@@ -148,7 +150,8 @@ export function machinesPlan({ days, split, picks, names, weekdays, today = 1 })
   const nameOf = (r) => String(names?.[r] ?? '').trim() || fallback[r]
   const from = Number(today)
   const chosen = weekdays ? mondayFirst(weekdays).sort((a, b) => ((a - from + 7) % 7) - ((b - from + 7) % 7)) : null
-  const week = (chosen || template.week.map(([weekday]) => weekday)).map((weekday, i) => [weekday, ab ? i % 2 : 0])
+  const week =
+    schedule === false ? [] : (chosen || template.week.map(([weekday]) => weekday)).map((weekday, i) => [weekday, ab ? i % 2 : 0])
   return {
     routines: groups.map((group, r) => ({ name: nameOf(r), picks: group })),
     week,
@@ -291,7 +294,8 @@ export function planToState(state, choices, ids) {
     return routine.id
   })
 
-  const scheduled = (state.schedule?.slots || []).length === 0 && routineIds.some(Boolean)
+  // req-215 — a plan with no week (a later workout, `schedule: false`) never touches the schedule.
+  const scheduled = plan.week.length > 0 && (state.schedule?.slots || []).length === 0 && routineIds.some(Boolean)
   if (scheduled) {
     s = { ...s, schedule: { ...withDefaultAnchor(s.schedule || { slots: [] }, ids.now), loopWeeks: 1 } }
     // The first KEPT day is today (a left-out day A does not push the plan to its next day).

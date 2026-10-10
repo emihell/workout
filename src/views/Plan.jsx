@@ -17,11 +17,13 @@ import {
   carriedFills,
   emptyDaySheetText,
   machinesPlan,
+  nextWorkoutName,
   nextWorkoutNames,
   planDaysText,
   slotFilters,
 } from '../plan-templates.js'
 import { go, useHashRoute } from '../route'
+import { hasActiveWorkout } from '../schedule-days.js'
 import { useStore } from '../store-context'
 import { askChoice } from '../ui/confirm.js'
 import { Actions, Button, Field, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Title } from '../ui/index.jsx'
@@ -263,8 +265,8 @@ function Choice({ name, checked, onChange, children }) {
 }
 
 // req-207 — the 7 weekday chips, Mon–Sun: each a toggle (aria-pressed), styled as the
-// segmented control's segments.
-function WeekdayChips({ value, onToggle }) {
+// segmented control's segments. req-215 — also the workout screen's Days row (Routine.jsx).
+export function WeekdayChips({ value, onToggle }) {
   return (
     <div className="ui-seg ui-seg--days" role="group" aria-label="Days">
       {WEEKDAYS_MON_FIRST.map((weekday) => {
@@ -400,9 +402,51 @@ function MachinesDays({ picks, routines, schedule, saving, onSave }) {
   )
 }
 
+// req-215 (DEC-119 §4) — a later workout (the user already has one): the picks, then the name
+// ("New workout #N", an emptied box saves it), then Save → one workout, no schedule change, and
+// the new workout's own screen (its Days row schedules it).
+function MachinesName({ picks, routines, saving, onSave }) {
+  const [prefill] = useState(() => nextWorkoutName(routines))
+  const [typed, setTyped] = useState(prefill)
+  const name = typed.trim() || prefill
+  return (
+    <Screen>
+      <Back to={MACHINES} />
+      <Title>Name your workout</Title>
+      <List>
+        {picks.map((pick) => (
+          <Row key={pick.kind === 'own' ? pick.exerciseId : pick.data.libraryId || pick.name}>
+            <span className="ui-row__stack">
+              <span>{pick.name}</span>
+              <span className="ui-row__meta">{pick.label}</span>
+            </span>
+          </Row>
+        ))}
+      </List>
+      <Field label="Name" value={typed} onChange={(e) => setTyped(e.target.value)} />
+      <Actions
+        className="ui-picker-bar"
+        retreat={<NavLink to="/routines/new" look="secondary">Cancel</NavLink>}
+        forward={
+          <Button
+            variant="primary"
+            disabled={saving}
+            onClick={() => onSave({ days: 1, split: SPLIT_SAME, picks, names: [name], schedule: false })}
+          >
+            Save
+          </Button>
+        }
+      />
+    </Screen>
+  )
+}
+
 export function RoutineMachines() {
   const store = useStore()
   const route = useHashRoute()
+  // req-215 — fixed when the flow opens: the first workout keeps the days step (a whole plan);
+  // a later one is exercises + name. Fixed, so Save's own new workout can't flip the step.
+  const [later] = useState(() => hasActiveWorkout(store.routines))
   // { picks (onPick's), selection (the picker's own, to reopen it ticked) } — memory only.
   const [chosen, setChosen] = useState(null)
   const [done, setDone] = useState(false)
@@ -411,6 +455,22 @@ export function RoutineMachines() {
   const [saving, setSaving] = useState(false)
 
   if (done) return <Done />
+  if (route.step === 'days' && chosen?.picks.length && later) {
+    return (
+      <MachinesName
+        picks={chosen.picks}
+        routines={store.routines}
+        saving={saving}
+        onSave={(choices) => {
+          if (savedRef.current) return
+          savedRef.current = true
+          setSaving(true)
+          const { routineIds } = store.applyPlan(choices)
+          go(routineIds[0] ? `/routines/${routineIds[0]}` : '/routines')
+        }}
+      />
+    )
+  }
   if (route.step === 'days' && chosen?.picks.length) {
     return (
       <MachinesDays
