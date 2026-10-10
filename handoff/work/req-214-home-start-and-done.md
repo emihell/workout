@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: ui**
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-214` (`1227986`…`b4e0186`, 2 commits).** **Lane: ui**
 
 # req-214 — Home: one-line done, one Start for several, Start on the scheduled-workout screen
 
