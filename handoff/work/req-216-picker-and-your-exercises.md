@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui**
+**Status: BUILT, NOT merged** **Lane: ui**
 
 # req-216 — picker shows what you've added; Your exercises split by use
 
