@@ -2482,3 +2482,13 @@ rounds. Latent noted, no fix: a workout in progress at deploy inherits its old u
 
 Emilio's eyes; backup reminded (DEC-046). Emilio: "merge". `reports/req-212.md`. Follow-up: req-10 must be rescanned (its
 per-set effort step no longer exists).
+
+## req-217 — one-arm exercises read "each side"; the note and form cues show during rest  (2026-10-10)
+
+**req-217** (DEC-119 §6, ui; throwaway agent). Read-time `libraryEntryFor(...).unilateral` (`library-hints.js`, a
+`useExerciseLibrary` hook); `RestNotes` component. No stored write. Main chunk 422.69 → 424.70 kB (gzip 127.63 → 128.38); the
+library stays a lazy chunk, now fetched on first log-screen open. Test edits: req-192 (note moved to rest), req-209 (signature),
+req-187 (one provider — L-051). Gate: `check: green — lint, skills, no import cycles, 114 test file(s), and the build all
+passed.` (Planner, throwaway worktree); branch smoke green on `plan qa`; scripted list 1–8, 10 YES (5 via the rest pill, 0
+skipped sets), 0 dialogs. `workout-log.js` touched display-only (string helpers, `eachSide=false` default) → no reviewer, reason
+given at closeout. `reports/req-217.md`.

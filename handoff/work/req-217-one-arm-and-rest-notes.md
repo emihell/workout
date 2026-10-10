@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — reads the bundled library; no stored write.
+**Status: BUILT, NOT merged** **Lane: ui** — reads the bundled library; no stored write.
 
 # req-217 — one-arm exercises say "each side"; notes and form cues show during rest
 

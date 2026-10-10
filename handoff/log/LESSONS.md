@@ -507,3 +507,10 @@ screen is now very busy, i did not mean that you just force merge everything".
   even inside a batch he approved.
 - Mechanical fixes still merge on Planner's own testing (DEC-035).
 - When turning his question into a spec, build the smallest reading of it, not the largest.
+
+## L-051 — a rendered test that remounts StoreProvider between screens can pass on a write to the unmounted provider  (build agent, req-217, 2026-10-10)
+
+req-187's AC1 answered the routine-kg sheet after the log screen's provider had unmounted; the write only landed through React's
+eager-state path. req-217's extra library-hook render turned that off and the stored kg stayed `[20,20,20]` — a test failure
+with no product bug (the app never unmounts the provider). **How to apply:** rendered tests keep one `StoreProvider` and swap
+the screen inside it; never `mount` a fresh provider per screen.
