@@ -1,4 +1,34 @@
-# req-10 — "set up" flow for a first-time exercise (guided calibration)
+**Status: NEEDS DECISIONS** **Lane: ui** — rescanned 2026-10-10 after req-212; the per-set effort loop below no longer has an input.
+
+## Open question (2026-10-10) — answer before build
+
+DEC-012's "Set it up" logs each set **with an effort rating** and suggests the next set's kg from it. Since req-212 (DEC-119 §1) a
+set logs with one **Done** and no effort (`src/ui/index.jsx:769-778`, `views/workout/item.jsx:280-284`); effort is picked once on
+the exercise review. How should setup suggest the next set?
+- **(a) One question after the first set only (recommended):** "How was that? Easy · Medium · Hard" → set 2's kg moves one valid
+  step up / stays / one step down (`moveToValidWeight`, `progress.js:69-82`), shown as an editable prefill with its reason; later
+  sets carry as usual. One extra tap, once per new exercise.
+- **(b) A quick effort tap after every setup set** — closest to DEC-012, but brings back per-set effort for setup sets only.
+- **(c) No suggestion:** a short guide line only ("start light — a weight you could lift ~15 times; adjust each set"), the carry
+  does the rest, the review's effort drives next time.
+
+## Rescan 2026-10-10 — what changed under this req [measured, Explore agent on `main` 98f94cf]
+
+- "Complete" → **Done**; "Moderate" → **Medium**; Failure is no longer offered (`ids.js:21-33`). Hard (4) **keeps** the kg
+  (`progress.js:201`); only missed reps (or a legacy 5) move down (`progress.js:183`).
+- Work-set kg seed is now routine kg → session carry → blank (req-178, `workout-log.js:531-548`); history never seeds a work set.
+  Carry: `carryForSet` (`workout-log.js:460-468`) — the seam a setup mode plugs into. Reps carry on uniform plans (req-210).
+- No-history signal unchanged: `lastSetsForExercise` (`history-queries.js:192-202`), called at `item.jsx:207`.
+- The component is `WorkoutItemLive` in `src/views/workout/item.jsx:203` (Workout.jsx is gone).
+- `model.js:501-504` sets `calibrationRequired` / "No history yet. Find a starting load." — rendered nowhere.
+- Latent: `initialSetFields` still defaults effort 3 "Moderate" (`workout-log.js:607, 616-619`) though nothing reads it now.
+- Emilio 2026-10-10 frames this req as the "empty box" case ("i only care if its empty or if its a weird number").
+
+The original text below is kept for its decided parts (DEC-012: never an invented starting kg; auto-prompt on no history; "I'll
+enter it" = today's form). Steps that name per-set effort follow the answer above.
+
+---
+
 
 **Status: READY** **Lane: ui** (a new feature — after the follow-ups, DEC-087; rescan before building) — the two shaping decisions are settled (DEC-012: guided calibration, not an
 invented number; auto-prompt on no-history). Remaining choices are flagged defaults below, and
