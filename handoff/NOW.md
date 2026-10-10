@@ -18,7 +18,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 **READY, held:**
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
-- **NOW: feedback batch 5 (DEC-119) DONE — req-212–218 live 2026-10-10.** Next: Emilio's end-of-batch list (calls in each req's Decisions), then req-10 (rescan: its per-set effort step is gone after req-212).
+- **NOW: feedback batch 5 (DEC-119) DONE — req-212–218 live 2026-10-10.** Next: Emilio's end-of-batch list (calls in each req's Decisions), then req-10 (rescan: its per-set effort step is gone since the set flow, DEC-119 §1).
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2, req-10**, throwaway agents, Planner closes. Then req-184
   session 2, req-10. Batch 192–195 feel list: each req's "Built — calls".
 - **Waiting (Emilio, DEC-075):** req-146 backend, req-149 progression rules. `req-10` first-time setup — rescan first. **[ux-feel]**
