@@ -2465,3 +2465,20 @@ abandon, DEC-038); start rules kept unchanged, so they now share one Start. Test
 source locks. Gate: `check: green — lint, skills, no import cycles, 112 test file(s), and the build all passed.` (Planner,
 throwaway worktree); branch smoke green on `plan qa`; scripted list 1–9 YES with stored receipts, 0 dialogs. No trigger files →
 no reviewer. `reports/req-214.md`.
+
+## req-212 — set flow: one Done per set, an edit sheet, an exercise review with one effort  (2026-10-10)
+
+**req-212** (DEC-119 §1, ui with the data gate; throwaway agent — no Builder session was running). Done logs `rpe: null` +
+`loggedAt`; the review writes one effort (— · Easy · Medium · Hard) to that item's logged non-skipped work sets; a set logged
+after a pick inherits it; `/workout/:id/set/:n` now redirects. No schema bump, 0 records rewritten, `progress.js` unchanged.
+17 test files edited, each judged a real change by the reviewer. 4 commits `d261380`…`5aa2770`.
+
+Gate (data): `check: green — lint, skills, no import cycles, 109 test file(s), and the build all passed.` (Planner, throwaway
+worktree, at 5aa2770); branch smoke green on `plan qa`; scripted list 1–7, 10 + clear/re-pick YES with stored receipts.
+
+Reviewer (independent, 2 rounds): round 1 one should-fix (untouched Save un-skipped a set) + one latent (orphan per-set edit
+route offering Failure) + nits → all fixed in 706bd38; round 2 one nit (0 s un-skip) → fixed in 5aa2770; "No blockers." both
+rounds. Latent noted, no fix: a workout in progress at deploy inherits its old uniform per-set effort.
+
+Emilio's eyes; backup reminded (DEC-046). Emilio: "merge". `reports/req-212.md`. Follow-up: req-10 must be rescanned (its
+per-set effort step no longer exists).

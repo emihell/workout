@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — with the **data gate**: it changes what a logged set stores (`rpe` source, new `loggedAt`) and
+**Status: BUILT, NOT merged** **Lane: ui** — with the **data gate**: it changes what a logged set stores (`rpe` source, new `loggedAt`) and
 touches `workout-log.js` → independent reviewer, backup reminder (DEC-046), **Emilio's eyes before merge** (he asked to check it).
 No schema bump, no migration, no rewrite of stored records.
 
