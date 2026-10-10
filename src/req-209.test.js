@@ -93,7 +93,9 @@ describe('§3 one set format: "{kg} kg × {reps}"', () => {
     // req-212 test edit — the done view (now the exercise review) lists its sets in the set list's
     // shape (loggedSetRowText → setPreviewText: "1 · {kg} kg × {reps}", the same kg × reps format);
     // the per-set effort word left those lines (one effort per exercise, DEC-119 §1).
-    assert.match(read('views/workout/item.jsx'), /loggedSetRowText\(label, set, weighted, cardioFields\)/)
+    // req-217 test edit — the call gained a trailing `eachSide` (reps read "12 each side" for a
+    // unilateral library entry); the formatter is unchanged, so the same call is matched.
+    assert.match(read('views/workout/item.jsx'), /loggedSetRowText\(label, set, weighted, cardioFields, eachSide\)/)
     assert.match(read('views/history/list.jsx'), /topSetText\(w\.sets, exerciseId\)/)
   })
 })

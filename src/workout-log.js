@@ -893,7 +893,9 @@ export function durationTargetFor(item, ex, workIndex) {
 // given, an upcoming work set's kg follows the same in-session carry its form will use
 // (carryForSet — DEC-002 / req-152; still below the routine kg). Absent = the req-106
 // start-of-exercise preview (nothing logged, no carry), as before.
-export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides, workLogged = null }) {
+// req-217 — `eachSide` (the exercise's library entry is unilateral, library-hints.js): reps read
+// "12 each side".
+export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides, workLogged = null, eachSide = false }) {
   const overrides = seedOverrides || {}
   const uniformReps = uniformRepsTargets(item)
   const slots = []
@@ -921,15 +923,17 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
       reps: timed ? '' : fields.reps,
       durationSec: timed ? durationTargetFor(item, ex, workIndex) : null,
     }
-    return { ...entry, text: setPreviewText(entry, weighted) }
+    return { ...entry, text: setPreviewText(entry, weighted, eachSide) }
   })
 }
 
 // req-106 — one preview line: "1 · 20 kg × 8". A weighted set with no kg shows "—" in
 // the kg slot (absent, not invented); bodyweight shows the reps alone; a timed set
 // shows its seconds ("30s", as formatSetLine does) in place of reps.
-export function setPreviewText({ label, weight, reps, durationSec }, weighted) {
-  const amount = durationSec != null ? `${durationSec}s` : reps || '—'
+// req-217 — `eachSide`: a reps amount reads "12 each side" (a set = both sides, reps per side);
+// seconds and a blank "—" are unchanged.
+export function setPreviewText({ label, weight, reps, durationSec }, weighted, eachSide = false) {
+  const amount = durationSec != null ? `${durationSec}s` : reps ? eachSideReps(reps, eachSide) : '—'
   const body = weighted ? `${weight ? `${weight} kg` : '—'} × ${amount}` : amount
   return `${label} · ${body}`
 }
@@ -943,7 +947,7 @@ export function setPreviewText({ label, weight, reps, durationSec }, weighted) {
 //              blank kg stays "—" (DESIGN §1).
 // `highlighted` marks the one row the screen is on: the current set, or — while Previous
 // is showing a logged set (`viewingIndex`, an index into workout.sets) — that set.
-export function setListRows({ workout, item, ex, weighted, hasHistory, historyFor, viewingIndex = null }) {
+export function setListRows({ workout, item, ex, weighted, hasHistory, historyFor, viewingIndex = null, eachSide = false }) {
   const state = itemLoggingState(workout, item)
   const sets = workout?.sets || []
   const wuSet = state.logged.find((set) => set.setType === 'wu') || null
@@ -956,6 +960,7 @@ export function setListRows({ workout, item, ex, weighted, hasHistory, historyFo
     historyFor,
     seedOverrides: workout?.seedOverrides,
     workLogged: state.workLogged,
+    eachSide,
   })
   return slots.map((slot) => {
     const logged = slot.setType === 'wu' ? wuSet : state.workLogged[slot.workIndex] || null
@@ -965,7 +970,7 @@ export function setListRows({ workout, item, ex, weighted, hasHistory, historyFo
         key: `${slot.setType}|${slot.workIndex}`,
         status: 'done',
         setIndex,
-        text: loggedSetRowText(slot.label, logged, weighted, ex?.type === 'cardio' && !ex?.hasDuration),
+        text: loggedSetRowText(slot.label, logged, weighted, ex?.type === 'cardio' && !ex?.hasDuration, eachSide),
         highlighted: viewingIndex != null && viewingIndex === setIndex,
       }
     }
@@ -984,13 +989,21 @@ export function setListRows({ workout, item, ex, weighted, hasHistory, historyFo
 // req-186 — a done row: the logged values in the preview's own shape ("1 · 20 kg × 8").
 // req-194 — `cardio` (a non-timed cardio exercise) or a set carrying level / distance: its
 // cardio fields, "1 · 12:30 · level 8 · 1.5 km"; an old cardio set (none) keeps its reps text.
-export function loggedSetRowText(label, set, weighted, cardio = false) {
+// req-217 — `eachSide`: the logged reps read "12 each side" (setPreviewText).
+export function loggedSetRowText(label, set, weighted, cardio = false, eachSide = false) {
   if (isSkippedSet(set)) return `${label} · skipped`
   const bits = cardio || hasCardioFields(set) ? cardioBits(set) : []
   if (bits.length) return `${label} · ${bits.join(' · ')}`
   const durationSec = set?.durationSec != null && set.durationSec !== '' ? Number(set.durationSec) : null
   const weight = set?.weight != null && Number(set.weight) !== 0 ? String(set.weight) : ''
-  return setPreviewText({ label, weight, reps: set?.reps != null ? String(set.reps) : '', durationSec }, weighted)
+  return setPreviewText({ label, weight, reps: set?.reps != null ? String(set.reps) : '', durationSec }, weighted, eachSide)
+}
+
+// req-217 (DEC-119 §6) — a unilateral exercise's reps are per side: "12" → "12 each side". Display
+// only; the stored reps stay "12". Blank stays blank.
+export function eachSideReps(reps, eachSide = true) {
+  const text = reps == null ? '' : String(reps)
+  return eachSide && text.trim() !== '' ? `${text} each side` : text
 }
 
 // req-186 (DEC-103 §3) — the workout pill's "current exercise". Review fix 1 — rule:

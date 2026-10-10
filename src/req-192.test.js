@@ -84,11 +84,14 @@ describe('SetLogForm — one Done logs the set (req-212; was: effort buttons log
 
 describe('the log screen (real store)', () => {
   // req-212 test edit — the work set logs with Done (rpe null), was Hard (rpe 4).
-  it('warm-up "Done" → rpe null; work "Done" → rpe null and rest armed; set list above kg; routine note shown', async () => {
+  // req-217 test edit — the routine note left the title area (DEC-119 §6): it shows under the
+  // set list while this exercise's rest runs, so it is asserted absent before the first set and
+  // present (in .ui-restnotes) once a Done has armed the rest. Was: shown under the title at once.
+  it('warm-up "Done" → rpe null; work "Done" → rpe null and rest armed; set list above kg; routine note shown during rest', async () => {
     const t = await harness()
     await t.mount(t.item(CHEST))
     const c = view.container
-    assert.match(view.text(), /Controlled, near failure/, 'the routine note')
+    assert.doesNotMatch(view.text(), /Controlled, near failure/, 'no routine note before a rest')
     const list = c.querySelector('.ui-setpreview')
     const kg = view.input('kg')
     assert.ok(list.compareDocumentPosition(kg) & 4, 'the set list precedes the kg box')
@@ -97,6 +100,7 @@ describe('the log screen (real store)', () => {
     const sets = t.active().sets.map(({ setType, rpe }) => ({ setType, rpe }))
     assert.deepEqual(sets, [{ setType: 'wu', rpe: null }, { setType: 'work', rpe: null }])
     assert.ok(t.active().restEndsAt > Date.now(), 'rest armed')
+    assert.match(c.querySelector('.ui-restnotes')?.textContent || '', /Controlled, near failure/, 'the routine note, during rest')
     assert.equal(view.button('Complete'), null)
     assert.equal(view.button('Skip rest'), null)
   })

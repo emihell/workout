@@ -797,6 +797,26 @@ export function ExerciseHead({ title, aside = null, subtitle = '' }) {
   )
 }
 
+// RestNotes (req-217, DEC-119 §6) — a quiet block under the set list while the exercise's rest
+// runs: the routine's note for it (`note`), then a few form cues (`cues`, strings). Read-only.
+// Renders nothing when both are empty.
+export function RestNotes({ note = '', cues = [] }) {
+  const list = (cues || []).filter(Boolean)
+  if (!note && !list.length) return null
+  return (
+    <section className="ui-restnotes" aria-label="While you rest">
+      {note ? <p className="ui-restnotes__note">{note}</p> : null}
+      {list.length ? (
+        <ul className="ui-restnotes__cues">
+          {list.map((cue) => (
+            <li key={cue}>{cue}</li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  )
+}
+
 // SetList (req-212, H5; was item.jsx's ad-hoc `ui-setpreview` list, req-106 / req-186) — one
 // small line per set of an exercise. `rows`: [{ key, status: 'done' | 'current' | 'upcoming',
 // text, highlighted }]. A done row is a button when `onOpen` is given (onOpen(row) — the

@@ -13,6 +13,7 @@ import {
   List,
   NavLink,
   NumberField,
+  RestNotes,
   WorkoutPill,
   Row,
   Screen,
@@ -255,6 +256,14 @@ export function Showcase() {
           onOpen={() => setSheetOpen(true)}
         />
         <p className="ui-field__label">done rows open the edit sheet; current is highlighted; upcoming is inert</p>
+      </Block>
+
+      {/* req-217 — the rest notes, shown under the set list while that exercise's rest runs. */}
+      <Block heading="Rest notes">
+        <RestNotes
+          note="Pull to ribs, squeeze scapula"
+          cues={['Brace on the bench with one hand', 'Pull the elbow back past the torso', 'Keep the back flat']}
+        />
       </Block>
 
       {/* req-212 — the edit sheet for one logged set (position: fixed, so opened on demand). */}

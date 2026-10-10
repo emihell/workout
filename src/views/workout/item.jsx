@@ -49,6 +49,7 @@ import {
   ExerciseHead,
   Field,
   NavLink,
+  RestNotes,
   Screen,
   SectionHeader,
   SegmentedControl,
@@ -68,6 +69,8 @@ import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCar
 import { equipmentLabel } from '../../equipment-label.js'
 import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
+import { isEachSide, restNotesFor, restNotesShowing } from '../../library-hints.js'
+import { useExerciseLibrary } from './use-library.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
 // workout-log.js); weight step and cues stay live. Old snapshots read live as before.
@@ -207,7 +210,12 @@ function WorkoutItemLive({ routineId, item }) {
   const currentType = needsWu ? 'wu' : 'work'
   // req-106 — the target rule moved to setTargetFor (shared with the preview).
   const target = setTargetFor(item, currentType, currentWorkIndex)
-  const { resting } = useRestCountdown(active)
+  const { resting, now } = useRestCountdown(active)
+  // req-217 (DEC-119 §6) — read from the library at display time (lazy chunk; null until it
+  // loads, and then the screen reads as before): a unilateral entry's reps read "12 each side";
+  // during this exercise's rest the routine note + up to 3 form cues show under the set list.
+  const library = useExerciseLibrary()
+  const eachSide = isEachSide(ex, library)
   // req-125 — the log form's values are kept as a draft on the active workout
   // (`setDraft`, see setDraftKey in workout-log.js) so navigation and a tab reload don't
   // lose them. The draft is written as the user edits (useSetDraftWriter, debounced) and
@@ -346,7 +354,7 @@ function WorkoutItemLive({ routineId, item }) {
   }
 
   const weighted = isWeightedType(ex.type)
-  const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'
+  const repsLabel = ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : eachSide ? 'Reps each side' : 'Reps'
   // req-85 — a timed exercise counts down a duration on its WORK sets (a warmup set
   // stays reps-based). Target seconds: this set's routine duration, else the last one
   // in the list, else the exercise default, else the app default. Never invents beyond
@@ -454,8 +462,10 @@ function WorkoutItemLive({ routineId, item }) {
         hasHistory: Boolean(last),
         historyFor: (at) => historySetPrefill(last, at),
         viewingIndex: editIndex,
+        eachSide,
       })
     : null
+  const restNotes = logging && restNotesShowing(active, item, now) ? restNotesFor(item, ex, library) : null
 
   return (
     <Screen className="ui-screen--rest">
@@ -481,14 +491,13 @@ function WorkoutItemLive({ routineId, item }) {
           ) : null
         }
       />
-      {/* req-192 (DEC-108 §6) — the routine's note for this exercise (the snapshot item's
-          `notes`, set in the routine), read-only under the title. Edited in the routine. */}
-      {/* req-212 (H5) — plain .ui-sub (the ad-hoc ui-item-note class had no CSS rule). The note
-          stays under the title until req-217 moves it. */}
-      {item.notes ? <p className="ui-sub">{item.notes}</p> : null}
+      {/* req-217 (DEC-119 §6) — the routine's note for this exercise left the title area: it
+          shows in the rest notes under the set list (below), while this exercise's rest runs. */}
       {/* req-192 (DEC-108 §6) — the set list sits under the title, above kg / reps.
           req-212 — the library SetList; a done row opens that set in the edit sheet. */}
       {setRows ? <SetList rows={setRows} onOpen={openLoggedSet} /> : null}
+      {/* req-217 — the routine note, then up to 3 form cues; gone when the rest ends or is skipped. */}
+      {restNotes ? <RestNotes note={restNotes.note} cues={restNotes.cues} /> : null}
       {/* req-80 — the note field the "Add note" control reveals, rendered by the
           title (not inside SetLogForm). autoFocus only when opened by tapping (no
           seeded note); an empty field submits no note (unchanged behaviour). */}
@@ -559,7 +568,7 @@ function WorkoutItemLive({ routineId, item }) {
         />
       ) : null}
       {editIndex != null ? (
-        <LoggedSetSheet key={editIndex} item={item} ex={ex} index={editIndex} onClose={() => setEditIndex(null)} />
+        <LoggedSetSheet key={editIndex} item={item} ex={ex} index={editIndex} eachSide={eachSide} onClose={() => setEditIndex(null)} />
       ) : null}
       {/* req-26 — the equipment + cues block that sat under the buttons is removed
           to declutter the mid-set screen. Cues stay reachable: the exercise Title
@@ -575,7 +584,7 @@ function WorkoutItemLive({ routineId, item }) {
 // req-186's Save did) with the same patch and seed-override rerun (viewedSetSave, DEC-052);
 // `loggedAt` is never in the patch, so it is kept. `onSaved` runs after the write (the review
 // re-applies its effort). Cancel / backdrop / Escape write nothing.
-function LoggedSetSheet({ item, ex, index, onClose, onSaved }) {
+function LoggedSetSheet({ item, ex, index, eachSide = false, onClose, onSaved }) {
   const store = useStore()
   const active = store.activeWorkout
   const set = active?.sets?.[index]
@@ -614,7 +623,7 @@ function LoggedSetSheet({ item, ex, index, onClose, onSaved }) {
       weighted={weighted}
       timed={timed}
       cardio={cardio}
-      repsLabel={ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : 'Reps'}
+      repsLabel={ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : eachSide ? 'Reps each side' : 'Reps'}
       kgLabel={kgLabelFor(ex)}
       initialWeight={weighted ? init.weight : ''}
       initialReps={init.reps}
@@ -652,13 +661,16 @@ function ExerciseReview({ routineId, item }) {
   const [editIndex, setEditIndex] = useState(null)
   const ex = liveExercise(store, item)
   const weighted = isWeightedType(ex?.type)
+  // req-217 — the set lines read "12 each side" for a unilateral library entry.
+  const library = useExerciseLibrary()
+  const eachSide = isEachSide(ex, library)
   // req-194 — a non-timed cardio exercise's sets read "1 · 12:30 · level 8 · 1.5 km".
   const cardioFields = ex?.type === 'cardio' && !ex?.hasDuration
   const { logged, workLogged } = itemLoggingState(active, item)
   const rows = logged.map((set) => {
     const label = set.setType === 'wu' ? 'Warm-up' : String(workLogged.indexOf(set) + 1)
     const setIndex = (active.sets || []).indexOf(set)
-    return { key: String(setIndex), status: 'done', setIndex, text: loggedSetRowText(label, set, weighted, cardioFields), highlighted: editIndex === setIndex }
+    return { key: String(setIndex), status: 'done', setIndex, text: loggedSetRowText(label, set, weighted, cardioFields, eachSide), highlighted: editIndex === setIndex }
   })
   const pct = exerciseImprovementPct(active, previousSameRoutineWorkouts(active, store.workouts, store.routines), item.exerciseId, store.exercises)
   // Effort: hidden on cardio (no effort, req-156) and when no logged, non-skipped work set exists.
@@ -726,6 +738,7 @@ function ExerciseReview({ routineId, item }) {
           item={item}
           ex={ex}
           index={editIndex}
+          eachSide={eachSide}
           onClose={() => setEditIndex(null)}
           // An edit that turns a skipped set into a real one: the effort picked for the
           // exercise covers it too (re-applied from the latest state).
