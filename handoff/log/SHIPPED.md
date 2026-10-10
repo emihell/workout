@@ -2434,3 +2434,10 @@ Reviewer (independent, 2 rounds):
 - the real-export probe on 13 files and the 3-time-zone byte-identical load passed.
 
 Emilio's eyes on the stored shape. Backup reminded twice (DEC-046). Emilio: "merge". `reports/req-211.md`.
+
+## req-213 — a workout done earlier in the week covers its next spot ("Done Tue ✓")  (2026-10-10)
+
+**req-213** (DEC-119 §2, ui; throwaway agent). Pure `doneEarlier` in `schedule.js`; Home today/Coming up and the day screen show
+"Done {Day} ✓"; nothing stored. Gate: `check: green — lint, skills, no import cycles, 109 test file(s), and the build all passed.`
+(Planner, throwaway worktree); branch smoke `smoke: green — 12 steps` on `plan qa`; scripted list 9/9 with receipts (storage
+byte-identical). No trigger files → no reviewer. `reports/req-213.md`.

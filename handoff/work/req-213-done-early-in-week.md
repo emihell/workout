@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — display only; reads workouts, writes nothing.
+**Status: BUILT, NOT merged** **Lane: ui** — display only; reads workouts, writes nothing.
 
 # req-213 — a workout done earlier in the week covers its next spot
 
