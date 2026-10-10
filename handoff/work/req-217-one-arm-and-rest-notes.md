@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — reads the bundled library; no stored write.
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-217` (`e40c849`…`f2539f9`, 2 commits).** **Lane: ui** — reads the bundled library; no stored write.
 
 # req-217 — one-arm exercises say "each side"; notes and form cues show during rest
 
