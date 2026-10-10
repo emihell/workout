@@ -1985,3 +1985,16 @@ we do not want to be a copy"). Verdicts from the licence files, detail and the i
    Gym visual's / CC BY-SA and not taken. Exception available: openGym's MIT body-map paths, with attribution, if ever wanted.
 3. Images stay on DEC-060's routes: free-exercise-db photos, then our own figures. A Gym visual licence would be a purchase
    (Emilio's call) and still forbids redistribution. `(unconfirmed)` — Planner's reading of the licences.
+
+## DEC-121 — progression goes through the user's own AI for now: export with rules → chat → import; in-app AI later  (Emilio, 2026-10-10)
+
+Emilio: "i want AI in the progression steps, right now i want the user to export their data and give it to their own ai, the
+export should have the rules for import and data structure, so users can export the data, and chat with their prefered ai to
+upgrade the plan, then import it in again - we will need a req to be able to do this - later i want to add AI into the app,
+some kind of API that we can do essentially the same thing but without user exporting and importing".
+1. **Now:** an AI round-trip req. [measured] A prototype exists: Export's "include the assistant prompt" option
+   (`views/Settings.jsx:30`) adds `exchange.js` `ASSISTANT` (prompt, howTheAppWorks, import rules) to the backup. The req
+   brings it current and safe (spec pending).
+2. **Later:** the same thing in-app through an API — Phase 3, gated on the backend (req-146) and DEC-085 §7's ask-gate.
+3. **Ideas kept, not specced** (`reference/inspiration-repos.md`): bodyweight level-up (#5) → part of AI progression;
+   supersets (#3) → an advanced setting (req-184 advanced users). Emilio: "sounds good, but its an advanced settings".

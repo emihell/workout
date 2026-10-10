@@ -28,6 +28,16 @@ Clean image routes stay: free-exercise-db photos (Unlicense, already linked) and
 6. Smaller: Swap remembers `swappedFrom` (GymMane); finish-screen "next time" built by the same function Start uses (openGym
    `lib/finish-compare.js`) as a test-backed invariant; plate math only from a user-entered kit.
 
+## Emilio's answers (2026-10-10, DEC-121)
+
+- #2 note for next time — "dont we already have a note?" → Planner: yes (plan note, set note, workout note); the gap is a note
+  written mid-workout showing next time. Proposed: "Keep for next time" on the log screen's note writes the plan's note.
+- #3 supersets — "sounds good, but its an advanced settings" → kept for req-184 (advanced users).
+- #4 one-arm / dumbbell — "how do others do it?" → Hevy: no unilateral logging yet; StrengthLog: log one side, total of both
+  bells, volume doubled; TrainHeroic / Built with Science: log as bilateral (10 reps, per-bell kg); MacroFactor: L/R button for
+  separate sides. Ours already labels "kg per dumbbell" and has no volume total (DEC-117 §4) — no change proposed.
+- #5 level-up — "save it as an idea, i want AI in the progression steps" → DEC-121.
+
 ## Seen and rejected (conflicts with DESIGN §1 or scope)
 
 Invented starting load (GymMane "3 × 10 @ 20 kg"), invented warm-up ramps, default plate inventory, silent starter-plan prefills,
