@@ -57,9 +57,19 @@ describe('req-182 AC1 (req-187) — the offer, rendered against the real store',
       captured.store = useStore()
       return child
     }
+    // req-218 test edit — one StoreProvider for the whole test, the screen swapped inside it
+    // (as the app's router does; L-051, same fix as req-187.test.js in req-217). It was a fresh
+    // provider per screen, so the sheet's Update routine wrote through the unmounted log screen's
+    // store and only saved by React's eager-state path — flaky since req-217. Assertions unchanged.
+    function Host() {
+      const [child, setChild] = React.useState(null)
+      // oxlint-disable-next-line react/immutability
+      captured.setChild = setChild
+      return h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet))
+    }
     const mount = async (child) => {
-      await view?.unmount()
-      view = await render(h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet)))
+      if (!view) view = await render(h(Host))
+      await act(async () => captured.setChild(child))
     }
     await mount(null)
     await act(async () => captured.store.startWorkout('fba'))
