@@ -526,6 +526,53 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 - **recalc → Routine → an inner editor screen** loses the chain (`navForBase` paths are used as URL prefixes).
 - **A stale id with a valid shape** (`/history/<deleted>`) is accepted as `from` → Back lands on "Not found.". Rare.
 
+### Gym-flow notes — batch 5, Emilio 2026-10-07..09 (in-app feedback JSON, app `daaa957` / `5233458`)
+
+Pasted 2026-10-10. [measured] `git log 5233458..main -- src` is empty → H3..H22 apply to live code; H1/H2 predate req-209.
+Code facts from a read-only rescan of `main` (2026-10-10); paths under `src/`. **Status: triaged, decisions with Emilio.**
+
+**Log screen (one req, the "set flow" — H5..H8, H11, H12):**
+- **H5 — log screen messy, align, use the right components.** Set list is ad-hoc `ui-setpreview` markup (`views/workout/item.jsx:540-564`), not a
+  library component; `ui-item-note` has no CSS rule; head is an ad-hoc div (`item.jsx:66-85`). No inline styles.
+- **H6 — bottom bar cluttered; "a Completed button, then pick effort?"** Bar today (`ui/index.jsx:813-857`): Previous · Skip set · (Next/Save) on top,
+  caption + Easy/Medium/Hard/Failure below (DEC-108 §1, 4 days old).
+- **H7 — "only easy medium hard?"** `RPE_OPTIONS` 2/3/4/5 (`ids.js:23-28`).
+- **H8 — effort once per exercise, at the end; an end-of-exercise review (all sets, efforts, progress, next / choose exercise); later an auto
+  rest timer learned from your own set gaps.** Effort is stored per set (`rpe`, `item.jsx:267`); `recommendNextPrescription` reads each set's
+  own rpe positionally (`progress.js:165-203`), reached only from History recalc (`store.jsx:225`). Last set → overview, no auto-advance
+  (`item.jsx:283-287`). **Sets carry no timestamps** (`item.jsx:258-274`) → the auto-timer needs a new optional field first.
+- **H11 — Previous button not needed; tapping a done set already opens it.** `openLoggedSet` (`item.jsx:328-333`) does what Previous does.
+- **H12 — editing a logged set should be a popup with just its fields, not the screen switching.** Viewing is `viewIndex` state re-rendering the
+  same form with Next/Save (`item.jsx:337-368`); future sets are inert (`item.jsx:555-559`).
+
+**Workout list / Home / schedule:**
+- **H1 — /routines "start and edit?"** Rows now open the editor and carry a Start (`views/Routine.jsx:61-68`; hidden on an empty workout). Likely done.
+- **H2 — "Your exercises" holds favourites and exercises in workouts.** No favourite concept exists; the list is every own exercise ever added
+  (`views/Exercises.jsx:73-127`). Meaning unclear → ask.
+- **H3 — a workout done earlier in the loop week drops from its next spot** (lower body Tue → not again Thu). No such logic: Done matches same
+  routine + slot + date (`schedule.js:140-171`); Coming up has no done check (`schedule.js:179-186`).
+- **H4 — Start from the schedule-slot screen.** It renders the editor (`views/Schedule.jsx:344-374` → `RoutineDetail`), no Start.
+- **H20 — today's done workout as one line: "Core   Done · See details ›".** Now name line + a "Done ✓ — see your sets" link (`Today.jsx:110-132`).
+- **H21 — 2+ workouts today: one primary Start that asks which in a sheet.** Now each has its own full-width Start (`Today.jsx:134-150`).
+
+**Creating workouts:**
+- **H13 — "Use a plan here? What if I already have one?"** `/routines/new` offers Pick exercises / Use a plan / Blank (`Routine.jsx:117-138`);
+  with a schedule, plans leave it alone and say so only at the end (`Plan.jsx:165-182`).
+- **H14 — New workout shouldn't handle days; scheduling is a separate thing.** Machines flow has a days step + weekday chips (DEC-116/117,
+  `Plan.jsx:319-336`, shown only on an empty schedule).
+- **H15/H16 — picker: show what's been added, a small list.** Multi-select + "Add N" exists (`ExercisePicker.jsx:49, 254-263`); picks show only
+  as ticks; exercises already in this workout are not marked.
+- **H17 — put this workout on a day from its own screen.** Not possible (`Routine.jsx:159-260`); only the day screen's Add workout.
+
+**First time / guidance:**
+- **H9 — one-arm row: is a set per arm?** Library has `unilateral` (62 entries) but it isn't copied to stored exercises
+  (`exerciseCatalog.js:219-235`) and nothing shows it.
+- **H10 — never reads notes; show them as tips during rest.** Routine note under the title (`item.jsx:538`); library cues never on the log
+  screen; nothing shows during rest. Exercise-specific — distinct from the parked generic tips (DEC-108 §6).
+- **H18 — first time on an exercise: a guide?** None on the log screen; `libraryEntryFor` unused (`exerciseLibrary.js:586-595`). → req-10.
+- **H19 — start values from height / weight / level.** **Conflicts with DESIGN §1 and DEC-012** (rejected: an initial weight from a heuristic).
+  No body data stored (`persistence.js:110-121`).
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
