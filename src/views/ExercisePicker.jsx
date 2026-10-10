@@ -15,15 +15,20 @@
 //   workout's pickers don't use that plan: they ask for sets and rest next).
 //   req-190 — onPick's second argument is the picker's own selection; passing it back as
 //   `initialSelection` reopens the picker with the same rows ticked (machines-first Back).
+//   req-216 (DEC-119 §5) — an "Added: …" strip above the bar names the picks in tap order (a
+//   tap on a name unticks it); `inWorkout` (a Set of exercise ids, the routine picker's) marks
+//   those rows "In this workout" — marked, still pickable.
 import { useEffect, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog.js'
 import { libraryItemMatch } from '../exercise-names.js'
 import { equipmentLabel } from '../equipment-label.js'
+import { addedStrip } from '../exercise-use.js'
 import { filteredBrowse, looseOwnMatch, ownRecentFirst, pickerItem, staplesByMuscle } from '../routine-picker.js'
 import { useStore } from '../store-context'
 import { Actions, Button, Checkbox, List, NavLink, Row, SearchField, SectionHeader } from '../ui/index.jsx'
 
-function PickRow({ name, checked, plan, onToggle }) {
+function PickRow({ name, checked, plan, inWorkout = false, onToggle }) {
+  const meta = [inWorkout ? 'In this workout' : '', checked ? plan : ''].filter(Boolean).join(' · ')
   return (
     <Row>
       <Checkbox
@@ -32,7 +37,7 @@ function PickRow({ name, checked, plan, onToggle }) {
         label={
           <span className="ui-row__stack">
             <span>{name}</span>
-            {checked && plan ? <span className="ui-row__meta">{plan}</span> : null}
+            {meta ? <span className="ui-row__meta">{meta}</span> : null}
           </span>
         }
       />
@@ -54,6 +59,7 @@ export function ExercisePicker({
   libraryFilter = null,
   startingLabel = null,
   initialSelection = null,
+  inWorkout = null,
   loadCatalog = loadExerciseCatalog,
 }) {
   const store = useStore()
@@ -65,6 +71,8 @@ export function ExercisePicker({
   const [picks, setPicks] = useState(() => initialSelection || [])
   // The near-duplicate question open under a library row: { entry, match } (req-180 §6).
   const [ask, setAsk] = useState(null)
+  // req-216 — the strip's "+N" shows every pick.
+  const [stripOpen, setStripOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -189,6 +197,10 @@ export function ExercisePicker({
     onAdd(added)
   }
 
+  const pickName = (pick) => (pick.kind === 'library' ? shownName(pick.entry) : pick.exercise.name)
+  // max 1 replaces on tap — the tick is the whole preview, so no strip.
+  const strip = max !== 1 && picks.length ? addedStrip(picks, stripOpen) : null
+
   const nothing = q && own.length === 0 && catalog && hits.length === 0
 
   return (
@@ -222,6 +234,7 @@ export function ExercisePicker({
                   name={[ex.name, equipmentLabel(ex.equipment)].filter(Boolean).join(' — ')}
                   checked={Boolean(picked)}
                   plan={picked ? pickPlan(picked).label : ''}
+                  inWorkout={Boolean(inWorkout?.has(ex.id))}
                   onToggle={() => toggleOwn(ex)}
                 />
               )
@@ -250,17 +263,38 @@ export function ExercisePicker({
           Show {found.restCount} more from the full library
         </Button>
       ) : null}
-      {/* DESIGN §4 — retreat left, primary right; kept in reach over a long list. */}
-      <Actions
-        className="ui-picker-bar"
-        retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
-        lateral={lateral}
-        forward={
-          <Button variant="primary" disabled={picks.length === 0} onClick={add}>
-            {addLabel(picks.length)}
-          </Button>
-        }
-      />
+      {/* DESIGN §4 — retreat left, primary right; kept in reach over a long list. req-216: the
+          strip rides in the same stuck block, on the page background. */}
+      <div className="ui-picker-dock">
+        {strip ? (
+          <p className={stripOpen ? 'ui-picker-strip is-open' : 'ui-picker-strip'} aria-label="Added">
+            Added:{' '}
+            {strip.shown.map((pick, i) => (
+              <span key={pick.key}>
+                <button type="button" className="ui-picker-strip__name" aria-label={`Remove ${pickName(pick)}`} onClick={() => drop(pick)}>
+                  {pickName(pick)}
+                </button>
+                {i < strip.shown.length - 1 || strip.more ? ', ' : ''}
+              </span>
+            ))}
+            {strip.more ? (
+              <button type="button" className="ui-picker-strip__name" aria-label={`Show all ${picks.length}`} onClick={() => setStripOpen(true)}>
+                +{strip.more}
+              </button>
+            ) : null}
+          </p>
+        ) : null}
+        <Actions
+          className="ui-picker-bar"
+          retreat={<NavLink to={cancelTo} look="secondary">Cancel</NavLink>}
+          lateral={lateral}
+          forward={
+            <Button variant="primary" disabled={picks.length === 0} onClick={add}>
+              {addLabel(picks.length)}
+            </Button>
+          }
+        />
+      </div>
     </>
   )
 }
