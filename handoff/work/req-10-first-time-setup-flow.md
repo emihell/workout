@@ -8,18 +8,17 @@
 2. **I'll enter it** = today's form, unchanged (routine kg → carry → blank, `workout-log.js:531-548`).
 3. **Set it up** = a short guide line under the kg box: "Pick a weight you could lift about 15 times. Log the set, then tell us
    how it felt." The kg box stays as today (routine kg or blank) — **never an invented number** (DEC-012, DESIGN §1).
-4. After set 1's **Done**, a one-time sheet: **"How was that? Easy · Medium · Hard"** (+ Skip). The pick writes set 1's `rpe`
-   (2/3/4) and seeds set 2's kg: Easy → `moveToValidWeight(kg, ex, +1)`, Medium/Hard → same kg, and a set 1 with **missed reps**
+4. After set 1's **Done**, a one-time sheet: **"How was that? Easy · Medium · Hard"** (+ Skip). The pick **only seeds set 2's kg — it is not stored**
+   (writing it as set 1's `rpe` would make later sets inherit it as the exercise effort, `item.jsx:280-284`): Easy → `moveToValidWeight(kg, ex, +1)`, Medium/Hard → same kg, and a set 1 with **missed reps**
    → one step down (`progress.js:69-82`; same thresholds as `recommendNextPrescription`, Hard holds). Weighted only; bodyweight
    moves reps ±1 the same way. Shown as an editable prefill with a reason line ("Up one step — set 1 felt easy"). Skip → normal
    carry. No valid step (`weightStep` n/a) → same kg, reason "No weight steps set for this exercise".
-5. Sets 3+ carry as usual. The exercise review's effort works as today (a set-1 pick counts as already picked only if it matches
-   — it does not pre-select the review).
+5. Sets 3+ carry as usual. The exercise's effort is picked on the review as today; set 1 keeps `rpe: null`.
 
 **Acceptance (in addition to the original criteria still valid):** unit tests for the set-2 seed (Easy / Medium / Hard / missed /
 no step / Alt 4/5 / Steps A/B / lightest-weight floor); browser: no-history exercise → prompt → Set it up → Done → sheet → Easy →
 set 2 kg = one valid step up with the reason; **failure case:** an exercise with history shows no prompt; Skip on the sheet
-leaves set 2 at the plain carry; nothing is ever prefilled on set 1 that the routine didn't have.
+leaves set 2 at the plain carry; after Easy, set 1 and set 2 still store `rpe: null`; nothing is ever prefilled on set 1 that the routine didn't have.
 
 **`(unconfirmed)`:** the wording of the prompt, guide line and reason; "about 15 times"; the prompt shows only once per exercise
 per workout.
