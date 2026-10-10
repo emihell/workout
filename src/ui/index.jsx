@@ -878,6 +878,8 @@ export function SetEditSheet({
     const seconds = timed ? secondsToSave(duration, 0) : null
     if (seconds?.error) next.duration = seconds.error
     else if (timed && skipped && duration.trim() === '') next.duration = 'Enter duration'
+    // Review round 2 — 0 s is not a done set either (as cardio-set.js refuses a zero duration).
+    else if (timed && skipped && seconds.value === 0) next.duration = 'Duration must be more than 0.'
     if (!timed && !cardio && reps.trim() === '') next.reps = `Enter ${repsLabel.toLowerCase()}`
     const read = cardio ? cardioValues(cardioState, { durationRequired: skipped }) : null
     if (read?.errors) next.cardio = read.errors
