@@ -281,6 +281,43 @@ a.ui-btn--quiet:active {
 html:has(.ui-picker-bar) {
   scroll-padding-bottom: calc(var(--ui-bottom-clear) + var(--ui-tap) + 4 * var(--ui-s2));
 }
+/* req-216 — the exercise picker's stuck block: the "Added: …" strip over its Cancel / Add row,
+   one block on the page background so the list never shows through between them. */
+.ui-picker-dock {
+  position: sticky;
+  bottom: calc(var(--ui-bottom-clear) + var(--ui-s2));
+  z-index: 5;
+  background: var(--ui-bg);
+}
+.ui-picker-strip {
+  /* one line of tap height; the names' buttons inherit it, so each is a 44px-tall target */
+  line-height: var(--ui-tap);
+  margin: var(--ui-s2) 0 0;
+  color: var(--ui-ink-2);
+  font-size: var(--ui-text-caption);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ui-picker-strip.is-open {
+  white-space: normal;
+}
+.ui-picker-strip__name {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.ui-picker-dock > .ui-picker-bar {
+  margin-top: var(--ui-s1);
+}
+/* the strip's line on top of the bar's reserve (req-190) */
+html:has(.ui-picker-strip) {
+  scroll-padding-bottom: calc(var(--ui-bottom-clear) + 2 * var(--ui-tap) + 4 * var(--ui-s2));
+}
 /* req-179 — a routine item's Reps / Kg / Duration group: label, "Different … per set"
    switch, field(s). A clear gap between groups so a switch reads as its own group's. */
 .ui-per-set {

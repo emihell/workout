@@ -15,6 +15,7 @@ import { exerciseNameMatch, libraryItemMatch, nameError, pickedExercisePath } fr
 import { askConfirm } from '../ui/confirm.js'
 import { exerciseLastTimeText } from './history/helpers.js'
 import { equipmentLabel } from '../equipment-label.js'
+import { exerciseUseSplit } from '../exercise-use.js'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -69,23 +70,58 @@ function ExerciseList({ exercises, showType = false, from = null }) {
   )
 }
 
+// req-216 (DEC-119 §5) — the two use sections; a section with nothing in it has no header.
+const USE_SECTIONS = [
+  ['inWorkouts', 'In your workouts'],
+  ['notInWorkout', 'Not in a workout'],
+]
+
+function TypeRows({ groups }) {
+  return (
+    <List>
+      {groups.map((group) => (
+        <Row key={group.type} to={`/exercises/type/${group.type}`} value={String(group.items.length)}>
+          {typeLabel(group.type)}
+        </Row>
+      ))}
+    </List>
+  )
+}
+
 export function Exercises({ type = null }) {
   const store = useStore()
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
   const all = (store.exercises || []).filter((ex) => !ex.archivedAt)
   const groups = groupedByType(all)
+  // req-216 — in any active routine vs the rest (an archived routine doesn't count).
+  const split = exerciseUseSplit(all, store.routines)
 
   if (type) {
     const group = groups.find((candidate) => candidate.type === type)
     const items = (group?.items || []).filter((ex) => matchesQuery(ex, q))
+    const from = `/exercises/type/${type}`
+    // req-216 — no search: this type's exercises under the same two use sections (the list
+    // screen's per-section count lands on its own section here); a search stays one list.
     return (
       <Screen>
         <Back to="/exercises" />
         <Title>{typeLabel(type)}</Title>
         <Field label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
         {items.length === 0 ? <p className="ui-sub">{q ? 'No matches.' : 'None.'}</p> : null}
-        <ExerciseList exercises={items} from={`/exercises/type/${type}`} />
+        {q ? (
+          <ExerciseList exercises={items} from={from} />
+        ) : (
+          USE_SECTIONS.map(([key, label]) => {
+            const shown = items.filter((ex) => split[key].includes(ex))
+            return shown.length ? (
+              <section key={key}>
+                <SectionHeader>{label}</SectionHeader>
+                <ExerciseList exercises={shown} from={from} />
+              </section>
+            ) : null
+          })
+        )}
       </Screen>
     )
   }
@@ -112,13 +148,16 @@ export function Exercises({ type = null }) {
       ) : groups.length === 0 ? (
         <p className="ui-sub">None.</p>
       ) : (
-        <List>
-          {groups.map((group) => (
-            <Row key={group.type} to={`/exercises/type/${group.type}`} value={String(group.items.length)}>
-              {typeLabel(group.type)}
-            </Row>
-          ))}
-        </List>
+        // req-216 — two sections, each grouped by type as before; an empty one has no header.
+        USE_SECTIONS.map(([key, label]) => {
+          const sectionGroups = groupedByType(split[key])
+          return sectionGroups.length ? (
+            <section key={key}>
+              <SectionHeader>{label}</SectionHeader>
+              <TypeRows groups={sectionGroups} />
+            </section>
+          ) : null
+        })
       )}
     </Screen>
   )

@@ -309,6 +309,8 @@ export function RoutineExercisePick({ routineId, paths }) {
       <ExercisePicker
         cancelTo={nav.base}
         createTo={nav.create}
+        // req-216 — rows already in this routine say "In this workout" (still pickable).
+        inWorkout={new Set(routine.exercises.map((item) => item.exerciseId))}
         onAdd={(added) => {
           for (const { exerciseId, item } of added) store.addRoutineExercise(routine.id, { exerciseId, ...item })
           go(nav.base)
