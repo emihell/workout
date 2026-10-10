@@ -2494,3 +2494,10 @@ skipped sets), 0 dialogs. `workout-log.js` touched display-only (string helpers,
 given at closeout. `reports/req-217.md`.
 
 No independent reviewer (`plan closeout --no-reviewer`): workout-log.js change is display-only: setPreviewText/loggedSetRowText/setListRows gain an eachSide=false string parameter; no write path touched
+
+## req-218 — req-178 / req-182 rendered tests: one StoreProvider (deploy red after req-217)  (2026-10-10)
+
+**req-218** (bug, test-only; throwaway agent). Harness-only change in two files (L-051); sweep found no other file answering a
+saving confirm after a screen swap. Receipt (Planner): `node --test src/req-178.test.js src/req-182.test.js` ×15 — main fail
+`111111111111011`, branch `000000000000000`. Gate: agent `check: green — … 114 test file(s)`; closeout re-runs it on the merge.
+No trigger files. `reports/req-218.md`. Ships req-217 to the site (its deploy `38082387254` was red).

@@ -1,4 +1,4 @@
-**Status: READY** **Lane: bug** — test-only; no product code.
+**Status: BUILT, NOT merged** **Lane: bug** — test-only; no product code.
 
 # req-218 — req-178 / req-182 rendered tests flake since req-217 (provider remount, L-051)
 
