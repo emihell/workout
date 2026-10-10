@@ -96,7 +96,7 @@ export function WorkoutSetup({
     scheduleSlotId && date
       ? `/workout/${routineId}/${scheduleSlotId}/${date}`
       : `/workout/${routineId}`
-  const paths = navForBase(`${preview}/setup`, preview, { showDelete: false })
+  const paths = navForBase(`${preview}/setup`, preview, { showDelete: false, showDays: false })
   return (
     <RoutineScreens
       routineId={routineId}

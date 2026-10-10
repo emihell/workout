@@ -139,7 +139,7 @@ const seeded = (routines = []) => ({
   ],
   routines,
 })
-async function setup(state = seeded()) {
+async function setup(state = seeded(), { days = true } = {}) {
   localStorage.clear()
   localStorage.setItem('workout-routine-kg-filled', '2026-09-26T00:00:00.000Z')
   localStorage.setItem('workout-mvp-v9', JSON.stringify(state))
@@ -152,7 +152,7 @@ async function setup(state = seeded()) {
   await view.click(box('Leg Press — '))
   await view.click(box('Chest Press — '))
   await tap(button('Next (2)'))
-  await tap(view.all('.ui-seg__item').find((n) => n.textContent.trim() === '2'))
+  if (days) await tap(view.all('.ui-seg__item').find((n) => n.textContent.trim() === '2'))
 }
 
 describe('AC2/AC3 the days and name step (rendered)', () => {
@@ -207,13 +207,13 @@ describe('AC2/AC3 the days and name step (rendered)', () => {
     assert.doesNotMatch(view.text(), /Pick 2 days/)
   })
 
+  // req-215 test edit (DEC-119 §4): with "New workout #1" already there this is a LATER workout,
+  // which has no days step — the name step follows the picker, so the day count and the Tue/Fri
+  // chips are no longer tapped. The prefill / emptied-box assertions are unchanged.
   it('an emptied name box saves its prefill; the prefill skips an existing "New workout #1"', async () => {
-    await setup(seeded([{ id: 'r1', name: 'New workout #1', focus: 'Machines', exercises: [] }]))
+    await setup(seeded([{ id: 'r1', name: 'New workout #1', focus: 'Machines', exercises: [] }]), { days: false })
     assert.equal(field('Name').value, 'New workout #2')
     await type(field('Name'), '')
-    // req-210 test edit: tick the 2 days first — nothing is pre-picked any more (DEC-117 §6).
-    await tap(chip('Tue'))
-    await tap(chip('Fri'))
     await tap(button('Save'))
     assert.deepEqual(stored().routines.map((r) => r.name), ['New workout #1', 'New workout #2'])
   })

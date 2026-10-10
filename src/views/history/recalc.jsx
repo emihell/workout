@@ -62,6 +62,7 @@ export function HistoryRoutine({ workoutId, screen = 'detail', itemId, exerciseI
   const paths = navForBase(`/history/${workoutId}/routine`, from || `/history/${workoutId}/recalculate`, {
     extra: whenLabel(workout),
     showDelete: false,
+    showDays: false,
   })
   return (
     <RoutineScreens

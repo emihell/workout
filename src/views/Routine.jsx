@@ -10,8 +10,10 @@ import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
 import { nextWorkoutName } from '../plan-templates.js'
+import { daysRowText, daysToggle, hasActiveWorkout, routineWeekdays } from '../schedule-days.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
 import { ExercisePicker } from './ExercisePicker'
+import { WeekdayChips } from './Plan'
 import { Back, Missing } from './shared'
 import { Actions, Button, Checkbox, Field, List, NavLink, Row, Screen, SectionHeader, Textarea, Title } from '../ui/index.jsx'
 import { askConfirm } from '../ui/confirm.js'
@@ -112,7 +114,11 @@ export function RoutineNewForm({ onSave, cancelTo, submitLabel = 'Next', default
 // req-181 (DEC-098 §4) / req-190 (DEC-105 §1) — three starts: your exercises first (then days
 // a week, views/Plan.jsx RoutineMachines), the slot plans as "Not sure?", or a blank routine.
 // All navigation, so NavLinks (DESIGN §4 / DEC-016).
+// req-215 (DEC-119 §4) — with a workout already made, "Use a plan" is gone (it builds a whole
+// week) and "Pick your exercises" is exercises + a name; the first time, both stay as they were.
 export function RoutineNew() {
+  const store = useStore()
+  const later = hasActiveWorkout(store.routines)
   return (
     <Screen>
       <Back to="/routines" />
@@ -122,13 +128,21 @@ export function RoutineNew() {
           Pick your exercises
         </NavLink>
       </p>
-      <p className="ui-sub">Tick the machines and exercises you use, then how many days a week.</p>
-      <p>
-        <NavLink to="/routines/new/plan" look="secondary" block>
-          Not sure? Use a plan
-        </NavLink>
+      <p className="ui-sub">
+        {later
+          ? 'Tick the machines and exercises you use, then name it.'
+          : 'Tick the machines and exercises you use, then how many days a week.'}
       </p>
-      <p className="ui-sub">Pick how many days a week, then an exercise for each slot.</p>
+      {later ? null : (
+        <>
+          <p>
+            <NavLink to="/routines/new/plan" look="secondary" block>
+              Not sure? Use a plan
+            </NavLink>
+          </p>
+          <p className="ui-sub">Pick how many days a week, then an exercise for each slot.</p>
+        </>
+      )}
       <p>
         <NavLink to="/routines/new/blank" look="secondary" block>
           Blank workout
@@ -157,6 +171,40 @@ export function RoutineNewBlank() {
   )
 }
 
+// req-215 (DEC-119 §4) — "Days": the weekdays this workout is on; Change opens the Mon–Sun chips.
+// Each tap writes at once through addSlot / removeSlot (schedule-days.js daysToggle): on adds the
+// day in every loop week, off removes this workout's slots on that weekday in every loop week.
+function DaysRow({ routineId }) {
+  const store = useStore()
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <List>
+        <Row
+          value={daysRowText(store, routineId)}
+          action={
+            <Button aria-expanded={open} onClick={() => setOpen(!open)}>
+              {open ? 'Done' : 'Change'}
+            </Button>
+          }
+        >
+          Days
+        </Row>
+      </List>
+      {open ? (
+        <WeekdayChips
+          value={routineWeekdays(store.schedule, routineId)}
+          onToggle={(weekday) => {
+            const { add, remove } = daysToggle(store.schedule, routineId, weekday)
+            for (const slotId of remove) store.removeSlot(slotId)
+            for (const slot of add) store.addSlot(slot)
+          }}
+        />
+      ) : null}
+    </>
+  )
+}
+
 export function RoutineDetail({ routineId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
@@ -180,6 +228,7 @@ export function RoutineDetail({ routineId, paths }) {
         <NavLink to={nav.edit} chevron="forward">Edit</NavLink>
       </div>
       {meta ? <p className="ui-sub">{meta}</p> : null}
+      {nav.showDays && !routine.archivedAt ? <DaysRow routineId={routine.id} /> : null}
       <SectionHeader>Exercises</SectionHeader>
       {/* req-202 (review s07) — Up/Down hide behind "Reorder"; the toggle reads "Done" while they show. */}
       <p className="ui-split-row">
