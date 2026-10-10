@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: ui** — display only; reads workouts, writes nothing.
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-213` (`1bea1a2`…`984a3ea`, 2 commits).** **Lane: ui** — display only; reads workouts, writes nothing.
 
 # req-213 — a workout done earlier in the week covers its next spot
 
