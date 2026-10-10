@@ -123,7 +123,8 @@ describe('AC2 Home', () => {
     const stale = { ...seed.workouts[0], id: 'w-stale', finishedAt: null, startedAt: old, performedOn: dateKey(old), scheduleSlotId: null, scheduledFor: null }
     await open('/', { ...withSlots([slot('s-t', TODAY_WD, 'sess-upper'), slot('s-n', (TODAY_WD + 2) % 7, 'sess-lower')]), workouts: [...seed.workouts, doneToday], activeWorkout: stale })
     const block = view.container.querySelector('.ui-today-workout')
-    const done = link('Done ✓ — see your sets ›')
+    // req-214 test edit (DEC-119 §3): the done line is one Row "{name}  Done ✓ ›" (was "Done ✓ — see your sets ›"); same link.
+    const done = link('Upper Body Done ✓ ›')
     assert.ok(done && block.contains(done))
     assert.equal(done.getAttribute('href'), `#${withFrom('/history/w-today', '/')}`)
     const cont = buttons('Continue')

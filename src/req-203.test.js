@@ -246,7 +246,8 @@ describe('§2 Home\'s done line links', () => {
     data.workouts.at(-1).scheduleSlotId = 's-today'
     data.workouts.at(-1).scheduledFor = TODAY
     await open('/', data)
-    const done = link('Done ✓ — see your sets ›')
+    // req-214 test edit (DEC-119 §3): the done line is one Row "{name}  Done ✓ ›" (was "Done ✓ — see your sets ›"); same link.
+    const done = link('Upper Body Done ✓ ›')
     assert.ok(done && view.container.querySelector('.ui-today-workout').contains(done), 'in today\'s block')
     assert.equal(done.getAttribute('href'), '#/history/w-today?from=%2F')
     await tap(done)

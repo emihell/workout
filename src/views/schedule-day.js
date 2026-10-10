@@ -3,7 +3,10 @@
 // what finished on it, whether a slot still offers Start now, and the plain copy for
 // the loop line and the Remove confirm.
 import { WEEKDAY_ORDER, weekdayName } from '../ids.js'
-import { addDays, coveringWorkout, dateKey, loopWeekIndex, mondayOf, toLocalDate } from '../schedule.js'
+import { addDays, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, mondayOf, slotsOn, spotStartOptions, toLocalDate } from '../schedule.js'
+import { parseRoute } from '../route.js'
+import { isCurrentWorkout } from '../current-workout.js'
+import { routineStartable } from '../exercise-names.js'
 import { completedOnDayKey } from '../history-queries.js'
 import { WEEKDAY_SHORT } from '../plan-templates.js'
 
@@ -162,4 +165,43 @@ export function movedFromText(from) {
 // "Done Tue ✓", the weekday the workout finished.
 export function doneEarlierText(workout) {
   return `Done ${WEEKDAY_SHORT[toLocalDate(workout.finishedAt).getDay()]} ✓`
+}
+
+// req-214 (DEC-119 §3, H4) — the scheduled-workout screen (`/schedule/:week/:weekday/:slotId`)
+// stands for the date of the day screen it was opened from (`from`, which carries that
+// screen's `?date=` / `from=/`: dayScreenDate). Opened from the undated loop day (Whole plan),
+// it is today when this slot is on today (slotsOn, moves applied), else no date.
+export function slotScreenDate(schedule, week, weekday, slotId, from, now = new Date()) {
+  const day = from ? parseRoute(from) : null
+  if (day?.name === 'schedule-day' && day.week === Number(week) && day.weekday === Number(weekday)) {
+    const date = dayScreenDate(schedule, week, weekday, day.from, day.date, now)
+    if (date) return date
+  }
+  return slotsOn(schedule, now).some((slot) => slot.id === slotId) ? dateKey(now) : null
+}
+
+// req-214 — that screen's primary Start, or null for none. No Start on an empty routine
+// (req-127). A current in-progress workout of this routine (this spot's occurrence, when the
+// Start is tagged) reads Continue. Today's spot starts tagged — the same slot / date /
+// occurrenceId Home's Start passes (spotStartOptions); any other date starts off-schedule
+// (`options: null`), as the day screen's Start now. Hidden where the day screen hides Start
+// now (startNowShown: a past date; today's spot already done) and on a spot a workout done
+// earlier this week covers (req-213's "Done Tue ✓").
+export function slotStart({ workouts, schedule, activeWorkout }, routine, slotId, date, now = new Date()) {
+  if (!routineStartable(routine)) return null
+  const todayKey = dateKey(now)
+  const tagged = date === todayKey && slotsOn(schedule, now).some((slot) => slot.id === slotId)
+  const options = tagged ? spotStartOptions(slotId, todayKey) : null
+  const active = activeWorkout
+  if (
+    active &&
+    active.routineId === routine.id &&
+    isCurrentWorkout(active, now, todayKey) &&
+    (!options || active.occurrenceId === options.occurrenceId)
+  ) {
+    return { label: 'Continue', continueWorkout: active, options }
+  }
+  if (!startNowShown({ workouts, routineId: routine.id, slotId, date, todayKey })) return null
+  if (date && doneEarlier(workouts, routine.id, date, slotId, schedule)) return null
+  return { label: 'Start', continueWorkout: null, options }
 }

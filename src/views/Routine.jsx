@@ -205,7 +205,7 @@ function DaysRow({ routineId }) {
   )
 }
 
-export function RoutineDetail({ routineId, paths }) {
+export function RoutineDetail({ routineId, paths, top = null }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
   const nav = pathsFor(routineId, paths)
@@ -228,6 +228,8 @@ export function RoutineDetail({ routineId, paths }) {
         <NavLink to={nav.edit} chevron="forward">Edit</NavLink>
       </div>
       {meta ? <p className="ui-sub">{meta}</p> : null}
+      {/* req-214 — the scheduled-workout screen's Start (ScheduleSlot), above the Days row. */}
+      {top}
       {nav.showDays && !routine.archivedAt ? <DaysRow routineId={routine.id} /> : null}
       <SectionHeader>Exercises</SectionHeader>
       {/* req-202 (review s07) — Up/Down hide behind "Reorder"; the toggle reads "Done" while they show. */}
@@ -648,7 +650,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
   )
 }
 
-export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, exerciseId }) {
+export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, exerciseId, top = null }) {
   if (screen === 'edit') return <RoutineEdit routineId={routineId} paths={paths} />
   if (screen === 'exercise-pick') return <RoutineExercisePick routineId={routineId} paths={paths} />
   if (screen === 'exercise-create') return <ExerciseNew returnBase={paths.base} />
@@ -660,5 +662,5 @@ export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, ex
   if (screen === 'exercise') {
     return <RoutineExerciseEdit routineId={routineId} itemId={itemId} paths={paths} />
   }
-  return <RoutineDetail routineId={routineId} paths={paths} />
+  return <RoutineDetail routineId={routineId} paths={paths} top={top} />
 }
