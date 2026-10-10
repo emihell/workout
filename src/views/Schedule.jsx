@@ -1,5 +1,5 @@
 import { LOOP_WEEKS, WEEKDAY_ORDER, weekdayName } from '../ids'
-import { addDays, clampLoopWeeks, dateKey, loopWeekIndex, mondayOf, moveInto, resolveSlot, slotsForWeekDay, slotsOn, toLocalDate } from '../schedule'
+import { addDays, clampLoopWeeks, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, mondayOf, moveInto, resolveSlot, slotsForWeekDay, slotsOn, toLocalDate } from '../schedule'
 import { routineById } from '../model.js'
 import { workoutRoutineId, workoutRoutineName } from './history/helpers'
 import {
@@ -8,6 +8,7 @@ import {
   dateDayPath,
   dayEveryText,
   dayScreenDate,
+  doneEarlierText,
   doneOnDay,
   longWeekdayDate,
   movedFromText,
@@ -228,8 +229,15 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
         {slots.map((slot) => {
           const { routine } = resolveSlot(routines, slot)
           const moved = date ? moveInto(store.schedule, slot.id, date) : null
+          // req-213 — a dated spot that a workout done earlier this week covers: "Done Tue ✓"
+          // (a link to that session) and no Start now, as for a covered spot.
+          const earlier =
+            routine && date && !coveringWorkout(store.workouts, routine.id, date, slot.id)
+              ? doneEarlier(store.workouts, routine.id, date, slot.id, store.schedule)
+              : null
           const startable =
             routine &&
+            !earlier &&
             routineStartable(routine) &&
             startNowShown({ workouts: store.workouts, routineId: routine.id, slotId: slot.id, date, todayKey })
           return (
@@ -256,6 +264,11 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
             >
               <NavLink to={childLink(dayPathOf(week, weekday, `/${slot.id}`), here, from)}>{slotLabel(routines, slot)}</NavLink>
               {moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null}
+              {earlier ? (
+                <span className="ui-moved">
+                  <NavLink to={childLink(`/history/${earlier.id}`, here, from)}>{doneEarlierText(earlier)}</NavLink>
+                </span>
+              ) : null}
             </Row>
           )
         })}

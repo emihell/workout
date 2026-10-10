@@ -157,3 +157,9 @@ export function dateDayPath(schedule, key) {
 export function movedFromText(from) {
   return `moved from ${WEEKDAY_SHORT[toLocalDate(from).getDay()]}`
 }
+
+// req-213 (DEC-119 §2) — the line on a spot an earlier workout this week covers (doneEarlier):
+// "Done Tue ✓", the weekday the workout finished.
+export function doneEarlierText(workout) {
+  return `Done ${WEEKDAY_SHORT[toLocalDate(workout.finishedAt).getDay()]} ✓`
+}
