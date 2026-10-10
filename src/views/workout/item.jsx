@@ -21,6 +21,7 @@ import {
   itemEffortSets,
   itemIsMarkedDone,
   itemKey,
+  isSkippedSet,
   itemLoggingState,
   loggedSetRowText,
   markItemDonePatch,
@@ -40,9 +41,8 @@ import {
   stopwatchFor,
   stopwatchOwner,
 } from '../../workout-log'
-import { SetEditForm } from '../set-edit'
-import { activeSetPatch, liveSetWeight, viewedSetSave } from '../set-values.js'
-import { Back, ExercisesLink, Missing } from '../shared'
+import { liveSetWeight, viewedSetSave } from '../set-values.js'
+import { ExercisesLink, Missing } from '../shared'
 import {
   Actions,
   Button,
@@ -55,7 +55,6 @@ import {
   SetEditSheet,
   SetList,
   SetLogForm,
-  Title,
 } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
 import { exerciseName, findItem, isActiveFor, itemDonePath, itemLogPath, itemSetsPath } from './workout-helpers.js'
@@ -66,6 +65,7 @@ import { askConfirm } from '../../ui/confirm.js'
 import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
 import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
+import { equipmentLabel } from '../../equipment-label.js'
 import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
 
@@ -91,6 +91,17 @@ function ExerciseTitle({ routineId, item, ex, bits, aside }) {
       aside={aside}
       subtitle={(bits || []).filter(Boolean).join(' · ')}
     />
+  )
+}
+
+// The review's setup lines under the title (the old done view's): equipment, then the routine's
+// note for this exercise. Review round 1 — restored (the spec never asked to remove them).
+function ExerciseSetupHeader({ item, ex }) {
+  return (
+    <>
+      {ex?.equipment ? <p className="ui-sub">{equipmentLabel(ex.equipment)}</p> : null}
+      {item?.notes ? <p className="ui-sub">{item.notes}</p> : null}
+    </>
   )
 }
 
@@ -260,7 +271,9 @@ function WorkoutItemLive({ routineId, item }) {
       ...(durationSec != null ? { durationSec } : {}),
       // req-212 (DEC-119 §1) — no effort on the set: the exercise review writes one effort onto
       // every work set of the item (store.setItemEffort); left unpicked, it stays null.
-      rpe: null,
+      // Review round 1 — effort is per exercise: a work set logged on an item that already has a
+      // picked effort (Add set after the review) gets that same effort.
+      rpe: currentType === 'work' && itemEffort(active, item) !== '' ? itemEffort(active, item) : null,
       note,
       targetReps: target || '',
       targetWeight:
@@ -576,6 +589,7 @@ function LoggedSetSheet({ item, ex, index, onClose, onSaved }) {
   const cardio = ex?.type === 'cardio' && !timed
   const target = setTargetFor(item, type, workIndex)
   const init = setDraftFromLoggedSet('', set)
+  const skipped = isSkippedSet(set)
   function save(values) {
     const result = viewedSetSave(values, {
       weighted,
@@ -604,7 +618,9 @@ function LoggedSetSheet({ item, ex, index, onClose, onSaved }) {
       kgLabel={kgLabelFor(ex)}
       initialWeight={weighted ? init.weight : ''}
       initialReps={init.reps}
-      initialDuration={timed ? init.durationSec ?? durationTargetFor(item, ex, workIndex) : ''}
+      // Review round 1 — a skipped timed set starts blank: the target is never written as if measured.
+      initialDuration={timed && !skipped ? init.durationSec ?? durationTargetFor(item, ex, workIndex) : ''}
+      skipped={skipped}
       initialCardio={cardio ? cardioFormText(set, lastDistanceUnit(last?.sets)) : null}
       cardioHint={cardio && set.durationSec == null && init.reps ? `Logged as ${init.reps}` : ''}
       onSave={save}
@@ -660,6 +676,7 @@ function ExerciseReview({ routineId, item }) {
       <ExercisesLink routineId={routineId} name={active.snapshot?.routineName} />
       <WorkoutPill />
       <ExerciseTitle routineId={routineId} item={item} ex={ex} bits={[roleTag(item.role)]} />
+      <ExerciseSetupHeader item={item} ex={ex} />
       {pct != null ? <p className="ui-sub">{improvementText(pct)}</p> : null}
       {rows.length ? (
         <SetList rows={rows} onOpen={(row) => setEditIndex(row.setIndex)} />
@@ -669,7 +686,8 @@ function ExerciseReview({ routineId, item }) {
       {showEffort ? (
         <>
           <SectionHeader>Effort</SectionHeader>
-          <SegmentedControl options={EFFORT_OPTIONS} value={effort} onChange={pickEffort} ariaLabel="Effort" />
+          {/* Review round 1 — clearable: "—" takes a mis-tap back to none (rpe null on those sets). */}
+          <SegmentedControl clearable options={EFFORT_OPTIONS} value={effort} onChange={pickEffort} ariaLabel="Effort" />
         </>
       ) : null}
       {/* Navigation only (nothing written), so links wearing the button look (DEC-040). Finish:
@@ -720,43 +738,22 @@ function ExerciseReview({ routineId, item }) {
   )
 }
 
+// req-212 review round 1 — the old per-set edit route (/workout/<id>/set/<n>) no longer has a
+// screen: nothing links to it, and its form offered per-set effort (Failure included) on a live
+// set (DEC-119 §1). An old link or Back entry is replaced by that set's exercise — its review
+// when done, else its log screen — where the edit sheet edits the set. Nothing is written.
 export function WorkoutSetEdit({ routineId, index }) {
   const store = useStore()
   const workout = store.activeWorkout
   const set = workout?.routineId === routineId ? workout.sets?.[index] : null
-  const item = workout?.snapshot?.items?.find(
-    (candidate) => itemKey(candidate) === (set?.routineItemId),
-  )
-  const usesLoad = isWeightedType(item?.exerciseType)
-  const usesRpe = set?.setType !== 'wu' && item?.exerciseType !== 'cardio'
-  const itemPath = itemSetsPath(routineId, item, workout)
+  const item = set ? workout?.snapshot?.items?.find((candidate) => itemKey(candidate) === set.routineItemId) : null
+  const target = item ? itemSetsPath(routineId, item, workout) : null
+
+  useEffect(() => {
+    if (target) go(target, { replace: true })
+  }, [target])
 
   if (workout?.routineId !== routineId) return <NotInWorkout routineId={routineId} />
-  if (!set) {
-    return <Missing>Not found.</Missing>
-  }
-
-  return (
-    <Screen className="ui-screen--rest">
-      <Back to={itemPath} />
-      <WorkoutPill />
-      <p className="ui-sub">{workout.snapshot?.routineName}</p>
-      <Title>Set</Title>
-      <SetEditForm
-        set={set}
-        showLoad={usesLoad}
-        showEffort={usesRpe}
-        cardio={item?.exerciseType === 'cardio' && !item?.hasDuration}
-        kgLabel={kgLabelFor(item)}
-        cancelTo={itemPath}
-        onSave={(values) => {
-          // req-154 — `22,5` → 22.5; unreadable kg → null (the form already shows why).
-          const patch = activeSetPatch(values, { showLoad: usesLoad })
-          if (!patch) return
-          store.updateActiveSet(index, patch)
-          go(itemPath)
-        }}
-      />
-    </Screen>
-  )
+  if (!set || !item) return <Missing>Not found.</Missing>
+  return null
 }

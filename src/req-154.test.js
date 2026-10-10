@@ -87,8 +87,13 @@ describe('site 2 — active set edit (item.jsx WorkoutSetEdit → activeSetPatch
     const patch = activeSetPatch(values('abc'), { showLoad: false })
     assert.deepEqual(patch, { reps: '8', rpe: 4, note: 'n' })
   })
-  it('WorkoutSetEdit saves only a non-null patch', () => {
-    assert.match(src('./views/workout/item.jsx'), /const patch = activeSetPatch\(values, \{ showLoad: usesLoad \}\)\n\s*if \(!patch\) return\n\s*store\.updateActiveSet\(index, patch\)/)
+  // req-212 test edit (review round 1) — WorkoutSetEdit no longer has a form (the route redirects
+  // to the set's exercise, where the edit sheet saves via viewedSetSave → updateActiveSet, which
+  // also refuses unreadable kg: req-212.test.js). It must not write at all now.
+  it('WorkoutSetEdit writes nothing (the route only redirects)', () => {
+    const item = src('./views/workout/item.jsx')
+    const body = item.slice(item.indexOf('export function WorkoutSetEdit'))
+    assert.doesNotMatch(body, /updateActiveSet|activeSetPatch|SetEditForm/)
   })
 })
 

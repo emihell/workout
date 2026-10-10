@@ -774,7 +774,7 @@ export function SetLogForm({
           {/* req-188 — the screen's only Skip: this set (Skip exercise is on the list). */}
           <Button variant="quiet" onClick={onSkip}>Skip set</Button>
         </div>
-        <Button type="submit" variant="primary" block className="ui-setlog__done">
+        <Button type="submit" variant="primary" block>
           Done
         </Button>
       </div>
@@ -839,6 +839,9 @@ export function SetList({ rows, onOpen, label = 'Sets' }) {
 // Save), and hands onSave({ weight, reps, durationSec, cardio }) to the caller, who writes it.
 // Cancel, the backdrop and Escape call onCancel and write nothing. A cardio set's typed reps
 // (an old "20 min") are passed back unchanged; `cardioHint` shows them.
+// Review round 1 — Save is disabled until a field is edited (an untouched Save wrote a skipped
+// set's prefill back as logged). `skipped`: the set is a skipped record, so un-skipping needs a
+// real entered value — reps, a typed Duration (s) on a timed set, a Duration on a cardio set.
 export function SetEditSheet({
   title = 'Set',
   weighted = true,
@@ -851,9 +854,11 @@ export function SetEditSheet({
   initialDuration = '',
   initialCardio = null,
   cardioHint = '',
+  skipped = false,
   onSave,
   onCancel,
 }) {
+  const [edited, setEdited] = useState(false)
   const [weight, setWeight] = useState(String(initialWeight ?? ''))
   const [reps, setReps] = useState(String(initialReps ?? ''))
   const [duration, setDuration] = useState(initialDuration != null ? String(initialDuration) : '')
@@ -872,8 +877,9 @@ export function SetEditSheet({
     if (weighted) next.weight = kgError(weight)
     const seconds = timed ? secondsToSave(duration, 0) : null
     if (seconds?.error) next.duration = seconds.error
+    else if (timed && skipped && duration.trim() === '') next.duration = 'Enter duration'
     if (!timed && !cardio && reps.trim() === '') next.reps = `Enter ${repsLabel.toLowerCase()}`
-    const read = cardio ? cardioValues(cardioState, { durationRequired: false }) : null
+    const read = cardio ? cardioValues(cardioState, { durationRequired: skipped }) : null
     if (read?.errors) next.cardio = read.errors
     if (Object.values(next).some(Boolean)) {
       setErrors(next)
@@ -895,8 +901,9 @@ export function SetEditSheet({
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            save()
+            if (edited) save()
           }}
+          onInput={() => setEdited(true)}
         >
           <div className="ui-setlog__nums">
             {weighted ? (
@@ -917,6 +924,7 @@ export function SetEditSheet({
                 viewing
                 hint={cardioHint}
                 onEdit={(field, value) => {
+                  setEdited(true)
                   setCardioState((c) => ({ ...c, [field]: value, ...(field === 'duration' ? { watched: false } : {}) }))
                   setErrors((x) => ({ ...x, cardio: null }))
                 }}
@@ -955,7 +963,7 @@ export function SetEditSheet({
             <Button variant="secondary" onClick={() => onCancel?.()}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" disabled={!edited}>
               Save
             </Button>
           </div>

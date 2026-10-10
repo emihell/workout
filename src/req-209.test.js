@@ -154,9 +154,7 @@ describe('§6 equipmentLabel — one display map', () => {
     assert.equal(equipmentLabel(null, 'Bodyweight'), 'Bodyweight')
   })
   it('every screen that shows equipment reads it through the map', () => {
-    // req-212 test edit — views/workout/item.jsx left the list: its done view (the one place it
-    // showed equipment) became the exercise review, which shows no equipment line (DEC-119 §1).
-    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/setup.jsx']) {
+    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/item.jsx', 'views/workout/setup.jsx']) {
       const source = read(file)
       assert.doesNotMatch(source, /— \{ex\.equipment\}|— \$\{ex\.equipment\}|\|\| 'bodyweight'|"ui-sub">\{ex\.equipment\}/, file)
       assert.match(source, /equipmentLabel\(/, file)
