@@ -1951,3 +1951,26 @@ arrow is computed with it.
 **DEC-050 cross-reference (Planner, 2026-10-07):** DEC-050's sentence "req-84's total-volume 'vs last time' on the auto-complete
 screen … stays" is overridden by DEC-117 §4 (Total lifted removed), and its finish-screen line by DEC-118. The comparison rule
 itself stands.
+
+## DEC-119 — feedback batch 5: one Done per set, effort once per exercise on a review screen, done-early days, creation without days  (Emilio, 2026-10-10)
+
+Emilio's 22 in-app notes 2026-10-07..09 (BACKLOG §batch 5, H1..H22). Planner recommended; Emilio: "sounds good" (also to the H2
+grouping). Specs: req-212..217.
+
+1. **Set flow (H5–H8, H11, H12) → req-212.** Each set logs with one **Done**; Skip set stays. Previous / Next go; tapping a
+   done set opens a **sheet** with its fields + Save. The last set opens an **exercise review**: the sets, ↑ N%, **one effort
+   Easy · Medium · Hard**, then next exercise or choose one. Emilio: "Maybe effort should be at the end of all sets?", "Maybe
+   only easy medium hard?". **Supersedes DEC-108 §1–2** (four effort buttons per set; Failure). Each set also records the
+   time it was logged, for a later rest timer learned from the user's own gaps (H8; the timer itself → BACKLOG).
+2. **Done early in the week (H3) → req-213.** A workout finished earlier in the same Mon–Sun week covers its next scheduled
+   spot that week, which shows "Done Tue ✓" instead of a Start. Display only, nothing stored.
+3. **Home (H4, H20, H21) → req-214.** A done workout is one line; 2+ startable workouts today share one Start that asks which;
+   the scheduled-workout screen gets a Start.
+4. **Creating (H13, H14, H17) → req-215.** New workout = exercises + name, no days; a "Days" row on the workout's own screen
+   schedules it; "Use a plan" shows only with no workouts. **Supersedes DEC-116's days step / DEC-117 §6** (setup days).
+5. **Picker + Your exercises (H2, H15, H16) → req-216.** An "Added:" strip above Add N; exercises already in the workout are
+   marked; Your exercises splits "In your workouts" / "Not in a workout". Emilio (H2): "w fave i mea my excersises".
+6. **One-arm + rest notes (H9, H10) → req-217.** A set of a one-arm exercise is both sides; reps read "each side". The
+   exercise's note and form cues show during rest instead of under the title. Distinct from the parked generic tips (DEC-108 §6).
+7. **Not taken:** H19 start values from height / weight / level — stays rejected (DEC-012, DESIGN §1); H18's first-time guide is
+   req-10. H1 already shipped (Start on each workout row).
