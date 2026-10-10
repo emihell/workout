@@ -531,6 +531,12 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 Pasted 2026-10-10. [measured] `git log 5233458..main -- src` is empty → H3..H22 apply to live code; H1/H2 predate req-209.
 Code facts from a read-only rescan of `main` (2026-10-10); paths under `src/`. **Decided → DEC-119; specced req-212..217 (READY).**
 Later from H8: a rest timer learned from the user's own set gaps (needs req-212's `loggedAt` history first).
+**Batch-5 follow-ups (2026-10-10):** (a) Emilio's call — missed reps lower only that set even when the exercise is Easy (req-212
+kept the per-set rule; "any missed set → all down" is a `progress.js` change); (b) req-218 sweep: 11 rendered tests still remount
+StoreProvider per screen — safe today, convert to the L-051 one-provider pattern before one answers a saving confirm after a swap;
+(c) req-212 latent: a workout in progress at deploy inherits its old uniform per-set effort on new sets (transitional, no fix);
+(d) the Days row text in a multi-week loop reads long ("Wed (week 1) and Wed (week 2)"); (e) req-217: the library chunk (264 kB
+gzip) now loads on the first log-screen open — "each side" can appear a beat late on a slow connection.
 
 **Log screen (one req, the "set flow" — H5..H8, H11, H12):**
 - **H5 — log screen messy, align, use the right components.** Set list is ad-hoc `ui-setpreview` markup (`views/workout/item.jsx:540-564`), not a
