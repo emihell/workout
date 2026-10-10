@@ -184,3 +184,48 @@ export function comingDays(schedule, routines, today = new Date(), n = 6) {
     return { dateKey: dateKey(date), week: loopWeekIndex(schedule, date), weekday: date.getDay(), slots }
   })
 }
+
+// req-213 (DEC-119 §2) — a workout done EARLIER in the week covers its routine's next spot.
+// For the spot (routine `routineId`, slot `slotId`, on `date`) with no coveringWorkout: the
+// earliest finished workout of that routine whose finish date is in [mondayOf(date), date)
+// and which covers no other spot of the routine that week. Each workout covers at most one
+// spot — the nearest later one: the week's spots of the routine are walked in date order
+// (slotsOn, so one-date moves apply) and each uncovered spot takes the earliest unused
+// earlier finish. A workout already claimed by a date (`scheduledFor`) outside this Mon–Sun
+// week is not a candidate (it belongs to that date's spot). Display only — nothing stored;
+// next week the spot is back. Null when nothing qualifies, or `slotId` isn't on `date`. Pure.
+export function doneEarlier(workouts, routineId, date, slotId, schedule) {
+  if (!date || !routineId) return null
+  const key = dateKey(date)
+  const monday = mondayOf(key)
+  const firstKey = dateKey(monday)
+  const lastKey = dateKey(addDays(monday, 6))
+  const spots = []
+  for (let k = 0; k < 7; k += 1) {
+    const day = dateKey(addDays(monday, k))
+    for (const slot of slotsOn(schedule, day)) {
+      if (slot.routineId === routineId) spots.push({ day, slotId: slot.id })
+    }
+  }
+  if (!spots.some((spot) => spot.day === key && spot.slotId === slotId)) return null
+  const coverOf = new Map(spots.map((spot) => [spot, coveringWorkout(workouts, routineId, spot.day, spot.slotId)]))
+  const covering = new Set([...coverOf.values()].filter(Boolean).map((workout) => workout.id))
+  const candidates = (workouts || [])
+    .filter((workout) => {
+      if (!workout?.finishedAt || workout.routineId !== routineId || covering.has(workout.id)) return false
+      if (workout.scheduledFor && (workout.scheduledFor < firstKey || workout.scheduledFor > lastKey)) return false
+      return dateKey(workout.finishedAt) >= firstKey
+    })
+    .sort((a, b) => new Date(a.finishedAt) - new Date(b.finishedAt))
+  const used = new Set()
+  for (const spot of spots) {
+    if (coverOf.get(spot)) {
+      if (spot.day === key && spot.slotId === slotId) return null
+      continue
+    }
+    const pick = candidates.find((workout) => !used.has(workout.id) && dateKey(workout.finishedAt) < spot.day) || null
+    if (pick) used.add(pick.id)
+    if (spot.day === key && spot.slotId === slotId) return pick
+  }
+  return null
+}

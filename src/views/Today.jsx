@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
-import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, loopWeekIndex, moveInto, occurrenceId, resolveSlot, slotsOn } from '../schedule'
-import { movedFromText } from './schedule-day.js'
+import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, moveInto, occurrenceId, resolveSlot, slotsOn } from '../schedule'
+import { doneEarlierText, movedFromText } from './schedule-day.js'
 import { routineById } from '../model.js'
 import { doneInTodayBlock, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
 import { useStore } from '../store-context'
@@ -74,9 +74,17 @@ function WorkoutInfo({ when, name, today }) {
 // its dated day screen (`?date=` + `from=/`, req-204), where a workout can be added.
 // req-211 — a workout moved onto this one date carries "moved from Fri" (named, when the
 // day has two workouts).
-function UpcomingRow({ schedule, routines, row }) {
+// req-213 (DEC-119 §2) — a workout done earlier this week covers its next spot here: the name
+// gets "· Done Tue ✓" (the row stays — it shows why; the whole row links the day screen).
+function UpcomingRow({ schedule, routines, workouts, row }) {
   const rest = row.slots.length === 0
-  const names = row.slots.map((slot) => resolveSlot(routines, slot).routine?.name).join(', ')
+  const names = row.slots
+    .map((slot) => {
+      const name = resolveSlot(routines, slot).routine?.name
+      const earlier = doneEarlier(workouts, slot.routineId, row.dateKey, slot.id, schedule)
+      return earlier ? `${name} · ${doneEarlierText(earlier)}` : name
+    })
+    .join(', ')
   const moved = row.slots
     .map((slot) => ({ slot, move: moveInto(schedule, slot.id, row.dateKey) }))
     .filter(({ move }) => move)
@@ -109,6 +117,9 @@ function UpcomingRow({ schedule, routines, row }) {
 // routine); `__routine` only spaces the routines apart under the shared date.
 function TodayRoutine({ store, routine, slot, date }) {
   const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
+  // req-213 — no cover today, but a workout of this routine done earlier this week covers
+  // this spot: "Done Tue ✓" (a link to that session) in place of Start.
+  const earlier = done ? null : doneEarlier(store.workouts, routine.id, date, slot.id, store.schedule)
   const moved = moveInto(store.schedule, slot.id, date)
   return (
     <>
@@ -122,6 +133,12 @@ function TodayRoutine({ store, routine, slot, date }) {
         <p className="ui-sub">
           <NavLink to={withFrom(`/history/${done.id}`, '/')} chevron="forward">
             Done ✓ — see your sets
+          </NavLink>
+        </p>
+      ) : earlier ? (
+        <p className="ui-sub">
+          <NavLink to={withFrom(`/history/${earlier.id}`, '/')} chevron="forward">
+            {doneEarlierText(earlier)}
           </NavLink>
         </p>
       ) : (
@@ -383,7 +400,7 @@ export function Today() {
             req-206 — no "Coming up" header: the rows follow "Workouts ›" directly. */}
         <List>
           {[...upcoming].reverse().map((row) => (
-            <UpcomingRow key={row.dateKey} schedule={schedule} routines={routines} row={row} />
+            <UpcomingRow key={row.dateKey} schedule={schedule} routines={routines} workouts={store.workouts} row={row} />
           ))}
         </List>
 
