@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui**
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-216` (`156872a`…`0a87baf`, 2 commits).** **Lane: ui**
 
 # req-216 — picker shows what you've added; Your exercises split by use
 

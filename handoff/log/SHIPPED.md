@@ -2441,3 +2441,10 @@ Emilio's eyes on the stored shape. Backup reminded twice (DEC-046). Emilio: "mer
 "Done {Day} ✓"; nothing stored. Gate: `check: green — lint, skills, no import cycles, 109 test file(s), and the build all passed.`
 (Planner, throwaway worktree); branch smoke `smoke: green — 12 steps` on `plan qa`; scripted list 9/9 with receipts (storage
 byte-identical). No trigger files → no reviewer. `reports/req-213.md`.
+
+## req-216 — picker "Added:" strip + "In this workout"; Your exercises split by use  (2026-10-10)
+
+**req-216** (DEC-119 §5, ui; throwaway agent). Pure helpers in `exercise-use.js`; the type drill-down pages split the same way
+(builder's call, keeps 1add816). Spec was stale: the picker bar already had a background. Gate: `check: green — lint, skills, no
+import cycles, 109 test file(s), and the build all passed.` (Planner, throwaway worktree); branch smoke green on `plan qa`;
+scripted list 1, 2, 4, 6, 7, 8 YES, ticks write nothing, 0 dialogs. No trigger files → no reviewer. `reports/req-216.md`.
