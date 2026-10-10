@@ -1998,3 +1998,12 @@ some kind of API that we can do essentially the same thing but without user expo
 2. **Later:** the same thing in-app through an API — Phase 3, gated on the backend (req-146) and DEC-085 §7's ask-gate.
 3. **Ideas kept, not specced** (`reference/inspiration-repos.md`): bodyweight level-up (#5) → part of AI progression;
    supersets (#3) → an advanced setting (req-184 advanced users). Emilio: "sounds good, but its an advanced settings".
+
+## DEC-122 — notes wait for a workout redesign; dumbbells log one bell, one-arm exercises say so plainly  (Emilio, 2026-10-10)
+
+1. **"Keep for next time" note: not now.** Emilio: "lets await wit hthe notes, if we want notes everywhere during a workout, we
+   havve to redesign it a bit". BACKLOG: notes during a workout need a design pass first.
+2. **Dumbbell weight = one dumbbell; one-arm work is stated.** Emilio: "for double handed, log one dumbell, but as we know the
+   excercise is one hand at the time, we tell the user that somehow, so there is no confusin and we are clear". Matches the
+   current "kg per dumbbell" label (`kg-label.js:11`) and req-217's "each side"; the req adds a plain one-arm instruction where
+   the library marks the exercise unilateral. Spec pending (with the "Last time" hint, req-10, the AI round-trip).
