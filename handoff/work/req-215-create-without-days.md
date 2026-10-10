@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — writes the schedule only through the existing `addSlot` / `removeSlot` store actions (one user tap
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-215` (`54a4085`…`0401a8b`, 2 commits).** **Lane: ui** — writes the schedule only through the existing `addSlot` / `removeSlot` store actions (one user tap
 each), no bulk write.
 
 # req-215 — New workout without days; "Days" on the workout's screen; "Use a plan" only when you have none

@@ -2448,3 +2448,11 @@ byte-identical). No trigger files → no reviewer. `reports/req-213.md`.
 (builder's call, keeps 1add816). Spec was stale: the picker bar already had a background. Gate: `check: green — lint, skills, no
 import cycles, 109 test file(s), and the build all passed.` (Planner, throwaway worktree); branch smoke green on `plan qa`;
 scripted list 1, 2, 4, 6, 7, 8 YES, ticks write nothing, 0 dialogs. No trigger files → no reviewer. `reports/req-216.md`.
+
+## req-215 — New workout without days; "Days" row on the workout screen; "Use a plan" only with none  (2026-10-10)
+
+**req-215** (DEC-119 §4, ui; throwaway agent). `machinesPlan({ schedule: false })` + `planToState` schedules only with a week;
+pure `schedule-days.js`; writes via `addSlot`/`removeSlot`. Test edits: req-207 (later workout has no days step), req-122
+(Actions count 20→21). Gate: `check: green — lint, skills, no import cycles, 109 test file(s), and the build all passed.`
+(Planner, throwaway worktree); branch smoke green on `plan qa`; scripted list 1–6, 8, 10 YES with stored receipts, 0 dialogs.
+No trigger files → no reviewer. `reports/req-215.md`.
