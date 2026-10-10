@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: ui** — with the **data gate**: it changes what a logged set stores (`rpe` source, new `loggedAt`) and
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-212` (`d261380`…`5aa2770`, 4 commits).** **Lane: ui** — with the **data gate**: it changes what a logged set stores (`rpe` source, new `loggedAt`) and
 touches `workout-log.js` → independent reviewer, backup reminder (DEC-046), **Emilio's eyes before merge** (he asked to check it).
 No schema bump, no migration, no rewrite of stored records.
 
