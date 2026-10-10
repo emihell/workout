@@ -2456,3 +2456,12 @@ pure `schedule-days.js`; writes via `addSlot`/`removeSlot`. Test edits: req-207 
 (Actions count 20→21). Gate: `check: green — lint, skills, no import cycles, 109 test file(s), and the build all passed.`
 (Planner, throwaway worktree); branch smoke green on `plan qa`; scripted list 1–6, 8, 10 YES with stored receipts, 0 dialogs.
 No trigger files → no reviewer. `reports/req-215.md`.
+
+## req-214 — Home: one-line done, one Start that asks which, Start on the scheduled-workout screen  (2026-10-10)
+
+**req-214** (DEC-119 §3, ui; throwaway agent). Shared `spotStartOptions` (`schedule.js`); the choice sheet reuses `askChoice`.
+Spec error caught by the builder: scope 2 said other workouts aren't startable while one runs — they were (each Start asks to
+abandon, DEC-038); start rules kept unchanged, so they now share one Start. Test edits: req-203/204/205 done-line text, today.test
+source locks. Gate: `check: green — lint, skills, no import cycles, 112 test file(s), and the build all passed.` (Planner,
+throwaway worktree); branch smoke green on `plan qa`; scripted list 1–9 YES with stored receipts, 0 dialogs. No trigger files →
+no reviewer. `reports/req-214.md`.

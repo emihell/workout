@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui**
+**Status: BUILT, NOT merged** **Lane: ui**
 
 # req-214 — Home: one-line done, one Start for several, Start on the scheduled-workout screen
 
