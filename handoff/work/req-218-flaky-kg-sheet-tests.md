@@ -1,4 +1,4 @@
-**Status: READY** **Lane: bug** — test-only; no product code.
+**Status: BUILT AND MERGED, 2026-10-10 — branch `req-218` (`288e46b`…`4db4c56`, 2 commits).** **Lane: bug** — test-only; no product code.
 
 # req-218 — req-178 / req-182 rendered tests flake since req-217 (provider remount, L-051)
 
