@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
-import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, moveInto, occurrenceId, resolveSlot, slotsOn } from '../schedule'
+import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, moveInto, resolveSlot, slotsOn, spotStartOptions } from '../schedule'
 import { doneEarlierText, movedFromText } from './schedule-day.js'
 import { routineById } from '../model.js'
 import { doneInTodayBlock, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
@@ -11,6 +11,7 @@ import { continueInProgress, startOrContinue } from '../workout-actions'
 import { withFrom } from '../route'
 import { routineStartable } from '../exercise-names.js'
 import { Banner, Button, FileButton, List, NavLink, Row, Screen, Title } from '../ui/index.jsx'
+import { askChoice } from '../ui/confirm.js'
 import { weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } from './history/helpers'
 
 // req-114 — the Start names its occurrence (slot@date), so startOrContinue only
@@ -20,21 +21,37 @@ import { weekdayDate, workoutDateKey, workoutRoutineId, workoutRoutineName } fro
 // req-127 — no Start on an empty routine (it made an empty active workout and could
 // abandon a real one); the preview already hides it (overview.jsx). Covers today's
 // block (req-200: the upcoming rows that also used it are gone).
+// req-214 — the slot/date/occurrenceId come from spotStartOptions, shared with the
+// "which workout?" sheet below and the scheduled-workout screen's Start.
 function StartButton({ store, routine, slot, date, label = 'Start', variant, block }) {
   if (!routineStartable(routine)) return null
   return (
-    <Button
-      variant={variant}
-      block={block}
-      onClick={() =>
-        startOrContinue(store, routine.id, {
-          scheduledFor: date,
-          scheduleSlotId: slot.id,
-          occurrenceId: occurrenceId(slot.id, date),
-        })
-      }
-    >
+    <Button variant={variant} block={block} onClick={() => startOrContinue(store, routine.id, spotStartOptions(slot.id, date))}>
       {label}
+    </Button>
+  )
+}
+
+// req-214 (DEC-119 §3, H21 "ask which to start in a modal instead of each one having a start
+// button") — 2+ startable spots today share ONE primary Start: it opens the in-app sheet
+// (askChoice) with a button per spot; the pick starts that spot exactly as its own Start
+// would (spotStartOptions). Cancel / backdrop / Escape resolve null and start nothing.
+function StartChooser({ store, spots, date }) {
+  return (
+    <Button
+      variant="primary"
+      block
+      onClick={async () => {
+        const picked = await askChoice('', {
+          title: 'Start which workout?',
+          choices: spots.map(({ slot, routine }) => ({ value: slot.id, label: routine.name })),
+        })
+        const spot = spots.find(({ slot }) => slot.id === picked)
+        if (!spot) return
+        await startOrContinue(store, spot.routine.id, spotStartOptions(spot.slot.id, date))
+      }}
+    >
+      Start
     </Button>
   )
 }
@@ -102,88 +119,89 @@ function UpcomingRow({ schedule, routines, workouts, row }) {
 }
 
 // req-14 (Emilio review) — today's workout is the Workout screen's focal point and
-// main call to action. Iter 8: a two-line stack — the bold date on top, then
-// the name as a secondary line — then a large, primary, full-width Start.
-// `Done …` shows once logged. req-55/DEC-038: this block never carries the
-// in-progress state — a current active workout is the single hero (`TodayHero`,
-// which req-114 renders above today's other occurrences), and a stale active
-// workout is a Continue row lower down, not the hero. So a today routine only
-// ever shows Start (or Done); the Continue path lives elsewhere. req-114: `Done`
-// uses the shared weekdayDate format, like every other row.
-// req-110 — a day with two+ routines is ONE day: the date line prints once, then
-// each routine (name, and its own Start or `Done …`) in schedule order.
-// With one routine the markup is exactly the pre-req-110 block (date, name, Start).
-// Each routine keeps the full-width primary Start (one clearly-tappable Start per
-// routine); `__routine` only spaces the routines apart under the shared date.
-function TodayRoutine({ store, routine, slot, date }) {
-  const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
-  // req-213 — no cover today, but a workout of this routine done earlier this week covers
-  // this spot: "Done Tue ✓" (a link to that session) in place of Start.
-  const earlier = done ? null : doneEarlier(store.workouts, routine.id, date, slot.id, store.schedule)
-  const moved = moveInto(store.schedule, slot.id, date)
+// main call to action: the bold date on top, then the name as a secondary line, then a
+// large, primary, full-width Start. req-55/DEC-038: this block never carries the
+// in-progress state — a current active workout is the single hero (`TodayHero`, which
+// req-114 renders above today's other occurrences).
+// req-110 — a day with two+ routines is ONE day: the date line prints once.
+// req-214 (DEC-119 §3) — today's spots split in two (todaySpots):
+//   - done (covered today, or req-213's "done earlier this week"): one Row each in the
+//     done list (TodayDone), "{name}  Done ✓ ›" / "Done Tue ✓ ›", linking that session;
+//   - pending: the names as plain lines, then ONE Start — the spot's own when one is
+//     startable, else a Start that asks which (StartChooser). An empty routine's name
+//     still lists, with no Start for it (req-127).
+function todaySpots(store, spots, date) {
+  const pending = []
+  const covered = []
+  for (const { slot, routine } of spots) {
+    const moved = moveInto(store.schedule, slot.id, date)
+    const done = coveringWorkout(store.workouts, routine.id, date, slot.id)
+    // req-213 — no cover today, but a workout of this routine done earlier this week covers
+    // this spot: "Done Tue ✓".
+    const earlier = done ? null : doneEarlier(store.workouts, routine.id, date, slot.id, store.schedule)
+    if (done || earlier) covered.push({ slot, routine, moved, session: done || earlier, value: done ? 'Done ✓' : doneEarlierText(earlier) })
+    else pending.push({ slot, routine, moved })
+  }
+  return { pending, covered }
+}
+
+function MovedMark({ moved }) {
+  return moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null
+}
+
+function TodayPending({ store, pending, date }) {
+  if (!pending.length) return null
+  const startable = pending.filter(({ routine }) => routineStartable(routine))
   return (
     <>
-      <p className="ui-today-workout__name">
-        {routine.name}
-        {moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null}
-      </p>
-      {done ? (
-        // req-203 §2 — the done line opens the sets (Lena run 3 took 5 taps to see them);
-        // Back returns Home, as req-195's done-today rows.
-        <p className="ui-sub">
-          <NavLink to={withFrom(`/history/${done.id}`, '/')} chevron="forward">
-            Done ✓ — see your sets
-          </NavLink>
+      {pending.map(({ slot, routine, moved }) => (
+        <p key={slot.id} className="ui-today-workout__name">
+          {routine.name}
+          <MovedMark moved={moved} />
         </p>
-      ) : earlier ? (
-        <p className="ui-sub">
-          <NavLink to={withFrom(`/history/${earlier.id}`, '/')} chevron="forward">
-            {doneEarlierText(earlier)}
-          </NavLink>
-        </p>
-      ) : (
-        <StartButton store={store} routine={routine} slot={slot} date={date} variant="primary" block />
-      )}
+      ))}
+      {startable.length === 1 ? (
+        <StartButton store={store} routine={startable[0].routine} slot={startable[0].slot} date={date} variant="primary" block />
+      ) : startable.length > 1 ? (
+        <StartChooser store={store} spots={startable} date={date} />
+      ) : null}
     </>
   )
 }
 
 function TodayWorkouts({ store, todays, date, done }) {
+  const { pending, covered } = todaySpots(store, todays, date)
   return (
     <div className="ui-today-workout">
       <p className="ui-today-workout__date">{weekdayDate(date)}</p>
-      {todays.length === 1 ? (
-        <TodayRoutine store={store} routine={todays[0].routine} slot={todays[0].slot} date={date} />
-      ) : (
-        todays.map(({ slot, routine }) => (
-          <div key={slot.id} className="ui-today-workout__routine">
-            <TodayRoutine store={store} routine={routine} slot={slot} date={date} />
-          </div>
-        ))
-      )}
-      <TodayDone store={store} done={done} />
+      <TodayPending store={store} pending={pending} date={date} />
+      <TodayDone store={store} covered={covered} done={done} />
     </div>
   )
 }
 
-// req-195 / DEC-108 §5 — the workouts finished today (not already a slot's Done above)
-// live INSIDE today's block, under its one date line: "<routine> · Done ✓ ›", each a
-// forward link to its History detail (Back returns to Today, req-171). Was a separate
-// "Completed today" row in the list below, which read as a second row for today. The
-// name resolves like every workout row (snapshot name survives a deleted routine). An
-// empty `done` renders nothing, so a day with nothing done is exactly the old block.
-function TodayDone({ store, done }) {
-  if (!done.length) return null
+// req-195 / DEC-108 §5 — the workouts finished today (not already a slot's Done) live
+// INSIDE today's block, under its one date line. req-214 (DEC-119 §3, H20 "Todays done can
+// be one line"): every done line is one Row — today's covered spots first (`covered`, from
+// todaySpots: "Done ✓" or "Done Tue ✓"), then the other finishes of today ("Done ✓") — each
+// a link to its History detail (Back returns Home, req-171/203). The name resolves like every
+// workout row (snapshot name survives a deleted routine). Nothing done renders nothing.
+function TodayDone({ store, covered = [], done }) {
+  if (!covered.length && !done.length) return null
   return (
-    <ul className="ui-today-workout__done">
-      {done.map((workout) => (
-        <li key={workout.id}>
-          <NavLink to={withFrom(`/history/${workout.id}`, '/')} chevron="forward">
-            {workoutRoutineName(workout, routineById(store.routines, workoutRoutineId(workout)))} · Done ✓
-          </NavLink>
-        </li>
+    <List>
+      {covered.map(({ slot, routine, moved, session, value }) => (
+        <Row key={slot.id} to={withFrom(`/history/${session.id}`, '/')} value={value}>
+          {routine.name}
+          <MovedMark moved={moved} />
+        </Row>
       ))}
-    </ul>
+      {done.map((workout) => (
+        <Row key={workout.id} to={withFrom(`/history/${workout.id}`, '/')} value="Done ✓">
+          {workoutRoutineName(workout, routineById(store.routines, workoutRoutineId(workout)))}
+        </Row>
+      ))}
+    </List>
   )
 }
 
@@ -214,27 +232,28 @@ function HeroRoutine({ store, workout }) {
 
 // req-114 / DEC-058 §3 — today's block while a current workout is in progress: TODAY's
 // date once, the in-progress workout first, then today's OTHER occurrences (`others`,
-// from otherTodayOccurrences) each with its own Start/Done, spaced like req-110's
-// routines. With no others it is the date and the hero alone (the req-55 shape).
+// from otherTodayOccurrences), spaced like req-110's routines. req-214: the others split
+// as TodayWorkouts' do — pending names + one Start (or the "which workout?" sheet), done
+// as rows. Starting one still goes through startOrContinue's abandon-on-new confirm
+// (DEC-038; no change to start rules). With no pending others it is the date and the hero.
 function TodayHero({ store, workout, others, date, done }) {
+  const { pending, covered } = todaySpots(store, others, date)
   return (
     <div className="ui-today-workout">
       <p className="ui-today-workout__date">{weekdayDate(date)}</p>
-      {others.length === 0 ? (
+      {pending.length === 0 ? (
         <HeroRoutine store={store} workout={workout} />
       ) : (
         <>
           <div className="ui-today-workout__routine">
             <HeroRoutine store={store} workout={workout} />
           </div>
-          {others.map(({ slot, routine }) => (
-            <div key={slot.id} className="ui-today-workout__routine">
-              <TodayRoutine store={store} routine={routine} slot={slot} date={date} />
-            </div>
-          ))}
+          <div className="ui-today-workout__routine">
+            <TodayPending store={store} pending={pending} date={date} />
+          </div>
         </>
       )}
-      <TodayDone store={store} done={done} />
+      <TodayDone store={store} covered={covered} done={done} />
     </div>
   )
 }

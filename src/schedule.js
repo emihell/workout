@@ -137,6 +137,13 @@ export function occurrenceId(slotId, date) {
   return `${slotId}@${dateKey(date)}`
 }
 
+// req-214 — the arguments that start a scheduled spot (its slot on `date`): what Home's
+// today Start, Home's "which workout?" sheet and the scheduled-workout screen's Start all
+// pass to startOrContinue, so the three can't drift apart.
+export function spotStartOptions(slotId, date) {
+  return { scheduledFor: dateKey(date), scheduleSlotId: slotId, occurrenceId: occurrenceId(slotId, date) }
+}
+
 export function coveringWorkout(workouts, routineId, scheduledDate, scheduleSlotId = null) {
   const done = (workouts || []).filter((w) => {
     const id = w.routineId

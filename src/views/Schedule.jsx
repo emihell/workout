@@ -16,12 +16,14 @@ import {
   removeSlotText,
   scheduleRowText,
   slotMenuSheet,
+  slotScreenDate,
+  slotStart,
   startNowShown,
 } from './schedule-day.js'
 import { childLink, go, withFrom } from '../route'
 import { nextWorkoutName } from '../plan-templates.js'
 import { useStore } from '../store-context'
-import { startOrContinue } from '../workout-actions'
+import { continueInProgress, startOrContinue } from '../workout-actions'
 import { routineStartable } from '../exercise-names.js'
 import { RoutineNewForm, RoutineScreens } from './Routine'
 import { navForBase } from './routine-nav.js'
@@ -375,6 +377,25 @@ export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId,
     showDelete: false,
   })
 
+  // req-214 (DEC-119 §3) — a primary Start at the top (slotStart decides it and its label).
+  const date = slotScreenDate(store.schedule, week, weekday, slotId, from)
+  const start = slotStart(store, routine, slotId, date)
+  const top = start ? (
+    <Button
+      variant="primary"
+      block
+      onClick={() =>
+        start.continueWorkout
+          ? continueInProgress(store, start.continueWorkout)
+          : start.options
+            ? startOrContinue(store, routine.id, start.options)
+            : startOrContinue(store, routine.id)
+      }
+    >
+      {start.label}
+    </Button>
+  ) : null
+
   return (
     <RoutineScreens
       routineId={routine.id}
@@ -382,6 +403,7 @@ export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId,
       screen={screen}
       itemId={itemId}
       exerciseId={exerciseId}
+      top={top}
     />
   )
 }

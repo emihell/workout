@@ -25,10 +25,12 @@ function fnBody(name) {
 test('today block prints the date line once, not once per routine', () => {
   const block = fnBody('TodayWorkouts')
   assert.equal(block.match(/ui-today-workout__date/g)?.length, 1)
-  // the date is outside the per-routine map
-  assert.ok(block.indexOf('ui-today-workout__date') < block.indexOf('todays.map('))
-  // the per-routine piece carries no date line
-  assert.doesNotMatch(fnBody('TodayRoutine'), /ui-today-workout__date/)
+  // req-214 test edit: the per-routine map moved out of TodayWorkouts into TodayPending (the
+  // pending names) and TodayDone (the done rows); the date line still prints once, before them.
+  assert.ok(block.indexOf('ui-today-workout__date') < block.indexOf('<TodayPending'))
+  // the per-routine pieces carry no date line
+  assert.doesNotMatch(fnBody('TodayPending'), /ui-today-workout__date/)
+  assert.doesNotMatch(fnBody('TodayDone'), /ui-today-workout__date/)
 })
 
 test('Today renders one grouped block for all of today\'s slots', () => {
@@ -39,23 +41,27 @@ test('Today renders one grouped block for all of today\'s slots', () => {
   assert.doesNotMatch(today, /todays\.map\(/)
 })
 
-test('each routine gets its own Start with its own slot, or Done once covered', () => {
-  const routine = fnBody('TodayRoutine')
-  assert.match(routine, /coveringWorkout\(store\.workouts, routine\.id, date, slot\.id\)/)
-  assert.match(routine, /<StartButton store=\{store\} routine=\{routine\} slot=\{slot\} date=\{date\} variant="primary" block \/>/)
-  // req-114 — `Done` now prints the shared weekdayDate format (was the raw ISO key).
-  // req-203 test edit (§2): the done line is now a link to that workout's History detail,
-  // "Done ✓ — see your sets ›", Back → Home. Still keyed off the same `done` (coveringWorkout).
-  assert.match(routine, /<NavLink to=\{withFrom\(`\/history\/\$\{done\.id\}`, '\/'\)\} chevron="forward">\s*Done ✓ — see your sets\s*<\/NavLink>/)
-  // StartButton threads the slot through to the workout (scheduleSlotId)
-  assert.match(fnBody('StartButton'), /scheduleSlotId: slot\.id/)
+// req-214 test edit (DEC-119 §3): was "each routine gets its own Start". Now one startable
+// spot keeps its own Start (with its own slot), 2+ share one Start that asks which
+// (StartChooser, same start arguments), and a covered spot is one Row "{name}  Done ✓ ›"
+// linking the session (was the "Done ✓ — see your sets ›" link). Still keyed off the same
+// `done` (coveringWorkout); the rendered behaviour is tested in req-214.test.js.
+test('one startable spot keeps its own Start; 2+ share one Start that asks; Done once covered', () => {
+  assert.match(fnBody('todaySpots'), /coveringWorkout\(store\.workouts, routine\.id, date, slot\.id\)/)
+  const pending = fnBody('TodayPending')
+  assert.match(pending, /startable\.length === 1 \?/)
+  assert.match(pending, /<StartButton store=\{store\} routine=\{startable\[0\]\.routine\} slot=\{startable\[0\]\.slot\} date=\{date\} variant="primary" block \/>/)
+  assert.match(pending, /<StartChooser store=\{store\} spots=\{startable\} date=\{date\} \/>/)
+  assert.match(fnBody('StartChooser'), /startOrContinue\(store, spot\.routine\.id, spotStartOptions\(spot\.slot\.id, date\)\)/)
+  assert.match(fnBody('TodayDone'), /<Row key=\{slot\.id\} to=\{withFrom\(`\/history\/\$\{session\.id\}`, '\/'\)\} value=\{value\}>/)
+  // StartButton threads the slot through to the workout (scheduleSlotId, via spotStartOptions)
+  assert.match(fnBody('StartButton'), /spotStartOptions\(slot\.id, date\)/)
 })
 
 test('one routine renders the pre-req-110 shape (no __routine wrapper)', () => {
-  const block = fnBody('TodayWorkouts')
-  assert.match(block, /todays\.length === 1 \?/)
-  const single = block.slice(block.indexOf('todays.length === 1 ?'), block.indexOf(') : ('))
-  assert.doesNotMatch(single, /ui-today-workout__routine/)
+  // req-214 test edit: TodayWorkouts no longer maps routines itself (single or several), so
+  // it has no __routine wrapper in any shape (was: none in the single-routine branch).
+  assert.doesNotMatch(fnBody('TodayWorkouts'), /ui-today-workout__routine/)
 })
 
 test('consecutive routines are spaced apart', () => {
@@ -80,11 +86,18 @@ test('the hero is the CURRENT workout and keeps today\'s other occurrences', () 
   // one date line — today's, not the workout's own date
   assert.equal(hero.match(/ui-today-workout__date/g)?.length, 1)
   assert.match(hero, /weekdayDate\(date\)/)
-  assert.match(hero, /<TodayRoutine store=\{store\} routine=\{routine\} slot=\{slot\} date=\{date\} \/>/)
+  // req-214 test edit: the others render through todaySpots → TodayPending / TodayDone (was
+  // one TodayRoutine each).
+  assert.match(hero, /todaySpots\(store, others, date\)/)
+  assert.match(hero, /<TodayPending store=\{store\} pending=\{pending\} date=\{date\} \/>/)
 })
 
 test('every Start names its occurrence; Done rows use weekdayDate', () => {
-  assert.match(fnBody('StartButton'), /occurrenceId: occurrenceId\(slot\.id, date\)/)
+  // req-214 test edit: the occurrence is built by spotStartOptions (schedule.js), shared by
+  // StartButton, StartChooser and the scheduled-workout screen.
+  const schedule = readFileSync(join(here, '..', 'schedule.js'), 'utf8')
+  assert.match(schedule, /export function spotStartOptions\(slotId, date\) \{\s*return \{ scheduledFor: dateKey\(date\), scheduleSlotId: slotId, occurrenceId: occurrenceId\(slotId, date\) \}/)
+  assert.match(fnBody('StartButton'), /spotStartOptions\(slot\.id, date\)/)
   assert.doesNotMatch(src, /Done \$\{dateKey\(/)
   assert.doesNotMatch(src, /Done \{dateKey\(/)
 })
@@ -100,13 +113,16 @@ test('the hero Continue calls continueInProgress, not startOrContinue', () => {
 // req-195 / DEC-108 §5 — a workout finished today lives inside today's block, never as a
 // second today-dated row in the list below.
 test('today\'s finished workouts render inside every shape of today\'s block', () => {
-  for (const name of ['TodayWorkouts', 'TodayHero', 'TodayEmpty']) {
-    assert.match(fnBody(name), /<TodayDone store=\{store\} done=\{done\} \/>/, name)
+  // req-214 test edit: TodayWorkouts / TodayHero also pass their covered spots (`covered`),
+  // and each done line is a Row with value "Done ✓" (was the "<name> · Done ✓" link text).
+  for (const name of ['TodayWorkouts', 'TodayHero']) {
+    assert.match(fnBody(name), /<TodayDone store=\{store\} covered=\{covered\} done=\{done\} \/>/, name)
   }
+  assert.match(fnBody('TodayEmpty'), /<TodayDone store=\{store\} done=\{done\} \/>/)
   const done = fnBody('TodayDone')
-  assert.match(done, /if \(!done\.length\) return null/)
+  assert.match(done, /if \(!covered\.length && !done\.length\) return null/)
   assert.match(done, /withFrom\(`\/history\/\$\{workout\.id\}`, '\/'\)/)
-  assert.match(done, / · Done ✓/)
+  assert.match(done, /value="Done ✓"/)
   const today = src.slice(src.indexOf('export function Today('))
   assert.match(today, /doneInTodayBlock\(store\.workouts, others, todayKey\)/)
 })

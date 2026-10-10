@@ -221,7 +221,8 @@ describe('DEC-115 Home → Schedule → History', () => {
     const at = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate(), 0, 30).toISOString()
     const done = { ...seed.workouts[0], id: 'w-today', routineId: 'sess-upper', finishedAt: at, startedAt: at, performedOn: dateKey(NOW), scheduleSlotId: 's-t', scheduledFor: dateKey(NOW), occurrenceId: `s-t@${dateKey(NOW)}` }
     await open('/', { ...withSlots([slot('s-t', TODAY_WD, 'sess-upper')]), workouts: [...seed.workouts, done] })
-    await tap(link('Done ✓ — see your sets ›'))
+    // req-214 test edit (DEC-119 §3): the done line is one Row "{name}  Done ✓ ›" (was "Done ✓ — see your sets ›"); same link.
+    await tap(link('Upper Body Done ✓ ›'))
     assert.equal(window.location.hash, `#${withFrom('/history/w-today', '/')}`)
     assert.equal(backHref(), '#/')
     await tap(link('‹ Back'))
