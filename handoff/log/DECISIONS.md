@@ -1974,3 +1974,14 @@ grouping). Specs: req-212..217.
    exercise's note and form cues show during rest instead of under the title. Distinct from the parked generic tips (DEC-108 §6).
 7. **Not taken:** H19 start values from height / weight / level — stays rejected (DEC-012, DESIGN §1); H18's first-time guide is
    req-10. H1 already shipped (Start on each workout row).
+
+## DEC-120 — exercises-dataset media is off-limits; openGym and GymMane are ideas only  (Planner, from licences; Emilio's intent, 2026-10-10)
+
+Emilio shared three repos 2026-10-10 ("the dataset is very interesting as it has alot of images"; the apps for "inspiration, but
+we do not want to be a copy"). Verdicts from the licence files, detail and the idea shortlist in `reference/inspiration-repos.md`:
+1. **exercises-dataset:** its images/GIFs are © Gym visual and its `LICENSE` grants no media rights — not bundled, hotlinked or
+   traced (same rule as RepDB, DEC-060/069). Its text is ExerciseDB repackaged [inferred] — not used.
+2. **openGym (AGPL-3.0) / GymMane (GPL-3.0):** no code copied; ideas re-derived in our own design. Their bundled media is
+   Gym visual's / CC BY-SA and not taken. Exception available: openGym's MIT body-map paths, with attribution, if ever wanted.
+3. Images stay on DEC-060's routes: free-exercise-db photos, then our own figures. A Gym visual licence would be a purchase
+   (Emilio's call) and still forbids redistribution. `(unconfirmed)` — Planner's reading of the licences.
