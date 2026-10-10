@@ -4,7 +4,7 @@
 import { buildPlannedWorkout, exerciseById, planSnapshot } from './model.js'
 import { dateKey } from './schedule.js'
 import { patchExercise } from './exercise-names.js'
-import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withLoggedSet } from './workout-log.js'
+import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withItemEffort, withLoggedSet } from './workout-log.js'
 import { historyPrescription, routinesUsingExercise } from './history-queries.js'
 
 // req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the
@@ -415,6 +415,16 @@ export function activeSetUpdatedState(s, index, patch) {
       sets: (s.activeWorkout.sets || []).map((set, i) => (i === index ? { ...set, ...patch } : set)),
     },
   }
+}
+
+// req-212 (DEC-119 §1) — the exercise review's effort onto the item's logged work sets
+// (withItemEffort, workout-log.js), from the latest state. Unknown item → same state.
+export function itemEffortState(s, itemId, rpe) {
+  if (!s.activeWorkout) return s
+  const item = (s.activeWorkout.snapshot?.items || []).find((candidate) => itemKey(candidate) === itemId)
+  if (!item) return s
+  const next = withItemEffort(s.activeWorkout, item, rpe)
+  return next === s.activeWorkout ? s : { ...s, activeWorkout: next }
 }
 
 export function activeSetRemovedState(s, index) {

@@ -271,7 +271,10 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     view = null
   })
 
-  it('Previous shows the logged set without un-logging; Next and Save leave restEndsAt alone; the pill skips the rest (req-192)', async () => {
+  // req-212 test edit (DEC-119 §1) — Previous / Next are gone: a done row opens the logged set in
+  // the edit sheet (Cancel / Save), the set form staying underneath. The req-186 guarantees are
+  // asserted on the sheet instead: nothing un-logged, the rest untouched, a reps-only Save keeps rpe.
+  it('a done row opens the logged set in the edit sheet without un-logging; Cancel and Save leave restEndsAt alone; the pill skips the rest (req-192)', async () => {
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
@@ -292,9 +295,10 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
 
     // warm-up, then work set 1
     // req-192 test edit: "Done" logs the warm-up, Medium (rpe 3, as Complete stored) set 1.
+    // req-212 test edit: one Done logs set 1 too (rpe null).
     await view.click(view.button('Done'))
     await view.type(view.input('kg'), '27.5')
-    await view.click(view.button('Medium'))
+    await view.click(view.button('Done'))
     assert.equal(active().sets.length, 2)
     assert.deepEqual(rows(), [
       ['is-done', null, '✓Done: Warm-up · 10 kg × 12'], // warm-up kg from db.json history,
@@ -311,37 +315,41 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     // scope 5 — the title's small "N/M" is gone
     for (const sub of view.all('.ui-sub')) assert.doesNotMatch(sub.textContent, /\d\/\d/)
 
-    // Previous → set 1's logged values, nothing removed, rest untouched
-    await view.click(view.button('Previous'))
-    assert.equal(view.input('kg').value, '27.5')
-    assert.equal(view.input('Reps').value, '12')
+    assert.equal(view.button('Previous'), null, 'no Previous (req-212)')
+    assert.equal(view.button('Next'), null, 'no Next (req-212)')
+    const sheet = () => view.container.querySelector('[role="dialog"]')
+    const sheetInput = (label) => [...sheet().querySelectorAll('label')].find((l) => l.textContent.trim().startsWith(label))?.querySelector('input')
+    const sheetButton = (label) => [...sheet().querySelectorAll('button')].find((b) => b.textContent.trim() === label)
+
+    // tap set 1 → the sheet shows its logged values, nothing removed, rest untouched
+    await view.click(view.all('.ui-setpreview__tap')[1])
+    assert.ok(sheet(), 'the edit sheet')
+    assert.equal(sheetInput('kg').value, '27.5')
+    assert.equal(sheetInput('Reps').value, '12')
     assert.equal(active().sets.length, 2, 'sets logged count unchanged')
     assert.equal(active().restEndsAt, restEndsAt, 'rest not reset')
-    // req-192 test edit: the current set's "Skip set" (was Complete) is gone while viewing; the
-    // logged effort (Medium, rpe 3) shows as the selected effort button.
-    assert.equal(view.button('Skip set'), null)
-    assert.equal(view.button('Medium').getAttribute('aria-pressed'), 'true')
-    assert.equal(view.all('[aria-pressed="true"]').length, 1)
-    assert.ok(view.button('Next'), 'Next (secondary)')
-    assert.match(view.button('Next').className, /ui-btn--secondary/)
-    assert.ok(view.button('Previous'), 'the warm-up is earlier, so Previous stays')
-    assert.equal(rows()[1][1], 'step', 'the viewed set is highlighted')
+    assert.equal(rows()[1][1], 'step', 'the open set is highlighted')
+    assert.ok(view.button('Skip set'), 'the current set form stays underneath')
 
-    // Next → back on set 2, same countdown
-    await view.click(view.button('Next'))
-    assert.ok(view.button('Skip set')) // req-192 test edit: was Complete
+    // Cancel → nothing written, back on set 2, same countdown
+    const before = JSON.stringify(active().sets)
+    await view.click(sheetButton('Cancel'))
+    assert.equal(sheet(), null)
+    assert.equal(JSON.stringify(active().sets), before, 'Cancel writes nothing')
     assert.equal(view.input('Reps').value, '11')
     assert.equal(active().restEndsAt, restEndsAt)
 
-    // Previous, change reps, Save → stored, rest unchanged
-    await view.click(view.button('Previous'))
+    // reopen, change reps, Save → stored, rest unchanged, loggedAt kept
+    await view.click(view.all('.ui-setpreview__tap')[1])
     const rpeBefore = active().sets[1].rpe
-    await view.type(view.input('Reps'), '10')
-    assert.equal(view.button('Next'), null)
-    assert.match(view.button('Save').className, /ui-btn--primary/)
-    await view.click(view.button('Save'))
+    const loggedAtBefore = active().sets[1].loggedAt
+    await view.type(sheetInput('Reps'), '10')
+    assert.match(sheetButton('Save').className, /ui-btn--primary/)
+    await view.click(sheetButton('Save'))
+    assert.equal(sheet(), null)
     assert.equal(active().sets[1].reps, '10')
     assert.equal(active().sets[1].rpe, rpeBefore, 'review fix 4 — reps-only Save keeps rpe')
+    assert.equal(active().sets[1].loggedAt, loggedAtBefore, 'req-212 — an edit never changes loggedAt')
     assert.equal(active().sets[1].weight, 27.5)
     assert.equal(active().sets.length, 2)
     assert.equal(active().restEndsAt, restEndsAt, 'Save leaves the rest alone')

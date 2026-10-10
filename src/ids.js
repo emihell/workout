@@ -27,6 +27,11 @@ export const RPE_OPTIONS = [
   { value: 5, label: 'Failure' },
 ]
 
+// req-212 (DEC-119 §1) — the one effort the exercise review offers: Easy 2 · Medium 3 · Hard 4
+// (the same numbers). Failure is no longer offered anywhere new; RPE_OPTIONS keeps 5 so an
+// old set still reads and labels "Failure" (History).
+export const EFFORT_OPTIONS = RPE_OPTIONS.filter((opt) => opt.value !== 5)
+
 export function rpeLabel(value) {
   const n = Number(value)
   if (!Number.isFinite(n) || n === 0) return ''

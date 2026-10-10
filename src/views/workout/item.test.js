@@ -27,13 +27,19 @@ function ruleBody(selector) {
   return css.slice(open + 1, css.indexOf('}', open))
 }
 
-test('done view has no Previous section and reads no last-finished sets', () => {
+// req-212 test edit (DEC-119 §1) — the done view is now the exercise review: its "Today" header
+// went (the set lines sit under the exercise name), and it carries the one Effort, Next / Finish,
+// Choose exercise and Add set. Still no Previous section and no read of last-finished sets.
+test('done view (the exercise review) has no Previous section and reads no last-finished sets', () => {
   const done = fnBody('WorkoutItemDone')
   assert.doesNotMatch(done, /<SectionHeader>Previous/)
   assert.doesNotMatch(done, /lastSetsForExercise\(/)
-  // exactly one "None." left — Today's empty state; none orphaned under a missing header
+  // exactly one "None." left — the set list's empty state
   assert.equal(done.match(/None\./g)?.length, 1)
-  assert.match(done, /<SectionHeader>Today<\/SectionHeader>/)
+  assert.doesNotMatch(done, /<SectionHeader>Today<\/SectionHeader>/)
+  assert.match(done, /<SectionHeader>Effort<\/SectionHeader>/)
+  assert.match(done, /Next: \{exerciseName\(next\)\}/)
+  assert.match(done, /Choose exercise/)
   assert.match(done, /Add set/)
 })
 

@@ -108,7 +108,9 @@ describe('2 — component tests (req-117 a), with the req-156 render harness', (
     assert.equal(JSON.stringify(store.workouts), before, 'byte-identical')
   })
 
-  it('item.jsx passes a restored duration to the form: log a timed set at 50 s, Previous → the Duration field reads 50', async () => {
+  // req-212 test edit (DEC-119 §1) — Previous is gone: the logged set opens from its done row of
+  // the set list, in the edit sheet. Same assertion: the sheet's Duration reads the logged 50 s.
+  it('item.jsx passes a restored duration to the edit sheet: log a timed set at 50 s, tap its row → the Duration field reads 50', async () => {
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
@@ -132,10 +134,13 @@ describe('2 — component tests (req-117 a), with the req-156 render harness', (
     )
     await view.unmount()
     view = await render(h(StoreProvider, null, h(Screen, { open: true })))
-    const previous = view.button('Previous')
-    assert.ok(previous, 'Previous is offered after a logged set')
-    await view.click(previous)
-    const duration = view.input('Duration (s)')
+    const row = view.all('.ui-setpreview__tap')[0]
+    assert.ok(row, 'the logged set is a tappable done row')
+    await view.click(row)
+    const sheet = view.container.querySelector('[role="dialog"]')
+    assert.ok(sheet, 'the edit sheet')
+    // (the live form underneath has its own Duration (s) box at the 60 s target — read the sheet's)
+    const duration = [...sheet.querySelectorAll('label')].find((l) => l.textContent.trim().startsWith('Duration (s)'))?.querySelector('input')
     assert.ok(duration, 'the timed form')
     assert.equal(duration.value, '50', 'the restored 50 s, not the 60 s target')
   })

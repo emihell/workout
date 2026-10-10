@@ -211,7 +211,9 @@ describe('AC3 — a done row opens the logged set (render, real store)', () => {
     await view?.unmount()
     view = null
   })
-  it('tap row 1 → "Set 1 · logged" view; sets.length and restEndsAt unchanged; upcoming rows are not buttons', async () => {
+  // req-212 test edit (DEC-119 §1) — the done row now opens the edit sheet (title "Set 1" /
+  // "Warm-up set", Cancel / Save) over the set screen, instead of the "· logged" view with Next.
+  it('tap row 1 → the edit sheet for set 1; sets.length and restEndsAt unchanged; upcoming rows are not buttons', async () => {
     const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
     const { useStore } = await import('./store-context.js')
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
@@ -232,24 +234,26 @@ describe('AC3 — a done row opens the logged set (render, real store)', () => {
     // the current set is told apart by its "Skip set" (viewing has Next, no Skip set).
     await view.click(view.button('Done')) // warm-up
     await view.type(view.input('kg'), '27.5')
-    await view.click(view.button('Medium')) // set 1
+    await view.click(view.button('Done')) // set 1 (req-212 test edit: one Done; was Medium)
     const restEndsAt = a().restEndsAt
     const length = a().sets.length
     const taps = view.all('.ui-setpreview li').map((li) => Boolean(li.querySelector('button.ui-setpreview__tap')))
     assert.deepEqual(taps, [true, true, false, false], 'done rows tappable, current/upcoming inert')
     const row1 = view.all('.ui-setpreview li')[1].querySelector('button')
     await view.click(row1)
-    assert.match(view.text(), /Set 1 · logged/)
-    assert.equal(view.input('kg').value, '27.5')
-    assert.ok(view.button('Next'))
-    assert.equal(view.button('Skip set'), null)
+    const sheet = () => view.container.querySelector('[role="dialog"]')
+    const cancel = () => [...sheet().querySelectorAll('button')].find((b) => b.textContent.trim() === 'Cancel')
+    assert.equal(sheet().querySelector('.ui-sheet__title').textContent, 'Set 1')
+    assert.equal(sheet().querySelector('input').value, '27.5')
     assert.equal(a().sets.length, length, 'sets.length unchanged')
     assert.equal(a().restEndsAt, restEndsAt, 'restEndsAt unchanged')
     assert.equal(view.all('.ui-setpreview li')[1].getAttribute('aria-current'), 'step')
+    await view.click(cancel())
     // the warm-up row too
     await view.click(view.all('.ui-setpreview li')[0].querySelector('button'))
-    assert.match(view.text(), /Warm-up set · logged/)
-    await view.click(view.button('Next'))
+    assert.equal(sheet().querySelector('.ui-sheet__title').textContent, 'Warm-up set')
+    await view.click(cancel())
+    assert.equal(sheet(), null)
     assert.ok(view.button('Skip set'), 'back on the current set')
     assert.equal(a().restEndsAt, restEndsAt)
   })

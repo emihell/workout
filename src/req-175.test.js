@@ -59,15 +59,25 @@ describe('req-175 — the live workout: new words on screen, stored setType / rp
     for (const old of OLD) assert.equal(text.includes(old), false, `"${old}" still on screen`)
     // req-192 test edit: the warm-up logs with "Done"; rpe 5 reads "Failure" (was "Max"), and
     // tapping it logs the set (no separate Complete).
+    // req-212 test edit (DEC-119 §1) — the set screen offers no effort at all now (Failure is not
+    // offered anywhere new; RPE_OPTIONS keeps 5 → "Failure" for reading old sets): the work set
+    // logs with Done, rpe null, and both logged sets carry `loggedAt` (checked, then left out
+    // of the pinned comparison). Was: tap "Failure" → rpe 5.
     await view.click(view.button('Done')) // the warm-up, as prefilled
-    const effort5 = RPE_OPTIONS.find((o) => o.value === 5).label // label-agnostic, so it runs on main too
+    const effort5 = RPE_OPTIONS.find((o) => o.value === 5).label
     assert.equal(effort5, 'Failure')
-    assert.ok(view.button(effort5), 'the Effort control shows the new word')
+    assert.equal(view.button(effort5), null, 'no Failure on the set screen')
     assert.equal(view.button('Max'), null)
-    await view.click(view.button(effort5))
+    await view.click(view.button('Done'))
     await act(async () => captured.store.finishWorkout({}))
     const finished = captured.store.workouts[0]
-    const logged = finished.sets.filter((s) => s.exerciseId === 'ex-leg-extension')
+    const logged = finished.sets
+      .filter((s) => s.exerciseId === 'ex-leg-extension')
+      .map(({ loggedAt, ...set }, i) => {
+        if (i < 2) assert.ok(Number.isFinite(Date.parse(loggedAt)), 'loggedAt parses')
+        else assert.equal(loggedAt, undefined, "Finish's skipped fill has no loggedAt")
+        return set
+      })
     assert.deepEqual(logged, EXPECTED_MAIN)
   })
 })
@@ -81,7 +91,8 @@ const EXPECTED_MAIN = [
   // req-178 (sanctioned edit) — the logged kg is main's (18: the routine now seeds it, and the
   // one-time fill set Leg Extension's routine kg to history's [18, 22, 25]); only the recorded
   // targetWeight (the routine kg) changed from [20, 24, 24] to that filled [18, 22, 25].
-  { ...LEG, setType: 'work', weight: 18, reps: '12', rpe: 5, note: '', targetReps: '12', targetWeight: 18 },
+  // req-212 test edit — rpe 5 → null: Done logs no effort (DEC-119 §1).
+  { ...LEG, setType: 'work', weight: 18, reps: '12', rpe: null, note: '', targetReps: '12', targetWeight: 18 },
   { ...LEG, setType: 'work', weight: 0, reps: 'skipped', rpe: null, note: 'skipped', targetReps: '12', targetWeight: 22 },
   { ...LEG, setType: 'work', weight: 0, reps: 'skipped', rpe: null, note: 'skipped', targetReps: '13', targetWeight: 25 },
 ]

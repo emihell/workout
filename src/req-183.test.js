@@ -92,7 +92,7 @@ describe('SetLogForm — the notes as rendered', () => {
     let submitted = null
     view = await render(form({ initialWeight: '500', routineKg: 50, onComplete: (v) => (submitted = v) }))
     assert.equal(view.text().includes('big change from 50 kg'), true)
-    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
+    await view.click(view.button('Done')) // req-212 test edit: one Done logs every set (DEC-119 §1; was the Medium effort button, req-192)
     assert.equal(submitted?.weight, '500')
   })
 })
@@ -137,7 +137,7 @@ describe('live log screen — real store, routine kg blanked on Leg Extension', 
     assert.equal(view.text().includes(`No weight entered · last time ${Number(lastKg)} kg`), true)
     await view.type(view.input('kg'), '500')
     assert.equal(view.text().includes(`That's a big change from ${Number(lastKg)} kg`), true)
-    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
+    await view.click(view.button('Done')) // req-212 test edit: one Done logs every set (DEC-119 §1; was the Medium effort button, req-192)
     const sets = captured.store.activeWorkout.sets
     assert.equal(sets.length, 2, 'one tap logged it, no dialog')
     assert.equal(sets[1].weight, 500)

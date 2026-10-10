@@ -7,6 +7,7 @@ import {
   Banner,
   Button,
   Checkbox,
+  ExerciseHead,
   Field,
   FileButton,
   List,
@@ -18,6 +19,8 @@ import {
   SectionHeader,
   SegmentedControl,
   Select,
+  SetEditSheet,
+  SetList,
   SetLogForm,
   Textarea,
   Title,
@@ -83,6 +86,7 @@ export function Showcase() {
   const [text, setText] = useState('')
   const [num, setNum] = useState('60')
   const [note, setNote] = useState('')
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   return (
     <Screen className="ui-showcase">
@@ -227,8 +231,49 @@ export function Showcase() {
         <WorkoutPill clock="1:12" setText="set 2/4" onOpen={() => {}} />
       </Block>
 
+      {/* req-212 (H5) — the exercise head and the set list, as the set screen and the review use them. */}
+      <Block heading="Exercise head">
+        <ExerciseHead
+          title="Chest Press"
+          subtitle="Warm-up set"
+          aside={
+            <Button variant="quiet" className="ui-addnote">
+              Add note
+            </Button>
+          }
+        />
+      </Block>
+
+      <Block heading="Set list">
+        <SetList
+          rows={[
+            { key: 'wu', status: 'done', text: 'Warm-up · 10 kg × 12' },
+            { key: '1', status: 'done', text: '1 · 27.5 kg × 12' },
+            { key: '2', status: 'current', text: '2 · 27.5 kg × 11', highlighted: true },
+            { key: '3', status: 'upcoming', text: '3 · 27.5 kg × 9' },
+          ]}
+          onOpen={() => setSheetOpen(true)}
+        />
+        <p className="ui-field__label">done rows open the edit sheet; current is highlighted; upcoming is inert</p>
+      </Block>
+
+      {/* req-212 — the edit sheet for one logged set (position: fixed, so opened on demand). */}
+      <Block heading="Set edit sheet">
+        <Button onClick={() => setSheetOpen(true)}>Open the edit sheet</Button>
+        {sheetOpen ? (
+          <SetEditSheet
+            title="Set 1"
+            initialWeight="27.5"
+            initialReps="12"
+            onSave={() => setSheetOpen(false)}
+            onCancel={() => setSheetOpen(false)}
+          />
+        ) : null}
+      </Block>
+
+      {/* req-212 — Skip set (quiet) over one Done (primary): no effort, no Previous / Next. */}
       <Block heading="Set-log form">
-        <SetLogForm weighted onComplete={() => {}} onSkip={() => {}} onPrevious={() => {}} />
+        <SetLogForm weighted onComplete={() => {}} onSkip={() => {}} />
       </Block>
     </Screen>
   )

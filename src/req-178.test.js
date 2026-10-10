@@ -444,7 +444,7 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     await mount(h(WorkoutItemLog, { routineId: 'dayA', itemId: 'ia' }))
     assert.equal(view.input('kg').value, '50', 'the routine kg, not history\'s 40')
     await view.type(view.input('kg'), '55')
-    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
+    await view.click(view.button('Done')) // req-212 test edit: one Done logs every set (DEC-119 §1; was the Medium effort button, req-192)
     await mount(h(Workout, { routineId: 'dayA' }))
     assert.match(view.text(), /Use 55 kg next time\?/) // req-189 edit: the sheet's new words
     await view.click(view.button('Yes'))
@@ -456,7 +456,7 @@ describe('req-178 AC10 (rendered) — Start → the set shows the routine kg →
     // The last exercise: its sheet first, then the auto-finish summary (not the list).
     await mount(h(WorkoutItemLog, { routineId: 'dayA', itemId: 'ib' }))
     await view.type(view.input('kg'), '32,5')
-    await view.click(view.button('Medium')) // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
+    await view.click(view.button('Done')) // req-212 test edit: one Done logs every set (DEC-119 §1; was the Medium effort button, req-192)
     await mount(h(Workout, { routineId: 'dayA' }))
     assert.match(view.text(), /Use 32\.5 kg next time\?/) // req-189 edit: the sheet's new words
     await view.click(view.button('Yes'))

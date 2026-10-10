@@ -90,7 +90,10 @@ describe('§3 one set format: "{kg} kg × {reps}"', () => {
   })
   it('the History exercise page and the log list render formatSetLine; By exercise renders topSetText', () => {
     assert.match(read('views/history/detail.jsx'), /\{formatSetLine\(s, /)
-    assert.match(read('views/workout/item.jsx'), /\{formatSetLine\(set, /)
+    // req-212 test edit — the done view (now the exercise review) lists its sets in the set list's
+    // shape (loggedSetRowText → setPreviewText: "1 · {kg} kg × {reps}", the same kg × reps format);
+    // the per-set effort word left those lines (one effort per exercise, DEC-119 §1).
+    assert.match(read('views/workout/item.jsx'), /loggedSetRowText\(label, set, weighted, cardioFields\)/)
     assert.match(read('views/history/list.jsx'), /topSetText\(w\.sets, exerciseId\)/)
   })
 })
@@ -151,7 +154,9 @@ describe('§6 equipmentLabel — one display map', () => {
     assert.equal(equipmentLabel(null, 'Bodyweight'), 'Bodyweight')
   })
   it('every screen that shows equipment reads it through the map', () => {
-    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/item.jsx', 'views/workout/setup.jsx']) {
+    // req-212 test edit — views/workout/item.jsx left the list: its done view (the one place it
+    // showed equipment) became the exercise review, which shows no equipment line (DEC-119 §1).
+    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/setup.jsx']) {
       const source = read(file)
       assert.doesNotMatch(source, /— \{ex\.equipment\}|— \$\{ex\.equipment\}|\|\| 'bodyweight'|"ui-sub">\{ex\.equipment\}/, file)
       assert.match(source, /equipmentLabel\(/, file)

@@ -32,11 +32,15 @@ afterEach(async () => {
 const mount = (s, itemId) => render(h(StoreContext.Provider, { value: s }, h(WorkoutItemLog, { routineId: 'r', itemId })))
 
 describe('req-162 — the log route of a marked-done item', () => {
-  it('renders nothing (no "Not found.") and redirects to the overview', async () => {
+  // req-212 test edit (DEC-119 §1) — the redirect now lands on the item's review (where the
+  // last Done goes; the overview's own row link opens it too), not the overview: a marked-done
+  // log route sending the user to the overview would also undo finishExercise's navigation
+  // to the review. The req-162 point (nothing rendered meanwhile, no "Not found.") is unchanged.
+  it('renders nothing (no "Not found.") and redirects to the item review', async () => {
     view = await mount(store(['si-a']), 'si-a')
     assert.doesNotMatch(view.text(), /Not found\./)
     assert.equal(view.text(), '')
-    assert.equal(location.hash, '#/workout/r', 'the redirect still runs')
+    assert.equal(location.hash, '#/workout/r/item/si-a/done', 'the redirect still runs')
   })
   it('a genuinely unknown item id with an active workout still says "Not found."', async () => {
     view = await mount(store([]), 'no-such-item')
