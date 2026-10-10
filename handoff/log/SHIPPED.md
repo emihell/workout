@@ -2492,3 +2492,5 @@ req-187 (one provider — L-051). Gate: `check: green — lint, skills, no impor
 passed.` (Planner, throwaway worktree); branch smoke green on `plan qa`; scripted list 1–8, 10 YES (5 via the rest pill, 0
 skipped sets), 0 dialogs. `workout-log.js` touched display-only (string helpers, `eachSide=false` default) → no reviewer, reason
 given at closeout. `reports/req-217.md`.
+
+No independent reviewer (`plan closeout --no-reviewer`): workout-log.js change is display-only: setPreviewText/loggedSetRowText/setListRows gain an eachSide=false string parameter; no write path touched
