@@ -409,24 +409,21 @@ export function WorkoutPill({ clock = null, setText = '', go = false, skip = fal
 
 // SetLogForm — the single most important gym surface: a kg NumberField, a big reps
 // field, and a bar pinned to the absolute bottom of the screen (req-80): a quiet
-// Previous · Skip set row over four effort buttons that LOG the set (req-192,
-// DEC-108 §1: Easy · Medium · Hard · Failure → onComplete with that effort), or one
-// "Done" where effort isn't shown.
+// Skip set row over one primary Done that logs the set (req-212, DEC-119 §1 — effort is
+// asked once per exercise on the review, not per set).
 // Presentational: it owns only the in-progress field values (local state, seeded
 // from the `initial*` props), remounted per-set by the caller with a `key`. All
-// the domain logic — history prefill, carry, restore, targets, the effort→RPE
-// mapping — lives in the caller (the workout screen), which passes the seeds in
-// and reads {weight, reps, effort} back out of onComplete.
+// the domain logic — history prefill, carry, targets — lives in the caller (the workout
+// screen), which passes the seeds in and reads {weight, reps, durationSec} back out of
+// onComplete.
 //
 // The note affordance is NOT here (req-80): "Add note" is a small control beside
 // the exercise title (item.jsx), and the note value is owned by the caller and
 // passed to completeSet directly — so it sits by the title, not in this field group.
 //
-// Props: `weighted` shows the kg field; `showEffort` shows the effort control
-// (off for warm-up / cardio sets, which have no RPE); `repsLabel` is "Reps" or
-// "Duration"; `effortOptions` overrides the effort buttons; `onChange` (req-125) hears
-// edits. The reps field is a full keyboard (not decimal-only) so durations like
-// "30 min" can be typed.
+// Props: `weighted` shows the kg field; `repsLabel` is "Reps" or "Duration";
+// `onChange` (req-125) hears edits. The reps field is a full keyboard (not decimal-only)
+// so durations like "30 min" can be typed.
 // req-85 — the in-set count-down for a timed exercise. A SECOND, concurrent timer
 // with its OWN local state (a deadline + a 250ms tick) — deliberately NOT the
 // persisted restEndsAt, so starting it never touches the rest pill/cue and the two
@@ -587,34 +584,20 @@ const EMPTY_CARDIO = { duration: '', level: '', distance: '', distanceUnit: 'm' 
 export function SetLogForm({
   weighted = true,
   timed = false,
-  showEffort = true,
   repsLabel = 'Reps',
-  effortOptions = [
-    { value: 2, label: 'Easy' },
-    { value: 3, label: 'Medium' },
-    { value: 4, label: 'Hard' },
-    { value: 5, label: 'Failure' },
-  ],
   initialWeight = '',
   initialReps = '',
   initialDuration = 0,
-  // req-192 — read only while `viewing` (the logged set's effort, shown selected). The current
-  // set has no preselected effort: tapping an effort button IS the answer (DEC-108 §1).
-  initialEffort = '',
   routineKg,
   lastKg = '',
   // req-189 — "kg per dumbbell" on a dumbbell exercise (kg-label.js); the caller decides.
   kgLabel = 'kg',
-  canGoBack = true,
   onComplete,
   onSkip,
-  onPrevious,
   onChange,
-  // req-186 (DEC-103 §4) — `viewing`: the form shows a set already logged (Previous). The
-  // bar becomes Previous (if `canGoBack`) · Next (secondary → onNext); once a field is
-  // changed the forward button is Save (primary, submits → onComplete with the values).
-  viewing = false,
-  onNext,
+  // req-212 (DEC-119 §1) — no effort, no Previous / Next / viewing mode: every set is logged by
+  // one Done (effort is asked once per exercise, on the review); a logged set is edited in
+  // SetEditSheet. onComplete gets { weight, reps, durationSec } (+ `cardio` on a cardio set).
   // req-194 — `cardio`: the cardio form (Duration + stopwatch, Level, Distance) in place of
   // Reps; `initialCardio` its starting text (draft, viewed set, or a single-time target
   // prefill); `cardioHint` a quiet note under Duration (a range target, never put in the box).
@@ -634,7 +617,6 @@ export function SetLogForm({
   const [cardioErrors, setCardioErrors] = useState({})
   const [reps, setReps] = useState(initialReps)
   const [duration, setDuration] = useState(String(initialDuration || ''))
-  const [effort, setEffort] = useState(initialEffort)
   // req-154 — set by Complete when the kg can't be read (`abc`, `2,5,5`); cleared by the
   // next kg edit. `22,5` is a number (DEC-058 §1) and never lands here.
   const [weightError, setWeightError] = useState(null)
@@ -647,46 +629,37 @@ export function SetLogForm({
   // values, so the caller can keep a draft of the un-logged set. It fires from the edit
   // itself (not an effect), so mounting or remounting writes nothing. `durationSec` is the
   // typed seconds as entered, present only on a timed form.
-  // req-186 — any edit while `viewing` a logged set turns Next into Save.
-  const [edited, setEdited] = useState(false)
-  const captionId = useId()
   // req-194 — a cardio edit (or a stopwatch Start / Stop, `now`: written to the draft at
   // once, not debounced, so a reload right after Start keeps it running).
   function editCardio(patch, { now = false } = {}) {
     const next = { ...cardioState, ...patch }
     setCardioState(next)
-    setEdited(true)
     setCardioErrors({})
-    onChange?.({ weight, reps, effort, durationSec: undefined, cardio: next }, { now })
+    onChange?.({ weight, reps, durationSec: undefined, cardio: next }, { now })
   }
   function edit(field, value) {
-    const next = { weight, reps, effort, duration, [field]: value }
-    setEdited(true)
+    const next = { weight, reps, duration, [field]: value }
     if (field === 'weight') {
       setWeight(value)
       setWeightError(null)
     } else if (field === 'reps') {
       setReps(value)
       setRepsError(null)
-    }
-    else if (field === 'effort') setEffort(value)
-    else {
+    } else {
       setDuration(value)
       setDurationError(null)
     }
     onChange?.({
       weight: next.weight,
       reps: next.reps,
-      effort: next.effort,
       durationSec: timed ? next.duration : undefined,
       ...(cardio ? { cardio: cardioState } : {}),
     })
   }
   const hints = kgHints({ weighted, kg: weight, routineKg, lastKg })
   // req-192 — the one logging path: validation (kg error, "Enter reps", duration) first, then
-  // onComplete. `chosen` is the effort button tapped (current set), the selected effort (Save on
-  // a viewed set), or null where effort isn't shown ("Done").
-  function submit(chosen) {
+  // onComplete. req-212 — reached only by Done (or Enter); there is no effort here.
+  function submit() {
     if (cardio) {
       submitCardio()
       return
@@ -705,39 +678,28 @@ export function SetLogForm({
     onComplete?.({
       weight,
       reps: timed ? '' : reps,
-      // req-156 (audit F-TRUST-2) — a hidden Effort (warm-up / cardio) is not an answer:
-      // null. req-192 — otherwise the effort button tapped (or, viewing, the one selected).
-      effort: showEffort ? chosen : null,
       durationSec: timed ? seconds.value : undefined,
     })
   }
   // req-194 — Done on a cardio set: a running stopwatch is stopped at this moment and its
   // time logged; Duration is required (blank → "Enter duration"), Level / Distance optional
-  // (blank → absent, unreadable → an inline error and nothing logged). Viewing a logged set,
-  // a blank Duration is allowed (an old set had none) and its typed reps text is kept.
+  // (blank → absent, unreadable → an inline error and nothing logged).
   function submitCardio() {
     const raw = stopwatch ? { ...cardioState, duration: clockText(secondsNow(stopwatch)) } : cardioState
-    const read = cardioValues(raw, { durationRequired: !viewing })
+    const read = cardioValues(raw, { durationRequired: true })
     if (read.errors) {
       setCardioErrors(read.errors)
       return
     }
-    onComplete?.({ weight, reps: viewing ? reps : '', effort: null, durationSec: undefined, cardio: read.values })
+    onComplete?.({ weight, reps: '', durationSec: undefined, cardio: read.values })
   }
   return (
     <form
       className="ui-setlog"
       onSubmit={(e) => {
         e.preventDefault()
-        // req-186 — viewing a logged set with nothing changed: the forward action is Next.
-        if (viewing && !edited) {
-          onNext?.()
-          return
-        }
-        // req-192 (DEC-108 §1) — the current set with effort shown is logged only by tapping an
-        // effort button: Enter in a field has no effort to log with, so it logs nothing.
-        if (!viewing && showEffort) return
-        submit(showEffort ? effort : null)
+        // req-212 — Enter in a field logs the set, as Done does (every set, warm-up or work).
+        submit()
       }}
     >
       <div className="ui-setlog__nums">
@@ -748,7 +710,6 @@ export function SetLogForm({
           <CardioFields
             values={cardioState}
             errors={cardioErrors}
-            viewing={viewing}
             hint={cardioHint}
             stopwatch={stopwatch}
             blockedBy={stopwatchBlockedBy}
@@ -804,58 +765,212 @@ export function SetLogForm({
         </p>
       ) : null}
       {/* req-80 — pinned to the absolute bottom (thumb reach) via .ui-setlog__actions.
-          req-192 (DEC-108 §1) — two tiers. Top, a quiet row: Previous (retreat, left) and Skip
-          set (lateral) — or, viewing a logged set, Previous · Next / Save as req-186. Bottom: the
-          set is LOGGED by tapping its effort, Easy · Medium · Hard · Failure (real buttons, a
-          caption so they read as actions, nothing preselected); a set without effort (warm-up,
-          cardio) gets one "Done". Viewing, the effort buttons select (the logged one shown
-          selected) and Save commits. Markup order = visual/focus order (DESIGN §4). */}
+          req-212 (DEC-119 §1) — every set, warm-up, work or cardio: a quiet Skip set row over one
+          primary Done that logs it. No effort here (asked once, on the exercise review) and no
+          Previous / Next (a done row of the set list opens SetEditSheet). Markup order =
+          visual/focus order (DESIGN §4). */}
       <div className="ui-setlog__actions">
         <div className="ui-setlog__nav">
-          {canGoBack ? <Button variant="quiet" onClick={onPrevious}>Previous</Button> : null}
-          {viewing ? (
-            edited ? (
-              <Button type="submit" variant="primary">
-                Save
-              </Button>
-            ) : (
-              <Button variant="secondary" onClick={onNext}>
-                Next
-              </Button>
-            )
-          ) : (
-            /* req-188 — the screen's only Skip: this set (Skip exercise is on the list). */
-            <Button variant="quiet" onClick={onSkip}>Skip set</Button>
-          )}
+          {/* req-188 — the screen's only Skip: this set (Skip exercise is on the list). */}
+          <Button variant="quiet" onClick={onSkip}>Skip set</Button>
         </div>
-        {showEffort ? (
-          <>
-            <p className="ui-setlog__caption" id={captionId}>
-              {viewing ? 'Effort' : 'Log set \u2014 how did it feel?'}
-            </p>
-            <div className="ui-effort" role="group" aria-labelledby={captionId}>
-              {effortOptions.map((opt) => {
-                const selected = viewing && String(opt.value) === String(effort)
-                return (
-                  <Button
-                    key={opt.value}
-                    variant={selected ? 'primary' : 'secondary'}
-                    className={cx('ui-effort__btn', selected && 'is-selected')}
-                    aria-pressed={viewing ? selected : undefined}
-                    onClick={() => (viewing ? edit('effort', opt.value) : submit(opt.value))}
-                  >
-                    {opt.label}
-                  </Button>
-                )
-              })}
-            </div>
-          </>
-        ) : viewing ? null : (
-          <Button type="submit" variant="primary" block className="ui-setlog__done">
-            Done
-          </Button>
-        )}
+        <Button type="submit" variant="primary" block>
+          Done
+        </Button>
       </div>
     </form>
+  )
+}
+
+// ExerciseHead (req-212, H5) — an exercise screen's head: the Title (a node: the name, or a
+// link to the exercise) with an optional small control beside it (`aside`, e.g. "Add note"),
+// and an optional caption line under it (`subtitle`). Was ad-hoc markup in item.jsx.
+export function ExerciseHead({ title, aside = null, subtitle = '' }) {
+  return (
+    <>
+      <div className="ui-exercise-head">
+        <Title>{title}</Title>
+        {aside ? <div className="ui-exercise-head__aside">{aside}</div> : null}
+      </div>
+      {subtitle ? <p className="ui-sub">{subtitle}</p> : null}
+    </>
+  )
+}
+
+// SetList (req-212, H5; was item.jsx's ad-hoc `ui-setpreview` list, req-106 / req-186) — one
+// small line per set of an exercise. `rows`: [{ key, status: 'done' | 'current' | 'upcoming',
+// text, highlighted }]. A done row is a button when `onOpen` is given (onOpen(row) — the
+// caller opens that logged set); current / upcoming rows are plain text. The row on screen
+// (`highlighted`) is set apart by fill and weight and marked aria-current.
+export function SetList({ rows, onOpen, label = 'Sets' }) {
+  return (
+    <ul className="ui-setpreview" aria-label={label}>
+      {(rows || []).map((row) => (
+        <li
+          key={row.key}
+          className={cx('ui-setpreview__row', `is-${row.status}`, row.highlighted && 'is-here')}
+          aria-current={row.highlighted ? 'step' : undefined}
+        >
+          {row.status === 'done' && onOpen ? (
+            <button type="button" className="ui-setpreview__tap" onClick={() => onOpen(row)}>
+              <span className="ui-setpreview__mark" aria-hidden="true">✓</span>
+              <span className="ui-visually-hidden">Done: </span>
+              {row.text}
+            </button>
+          ) : (
+            <>
+              <span className="ui-setpreview__mark" aria-hidden="true">
+                {row.status === 'done' ? '✓' : ''}
+              </span>
+              {row.text}
+            </>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// SetEditSheet (req-212, DEC-119 §1) — edit ONE logged set over the screen it was opened
+// from: that set's own fields (kg + reps, a timed set's seconds, or a cardio set's Duration /
+// Level / Distance), Cancel and Save. No effort (asked once per exercise, on the review).
+// Presentational, like SetLogForm: it owns the field text, validates it the same way (kg
+// that can't be read, blank reps, unreadable seconds / cardio values → inline errors, no
+// Save), and hands onSave({ weight, reps, durationSec, cardio }) to the caller, who writes it.
+// Cancel, the backdrop and Escape call onCancel and write nothing. A cardio set's typed reps
+// (an old "20 min") are passed back unchanged; `cardioHint` shows them.
+// Review round 1 — Save is disabled until a field is edited (an untouched Save wrote a skipped
+// set's prefill back as logged). `skipped`: the set is a skipped record, so un-skipping needs a
+// real entered value — reps, a typed Duration (s) on a timed set, a Duration on a cardio set.
+export function SetEditSheet({
+  title = 'Set',
+  weighted = true,
+  timed = false,
+  cardio = false,
+  repsLabel = 'Reps',
+  kgLabel = 'kg',
+  initialWeight = '',
+  initialReps = '',
+  initialDuration = '',
+  initialCardio = null,
+  cardioHint = '',
+  skipped = false,
+  onSave,
+  onCancel,
+}) {
+  const [edited, setEdited] = useState(false)
+  const [weight, setWeight] = useState(String(initialWeight ?? ''))
+  const [reps, setReps] = useState(String(initialReps ?? ''))
+  const [duration, setDuration] = useState(initialDuration != null ? String(initialDuration) : '')
+  const [cardioState, setCardioState] = useState(() => ({ ...EMPTY_CARDIO, ...(initialCardio || {}) }))
+  const [errors, setErrors] = useState({})
+  const titleId = useId()
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onCancel?.()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
+  function save() {
+    const next = {}
+    if (weighted) next.weight = kgError(weight)
+    const seconds = timed ? secondsToSave(duration, 0) : null
+    if (seconds?.error) next.duration = seconds.error
+    else if (timed && skipped && duration.trim() === '') next.duration = 'Enter duration'
+    // Review round 2 — 0 s is not a done set either (as cardio-set.js refuses a zero duration).
+    else if (timed && skipped && seconds.value === 0) next.duration = 'Duration must be more than 0.'
+    if (!timed && !cardio && reps.trim() === '') next.reps = `Enter ${repsLabel.toLowerCase()}`
+    const read = cardio ? cardioValues(cardioState, { durationRequired: skipped }) : null
+    if (read?.errors) next.cardio = read.errors
+    if (Object.values(next).some(Boolean)) {
+      setErrors(next)
+      return
+    }
+    onSave?.({
+      weight,
+      reps: timed ? '' : reps,
+      durationSec: timed ? seconds.value : undefined,
+      ...(cardio ? { cardio: read.values } : {}),
+    })
+  }
+  return (
+    <div className="ui-sheet-backdrop" onClick={() => onCancel?.()}>
+      <div className="ui-sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={(e) => e.stopPropagation()}>
+        <p id={titleId} className="ui-sheet__title">
+          {title}
+        </p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (edited) save()
+          }}
+          onInput={() => setEdited(true)}
+        >
+          <div className="ui-setlog__nums">
+            {weighted ? (
+              <NumberField
+                label={kgLabel}
+                selectOnFocus
+                value={weight}
+                onChange={(e) => {
+                  setWeight(e.target.value)
+                  setErrors((x) => ({ ...x, weight: null }))
+                }}
+              />
+            ) : null}
+            {cardio ? (
+              <CardioFields
+                values={cardioState}
+                errors={errors.cardio || {}}
+                viewing
+                hint={cardioHint}
+                onEdit={(field, value) => {
+                  setEdited(true)
+                  setCardioState((c) => ({ ...c, [field]: value, ...(field === 'duration' ? { watched: false } : {}) }))
+                  setErrors((x) => ({ ...x, cardio: null }))
+                }}
+              />
+            ) : timed ? (
+              <NumberField
+                label="Duration (s)"
+                selectOnFocus
+                value={duration}
+                onChange={(e) => {
+                  setDuration(e.target.value)
+                  setErrors((x) => ({ ...x, duration: null }))
+                }}
+              />
+            ) : (
+              <Field
+                label={repsLabel}
+                className="ui-input--num"
+                selectOnFocus
+                value={reps}
+                onChange={(e) => {
+                  setReps(e.target.value)
+                  setErrors((x) => ({ ...x, reps: null }))
+                }}
+              />
+            )}
+          </div>
+          {['weight', 'reps', 'duration'].map((key) =>
+            errors[key] ? (
+              <p key={key} className="ui-field-error" role="alert">
+                {errors[key]}
+              </p>
+            ) : null,
+          )}
+          <div className="ui-sheet__actions">
+            <Button variant="secondary" onClick={() => onCancel?.()}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" disabled={!edited}>
+              Save
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }

@@ -12,6 +12,7 @@ import {
   draftContinuedState,
   exerciseAddedState,
   exerciseUpdatedState,
+  itemEffortState,
   itemSkippedState,
   itemsAddedState,
   loopWeeksState,
@@ -211,6 +212,11 @@ export function StoreProvider({ children }) {
       },
       updateActiveSet(index, patch) {
         setState((s) => activeSetUpdatedState(s, index, patch))
+      },
+      // req-212 (DEC-119 §1) — the exercise review's one effort: `rpe` (2 / 3 / 4, or null)
+      // on every logged, non-skipped work set of the item (itemEffortState → withItemEffort).
+      setItemEffort(itemId, rpe) {
+        setState((s) => itemEffortState(s, itemId, rpe))
       },
       // req-25 — clears the armed rest too (activeSetRemovedState).
       removeActiveSet(index) {

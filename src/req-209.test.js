@@ -90,7 +90,10 @@ describe('§3 one set format: "{kg} kg × {reps}"', () => {
   })
   it('the History exercise page and the log list render formatSetLine; By exercise renders topSetText', () => {
     assert.match(read('views/history/detail.jsx'), /\{formatSetLine\(s, /)
-    assert.match(read('views/workout/item.jsx'), /\{formatSetLine\(set, /)
+    // req-212 test edit — the done view (now the exercise review) lists its sets in the set list's
+    // shape (loggedSetRowText → setPreviewText: "1 · {kg} kg × {reps}", the same kg × reps format);
+    // the per-set effort word left those lines (one effort per exercise, DEC-119 §1).
+    assert.match(read('views/workout/item.jsx'), /loggedSetRowText\(label, set, weighted, cardioFields\)/)
     assert.match(read('views/history/list.jsx'), /topSetText\(w\.sets, exerciseId\)/)
   })
 })

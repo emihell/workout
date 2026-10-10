@@ -770,6 +770,47 @@ export function withLoggedSet(workout, setRecord, activePatch = {}, draftKey = n
   return next
 }
 
+// req-212 (DEC-119 §1) — the exercise review's one effort. The sets it covers: this item's
+// logged work sets that are not skipped (a warm-up, a skipped set and another exercise's
+// sets are never touched). `withItemEffort` writes `rpe` (a number, or null = no effort) on
+// each of them and leaves every other field — `loggedAt` included — as it was, so the
+// per-set rule in progress.js reads the one exercise effort unchanged.
+export function itemEffortSets(workout, item) {
+  return setsForItem(workout?.sets, item).filter((set) => set.setType !== 'wu' && !isSkippedSet(set))
+}
+
+export function withItemEffort(workout, item, rpe) {
+  if (!workout || !item) return workout
+  const targets = new Set(itemEffortSets(workout, item))
+  if (!targets.size) return workout
+  const value = rpe === '' || rpe == null ? null : Number(rpe)
+  return { ...workout, sets: (workout.sets || []).map((set) => (targets.has(set) ? { ...set, rpe: value } : set)) }
+}
+
+// The effort the review shows as picked: the one rpe every covered set shares, when it is
+// one the review offers (2 / 3 / 4); else '' (nothing picked — a fresh exercise, sets that
+// differ, or an old Failure the review no longer offers).
+export function itemEffort(workout, item) {
+  const sets = itemEffortSets(workout, item)
+  if (!sets.length) return ''
+  const first = sets[0].rpe
+  if (first == null || first === '' || !sets.every((set) => String(set.rpe) === String(first))) return ''
+  return [2, 3, 4].includes(Number(first)) ? Number(first) : ''
+}
+
+// req-212 — the review's primary: the next exercise not done, in list order after this one,
+// wrapping to the top for one skipped earlier; null when none is left (→ Finish).
+export function nextNotDoneItem(workout, item) {
+  const items = workout?.snapshot?.items || []
+  const at = items.findIndex((candidate) => itemKey(candidate) === itemKey(item))
+  const ordered = at < 0 ? items : [...items.slice(at + 1), ...items.slice(0, at)]
+  return (
+    ordered.find(
+      (candidate) => itemKey(candidate) !== itemKey(item) && !itemIsMarkedDone(workout, candidate) && !itemLoggingState(workout, candidate).plannedDone,
+    ) || null
+  )
+}
+
 // req-194 review fix 1 — the cardio stopwatch: ONE optional field on the active workout,
 // `stopwatch: { draftKey, startedAt, baseSec }` — the set it runs for (setDraftKey), its
 // start (epoch ms) and the seconds it resumed from. Separate from `setDraft` (one draft for

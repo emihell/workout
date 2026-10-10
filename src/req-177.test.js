@@ -99,18 +99,21 @@ async function harness() {
   return { captured, mount }
 }
 
-describe('req-177 AC1 — picking Max on the live workout stores rpe 5', () => {
-  it('Leg Extension: Max button → the finished work set has rpe 5', async () => {
+// req-212 test edit (DEC-119 §1) — Failure (was Max) is no longer offered on the set screen; Done
+// logs the set with rpe null. Old rpe-5 sets still read "Failure" (req-212.test.js AC6).
+describe('req-177 AC1 — the live workout (req-212: no Failure / Max on the set screen)', () => {
+  it('Leg Extension: Done → the finished work set has rpe null; no Failure button', async () => {
     const { captured, mount } = await harness()
     const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
     await act(async () => captured.store.startWorkout('sess-lower'))
     await mount(h(WorkoutItemLog, { routineId: 'sess-lower', itemId: 'si-sess-lower-2-ex-leg-extension' }))
     // req-192 test edit: "Done" logs the warm-up; tapping Failure (was Max + Complete) logs the set.
     await view.click(view.button('Done')) // the warm-up, as prefilled
-    await view.click(view.button('Failure'))
+    assert.equal(view.button('Failure'), null)
+    await view.click(view.button('Done'))
     await act(async () => captured.store.finishWorkout({}))
     const worked = captured.store.workouts[0].sets.filter((s) => s.exerciseId === 'ex-leg-extension' && s.setType === 'work' && s.note !== 'skipped')
-    assert.deepEqual(worked.map((s) => s.rpe), [5])
+    assert.deepEqual(worked.map((s) => s.rpe), [null])
   })
 })
 

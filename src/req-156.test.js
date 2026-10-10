@@ -42,24 +42,25 @@ async function logSet({ showEffort, weighted = true, pick }) {
   return submitted
 }
 
+// req-212 test edit (DEC-119 §1) — SetLogForm has no effort control at all now: every set (warm-up,
+// work, cardio) is logged by one Done, and its values carry no effort key (item.jsx stores rpe
+// null; the exercise review writes the one effort). Was: Done where hidden, an effort button on
+// a work set (req-192).
 describe('SetLogForm (render) — the live log', () => {
-  it('a warm-up set (Effort hidden) submits no effort', async () => {
+  it('a warm-up set submits no effort', async () => {
     const values = await logSet({ showEffort: false })
     assert.equal(view.text().includes('Effort'), false, 'the control is not shown')
-    assert.equal(values.effort, null)
+    assert.equal('effort' in values, false)
     assert.equal(values.weight, '20')
   })
-  it('a cardio set (Effort hidden, unweighted) submits no effort', async () => {
+  it('a cardio set (unweighted) submits no effort', async () => {
     const values = await logSet({ showEffort: false, weighted: false })
-    assert.equal(values.effort, null)
+    assert.equal('effort' in values, false)
   })
-  it('a work set submits the effort button tapped; none is preselected (req-192)', async () => {
-    assert.equal((await logSet({ showEffort: true, pick: 'Medium' })).effort, 3)
-    assert.equal(view.all('[aria-pressed="true"]').length, 0, 'no effort preselected')
-    assert.equal(view.button('Done'), null, 'a work set has no Done')
-    await view.unmount()
-    view = null
-    assert.equal((await logSet({ showEffort: true, pick: 'Hard' })).effort, 4)
+  it('a work set is logged by Done too: no effort buttons, no effort submitted', async () => {
+    const values = await logSet({ showEffort: true })
+    assert.equal('effort' in values, false)
+    for (const label of ['Easy', 'Medium', 'Hard', 'Failure']) assert.equal(view.button(label), null, label)
   })
 })
 
@@ -127,15 +128,16 @@ describe('live log screen (render) — WorkoutItemLog + the real store', () => {
     view = await render(h(StoreProvider, null, h(Screen, { started: true })))
     assert.match(view.text(), /Warm-up set/)
     assert.equal(view.text().includes('how did it feel'), false)
-    // req-192 (test edit) — the warm-up logs with "Done", the work set with its effort button
-    // (Medium = rpe 3, the value the old preselected Complete stored).
+    // req-192 (test edit) — the warm-up logs with "Done", the work set with its effort button.
+    // req-212 test edit (DEC-119 §1) — the work set logs with "Done" too, rpe null (the effort is
+    // asked once, on the exercise review).
     await view.click(view.button('Done'))
-    assert.equal(view.text().includes('how did it feel'), true, 'the work set shows the effort buttons')
-    await view.click(view.button('Medium'))
+    assert.equal(view.text().includes('how did it feel'), false, 'no effort buttons on the work set')
+    await view.click(view.button('Done'))
     const sets = captured.store.activeWorkout.sets.map(({ setType, rpe }) => ({ setType, rpe }))
     assert.deepEqual(sets, [
       { setType: 'wu', rpe: null },
-      { setType: 'work', rpe: 3 },
+      { setType: 'work', rpe: null },
     ])
   })
 })

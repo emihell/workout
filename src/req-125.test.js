@@ -329,7 +329,8 @@ describe('req-125 no mid-typing reset (static)', () => {
     const reads = item.split('\n').filter((line) => line.includes('setDraftFor('))
     // req-186 — 3 → 4: Next (back from a logged set Previous showed) re-snaps the current
     // set's draft into draftSnap, the same keyed read; the line check below still holds.
-    assert.equal(reads.length, 4)
+    // req-212 test edit — 4 → 3: Previous / Next are gone (DEC-119 §1), so is Next's re-snap.
+    assert.equal(reads.length, 3)
     for (const line of reads) assert.match(line, /setDraftFor\(active, setSeedKey\)/)
     assert.match(item, /if \(draftSnap\.key !== setSeedKey\) setDraftSnap\(/)
     assert.match(item, /key=\{setSeedKey\}/)
@@ -338,8 +339,11 @@ describe('req-125 no mid-typing reset (static)', () => {
   })
 
   it('SetLogForm reads its initial* props only as useState initialisers', () => {
-    const body = ui.slice(ui.indexOf('export function SetLogForm'))
-    for (const prop of ['initialWeight', 'initialReps', 'initialDuration', 'initialEffort']) {
+    // req-212 test edit — the body stops at the next export (SetEditSheet, after it, has its own
+    // initial* props); initialEffort is gone with the effort buttons (DEC-119 §1).
+    const from = ui.indexOf('export function SetLogForm')
+    const body = ui.slice(from, ui.indexOf('\nexport function ', from + 1))
+    for (const prop of ['initialWeight', 'initialReps', 'initialDuration']) {
       const uses = body.split('\n').filter((line) => line.includes(prop) && !/^\s*initial\w+ = /.test(line))
       assert.equal(uses.length, 1, prop)
       assert.match(uses[0], /useState\(/, prop)

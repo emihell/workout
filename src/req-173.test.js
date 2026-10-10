@@ -49,9 +49,10 @@ describe('SetLogForm — the "No weight entered" note', () => {
   it('Complete with blank kg still submits in one tap, with the blank kg', async () => {
     let submitted = null
     view = await render(form({ weighted: true, initialWeight: '', onComplete: (v) => (submitted = v) }))
-    // req-192 test edit: Complete → the effort button (Medium = rpe 3, what Complete stored)
-    await view.click(view.button('Medium'))
-    assert.deepEqual(submitted, { weight: '', reps: '10', effort: 3, durationSec: undefined })
+    // req-212 test edit: one Done logs every set, with no effort key (DEC-119 §1; was the Medium
+    // effort button → effort 3, req-192). The blank kg still submits blank in one tap.
+    await view.click(view.button('Done'))
+    assert.deepEqual(submitted, { weight: '', reps: '10', durationSec: undefined })
   })
 })
 
@@ -79,11 +80,15 @@ describe('live log screen — the stored set after Complete with blank kg (uncha
     await view.click(view.button('Done'))
     await view.type(view.input('kg'), '')
     assert.equal(view.text().includes(NOTE), true)
-    await view.click(view.button('Medium'))
+    await view.click(view.button('Done')) // req-212 test edit: one Done logs the set (DEC-119 §1; was the Medium effort button)
     assert.equal(captured.store.activeWorkout.sets.length, 2, 'one tap logged it')
     // Pinned from main (7e1de43) by running these same steps there — the note changes
     // nothing underneath: a blank kg on a weighted set is still stored as 0.
-    assert.deepEqual(captured.store.activeWorkout.sets[1], EXPECTED_WORK_SET)
+    // req-212 test edit — the set now also carries `loggedAt` (a fresh ISO time: checked to parse,
+    // then left out of the pinned comparison) and rpe null (EXPECTED_WORK_SET below).
+    const { loggedAt, ...stored } = captured.store.activeWorkout.sets[1]
+    assert.ok(Number.isFinite(Date.parse(loggedAt)), 'loggedAt parses')
+    assert.deepEqual(stored, EXPECTED_WORK_SET)
   })
 })
 
@@ -93,7 +98,7 @@ const EXPECTED_WORK_SET = {
   setType: 'work',
   weight: 0,
   reps: '12',
-  rpe: 3,
+  rpe: null, // req-212 test edit — was 3 (Medium tapped); Done logs rpe null (DEC-119 §1)
   note: '',
   targetReps: '12',
   // req-178 (sanctioned edit) — was 20: the one-time fill set Leg Extension's routine kg

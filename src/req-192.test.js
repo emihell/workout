@@ -52,48 +52,39 @@ describe('labels (DEC-108 §2) — values unchanged', () => {
   })
 })
 
-describe('SetLogForm — effort buttons log the set', () => {
-  it('each button logs with its value; none preselected; no Complete; Enter logs nothing', async () => {
-    const { SetLogForm } = await importJsx('./ui/index.jsx', import.meta.url)
-    for (const [label, value] of [['Easy', 2], ['Medium', 3], ['Hard', 4], ['Failure', 5]]) {
-      const got = []
-      view = await render(h(SetLogForm, { initialWeight: '40', initialReps: '8', effortOptions: RPE_OPTIONS, onComplete: (v) => got.push(v) }))
-      assert.equal(view.button('Complete'), null)
-      assert.equal(view.button('Done'), null)
-      assert.equal(view.all('[aria-pressed]').length, 0, 'no selection state on the current set')
-      assert.match(view.text(), /Log set — how did it feel\?/)
-      // Enter (form submit) has no effort to log with.
-      await act(async () => view.container.querySelector('form').requestSubmit())
-      assert.equal(got.length, 0)
-      await view.click(view.button(label))
-      assert.deepEqual(got, [{ weight: '40', reps: '8', effort: value, durationSec: undefined }])
-      await view.unmount()
-      view = null
-    }
-  })
-
-  it('failure case: kg "2,5,5" → Medium → inline kg error, nothing logged', async () => {
+// req-212 test edit (DEC-119 §1, supersedes DEC-108 §1–2) — the four effort buttons are gone from
+// the set screen: one Done logs every set (Enter too), and no effort is submitted. The kg
+// failure case is unchanged (Done in place of Medium).
+describe('SetLogForm — one Done logs the set (req-212; was: effort buttons log it)', () => {
+  it('no effort buttons, no caption; Done logs { weight, reps, durationSec }; Enter logs too', async () => {
     const { SetLogForm } = await importJsx('./ui/index.jsx', import.meta.url)
     const got = []
-    view = await render(h(SetLogForm, { initialWeight: '2,5,5', initialReps: '8', effortOptions: RPE_OPTIONS, onComplete: (v) => got.push(v) }))
-    await view.click(view.button('Medium'))
-    assert.equal(got.length, 0)
-    assert.ok(view.container.querySelector('.ui-field-error'), 'inline kg error shown')
-  })
-
-  it('effort hidden → one "Done", logs effort null; Enter logs too', async () => {
-    const { SetLogForm } = await importJsx('./ui/index.jsx', import.meta.url)
-    const got = []
-    view = await render(h(SetLogForm, { showEffort: false, initialWeight: '10', initialReps: '12', onComplete: (v) => got.push(v) }))
-    assert.equal(view.button('Medium'), null)
+    view = await render(h(SetLogForm, { initialWeight: '40', initialReps: '8', onComplete: (v) => got.push(v) }))
+    for (const label of ['Easy', 'Medium', 'Hard', 'Failure', 'Complete', 'Previous', 'Next']) assert.equal(view.button(label), null, label)
+    assert.doesNotMatch(view.text(), /how did it feel/)
+    assert.match(view.button('Done').className, /ui-btn--primary/)
+    assert.match(view.button('Skip set').className, /ui-btn--quiet/)
     await view.click(view.button('Done'))
     await act(async () => view.container.querySelector('form').requestSubmit())
-    assert.deepEqual(got.map((v) => v.effort), [null, null])
+    assert.deepEqual(got, [
+      { weight: '40', reps: '8', durationSec: undefined },
+      { weight: '40', reps: '8', durationSec: undefined },
+    ])
+  })
+
+  it('failure case: kg "2,5,5" → Done → inline kg error, nothing logged', async () => {
+    const { SetLogForm } = await importJsx('./ui/index.jsx', import.meta.url)
+    const got = []
+    view = await render(h(SetLogForm, { initialWeight: '2,5,5', initialReps: '8', onComplete: (v) => got.push(v) }))
+    await view.click(view.button('Done'))
+    assert.equal(got.length, 0)
+    assert.ok(view.container.querySelector('.ui-field-error'), 'inline kg error shown')
   })
 })
 
 describe('the log screen (real store)', () => {
-  it('warm-up "Done" → rpe null; Hard → rpe 4 and rest armed; set list above kg; routine note shown', async () => {
+  // req-212 test edit — the work set logs with Done (rpe null), was Hard (rpe 4).
+  it('warm-up "Done" → rpe null; work "Done" → rpe null and rest armed; set list above kg; routine note shown', async () => {
     const t = await harness()
     await t.mount(t.item(CHEST))
     const c = view.container
@@ -102,9 +93,9 @@ describe('the log screen (real store)', () => {
     const kg = view.input('kg')
     assert.ok(list.compareDocumentPosition(kg) & 4, 'the set list precedes the kg box')
     await view.click(view.button('Done'))
-    await view.click(view.button('Hard'))
+    await view.click(view.button('Done'))
     const sets = t.active().sets.map(({ setType, rpe }) => ({ setType, rpe }))
-    assert.deepEqual(sets, [{ setType: 'wu', rpe: null }, { setType: 'work', rpe: 4 }])
+    assert.deepEqual(sets, [{ setType: 'wu', rpe: null }, { setType: 'work', rpe: null }])
     assert.ok(t.active().restEndsAt > Date.now(), 'rest armed')
     assert.equal(view.button('Complete'), null)
     assert.equal(view.button('Skip rest'), null)
@@ -123,20 +114,24 @@ describe('the log screen (real store)', () => {
     assert.equal(t.active().sets[0].rpe, null)
   })
 
-  it('a viewed logged set shows its effort selected; another effort + Save writes it; rest untouched', async () => {
+  // req-212 test edit (DEC-119 §1) — was "a viewed logged set shows its effort selected; another
+  // effort + Save writes it": the logged set now opens in the edit sheet, which has no effort
+  // (the exercise review carries the one effort). A stored rpe is kept by a sheet Save.
+  it('a logged set opens in the edit sheet with no effort control; Save keeps its stored rpe; rest untouched', async () => {
     const t = await harness()
     await t.mount(t.item(CHEST))
     await view.click(view.button('Done'))
-    await view.click(view.button('Failure'))
+    await view.click(view.button('Done'))
+    await act(async () => t.captured.store.updateActiveSet(1, { rpe: 5 }))
     const restEndsAt = t.active().restEndsAt
-    await view.click(view.button('Previous'))
-    assert.equal(view.button('Failure').getAttribute('aria-pressed'), 'true')
-    assert.equal(view.all('[aria-pressed="true"]').length, 1)
-    assert.equal(t.active().sets.length, 2, 'selecting does not log')
-    await view.click(view.button('Easy'))
-    assert.equal(t.active().sets[1].rpe, 5, 'not written until Save')
-    await view.click(view.button('Save'))
-    assert.equal(t.active().sets[1].rpe, 2)
+    await view.click(view.all('.ui-setpreview__tap')[1])
+    const sheet = view.container.querySelector('[role="dialog"]')
+    assert.ok(sheet)
+    for (const label of ['Easy', 'Medium', 'Hard', 'Failure']) {
+      assert.equal([...sheet.querySelectorAll('button')].some((b) => b.textContent.trim() === label), false, label)
+    }
+    await view.click([...sheet.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Save'))
+    assert.equal(t.active().sets[1].rpe, 5)
     assert.equal(t.active().sets.length, 2)
     assert.equal(t.active().restEndsAt, restEndsAt)
   })
@@ -145,7 +140,7 @@ describe('the log screen (real store)', () => {
     const t = await harness()
     await t.mount(t.item(CHEST))
     await view.click(view.button('Done'))
-    await view.click(view.button('Medium'))
+    await view.click(view.button('Done')) // req-212 test edit: one Done (was Medium)
     let pill = view.container.querySelector('.ui-restpill')
     assert.match(pill.textContent, /·skip$/)
     assert.match(pill.getAttribute('aria-label'), /skip the rest/)
@@ -154,7 +149,7 @@ describe('the log screen (real store)', () => {
     assert.equal(t.active().restPausedRemaining, null)
 
     // Rest again, then the same pill from the overview opens the exercise (rest untouched).
-    await view.click(view.button('Medium'))
+    await view.click(view.button('Done')) // req-212 test edit: one Done (was Medium)
     const restEndsAt = t.active().restEndsAt
     assert.ok(restEndsAt > Date.now())
     const { Workout } = await importJsx('./views/workout/overview.jsx', import.meta.url)
