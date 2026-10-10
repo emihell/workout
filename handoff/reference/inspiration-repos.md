@@ -15,7 +15,7 @@ Clean image routes stay: free-exercise-db photos (Unlicense, already linked) and
 
 ## Ideas shortlist (not decided — Emilio's calls)
 
-1. **"Why this number"** on the live set and review — openGym `lib/progression.js` returns `{kind, why}` per prescription. Makes
+1. ~~**"Why this number"**~~ — **dropped (Emilio, 2026-10-10):** "i only care if its empty or if its a weird number, if its the same numbrer as last time ,then i think its good and i dont care really where it came from". Already covered: "No weight entered", "Last time: X kg", the >50% "big change" warning (`kg-hints.js`). Was: on the live set and review — openGym `lib/progression.js` returns `{kind, why}` per prescription. Makes
    `progress.js` reasoning visible where you lift (CLAUDE.md rule). No schema change.
 2. **Note for next time** — openGym `pinnedNoteFor` (`lib/history.js:397-420`): a note marked "for next time" shows next time
    that exercise comes up, dated, newest only. User's own data. One optional field (data lane). Pairs with req-217 rest notes.
