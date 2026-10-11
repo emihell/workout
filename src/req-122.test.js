@@ -94,6 +94,7 @@ test('call sites that pass both put the retreat link in retreat and the commit i
   // (Cancel / Swap or Add N) in views/workout/mid-workout-picker.jsx, plus req-190's
   // machines-first days step (Cancel / Save) in Plan.jsx, plus req-198's Developer-group row
   // (Export analytics, split from Export / Import) in Settings.jsx, plus req-215's later-workout
-  // name step (Cancel / Save) in Plan.jsx
-  assert.equal(count, 21)
+  // name step (Cancel / Save) in Plan.jsx, plus req-10's first-time prompt (I'll enter it /
+  // Set it up) in views/workout/item.jsx
+  assert.equal(count, 22)
 })

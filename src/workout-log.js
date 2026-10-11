@@ -183,10 +183,12 @@ export function withSkippedUnloggedSets(workout) {
 // finished-history record (which feeds history-prefill from `sets` alone). req-116 —
 // the auto-finish dismissed flag is transient in the same way and is dropped too.
 // req-125 — so is the set-form draft (`setDraft`). req-194 — and the cardio stopwatch.
+// req-10 — and the first-time setup answers (`firstTimeSetup`): never part of history.
 export function finishedState(state, { overallNote, overallFeel } = {}, finishedAt = new Date().toISOString()) {
   if (!state?.activeWorkout) return state
   const {
     seedOverrides: _seedOverrides,
+    firstTimeSetup: _firstTimeSetup,
     autoFinishDismissed: _dismissed,
     setDraft: _draft,
     stopwatch: _stopwatch,
@@ -467,6 +469,20 @@ export function carryForSet(currentType, workLogged) {
   }
 }
 
+// req-10 (DEC-123 §1) — the first-time setup's set-2 seed for this item, or null. It lives on
+// `activeWorkout.firstTimeSetup[exerciseId].seed` (first-time-setup.js; transient session
+// state like seedOverrides, dropped by finishedState) and names the item it was asked on.
+// `workIndex` given → only when it names that work set (the live form's question).
+export function setupSeedFor(workout, item, setType = 'work', workIndex = null) {
+  if (setType !== 'work' || !item) return null
+  const map = workout?.firstTimeSetup
+  const entry = map && typeof map === 'object' ? map[item.exerciseId] : null
+  const seed = entry && typeof entry === 'object' ? entry.seed : null
+  if (!seed || typeof seed !== 'object' || seed.itemKey !== itemKey(item)) return null
+  if (workIndex != null && Number(seed.workIndex) !== Number(workIndex)) return null
+  return seed
+}
+
 // req-117 — the log form's values for a set being un-logged by "Previous" (moved here
 // from item.jsx so it is testable). A timed set also restores its logged seconds
 // (`durationSec`), so Previous on a timed set shows the time just logged, not the
@@ -528,9 +544,22 @@ export function restoreFromLoggedSet(set) {
 // working set logged this session) win over the target, so a changed rep count rides to the
 // remaining sets. Per-set targets that differ (12/10/8) pass false and keep their own target.
 // A warm-up has no carry (carryForSet), so its reps are never carried.
-export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps = false }) {
+//
+// req-10 (DEC-123 §1) — `setup`: the first-time setup's set-2 seed (first-time-setup.js
+// setTwoSeed, `{ weight?, reps? }`), passed only for the set it names. Computed from set 1's
+// LOGGED kg / reps and the user's "How was that?" answer, so it is the user's own data (never a
+// guessed starting kg — set 1 never gets one). It sits above override / routine kg / carry; a
+// field it doesn't carry falls through unchanged. Absent = unchanged behaviour.
+export function setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps = false, setup = null }) {
   if (fromRestore) {
     return { weight: weighted ? restore.weight : '', reps: restore.reps }
+  }
+  if (setup) {
+    const plain = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps })
+    return {
+      weight: weighted && setup.weight != null ? String(setup.weight) : plain.weight,
+      reps: setup.reps != null ? String(setup.reps) : plain.reps,
+    }
   }
   const ov = override || {}
   let baseWeight
@@ -611,8 +640,9 @@ export function nextSeedOverrides(overrides, { exerciseId, setType, weighted, se
 // alone. (The pure pendingWeightFor helper went with it.)
 // req-178 — `routineKg` as setLogSeed (a work set's routine kg; undefined for a warm-up).
 // req-210 — `uniformReps` as setLogSeed.
-export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps }) {
-  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps })
+// req-10 — `setup` as setLogSeed (the first-time setup's set-2 seed).
+export function initialSetFields({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps, setup = null }) {
+  const seed = setLogSeed({ weighted, fromRestore, restore, hasHistory, historyHasSet, history, carry, target, override, routineKg, uniformReps, setup })
   const effort =
     fromRestore && restore.rpe != null && restore.rpe !== ''
       ? rpeOptionValue(restore.rpe) || restore.rpe
@@ -895,7 +925,9 @@ export function durationTargetFor(item, ex, workIndex) {
 // start-of-exercise preview (nothing logged, no carry), as before.
 // req-217 — `eachSide` (the exercise's library entry is unilateral, library-hints.js): reps read
 // "12 each side".
-export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides, workLogged = null, eachSide = false }) {
+// req-10 — `setupSeed` (setupSeedFor below): the first-time setup's set-2 seed, applied to the
+// work set it names, so the list shows what that set's form will prefill.
+export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOverrides, workLogged = null, eachSide = false, setupSeed = null }) {
   const overrides = seedOverrides || {}
   const uniformReps = uniformRepsTargets(item)
   const slots = []
@@ -913,6 +945,7 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
       override: overrides[seedOverrideKey(item.exerciseId, setType)],
       routineKg: routineKgFor(item, setType, workIndex),
       uniformReps,
+      setup: setupSeed && setType === 'work' && Number(setupSeed.workIndex) === workIndex ? setupSeed : null,
     })
     const timed = Boolean(ex?.hasDuration) && setType === 'work'
     const entry = {
@@ -961,6 +994,7 @@ export function setListRows({ workout, item, ex, weighted, hasHistory, historyFo
     seedOverrides: workout?.seedOverrides,
     workLogged: state.workLogged,
     eachSide,
+    setupSeed: setupSeedFor(workout, item),
   })
   return slots.map((slot) => {
     const logged = slot.setType === 'wu' ? wuSet : state.workLogged[slot.workIndex] || null
