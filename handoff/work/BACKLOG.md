@@ -531,6 +531,10 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
 Pasted 2026-10-10. [measured] `git log 5233458..main -- src` is empty → H3..H22 apply to live code; H1/H2 predate req-209.
 Code facts from a read-only rescan of `main` (2026-10-10); paths under `src/`. **Decided → DEC-119; specced req-212..217 (READY).**
 Later from H8: a rest timer learned from the user's own set gaps (needs req-212's `loggedAt` history first).
+**req-220 follow-ups (2026-10-11):** (a) Emilio's call — import choice sheet styles "Replace everything" filled (DEC-017 destructive
+look) and the default "Keep my history" plain; Planner recommends flipping (Keep filled, Replace plain + "can't be undone"); (b) the
+anti-staleness app-path test doesn't cover History edit/recalc, Swap/Add/Add set/timed/Skip through the UI, `applyPlan`, or extra
+editor-form fields (reviewer latent).
 **Batch-5 follow-ups (2026-10-10):** (a) Emilio's call — missed reps lower only that set even when the exercise is Easy (req-212
 kept the per-set rule; "any missed set → all down" is a `progress.js` change); (b) req-218 sweep: 11 rendered tests still remount
 StoreProvider per screen — safe today, convert to the L-051 one-provider pattern before one answers a saving confirm after a swap;
@@ -667,6 +671,9 @@ target before starting any of these; each is a milestone, not a `req`.
   (History still renders from the stored `exerciseName`). Emilio's call whether either matters.
 
 ## Workflow / tooling backlog (infra, not product)
+
+- **`plan closeout` exits 1 silently when the req doc has no `# ` title** (2026-10-11, req-10): `co_title=$(grep -m1 '^# ' …)`
+  fails under `set -euo pipefail` before any message. Make the title optional (fall back to the req id) or print why. Small tooling req.
 
 - **dates-tz guard asserts the exact case count** (L-045, req-185 report): `/# pass [1-9]/` at `src/dates-tz.test.js`
   passes on an empty cases file (`# pass 1`). Assert the count `dates-tz.cases.js` defines (9 today). Small, bug lane.
