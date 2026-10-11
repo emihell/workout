@@ -2018,3 +2018,11 @@ Planner's recommendations; Emilio: "your picks".
    (default: plan, exercises and schedule from the file, current `workouts` kept) or **Replace everything**. Applies to every
    import.
 3. **req-220 button:** "Export for your AI" on Backup & data under "Back up now", with a 3-line how-to; the dev checkbox goes.
+
+## DEC-124 — in-app AI: Claude API (Opus 5) from our backend; AI proposes, req-220's preview confirms  (Emilio, 2026-10-11)
+
+Emilio asked which API for the in-app AI (DEC-121 §2); Planner recommended; Emilio: "sounds good". Recorded as the AI section of
+`work/req-146-backend-design.md` (started as a design doc, rest NEEDS DECISIONS): Claude Opus 5, key on the backend only,
+`ASSISTANT` as the cached system prompt, streamed chat, plan returned through a strict schema-validated tool, written only via
+req-220's preview + Keep my history / Replace everything; history sent as recent weeks + a summary from real logs. Cheaper model
+and the multi-user cost model stay Emilio's calls. Gated on the backend (DEC-085 §7).

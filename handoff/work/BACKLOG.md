@@ -628,7 +628,7 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
 ## Phase 3 — the heavy build  (gated on ONE decision)
 
-- **`req-146` backend design** (NEEDS DECISIONS — a design req, no code; DEC-073). Why: a real product, other users soon,
+- **`req-146` backend design** (NEEDS DECISIONS — design doc `work/req-146-backend-design.md`; AI section decided DEC-124; DEC-073). Why: a real product, other users soon,
   training together (shared routine, own values; one person starts an exercise and it starts for everyone). Decide:
   hosting (own computer vs managed), accounts, the sharing data model, live group sessions, migration from localStorage,
   offline-first in the gym, privacy/GDPR, backups. Planning's concerns to raise: a home server serving other people
