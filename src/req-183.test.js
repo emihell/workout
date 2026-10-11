@@ -69,7 +69,7 @@ describe('SetLogForm — the notes as rendered', () => {
     await view.type(view.input('kg'), '50')
     assert.equal(view.text().includes("That's a big change from 30 kg"), true)
   })
-  it('routine 30 → no last-time hint', async () => {
+  it('routine 30, last 30 → no last-time hint', async () => {
     view = await render(form({ initialWeight: '30', routineKg: 30, lastKg: '30' }))
     assert.equal(/last time/i.test(view.text()), false)
   })
@@ -143,10 +143,16 @@ describe('live log screen — real store, routine kg blanked on Leg Extension', 
     assert.equal(sets[1].weight, 500)
     console.log('stored set:', JSON.stringify({ weight: sets[1].weight, reps: sets[1].reps, setType: sets[1].setType }))
   })
-  it('routine kg present → no last-time hint on set 1', async () => {
-    await start({ blank: false })
+  // req-219 test edit (DEC-122 §2): the last-time note now shows whenever history's kg differs
+  // from the routine kg, not only when the routine is blank. Leg Extension's fixture routine kg
+  // (20) differs from last time's (18), so the note is now expected; equal kg → none is
+  // asserted in req-219.test.js. The box is still the routine kg (no prefill change).
+  it('routine kg present and ≠ last time → box keeps the routine kg; "Last time: X kg"; no big change', async () => {
+    const { lastKg } = await start({ blank: false })
     await view.click(view.button('Done')) // req-192 test edit: the warm-up logs with "Done"
     assert.notEqual(view.input('kg').value, '')
-    assert.equal(/last time|big change/i.test(view.text()), false)
+    assert.notEqual(Number(view.input('kg').value), Number(lastKg), 'fixture: routine kg differs from last time')
+    assert.equal(view.text().includes(`Last time: ${Number(lastKg)} kg`), true)
+    assert.equal(/big change/i.test(view.text()), false)
   })
 })
