@@ -1128,6 +1128,8 @@ html:has(.ui-picker-strip) {
   margin: 0 0 var(--ui-s4);
   font-size: var(--ui-text-body);
   color: var(--ui-ink);
+  /* req-220 — the import preview is one line per count; no other message has a newline. */
+  white-space: pre-line;
 }
 .ui-sheet__actions {
   display: flex;

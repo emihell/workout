@@ -83,6 +83,33 @@ describe('req-115 commitBackup — failure cases throw, state unchanged', () => 
   }
 })
 
+// req-220 review round 1 — the written state (Keep my history; setup brought back archived) is
+// computed from the CURRENT data before setState, so a malformed stored record throws to the
+// caller with nothing written, and the updater never reads React's state.
+describe('req-115 + req-220 — commitBackup computes the write before setState', () => {
+  const file = () => wrap(validState())
+  for (const keepHistory of [true, false]) {
+    it(`keepHistory ${keepHistory}: a malformed current record throws, setState never called`, () => {
+      const before = validState()
+      const store = fakeStore(before)
+      // workouts:[null] — Keep reads every kept record; the replace path reads `routines` (a
+      // non-array) to bring back what the file's workouts use.
+      const current = keepHistory ? { ...validState(), workouts: [null] } : { ...validState(), routines: 'x' }
+      const payload = keepHistory ? file() : wrap({ ...validState(), routines: [] })
+      assert.throws(() => commitBackup(payload, store.setState, { keepHistory, current }), TypeError)
+      assert.equal(store.calls, 0)
+      assert.equal(store.state, before)
+    })
+    it(`keepHistory ${keepHistory}: the updater returns the precomputed state without reading its argument`, () => {
+      const updaters = []
+      const result = commitBackup(file(), (updater) => updaters.push(updater), { keepHistory, current: validState() })
+      const poison = new Proxy({}, { get: () => assert.fail('the updater read the latest state') })
+      assert.equal(updaters.length, 1)
+      assert.equal(updaters[0](poison), result.state)
+    })
+  }
+})
+
 // Review loop-back: hand/AI-edited backups that main imports fine must still import.
 // migrateState treats these as absent (`x || []`, `if (workout.snapshot)`,
 // `source.activeWorkout ? … : null`, flattenRoutines ignoring sessions/programs when
@@ -140,7 +167,9 @@ describe('req-115 commitBackup — success', () => {
 
   it('store.jsx routes applyBackup through commitBackup, not inside a setState updater', () => {
     const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
-    assert.match(src, /applyBackup\(payload\) \{\s*return commitBackup\(payload, setState\)/)
+    // req-220 test edit: the method gained Keep my history's option and passes it on; it still
+    // returns commitBackup directly (validate first, then set), never inside an updater.
+    assert.match(src, /applyBackup\(payload, \{ keepHistory = false \} = \{\}\) \{\s*return commitBackup\(payload, setState, \{ keepHistory, current: state \}\)/)
     assert.equal(/applyBackupFn/.test(src), false)
   })
 })

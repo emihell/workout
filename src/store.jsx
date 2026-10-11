@@ -237,8 +237,9 @@ export function StoreProvider({ children }) {
         setState((s) => finishedState(s, args))
       },
       // req-115 — validate + migrate first, then set; a bad file throws to the caller.
-      applyBackup(payload) {
-        return commitBackup(payload, setState)
+      // req-220 — `{ keepHistory: true }`: Keep my history (exchange.js keptHistoryState).
+      applyBackup(payload, { keepHistory = false } = {}) {
+        return commitBackup(payload, setState, { keepHistory, current: state })
       },
     }
   }, [state, setState])

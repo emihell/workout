@@ -15,6 +15,7 @@
 // req-188 — `askChoice(message, { title, choices: [{ value, label }] })`: the same one sheet
 // with a button per choice (stacked) above Cancel; resolves the chosen `value`, or null on
 // Cancel / backdrop / Escape / navigation. A plain askConfirm still resolves a boolean.
+// req-220 — a choice may carry `destructive: true` (styled as the confirm's destructive button).
 
 let pending = null // { message, confirmLabel, cancelLabel, title, stayOn, choices, resolve }
 const listeners = new Set()
