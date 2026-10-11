@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: ui** — rescanned 2026-10-10; decided DEC-123 §1. Builder: Builder session or throwaway agent (ux-feel).
+**Status: BUILT AND MERGED, 2026-10-11 — branch `req-10` (`fa04988`…`63c971f`, 4 commits).** **Lane: ui** — rescanned 2026-10-10; decided DEC-123 §1. Builder: Builder session or throwaway agent (ux-feel).
 
 ## Decided build (DEC-123 §1, 2026-10-10) — supersedes the per-set effort steps in the original text below
 
