@@ -23,11 +23,20 @@ function backupLines(summary) {
 // say what they do). Names the restore button as it reads (Planner, req-203 copy fix).
 export const BACKUP_LINE = 'Saves all your workouts and history to a file on this device. Use Restore from a backup to bring it back.'
 
+// req-220 (DEC-123 §3) — the 3-line how-to under "Export for your AI" (wording unconfirmed).
+// One string literal (a constant export keeps fast refresh), one line per step.
+export const AI_HOWTO =
+  '1. Export for your AI saves your data with instructions an AI can read.\n2. Give the file to your AI and talk your plan through with it.\n3. Restore the file it gives back here. You see what changes before anything is replaced.'
+
+function importedLines(result) {
+  const kept = result.keptHistory ? ' Your logged history was kept.' : ''
+  return `${backupLines(result.summary)}${kept}`
+}
+
 export function Settings({ dev = null }) {
   const store = useStore()
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const [includeAssistant, setIncludeAssistant] = useState(false)
   // req-87 — the feedback-notes toggle. Its own localStorage key (never
   // workout-mvp-v9); default OFF. Flipping it shows/hides the ✎ capture button
   // app-wide immediately (App.jsx's gate subscribes to the same store).
@@ -59,9 +68,9 @@ export function Settings({ dev = null }) {
             <Button
               onClick={() => {
                 recordButton('export-database')
-                const filename = exportBackup(store, { includeAssistant })
+                const filename = exportBackup(store)
                 setError('')
-                setMessage(`Backup saved — ${filename}${includeAssistant ? ' (with the assistant prompt)' : ''}`)
+                setMessage(`Backup saved — ${filename}`)
               }}
             >
               Back up now
@@ -82,7 +91,7 @@ export function Settings({ dev = null }) {
                     if (!result) return // cancelled at the confirm
                     recordButton('import')
                     setError('')
-                    setMessage(backupLines(result.summary))
+                    setMessage(importedLines(result))
                   } catch (err) {
                     setMessage('')
                     setError(err instanceof Error ? err.message : 'Could not import.')
@@ -93,12 +102,33 @@ export function Settings({ dev = null }) {
           </>
         }
       />
+      {/* req-220 (DEC-123 §3) — the AI round-trip: always visible, under "Back up now". */}
+      <Actions
+        lateral={
+          <Button
+            onClick={() => {
+              recordButton('export-for-ai')
+              const filename = exportBackup(store, { includeAssistant: true })
+              setError('')
+              setMessage(`Saved for your AI — ${filename}`)
+            }}
+          >
+            Export for your AI
+          </Button>
+        }
+      />
+      <p className="ui-sub">
+        {AI_HOWTO.split('\n').map((line, index) => (
+          <span key={line}>
+            {index ? <br /> : null}
+            {line}
+          </span>
+        ))}
+      </p>
       {message ? <Banner>{message}</Banner> : null}
       {error ? <Banner role="alert">{error}</Banner> : null}
       {devTools ? (
         <DeveloperTools
-          includeAssistant={includeAssistant}
-          setIncludeAssistant={setIncludeAssistant}
           feedbackEnabled={feedbackEnabled}
           onAnalytics={() => {
             setError('')
@@ -112,12 +142,11 @@ export function Settings({ dev = null }) {
 
 // req-209 — the developer tools, shown only with the device flag on (Noa: developer copy
 // beside the backup read as a trust-breaker).
-function DeveloperTools({ includeAssistant, setIncludeAssistant, feedbackEnabled, onAnalytics }) {
+// req-220 (DEC-123 §3) — the "Assistant prompt" checkbox left: Export for your AI replaced it.
+function DeveloperTools({ feedbackEnabled, onAnalytics }) {
   return (
     <>
       <SectionHeader>Developer</SectionHeader>
-      {/* Adds the assistant prompt to the Export above. */}
-      <Checkbox label="Assistant prompt" checked={includeAssistant} onChange={setIncludeAssistant} />
       <Actions
         lateral={
           <Button

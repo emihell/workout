@@ -105,7 +105,10 @@ describe('importWithBackup (req-07 / DEC-004)', () => {
     let downloads = 0
     const done = importWithBackup({ store, payload: validIncoming, download: () => (downloads += 1) })
     const pending = getPendingConfirm()
-    assert.equal(pending.message, 'Replace all data on this device?')
+    // req-220 test edit: the preview's lines now sit above the same question (was the
+    // question alone); the question, its button and Cancel's outcome are unchanged.
+    assert.ok(pending.message.endsWith('\n\nReplace all data on this device?'), pending.message)
+    assert.match(pending.message, /^Workouts: 1 removed\nExercises: 1 added, 1 removed\nSchedule: unchanged\nLogged history: unchanged/)
     assert.equal(pending.confirmLabel, 'Replace')
     answerConfirm(false)
     assert.equal(await done, null)

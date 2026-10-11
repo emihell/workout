@@ -1,5 +1,5 @@
-import { applyBackup as validateBackup, buildBackup } from './exchange.js'
-import { askConfirm } from './ui/confirm.js'
+import { applyBackup as validateBackup, buildBackup, importPreview, previewLines } from './exchange.js'
+import { askChoice, askConfirm } from './ui/confirm.js'
 import { dateKey } from './schedule.js'
 import { getLoadUnreadable, keepUnreadableCopy, readUnreadableValues, releaseUnreadable } from './persistence.js'
 
@@ -24,8 +24,10 @@ export function downloadJson(filename, data) {
 
 // req-198 — the one Export: Backup & data's button and the save-failed banner's both call
 // this, so the banner's download is the same file. `download` is injectable for tests.
+// req-220 — "Export for your AI" is the same backup with `assistant` (the rules and the data
+// structure) added, under its own name so the user can tell the two files apart.
 export function exportBackup(store, { includeAssistant = false, now = new Date(), download = downloadJson } = {}) {
-  const filename = `workout-database-${dateKey(now)}.json`
+  const filename = `${includeAssistant ? 'workout-for-ai' : 'workout-database'}-${dateKey(now)}.json`
   download(filename, buildBackup(store, { includeAssistant }))
   return filename
 }
@@ -84,10 +86,19 @@ export const KEEP_NO_SPACE_MESSAGE =
 // the lock lifts. If getItem THROWS we can't tell → abort, lock kept.
 // Cancel or a bad file: nothing read, kept, downloaded or saved. `unreadable`,
 // `unreadableValues`, `keepCopy`, `release`, `downloadRaw` are injected for tests.
+//
+// req-220 (DEC-123 §2) — the preview. After validation and before the question, the file is
+// compared with the current data (exchange.js importPreview) and `ask(message, preview)` shows
+// what changes. When the file would change logged history (`preview.conflict`) the answer is
+// a choice: 'keep' (Keep my history — the default; `true` means it too) or 'replace'
+// (Replace everything); anything falsy cancels. Otherwise it is the plain confirm and a truthy
+// answer replaces, as before. In the unreadable state there is no readable data to compare
+// with, so `preview` is null and the question is the req-157 one, unchanged. The order after
+// the answer — copies, the safety download, then the write — is the same for both choices.
 export async function importWithBackup({
   store,
   payload,
-  ask = (message) => askConfirm(message, { confirmLabel: 'Replace' }),
+  ask = askImport,
   download = downloadJson,
   downloadRaw = downloadText,
   unreadable = getLoadUnreadable,
@@ -95,9 +106,11 @@ export async function importWithBackup({
   keepCopy = keepUnreadableCopy,
   release = releaseUnreadable,
 }) {
-  validateBackup(payload)
+  const incoming = validateBackup(payload)
   const locked = unreadable()
-  if (!(await ask(locked ? REPLACE_UNREADABLE_MESSAGE : REPLACE_MESSAGE))) return null
+  const preview = locked ? null : importPreview(store, incoming.state)
+  const mode = importMode(await ask(locked ? REPLACE_UNREADABLE_MESSAGE : REPLACE_MESSAGE, preview), preview)
+  if (!mode) return null
   const today = dateKey(new Date())
   const read = locked ? unreadableValues() : { unlocked: true }
   if (read.error) throw new Error(KEEP_FAILED_MESSAGE)
@@ -114,5 +127,35 @@ export async function importWithBackup({
     download(`workout-database-${today}.json`, buildBackup(store))
   }
   if (locked) release()
-  return store.applyBackup(payload)
+  return mode === 'keep' ? store.applyBackup(payload, { keepHistory: true }) : store.applyBackup(payload)
+}
+
+// An answer → 'keep' | 'replace' | null (cancelled). Keep is offered only on a conflict.
+export function importMode(answer, preview) {
+  if (!answer) return null
+  if (!preview?.conflict) return 'replace'
+  if (answer === 'replace') return 'replace'
+  return answer === true || answer === 'keep' ? 'keep' : null
+}
+
+export const HISTORY_CHANGED_TITLE = 'This file changes your logged history'
+export const KEEP_HISTORY_LINE =
+  'Keep my history takes the workouts, exercises and schedule from the file and keeps your logged history on this device as it is. A copy of your current data downloads first.'
+export const IMPORT_CHOICES = [
+  { value: 'keep', label: 'Keep my history' },
+  { value: 'replace', label: 'Replace everything' },
+]
+
+// The default `ask`: the in-app sheet with the preview above the question (req-220).
+export function askImport(message, preview) {
+  if (!preview) return askConfirm(message, { confirmLabel: 'Replace' })
+  const lines = previewLines(preview).join('\n')
+  if (preview.conflict) {
+    const kept = preview.keptSetup.routines + preview.keptSetup.exercises
+    const keptLine = kept
+      ? `\nYour history uses ${kept} ${kept === 1 ? 'item' : 'items'} the file removes; Keep my history keeps ${kept === 1 ? 'it' : 'them'}, archived.`
+      : ''
+    return askChoice(`${lines}\n\n${KEEP_HISTORY_LINE}${keptLine}`, { title: HISTORY_CHANGED_TITLE, choices: IMPORT_CHOICES })
+  }
+  return askConfirm(`${lines}\n\n${message}`, { confirmLabel: 'Replace' })
 }

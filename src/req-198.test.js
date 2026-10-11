@@ -58,7 +58,10 @@ test('exportBackup downloads the same backup file Settings exported (name + payl
 })
 
 test('Settings (Backup & data) uses exportBackup too — one Export implementation', () => {
-  assert.match(settings, /exportBackup\(store, \{ includeAssistant \}\)/)
+  // req-220 test edit (DEC-123 §3): the dev checkbox left, so Back up now exports plain and
+  // Export for your AI passes includeAssistant: true — both through the one exportBackup.
+  assert.match(settings, /exportBackup\(store\)/)
+  assert.match(settings, /exportBackup\(store, \{ includeAssistant: true \}\)/)
   assert.doesNotMatch(settings, /buildBackup/)
 })
 
@@ -76,8 +79,12 @@ test('/settings is titled "Backup & data", Back → /history, Export then Import
   const imp = at('label="Restore from a backup"')
   const dev = at('<SectionHeader>Developer</SectionHeader>')
   assert.ok(exp < imp && imp < dev, 'Export, then Import, then the Developer group')
-  // the Developer group holds the four developer tools, after the header
-  for (const tool of ['label="Assistant prompt"', 'Export analytics', 'label="Feedback notes"', '<Row to="/components">']) {
+  // the Developer group holds the developer tools, after the header
+  // req-220 test edit (DEC-123 §3): "Assistant prompt" left the group (Export for your AI
+  // replaced it, before the group — asserted below); the other three are unchanged.
+  assert.equal(settings.includes('label="Assistant prompt"'), false)
+  assert.ok(at('Export for your AI\n') > imp && at('Export for your AI\n') < dev, 'Export for your AI after Restore, before Developer')
+  for (const tool of ['Export analytics', 'label="Feedback notes"', '<Row to="/components">']) {
     assert.ok(at(tool) > dev, `${tool} sits in the Developer group`)
   }
 })

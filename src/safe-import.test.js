@@ -140,7 +140,9 @@ describe('req-115 commitBackup — success', () => {
 
   it('store.jsx routes applyBackup through commitBackup, not inside a setState updater', () => {
     const src = readFileSync(fileURLToPath(new URL('./store.jsx', import.meta.url)), 'utf8')
-    assert.match(src, /applyBackup\(payload\) \{\s*return commitBackup\(payload, setState\)/)
+    // req-220 test edit: the method gained Keep my history's option and passes it on; it still
+    // returns commitBackup directly (validate first, then set), never inside an updater.
+    assert.match(src, /applyBackup\(payload, \{ keepHistory = false \} = \{\}\) \{\s*return commitBackup\(payload, setState, \{ keepHistory, current: state \}\)/)
     assert.equal(/applyBackupFn/.test(src), false)
   })
 })
