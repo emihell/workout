@@ -12,7 +12,7 @@ import { DEVICE_FILL_KEY } from './routine-kg-fill.js'
 import { moveToValidWeight } from './progress.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 import { finishedState, initialSetFields, setLogSeed, setPreview, setupSeedFor } from './workout-log.js'
-import { SETUP_TEXT, setTwoSeed, setupPromptShows, setupSheetShows } from './first-time-setup.js'
+import { SETUP_TEXT, setTwoSeed, setupAfterSetOneEdit, setupAnsweredPatch, setupPromptShows, setupSheetShows } from './first-time-setup.js'
 
 const h = React.createElement
 const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
@@ -20,7 +20,7 @@ const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve,
 const weighted = (extra = {}) => ({ id: 'ex', name: 'Leg Press', type: 'machine', weightStep: '2.5', ...extra })
 const bodyweight = (extra = {}) => ({ id: 'bw', name: 'Push-up', type: 'bodyweight', weightStep: '', ...extra })
 const set1 = (weight, reps = '10', extra = {}) => ({ setType: 'work', weight, reps, rpe: null, note: '', ...extra })
-const seed = (ex, s, feel, target1 = '10', target2 = '10') => setTwoSeed({ ex, set1: s, feel, target1, target2 })
+const seed = (ex, s, feel, target1 = '10') => setTwoSeed({ ex, set1: s, feel, target1 })
 
 describe('req-10 — setTwoSeed: set 2 from set 1 + "How was that?" (the shared progression rule)', () => {
   it('Easy → one valid step up, equal to moveToValidWeight(+1), with the reason', () => {
@@ -93,15 +93,20 @@ describe('req-10 — setTwoSeed: set 2 from set 1 + "How was that?" (the shared 
     assert.deepEqual(range, { workIndex: 1, weight: '20', reason: "Same kg — the target isn't a single number" })
   })
 
-  it('bodyweight: reps ±1 on set 2 (Easy +1, missed −1, Medium/Hard same), never below 1', () => {
+  // Review round 1 (test rewritten with the behaviour) — bodyweight builds on set 1's LOGGED reps,
+  // not the routine target: Easy → logged + 1; Medium / Hard / missed → no seed (the plain carry).
+  it('bodyweight: Easy → set 1\'s logged reps + 1; Medium / Hard / missed → no seed', () => {
     const ex = bodyweight()
     assert.deepEqual(seed(ex, set1(0, '10'), 'easy'), { workIndex: 1, reps: '11', reason: 'One more rep — set 1 felt easy' })
-    assert.deepEqual(seed(ex, set1(0, '8'), 'medium'), { workIndex: 1, reps: '9', reason: 'One rep fewer — set 1 missed reps' })
-    assert.deepEqual(seed(ex, set1(0, '10'), 'medium'), { workIndex: 1, reason: 'Same reps — set 1 felt medium' })
-    assert.deepEqual(seed(ex, set1(0, '10'), 'hard'), { workIndex: 1, reason: 'Same reps — set 1 felt hard' })
-    // The ±1 lands on set 2's own target (12/10 plan: Easy on set 1 → set 2 at 11).
-    assert.equal(seed(ex, set1(0, '12'), 'easy', '12', '10').reps, '11')
-    assert.deepEqual(seed(ex, set1(0, '0'), 'easy', '1', '1'), { workIndex: 1, reason: 'Same reps — already at 1 rep' }, 'missed at 1 rep: never below 1')
+    // Target 10, set 1 did 15: Easy builds on the 15, never the 10.
+    assert.deepEqual(seed(ex, set1(0, '15'), 'easy'), { workIndex: 1, reps: '16', reason: 'One more rep — set 1 felt easy' })
+    assert.equal(seed(ex, set1(0, '15'), 'medium'), null, 'Medium: the plain carry (15), no reason line')
+    assert.equal(seed(ex, set1(0, '15'), 'hard'), null, 'Hard: the plain carry (15), no reason line')
+    // Missed 6 of 10 → no seed, whatever the answer (Easy included).
+    for (const feel of ['easy', 'medium', 'hard']) assert.equal(seed(ex, set1(0, '6'), feel), null, feel)
+    // No reps target: Easy still builds on what was logged.
+    assert.equal(seed(ex, set1(0, '12'), 'easy', '').reps, '13')
+    assert.equal(seed(ex, set1(0, '10'), 'easy', '8-12'), null, 'a range target holds')
     assert.equal(seed(ex, set1(0, '10'), 'easy').weight, undefined, 'bodyweight never seeds a kg')
   })
 
@@ -146,6 +151,10 @@ describe('req-10 — when the prompt and the sheet show', () => {
     assert.equal(setupSheetShows({ ...ok, set1: set1(0, 'skipped', { note: 'skipped' }) }), false)
     assert.equal(setupSheetShows({ ...ok, set1: set1(0) }), false, 'a weighted set 1 with no kg: nothing to step from')
     assert.equal(setupSheetShows({ ...ok, ex: bodyweight(), set1: set1(0) }), true)
+    // Review round 1 — the sheet belongs to the item the prompt was answered on.
+    const onItem = { ...ok, entry: { mode: 'setup', itemKey: 'i1' } }
+    assert.equal(setupSheetShows({ ...onItem, key: 'i1' }), true)
+    assert.equal(setupSheetShows({ ...onItem, key: 'i2' }), false, 'a second item of the same exercise: no sheet')
   })
 })
 
@@ -177,6 +186,39 @@ describe('req-10 — the seed seam (setLogSeed / setPreview / setupSeedFor)', ()
     const item = { routineItemId: 'i1', exerciseId: 'ex', sets: 3, targets: ['10', '10', '10'], suggestedWeights: [] }
     const rows = setPreview({ item, ex: weighted(), weighted: true, hasHistory: false, historyFor: () => ({ weight: '', reps: '' }), seedOverrides: {}, workLogged: [set1(20)], setupSeed: { workIndex: 1, weight: '22.5' } })
     assert.deepEqual(rows.map((r) => r.weight), ['20', '22.5', '20'])
+  })
+  it('review round 1 — a kg override newer than the seed beats it; the one recorded with it does not', () => {
+    const item = { routineItemId: 'i1', exerciseId: 'ex', sets: 3 }
+    const withOverride = (weight) => ({
+      seedOverrides: weight == null ? {} : { 'ex::work': { weight } },
+      firstTimeSetup: { ex: { mode: 'setup', itemKey: 'i1', answered: 'easy', seed: { itemKey: 'i1', workIndex: 1, weight: '22.5', reason: 'r', overrideWeight: '20' } } },
+    })
+    assert.equal(setupSeedFor(withOverride('20'), item, 'work', 1).weight, '22.5', 'the override at seed time: the seed stands')
+    assert.equal(setupSeedFor(withOverride('25'), item, 'work', 1), null, 'a later override (25) wins')
+    assert.equal(setupSeedFor(withOverride(null), item, 'work', 1), null)
+  })
+  it('review round 1 — setupAnsweredPatch reads the workout at answer time; setupAfterSetOneEdit recomputes from the edited set 1', () => {
+    const item = { routineItemId: 'i1', exerciseId: 'ex', sets: 3, targets: ['10', '10', '10'] }
+    const logged = (weight) => ({ routineItemId: 'i1', exerciseId: 'ex', setType: 'work', weight, reps: '10', rpe: null, note: '' })
+    const workout = { sets: [logged(20)], seedOverrides: { 'ex::work': { weight: '20' } }, firstTimeSetup: { ex: { mode: 'setup', itemKey: 'i1' } } }
+    const answered = { ...workout, ...setupAnsweredPatch(workout, item, weighted(), 'easy') }
+    assert.deepEqual(answered.firstTimeSetup.ex, {
+      mode: 'setup', itemKey: 'i1', answered: 'easy',
+      seed: { workIndex: 1, weight: '22.5', reason: 'Up one step — set 1 felt easy', itemKey: 'i1', overrideWeight: '20' },
+    })
+    assert.equal(answered.sets[0].rpe, null, 'the answer is not on the set')
+    // Set 1 edited to 30 (and its override with it): 32.5, same answer, same reason.
+    const edited = { ...answered, sets: [logged(30)], seedOverrides: { 'ex::work': { weight: '30' } } }
+    const refreshed = { ...edited, ...setupAfterSetOneEdit(edited, item, weighted()) }
+    assert.equal(setupSeedFor(refreshed, item, 'work', 1).weight, '32.5')
+    assert.equal(setupSeedFor(refreshed, item, 'work', 1).reason, 'Up one step — set 1 felt easy')
+    // Edited to a blank kg → the answer yields no seed → dropped.
+    const blank = { ...answered, sets: [logged(0)] }
+    assert.equal(setupAfterSetOneEdit(blank, item, weighted()).firstTimeSetup.ex.seed, undefined)
+    // Nothing to do: set 2 already logged / Skip / another item.
+    assert.equal(setupAfterSetOneEdit({ ...answered, sets: [logged(20), logged(22.5)] }, item, weighted()), null)
+    assert.equal(setupAfterSetOneEdit({ ...workout, firstTimeSetup: { ex: { mode: 'setup', itemKey: 'i1', answered: 'skip' } } }, item, weighted()), null)
+    assert.equal(setupAfterSetOneEdit(answered, { ...item, routineItemId: 'i2' }, weighted()), null)
   })
   it('initialSetFields passes setup through', () => {
     assert.equal(initialSetFields({ ...inputs, setup: { weight: '17.5' } }).weight, '17.5')
@@ -238,8 +280,17 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
     await act(async () => captured.store.startWorkout('up'))
     const stored = () => JSON.parse(localStorage.getItem('workout-mvp-v9'))
     const open = async (itemId) => act(async () => captured.setChild(h(WorkoutItemLog, { routineId: 'up', itemId })))
-    return { stored, open }
+    // A reload: the app torn down and started again from what was saved (one provider per app).
+    const reload = async (itemId) => {
+      await view.unmount()
+      view = await render(h(Host))
+      await open(itemId)
+    }
+    return { stored, open, reload }
   }
+  const sheetOf = () => view.container.querySelector('[role="dialog"]')
+  const inSheet = (label) => [...sheetOf().querySelectorAll('label')].find((l) => l.textContent.trim().startsWith(label))?.querySelector('input')
+  const sheetButton = (label) => [...sheetOf().querySelectorAll('button')].find((b) => b.textContent.trim() === label)
 
   const sheet = () => view.all('[role="alertdialog"]')[0] ?? null
   const kg = () => view.input('kg')?.value
@@ -341,6 +392,55 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
     assert.equal(reps(), '11')
     assert.match(view.text(), /One more rep — set 1 felt easy/)
     assert.deepEqual(t.stored().activeWorkout.sets.map((s) => s.rpe), [null])
+  })
+
+  it('review round 1 — editing set 1 (20 → 30) after Easy re-seeds set 2 at 32.5 with the same reason; a reload keeps it', async () => {
+    const t = await harness([routineItem('ia', 'ex', 3)])
+    await t.open('ia')
+    await view.click(view.button('Set it up'))
+    await view.type(view.input('kg'), '20')
+    await view.click(view.button('Done'))
+    await view.click(view.button('Easy'))
+    await flush()
+    assert.equal(kg(), '22.5')
+    await view.click(view.all('.ui-setpreview__tap')[0])
+    assert.ok(sheetOf(), 'set 1 opens in the edit sheet')
+    await view.type(inSheet('kg'), '30')
+    await view.click(sheetButton('Save'))
+    await flush()
+    assert.equal(t.stored().activeWorkout.sets[0].weight, 30)
+    assert.equal(kg(), '32.5', 'set 2 re-seeded from the edited set 1')
+    assert.match(view.text(), /Up one step — set 1 felt easy/)
+    assert.equal(t.stored().activeWorkout.sets[0].rpe, null)
+    await t.reload('ia')
+    assert.equal(kg(), '32.5', 'after a reload')
+    assert.match(view.text(), /Up one step — set 1 felt easy/)
+  })
+
+  it('review round 1 — bodyweight target 10, set 1 did 15: Medium → set 2 is the plain carry (15), no reason line', async () => {
+    const t = await harness([routineItem('ib', 'bw', 3)], { exercises: [bodyweight()] })
+    await t.open('ib')
+    await view.click(view.button('Set it up'))
+    await view.type(view.input('Reps'), '15')
+    await view.click(view.button('Done'))
+    await view.click(view.button('Medium'))
+    await flush()
+    assert.equal(reps(), '15')
+    assert.doesNotMatch(view.text(), /rep —|Same reps/)
+    assert.equal(t.stored().activeWorkout.firstTimeSetup.bw.seed, undefined)
+  })
+
+  it('review round 1 — a second item of the same exercise shows neither prompt nor guide', async () => {
+    const t = await harness([routineItem('ia', 'ex', 2), routineItem('ia2', 'ex', 2)])
+    await t.open('ia')
+    await view.click(view.button('Set it up'))
+    assert.match(view.text(), /Pick a weight/)
+    await t.open('ia2')
+    assert.equal(view.button('Set it up'), null)
+    assert.doesNotMatch(view.text(), /Pick a weight/)
+    await view.type(view.input('kg'), '20')
+    await view.click(view.button('Done'))
+    assert.equal(sheet(), null, 'no sheet on the other item')
   })
 
   it('failure case: a cardio exercise shows no prompt', async () => {

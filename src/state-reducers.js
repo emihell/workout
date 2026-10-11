@@ -389,8 +389,14 @@ export function workoutAbandonedState(s) {
   return { ...s, activeWorkout: null }
 }
 
+// req-10 review round 1 — `patch` may be a function of the CURRENT active workout (read inside
+// the functional update, so it sees writes queued before it); null from it writes nothing.
 export function activePatchedState(s, patch) {
   if (!s.activeWorkout) return s
+  if (typeof patch === 'function') {
+    const next = patch(s.activeWorkout)
+    return next ? { ...s, activeWorkout: { ...s.activeWorkout, ...next } } : s
+  }
   return { ...s, activeWorkout: { ...s.activeWorkout, ...patch } }
 }
 

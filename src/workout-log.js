@@ -480,6 +480,13 @@ export function setupSeedFor(workout, item, setType = 'work', workIndex = null) 
   const seed = entry && typeof entry === 'object' ? entry.seed : null
   if (!seed || typeof seed !== 'object' || seed.itemKey !== itemKey(item)) return null
   if (workIndex != null && Number(seed.workIndex) !== Number(workIndex)) return null
+  // Review round 1 — a kg override newer than the seed (the user's own kg, written after it)
+  // wins: a seed whose recorded override no longer matches is not used. (Editing set 1 rewrites
+  // the seed with the new override, setupAfterSetOneEdit, so the seed then stands again.)
+  if (seed.weight != null) {
+    const now = workout?.seedOverrides?.[seedOverrideKey(item.exerciseId, 'work')]?.weight
+    if (String(now ?? '') !== String(seed.overrideWeight ?? '')) return null
+  }
   return seed
 }
 

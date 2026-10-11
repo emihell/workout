@@ -13,6 +13,7 @@
 import { isWeightedType } from './ids.js'
 import { HOLD_REASONS, isAssistedExercise, recommendNextPrescription, unreadableTarget, validWeights } from './progress.js'
 import { isSkippedSet } from './set-rules.js'
+import { itemKey, itemLoggingState, seedOverrideKey, setTargetFor } from './workout-log.js'
 
 // The sheet's answers. `rpe` is only the value handed to recommendNextPrescription (the same
 // numbers EFFORT_OPTIONS uses: Easy 2, Medium 3, Hard 4) — it is never written anywhere.
@@ -35,9 +36,13 @@ export const SETUP_TEXT = {
 
 // The per-exercise entry on activeWorkout.firstTimeSetup (keyed by exerciseId: once answered it
 // doesn't show again for that exercise in this workout):
-//   { mode: 'setup' | 'manual', answered?: 'easy' | 'medium' | 'hard' | 'skip',
-//     seed?: { itemKey, workIndex: 1, weight?, reps?, reason } }
-// `answered` is the sheet's answer, kept only so it asks once; it is dropped at Finish.
+//   { mode: 'setup' | 'manual', itemKey, answered?: 'easy' | 'medium' | 'hard' | 'skip',
+//     seed?: { itemKey, workIndex: 1, weight?, reps?, reason, overrideWeight } }
+// `itemKey`: the item the prompt was answered on (the guide line and the sheet belong to it).
+// `answered` is the sheet's answer: so it asks once, and so an edit of set 1 can recompute the
+// seed (setupAfterSetOneEdit). `overrideWeight`: this exercise's session kg override when the seed
+// was written — a later override (the user's own kg) beats the seed (setupSeedFor, workout-log.js).
+// All of it is dropped at Finish.
 export function firstTimeSetupFor(workout, exerciseId) {
   const map = workout?.firstTimeSetup
   const entry = map && typeof map === 'object' ? map[exerciseId] : null
@@ -65,8 +70,10 @@ export function setupPromptShows({ ex, hasHistory, currentType, workLogged, entr
 
 // After set 1's Done, in setup mode: ask only when there is a set 2 to seed, set 1 was logged
 // (not skipped), and — weighted — set 1 has a kg to step from (a blank kg logs 0: nothing to move).
-export function setupSheetShows({ ex, entry, set1, exerciseDone }) {
+// Review round 1 — `key`: the item on screen; the sheet belongs to the item the prompt was answered on.
+export function setupSheetShows({ ex, entry, set1, exerciseDone, key }) {
   if (entry?.mode !== 'setup' || entry.answered || entry.seed || exerciseDone) return false
+  if (key !== undefined && entry.itemKey !== key) return false
   if (!set1 || isSkippedSet(set1) || !setupApplies(ex)) return false
   if (ex.type !== 'bodyweight' && !(Number(set1.weight) > 0)) return false
   return true
@@ -91,8 +98,8 @@ const FELT = { easy: 'felt easy', medium: 'felt medium', hard: 'felt hard' }
 // on set 1 alone, judged against set 1's own target: Easy → one valid step up; Medium / Hard →
 // same kg; missed reps → one step down (whatever the answer; Hard holds); the helper's holds
 // (assisted, a target that isn't one number, already at the lightest weight, no weight step)
-// keep the kg and say why. Bodyweight moves set 2's reps ±1 instead (never below 1).
-export function setTwoSeed({ ex, set1, feel, target1, target2 }) {
+// keep the kg and say why. Bodyweight: Easy → set 1's logged reps + 1, else no seed (below).
+export function setTwoSeed({ ex, set1, feel, target1 }) {
   const pick = SETUP_FEELS.find((f) => f.value === feel)
   if (!pick || !set1 || isSkippedSet(set1) || !setupApplies(ex)) return null
   const kg = Number(set1.weight) || 0
@@ -107,25 +114,14 @@ export function setTwoSeed({ ex, set1, feel, target1, target2 }) {
   const why = FELT[feel]
   const held = (key) => result.reason.includes(HOLD_REASONS[key])
 
+  // Review round 1 — bodyweight builds on what set 1 LOGGED, not the routine target: Easy (with
+  // the target met — the helper didn't move down — and a target it can read) → set 1's reps + 1.
+  // Medium / Hard / missed reps → no seed: set 2 keeps the plain seed (set 1's reps carried on a
+  // uniform plan, else its own target), with no reason line.
   if (bodyweight) {
-    const before = plainInt(target1)
-    const after = plainInt(result.targets[0])
-    const delta = before != null && after != null ? after - before : 0
-    if (delta === 0) {
-      const reason = held('target')
-        ? "Same reps — the target isn't a single number"
-        : result.action === 'down'
-          ? 'Same reps — already at 1 rep'
-          : `Same reps — set 1 ${why}`
-      return { workIndex: 1, reason }
-    }
-    const base = plainInt(target2) ?? before
-    const reps = String(Math.max(1, base + delta))
-    return {
-      workIndex: 1,
-      reps,
-      reason: delta > 0 ? `One more rep — set 1 ${why}` : 'One rep fewer — set 1 missed reps',
-    }
+    const logged = plainInt(set1.reps)
+    if (feel !== 'easy' || logged == null || result.action === 'down' || held('target')) return null
+    return { workIndex: 1, reps: String(logged + 1), reason: `One more rep — set 1 ${why}` }
   }
 
   const moved = Number(result.weights[0]) || 0
@@ -140,4 +136,39 @@ export function setTwoSeed({ ex, set1, feel, target1, target2 }) {
   else if (held('lightest')) reason = HOLD_TEXT.lightest
   else reason = `Same kg — set 1 ${why}`
   return { workIndex: 1, weight: String(next), reason }
+}
+
+function overrideWeightNow(workout, exerciseId) {
+  const weight = workout?.seedOverrides?.[seedOverrideKey(exerciseId, 'work')]?.weight
+  return weight != null ? String(weight) : ''
+}
+
+// The activeWorkout patch for the sheet's answer, built from the workout AS IT IS NOW (set 1
+// logged, its override written): the item's one logged work set is set 1. `feel` null = Skip.
+// The answer and the seed go on firstTimeSetup only — never onto a set.
+export function setupAnsweredPatch(workout, item, ex, feel) {
+  const key = itemKey(item)
+  const { workLogged } = itemLoggingState(workout, item)
+  const seed =
+    feel && workLogged.length === 1
+      ? setTwoSeed({ ex, set1: workLogged[0], feel, target1: setTargetFor(item, 'work', 0) })
+      : null
+  return firstTimeSetupPatch(workout, item.exerciseId, {
+    mode: 'setup',
+    itemKey: key,
+    answered: feel || 'skip',
+    ...(seed ? { seed: { ...seed, itemKey: key, overrideWeight: overrideWeightNow(workout, item.exerciseId) } } : {}),
+  })
+}
+
+// Review round 1 — set 1 of this item edited (the edit sheet) while set 2 is still to come:
+// the seed is recomputed from the edited set 1 with the same stored answer (dropped when that
+// answer no longer yields one). Null = nothing to change (no answer / Skip / another item / set 2
+// already logged).
+export function setupAfterSetOneEdit(workout, item, ex) {
+  const entry = firstTimeSetupFor(workout, item.exerciseId)
+  if (!entry || entry.mode !== 'setup' || !entry.answered || entry.answered === 'skip') return null
+  if ((entry.itemKey ?? entry.seed?.itemKey) !== itemKey(item)) return null
+  if (itemLoggingState(workout, item).workLogged.length !== 1) return null
+  return setupAnsweredPatch(workout, item, ex, entry.answered)
 }
