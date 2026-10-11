@@ -99,6 +99,7 @@ export const FIELDS = {
     setDraft: 'activeWorkout only: what is typed into the open set; dropped at Finish.',
     autoFinishDismissed: 'activeWorkout only: the user dismissed the auto-finish offer; dropped at Finish.',
     stopwatch: 'activeWorkout only: a running cardio stopwatch; dropped at Finish and on import.',
+    firstTimeSetup: 'activeWorkout only: first-time setup answers, keyed by exercise id (see firstTimeSetup); dropped at Finish.',
   },
   snapshot: {
     routineId: 'The routine started.',
@@ -147,6 +148,53 @@ export const FIELDS = {
     distance: 'Cardio: distance, only when entered.',
     distanceUnit: 'Cardio: m or km, with distance.',
     loggedAt: 'ISO time the set was logged (absent on older sets and on sets Finish recorded as skipped).',
+  },
+  // Nested values (review round 1): each described the same way.
+  warmup: {
+    reps: 'Reps of the one easy warm-up set before the working sets.',
+  },
+  legacyRecommendation: {
+    sets: 'Legacy baseline: working sets.',
+    targets: 'Legacy baseline: reps per set.',
+    suggestedWeights: 'Legacy baseline: kg per set.',
+  },
+  seedOverride: {
+    weight: 'activeWorkout only: the kg the user changed to this session, carried to the next sets of that exercise.',
+    reps: 'activeWorkout only: reps carried the same way (older sessions).',
+  },
+  setDraft: {
+    key: 'activeWorkout only: which set the draft is for.',
+    weight: 'Typed kg (text).',
+    reps: 'Typed reps (text).',
+    effort: 'Picked effort, or "".',
+    durationSec: 'Typed seconds (timed).',
+    cardio: 'Typed cardio values (see setDraftCardio).',
+    note: 'Typed note.',
+  },
+  setDraftCardio: {
+    durationSec: 'Typed duration in seconds, or null.',
+    level: 'Typed level, or null.',
+    distance: 'Typed distance, or null.',
+    distanceUnit: 'm or km, or null.',
+  },
+  stopwatch: {
+    draftKey: 'activeWorkout only: the set the cardio stopwatch runs for.',
+    startedAt: 'When it started (ms since 1970).',
+    baseSec: 'Seconds already on it when started.',
+  },
+  firstTimeSetup: {
+    mode: 'activeWorkout only, keyed by exercise id: "setup" (guided first-time setup) or "manual".',
+    itemKey: 'The workout item the prompt was answered on.',
+    answered: 'How set 1 felt: easy | medium | hard | skip. Never stored on a set.',
+    seed: 'The suggested set 2 it produced (see firstTimeSetupSeed).',
+  },
+  firstTimeSetupSeed: {
+    itemKey: 'The workout item.',
+    workIndex: 'Which working set it prefills (1 = set 2).',
+    weight: 'Suggested kg for set 2 (text).',
+    reps: 'Suggested reps for set 2 (bodyweight, text).',
+    reason: 'Why, shown to the user.',
+    overrideWeight: 'The session kg override when the suggestion was made.',
   },
 }
 
@@ -324,32 +372,62 @@ export const ASSISTANT = {
   },
 }
 
-// req-220 — the stored fields of `state` that FIELDS does not describe, as "entity.field"
-// strings (sorted, unique). Walks every entity the map covers: root, exercises, routines and
-// their items, schedule + slots + moves, finished workouts (and drafts / the active workout)
-// with their snapshot, snapshot items and sets. Empty = the export describes everything.
+// req-220 — how the stored entities nest: entity → field → the entity it holds. `[entity]` an
+// array of them, `{ map: entity }` an object keyed by ids (values are that entity), a string one
+// object. OPAQUE fields are legacy values nothing reads, kept as they are and described as such
+// in FIELDS; their insides are not checked. Every other field holding an object (or an array of
+// objects) must be in NESTING, or the check reports it as "entity.field{}" — so a new nested
+// shape can't slip past undocumented (review round 1).
+const NESTING = {
+  state: {
+    exercises: ['exercise'],
+    routines: ['routine'],
+    schedule: 'schedule',
+    workouts: ['workout'],
+    draftWorkouts: ['workout'],
+    activeWorkout: 'workout',
+    legacyRecommendations: { map: 'legacyRecommendation' },
+  },
+  routine: { exercises: ['routineItem'] },
+  routineItem: { warmup: 'warmup' },
+  schedule: { slots: ['scheduleSlot'], moves: ['scheduleMove'] },
+  workout: {
+    snapshot: 'snapshot',
+    sets: ['set'],
+    seedOverrides: { map: 'seedOverride' },
+    setDraft: 'setDraft',
+    stopwatch: 'stopwatch',
+    firstTimeSetup: { map: 'firstTimeSetup' },
+  },
+  snapshot: { items: ['snapshotItem'] },
+  snapshotItem: { warmup: 'warmup' },
+  setDraft: { cardio: 'setDraftCardio' },
+  firstTimeSetup: { seed: 'firstTimeSetupSeed' },
+}
+const OPAQUE = { state: ['plannedWorkouts'], workout: ['progression'] }
+
+// The stored fields of `state` that FIELDS does not describe, as "entity.field" strings (sorted,
+// unique), walking NESTING from the root. Empty = the export describes everything.
 export function undocumentedFields(state) {
   const missing = new Set()
-  const check = (entity, record) => {
+  const holdsObjects = (value) => isPlainObject(value) || (Array.isArray(value) && value.some(isPlainObject))
+  const visit = (entity, record) => {
     if (!isPlainObject(record)) return
-    for (const key of Object.keys(record)) if (!Object.hasOwn(FIELDS[entity], key)) missing.add(`${entity}.${key}`)
+    for (const [key, value] of Object.entries(record)) {
+      if (!Object.hasOwn(FIELDS[entity], key)) missing.add(`${entity}.${key}`)
+      const inner = NESTING[entity]?.[key]
+      if (inner === undefined) {
+        if (holdsObjects(value) && !OPAQUE[entity]?.includes(key)) missing.add(`${entity}.${key}{}`)
+      } else if (Array.isArray(inner)) {
+        for (const element of Array.isArray(value) ? value : []) visit(inner[0], element)
+      } else if (typeof inner === 'object') {
+        for (const element of isPlainObject(value) ? Object.values(value) : []) visit(inner.map, element)
+      } else {
+        visit(inner, value)
+      }
+    }
   }
-  check('state', state)
-  for (const exercise of state?.exercises || []) check('exercise', exercise)
-  for (const routine of state?.routines || []) {
-    check('routine', routine)
-    for (const item of routine?.exercises || []) check('routineItem', item)
-  }
-  check('schedule', state?.schedule)
-  for (const slot of state?.schedule?.slots || []) check('scheduleSlot', slot)
-  for (const move of state?.schedule?.moves || []) check('scheduleMove', move)
-  const workouts = [...(state?.workouts || []), ...(state?.draftWorkouts || []), ...(state?.activeWorkout ? [state.activeWorkout] : [])]
-  for (const workout of workouts) {
-    check('workout', workout)
-    check('snapshot', workout?.snapshot)
-    for (const item of workout?.snapshot?.items || []) check('snapshotItem', item)
-    for (const set of workout?.sets || []) check('set', set)
-  }
+  visit('state', state)
   return [...missing].sort()
 }
 

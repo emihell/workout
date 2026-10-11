@@ -129,6 +129,24 @@ describe('req-220 scope 3 — every stored field is described in the export', ()
     ])
   })
 
+  it('RECEIPT (review round 1): nested values are checked too, and an unknown nested object is reported', () => {
+    const state = fullState()
+    state.routines[0].exercises[1].warmup.tempo = 'slow'
+    state.activeWorkout.firstTimeSetup = { 'ex-press': { mode: 'setup', itemKey: 'si-press', seed: { workIndex: 1, extra: 1 } } }
+    state.activeWorkout.seedOverrides['ex-press::work'].unit = 'kg'
+    state.legacyRecommendations['si-press'].note = 'x'
+    state.workouts[0].sets[0].meta = { source: 'watch' }
+    state.workouts[0].progression = { anything: { goes: true } } // legacy, opaque: not reported
+    assert.deepEqual(undocumentedFields(state), [
+      'firstTimeSetupSeed.extra',
+      'legacyRecommendation.note',
+      'seedOverride.unit',
+      'set.meta',
+      'set.meta{}',
+      'warmup.tempo',
+    ])
+  })
+
   it('the full state carries the fields the req names (so the check above really covers them)', () => {
     const state = fullState()
     const sets = state.workouts.flatMap((workout) => workout.sets)
