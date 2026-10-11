@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { EFFORT_OPTIONS, isWeightedType, roleTag } from '../../ids'
 import { go } from '../../route'
@@ -37,6 +37,7 @@ import {
   setDraftKey,
   setListRows,
   setTargetFor,
+  setupSeedFor,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,
@@ -62,7 +63,17 @@ import { exerciseName, findItem, isActiveFor, itemDonePath, itemLogPath, itemSet
 import { WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
-import { askConfirm } from '../../ui/confirm.js'
+import { askChoice, askConfirm } from '../../ui/confirm.js'
+import {
+  SETUP_FEELS,
+  SETUP_TEXT,
+  firstTimeSetupFor,
+  firstTimeSetupPatch,
+  setupAfterSetOneEdit,
+  setupAnsweredPatch,
+  setupPromptShows,
+  setupSheetShows,
+} from '../../first-time-setup.js'
 import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
 import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
@@ -268,7 +279,9 @@ function WorkoutItemLive({ routineId, item }) {
       exerciseId: item.exerciseId,
       setType: currentType,
       weighted,
-      seed,
+      // req-10 — compared against the seed WITHOUT the setup suggestion (plainSeed): set 2
+      // logged at the suggested kg is this session's new kg, carried to the remaining sets.
+      seed: plainSeed,
       // req-154 — the parsed kg, not the typed text: `22,5` must compare (and carry) as 22.5.
       logged: { weight: loggedWeight, reps },
     })
@@ -299,6 +312,26 @@ function WorkoutItemLive({ routineId, item }) {
     const setRecord = cardio ? withCardioValues(fields, cardio) : fields
     store.completeSet(setRecord, { ...restAfterSet(), seedOverrides }, { draftKey: setSeedKey })
     if (done) finishExercise(setRecord)
+    else if (currentType === 'work' && currentWorkIndex === 0) askHowItFelt(setRecord)
+  }
+
+  // req-10 (DEC-123 §1) — in setup mode, set 1's Done asks "How was that?" once. The answer
+  // only seeds set 2 (setTwoSeed: an editable prefill + its reason); it is never written onto a
+  // set (set 1 keeps rpe null — req-212 would spread it as the exercise effort). Skip, the
+  // backdrop, Escape or navigating away → no seed: set 2 keeps the plain carry (the Skip is
+  // remembered, so the sheet never asks again for this exercise).
+  // Review round 1 — the patch is built from the active workout at answer time (a functional
+  // patch), not this render's pre-set-1 copy.
+  function askHowItFelt(set1) {
+    if (!setupSheetShows({ ex, entry: setupEntry, set1, exerciseDone: false, key: itemKey(item) })) return
+    askChoice('', {
+      title: SETUP_TEXT.sheetTitle,
+      choices: SETUP_FEELS.map(({ value, label }) => ({ value, label })),
+      cancelLabel: SETUP_TEXT.sheetSkip,
+    }).then((feel) => {
+      recordButton(feel ? `setup-feel-${feel}` : 'setup-feel-skip')
+      store.patchActive((current) => setupAnsweredPatch(current, item, ex, feel))
+    })
   }
 
   // req-187 — the set that finishes the exercise: req-212 — the exercise review, then (only
@@ -404,7 +437,7 @@ function WorkoutItemLive({ routineId, item }) {
   // req-183 — also handed to SetLogForm with historyPrefill.weight, for the kg notes only
   // (kg-hints.js: last time / big change); the box's value is still the seed's.
   const routineKg = routineKgFor(item, currentType, currentWorkIndex)
-  const seed = initialSetFields({
+  const seedInputs = {
     weighted,
     fromRestore: false,
     restore: null,
@@ -418,7 +451,23 @@ function WorkoutItemLive({ routineId, item }) {
     routineKg,
     // req-210 / DEC-117 §3 — a changed rep count carries only on a uniform plan (3 × 10).
     uniformReps: uniformRepsTargets(item),
-  })
+  }
+  // req-10 (DEC-123 §1) — first-time setup. `setupEntry`: this exercise's answer this workout
+  // (activeWorkout.firstTimeSetup); `setupSeed`: set 2's seed from set 1 + "How was that?",
+  // only on the set it names. `plainSeed` (without it) is req-83's comparison base, so a kept
+  // suggestion counts as this session's kg change and carries on to sets 3+ (DEC-052).
+  const setupEntry = firstTimeSetupFor(active, item.exerciseId)
+  const setupSeed = setupSeedFor(active, item, currentType, currentWorkIndex)
+  const plainSeed = initialSetFields(seedInputs)
+  const seed = setupSeed ? initialSetFields({ ...seedInputs, setup: setupSeed }) : plainSeed
+  const showSetupPrompt = setupPromptShows({ ex, hasHistory: Boolean(last), currentType, workLogged: state.workLogged, entry: setupEntry })
+  // Review round 1 — the guide belongs to the item the prompt was answered on.
+  const showSetupGuide =
+    setupEntry?.mode === 'setup' && setupEntry.itemKey === itemKey(item) && currentType === 'work' && state.workLogged.length === 0
+  function answerSetupPrompt(mode) {
+    recordButton(mode === 'setup' ? 'setup-start' : 'setup-manual')
+    store.patchActive((current) => firstTimeSetupPatch(current, item.exerciseId, { mode, itemKey: itemKey(item) }))
+  }
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
   // title. The value lives here (passed straight to completeSet), and the reveal
@@ -527,7 +576,35 @@ function WorkoutItemLive({ routineId, item }) {
           while the pill counts down (D2, self-paced). The form remounts per set by
           `key`; rest ending doesn't change the key, so in-progress edits survive. Once
           the exercise is planned-done, completeSet has already advanced to the overview. */}
+      {/* req-10 (DEC-123 §1) — first-time setup, kept beside the form (SetLogForm untouched):
+          the prompt at the first work set of a no-history exercise; in setup, the guide line on
+          set 1; on set 2, the reason for its suggested prefill. */}
+      {logging && showSetupPrompt ? (
+        <div className="ui-first-time" role="group" aria-label="First time">
+          <p className="ui-sub">{SETUP_TEXT.prompt}</p>
+          <Actions
+            lateral={
+              <Button variant="quiet" onClick={() => answerSetupPrompt('manual')}>
+                {SETUP_TEXT.manual}
+              </Button>
+            }
+            forward={
+              <Button variant="secondary" onClick={() => answerSetupPrompt('setup')}>
+                {SETUP_TEXT.setUp}
+              </Button>
+            }
+          />
+        </div>
+      ) : null}
+      {logging && showSetupGuide ? (
+        <p className="ui-field-note ui-first-time__guide">{ex.type === 'bodyweight' ? SETUP_TEXT.guideBodyweight : SETUP_TEXT.guideWeighted}</p>
+      ) : null}
+      {logging && setupSeed?.reason ? <p className="ui-field-note ui-first-time__reason">{setupSeed.reason}</p> : null}
+      {/* req-10 — the keyed Fragment remounts the form when the setup seed lands or changes (the
+          sheet is answered after set 2's form is already up; review round 1 — an edit of set 1
+          re-seeds it); the form itself stays keyed per set. */}
       {plannedDone ? null : (
+        <Fragment key={setupSeed ? `setup|${setupSeed.weight ?? ''}|${setupSeed.reps ?? ''}` : 'plain'}>
         <SetLogForm
           key={setSeedKey}
           weighted={weighted}
@@ -556,6 +633,7 @@ function WorkoutItemLive({ routineId, item }) {
             if (opts?.now) draftWriter.flush()
           }}
         />
+        </Fragment>
       )}
       {/* req-109 — exercise-level lateral actions, in normal flow below the form (the
           set-level bar stays pinned at the bottom).
@@ -619,6 +697,10 @@ function LoggedSetSheet({ item, ex, index, eachSide = false, onClose, onSaved })
     recordButton('save-set')
     store.updateActiveSet(index, result.setPatch)
     if (result.seedOverrides !== active.seedOverrides) store.patchActive({ seedOverrides: result.seedOverrides })
+    // req-10 review round 1 — set 1 edited before set 2 is logged: the first-time setup's set-2
+    // seed is recomputed from the edited set (same answer), against the state the writes above
+    // leave (a functional patch, queued after them). Any other set / no setup → nothing.
+    if (type === 'work' && workIndex === 0) store.patchActive((current) => setupAfterSetOneEdit(current, item, ex))
     onSaved?.()
     onClose()
   }
