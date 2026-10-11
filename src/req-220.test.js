@@ -611,3 +611,50 @@ describe('req-220 review round 1 — item 3: a change outside the counts says "O
     assert.equal(lines.includes('Other data: changed'), false)
   })
 })
+
+// ── Review round 2 ──────────────────────────────────────────────────────────────────
+describe('req-220 review round 2 — A: only exercises the records use come back', () => {
+  it("PROBE: ex-unused in rtn-a (never logged); the file drops rtn-a and ex-unused → rtn-a archived, ex-unused not written, stripped from rtn-a", async () => {
+    const base = fullState()
+    base.exercises.push({ id: 'ex-unused', name: 'Unused', equipment: 'Machine', muscles: '', cues: '', type: 'machine', weightStep: '5', archivedAt: null, hasDuration: false, durationSec: 30 })
+    base.routines[0].exercises.push({ id: 'si-unused', exerciseId: 'ex-unused', role: 'main', sets: 1, targets: ['10'], suggestedWeights: [], durations: [], restSec: 60, notes: '', warmup: null })
+    const { activeWorkout: _active, ...rest } = base
+    const store = device({ ...rest, activeWorkout: null })
+    const file = exported(store, (state) => {
+      state.routines = []
+      state.exercises = state.exercises.filter((exercise) => exercise.id !== 'ex-unused')
+    })
+    const { calls, done } = run(store, file, true)
+    await done
+    const { preview } = calls.asked[0]
+    assert.equal(preview.conflict, false)
+    assert.deepEqual(preview.archived.replace, { routines: 1, exercises: 0 })
+    assert.ok(previewLines(preview).includes('1 workout kept as archived — your history uses it.'), previewLines(preview).join(' | '))
+    const saved = JSON.parse(disk.get(KEY))
+    assert.equal(saved.exercises.some((exercise) => exercise.id === 'ex-unused'), false, 'ex-unused is not written')
+    const rtn = saved.routines.find((routine) => routine.id === 'rtn-a')
+    assert.ok(rtn.archivedAt)
+    assert.equal(rtn.exercises.some((item) => item.exerciseId === 'ex-unused'), false, 'stripped from the restored routine')
+    assert.deepEqual(rtn.exercises.map((item) => item.id), ['si-bike', 'si-press', 'si-plank'], 'the items history used stay')
+    assert.deepEqual(dangling(saved), [])
+  })
+})
+
+describe('req-220 review round 2 — B: the conflict sheet says which choice its lines describe', () => {
+  it('"With Keep my history: …" on the archived line; the schedule line names both when they differ', () => {
+    const store = device()
+    const incoming = applyBackup(
+      exported(store, (state) => {
+        state.workouts = state.workouts.filter((workout) => workout.routineId !== 'sess-upper') // conflict
+        state.routines = state.routines.filter((routine) => routine.id !== 'sess-upper') // only Keep's history uses it
+      }),
+    ).state
+    const preview = importPreview(store, incoming)
+    assert.equal(preview.conflict, true)
+    const lines = previewLines(preview)
+    assert.ok(lines.includes('With Keep my history: 1 workout kept as archived — your history uses it.'), lines.join(' | '))
+    assert.ok(lines.includes('Schedule: changed with Keep my history, unchanged with Replace everything'), lines.join(' | '))
+    // the plain confirm (no conflict) keeps the unlabelled line
+    assert.equal(previewLines({ ...preview, conflict: false }, 'replace').some((line) => line.startsWith('With Keep')), false)
+  })
+})

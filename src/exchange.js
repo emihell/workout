@@ -685,7 +685,9 @@ function outsideCounts(state, other) {
 // DESIGN §3 / removeRoutineFromState — setup that history references is archived, not deleted.
 // `records` (the history the import will write) may name a routine or exercise the file left
 // out: the device's own copy comes back, archived (its archivedAt kept when it already had one).
-// An exercise a brought-back routine uses comes back too. Nothing is invented: every record is
+// Review round 2 — as removeExerciseFromState: only an exercise the RECORDS reference comes back;
+// a brought-back routine's items whose exercise ends up in neither the file nor the brought-back
+// set are stripped from it (the app strips a deleted exercise from routines). Nothing is invented: every record is
 // the device's own, and a reference the device can't resolve either stays as it is (migrateState
 // already shows it as "Deleted routine" / "Deleted exercise").
 export function setupKeptForHistory(incoming, records, current, archivedAt) {
@@ -700,11 +702,16 @@ export function setupKeptForHistory(incoming, records, current, archivedAt) {
     for (const set of record.sets || []) exerciseIds.add(set.exerciseId)
     for (const item of record.snapshot?.items || []) exerciseIds.add(item.exerciseId)
   }
-  for (const routine of routines) for (const item of routine.exercises || []) exerciseIds.add(item.exerciseId)
   const exercises = (current?.exercises || [])
     .filter((exercise) => exerciseIds.has(exercise.id) && !incomingExercises.has(exercise.id))
     .map((exercise) => ({ ...exercise, archivedAt: exercise.archivedAt || archivedAt }))
-  return { routines, exercises }
+  const present = new Set([...incomingExercises, ...exercises.map((exercise) => exercise.id)])
+  const stripped = routines.map((routine) =>
+    (routine.exercises || []).every((item) => present.has(item.exerciseId))
+      ? routine
+      : { ...routine, exercises: routine.exercises.filter((item) => present.has(item.exerciseId)) },
+  )
+  return { routines: stripped, exercises }
 }
 
 // The state an import writes, on every path. `keepHistory` (Keep my history): the file, except
@@ -802,6 +809,15 @@ export function archivedLine({ routines, exercises }) {
   return `${parts.join(' and ')} kept as archived — your history uses ${routines + exercises === 1 ? 'it' : 'them'}.`
 }
 
+function scheduleText(preview, mode) {
+  const on = preview.scheduleChangedOn
+  const word = (changed) => (changed ? 'changed' : 'unchanged')
+  if (!on) return word(preview.scheduleChanged)
+  // Review round 2 — the two choices write different schedules: say which one this line is.
+  if (mode === 'keep' && on.keep !== on.replace) return `${word(on.keep)} with Keep my history, ${word(on.replace)} with Replace everything`
+  return word(on[mode])
+}
+
 // The preview as plain lines, for the confirm sheet (and tests). `mode` names the path the
 // archived line describes: 'replace' (the plain confirm) or 'keep' (the choice sheet's default).
 export function previewLines(preview, mode = preview.conflict ? 'keep' : 'replace') {
@@ -809,7 +825,7 @@ export function previewLines(preview, mode = preview.conflict ? 'keep' : 'replac
   const lines = [
     `Workouts: ${countParts(preview.routines) || 'unchanged'}`,
     `Exercises: ${countParts(preview.exercises) || 'unchanged'}`,
-    `Schedule: ${(preview.scheduleChangedOn?.[mode] ?? preview.scheduleChanged) ? 'changed' : 'unchanged'}`,
+    `Schedule: ${scheduleText(preview, mode)}`,
     `Logged history: ${countParts(preview.history, 'logged workout') || 'unchanged'}`,
   ]
   if (preview.otherChanged) lines.push('Other data: changed')
@@ -817,7 +833,8 @@ export function previewLines(preview, mode = preview.conflict ? 'keep' : 'replac
   if (preview.active === 'replaced') lines.push('Workout in progress: the file has a different one.')
   if (preview.active === 'removed') lines.push('Workout in progress: not in the file.')
   const archived = archivedLine(preview.archived?.[mode] || { routines: 0, exercises: 0 })
-  if (archived) lines.push(archived)
+  // Review round 2 — on the choice sheet the line is Keep's (Replace can write a different set).
+  if (archived) lines.push(mode === 'keep' ? `With Keep my history: ${archived}` : archived)
   return lines
 }
 
