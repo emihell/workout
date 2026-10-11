@@ -2509,3 +2509,20 @@ uses `isEachSide`. Test edit: req-183 ("routine kg present → no hint" was the 
 Gate: `check: green — lint, skills, no import cycles, 115 test file(s), and the build all passed.` (Planner, throwaway
 worktree); branch smoke green on `plan qa`; scripted list 1–4, 6–8 YES (2–4 with the plan kg set to differ — the seed's
 first-load kg fill makes plan = last time, so no note there, also correct). No trigger files. `reports/req-219.md`.
+
+## req-10 — first-time guided setup: one "How was that?" after set 1 seeds set 2  (2026-10-11)
+
+**req-10** (DEC-012 / DEC-123 §1, ui; throwaway agent). Prompt "First time — I'll enter it / Set it up" on a no-history
+weighted/bodyweight exercise; after set 1, Easy · Medium · Hard / Skip seeds set 2 (weighted via `recommendNextPrescription` /
+`moveToValidWeight` on set 1's logged kg; bodyweight: Easy → logged reps + 1) with a reason line; never stored (`rpe` stays
+null). Transient `activeWorkout.firstTimeSetup` (survives reload, stripped by Finish); `activePatchedState` accepts a function.
+Test edit: req-122 Actions count 21 → 22.
+
+Gate: `check: green — lint, skills, no import cycles, 115 test file(s), and the build all passed.` (Planner, throwaway
+worktree, 63c971f); branch smoke green on `plan qa`; scripted list (prompt, guide, sheet, Easy → 22.5 + reason, sets rpe null,
+set 3 carries, history/cardio no prompt, bodyweight 10 → 11) all YES.
+
+Reviewer (independent, 2 rounds): round 1 two should-fix (bodyweight seeded from the target; stale seed after a set-1 edit) +
+nit + latent → fixed in 4f112ba; round 2 "No blockers." Known limit: a kg/reps typed on set 2 is replaced if set 1 is then
+edited. `(unconfirmed)` for Emilio: an accepted suggestion carries to sets 3+ (DEC-052); bodyweight missed reps → no seed (plain
+carry); Easy on per-set targets (12/10/8) gives set 1 reps + 1. `reports/req-10.md`.
