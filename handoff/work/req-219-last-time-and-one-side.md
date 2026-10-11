@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — display only; no stored write.
+**Status: BUILT, NOT merged** **Lane: ui** — display only; no stored write.
 
 # req-219 — "Last time" shows when the plan's kg differs; one-side exercises say "one side at a time"
 

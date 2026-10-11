@@ -2501,3 +2501,11 @@ No independent reviewer (`plan closeout --no-reviewer`): workout-log.js change i
 saving confirm after a screen swap. Receipt (Planner): `node --test src/req-178.test.js src/req-182.test.js` ×15 — main fail
 `111111111111011`, branch `000000000000000`. Gate: agent `check: green — … 114 test file(s)`; closeout re-runs it on the merge.
 No trigger files. `reports/req-218.md`. Ships req-217 to the site (its deploy `38082387254` was red).
+
+## req-219 — "Last time" shows when the plan's kg differs; one-side exercises say "one side at a time"  (2026-10-11)
+
+**req-219** (DEC-122 §2, ui; throwaway agent, resumed after a stall — L-052). `kgHints` compares routine kg vs last time; the line
+uses `isEachSide`. Test edit: req-183 ("routine kg present → no hint" was the rule replaced; same-kg case moved to req-219.test).
+Gate: `check: green — lint, skills, no import cycles, 115 test file(s), and the build all passed.` (Planner, throwaway
+worktree); branch smoke green on `plan qa`; scripted list 1–4, 6–8 YES (2–4 with the plan kg set to differ — the seed's
+first-load kg fill makes plan = last time, so no note there, also correct). No trigger files. `reports/req-219.md`.
