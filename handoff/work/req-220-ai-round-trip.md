@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: data** — import replaces stored state (a bulk write): independent reviewer, backup reminder,
+**Status: BUILT AND MERGED, 2026-10-11 — branch `req-220` (`e52c295`…`48fea6f`, 7 commits).** **Lane: data** — import replaces stored state (a bulk write): independent reviewer, backup reminder,
 Emilio's eyes before merge (DEC-035 carve-out).
 
 # req-220 — "Export for your AI": a current, self-describing export, and an import that shows what changed
