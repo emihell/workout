@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — display only; no stored write.
+**Status: BUILT AND MERGED, 2026-10-11 — branch `req-219` (`03c1612`…`63b31c1`, 2 commits).** **Lane: ui** — display only; no stored write.
 
 # req-219 — "Last time" shows when the plan's kg differs; one-side exercises say "one side at a time"
 

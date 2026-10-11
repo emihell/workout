@@ -5,6 +5,9 @@ of the writers, `reports/req-165.md`). Supersedes the 2026-09-12/-14/-18 version
 "cardio adjusts reps" claims were wrong — audit 2026-09-24 F-DRIFT-3). A `DEC-` or req that moves the schema updates this
 in the same pass.
 
+**Updated 2026-10-10 (Planner)** for req-193/194/211/212 from the rescans of `main` 98f94cf (Explore agents, cited per
+line below). Not re-measured from a golden state; a builder touching the schema re-measures.
+
 ## Keys, load and write rules
 
 - **Live key** `workout-mvp-v9` (`SCHEMA_VERSION = 9`). **Legacy keys** `-v8`…`-v5` are read for migration and removed
@@ -49,7 +52,8 @@ State (`workout-mvp-v9`):
 
 **Exercise** (E; M defaults):
 - `id`, `name`, `equipment`, `muscles`, `cues`, `type` (`machine|free|bodyweight|cardio|assisted…`).
-- `weightStep` (string: `"2.5"`, `"Alt 4/5"`, `"n/a"`).
+- `weightStep` (string: `"2.5"`, `"Steps A/B"` two alternating sizes, `"Alt 4/5"` legacy, `"n/a"`).
+- `lightestWeight` (kg, optional; req-193 — the first weight of the stack; suggestions count from it, `progress.js:9-31`).
 - `archivedAt` (ISO | null, M → null).
 - `hasDuration` (bool, M → false).
 - `durationSec` (number, M → default).
@@ -64,6 +68,8 @@ State (`workout-mvp-v9`):
 **Schedule** (E; M normalises slots):
 - `loopWeeks` (number) and `anchor` (date string; loadState defaults it once, req-114).
 - `slots[]`: `id`, `week`, `weekday`, `routineId`.
+- `moves[]` (req-211, DEC-117 §2): `{id, slotId, from, to}` — a one-date move inside the same Mon–Sun week; `slotsOn` honours
+  it only while the slot is on `from`; malformed ones dropped by `normaliseMoves` (`model.js:279-348`, `schedule.js:82-84`).
 
 **Workout, finished** (F; H edits; M rebuilds legacy snapshots):
 - `id`, `routineId`, `occurrenceId`, `scheduleSlotId`, `scheduledFor`, `performedOn`.
@@ -87,10 +93,15 @@ State (`workout-mvp-v9`):
 - `setType` (`wu|work`).
 - `weight` (number; History allows `''`).
 - `reps` (string, or `'skipped'`).
-- `rpe` (number | null; null on WU/cardio since req-156).
+- `rpe` (number | null; null on WU/cardio since req-156). **Since req-212 (DEC-119 §1) effort is per exercise:** Done logs
+  `null`; the exercise review writes one value (2 Easy · 3 Medium · 4 Hard) to every logged non-skipped work set of that item;
+  a set logged after a pick inherits it (`workout-log.js:778-799`, `item.jsx:280-284`). 5 (Failure) is legacy, still read.
 - `note`.
 - `targetReps`, `targetWeight` (number | null).
-- `durationSec` (timed work sets; History too since req-163).
+- `durationSec` (timed work sets; History too since req-163; cardio duration since req-194).
+- `level`, `distance`, `distanceUnit` (cardio, req-194; each only when entered, `cardio-set.js:108-116`).
+- `loggedAt` (ISO; req-212 — set when Done / Skip set logs it, never rewritten by edits; absent on older sets and on Finish's
+  skipped fill).
 
 **Active workout:** the finished-workout fields with `finishedAt: null`, plus these transient ones, all stripped by F:
 - `seedOverrides {<exerciseId::wu|work>: {weight}}` (S → {}, L).
@@ -102,9 +113,10 @@ State (`workout-mvp-v9`):
 
 - `validWeights(exercise)`: `weightOptions` if present; else the `Alt 4/5` sequence
   (start 9, alternate +5/+4); else a numeric `weightStep`; else `[]`.
-- `moveToValidWeight(w, ex, ±1)`: next/previous valid option. With **no valid
+- `moveToValidWeight(w, ex, ±1)` (`progress.js:69-82`): next/previous valid option; at or below `lightestWeight` "down"
+  holds with a reason (req-193). With **no valid
   increment** (`weightStep:'n/a'`, `[]`) the recommendation **holds** — no invented
   0.5 kg step (DEC-030; was `progress.js:28` fallback).
 - `recommendNextPrescription`: missed reps or `rpe>=5` → down one step; `rpe<=2` and
-  not missed → up one step; else keep. Bodyweight/cardio adjust **reps**, not weight.
+  not missed → up one step; else keep (Hard = 4 keeps). Only `type === 'bodyweight'` adjusts **reps** (±1); cardio holds.
 - Computed from history and nothing else; decision is inspectable (DESIGN §2).

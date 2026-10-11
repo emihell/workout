@@ -514,3 +514,11 @@ req-187's AC1 answered the routine-kg sheet after the log screen's provider had 
 eager-state path. req-217's extra library-hook render turned that off and the stored kg stayed `[20,20,20]` — a test failure
 with no product bug (the app never unmounts the provider). **How to apply:** rendered tests keep one `StoreProvider` and swap
 the screen inside it; never `mount` a fresh provider per screen.
+
+## L-052 — a build agent killed mid-run loses everything it hadn't committed; brief agents to commit early  (Planner, 2026-10-11)
+
+2026-10-10: the org spend limit stopped all three batch agents (req-219, req-10, req-220) mid-build; their isolated worktrees
+were cleaned up with no commit and no branch left, so the batch restarted from zero. On 2026-10-11 the restarted req-219 agent
+stalled (stream watchdog) with uncommitted edits — that worktree survived and the same agent was resumed with `SendMessage`.
+**How to apply:** every build brief says "commit early once a coherent part passes tests"; on an agent failure, check
+`git worktree list` + `git status` in its worktree first — resume the same agent if the worktree is there, relaunch only if not.
