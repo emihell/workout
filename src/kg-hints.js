@@ -2,8 +2,11 @@
 // block or a dialog: the box keeps whatever the seed chain put there (setLogSeed), and
 // Complete logs the typed kg exactly as before.
 //
-//   lastTime     — the routine has no kg at this set index, but history does: the named
-//                  history value ("Last time: 30 kg"), never copied into the box (DESIGN §1).
+//   lastTime     — history has a kg at this set index and it differs from the routine kg
+//                  there (a blank routine kg included): the named history value ("Last
+//                  time: 30 kg"), never copied into the box (DESIGN §1). Same kg → no note.
+//                  req-219 (DEC-122 §2) — was "routine blank only". Compared against the
+//                  routine kg, not the typed kg, so typing doesn't make the note flicker.
 //   bigJumpFrom  — the typed kg differs from the reference by MORE than 50% (exactly 50%
 //                  is not a big change). Reference = the routine kg at this index, else the
 //                  last-time kg; no reference → no note.
@@ -25,7 +28,7 @@ export function kgHints({ weighted, kg, routineKg, lastKg }) {
   if (!weighted || routineKg === undefined) return NONE
   const planned = positive(routineKg)
   const last = positive(lastKg)
-  const lastTime = planned == null ? last : null
+  const lastTime = last != null && last !== planned ? last : null
   const ref = planned ?? last
   const typed = readKg(kg).value
   const bigJumpFrom = ref != null && typed > 0 && Math.abs(typed - ref) / ref > 0.5 ? ref : null

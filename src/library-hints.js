@@ -12,6 +12,10 @@ export function isEachSide(exercise, library) {
   return libraryEntryFor(exercise, library)?.unilateral === true
 }
 
+// req-219 — the quiet line under the exercise head (log screen + review) when isEachSide.
+// "One side", not "one arm": the flag also covers legs and stretches.
+export const ONE_SIDE_LINE = 'One side at a time — all reps on one side, then the other.'
+
 // The rest block's content: the routine item's note (if any), then up to REST_CUES_MAX of the
 // resolved entry's formCues. Null when there is neither (scope 3: nothing shows).
 export function restNotesFor(item, exercise, library) {

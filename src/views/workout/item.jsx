@@ -69,7 +69,7 @@ import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCar
 import { equipmentLabel } from '../../equipment-label.js'
 import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
-import { isEachSide, restNotesFor, restNotesShowing } from '../../library-hints.js'
+import { ONE_SIDE_LINE, isEachSide, restNotesFor, restNotesShowing } from '../../library-hints.js'
 import { useExerciseLibrary } from './use-library.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
@@ -85,15 +85,19 @@ function exerciseEditorPath(routineId, item) {
 // `aside` (req-80) renders a small control beside the title — the live log screen
 // passes the "Add note" toggle here so it sits next to the exercise name.
 // req-212 (H5) — the head is the library's ExerciseHead (was ad-hoc markup here).
-function ExerciseTitle({ routineId, item, ex, bits, aside }) {
+// req-219 — `eachSide` (a unilateral library entry) adds one quiet line under the head.
+function ExerciseTitle({ routineId, item, ex, bits, aside, eachSide = false }) {
   const inLibrary = Boolean(item?.exerciseId && ex?.id === item.exerciseId)
   const name = exerciseName(item)
   return (
-    <ExerciseHead
-      title={inLibrary ? <NavLink to={exerciseEditorPath(routineId, item)} look="plain">{name}</NavLink> : name}
-      aside={aside}
-      subtitle={(bits || []).filter(Boolean).join(' · ')}
-    />
+    <>
+      <ExerciseHead
+        title={inLibrary ? <NavLink to={exerciseEditorPath(routineId, item)} look="plain">{name}</NavLink> : name}
+        aside={aside}
+        subtitle={(bits || []).filter(Boolean).join(' · ')}
+      />
+      {eachSide ? <p className="ui-sub">{ONE_SIDE_LINE}</p> : null}
+    </>
   )
 }
 
@@ -483,6 +487,7 @@ function WorkoutItemLive({ routineId, item }) {
           // carry it (itemSetPosition, workout-log.js).
           currentType === 'wu' ? 'Warm-up set' : null,
         ]}
+        eachSide={eachSide}
         aside={
           logging && !showNote ? (
             <Button variant="quiet" className="ui-addnote" onClick={() => setShowNote(true)}>
@@ -687,7 +692,7 @@ function ExerciseReview({ routineId, item }) {
     <Screen className="ui-screen--rest">
       <ExercisesLink routineId={routineId} name={active.snapshot?.routineName} />
       <WorkoutPill />
-      <ExerciseTitle routineId={routineId} item={item} ex={ex} bits={[roleTag(item.role)]} />
+      <ExerciseTitle routineId={routineId} item={item} ex={ex} bits={[roleTag(item.role)]} eachSide={eachSide} />
       <ExerciseSetupHeader item={item} ex={ex} />
       {pct != null ? <p className="ui-sub">{improvementText(pct)}</p> : null}
       {rows.length ? (

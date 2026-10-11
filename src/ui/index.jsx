@@ -742,7 +742,7 @@ export function SetLogForm({
           block or a confirm: Complete still logs it in one tap, as 0 (set-values.js
           liveSetWeight), exactly as before. Never a default weight (DESIGN core rule). */}
       {/* req-183 (DEC-102) — beside it, two more quiet notes (kg-hints.js): the last-time kg
-          when the routine has none here (named, never put in the box), and a big-change
+          when it differs from the routine kg here (req-219; named, never put in the box), and a big-change
           note on a > 50% jump. Neither blocks Complete. */}
       {weighted && readKg(weight).empty ? (
         <p className="ui-field-note">
