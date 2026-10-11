@@ -532,7 +532,7 @@ export function summaryOf(state) {
 }
 
 // ---------------------------------------------------------------------------------------
-// req-220 (DEC-123 §2) — the import preview and "Keep my history".
+// req-220 (DEC-123 §2) — the import preview, "Keep my history", and the history-safe write.
 //
 // importPreview(current, incoming): what replacing `current` (the store's data) with
 // `incoming` (applyBackup(payload).state) would change, counted by id. `current` goes through
@@ -540,11 +540,12 @@ export function summaryOf(state) {
 // (a just-finished workout has no `schemaVersion` until the next load; the migration adds it
 // on both sides). Records compare by a key-order-independent JSON string.
 //
-// `conflict` — the file would change the user's logged history on this device: a logged
-// workout changed or removed, workouts added while the device already has history, or the
-// workout in progress replaced or dropped. Only then does the import offer Keep my history /
-// Replace everything. With no history on the device there is nothing to keep (a restore onto
-// a new device takes the file's history without a choice).
+// "Logged history" = finished `workouts` + legacy `draftWorkouts` (review round 1: drafts are
+// the user's logged sets too). `conflict` — the file would change it: a record changed or
+// removed, records added while the device already has history, or the workout in progress
+// replaced or dropped. Only then does the import offer Keep my history / Replace everything.
+// With no history on the device there is nothing to keep (a restore onto a new device takes
+// the file's history without a choice).
 
 function stableJson(value) {
   return JSON.stringify(value, (_key, v) =>
@@ -574,19 +575,42 @@ function scheduleOf(state) {
   return { loopWeeks, anchor, slots, moves }
 }
 
-// The records Keep my history keeps from the device: logged workouts, the workout in progress,
-// and legacy drafts — the user's own logged data, never taken from a file.
+const loggedHistory = (state) => [...(state?.workouts || []), ...(state?.draftWorkouts || [])]
+
+// Every record that references setup: logged workouts, legacy drafts and the workout in progress.
 function historyRecords(state) {
-  return [...(state?.workouts || []), ...(state?.draftWorkouts || []), ...(state?.activeWorkout ? [state.activeWorkout] : [])]
+  return [...loggedHistory(state), ...(state?.activeWorkout ? [state.activeWorkout] : [])]
+}
+
+// What a counted area cannot show (review round 1 nit): every root field outside the counted
+// ones, schedule fields beyond loopWeeks/anchor/slots/moves, and the ORDER of the records both
+// sides share (a reorder changes no record).
+function outsideCounts(state, other) {
+  const { exercises, routines, workouts, draftWorkouts, activeWorkout: _active, schedule, ...root } = state
+  const { loopWeeks: _l, anchor: _a, slots: _s, moves: _m, ...scheduleRest } = schedule || {}
+  const shared = (records, others) => {
+    const ids = new Set((others || []).map((record) => record?.id))
+    return (records || []).map((record) => record?.id).filter((id) => ids.has(id))
+  }
+  return {
+    root,
+    scheduleRest,
+    order: [
+      shared(exercises, other.exercises),
+      shared(routines, other.routines),
+      shared(workouts, other.workouts),
+      shared(draftWorkouts, other.draftWorkouts),
+    ],
+  }
 }
 
 // DESIGN §3 / removeRoutineFromState — setup that history references is archived, not deleted.
-// Under Keep my history the kept records may name a routine or exercise the file removed: the
-// device's own copy comes back, archived (its archivedAt kept when it already had one). An
-// exercise a brought-back routine uses comes back too. Nothing is invented: every record is
-// the device's own.
-export function setupKeptForHistory(incoming, current, archivedAt) {
-  const records = historyRecords(current)
+// `records` (the history the import will write) may name a routine or exercise the file left
+// out: the device's own copy comes back, archived (its archivedAt kept when it already had one).
+// An exercise a brought-back routine uses comes back too. Nothing is invented: every record is
+// the device's own, and a reference the device can't resolve either stays as it is (migrateState
+// already shows it as "Deleted routine" / "Deleted exercise").
+export function setupKeptForHistory(incoming, records, current, archivedAt) {
   const incomingRoutines = new Set((incoming?.routines || []).map((routine) => routine.id))
   const incomingExercises = new Set((incoming?.exercises || []).map((exercise) => exercise.id))
   const routineIds = new Set(records.map((record) => record.routineId || record.snapshot?.routineId).filter(Boolean))
@@ -605,45 +629,78 @@ export function setupKeptForHistory(incoming, current, archivedAt) {
   return { routines, exercises }
 }
 
-// Keep my history: everything from the file except the device's logged records, which stay
-// exactly as they are (the same arrays/objects, so `workouts` is byte-identical when saved),
-// plus the setup they reference (setupKeptForHistory).
-export function keptHistoryState(incoming, current, archivedAt = new Date().toISOString()) {
-  const kept = setupKeptForHistory(incoming, current, archivedAt)
+// The state an import writes, on every path. `keepHistory` (Keep my history): the file, except
+// the device's logged records and workout in progress, which stay exactly as they are (the same
+// arrays/objects, so `workouts` is byte-identical when saved). Otherwise (Replace everything,
+// and every no-conflict import): the file as it is. Then, on both, setupKeptForHistory for the
+// records being written; a routine brought back archived loses its schedule slots (and their
+// moves), as removeRoutineFromState drops them. With nothing to bring back the result is the
+// file (or the Keep merge) unchanged — byte-for-byte the pre-req-220 replace.
+export function importResult(incoming, current, { keepHistory = false, archivedAt = new Date().toISOString() } = {}) {
+  const base = keepHistory
+    ? {
+        ...incoming,
+        workouts: current?.workouts || [],
+        draftWorkouts: current?.draftWorkouts || [],
+        activeWorkout: current?.activeWorkout ?? null,
+      }
+    : incoming
+  const kept = setupKeptForHistory(incoming, historyRecords(base), current, archivedAt)
+  if (!kept.routines.length && !kept.exercises.length) return base
+  const archived = new Set(kept.routines.map((routine) => routine.id))
+  const slots = (base.schedule?.slots || []).filter((slot) => !archived.has(slot.routineId))
+  const slotIds = new Set(slots.map((slot) => slot.id))
   return {
-    ...incoming,
-    workouts: current?.workouts || [],
-    draftWorkouts: current?.draftWorkouts || [],
-    activeWorkout: current?.activeWorkout ?? null,
-    routines: [...(incoming.routines || []), ...kept.routines],
-    exercises: [...(incoming.exercises || []), ...kept.exercises],
+    ...base,
+    routines: [...(base.routines || []), ...kept.routines],
+    exercises: [...(base.exercises || []), ...kept.exercises],
+    schedule: archived.size
+      ? { ...base.schedule, slots, moves: (base.schedule?.moves || []).filter((move) => slotIds.has(move.slotId)) }
+      : base.schedule,
   }
+}
+
+export function keptHistoryState(incoming, current, archivedAt = new Date().toISOString()) {
+  return importResult(incoming, current, { keepHistory: true, archivedAt })
 }
 
 export function importPreview(current, incoming) {
   const data = dataOnly(current)
   const before = importedState(data, false)
-  const history = diffById(before.workouts, incoming.workouts)
+  const history = diffById(loggedHistory(before), loggedHistory(incoming))
   const activeBefore = before.activeWorkout ? stableJson(before.activeWorkout) : null
   const activeAfter = incoming.activeWorkout ? stableJson(incoming.activeWorkout) : null
   let active = 'same'
   if (activeBefore !== activeAfter) active = activeBefore === null ? 'added' : activeAfter === null ? 'removed' : 'replaced'
-  const hasHistory = (data.workouts || []).length > 0
-  const kept = setupKeptForHistory(incoming, data, null)
+  const hasHistory = loggedHistory(data).length > 0
+  const count = (kept) => ({ routines: kept.routines.length, exercises: kept.exercises.length })
+  const keepRecords = historyRecords({ ...incoming, workouts: data.workouts, draftWorkouts: data.draftWorkouts, activeWorkout: data.activeWorkout })
+  const nothingChanged = stableJson(before) === stableJson(incoming)
   return {
-    nothingChanged: stableJson(before) === stableJson(incoming),
+    nothingChanged,
     routines: diffById(before.routines, incoming.routines),
     exercises: diffById(before.exercises, incoming.exercises),
     scheduleChanged: stableJson(scheduleOf(before)) !== stableJson(scheduleOf(incoming)),
+    // The schedule each path WRITES: importResult drops the slots of a routine it brings back
+    // archived, so a file that kept such a slot still changes the schedule.
+    scheduleChangedOn: {
+      replace: stableJson(scheduleOf(before)) !== stableJson(scheduleOf(importResult(incoming, data, { archivedAt: null }))),
+      keep: stableJson(scheduleOf(before)) !== stableJson(scheduleOf(importResult(incoming, data, { keepHistory: true, archivedAt: null }))),
+    },
     history,
     active,
+    otherChanged: !nothingChanged && stableJson(outsideCounts(before, incoming)) !== stableJson(outsideCounts(incoming, before)),
     conflict:
       history.changed > 0 ||
       history.removed > 0 ||
       (history.added > 0 && hasHistory) ||
       active === 'replaced' ||
       active === 'removed',
-    keptSetup: { routines: kept.routines.length, exercises: kept.exercises.length },
+    // What importResult brings back archived on each path (review round 1, item 1).
+    archived: {
+      replace: count(setupKeptForHistory(incoming, historyRecords(incoming), data, null)),
+      keep: count(setupKeptForHistory(incoming, keepRecords, data, null)),
+    },
   }
 }
 
@@ -658,18 +715,31 @@ function countParts(diff, noun = '') {
   return parts.join(', ')
 }
 
-// The preview as plain lines, for the confirm sheet (and tests).
-export function previewLines(preview) {
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
+
+// "2 workouts and 1 exercise kept as archived — your history uses them", or null.
+export function archivedLine({ routines, exercises }) {
+  const parts = [routines ? plural(routines, 'workout') : '', exercises ? plural(exercises, 'exercise') : ''].filter(Boolean)
+  if (!parts.length) return null
+  return `${parts.join(' and ')} kept as archived — your history uses ${routines + exercises === 1 ? 'it' : 'them'}.`
+}
+
+// The preview as plain lines, for the confirm sheet (and tests). `mode` names the path the
+// archived line describes: 'replace' (the plain confirm) or 'keep' (the choice sheet's default).
+export function previewLines(preview, mode = preview.conflict ? 'keep' : 'replace') {
   if (preview.nothingChanged) return ['Nothing changed: this file matches the data on this device.']
   const lines = [
     `Workouts: ${countParts(preview.routines) || 'unchanged'}`,
     `Exercises: ${countParts(preview.exercises) || 'unchanged'}`,
-    `Schedule: ${preview.scheduleChanged ? 'changed' : 'unchanged'}`,
+    `Schedule: ${(preview.scheduleChangedOn?.[mode] ?? preview.scheduleChanged) ? 'changed' : 'unchanged'}`,
     `Logged history: ${countParts(preview.history, 'logged workout') || 'unchanged'}`,
   ]
+  if (preview.otherChanged) lines.push('Other data: changed')
   if (preview.active === 'added') lines.push('Workout in progress: taken from the file.')
   if (preview.active === 'replaced') lines.push('Workout in progress: the file has a different one.')
   if (preview.active === 'removed') lines.push('Workout in progress: not in the file.')
+  const archived = archivedLine(preview.archived?.[mode] || { routines: 0, exercises: 0 })
+  if (archived) lines.push(archived)
   return lines
 }
 
@@ -678,17 +748,14 @@ export function previewLines(preview) {
 // (Settings/Today's existing error path) and setState is never called, so state is
 // unchanged. store.applyBackup used to run it INSIDE the setState updater, where React
 // swallowed the throw and re-threw it during render, above every ErrorBoundary.
-// req-220 — `keepHistory`: Keep my history (keptHistoryState), built inside the updater from
-// the LATEST state, so the logged records saved are the device's as they are at that moment.
-// `current` (the caller's snapshot of the same state) only feeds the returned summary.
+// req-220 — the written state (importResult: Keep my history, and the archived setup history
+// uses) is computed here too, from `current` (the store's state the import was previewed
+// against), BEFORE setState: the updater only returns the finished value, so nothing in it can
+// throw (review round 1 — a malformed stored record throws here, to the caller, with nothing
+// written).
 export function commitBackup(payload, setState, { keepHistory = false, current = null } = {}) {
   const result = applyBackup(payload)
-  if (!keepHistory) {
-    setState(() => result.state)
-    return result
-  }
-  const archivedAt = new Date().toISOString()
-  setState((latest) => keptHistoryState(result.state, latest, archivedAt))
-  const state = keptHistoryState(result.state, dataOnly(current), archivedAt)
-  return { state, summary: summaryOf(state), keptHistory: true }
+  const state = importResult(result.state, dataOnly(current), { keepHistory })
+  setState(() => state)
+  return { state, summary: summaryOf(state), ...(keepHistory ? { keptHistory: true } : {}) }
 }

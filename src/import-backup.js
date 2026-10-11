@@ -141,21 +141,22 @@ export function importMode(answer, preview) {
 export const HISTORY_CHANGED_TITLE = 'This file changes your logged history'
 export const KEEP_HISTORY_LINE =
   'Keep my history takes the workouts, exercises and schedule from the file and keeps your logged history on this device as it is. A copy of your current data downloads first.'
+// Review round 1 — "Replace everything" wears the sheet's destructive look (ink-filled, as the
+// confirm's Replace / Delete button; the library has no separate danger variant, DEC-017).
+// Keep my history stays first and is the default answer (`true`).
 export const IMPORT_CHOICES = [
   { value: 'keep', label: 'Keep my history' },
-  { value: 'replace', label: 'Replace everything' },
+  { value: 'replace', label: 'Replace everything', destructive: true },
 ]
 
-// The default `ask`: the in-app sheet with the preview above the question (req-220).
+// The default `ask`: the in-app sheet with the preview above the question (req-220). On a
+// conflict the preview's archived line describes Keep (the default); the plain confirm's
+// describes the replace it confirms.
 export function askImport(message, preview) {
   if (!preview) return askConfirm(message, { confirmLabel: 'Replace' })
   const lines = previewLines(preview).join('\n')
   if (preview.conflict) {
-    const kept = preview.keptSetup.routines + preview.keptSetup.exercises
-    const keptLine = kept
-      ? `\nYour history uses ${kept} ${kept === 1 ? 'item' : 'items'} the file removes; Keep my history keeps ${kept === 1 ? 'it' : 'them'}, archived.`
-      : ''
-    return askChoice(`${lines}\n\n${KEEP_HISTORY_LINE}${keptLine}`, { title: HISTORY_CHANGED_TITLE, choices: IMPORT_CHOICES })
+    return askChoice(`${lines}\n\n${KEEP_HISTORY_LINE}`, { title: HISTORY_CHANGED_TITLE, choices: IMPORT_CHOICES })
   }
   return askConfirm(`${lines}\n\n${message}`, { confirmLabel: 'Replace' })
 }

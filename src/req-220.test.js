@@ -259,7 +259,7 @@ describe('req-220 AC3 (failure case) — a logged set kg altered', () => {
     const store = device()
     const preview = importPreview(store, applyBackup(altered(store)).state)
     assert.equal(preview.conflict, true)
-    assert.equal(previewLines(preview).at(-1), 'Logged history: 1 logged workout changed')
+    assert.ok(previewLines(preview).includes('Logged history: 1 logged workout changed'))
   })
 
   it('Keep my history (the default answer) → stored workouts byte-identical; routines from the file', async () => {
@@ -362,7 +362,7 @@ describe('req-220 — Keep my history: the open calls', () => {
     ).state
     const preview = importPreview(current, incoming)
     assert.equal(preview.conflict, false, 'history itself is unchanged')
-    assert.deepEqual(preview.keptSetup, { routines: 1, exercises: 1 })
+    assert.deepEqual(preview.archived, { replace: { routines: 1, exercises: 1 }, keep: { routines: 1, exercises: 1 } })
     const kept = keptHistoryState(incoming, current, '2026-10-11T00:00:00.000Z')
     assert.deepEqual(kept.routines.map((routine) => [routine.id, routine.archivedAt]), [['rtn-a', '2026-10-11T00:00:00.000Z']])
     assert.deepEqual(kept.exercises.find((exercise) => exercise.id === 'ex-press').archivedAt, '2026-10-11T00:00:00.000Z')
@@ -387,7 +387,7 @@ describe('req-220 — Keep my history: the open calls', () => {
     const incoming = applyBackup(file).state
     const preview = importPreview(store, incoming)
     assert.equal(preview.conflict, true)
-    assert.equal(previewLines(preview).at(-1), 'Logged history: 1 logged workout added')
+    assert.ok(previewLines(preview).includes('Logged history: 1 logged workout added'))
     assert.equal(keptHistoryState(incoming, store).workouts.length, 13)
   })
 
@@ -416,6 +416,8 @@ describe('req-220 — through the real in-app sheet (the default ask)', () => {
     assert.equal(pending.title, HISTORY_CHANGED_TITLE)
     assert.deepEqual(pending.choices, IMPORT_CHOICES)
     assert.deepEqual(IMPORT_CHOICES.map((choice) => choice.label), ['Keep my history', 'Replace everything'])
+    // review round 1 item 7 — Replace everything is the destructive one; Keep is not.
+    assert.deepEqual(IMPORT_CHOICES.map((choice) => Boolean(choice.destructive)), [false, true])
     assert.match(pending.message, /Logged history: 1 logged workout removed/)
     assert.match(pending.message, /A copy of your current data downloads first\./)
     answerConfirm('keep')
@@ -441,5 +443,153 @@ describe('req-220 — through the real in-app sheet (the default ask)', () => {
     assert.equal(pending.confirmLabel, 'Replace')
     answerConfirm(false)
     assert.equal(await done, null)
+  })
+})
+
+// ── Review round 1 ──────────────────────────────────────────────────────────────────
+const dangling = (state) => {
+  const routines = new Set(state.routines.map((routine) => routine.id))
+  const exercises = new Set(state.exercises.map((exercise) => exercise.id))
+  const records = [...state.workouts, ...state.draftWorkouts, ...(state.activeWorkout ? [state.activeWorkout] : [])]
+  return [
+    ...records.filter((record) => !routines.has(record.routineId)).map((record) => `routine ${record.routineId} (${record.id})`),
+    ...records.flatMap((record) => record.sets.filter((set) => !exercises.has(set.exerciseId)).map((set) => `exercise ${set.exerciseId} (${record.id})`)),
+    ...state.schedule.slots.filter((slot) => !routines.has(slot.routineId)).map((slot) => `slot ${slot.id}`),
+  ]
+}
+
+describe('req-220 review round 1 — item 1: no import hard-deletes setup that history uses', () => {
+  it('PROBE: the file drops all 3 routines and leaves history alone → plain replace; the 3 come back archived, no dangling refs, the preview says so', async () => {
+    const store = device()
+    const file = exported(store, (state) => {
+      state.routines = []
+    })
+    const { calls, done } = run(store, file, true)
+    await done
+    const { preview } = calls.asked[0]
+    assert.equal(preview.conflict, false)
+    assert.deepEqual(previewLines(preview), [
+      'Workouts: 3 removed',
+      'Exercises: unchanged',
+      'Schedule: changed', // the 3 archived routines' slots are dropped (item 6)
+      'Logged history: unchanged',
+      '3 workouts kept as archived — your history uses them.',
+    ])
+    const saved = JSON.parse(disk.get(KEY))
+    assert.deepEqual(saved.routines.map((routine) => routine.id).sort(), ['sess-lower', 'sess-push-pull', 'sess-upper'])
+    assert.ok(saved.routines.every((routine) => typeof routine.archivedAt === 'string'), 'archived')
+    assert.deepEqual(dangling(saved), [])
+    // item 6 — the archived routines' slots go, as removeRoutineFromState drops them
+    assert.equal(saved.schedule.slots.length, 0)
+    assert.equal(saved.workouts.length, 13)
+  })
+
+  it('an exercise history uses, dropped by the file, comes back archived (exercise only)', async () => {
+    const store = device()
+    const used = store.workouts[0].sets[0].exerciseId
+    const file = exported(store, (state) => {
+      state.exercises = state.exercises.filter((exercise) => exercise.id !== used)
+      for (const routine of state.routines) routine.exercises = routine.exercises.filter((item) => item.exerciseId !== used)
+    })
+    const { calls, done } = run(store, file, true)
+    await done
+    assert.ok(previewLines(calls.asked[0].preview).includes('1 exercise kept as archived — your history uses it.'))
+    const saved = JSON.parse(disk.get(KEY))
+    assert.ok(saved.exercises.find((exercise) => exercise.id === used).archivedAt)
+    assert.deepEqual(dangling(saved), [])
+  })
+
+  it("Replace everything: the references come from the file's own workouts", async () => {
+    const store = device()
+    const file = exported(store, (state) => {
+      state.workouts = state.workouts.filter((workout) => workout.routineId !== 'sess-upper') // history changed → conflict
+      state.routines = state.routines.filter((routine) => routine.id !== 'sess-lower') // still used by the file's workouts
+      state.routines = state.routines.filter((routine) => routine.id !== 'sess-upper') // used by none of the file's
+      state.schedule.slots = state.schedule.slots.filter((slot) => slot.routineId === 'sess-push-pull')
+    })
+    const { calls, done } = run(store, file, 'replace')
+    await done
+    assert.equal(calls.asked[0].preview.conflict, true)
+    assert.deepEqual(calls.asked[0].preview.archived, { replace: { routines: 1, exercises: 0 }, keep: { routines: 2, exercises: 0 } })
+    const saved = JSON.parse(disk.get(KEY))
+    assert.deepEqual(saved.routines.filter((routine) => routine.archivedAt).map((routine) => routine.id), ['sess-lower'])
+    assert.equal(saved.routines.some((routine) => routine.id === 'sess-upper'), false, 'unused by the written history: gone')
+    assert.deepEqual(dangling(saved), [])
+  })
+
+  it('nothing to bring back → the replace writes exactly the file (the pre-req-220 replace)', () => {
+    const store = device()
+    const file = exported(store, (state) => (state.routines[0].name = 'x'))
+    const incoming = applyBackup(file).state
+    const written = []
+    commitBackup(file, (updater) => written.push(updater()), { current: { ...store } })
+    assert.equal(JSON.stringify(written[0]), JSON.stringify(incoming))
+  })
+})
+
+describe('req-220 review round 1 — item 6: Keep drops the slots of a routine it brings back archived', () => {
+  it('the file removed rtn-a but kept its slot and move → Keep: rtn-a archived, slot and move gone', () => {
+    const current = fullState()
+    const incoming = applyBackup(
+      exported(makeStore(current), (state) => {
+        state.routines = []
+        state.workouts[0].overallNote = 'edited' // a conflict, so Keep is offered
+      }),
+    ).state
+    assert.equal(importPreview(current, incoming).conflict, true)
+    assert.equal(incoming.schedule.slots.length, 1)
+    const kept = keptHistoryState(incoming, current, 'T')
+    assert.deepEqual(kept.routines.map((routine) => [routine.id, routine.archivedAt]), [['rtn-a', 'T']])
+    assert.deepEqual(kept.schedule.slots, [])
+    assert.deepEqual(kept.schedule.moves, [])
+  })
+})
+
+describe('req-220 review round 1 — item 2: legacy drafts are logged history', () => {
+  const draft = () => ({ ...fixture().workouts[0], id: 'draft-1', finishedAt: null })
+  it('a file without the device draft → a conflict, "1 logged workout removed"; Keep keeps it; Replace drops it', async () => {
+    const keep = device({ ...fixture(), draftWorkouts: [draft()] })
+    const drafts = JSON.stringify(keep.draftWorkouts)
+    const file = exported(keep, (state) => (state.draftWorkouts = []))
+    const { calls, done } = run(keep, file, true)
+    await done
+    assert.equal(calls.asked[0].preview.conflict, true)
+    assert.ok(previewLines(calls.asked[0].preview).includes('Logged history: 1 logged workout removed'))
+    assert.equal(JSON.stringify(JSON.parse(disk.get(KEY)).draftWorkouts), drafts)
+
+    const replace = device({ ...fixture(), draftWorkouts: [draft()] })
+    await run(replace, exported(replace, (state) => (state.draftWorkouts = [])), 'replace').done
+    assert.deepEqual(JSON.parse(disk.get(KEY)).draftWorkouts, [])
+  })
+  it('a draft edited by the file → "1 logged workout changed"', () => {
+    const store = device({ ...fixture(), draftWorkouts: [draft()] })
+    const incoming = applyBackup(exported(store, (state) => (state.draftWorkouts[0].sets[0].weight = 1))).state
+    const preview = importPreview(store, incoming)
+    assert.equal(preview.conflict, true)
+    assert.deepEqual(preview.history, { added: 0, changed: 1, removed: 0, unchanged: 13 })
+  })
+})
+
+describe('req-220 review round 1 — item 3: a change outside the counts says "Other data: changed"', () => {
+  it('a reorder of the exercises', () => {
+    const store = device()
+    const preview = importPreview(store, applyBackup(exported(store, (state) => state.exercises.reverse())).state)
+    assert.equal(preview.nothingChanged, false)
+    assert.deepEqual(previewLines(preview), ['Workouts: unchanged', 'Exercises: unchanged', 'Schedule: unchanged', 'Logged history: unchanged', 'Other data: changed'])
+  })
+  it('legacyRecommendations / plannedWorkouts', () => {
+    const store = device()
+    const edits = [
+      (state) => (state.legacyRecommendations = { x: { sets: 1, targets: [], suggestedWeights: [] } }),
+      (state) => (state.plannedWorkouts = [{ id: 'p', items: [] }]),
+    ]
+    for (const edit of edits) {
+      assert.ok(previewLines(importPreview(store, applyBackup(exported(store, edit)).state)).includes('Other data: changed'))
+    }
+  })
+  it('not shown when only counted areas changed', () => {
+    const store = device()
+    const lines = previewLines(importPreview(store, applyBackup(exported(store, (state) => (state.routines[0].name = 'x'))).state))
+    assert.equal(lines.includes('Other data: changed'), false)
   })
 })
