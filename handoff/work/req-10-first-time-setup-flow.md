@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — rescanned 2026-10-10; decided DEC-123 §1. Builder: Builder session or throwaway agent (ux-feel).
+**Status: BUILT, NOT merged** **Lane: ui** — rescanned 2026-10-10; decided DEC-123 §1. Builder: Builder session or throwaway agent (ux-feel).
 
 ## Decided build (DEC-123 §1, 2026-10-10) — supersedes the per-set effort steps in the original text below
 
