@@ -668,6 +668,9 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
+- **`plan closeout` exits 1 silently when the req doc has no `# ` title** (2026-10-11, req-10): `co_title=$(grep -m1 '^# ' …)`
+  fails under `set -euo pipefail` before any message. Make the title optional (fall back to the req id) or print why. Small tooling req.
+
 - **dates-tz guard asserts the exact case count** (L-045, req-185 report): `/# pass [1-9]/` at `src/dates-tz.test.js`
   passes on an empty cases file (`# pass 1`). Assert the count `dates-tz.cases.js` defines (9 today). Small, bug lane.
 
