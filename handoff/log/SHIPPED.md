@@ -2526,3 +2526,20 @@ Reviewer (independent, 2 rounds): round 1 two should-fix (bodyweight seeded from
 nit + latent → fixed in 4f112ba; round 2 "No blockers." Known limit: a kg/reps typed on set 2 is replaced if set 1 is then
 edited. `(unconfirmed)` for Emilio: an accepted suggestion carries to sets 3+ (DEC-052); bodyweight missed reps → no seed (plain
 carry); Easy on per-set targets (12/10/8) gives set 1 reps + 1. `reports/req-10.md`.
+
+## req-220 — "Export for your AI", and an import that shows what changed (Keep my history)  (2026-10-11)
+
+**req-220** (DEC-121 / DEC-123 §2–3, data lane; throwaway agent). "Export for your AI" on Backup & data (`workout-for-ai-<date>.json`,
+`assistant` incl. a `FIELDS` map of every stored field); every import previews counts first; a logged-history change offers Keep my
+history (default) / Replace everything; setup the resulting history references is restored archived on every write path (only
+what records reference); the write is computed before `setState`. No schema bump; 0 records rewritten on load. Test edits:
+import-backup (exact → endsWith + lines), safe-import regex, req-198, req-122 (23 with req-10).
+
+Gate (data): `check: green — lint, skills, no import cycles, 119 test file(s), and the build all passed.` (Planner, throwaway
+worktree, 48fea6f); branch smoke green on `plan qa`; scripted list 1–3, 5–9 + archive case YES (Keep → 13 workouts byte-identical;
+safety copy before each write; Cancel writes and downloads nothing).
+
+Reviewer (independent, 2 rounds + Planner read of round 3): round 1 two should-fix (history-referenced setup hard-deleted on a
+no-conflict import; drafts invisible) + 2 latent + 3 nits → fixed (fe06a55, 7223d32); round 2 one should-fix (an unused exercise
+restored) + nit → fixed in 0d8edb4; "No blockers." both rounds. Emilio's eyes; backup reminded (DEC-046). Emilio: "merge".
+`reports/req-220.md`.

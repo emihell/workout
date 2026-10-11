@@ -1,4 +1,4 @@
-**Status: READY** **Lane: data** — import replaces stored state (a bulk write): independent reviewer, backup reminder,
+**Status: BUILT, NOT merged** **Lane: data** — import replaces stored state (a bulk write): independent reviewer, backup reminder,
 Emilio's eyes before merge (DEC-035 carve-out).
 
 # req-220 — "Export for your AI": a current, self-describing export, and an import that shows what changed
