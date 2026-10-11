@@ -43,7 +43,7 @@ answered?, seed?: { itemKey, workIndex: 1, weight?, reps?, reason } }`.
 
 - `node --test src/req-10.test.js` → `ℹ tests 28 … ℹ pass 28 ℹ fail 0`. That covers:
   - set-2 seed cases: Easy / Medium / Hard / missed / no step (n/a, blank) / Alt 4/5 / Steps 4/5 /
-    lightest-weight floor / assisted / range target / bodyweight ±1 / failure nulls;
+    lightest-weight floor / assisted / range target / bodyweight (Easy → logged reps + 1, review round 1) / failure nulls;
   - prompt and sheet conditions;
   - the seed seam;
   - transient-state load and finish;
@@ -78,7 +78,7 @@ answered?, seed?: { itemKey, workIndex: 1, weight?, reps?, reason } }`.
    - "Same kg — already the lightest weight"
    - "Same kg — assisted, kept as is"
    - "Same kg — the target isn't a single number"
-   - "Same reps — already at 1 rep"
+   - (removed in review round 1)
    - Easy at the top of a fixed `weightOptions` list holds rather than stepping down.
 
 ## Workflow
@@ -94,4 +94,37 @@ answered?, seed?: { itemKey, workIndex: 1, weight?, reps?, reason } }`.
   times", "Up one step — set 1 felt easy"). Plus the extra hold, bodyweight and guide wording above.
   All of it is Emilio's at the ux-feel gate.
 - **Candidate DEC:** choice 1 (accepting the suggestion counts as this session's kg change).
+- **Review round 1** (independent reviewer, no blockers; fixed in 4f112ba). All four items held
+  against the code.
+  1. **Bodyweight uses set 1's logged reps.** Easy → logged reps + 1 ("One more rep — set 1 felt
+     easy"). Medium, Hard and missed reps → no seed, so set 2 gets the plain carry and no reason line.
+     - Test rewritten with the behaviour: target 10, set 1 did 15 → Easy 16, Medium/Hard null.
+     - Missed 6/10 → null for every answer.
+     - Rendered check: Medium → set 2 reps 15, no reason line.
+     - The "Same reps — already at 1 rep" wording went with the old rule.
+  2. **Editing set 1 re-seeds set 2.**
+     - Editing set 1 in the edit sheet before set 2 is logged recomputes the seed from the edited
+       set with the same stored answer (`setupAfterSetOneEdit`). If the answer no longer gives a
+       seed, the seed is dropped.
+     - The seed now records the kg override that was current when it was written
+       (`overrideWeight`). `setupSeedFor` ignores the seed once a newer override exists, so the
+       user's own later kg wins, including after a reload.
+     - Rendered test: 20 → Easy → 22.5; edit set 1 to 30 → 32.5 with the same reason; a reload keeps
+       32.5.
+     - Known limit: kg typed on set 2 before set 1 is edited is replaced by the new seed. The form
+       remounts and the draft is read once per set (req-125).
+  3. **The guide line and the sheet are tied to the item.** The entry now stores the `itemKey` the
+     prompt was answered on. A second item of the same exercise shows no prompt, guide or sheet
+     (rendered test).
+  4. **The answer is saved from the current workout.** The answer patch is now a functional
+     `patchActive`, built from the workout at answer time.
+     - `activePatchedState` (shared, `state-reducers.js`) now also accepts a function. Object patches
+       behave exactly as before.
+     - Because a function patch now exists, the edit-sheet refresh is queued after
+       `updateActiveSet` and the override write, so it sees both.
+  - Receipts:
+    - `node --test src/req-10.test.js` → `# tests 33 # pass 33 # fail 0`
+    - `node --test` → `# tests 1760 # pass 1760 # fail 0`
+    - `./check` → `check: green — lint, skills, no import cycles, 115 test file(s), and the build all passed.`
+    - `node scripts/smoke.mjs`, run after commit 4f112ba → `smoke: green — 12 steps (build 0.3s, browser 4.6s)`
 - `handoff/` untouched. Not merged, not pushed.
