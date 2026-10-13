@@ -584,6 +584,34 @@ gzip) now loads on the first log-screen open — "each side" can appear a beat l
 - **H19 — start values from height / weight / level.** **Conflicts with DESIGN §1 and DEC-012** (rejected: an initial weight from a heuristic).
   No body data stored (`persistence.js:110-121`).
 
+### Gym-flow notes — batch 6, Emilio 2026-10-10..13 (in-app feedback JSON, app `0f9a6ce` / `10c4724`)
+
+Pasted 2026-10-13. [measured] `git log 10c4724..main -- src` is empty → I1..I11 apply to live code. Code facts from a read-only
+rescan of `main` (2026-10-13); paths under `src/`. **Status: recommendations to Emilio, nothing decided.**
+
+- **I1 — tap a workout on Home → a quick-view sheet: what it is, Edit, Swap for this day only (permanent swaps stay in Schedule).**
+  Today's workout name is a plain `<p>` (`views/Today.jsx:157-161`); only Start / StartChooser act. A one-date *move* exists
+  (req-211, `Schedule.jsx:150-163` → `store.moveSlotOnDate`, `store.jsx:137-140`); a one-date *swap* does not → a new override kind
+  in saved state (ask-gate #2). Reusable sheet: `ConfirmSheet` / `askChoice` (`ui/confirm.js:27,35`); no general popover.
+- **I2, I4, I6, I8 — "did we remove effort per set?", "effort by set or whole exercise?", "what is effort –?"** Effort is once per
+  exercise on the review screen by decision (DEC-119 §1). The "–" is the clearable SegmentedControl's empty segment
+  (`ui/index.jsx:66`), selected by default because nothing is preselected (`:72`) → reads as an option called "–". Same control in
+  History set edit (`views/set-edit.jsx:189-194`).
+- **I3 — "first time I open an exercise, should I not get the Go?"** The GO pill (`ui/index.jsx:389-415`, `views/workout/rest.jsx`)
+  is hidden until a set is logged: `currentWorkoutItem` returns null with no logged set (`workout-log.js:1067`).
+- **I5 — Start → straight to the first exercise, maybe a 5 s countdown with Replace / Skip; "give me some options".** Start always
+  lands on the overview list (`workout-actions.js:55-66`); Continue resumes at the first not-done exercise (`:24-31`).
+- **I7 — "now we go ex to ex, are we missing functionality?"** Review → `Next: <name>` (`item.jsx:796-799`, `nextNotDoneItem`
+  `workout-log.js:840-849`, wraps); the overview list is still there, just never on the path. Nothing removed.
+- **I9 — show how much of the whole workout is left, maybe in the GO pill.** Nothing shows "N of M" anywhere; the pill shows only
+  "set N/M" of the current exercise (`workout-log.js:1086,1116`).
+- **I10 — plank needs a timer.** A countdown exists (`DurationTimer`, `ui/index.jsx:440-488`) but only for `hasDuration` exercises.
+  The seeded Plank (`db.json:75-82`) has no `hasDuration`; library-created Planks do (req-180, `exerciseCatalog.js:216-232`).
+  User fix today: exercise settings → timed (`views/Exercises.jsx:423`). Logs typed seconds, not actual (`ui/index.jsx:437-438`).
+- **I11 — forgot to close a workout; the time is wrong.** Duration isn't stored; it's `finishedAt − startedAt` (`history-queries.js:
+  265-270`), `finishedAt` stamped at save (`workout-log.js:187,200`) → the whole gap counts. No stale-workout handling; past 6 h it's
+  an "in progress" peek row with Continue (`current-workout.js:10-17`, `Today.jsx:265-280`). Sets carry `loggedAt` since req-212.
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
