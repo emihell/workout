@@ -239,6 +239,19 @@ export function findInFromChain(from, match) {
   return null
 }
 
+// req-225 review round 1 (DEC-126 §1) — a scheduled-workout path's slot segment may carry the
+// date of a one-day swap it stands for: `{slotId}@YYYY-MM-DD` (`on`). The editor's base path
+// carries it, so every sub-screen (an exercise, Add exercise — they drop `from`) resolves the
+// same routine as the screen it came from, whatever today is. A segment whose `@` suffix is not
+// a date is a plain slot id. Slot ids are `slot-…` (uid) and never hold `@`.
+export function slotSegment(segment) {
+  const at = String(segment).lastIndexOf('@')
+  if (at > 0 && /^\d{4}-\d{2}-\d{2}$/.test(segment.slice(at + 1))) {
+    return { slotId: segment.slice(0, at), on: segment.slice(at + 1) }
+  }
+  return { slotId: segment }
+}
+
 // The route shape of a path (no query), or null when no route matches.
 function matchRoute(rawPath) {
   const parts = String(rawPath).split('/').filter(Boolean)
@@ -262,7 +275,7 @@ function matchRoute(rawPath) {
       name: 'schedule-slot',
       week: Number(parts[1]),
       weekday: Number(parts[2]),
-      slotId: parts[3],
+      ...slotSegment(parts[3]),
       screen: 'detail',
     }
   }
@@ -273,7 +286,7 @@ function matchRoute(rawPath) {
         name: 'schedule-slot',
         week: Number(parts[1]),
         weekday: Number(parts[2]),
-        slotId: parts[3],
+        ...slotSegment(parts[3]),
         ...nested,
       }
     }
@@ -283,7 +296,7 @@ function matchRoute(rawPath) {
       name: 'schedule-slot',
       week: Number(parts[1]),
       weekday: Number(parts[2]),
-      slotId: parts[3],
+      ...slotSegment(parts[3]),
       screen: 'detail',
     }
   }

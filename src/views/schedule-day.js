@@ -203,18 +203,27 @@ export function slotScreenDate(schedule, week, weekday, slotId, from, now = new 
   return slotsOn(schedule, now).some((slot) => slot.id === slotId) ? dateKey(now) : null
 }
 
-// req-225 (DEC-125 §5) — the slot as that screen shows it: on the screen's date (slotScreenDate:
-// the dated day screen it was opened from, else today when the slot is on today), the slot as
-// slotsOn has it — the swapped-in routine (`swappedFrom` set) when a one-date swap is on it.
-// The date rule is slotScreenDate's, not "a dated `from` only", because the screen's own
-// sub-screens (an exercise of the routine, Add exercise) carry no `from` (routine-nav.js):
-// they must keep resolving the same routine, or an item of the swapped-in routine is
-// "Not found". No date → the slot itself (the recurring plan).
-export function slotScreenSlot(schedule, week, weekday, slot, from, now = new Date()) {
-  if (!slot) return slot
-  const date = slotScreenDate(schedule, week, weekday, slot.id, from, now)
-  if (!date) return slot
-  return slotsOn(schedule, date).find((candidate) => candidate.id === slot.id) || slot
+// req-225 (DEC-125 §5; review round 1, DEC-126 §1) — the slot as the scheduled-workout screen
+// shows it, and the swap date its sub-screens must carry (`on`, null when none). A one-day swap
+// shows ONLY where it applies: the path's own `on` (the editor's base path carries it, so a
+// sub-screen — which drops `from` — resolves the parent's routine on any day), else a DATED day
+// screen of this week/weekday as `from` (Home's sheet Edit; a dated day screen's row, today's or a
+// Coming up date's). The Whole plan (no `from`, `/schedule`, the undated day screen) always opens
+// the slot's OWN routine, even on a swapped day — its row names that one. No clock fallback.
+export function slotScreenSlot(schedule, week, weekday, slot, from, on = null, now = new Date()) {
+  if (!slot) return { slot, on: null }
+  let date = null
+  if (on && dateKey(on) === on) {
+    date = on
+  } else {
+    const day = from ? parseRoute(from) : null
+    if (day?.name === 'schedule-day' && day.week === Number(week) && day.weekday === Number(weekday)) {
+      date = dayScreenDate(schedule, week, weekday, day.from, day.date, now)
+    }
+  }
+  if (!date) return { slot, on: null }
+  const shown = slotsOn(schedule, date).find((candidate) => candidate.id === slot.id)
+  return shown?.swappedFrom ? { slot: shown, on: date } : { slot, on: null }
 }
 
 // req-214 — that screen's primary Start, or null for none. No Start on an empty routine
@@ -227,9 +236,9 @@ export function slotScreenSlot(schedule, week, weekday, slot, from, now = new Da
 export function slotStart({ workouts, schedule, activeWorkout }, routine, slotId, date, now = new Date()) {
   if (!routineStartable(routine)) return null
   const todayKey = dateKey(now)
-  // req-225 — tagged only when this routine is what the slot stands for today: from the Whole
-  // plan, a slot swapped for today shows its own routine, which then starts off-schedule (as on
-  // any other date) rather than as today's spot of a different routine.
+  // req-225 (DEC-126 §1) — tagged only when this routine is what the slot stands for today. The
+  // Whole plan opens a slot swapped for today with its OWN routine: that Start is off-schedule
+  // (as on any other date), never today's spot of the swapped-in routine.
   const tagged =
     date === todayKey && slotsOn(schedule, now).some((slot) => slot.id === slotId && slot.routineId === routine.id)
   const options = tagged ? spotStartOptions(slotId, todayKey) : null

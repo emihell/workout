@@ -111,10 +111,11 @@ function Screen() {
   if (route.name === 'schedule-slot') {
     return (
       <ScheduleSlot
-        key={`${route.week}-${route.weekday}-${route.slotId}-${route.screen}-${route.itemId}-${route.exerciseId}`}
+        key={`${route.week}-${route.weekday}-${route.slotId}-${route.on}-${route.screen}-${route.itemId}-${route.exerciseId}`}
         week={route.week}
         weekday={route.weekday}
         slotId={route.slotId}
+        on={route.on}
         screen={route.screen}
         itemId={route.itemId}
         exerciseId={route.exerciseId}

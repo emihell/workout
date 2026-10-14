@@ -15,7 +15,9 @@ import { migrateState, normaliseSwaps, SCHEMA_VERSION } from './model.js'
 import { applyBackup, buildBackup, importResult, undocumentedFields } from './exchange.js'
 import { removeRoutineFromState, slotRemovedState, slotSwappedOnDateState } from './state-reducers.js'
 import { slotScreenSlot, slotStart, swapChoices, swappedFromText, todaySlotEditPath } from './views/schedule-day.js'
-import { parseRoute } from './route.js'
+import { parseRoute, slotSegment, withFrom } from './route.js'
+import { slotMovedOnDateState } from './state-reducers.js'
+import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const h = React.createElement
@@ -278,17 +280,40 @@ describe('screen helpers', () => {
     assert.equal(day.date, THU)
     assert.equal(day.from, '/')
   })
-  it('slotScreenSlot: the screen\'s date (dated from, else today) → the swapped slot; another day → the slot itself', () => {
+  // review round 1 (DEC-126 §1) — replaces the round-0 test, whose "no from → swapped" case is
+  // now wrong: the Whole plan always opens the slot's own routine.
+  it('slotScreenSlot: Whole plan (4 `from` shapes) → own routine even on a swapped today', () => {
     const schedule = sched({ swaps: [SWAP_THU] })
-    const from = `/schedule/0/4?date=${THU}&from=%2F`
-    assert.equal(slotScreenSlot(schedule, 0, 4, SLOTS[1], from, NOW).routineId, 'sess-upper')
-    // a sub-screen (no `from`) on the swap's date keeps the swapped-in routine
-    assert.equal(slotScreenSlot(schedule, 0, 4, SLOTS[1], null, NOW).routineId, 'sess-upper')
-    // Whole plan on another day: the recurring slot
-    const wed = new Date(2026, 9, 7, 12)
-    assert.equal(slotScreenSlot(schedule, 0, 4, SLOTS[1], '/schedule', wed).routineId, 'sess-lower')
+    for (const from of [null, '/schedule', '/schedule/0/4', `/schedule/0/4?from=${encodeURIComponent('/schedule')}`]) {
+      const shown = slotScreenSlot(schedule, 0, 4, SLOTS[1], from, null, NOW)
+      assert.equal(shown.slot.routineId, 'sess-lower', `from ${from}`)
+      assert.equal(shown.on, null)
+    }
+  })
+  it('slotScreenSlot: today\'s dated day screen → swapped, with `on`; the path\'s `on` → swapped on any day', () => {
+    const schedule = sched({ swaps: [SWAP_THU] })
+    for (const from of [`/schedule/0/4?from=%2F`, `/schedule/0/4?date=${THU}&from=%2F`]) {
+      const shown = slotScreenSlot(schedule, 0, 4, SLOTS[1], from, null, NOW)
+      assert.equal(shown.slot.routineId, 'sess-upper', `from ${from}`)
+      assert.equal(shown.on, THU)
+    }
+    // a sub-screen (no `from`, the base path's `@date`) — even the next day (editor left open past midnight)
+    const fri = new Date(2026, 9, 9, 0, 5)
+    assert.equal(slotScreenSlot(schedule, 0, 4, SLOTS[1], null, THU, fri).slot.routineId, 'sess-upper')
     // next week's dated screen: the swap is for one date only
-    assert.equal(slotScreenSlot(schedule, 0, 4, SLOTS[1], `/schedule/0/4?date=2026-10-15&from=%2F`, NOW).routineId, 'sess-lower')
+    assert.equal(slotScreenSlot(schedule, 0, 4, SLOTS[1], `/schedule/0/4?date=2026-10-15&from=%2F`, null, NOW).slot.routineId, 'sess-lower')
+    // an `on` with no swap there: the slot itself, no `on` carried
+    assert.deepEqual(slotScreenSlot(schedule, 0, 4, SLOTS[1], null, '2026-10-15', NOW), { slot: SLOTS[1], on: null })
+  })
+  it('slotSegment: `{slotId}@YYYY-MM-DD` parses to slotId + on; anything else is the slot id', () => {
+    assert.deepEqual(slotSegment('slot-a@2026-10-08'), { slotId: 'slot-a', on: '2026-10-08' })
+    assert.deepEqual(slotSegment('slot-a'), { slotId: 'slot-a' })
+    assert.deepEqual(slotSegment('slot-a@x'), { slotId: 'slot-a@x' })
+    const route = parseRoute('/schedule/0/4/s-thu@2026-10-08/exercise/item-1')
+    assert.equal(route.name, 'schedule-slot')
+    assert.equal(route.slotId, 's-thu')
+    assert.equal(route.on, '2026-10-08')
+    assert.equal(route.screen, 'exercise')
   })
   it('slotStart: today\'s spot is tagged only for the routine it stands for today', () => {
     const state = { workouts: [], schedule: sched({ swaps: [SWAP_THU] }), activeWorkout: null }
@@ -421,7 +446,7 @@ describe('AC6 Home → sheet → Edit / Swap for today / Back', () => {
     const item = [...view.container.querySelectorAll('.ui-row__stack a')][0]
     assert.equal(Boolean(item), true)
     await tap(item)
-    assert.match(window.location.hash, /^#\/schedule\/0\/4\/s-thu\/exercise\//)
+    assert.match(window.location.hash, new RegExp(`^#/schedule/0/4/s-thu@${THU}/exercise/`)) // round 1: the base path carries the swap date
     assert.equal(view.text().includes('Not found'), false)
   })
 })
@@ -448,5 +473,84 @@ describe('AC7 failure case: the swapped-in routine is archived after the swap', 
     await go('/')
     assert.equal(Boolean(nameButton('Lower Body')), true)
     assert.equal(block().textContent.includes('swapped from'), false)
+  })
+})
+
+// ---- review round 1 (DEC-126) ----
+
+const SAT = '2026-10-10'
+const button = (label) => [...document.body.querySelectorAll('button')].find((b) => b.textContent.trim() === label)
+const link = (text) => [...view.container.querySelectorAll('a')].find((a) => a.textContent.trim() === text)
+
+describe('round 1 §1 — the Whole plan opens the own routine; a swap only where it applies', () => {
+  it('Whole plan (no from, and from the undated day) on a swapped today → own routine (Lower)', async () => {
+    await open(v9(sched({ swaps: [SWAP_THU] })), '/schedule/0/4/s-thu')
+    assert.equal(view.text().includes('Lower Body'), true)
+    assert.equal(view.text().includes('Upper Body'), false)
+    await go(withFrom('/schedule/0/4/s-thu', '/schedule/0/4'))
+    assert.equal(view.text().includes('Lower Body'), true)
+    assert.equal(view.text().includes('Upper Body'), false)
+  })
+  it('a future-dated (imported) swap from Coming up → editor and an exercise sub-screen both show the swapped routine', async () => {
+    // next Tue (in Coming up's 6 days): Upper's slot swapped to Lower for that date only
+    const swap = { id: 'w-next', slotId: 's-tue', date: NEXT_TUE, routineId: 'sess-lower' }
+    const stored = v9(sched({ swaps: [swap] }))
+    await open(stored)
+    const row = [...view.container.querySelectorAll('a')].find((a) => (a.getAttribute('href') || '').includes(`date=${NEXT_TUE}`))
+    assert.equal(Boolean(row), true)
+    assert.equal(row.textContent.includes('Lower Body'), true)
+    assert.equal(row.textContent.includes('swapped from Upper Body'), true)
+    await tap(row)
+    assert.equal(view.text().includes('swapped from Upper Body'), true)
+    await tap(link('Lower Body'))
+    assert.match(window.location.hash, /^#\/schedule\/0\/2\/s-tue\?from=/)
+    assert.equal(view.text().includes('Lower Body'), true)
+    const lower = stored.routines.find((r) => r.id === 'sess-lower')
+    const lowerFirst = stored.exercises.find((e) => e.id === lower.exercises[0].exerciseId).name
+    const item = [...view.container.querySelectorAll('.ui-row__stack a')].find((a) => a.textContent.trim() === lowerFirst)
+    assert.equal(Boolean(item), true)
+    await tap(item)
+    assert.match(window.location.hash, new RegExp(`^#/schedule/0/2/s-tue@${NEXT_TUE}/exercise/`))
+    assert.equal(view.text().includes('Not found'), false)
+    assert.equal(view.text().includes(lowerFirst), true)
+  })
+})
+
+describe('round 1 §2 — Change day on a swapped spot carries the swap', () => {
+  it('reducer: the swap entry\'s date follows the move (one record rewritten, none added); moving back carries it back', () => {
+    const s0 = v9(sched({ swaps: [SWAP_THU] }))
+    const s1 = slotMovedOnDateState(s0, { id: 'mv-1', slotId: 's-thu', date: THU, to: SAT })
+    assert.deepEqual(s1.schedule.swaps, [{ ...SWAP_THU, date: SAT }])
+    assert.equal(slotsOn(s1.schedule, THU).length, 0)
+    assert.equal(slotsOn(s1.schedule, SAT).find((slot) => slot.id === 's-thu').routineId, 'sess-upper')
+    const s2 = slotMovedOnDateState(s1, { id: 'mv-2', slotId: 's-thu', date: SAT, to: THU })
+    assert.deepEqual(s2.schedule.swaps, [SWAP_THU])
+    assert.deepEqual(s2.schedule.moves, [])
+    assert.deepEqual(s2.schedule, s0.schedule)
+    // an unswapped move leaves swaps alone (same array)
+    const plain = v9(sched({ swaps: [SWAP_TUE] }))
+    assert.equal(slotMovedOnDateState(plain, { id: 'mv-3', slotId: 's-thu', date: THU, to: SAT }).schedule.swaps === plain.schedule.swaps, true)
+  })
+  it('rendered: Thu Lower swapped to Upper → Change day → Sat shows Upper, Thu empty, one swap dated Sat; back → Thu', async () => {
+    await open(v9(sched({ swaps: [SWAP_THU] })), withFrom(`/schedule/0/4?date=${THU}`, '/'))
+    await tap(button('⋯'))
+    await tap(button('Change day'))
+    assert.equal(getPendingConfirm().title, 'Move Upper Body to which day?')
+    await act(async () => answerConfirm(SAT))
+    await settle()
+    let schedule = saved().schedule
+    assert.deepEqual(schedule.swaps, [{ ...SWAP_THU, date: SAT }])
+    assert.equal(slotsOn(schedule, THU).length, 0)
+    assert.equal(slotsOn(schedule, SAT)[0].routineId, 'sess-upper')
+    assert.equal(view.text().includes('Upper Body'), true)
+    assert.equal(view.text().includes('swapped from Lower Body'), true)
+    await tap(button('⋯'))
+    await tap(button('Change day'))
+    await act(async () => answerConfirm(THU))
+    await settle()
+    schedule = saved().schedule
+    assert.deepEqual(schedule.swaps, [SWAP_THU])
+    assert.deepEqual(schedule.moves, [])
+    assert.equal(slotsOn(schedule, THU).find((slot) => slot.id === 's-thu').routineId, 'sess-upper')
   })
 })

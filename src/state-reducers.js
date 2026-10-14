@@ -351,7 +351,17 @@ export function slotMovedOnDateState(s, { id, slotId, date, to }) {
   const from = current ? current.from : date
   const rest = moves.filter((move) => !(move.slotId === slotId && (move.to === date || move.from === from)))
   const next = to === from ? rest : [...rest, { id, slotId, from, to }]
-  return { ...s, schedule: { ...s.schedule, moves: next } }
+  // req-225 review round 1 (DEC-126 §2) — a swapped spot carries its swap: the swap entry for
+  // (slotId, date) has its `date` rewritten to `to` (one record rewritten, in its place; none
+  // added), so the new date shows the swapped-in routine and the old one none. Moving back
+  // carries it back. A stale entry already on (slotId, to) is replaced by the carried one.
+  const swaps = Array.isArray(s.schedule?.swaps) ? s.schedule.swaps : null
+  const carried = swaps && swaps.find((swap) => swap.slotId === slotId && swap.date === date)
+  if (!carried) return { ...s, schedule: { ...s.schedule, moves: next } }
+  const nextSwaps = swaps
+    .filter((swap) => !(swap.slotId === slotId && swap.date === to))
+    .map((swap) => (swap === carried ? { ...swap, date: to } : swap))
+  return { ...s, schedule: { ...s.schedule, moves: next, swaps: nextSwaps } }
 }
 
 export function exerciseAddedState(s, exercise) {
