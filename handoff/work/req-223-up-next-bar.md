@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — the in-workout path; writes only through existing store calls (Skip, Swap).
+**Status: BUILT AND MERGED, 2026-10-14 — branch `req-223` (`4727c17`…`308479e`, 8 commits).** **Lane: ui** — the in-workout path; writes only through existing store calls (Skip, Swap).
 
 # req-223 — Start opens the first exercise; an "Up next" bar on each arrival, 5 s, Skip / Swap
 
