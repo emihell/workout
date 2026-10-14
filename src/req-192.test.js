@@ -160,7 +160,8 @@ describe('the log screen (real store)', () => {
     window.location.hash = '#/workout/sess-upper'
     await t.mount(h(Workout, { routineId: 'sess-upper' }))
     pill = view.container.querySelector('.ui-restpill')
-    assert.match(pill.textContent, /set \d\/\d$/)
+    // req-222 test edit: the pill now ends with the whole-workout count after the set count.
+    assert.match(pill.textContent, /set \d\/\d · \d\/\d$/)
     await view.click(pill)
     assert.equal(window.location.hash, `#/workout/sess-upper/item/${CHEST}/log`)
     assert.equal(t.active().restEndsAt, restEndsAt, 'opening does not skip')

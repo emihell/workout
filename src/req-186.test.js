@@ -167,17 +167,20 @@ describe('the pill label', () => {
   it('rest clock: Ns under a minute, m:ss from 60 s', () => {
     assert.deepEqual([0, 9, 59, 60, 72, 125.2].map(restClockText), ['0s', '9s', '59s', '1:00', '1:12', '2:06'])
   })
+  // req-222 test edit: the label ends with the whole-workout count (" · 1/1", one item), and a
+  // workout with nothing logged now shows GO on its first item (was null); all done is the null case.
   it('resting → "1:12 · set 2/3"; rest over or none armed → "GO · set 2/3"; no current → null', () => {
     const items = [item('a')]
     const now = 1_000_000
     const resting = workout(items, [set('a')], { restEndsAt: now + 72_000 })
-    assert.equal(workoutPillState(resting, now).label, '1:12 · set 2/3')
+    assert.equal(workoutPillState(resting, now).label, '1:12 · set 2/3 · 1/1')
     assert.equal(workoutPillState(resting, now).go, false)
     const over = workout(items, [set('a')], { restEndsAt: now - 1 })
-    assert.equal(workoutPillState(over, now).label, 'GO · set 2/3')
+    assert.equal(workoutPillState(over, now).label, 'GO · set 2/3 · 1/1')
     assert.equal(workoutPillState(over, now).go, true)
-    assert.equal(workoutPillState(workout(items, [set('a')]), now).label, 'GO · set 2/3')
-    assert.equal(workoutPillState(workout(items), now), null)
+    assert.equal(workoutPillState(workout(items, [set('a')]), now).label, 'GO · set 2/3 · 1/1')
+    assert.equal(workoutPillState(workout(items), now).label, 'GO · 1/1')
+    assert.equal(workoutPillState(workout(items, [set('a'), set('a'), set('a')]), now), null)
   })
 })
 

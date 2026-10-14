@@ -229,7 +229,7 @@ export function Showcase() {
 
       <Block heading="Workout pill">
         {/* position: fixed — one at a time; the GO state is .ui-restpill--go */}
-        <WorkoutPill clock="1:12" setText="set 2/4" onOpen={() => {}} />
+        <WorkoutPill clock="1:12" setText="set 2/4" countText="3/7" onOpen={() => {}} />
       </Block>
 
       {/* req-212 (H5) — the exercise head and the set list, as the set screen and the review use them. */}

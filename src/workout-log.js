@@ -1108,8 +1108,14 @@ export function restClockText(seconds) {
 // just finished. So an item with no logged (non-skipped) set carries no set count:
 // `setText` is '' and the label is the clock or GO alone. The count returns with its
 // first logged set.
+// req-222 (DEC-125 §3) — the pill shows from the start: before any logged set (where
+// currentWorkoutItem stays null) its item is the first not-done item in snapshot order, so
+// a fresh workout reads "GO · 1/7". And it carries the whole-workout count (`countText`,
+// workoutPosition): "GO · set 2/4 · 3/7", resting "1:12 · set 2/4 · 3/7", "GO · 3/7"
+// before a set of the current item. All done (or no items) → null, as before.
 export function workoutPillState(workout, now) {
-  const item = currentWorkoutItem(workout)
+  const done = (candidate) => itemIsMarkedDone(workout, candidate) || itemLoggingState(workout, candidate).plannedDone
+  const item = currentWorkoutItem(workout) || (workout?.snapshot?.items || []).find((candidate) => !done(candidate)) || null
   if (!item) return null
   const { current, total } = itemSetPosition(workout, item)
   const { remainingMs, resting } = restRemaining(workout, now)
@@ -1117,6 +1123,8 @@ export function workoutPillState(workout, now) {
   const setText = started ? `set ${current}/${total}` : ''
   const clock = resting ? restClockText(remainingMs / 1000) : null
   const lead = resting ? clock : 'GO'
+  const position = workoutPosition(workout)
+  const countText = position ? `${position.current}/${position.total}` : ''
   return {
     item,
     current,
@@ -1125,8 +1133,29 @@ export function workoutPillState(workout, now) {
     go: !resting,
     clock,
     setText,
-    label: setText ? `${lead} · ${setText}` : lead,
+    countText,
+    label: [lead, setText, countText].filter(Boolean).join(' · '),
   }
+}
+
+// req-189 — an item a Swap replaced: some item in the snapshot carries `replacesItemId` = its
+// key (replacementItem sets it, on a Swap item only). Derived; no stored marker. Moved here from
+// views/workout/row-label.js (req-222), which re-exports it.
+export function itemSwappedAway(workout, item) {
+  const key = itemKey(item)
+  return Boolean(key) && (workout?.snapshot?.items || []).some((other) => other.replacesItemId === key)
+}
+
+// req-222 (DEC-125 §3) — "how far along" the whole workout is, for the pill's "N/M":
+//   M = snapshot items minus originals a Swap replaced (the replacement counts instead; an
+//       Add exercise item counts; a plain Skip exercise still counts — it is done);
+//   N = done items among those (skipped included; the overview's done test) + 1, capped at M.
+// N counts done items, not the current row's position. No counted items → null.
+export function workoutPosition(workout) {
+  const counted = (workout?.snapshot?.items || []).filter((item) => !itemSwappedAway(workout, item))
+  if (counted.length === 0) return null
+  const doneCount = counted.filter((item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone).length
+  return { current: Math.min(counted.length, doneCount + 1), total: counted.length, done: doneCount }
 }
 
 // req-25 — the rest-patch decision, made pure so "when does rest run after a set"

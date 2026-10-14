@@ -385,13 +385,15 @@ export function ConfirmSheet() {
 // screen wires onOpen; the showcase passes a stub.
 // req-192 (DEC-108 §3) — `skip`: resting, on the current exercise's own log screen, a tap
 // skips the rest; the pill then reads "1:12 · skip" in place of the set count.
-export function WorkoutPill({ clock = null, setText = '', go = false, skip = false, onOpen }) {
+// req-222 (DEC-125 §3) — `countText`: the whole-workout count ("3/7"), after the set count;
+// not shown while `skip` (the tail is "skip" there, DEC-108 §3).
+export function WorkoutPill({ clock = null, setText = '', countText = '', go = false, skip = false, onOpen }) {
   const lead = go ? 'GO' : clock
   const label = skip
     ? `Rest ${clock} — skip the rest`
-    : `${go ? 'Go' : `Rest ${clock}`}${setText ? `, ${setText}` : ''} — open the exercise`
+    : `${go ? 'Go' : `Rest ${clock}`}${setText ? `, ${setText}` : ''}${countText ? `, exercise ${countText}` : ''} — open the exercise`
   // req-203 §7 — no set count (the next exercise, nothing logged yet): no separator either.
-  const tail = skip ? 'skip' : setText
+  const tail = skip ? 'skip' : [setText, countText].filter(Boolean).join(' · ')
   return (
     <button
       type="button"
