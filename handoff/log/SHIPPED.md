@@ -2543,3 +2543,8 @@ Reviewer (independent, 2 rounds + Planner read of round 3): round 1 two should-f
 no-conflict import; drafts invisible) + 2 latent + 3 nits → fixed (fe06a55, 7223d32); round 2 one should-fix (an unused exercise
 restored) + nit → fixed in 0d8edb4; "No blockers." both rounds. Emilio's eyes; backup reminded (DEC-046). Emilio: "merge".
 `reports/req-220.md`.
+
+## req-221 — effort picker without the "—"; tap the picked one to clear; seed Plank timed  (2026-10-14)
+
+**req-221** (DEC-125 §1, §6; ui lane; throwaway agent). `SegmentedControl clearable` has no dash segment; tap the selected one → ''. History set edit offers Easy · Medium · Hard, an old Failure set keeps Failure. Seed `ex-plank` timed; req-164/165 goldens pass through `withTimedPlank` (test edits: req-212, req-167, req-164, req-165).
+Gate (ui): `check: green — lint, skills, no import cycles, 120 test file(s), and the build all passed.` (Planner, throwaway worktree, 346aca9); `plan qa` smoke green (12 steps); scripted list 1–6 YES (review radios Easy/Medium/Hard none checked; Medium → rpe 3,3,3, again → null; rpe-5 set shows Failure*, saved 5; Feel cleared → ''; Plank shows Duration). No reviewer: no trigger file. `reports/req-221.md`.

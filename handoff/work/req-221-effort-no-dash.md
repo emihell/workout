@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — a shared control's look; writes nothing new.
+**Status: BUILT, NOT merged — branch `req-221` (`346aca9`).** **Lane: ui** — a shared control's look; writes nothing new.
 
 # req-221 — effort picker: no "—" segment; tap the picked one again to clear
 
