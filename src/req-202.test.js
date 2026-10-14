@@ -75,10 +75,9 @@ describe('item 2 — in-workout back link reads the workout name', () => {
   it('the log screen and the done screen link "‹ Upper Body" to the overview', async () => {
     await open('/routines')
     await tap(buttons('Start')[0])
-    assert.equal(window.location.hash, '#/workout/sess-upper')
-    const item = view.all('a').find((a) => /\/workout\/sess-upper\/item\//.test(a.getAttribute('href') || ''))
-    assert.ok(item, 'an exercise row on the overview')
-    await tap(item)
+    // req-223 test edit: Start now lands on the first exercise's log screen itself (was the
+    // overview, then a tap on an exercise row) — the same log screen this test reads.
+    assert.match(window.location.hash, /^#\/workout\/sess-upper\/item\/[^/]+\/log$/)
     const back = link('‹ Upper Body')
     assert.ok(back, `back link names the workout: ${view.text().slice(0, 80)}`)
     assert.equal(back.getAttribute('href'), '#/workout/sess-upper')

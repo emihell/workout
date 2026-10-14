@@ -1,6 +1,6 @@
 // req-165 (F-LINT-1) — the in-workout screens' shared plain helpers, moved out of
 // helpers.jsx (which now exports components only). JSX-free.
-import { itemKey, itemLoggingState } from '../../workout-log'
+import { autoCompleteArmed, itemKey, itemLoggingState } from '../../workout-log'
 import { itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
 import { recordButton } from '../../analytics'
 import { leaveWorkoutToToday } from '../../workout-actions'
@@ -41,4 +41,24 @@ export async function abandonWorkout(store) {
   recordButton('abandon-workout')
   store.abandonWorkout()
   leaveWorkoutToToday()
+}
+
+// req-223 (DEC-103 §2, DEC-125 §2) — the two exercise actions, in one place for both places
+// that offer them: the list row's "⋯" sheet (overview.jsx rowActions) and the log screen's
+// "Up next" bar. Swap is navigation (the Swap picker; nothing written until a pick). Skip is
+// one write: every remaining set logged skipped and the item done (store.skipItem).
+export function swapExercisePath(routineId, item) {
+  return itemReplacePath(routineId, item)
+}
+
+export function skipExercise(store, item) {
+  recordButton('skip-exercise')
+  store.skipItem(itemKey(item))
+}
+
+// Where "Finish" goes with no exercise left (req-212's review rule, shared with the Up next
+// bar's Skip, req-223): the auto-complete summary on the overview when it is armed, else the
+// Finish screen.
+export function finishTarget(workout, routineId) {
+  return autoCompleteArmed(workout) ? `/workout/${routineId}` : `/workout/${routineId}/finish`
 }

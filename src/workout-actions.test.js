@@ -32,6 +32,9 @@ function fakeStore(overrides = {}) {
     startWorkout: record('startWorkout'),
     continueDraft: record('continueDraft'),
     abandonDraft: record('abandonDraft'),
+    // req-223 — startOrContinue reads the plan to land on its first exercise; no plan here
+    // (null) keeps these tests' landing on the overview. Not recorded: it writes nothing.
+    getPlannedWorkout: () => null,
     ...overrides,
   }
 }

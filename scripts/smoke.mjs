@@ -6,7 +6,8 @@
 //   node scripts/smoke.mjs --ref <ref>     same, for another ref
 //   node scripts/smoke.mjs --url <url>     test a server already up (e.g. `./plan qa <ref>`)
 //
-// The loop: Start today's routine → log a set typed "22,5" → skip an exercise →
+// The loop: Start today's routine (lands on its first exercise's "Up next" bar, req-223) →
+// Skip from the bar → log a set typed "22,5" → skip an exercise from the list →
 // Finish → Save → the stored workout has 22.5 kg and the skipped sets → Back never
 // renders "Not found." → Home → Schedule → History shows the workout → Back, Back unwinds to its month
 // (req-171). Exit 0 green, 1 on the first failed
@@ -38,6 +39,7 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const STORAGE_KEY = 'workout-mvp-v9'
 const TODAY = '2026-09-21T10:00:00' // a Monday: db.json's slot-sess-upper
 const ROUTINE = 'Upper Body'
+const FIRST_EXERCISE = 'Rowing' // req-223 — the seed's first Upper Body item (a cardio warm-up)
 const LOG_EXERCISE = 'Chest Press'
 const SKIP_EXERCISE = 'Lat Pulldown'
 const TYPED_WEIGHT = '22,5'
@@ -138,15 +140,23 @@ async function main() {
       await page.goto(url, { waitUntil: 'networkidle0' })
       await waitText(page, ROUTINE)
     })
-    await step(`Start today's routine (${ROUTINE})`, async () => {
+    // req-223 smoke edit (DEC-125 §2) — a new Start opens the FIRST exercise (the seed's Rowing
+    // warm-up) with the "Up next" bar, not the list. The bar's Skip skips Rowing and opens
+    // ${LOG_EXERCISE} with its own bar; Start now hides it. (Was: Start → the list → open ${LOG_EXERCISE}.)
+    await step(`Start today's routine (${ROUTINE}) → its first exercise, with "Up next"`, async () => {
       await clickButton(page, 'Start', { className: 'ui-btn--primary' })
-      await waitHash(page, /^#\/workout\/[^/]+$/)
-      await waitText(page, LOG_EXERCISE)
+      await waitHash(page, /^#\/workout\/[^/]+\/item\/[^/]+\/log$/)
+      await waitText(page, `Up next: ${FIRST_EXERCISE}`)
     })
-    await step(`open ${LOG_EXERCISE}`, async () => {
-      await clickLink(page, LOG_EXERCISE)
-      // req-192 (DEC-108 §1) — no Complete any more: the effort buttons log a work set, and
-      // a set without effort (Chest Press opens on its warm-up) has one "Done".
+    await step(`Skip ${FIRST_EXERCISE} from the Up next bar → ${LOG_EXERCISE}, with its bar`, async () => {
+      await clickButton(page, 'Skip', { className: 'ui-btn--secondary' })
+      await waitText(page, `Up next: ${LOG_EXERCISE}`)
+      await waitHash(page, /chest-press\/log$/)
+    })
+    await step('Start now hides the bar', async () => {
+      await clickButton(page, 'Start now')
+      await page.waitForFunction(() => !document.querySelector('.ui-up-next'), { timeout: STEP_TIMEOUT })
+      // req-192 (DEC-108 §1) — a set without effort (Chest Press opens on its warm-up) has one "Done".
       await waitText(page, 'Done')
     })
     await step(`type "${TYPED_WEIGHT}" kg and log the set (Done)`, async () => {
