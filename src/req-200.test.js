@@ -110,7 +110,8 @@ describe('req-200 — the day screen', () => {
     assert.equal(stored().activeWorkout, null)
     await tap(buttons('Start now')[0])
     assert.equal(stored().activeWorkout?.routineId, 'sess-push-pull')
-    assert.equal(window.location.hash, '#/workout/sess-push-pull')
+    // req-223 test edit: a new Start lands on the first exercise's log screen (was the overview).
+    assert.match(window.location.hash, /^#\/workout\/sess-push-pull\/item\/[^/]+\/log$/)
   })
 
   it('Add workout from Home\'s day keeps the way back: day → add → day (?from=/) → Home', async () => {

@@ -12,12 +12,11 @@ import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/in
 import { activeNote } from '../../workout-note.js'
 import { weekdayDate } from '../history/helpers'
 import { MissingItem, NotInWorkout } from './helpers'
-import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, itemReplacePath } from './workout-helpers.js'
+import { abandonWorkout, exerciseName, findItem, isActiveFor, itemCurrentPath, skipExercise, swapExercisePath } from './workout-helpers.js'
 import { AutoCompleteSummary } from './auto-complete'
 import { doneRowSuffix } from './row-label.js'
 import { WorkoutPill } from './rest'
 import { askChoice, getPendingConfirm, subscribeConfirm } from '../../ui/confirm.js'
-import { recordButton } from '../../analytics'
 import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
 
@@ -33,11 +32,9 @@ async function rowActions(store, routineId, item) {
       { value: 'skip', label: 'Skip exercise' },
     ],
   })
-  if (choice === 'swap') go(itemReplacePath(routineId, item))
-  else if (choice === 'skip') {
-    recordButton('skip-exercise')
-    store.skipItem(itemKey(item))
-  }
+  // req-223 — the actions themselves are shared with the log screen's Up next bar.
+  if (choice === 'swap') go(swapExercisePath(routineId, item))
+  else if (choice === 'skip') skipExercise(store, item)
 }
 
 // req-93 — the exercise's label in the in-workout list. Main is the default and the

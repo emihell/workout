@@ -1,14 +1,13 @@
 import { Fragment, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { EFFORT_OPTIONS, isWeightedType, roleTag } from '../../ids'
-import { go } from '../../route'
+import { go, hashPath } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
 import { exerciseById } from '../../model.js'
 import { historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import {
-  autoCompleteArmed,
   canRemoveAddedSet,
   carryForSet,
   uniformRepsTargets,
@@ -38,6 +37,7 @@ import {
   setListRows,
   setTargetFor,
   setupSeedFor,
+  skipItemPatch,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,
@@ -59,7 +59,18 @@ import {
   SetLogForm,
 } from '../../ui/index.jsx'
 import { MissingItem, NotInWorkout } from './helpers'
-import { exerciseName, findItem, isActiveFor, itemDonePath, itemLogPath, itemSetsPath } from './workout-helpers.js'
+import {
+  exerciseName,
+  findItem,
+  finishTarget,
+  isActiveFor,
+  itemDonePath,
+  itemLogPath,
+  itemSetsPath,
+  skipExercise,
+  swapExercisePath,
+} from './workout-helpers.js'
+import { UP_NEXT_MS, arrivalFor, clearArrival, markArrival } from '../../up-next.js'
 import { WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
@@ -158,9 +169,13 @@ export function WorkoutItemLog({ routineId, itemId }) {
   const markedDone = Boolean(item && itemIsMarkedDone(active, item))
 
   // req-212 — a marked-done item belongs on its review (where the last Done lands).
+  // req-223 — only while the browser is still ON this log screen: the Up next bar's Skip marks
+  // the item done and has already moved on to the next exercise (or Finish) in the same tap.
   useEffect(() => {
-    if (markedDone && item) go(itemDonePath(routineId, item), { replace: true })
-  }, [markedDone, routineId, item])
+    if (!markedDone || !item) return
+    if (hashPath(window.location.hash) !== `/workout/${routineId}/item/${itemId}/log`) return
+    go(itemDonePath(routineId, item), { replace: true })
+  }, [markedDone, routineId, itemId, item])
 
   if (!mine) return <NotInWorkout routineId={routineId} />
   if (!item) return <MissingItem />
@@ -215,12 +230,90 @@ function useSetDraftWriter(store) {
   return writer
 }
 
+// req-223 (DEC-125 §2) — "Up next: {name}", a 5 s "Starting in N…" countdown, and Skip · Swap
+// · Start now. Shown on ARRIVAL only (up-next.js). The countdown writes nothing and starts
+// nothing: at 0 it only hides the bar (onHide), as Start now does. Its timer is UI-only (a
+// deadline + 250 ms tick, auto-complete.jsx's pattern), cleared on unmount — leaving the screen,
+// logging a set (the parent stops rendering it), Skip or Swap.
+function UpNextBar({ item, routineId, onHide, onSkip }) {
+  const [deadline] = useState(() => Date.now() + UP_NEXT_MS)
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const t = setInterval(() => {
+      const n = Date.now()
+      setNow(n)
+      if (n >= deadline) {
+        clearInterval(t)
+        onHide()
+      }
+    }, 250)
+    return () => clearInterval(t)
+    // deadline is set once; onHide only sets the parent's state. Run-once interval.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deadline])
+  const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
+  return (
+    <div className="ui-up-next" role="group" aria-label="Up next">
+      <p className="ui-up-next__name">Up next: {exerciseName(item)}</p>
+      <p className="ui-sub" aria-live="polite">
+        Starting in {secondsLeft}…
+      </p>
+      {/* DESIGN §4 — Skip and Swap are lateral, Start now (forward) on the right. Swap is
+          navigation, so a link wearing the button look beside the real Buttons (DEC-040). */}
+      <Actions
+        lateral={
+          <>
+            <Button variant="secondary" onClick={onSkip}>
+              Skip
+            </Button>
+            <NavLink to={swapExercisePath(routineId, item)} look="secondary">
+              Swap
+            </NavLink>
+          </>
+        }
+        forward={
+          <Button
+            variant="primary"
+            onClick={() => {
+              recordButton('up-next-start-now')
+              onHide()
+            }}
+          >
+            Start now
+          </Button>
+        }
+      />
+    </div>
+  )
+}
+
 function WorkoutItemLive({ routineId, item }) {
   const store = useStore()
   const active = store.activeWorkout
   const ex = liveExercise(store, item)
   const last = lastSetsForExercise(store.workouts, item.exerciseId)
   const state = itemLoggingState(active, item)
+  // req-223 — the Up next bar: this screen was arrived at from a new Start, a review's Next or
+  // the bar's Skip (a pure read of the in-memory marker, then cleared below), and no set of
+  // this exercise is logged. Hidden by the countdown, Start now, or the first logged set.
+  const [upNext, setUpNext] = useState(() => arrivalFor(routineId, item) && state.logged.length === 0)
+  useEffect(() => clearArrival(), [])
+  const showUpNext = upNext && state.logged.length === 0
+  // Skip from the bar: the list's Skip exercise, then ARRIVE at the next not-done exercise (its
+  // own bar); none left → the review's Finish target. Computed on the workout as the skip leaves
+  // it (the same pure patch store.skipItem applies). Replaces this entry: the skipped exercise's
+  // log screen is gone (it would only bounce to its review).
+  function skipFromBar() {
+    const after = { ...active, ...skipItemPatch(active, itemKey(item)) }
+    skipExercise(store, item)
+    const next = nextNotDoneItem(after, item)
+    if (next) {
+      markArrival(routineId, next)
+      go(itemLogPath(routineId, next), { replace: true })
+    } else {
+      go(finishTarget(after, routineId), { replace: true })
+    }
+  }
   const { needsWu, workCount, currentWorkIndex, plannedDone } = state
   const currentType = needsWu ? 'wu' : 'work'
   // req-106 — the target rule moved to setTargetFor (shared with the preview).
@@ -526,6 +619,8 @@ function WorkoutItemLive({ routineId, item }) {
       {/* req-186 — the workout pill (rest clock / GO + set N/M; self-hides with no current exercise).
           req-192 — told which item this screen is, so on the current exercise a tap skips the rest. */}
       <WorkoutPill ownItemKey={itemKey(item)} />
+      {/* req-223 — the Up next bar sits above the exercise, under the pill. */}
+      {showUpNext ? <UpNextBar item={item} routineId={routineId} onHide={() => setUpNext(false)} onSkip={skipFromBar} /> : null}
       <ExerciseTitle
         routineId={routineId}
         item={item}
@@ -794,11 +889,12 @@ function ExerciseReview({ routineId, item }) {
           before req-212), else the Finish screen. */}
       <div className="ui-workout-end">
         {next ? (
-          <NavLink to={itemLogPath(routineId, next)} look="primary" block>
+          // req-223 — Next is an arrival: the next exercise opens with its Up next bar.
+          <NavLink to={itemLogPath(routineId, next)} look="primary" block onClick={() => markArrival(routineId, next)}>
             Next: {exerciseName(next)}
           </NavLink>
         ) : (
-          <NavLink to={autoCompleteArmed(active) ? `/workout/${routineId}` : `/workout/${routineId}/finish`} look="primary" block>
+          <NavLink to={finishTarget(active, routineId)} look="primary" block>
             Finish
           </NavLink>
         )}

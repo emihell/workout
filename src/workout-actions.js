@@ -3,7 +3,8 @@ import { go, hashPath } from './route.js'
 import { dateKey } from './schedule.js'
 import { askConfirm } from './ui/confirm.js'
 import { itemIsMarkedDone, itemLoggingState } from './workout-log.js'
-import { itemCurrentPath } from './workout-paths.js'
+import { itemCurrentPath, itemLogPath } from './workout-paths.js'
+import { markArrival } from './up-next.js'
 
 // req-55 / DEC-038 — the one warning shown before an in-progress workout is
 // discarded. There is exactly one in-progress workout; starting a different one, or
@@ -52,15 +53,26 @@ export async function startOrContinue(store, routineId, options = {}) {
     if (!(await askConfirm(ABANDON_ON_NEW_WARNING, { confirmLabel: 'Abandon' }))) return
     store.abandonWorkout()
   }
-  if (!continuingSame) {
-    store.startWorkout(routineId, scheduledFor, scheduleSlotId, config.plan || null)
-  }
   const base = `/workout/${routineId}`
-  // req-76 — resuming the same in-progress workout lands on its current exercise;
-  // starting new keeps the overview as the landing (start-new is out of scope). The
-  // replace decision stays tied to the workout base: if we're already anywhere in
-  // this workout, replace rather than stacking history.
-  const target = continuingSame ? resumeTarget(active) : base
+  // req-76 — resuming the same in-progress workout lands on its current exercise.
+  // req-223 (DEC-125 §2) — starting new lands on the FIRST exercise's log screen (list order),
+  // marked as an arrival so it shows the "Up next" bar; an empty workout keeps the overview.
+  // The first item is the plan's: the same plan startWorkout snapshots (the caller's, else
+  // buildPlannedWorkout for this routine / date / slot), whose items keep their keys. The
+  // replace decision stays tied to the workout base: if we're already anywhere in this
+  // workout, replace rather than stacking history.
+  let target = base
+  if (continuingSame) {
+    target = resumeTarget(active)
+  } else {
+    const plan = config.plan || store.getPlannedWorkout({ routineId, date: scheduledFor, scheduleSlotId })
+    store.startWorkout(routineId, scheduledFor, scheduleSlotId, config.plan || null)
+    const first = plan?.items?.[0]
+    if (first) {
+      markArrival(routineId, first)
+      target = itemLogPath(routineId, first)
+    }
+  }
   const here = hashPath(typeof window === 'undefined' ? '/' : window.location.hash)
   const replace = here === base || here.startsWith(`${base}/`)
   go(target, { replace })

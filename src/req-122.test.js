@@ -96,6 +96,8 @@ test('call sites that pass both put the retreat link in retreat and the commit i
   // (Export analytics, split from Export / Import) in Settings.jsx, plus req-215's later-workout
   // name step (Cancel / Save) in Plan.jsx, plus req-10's first-time prompt (I'll enter it /
   // Set it up) in views/workout/item.jsx, plus req-220's "Export for your AI" row in Settings.jsx
-  // (req-220 test edit: count 22 → 23, a new lateral-only row; the role checks above unchanged)
-  assert.equal(count, 23)
+  // (req-220 test edit: count 22 → 23, a new lateral-only row; the role checks above unchanged),
+  // plus req-223's Up next bar (Skip · Swap lateral, Start now forward) in views/workout/item.jsx
+  // (req-223 test edit: count 23 → 24; the role checks above unchanged)
+  assert.equal(count, 24)
 })

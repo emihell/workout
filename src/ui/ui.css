@@ -1094,6 +1094,27 @@ html:has(.ui-picker-strip) {
   flex: 1 1 0;
 }
 
+/* req-223 (DEC-125 §2) — the "Up next" bar on arrival at an exercise: a filled block above
+ * the exercise title (name, the 5 s countdown, Skip · Swap · Start now). The three actions
+ * share the row equally so each keeps a full tap target at 390px. */
+.ui-up-next {
+  background: var(--ui-fill);
+  border-radius: var(--ui-radius);
+  padding: var(--ui-s3);
+  margin-bottom: var(--ui-s3);
+}
+.ui-up-next__name {
+  font-size: var(--ui-text-body);
+  font-weight: 600;
+  margin: 0 0 var(--ui-s1);
+}
+.ui-up-next .ui-actions {
+  margin-top: var(--ui-s2);
+}
+.ui-up-next .ui-actions > * {
+  flex: 1 1 0;
+}
+
 /* req-24 / DEC-079 — the confirm sheet (ConfirmSheet). A dimmed full-screen backdrop
  * above everything (the rest pill is 20), and a solid sheet pinned to the
  * bottom — thumb reach — clearing the home-indicator safe area. Cancel and the
