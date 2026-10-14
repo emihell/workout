@@ -589,6 +589,7 @@ gzip) now loads on the first log-screen open — "each side" can appear a beat l
 Pasted 2026-10-13. [measured] `git log 10c4724..main -- src` is empty → I1..I11 apply to live code. Code facts from a read-only
 rescan of `main` (2026-10-13); paths under `src/`. **Decided → DEC-125; specced req-221..225 (READY; req-225 data lane).** Order: 221 → 222 → 223 → 224 → 225.
 **req-222 follow-ups (reviewer, 2026-10-14):** (a) latent — Add set on a swapped-away exercise reopens it but `workoutPosition` doesn't count it; the cap (`workout-log.js:1157`) hides "5/4" as "4/4"; (b) nit — stale "shows no pill" comment `workout-log.js:1052`; (c) nit — an in-progress workout swapped before req-188's `replacesItemId` counts both items (display only).
+**req-224 follow-ups (reviewer, 2026-10-14):** (a) Finish screen computes the time at mount, the store at Save — open Finish at 10:55, Save at 15:00 → screen said 55 min, History says 50 (saved value right, no line shown); (b) a left-open workout from an earlier day, saved > 6 h after its last set, no longer trips req-116's Back-after-Finish guard (`finishedForPlan`) → preview offers Start; (c) auto-complete summary shows the shorter Duration with no "left open" line.
 
 - **I1 — tap a workout on Home → a quick-view sheet: what it is, Edit, Swap for this day only (permanent swaps stay in Schedule).**
   Today's workout name is a plain `<p>` (`views/Today.jsx:157-161`); only Start / StartChooser act. A one-date *move* exists
