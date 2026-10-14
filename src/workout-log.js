@@ -1081,8 +1081,9 @@ export function eachSideReps(reps, eachSide = true) {
 }
 
 // req-186 (DEC-103 §3) — the workout pill's "current exercise". Review fix 1 — rule:
-//   - nothing LOGGED (no non-skipped set; loggedSetCount's meaning, DEC-058 §4) → null:
-//     a Skip exercise / Swap alone writes only skipped records and shows no pill;
+//   - nothing LOGGED (no non-skipped set; loggedSetCount's meaning, DEC-058 §4) → null
+//     (a Skip exercise / Swap alone writes only skipped records). The pill still shows then:
+//     since req-222 workoutPillState falls back to the first not-done item;
 //   - the item of the most recent set record (completeSet appends), if it isn't done —
 //     a set-level Skip on an exercise in progress keeps it current;
 //   - that item done AND its last record skipped AND a replacement (addedMidWorkout)
@@ -1184,10 +1185,13 @@ export function itemSwappedAway(workout, item) {
 //       Add exercise item counts; a plain Skip exercise still counts — it is done);
 //   N = done items among those (skipped included; the overview's done test) + 1, capped at M.
 // N counts done items, not the current row's position. No counted items → null.
+// req-227 — a swapped-away original that is NOT done (reopened by Add set on its review) is
+// work left, so it counts again (in M, and as current); a swapped-away done one stays out.
 export function workoutPosition(workout) {
-  const counted = (workout?.snapshot?.items || []).filter((item) => !itemSwappedAway(workout, item))
+  const done = (item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone
+  const counted = (workout?.snapshot?.items || []).filter((item) => !itemSwappedAway(workout, item) || !done(item))
   if (counted.length === 0) return null
-  const doneCount = counted.filter((item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone).length
+  const doneCount = counted.filter(done).length
   return { current: Math.min(counted.length, doneCount + 1), total: counted.length, done: doneCount }
 }
 

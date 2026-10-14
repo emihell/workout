@@ -9,6 +9,7 @@ import { ImprovementLines } from './helpers'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
 import { finishTimeFor } from '../../workout-log.js'
+import { leftOpenText } from '../../finish-unfinished.js'
 
 // req-84 — auto-complete a finished routine. When every exercise is done the overview
 // mounts this instead of the list: a "great job" summary (duration/sets — req-210 dropped volume — each
@@ -49,11 +50,13 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
   const [deadline] = useState(() => Date.now() + COUNTDOWN_MS)
   const [now, setNow] = useState(() => Date.now())
   const committedRef = useRef(false)
+  // req-224 — the finish time the commit saves (finishTimeFor): the last set's when the
+  // workout was left open > 3 h, else now. req-227 — when the left-open rule applied, the
+  // Finish screen's line shows here too.
+  const [finish] = useState(() => finishTimeFor(active, mountNow))
   const [stats] = useState(() => {
     const prior = summaryPriorWorkout(active, store.workouts, store.routines)
-    // req-224 — the finish time the commit saves (finishTimeFor): the last set's when the
-    // workout was left open > 3 h, else now.
-    return workoutSummaryStats(active, prior, Date.parse(finishTimeFor(active, mountNow).finishedAt))
+    return workoutSummaryStats(active, prior, Date.parse(finish.finishedAt))
   })
   // req-210 (DEC-117 §1) — per exercise "↑ N%" vs the previous same-routine workout(s), the
   // Finish screen's source (DEC-050). Captured at mount like the stats.
@@ -111,6 +114,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
           </Row>
         ))}
       </List>
+      {finish.leftOpen ? <p className="ui-sub">{leftOpenText(finish.finishedAt)}</p> : null}
       <ImprovementLines list={improvements} />
       {countdown ? (
         <p className="ui-sub" aria-live="polite">

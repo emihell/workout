@@ -113,11 +113,12 @@ describe('req-83 store wiring for live seed overrides', () => {
   // drop is now asserted behaviourally there (finish-routine.test.js). This guard
   // checks the store delegates to it, so that test covers what the store does.
   it('finishWorkout delegates to finishedState (which drops seedOverrides)', () => {
-    const body = src.match(/finishWorkout\(args\)\s*\{[\s\S]*?\n {6}\},/)
+    // req-227 test edit — the method takes an optional finishedAt (the Finish screen's shown time).
+    const body = src.match(/finishWorkout\(args, finishedAt\)\s*\{[\s\S]*?\n {6}\},/)
     assert.ok(body, 'finishWorkout method not found in store.jsx')
     // req-224 — the store now passes the finish time (finishTimeFor: the last set's when
     // left open > 3 h); still a straight delegation to finishedState.
-    assert.match(body[0], /setState\(\(s\) => finishedState\(s, args, finishTimeFor\(s\.activeWorkout, Date\.now\(\)\)\.finishedAt\)\)/)
+    assert.match(body[0], /setState\(\(s\) => finishedState\(s, args, finishedAt \?\? finishTimeFor\(s\.activeWorkout, Date\.now\(\)\)\.finishedAt\)\)/)
   })
 })
 

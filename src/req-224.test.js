@@ -188,15 +188,18 @@ describe('req-224 — the Finish screen', () => {
   })
 
   it('AC6: not left open (last set 2 h 40 ago) → no line, minutes to now, Save stores now', async () => {
+    // req-227 test edit — Save now stores the time the screen derived (at mount / last tick),
+    // not a fresh Date.now() at the tap, so `before` is taken before the screen opens.
+    const before = Date.now()
     const { captured, sets } = await finishScreen({ startAgo: 210 * MIN, lastAgo: 160 * MIN })
     const text = view.text()
     assert.equal(text.includes('You left this workout open'), false)
     assert.equal(text.includes('— 210 min ·'), true, text)
-    const before = Date.now()
     await view.click(view.button('Save'))
     const saved = captured.store.workouts[0]
     assert.equal(saved.finishedAt === sets[1].loggedAt, false)
     assert.equal(Date.parse(saved.finishedAt) >= before, true)
+    assert.equal(Date.parse(saved.finishedAt) <= Date.now(), true)
   })
 })
 

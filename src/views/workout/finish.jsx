@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { improvementList } from '../../beat-last-time'
@@ -19,6 +19,19 @@ export function WorkoutFinish({ routineId }) {
   return <FinishScreen routineId={routineId} />
 }
 
+// req-227 — how often the Finish screen re-derives its finish time (minutes + left-open line).
+export const FINISH_TICK_MS = 30000
+
+// The current time, refreshed every `ms` while mounted.
+function useNow(ms) {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), ms)
+    return () => clearInterval(t)
+  }, [ms])
+  return now
+}
+
 function FinishScreen({ routineId }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -32,9 +45,12 @@ function FinishScreen({ routineId }) {
   // Finish. A legacy active workout without the field reads as '' (activeNote).
   const overallNote = activeNote(active)
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
-  // req-224 (DEC-125 §4) — the finish Save writes (finishTimeFor, store.finishWorkout): the
-  // last set's time when the workout was left open > 3 h, else now. Captured at mount.
-  const [finish] = useState(() => finishTimeFor(active, Date.now()))
+  // req-224 (DEC-125 §4) — the finish Save writes (finishTimeFor): the last set's time when
+  // the workout was left open > 3 h, else now. req-227 — re-derived on a FINISH_TICK_MS tick
+  // while the screen is open (so sitting here across the 3 h mark shows the line), and Save
+  // passes exactly this value to store.finishWorkout: what the screen shows is what's saved.
+  const now = useNow(FINISH_TICK_MS)
+  const finish = finishTimeFor(active, now)
   const minutes = Math.max(1, Math.round((Date.parse(finish.finishedAt) - started.getTime()) / 60000))
   // req-116 — only non-skipped sets count (a logged warm-up counts); the auto-complete
   // summary counts the same way (workoutSummaryStats → loggedSetCount).
@@ -97,7 +113,7 @@ function FinishScreen({ routineId }) {
         block
         onClick={() => {
           recordButton('finish-workout')
-          store.finishWorkout({ overallNote, overallFeel })
+          store.finishWorkout({ overallNote, overallFeel }, finish.finishedAt)
           leaveWorkoutToToday()
         }}
       >
