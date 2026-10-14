@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { improvementList } from '../../beat-last-time'
@@ -6,7 +5,8 @@ import { previousSameRoutineWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { Back } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { anythingLogged, finishTimeFor, loggedSetCount } from '../../workout-log'
+import { anythingLogged, loggedSetCount } from '../../workout-log'
+import { useFinishTime } from './finish-time.js'
 import { finishSkippedLines, leftOpenText } from '../../finish-unfinished.js'
 import { activeFeel, activeNote } from '../../workout-note.js'
 import { ImprovementLines, NotInWorkout } from './helpers'
@@ -32,9 +32,11 @@ function FinishScreen({ routineId }) {
   // Finish. A legacy active workout without the field reads as '' (activeNote).
   const overallNote = activeNote(active)
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
-  // req-224 (DEC-125 §4) — the finish Save writes (finishTimeFor, store.finishWorkout): the
-  // last set's time when the workout was left open > 3 h, else now. Captured at mount.
-  const [finish] = useState(() => finishTimeFor(active, Date.now()))
+  // req-224 (DEC-125 §4) — the finish Save writes (finishTimeFor): the last set's time when
+  // the workout was left open > 3 h, else now. req-227 — re-derived on a tick and when the page
+  // comes back to the foreground (useFinishTime), and Save passes this value to
+  // store.finishWorkout: what the screen shows is what's saved (unless stale — finish-time.js).
+  const { finish, finishedAtForSave } = useFinishTime(active)
   const minutes = Math.max(1, Math.round((Date.parse(finish.finishedAt) - started.getTime()) / 60000))
   // req-116 — only non-skipped sets count (a logged warm-up counts); the auto-complete
   // summary counts the same way (workoutSummaryStats → loggedSetCount).
@@ -97,7 +99,8 @@ function FinishScreen({ routineId }) {
         block
         onClick={() => {
           recordButton('finish-workout')
-          store.finishWorkout({ overallNote, overallFeel })
+          const finishedAt = finishedAtForSave()
+          store.finishWorkout({ overallNote, overallFeel }, finishedAt)
           leaveWorkoutToToday()
         }}
       >

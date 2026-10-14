@@ -8,7 +8,8 @@ import { improvementList } from '../../beat-last-time.js'
 import { ImprovementLines } from './helpers'
 import { Button, List, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
 import { autoFinishArgs } from '../../workout-note.js'
-import { finishTimeFor } from '../../workout-log.js'
+import { useFinishTime } from './finish-time.js'
+import { leftOpenText } from '../../finish-unfinished.js'
 
 // req-84 — auto-complete a finished routine. When every exercise is done the overview
 // mounts this instead of the list: a "great job" summary (duration/sets — req-210 dropped volume — each
@@ -44,17 +45,17 @@ function signed(n) {
 // [Keep going] dismisses as before. No Edit (the spec's two buttons; Keep going → the
 // overview's Finish link reaches the Finish screen). A completed last set keeps the countdown (default).
 export function AutoCompleteSummary({ routineId, active, store, onCancel, countdown = true }) {
-  // Captured once at mount so the shown duration is stable, not ticking.
-  const [mountNow] = useState(() => Date.now())
   const [deadline] = useState(() => Date.now() + COUNTDOWN_MS)
   const [now, setNow] = useState(() => Date.now())
   const committedRef = useRef(false)
-  const [stats] = useState(() => {
-    const prior = summaryPriorWorkout(active, store.workouts, store.routines)
-    // req-224 — the finish time the commit saves (finishTimeFor): the last set's when the
-    // workout was left open > 3 h, else now.
-    return workoutSummaryStats(active, prior, Date.parse(finishTimeFor(active, mountNow).finishedAt))
-  })
+  // req-224 — the finish time the commit saves (finishTimeFor): the last set's when the
+  // workout was left open > 3 h, else now. req-227 — when the left-open rule applied, the
+  // Finish screen's line shows here too; review round 1 — the same mechanism as the Finish
+  // screen (useFinishTime: tick + foreground refresh; the commit passes the shown time, stale
+  // guard), since the no-countdown summary can sit open for hours.
+  const { finish, finishedAtForSave } = useFinishTime(active)
+  const [prior] = useState(() => summaryPriorWorkout(active, store.workouts, store.routines))
+  const stats = workoutSummaryStats(active, prior, Date.parse(finish.finishedAt))
   // req-210 (DEC-117 §1) — per exercise "↑ N%" vs the previous same-routine workout(s), the
   // Finish screen's source (DEC-050). Captured at mount like the stats.
   const [improvements] = useState(() =>
@@ -72,7 +73,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
     // Optional cue at an auto-commit — the AudioContext is already unlocked from set-complete
     // taps; defaultBeep is fail-silent if not.
     if (!manual) defaultBeep()
-    store.finishWorkout(autoFinishArgs(active))
+    store.finishWorkout(autoFinishArgs(active), finishedAtForSave())
     leaveWorkoutToToday()
   }
 
@@ -111,6 +112,7 @@ export function AutoCompleteSummary({ routineId, active, store, onCancel, countd
           </Row>
         ))}
       </List>
+      {finish.leftOpen ? <p className="ui-sub">{leftOpenText(finish.finishedAt)}</p> : null}
       <ImprovementLines list={improvements} />
       {countdown ? (
         <p className="ui-sub" aria-live="polite">
