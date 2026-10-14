@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — changes the `finishedAt` one Finish writes (normal save path, one record). Touches `workout-log.js` →
+**Status: BUILT, NOT merged — branch `req-224` (`8a6ae2a`…`89dbb5d`).** **Lane: ui** — changes the `finishedAt` one Finish writes (normal save path, one record). Touches `workout-log.js` →
 independent reviewer (DEC-057); no schema change, no bulk write.
 
 # req-224 — a workout left open saves its last set's time as the finish
