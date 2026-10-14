@@ -2548,3 +2548,8 @@ restored) + nit → fixed in 0d8edb4; "No blockers." both rounds. Emilio's eyes;
 
 **req-221** (DEC-125 §1, §6; ui lane; throwaway agent). `SegmentedControl clearable` has no dash segment; tap the selected one → ''. History set edit offers Easy · Medium · Hard, an old Failure set keeps Failure. Seed `ex-plank` timed; req-164/165 goldens pass through `withTimedPlank` (test edits: req-212, req-167, req-164, req-165).
 Gate (ui): `check: green — lint, skills, no import cycles, 120 test file(s), and the build all passed.` (Planner, throwaway worktree, 346aca9); `plan qa` smoke green (12 steps); scripted list 1–6 YES (review radios Easy/Medium/Hard none checked; Medium → rpe 3,3,3, again → null; rpe-5 set shows Failure*, saved 5; Feel cleared → ''; Plank shows Duration). No reviewer: no trigger file. `reports/req-221.md`.
+
+## req-222 — the GO pill shows from the start and counts the whole workout  (2026-10-14)
+
+**req-222** (DEC-125 §3; ui lane; throwaway agent). Pill from the first screen ("GO · 1/9"), whole-workout count "set 2/4 · 3/7"; M skips swapped-away originals (via `replacesItemId`), N = done + 1 capped. Spec slip: the seed's Upper Body has 9 items, not 7 (AC8). Test edits: req-186, req-192, req-203 (reviewer: real changes).
+Gate (ui): `check: green — lint, skills, no import cycles, 121 test file(s), and the build all passed.` (Planner, throwaway worktree, c8a3316); `plan qa` smoke green; browser at 375 px: Start "GO · 1/9", tap → Rowing log, skip → "GO · 2/9", resting "1:30 · set 2/4 · 2/9" no overflow, swap → snapshot 10 rows / M 9, all done → no pill. Reviewer (independent): "No blockers."; 1 latent + 2 nits → BACKLOG. `reports/req-222.md`.

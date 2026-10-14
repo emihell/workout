@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — display only; writes nothing. Touches `workout-log.js` → independent reviewer (DEC-057).
+**Status: BUILT, NOT merged — branch `req-222` (`c8a3316`).** **Lane: ui** — display only; writes nothing. Touches `workout-log.js` → independent reviewer (DEC-057).
 
 # req-222 — the GO pill shows from the start and counts the whole workout
 
