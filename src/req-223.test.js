@@ -316,3 +316,81 @@ describe('the arrival marker (up-next.js) — memory only', () => {
     assert.equal(sessionStorage.length, 0)
   })
 })
+
+// ── Review fixes ─────────────────────────────────────────────────────────────────────
+describe('review fix 1 — the done-item redirect compares the parsed route', () => {
+  it('a done item opened at …/log?x=1 or …/log/ still lands on its review (no blank screen)', async () => {
+    await startThree()
+    await tap(button('Start now'))
+    await tap(button('Done')) // Chest Press (1 set) done → its review
+    const done = `#/workout/${R}/item/${KEYS[0]}/done`
+    assert.equal(window.location.hash, done)
+    for (const suffix of ['?x=1', '/']) {
+      await act(async () => {
+        window.location.hash = `${logPath(KEYS[0])}${suffix}`
+      })
+      await flush()
+      await flush()
+      assert.equal(window.location.hash, done, `…/log${suffix} → the review`)
+      assert.match(view.text(), /Next: Lat Pulldown/)
+    }
+  })
+})
+
+describe('review fix 2 — a modified click on Next leaves no marker', () => {
+  it('meta / ctrl / shift / alt / middle click → no marker; a plain click → marked', async () => {
+    await startThree()
+    await tap(button('Start now'))
+    await tap(button('Done'))
+    const next = link('Next: Lat Pulldown')
+    assert.ok(next)
+    // Keep this tab where it is (a new-tab click wouldn't navigate it); React's handler still runs.
+    next.addEventListener('click', (e) => e.preventDefault())
+    const lat = { routineItemId: KEYS[1] }
+    const fire = (init) =>
+      act(async () => {
+        next.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true, button: 0, ...init }))
+      })
+    for (const init of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }]) {
+      await fire(init)
+      assert.equal(arrivalFor(R, lat), false, JSON.stringify(init))
+    }
+    await fire({})
+    assert.equal(arrivalFor(R, lat), true, 'a plain click marks')
+  })
+})
+
+describe('review fix 3 — once a set is logged the bar never comes back', () => {
+  it('bar → a set logged → the set removed again → still no bar (no fresh countdown)', async () => {
+    localStorage.clear()
+    localStorage.setItem('workout-routine-kg-filled', '2026-09-26T00:00:00.000Z')
+    localStorage.setItem('workout-mvp-v8', JSON.stringify(threeItems()))
+    window.location.hash = logPath(KEYS[1])
+    const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
+    const { useStore } = await import('./store-context.js')
+    const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
+    const captured = {}
+    function Grab() {
+      // A test harness reading the live store out of the tree (as req-220.test.js).
+      // oxlint-disable-next-line react/immutability
+      captured.store = useStore()
+      return captured.store.activeWorkout ? h(WorkoutItemLog, { routineId: R, itemId: KEYS[1] }) : null
+    }
+    view = await render(h(StoreProvider, null, h(Grab)))
+    await flush()
+    markArrival(R, { routineItemId: KEYS[1] })
+    await act(async () => captured.store.startWorkout(R))
+    await flush()
+    assert.ok(bar(), 'the bar shows on arrival')
+    await tap(button('Done')) // Lat Pulldown's warm-up set: the exercise stays open
+    assert.equal(captured.store.activeWorkout.sets.length, 1)
+    assert.ok(button('Done'), 'still on its log screen')
+    assert.equal(bar(), null)
+    // The logged set taken away again (no screen does this today — the latent case).
+    await act(async () => captured.store.patchActive({ sets: [] }))
+    await flush()
+    assert.deepEqual(captured.store.activeWorkout.sets, [])
+    assert.ok(button('Done'), 'the log screen is still up')
+    assert.equal(bar(), null, 'no second bar')
+  })
+})

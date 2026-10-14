@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { EFFORT_OPTIONS, isWeightedType, roleTag } from '../../ids'
-import { go, hashPath } from '../../route'
+import { go, hashPath, parseRoute } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
 import { exerciseById } from '../../model.js'
@@ -173,7 +173,9 @@ export function WorkoutItemLog({ routineId, itemId }) {
   // the item done and has already moved on to the next exercise (or Finish) in the same tap.
   useEffect(() => {
     if (!markedDone || !item) return
-    if (hashPath(window.location.hash) !== `/workout/${routineId}/item/${itemId}/log`) return
+    // Compared as the parsed route (review fix 1), so `…/log?x=1` or `…/log/` still redirects.
+    const here = parseRoute(hashPath(window.location.hash))
+    if (here.name !== 'workout-item-log' || here.routineId !== routineId || here.itemId !== itemId) return
     go(itemDonePath(routineId, item), { replace: true })
   }, [markedDone, routineId, itemId, item])
 
@@ -298,6 +300,9 @@ function WorkoutItemLive({ routineId, item }) {
   // this exercise is logged. Hidden by the countdown, Start now, or the first logged set.
   const [upNext, setUpNext] = useState(() => arrivalFor(routineId, item) && state.logged.length === 0)
   useEffect(() => clearArrival(), [])
+  // Review fix 3 — a logged set ends the bar for good (state adjusted during render, as draftSnap
+  // below), so it can never come back with a fresh countdown even if the set count drops again.
+  if (upNext && state.logged.length > 0) setUpNext(false)
   const showUpNext = upNext && state.logged.length === 0
   // Skip from the bar: the list's Skip exercise, then ARRIVE at the next not-done exercise (its
   // own bar); none left → the review's Finish target. Computed on the workout as the skip leaves
@@ -837,6 +842,13 @@ export function WorkoutItemDone({ routineId, itemId }) {
   return <ExerciseReview key={itemKey(item)} routineId={routineId} item={item} />
 }
 
+// req-223 review fix 2 — only a plain left click navigates THIS tab; a modified or middle click
+// (new tab / window, download) must not leave a marker behind for a later list-row open.
+function markNextArrival(e, routineId, next) {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+  markArrival(routineId, next)
+}
+
 function ExerciseReview({ routineId, item }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -890,7 +902,7 @@ function ExerciseReview({ routineId, item }) {
       <div className="ui-workout-end">
         {next ? (
           // req-223 — Next is an arrival: the next exercise opens with its Up next bar.
-          <NavLink to={itemLogPath(routineId, next)} look="primary" block onClick={() => markArrival(routineId, next)}>
+          <NavLink to={itemLogPath(routineId, next)} look="primary" block onClick={(e) => markNextArrival(e, routineId, next)}>
             Next: {exerciseName(next)}
           </NavLink>
         ) : (
