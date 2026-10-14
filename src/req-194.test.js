@@ -258,9 +258,21 @@ async function harness({ fresh = true, targets = null, extraStairs = false } = {
     captured.store = useStore()
     return child
   }
+  // L-051 (req-226): one StoreProvider for the whole harness, the screen swapped inside it. The key
+  // gives each mount a fresh screen, as the old per-mount render did; only the provider stays.
+  const host = {}
+  function Host() {
+    const [screen, setScreen] = React.useState({ n: 0, child: null })
+    // oxlint-disable-next-line react/immutability
+    host.swap = setScreen
+    return h(StoreProvider, null, h(Screen, { key: screen.n, child: screen.child }))
+  }
   const mount = async (child) => {
-    await view?.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { child })))
+    if (!host.swap) {
+      await view?.unmount()
+      view = await render(h(Host))
+    }
+    await act(async () => host.swap((screen) => ({ n: screen.n + 1, child })))
   }
   await mount(null)
   if (fresh) await act(async () => captured.store.startWorkout('sess-upper'))
