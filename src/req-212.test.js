@@ -482,3 +482,23 @@ describe('review round 1 — effort is per exercise: Add set and clearing', () =
     assert.equal(view.all('[role="radio"][aria-checked="true"]').length, 0)
   })
 })
+
+// req-226 AC3 (L-051) — a writing sheet answered after the screen was swapped. The sheet's answer
+// writes through the provider that opened it; with one StoreProvider for the harness (as the app
+// has) the write is stored. Under the old per-mount provider it landed in the unmounted one.
+describe('req-226 — a write answered after a screen swap lands in the one provider', () => {
+  it('Chest Press at 40 kg → "Use 40 kg next time?"; swap to the review; Yes → the stored routine has 40', async () => {
+    const t = await harness()
+    await t.start()
+    await t.mount(t.log(CHEST))
+    await view.click(view.button('Done')) // the warm-up
+    await view.type(view.input('kg'), '40')
+    for (let i = 0; i < 3; i++) await view.click(view.button('Done'))
+    assert.match(getPendingConfirm()?.title ?? '', /Use 40 kg next time\?/, 'the routine-kg sheet is open')
+    await t.mount(t.review(CHEST)) // the screen changes while the sheet is still open
+    await view.click(view.button('Yes'))
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
+    const item = JSON.parse(localStorage.getItem('workout-mvp-v9')).routines.find((r) => r.id === 'sess-upper').exercises.find((i) => i.id === CHEST)
+    assert.deepEqual(item.suggestedWeights, [40, 40, 40])
+  })
+})
