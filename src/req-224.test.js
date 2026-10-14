@@ -93,6 +93,25 @@ describe('req-224 — finishTimeFor', () => {
     assert.equal(finishTimeFor(onlySkips, at(20, 0)).finishedAt, at(20, 0).toISOString())
   })
 
+  it('review round 1: work set Mon 19:00 + Skip set Tue 08:00, Finish Tue 08:01 → finishedAt Mon 19:00', () => {
+    const skipTap = set(iso(8, 0, 13), { reps: 'skipped', weight: 0, note: 'skipped' }) // Skip set writes loggedAt
+    const w = active([set(iso(19, 0)), skipTap], iso(18, 0))
+    assert.equal(lastSetAt(w), iso(19, 0))
+    const t = finishTimeFor(w, at(8, 1, 13))
+    assert.equal(t.leftOpen, true)
+    assert.equal(t.finishedAt, iso(19, 0))
+    assert.equal(finish(w, at(8, 1, 13)).finishedAt, iso(19, 0))
+  })
+
+  it('review round 1: every set with loggedAt is a skip → now', () => {
+    const skip = (h) => set(iso(h, 0), { reps: 'skipped', weight: 0, note: 'skipped' })
+    const w = active([skip(10), skip(11), set(null)])
+    assert.equal(lastSetAt(w), null)
+    const t = finishTimeFor(w, at(20, 0))
+    assert.equal(t.leftOpen, false)
+    assert.equal(t.finishedAt, at(20, 0).toISOString())
+  })
+
   it('finishedState\'s own default is still now (every other caller)', () => {
     const before = Date.now()
     const saved = finishedState({ activeWorkout: morning(), workouts: [] }).workouts[0]

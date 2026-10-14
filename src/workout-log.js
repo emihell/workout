@@ -169,14 +169,16 @@ export function withSkippedUnloggedSets(workout) {
   }
 }
 
-// req-224 (DEC-125 §4) — a workout left open. `lastSetAt`: the latest `loggedAt` (req-212,
-// written on a logged set and on Skip set) among the workout's sets, as the stored string, or
-// null. Sets without a readable `loggedAt` — older sets, and the skipped sets Finish / Skip
-// exercise record (skippedSet has none) — never count. Pure.
+// req-224 (DEC-125 §4) — a workout left open. `lastSetAt`: the latest `loggedAt` (req-212)
+// among the workout's LOGGED sets, as the stored string, or null. Skipped sets never count —
+// a Skip set tap writes `loggedAt` too, and skipping the rest next morning must not hide the
+// gap (review round 1); Finish / Skip exercise skips have none anyway. Sets without a
+// readable `loggedAt` (older sets) never count. Pure.
 export function lastSetAt(workout) {
   let last = null
   let lastMs = -Infinity
   for (const set of workout?.sets || []) {
+    if (isSkippedSet(set)) continue
     const ms = Date.parse(set?.loggedAt ?? '')
     if (Number.isFinite(ms) && ms > lastMs) {
       last = set.loggedAt
