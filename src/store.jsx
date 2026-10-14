@@ -38,7 +38,7 @@ import {
 import { StoreContext } from './store-context'
 import { exerciseFromData } from './exercise-names.js'
 import { nextWorkoutName, planIds, planToState } from './plan-templates.js'
-import { addWorkingSetToState, finishedState } from './workout-log'
+import { addWorkingSetToState, finishedState, finishTimeFor } from './workout-log'
 
 export function StoreProvider({ children }) {
   const [state, setStateRaw] = useState(loadState)
@@ -233,8 +233,10 @@ export function StoreProvider({ children }) {
       },
       // req-112 / DEC-056 — Finish never writes the routine; the pure reducer is in
       // workout-log.js so the manual and auto-complete paths are unit-tested through it.
+      // req-224 — the finish time is the last set's when the workout was left open > 3 h
+      // (finishTimeFor); finishedState's own default (now) stays for every other caller.
       finishWorkout(args) {
-        setState((s) => finishedState(s, args))
+        setState((s) => finishedState(s, args, finishTimeFor(s.activeWorkout, Date.now()).finishedAt))
       },
       // req-115 — validate + migrate first, then set; a bad file throws to the caller.
       // req-220 — `{ keepHistory: true }`: Keep my history (exchange.js keptHistoryState).

@@ -6,6 +6,8 @@
 // for item i — no second counting rule. Pure; the screen only renders `lines`.
 import { isSkippedSet } from './set-rules.js'
 import { setsForItem, withSkippedUnloggedSets, workCountFor } from './workout-log.js'
+import { dateKey } from './schedule.js'
+import { weekdayDate } from './views/history/helpers.js'
 
 // Per snapshot item (workout order): the sets Finish adds for it, split into warm-up and
 // work. Items Finish adds nothing to are left out.
@@ -61,4 +63,18 @@ export function finishSkippedLines(workout) {
   const untouched = entries.filter((entry) => !entry.started).map((entry) => entry.item?.exerciseName || 'Exercise')
   if (untouched.length) lines.push(`Not started, saved as skipped: ${untouched.join(', ')}.`)
   return lines
+}
+
+// req-224 (DEC-125 §4) — the Finish screen's line when the workout was left open
+// (finishTimeFor's `leftOpen`): the saved finish time as local HH:MM, plus the day
+// (weekdayDate, "Mon, Oct 13") when it isn't `now`'s local day. Wording (unconfirmed):
+// "You left this workout open — saved as finished at 10:50, your last set." Pure.
+export function leftOpenText(finishedAt, now = new Date()) {
+  const at = new Date(finishedAt)
+  if (!Number.isFinite(at.getTime())) return ''
+  const pad = (n) => String(n).padStart(2, '0')
+  const time = `${pad(at.getHours())}:${pad(at.getMinutes())}`
+  const key = dateKey(at)
+  const when = key === dateKey(now) ? time : `${time} on ${weekdayDate(key, now)}`
+  return `You left this workout open — saved as finished at ${when}, your last set.`
 }
