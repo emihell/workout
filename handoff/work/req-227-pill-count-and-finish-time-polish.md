@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — display fixes; touches `workout-log.js` → independent reviewer (DEC-057).
+**Status: BUILT, NOT merged — branch `req-227` (`31a15d9`…`ed29841`).** **Lane: ui** — display fixes; touches `workout-log.js` → independent reviewer (DEC-057).
 
 # req-227 — GO count includes a reopened swapped exercise; Finish screen and Save agree; auto-complete says "left open"
 
