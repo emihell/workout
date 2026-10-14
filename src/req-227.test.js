@@ -280,6 +280,15 @@ describe('req-227 review round 1 — the no-countdown summary updates and saves 
     await view.click(view.button('Finish'))
     assert.equal(captured.store.workouts[0].finishedAt, sets[1].loggedAt)
   })
+  it('the summary passes its shown time: opened 13:49:50 (not left open), Finish 13:50:05 → 13:49:50, not 10:50', async () => {
+    const { captured, sets } = await openScreen('auto', at(13, 49, 50))
+    await tick(15000)
+    const text = view.text()
+    assert.equal(text.includes('You left this workout open'), false, text)
+    await view.click(view.button('Finish'))
+    assert.equal(captured.store.workouts[0].finishedAt === sets[1].loggedAt, false)
+    assert.equal(captured.store.workouts[0].finishedAt, iso(13, 49, 50))
+  })
   it('summary opened 10:52, phone locked, Finish at 13:40 → stores 13:40 (stale guard)', async () => {
     const { captured } = await openScreen('auto', at(10, 52))
     await setClock(at(13, 40))
