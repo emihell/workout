@@ -84,7 +84,7 @@ describe('AC1 — Start lands on item 1 with the bar; 5 s later it is gone, noth
     assert.match(barText(), /Starting in 1…/)
     const before = localStorage.getItem(KEY)
     await tick(1000)
-    assert.equal(bar(), null, 'the bar hides at 0')
+    assert.ok(!bar(), 'the bar hides at 0')
     assert.equal(localStorage.getItem(KEY), before, 'the countdown wrote nothing')
     assert.deepEqual(stored().activeWorkout.sets, [])
     assert.equal(window.location.hash, logPath(KEYS[0]), 'and started nothing / went nowhere')
@@ -95,7 +95,7 @@ describe('AC1 — Start lands on item 1 with the bar; 5 s later it is gone, noth
     await startThree()
     const before = localStorage.getItem(KEY)
     await tap(button('Start now'))
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
     assert.equal(localStorage.getItem(KEY), before)
   })
 })
@@ -137,7 +137,7 @@ describe('AC4 — Skip on the last not-done item → the Finish target, no bar, 
     await tap(button('Skip'))
     await tap(button('Skip'))
     assert.equal(window.location.hash, `#/workout/${R}/finish`)
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
     assert.doesNotMatch(view.text(), /Not found\./)
     assert.ok(stored().activeWorkout, 'nothing finished by the skip')
   })
@@ -151,7 +151,7 @@ describe('AC4 — Skip on the last not-done item → the Finish target, no bar, 
     await tap(button('Skip'))
     assert.equal(window.location.hash, `#/workout/${R}`)
     assert.match(view.text(), /Great job!/)
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
   })
 })
 
@@ -170,7 +170,7 @@ describe('AC5 — Swap from the bar', () => {
     const rep = items.find((i) => i.replacesItemId === KEYS[0])
     assert.ok(rep, 'the replacement is in the workout')
     assert.equal(window.location.hash, logPath(rep.routineItemId || rep.id))
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
     assert.ok(button('Done'), 'its log form is up')
   })
 })
@@ -185,7 +185,7 @@ describe('AC6 — failure case: the trigger is the arrival, not "no sets logged"
     await tap(row)
     assert.equal(window.location.hash, logPath(KEYS[1]))
     assert.deepEqual(itemSets(KEYS[1]), [])
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
   })
 
   it('item 2 opened from the GO pill → no bar', async () => {
@@ -198,7 +198,7 @@ describe('AC6 — failure case: the trigger is the arrival, not "no sets logged"
     await tap(pill)
     assert.equal(window.location.hash, logPath(KEYS[1]))
     assert.deepEqual(itemSets(KEYS[1]), [])
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
   })
 
   it('reloading the bar\'s URL → no bar (a fresh page: the marker is memory only)', async () => {
@@ -219,7 +219,7 @@ describe('AC6 — failure case: the trigger is the arrival, not "no sets logged"
     assert.equal(window.location.hash, logPath(KEYS[0]))
     assert.deepEqual(itemSets(KEYS[0]), [])
     assert.ok(button('Done'), 'the log screen rendered')
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
   })
 
   it('Back to the bar\'s screen after leaving it → no bar (the marker was used up on arrival)', async () => {
@@ -229,7 +229,7 @@ describe('AC6 — failure case: the trigger is the arrival, not "no sets logged"
       window.location.hash = logPath(KEYS[0])
     })
     await flush()
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
   })
 })
 
@@ -280,7 +280,7 @@ describe('AC8 — logging a set while the countdown runs', () => {
     assert.match(barText(), /Starting in 3…/)
     await tap(button('Done'))
     assert.equal(itemSets(KEYS[0]).length, 1, 'one set saved')
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
     await tick(5000) // the bar's timer is gone with it: nothing more happens
     assert.equal(itemSets(KEYS[0]).length, 1)
   })
@@ -293,7 +293,7 @@ describe('AC8 — logging a set while the countdown runs', () => {
     await tap(button('Done')) // its warm-up set
     assert.equal(window.location.hash, logPath(KEYS[1]), 'still on Lat Pulldown')
     assert.equal(itemSets(KEYS[1]).length, 1)
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
     await tick(5000)
     assert.equal(itemSets(KEYS[1]).length, 1)
   })
@@ -385,12 +385,12 @@ describe('review fix 3 — once a set is logged the bar never comes back', () =>
     await tap(button('Done')) // Lat Pulldown's warm-up set: the exercise stays open
     assert.equal(captured.store.activeWorkout.sets.length, 1)
     assert.ok(button('Done'), 'still on its log screen')
-    assert.equal(bar(), null)
+    assert.ok(!bar(), 'no Up next bar')
     // The logged set taken away again (no screen does this today — the latent case).
     await act(async () => captured.store.patchActive({ sets: [] }))
     await flush()
     assert.deepEqual(captured.store.activeWorkout.sets, [])
     assert.ok(button('Done'), 'the log screen is still up')
-    assert.equal(bar(), null, 'no second bar')
+    assert.ok(!bar(), 'no second bar')
   })
 })
