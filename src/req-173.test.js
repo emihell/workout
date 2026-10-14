@@ -73,8 +73,8 @@ describe('live log screen — the stored set after Complete with blank kg (uncha
     }
     view = await render(h(StoreProvider, null, h(Screen, { started: false })))
     await act(async () => captured.store.startWorkout('sess-lower'))
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { started: true })))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(Screen, { started: true })))
     // WU set first: log it as prefilled, then clear the work set's kg.
     // req-192 test edit: the warm-up logs with "Done", the work set with Medium (rpe 3, as before)
     await view.click(view.button('Done'))

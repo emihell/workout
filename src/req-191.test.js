@@ -227,8 +227,8 @@ describe('AC3 — a done row opens the logged set (render, real store)', () => {
     }
     view = await render(h(StoreProvider, null, h(Screen, { open: false })))
     await act(async () => captured.store.startWorkout('sess-upper'))
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { open: true })))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(Screen, { open: true })))
     const a = () => captured.store.activeWorkout
     // req-192 test edit: "Done" logs the warm-up, Medium (rpe 3, as Complete stored) set 1;
     // the current set is told apart by its "Skip set" (viewing has Next, no Skip set).

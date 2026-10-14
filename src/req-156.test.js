@@ -124,8 +124,8 @@ describe('live log screen (render) — WorkoutItemLog + the real store', () => {
     view = await render(h(StoreProvider, null, h(Screen, { started: false })))
     const { act } = await import('./test-support/render.js')
     await act(async () => captured.store.startWorkout('sess-lower'))
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { started: true })))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(Screen, { started: true })))
     assert.match(view.text(), /Warm-up set/)
     assert.equal(view.text().includes('how did it feel'), false)
     // req-192 (test edit) — the warm-up logs with "Done", the work set with its effort button.

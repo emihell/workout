@@ -132,8 +132,8 @@ describe('2 — component tests (req-117 a), with the req-156 render harness', (
     await act(async () =>
       captured.store.completeSet({ exerciseId: 'ex-plank', routineItemId: item.routineItemId, setType: 'work', weight: 0, reps: '', durationSec: 50, rpe: 3, note: '' }),
     )
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { open: true })))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(Screen, { open: true })))
     const row = view.all('.ui-setpreview__tap')[0]
     assert.ok(row, 'the logged set is a tappable done row')
     await view.click(row)

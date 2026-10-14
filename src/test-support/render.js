@@ -72,6 +72,11 @@ export async function render(element) {
         input.dispatchEvent(new window.Event('input', { bubbles: true }))
       })
     },
+    // Render a new element into the same root: the parts of the tree that keep their place (a
+    // StoreProvider at the top) stay mounted, so a screen swap keeps one provider (L-051, req-226).
+    async rerender(next) {
+      await act(async () => root.render(next))
+    },
     async unmount() {
       await act(async () => root.unmount())
       container.remove()
