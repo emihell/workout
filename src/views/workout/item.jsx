@@ -785,7 +785,7 @@ function ExerciseReview({ routineId, item }) {
       {showEffort ? (
         <>
           <SectionHeader>Effort</SectionHeader>
-          {/* Review round 1 — clearable: "—" takes a mis-tap back to none (rpe null on those sets). */}
+          {/* clearable (req-221): tap the picked one again → none (rpe null on those sets). */}
           <SegmentedControl clearable options={EFFORT_OPTIONS} value={effort} onChange={pickEffort} ariaLabel="Effort" />
         </>
       ) : null}

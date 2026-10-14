@@ -122,9 +122,9 @@ describe("4 — History toggle WU → Work doesn't revive a legacy rpe", () => {
     const store = historyStore(PRESS, [{ exerciseId: 'ex-a', routineItemId: 'si-a', setType: 'wu', weight: 10, reps: '12', rpe: 3, note: '' }])
     view = await mount(store)
     await view.click(typeButton(view, 'Work'))
-    // The clearable control shows "—" pressed when unset; no effort LABEL may be pressed.
+    // req-221 — the clearable control has no "—" segment any more: nothing is pressed when unset.
     const pressed = view.all('[aria-label="Effort"] button').filter((b) => b.getAttribute('aria-pressed') === 'true' || b.getAttribute('aria-checked') === 'true')
-    assert.deepEqual(pressed.map((b) => b.textContent.trim()).filter((t) => t !== '—'), [], 'no effort pre-selected')
+    assert.deepEqual(pressed.map((b) => b.textContent.trim()), [], 'no effort pre-selected')
     await view.click(view.button('Save'))
     assert.equal(store.writes[0].patch.sets[0].rpe, null)
   })
