@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { leaveWorkoutToToday } from '../../workout-actions'
 import { recordButton } from '../../analytics'
 import { improvementList } from '../../beat-last-time'
@@ -6,7 +5,8 @@ import { previousSameRoutineWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { Back } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { anythingLogged, finishTimeFor, loggedSetCount } from '../../workout-log'
+import { anythingLogged, loggedSetCount } from '../../workout-log'
+import { useFinishTime } from './finish-time.js'
 import { finishSkippedLines, leftOpenText } from '../../finish-unfinished.js'
 import { activeFeel, activeNote } from '../../workout-note.js'
 import { ImprovementLines, NotInWorkout } from './helpers'
@@ -17,19 +17,6 @@ export function WorkoutFinish({ routineId }) {
   const store = useStore()
   if (!isActiveFor(store.activeWorkout, routineId)) return <NotInWorkout routineId={routineId} />
   return <FinishScreen routineId={routineId} />
-}
-
-// req-227 — how often the Finish screen re-derives its finish time (minutes + left-open line).
-export const FINISH_TICK_MS = 30000
-
-// The current time, refreshed every `ms` while mounted.
-function useNow(ms) {
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), ms)
-    return () => clearInterval(t)
-  }, [ms])
-  return now
 }
 
 function FinishScreen({ routineId }) {
@@ -46,11 +33,10 @@ function FinishScreen({ routineId }) {
   const overallNote = activeNote(active)
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
   // req-224 (DEC-125 §4) — the finish Save writes (finishTimeFor): the last set's time when
-  // the workout was left open > 3 h, else now. req-227 — re-derived on a FINISH_TICK_MS tick
-  // while the screen is open (so sitting here across the 3 h mark shows the line), and Save
-  // passes exactly this value to store.finishWorkout: what the screen shows is what's saved.
-  const now = useNow(FINISH_TICK_MS)
-  const finish = finishTimeFor(active, now)
+  // the workout was left open > 3 h, else now. req-227 — re-derived on a tick and when the page
+  // comes back to the foreground (useFinishTime), and Save passes this value to
+  // store.finishWorkout: what the screen shows is what's saved (unless stale — finish-time.js).
+  const { finish, finishedAtForSave } = useFinishTime(active)
   const minutes = Math.max(1, Math.round((Date.parse(finish.finishedAt) - started.getTime()) / 60000))
   // req-116 — only non-skipped sets count (a logged warm-up counts); the auto-complete
   // summary counts the same way (workoutSummaryStats → loggedSetCount).
@@ -113,7 +99,7 @@ function FinishScreen({ routineId }) {
         block
         onClick={() => {
           recordButton('finish-workout')
-          store.finishWorkout({ overallNote, overallFeel }, finish.finishedAt)
+          store.finishWorkout({ overallNote, overallFeel }, finishedAtForSave())
           leaveWorkoutToToday()
         }}
       >

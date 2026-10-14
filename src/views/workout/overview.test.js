@@ -82,10 +82,11 @@ test('Finish shows and writes back the same note; auto-complete saves it', () =>
   assert.match(finish, /const overallNote = activeNote\(active\)/)
   assert.match(finish, /store\.patchActive\(\{ overallNote: e\.target\.value \}\)/)
   // req-227 test edit — Save also passes the finish time the screen shows.
-  assert.match(finish, /store\.finishWorkout\(\{ overallNote, overallFeel \}, finish\.finishedAt\)/)
+  assert.match(finish, /store\.finishWorkout\(\{ overallNote, overallFeel \}, finishedAtForSave\(\)\)/)
   const auto = readFileSync(join(here, 'auto-complete.jsx'), 'utf8')
   assert.doesNotMatch(auto, /overallNote: ''/)
-  assert.match(auto, /store\.finishWorkout\(autoFinishArgs\(active\)\)/)
+  // req-227 test edit (review round 1) — auto-complete also passes the time it shows.
+  assert.match(auto, /store\.finishWorkout\(autoFinishArgs\(active\), finishedAtForSave\(\)\)/)
 })
 
 // req-114 (audit G) — the preview's plan date is the local day (planDateFor, unit-tested

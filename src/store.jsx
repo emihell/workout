@@ -242,10 +242,12 @@ export function StoreProvider({ children }) {
       // workout-log.js so the manual and auto-complete paths are unit-tested through it.
       // req-224 — the finish time is the last set's when the workout was left open > 3 h
       // (finishTimeFor); finishedState's own default (now) stays for every other caller.
-      // req-227 — `finishedAt` given (the Finish screen passes the time it shows) → saved as
-      // is; omitted (auto-complete) → computed here at save time, as before.
+      // req-227 — `finishedAt` given (the Finish screen / auto-complete pass the time they show)
+      // → saved as is, but only a readable date string (review round 1); anything else ('', a
+      // Date, an event object) → computed here at save time, as before.
       finishWorkout(args, finishedAt) {
-        setState((s) => finishedState(s, args, finishedAt ?? finishTimeFor(s.activeWorkout, Date.now()).finishedAt))
+        const given = typeof finishedAt === 'string' && Number.isFinite(Date.parse(finishedAt)) ? finishedAt : null
+        setState((s) => finishedState(s, args, given ?? finishTimeFor(s.activeWorkout, Date.now()).finishedAt))
       },
       // req-115 — validate + migrate first, then set; a bad file throws to the caller.
       // req-220 — `{ keepHistory: true }`: Keep my history (exchange.js keptHistoryState).
