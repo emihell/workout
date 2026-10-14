@@ -99,7 +99,8 @@ function FinishScreen({ routineId }) {
         block
         onClick={() => {
           recordButton('finish-workout')
-          store.finishWorkout({ overallNote, overallFeel }, finishedAtForSave())
+          const finishedAt = finishedAtForSave()
+          store.finishWorkout({ overallNote, overallFeel }, finishedAt)
           leaveWorkoutToToday()
         }}
       >
