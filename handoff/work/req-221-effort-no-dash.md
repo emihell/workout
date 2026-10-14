@@ -1,4 +1,4 @@
-**Status: READY** **Lane: ui** — a shared control's look; writes nothing new.
+**Status: BUILT AND MERGED, 2026-10-14 — branch `req-221` (`346aca9`…`346aca9`, 1 commit).** **Lane: ui** — a shared control's look; writes nothing new.
 
 # req-221 — effort picker: no "—" segment; tap the picked one again to clear
 

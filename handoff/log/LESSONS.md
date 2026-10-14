@@ -522,3 +522,10 @@ were cleaned up with no commit and no branch left, so the batch restarted from z
 stalled (stream watchdog) with uncommitted edits — that worktree survived and the same agent was resumed with `SendMessage`.
 **How to apply:** every build brief says "commit early once a coherent part passes tests"; on an agent failure, check
 `git worktree list` + `git status` in its worktree first — resume the same agent if the worktree is there, relaunch only if not.
+
+## L-053 — `src/db.json` is in the req-164 / req-165 goldens; a seed edit breaks them  (Builder agent, req-221, 2026-10-14)
+
+req-221 marked the seed Plank timed; 11 subtests in `req-164` / `req-165` failed — their saved goldens were recorded from
+`db.json`. The spec's READY check said "tests reading db.json stay green" but didn't name the goldens. Fixed with
+`test-support/timed-plank.js` (the `withEmptyMoves` pattern, req-211), goldens not re-recorded. **How to apply:** a req that
+edits `db.json` names `req-164` / `req-165` and says whether to transform or re-record their goldens.
