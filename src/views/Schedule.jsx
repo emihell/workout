@@ -17,8 +17,10 @@ import {
   scheduleRowText,
   slotMenuSheet,
   slotScreenDate,
+  slotScreenSlot,
   slotStart,
   startNowShown,
+  swappedFromText,
 } from './schedule-day.js'
 import { childLink, go, withFrom } from '../route'
 import { nextWorkoutName } from '../plan-templates.js'
@@ -174,7 +176,9 @@ async function slotActions(store, { routines, slot, week, weekday, loop, date, f
     go(withFrom(changedDayPath(week, Number(picked), date), from))
   } else if (choice === 'remove') {
     // req-211 — a slot moved onto this date still repeats on its own day: name that one.
-    if (!(await askConfirm(removeSlotText(name, slot.weekday, slot.week, loop), { confirmLabel: 'Remove' }))) return
+    // req-225 — and a slot swapped for this date repeats with its OWN routine: name that one.
+    const own = slot.swappedFrom ? slotLabel(routines, { ...slot, routineId: slot.swappedFrom }) : name
+    if (!(await askConfirm(removeSlotText(own, slot.weekday, slot.week, loop), { confirmLabel: 'Remove' }))) return
     store.removeSlot(slot.id)
   }
 }
@@ -266,6 +270,10 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
             >
               <NavLink to={childLink(dayPathOf(week, weekday, `/${slot.id}`), here, from)}>{slotLabel(routines, slot)}</NavLink>
               {moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null}
+              {/* req-225 — a slot swapped for this date (Home's "Swap for today") says so. */}
+              {slot.swappedFrom ? (
+                <span className="ui-moved">{swappedFromText(slotLabel(routines, { ...slot, routineId: slot.swappedFrom }))}</span>
+              ) : null}
               {earlier ? (
                 <span className="ui-moved">
                   <NavLink to={childLink(`/history/${earlier.id}`, here, from)}>{doneEarlierText(earlier)}</NavLink>
@@ -364,7 +372,10 @@ export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId,
     return <Missing>Not on this day.</Missing>
   }
 
-  const { routine } = resolveSlot(store.routines, slot)
+  // req-225 — opened from a DATED day screen (Home's sheet Edit, or a dated day screen's row),
+  // the slot stands for its routine on that date: a one-date swap makes it the swapped-in one.
+  const shown = slotScreenSlot(store.schedule, week, weekday, slot, from)
+  const { routine } = resolveSlot(store.routines, shown)
   if (!routine) {
     return <Missing>Not found.</Missing>
   }

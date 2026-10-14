@@ -96,9 +96,36 @@ export function slotsOn(schedule, date) {
   const moves = liveMoves(schedule, slots)
   const away = new Set(moves.filter((move) => move.from === key).map((move) => move.slotId))
   const into = new Set(moves.filter((move) => move.to === key).map((move) => move.slotId))
-  return slots.filter(
-    (s) => into.has(s.id) || (Number(s.week) === week && Number(s.weekday) === weekday && !away.has(s.id)),
-  )
+  const swapped = swapsOn(schedule, key)
+  return slots
+    .filter((s) => into.has(s.id) || (Number(s.week) === week && Number(s.weekday) === weekday && !away.has(s.id)))
+    .map((s) => {
+      const swap = swapped.get(s.id)
+      return swap && swap.routineId !== s.routineId ? { ...s, routineId: swap.routineId, swappedFrom: s.routineId } : s
+    })
+}
+
+// req-225 (DEC-125 §5) — `schedule.swaps` (optional, normalised by migrateState): a one-date
+// routine swap `{ id, slotId, date, routineId }` makes that slot, shown on `date` (after
+// moves), stand for `routineId` on that date only. slotsOn returns it with `routineId` = the
+// swap's and `swappedFrom` = the slot's own; the stored slot and every other date are
+// untouched. Absent → no swaps. A swap keyed to a date the slot isn't on simply never shows.
+export function scheduleSwaps(schedule) {
+  return Array.isArray(schedule?.swaps) ? schedule.swaps : []
+}
+
+// The swaps of `key`, by slot id (the last for a slot wins, as normaliseSwaps keeps it).
+function swapsOn(schedule, key) {
+  const out = new Map()
+  for (const swap of scheduleSwaps(schedule)) {
+    if (swap && swap.date === key && typeof swap.routineId === 'string') out.set(swap.slotId, swap)
+  }
+  return out
+}
+
+// req-225 — the swap that makes `slotId` another routine on `date`, or null.
+export function swapOn(schedule, slotId, date) {
+  return swapsOn(schedule, dateKey(date)).get(slotId) || null
 }
 
 // req-211 review — a move counts only while its slot is genuinely on `move.from` (that date's

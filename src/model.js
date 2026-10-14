@@ -307,6 +307,36 @@ export function normaliseMoves(moves, slots) {
     .filter((move, index, all) => !all.slice(index + 1).some((later) => later.slotId === move.slotId && later.from === move.from))
 }
 
+// req-225 (DEC-125 §5) — `schedule.swaps`: `[{ id, slotId, date, routineId }]`, `date`
+// 'YYYY-MM-DD'. A one-date routine swap ("Swap for today" on Home): that slot, on that date,
+// is `routineId` instead of its own. Additive and optional (no version bump, the `moves`
+// precedent): a store without it reads as []. An entry is kept only when it is a plain object
+// with a non-empty string id, a slotId naming an existing slot, a real calendar date, and a
+// routineId naming an existing, non-archived routine other than the slot's own; its four
+// fields are what is kept, and of several for one (slotId, date) the last wins, in its place.
+// A dropped entry is never repaired: the spot falls back to its own routine (fails closed).
+export function normaliseSwaps(swaps, slots, routines) {
+  if (!Array.isArray(swaps)) return []
+  const slotById = new Map((slots || []).map((slot) => [slot.id, slot]))
+  const live = new Set((routines || []).filter((routine) => routine && !routine.archivedAt).map((routine) => routine.id))
+  return swaps
+    .filter(
+      (swap) =>
+        swap !== null &&
+        typeof swap === 'object' &&
+        !Array.isArray(swap) &&
+        typeof swap.id === 'string' &&
+        swap.id !== '' &&
+        slotById.has(swap.slotId) &&
+        isDateKey(swap.date) &&
+        typeof swap.routineId === 'string' &&
+        live.has(swap.routineId) &&
+        swap.routineId !== slotById.get(swap.slotId).routineId,
+    )
+    .map(({ id, slotId, date, routineId }) => ({ id, slotId, date, routineId }))
+    .filter((swap, index, all) => !all.slice(index + 1).some((later) => later.slotId === swap.slotId && later.date === swap.date))
+}
+
 // req-120 (audit C) — `legacy` says the input predates v9. The caller computes it from
 // the RAW stored value, before any `{ ...emptyState(), ...raw }` merge (which injects
 // schemaVersion 9). Only legacy input gets the plan backfill/baseline; the default is
@@ -346,6 +376,9 @@ export function migrateState(input, { legacy = false } = {}) {
       // req-211 — the one-date moves: absent/non-array → [], and only well-formed entries for
       // a slot that exists survive (a hand-edited or stale entry is dropped, never repaired).
       moves: normaliseMoves(source.schedule?.moves, slots),
+      // req-225 — the one-date routine swaps: absent/non-array → [], and only entries for an
+      // existing slot and a live (present, non-archived) other routine survive.
+      swaps: normaliseSwaps(source.schedule?.swaps, slots, routines),
     },
     plannedWorkouts: (Array.isArray(source.plannedWorkouts) ? source.plannedWorkouts : []).map((plan) => {
       const items = (plan.items || []).map((item) => {

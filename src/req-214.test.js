@@ -73,6 +73,8 @@ const squash = (text) => text.replace(/\s+/g, '')
 const block = () => view.container.querySelector('.ui-today-workout')
 const buttons = (label) => [...document.body.querySelectorAll('button')].filter((b) => b.textContent.trim() === label)
 const sheet = () => document.body.querySelector('.ui-sheet')
+// req-225 test edit: a button of the open sheet by its label.
+const sheetButton = (label) => [...sheet().querySelectorAll('button')].find((b) => b.textContent.trim() === label)
 const saved = () => JSON.parse(localStorage.getItem('workout-mvp-v9'))
 const encode = (path) => encodeURIComponent(path)
 
@@ -118,7 +120,9 @@ describe('scope 2 — one Start for several', () => {
     assert.equal(sheet().querySelector('.ui-sheet__title').textContent, 'Start which workout?')
     const choices = [...sheet().querySelectorAll('.ui-sheet__choices button')].map((b) => b.textContent)
     assert.deepEqual(choices, ['Upper Body', 'Lower Body'])
-    await tap(buttons('Lower Body')[0])
+    // req-225 test edit: today's names are buttons now (they open the workout sheet), so the
+    // pick is looked up inside the sheet rather than as the first button with that label.
+    await tap(sheetButton('Lower Body'))
     const active = saved().activeWorkout
     assert.equal(active.routineId, 'sess-lower')
     assert.equal(active.scheduleSlotId, 's-low')
@@ -156,7 +160,7 @@ describe('scope 2 — one Start for several', () => {
     assert.equal(buttons('Continue').length, 1)
     assert.equal(buttons('Start').length, 1)
     await tap(buttons('Start')[0])
-    await tap(buttons('Upper Body')[0])
+    await tap(sheetButton('Upper Body')) // req-225 test edit: inside the sheet (see AC2)
     // startOrContinue's one-active rule (DEC-038) — unchanged: it asks before abandoning
     assert.ok(buttons('Abandon').length, 'abandon-on-new confirm')
     await tap(buttons('Cancel')[0])

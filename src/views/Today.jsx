@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordButton } from '../analytics'
 import { importWithBackup } from '../import-backup'
 import { isCurrentWorkout, otherTodayOccurrences } from '../current-workout'
 import { clampLoopWeeks, comingDays, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, moveInto, resolveSlot, slotsOn, spotStartOptions } from '../schedule'
-import { doneEarlierText, movedFromText } from './schedule-day.js'
-import { routineById } from '../model.js'
+import { doneEarlierText, movedFromText, swapChoices, swappedFromText, todaySlotEditPath } from './schedule-day.js'
+import { exerciseById, routineById } from '../model.js'
+import { routineItemMeta } from '../ids'
 import { doneInTodayBlock, isFirstRun, staleInProgressWorkouts } from '../history-queries.js'
 import { useStore } from '../store-context'
 import { continueInProgress, startOrContinue } from '../workout-actions'
@@ -108,6 +109,15 @@ function UpcomingRow({ schedule, routines, workouts, row }) {
     .map(({ slot, move }) =>
       row.slots.length > 1 ? `${resolveSlot(routines, slot).routine?.name} ${movedFromText(move.from)}` : movedFromText(move.from),
     )
+  // req-225 — a spot swapped for that date (only today's can be swapped from Home, but an
+  // imported swap may name a later date) says so, as a moved one does.
+  const swapped = row.slots
+    .filter((slot) => slot.swappedFrom && routineById(routines, slot.swappedFrom))
+    .map((slot) => {
+      const text = swappedFromText(routineById(routines, slot.swappedFrom).name)
+      return row.slots.length > 1 ? `${resolveSlot(routines, slot).routine?.name} ${text}` : text
+    })
+  moved.push(...swapped)
   return (
     <Row to={withFrom(`/schedule/${row.week}/${row.weekday}?date=${row.dateKey}`, '/')} className={rest ? 'ui-row--rest' : ''}>
       {weekdayDate(row.dateKey)} · {rest ? 'Rest' : names}
@@ -149,17 +159,136 @@ function MovedMark({ moved }) {
   return moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null
 }
 
+// req-225 — a spot swapped for today ("Swap for today"): "swapped from {its own routine}".
+function SwappedMark({ store, slot }) {
+  if (!slot?.swappedFrom) return null
+  const own = routineById(store.routines, slot.swappedFrom)
+  return own ? <span className="ui-moved">{swappedFromText(own.name)}</span> : null
+}
+
+// req-225 (DEC-125 §5, Emilio I1: "a quick overview of it … With a edit button? And switch?") —
+// tapping a pending workout's name in today's block opens this sheet: the name, its exercises
+// (name + the routine editor's own meta line, routineItemMeta), then Edit (the scheduled-workout
+// screen the Schedule opens for this slot), Swap for today, and — on a swapped spot — Back to
+// {its own}. Swap for today turns the sheet into the list of other workouts (swapChoices); a pick
+// saves the one-date swap (store.swapSlotOnDate) and closes. Swapping and Back are reversible, so
+// neither asks to confirm. Its own small sheet, not askChoice (text + buttons only): the same
+// backdrop/sheet look as ConfirmSheet; Close / backdrop / Escape close it, writing nothing.
+function WorkoutSheet({ store, slot, routine, date, onClose }) {
+  const [picking, setPicking] = useState(false)
+  const closeRef = useRef(null)
+  useEffect(() => {
+    closeRef.current?.focus()
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose, picking])
+  const own = slot.swappedFrom ? routineById(store.routines, slot.swappedFrom) : null
+  const swapTo = (routineId) => {
+    store.swapSlotOnDate({ slotId: slot.id, date, routineId })
+    onClose()
+  }
+  const choices = swapChoices(store.routines, slot)
+  return (
+    <div className="ui-sheet-backdrop" onClick={onClose}>
+      <div
+        className="ui-sheet ui-workout-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ui-workout-sheet-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {picking ? (
+          <>
+            <p id="ui-workout-sheet-title" className="ui-sheet__title">
+              Swap {routine.name} for which workout?
+            </p>
+            <p className="ui-sheet__message">Only today — the Schedule stays as it is.</p>
+            {choices.length ? (
+              <div className="ui-sheet__choices ui-workout-sheet__scroll">
+                {choices.map((choice) => (
+                  <Button key={choice.id} block onClick={() => swapTo(choice.id)}>
+                    {choice.name}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <p className="ui-sheet__message">No other workouts to swap for.</p>
+            )}
+            <div className="ui-sheet__actions">
+              <Button ref={closeRef} onClick={() => setPicking(false)}>
+                Cancel
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p id="ui-workout-sheet-title" className="ui-sheet__title">
+              {routine.name}
+              {own ? <span className="ui-moved">{swappedFromText(own.name)}</span> : null}
+            </p>
+            {routine.exercises?.length ? (
+              <ul className="ui-workout-sheet__list ui-workout-sheet__scroll">
+                {routine.exercises.map((item, index) => {
+                  const exercise = exerciseById(store.exercises, item.exerciseId)
+                  return (
+                    <li key={item.id || `${item.exerciseId}-${index}`} className="ui-row__stack">
+                      <span>{exercise?.name || 'Deleted exercise'}</span>
+                      <span className="ui-row__meta">{routineItemMeta(item, { timed: Boolean(exercise?.hasDuration) })}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              <p className="ui-sheet__message">No exercises yet.</p>
+            )}
+            <div className="ui-sheet__choices">
+              <NavLink to={todaySlotEditPath(store.schedule, slot.id)} look="secondary" block>
+                Edit
+              </NavLink>
+              <Button block onClick={() => setPicking(true)}>
+                Swap for today
+              </Button>
+              {own ? (
+                <Button block onClick={() => swapTo(own.id)}>
+                  Back to {own.name}
+                </Button>
+              ) : null}
+            </div>
+            <div className="ui-sheet__actions">
+              <Button ref={closeRef} onClick={onClose}>
+                Close
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function TodayPending({ store, pending, date }) {
+  // req-225 — the slot id of the workout whose sheet is open (null: none).
+  const [open, setOpen] = useState(null)
+  const close = useCallback(() => setOpen(null), [])
   if (!pending.length) return null
   const startable = pending.filter(({ routine }) => routineStartable(routine))
+  const shown = pending.find(({ slot }) => slot.id === open)
   return (
     <>
       {pending.map(({ slot, routine, moved }) => (
         <p key={slot.id} className="ui-today-workout__name">
-          {routine.name}
+          {/* req-225 — the name opens the workout's sheet. */}
+          <button type="button" className="ui-today-workout__open" aria-haspopup="dialog" onClick={() => setOpen(slot.id)}>
+            {routine.name}
+          </button>
+          <SwappedMark store={store} slot={slot} />
           <MovedMark moved={moved} />
         </p>
       ))}
+      {shown ? <WorkoutSheet store={store} slot={shown.slot} routine={shown.routine} date={date} onClose={close} /> : null}
       {startable.length === 1 ? (
         <StartButton store={store} routine={startable[0].routine} slot={startable[0].slot} date={date} variant="primary" block />
       ) : startable.length > 1 ? (
@@ -193,6 +322,7 @@ function TodayDone({ store, covered = [], done }) {
       {covered.map(({ slot, routine, moved, session, value }) => (
         <Row key={slot.id} to={withFrom(`/history/${session.id}`, '/')} value={value}>
           {routine.name}
+          <SwappedMark store={store} slot={slot} />
           <MovedMark moved={moved} />
         </Row>
       ))}

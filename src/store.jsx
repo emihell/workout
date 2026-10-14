@@ -29,6 +29,7 @@ import {
   setLoggedState,
   slotAddedState,
   slotMovedOnDateState,
+  slotSwappedOnDateState,
   slotRemovedState,
   startedWorkoutState,
   workoutAbandonedState,
@@ -137,6 +138,12 @@ export function StoreProvider({ children }) {
       moveSlotOnDate({ slotId, date, to }) {
         const id = uid('move')
         setState((s) => slotMovedOnDateState(s, { id, slotId, date, to }))
+      },
+      // req-225 (DEC-125 §5) — one date only: the slot shown on `date` is `routineId` that day
+      // (schedule.swaps); `routineId` = the slot's own removes the swap ("Back to …").
+      swapSlotOnDate({ slotId, date, routineId }) {
+        const id = uid('swap')
+        setState((s) => slotSwappedOnDateState(s, { id, slotId, date, routineId }))
       },
       addExercise(data) {
         // req-127 — the record is built by exerciseFromData (exercise-names.js), unchanged.

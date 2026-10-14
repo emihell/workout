@@ -181,11 +181,22 @@ export function removeRoutineFromState(s, routineId, archivedAt = new Date().toI
     routines: referenced
       ? (s.routines || []).map((routine) => (routine.id === routineId ? { ...routine, archivedAt } : routine))
       : (s.routines || []).filter((routine) => routine.id !== routineId),
-    schedule: {
-      ...s.schedule,
-      slots: (s.schedule?.slots || []).filter((slot) => slot.routineId !== routineId),
-    },
+    schedule: removedRoutineSchedule(s.schedule, routineId),
   }
+}
+
+// req-225 — a removed (deleted or archived) routine's swaps go too: the ones that swap it IN
+// (the spot falls back to its own routine, as on the next load) and the ones of its removed
+// slots. Moves are left as before (req-211: migrateState drops them on load). A schedule with
+// no `swaps` field gets none written (the stored shape is unchanged for it).
+function removedRoutineSchedule(schedule, routineId) {
+  const slots = (schedule?.slots || []).filter((slot) => slot.routineId !== routineId)
+  const next = { ...schedule, slots }
+  if (Array.isArray(schedule?.swaps)) {
+    const kept = new Set(slots.map((slot) => slot.id))
+    next.swaps = schedule.swaps.filter((swap) => swap.routineId !== routineId && kept.has(swap.slotId))
+  }
+  return next
 }
 
 // req-119 — the head line of the delete confirm (Exercises.jsx / Routine.jsx), pure so
@@ -299,6 +310,7 @@ export function slotAddedState(s, slot) {
 }
 
 // req-211 — a removed slot takes its one-date moves with it (they name it by id).
+// req-225 — and its one-date swaps.
 export function slotRemovedState(s, slotId) {
   return {
     ...s,
@@ -306,8 +318,26 @@ export function slotRemovedState(s, slotId) {
       ...s.schedule,
       slots: (s.schedule?.slots || []).filter((slot) => slot.id !== slotId),
       moves: (Array.isArray(s.schedule?.moves) ? s.schedule.moves : []).filter((move) => move.slotId !== slotId),
+      swaps: (Array.isArray(s.schedule?.swaps) ? s.schedule.swaps : []).filter((swap) => swap.slotId !== slotId),
     },
   }
+}
+
+// req-225 (DEC-125 §5) — "Swap for today" on Home: the slot shown on `date` stands for
+// `routineId` on that one date. One entry per (slotId, date): an existing swap for it is
+// replaced; swapping back to the slot's own routine removes it ("Back to …"). Nothing else is
+// touched — not the slot, not another date's swap. `id` is made by the caller (store.jsx), so a
+// re-run updater writes the same record. An unknown slot → the same state.
+export function slotSwappedOnDateState(s, { id, slotId, date, routineId }) {
+  const slot = (s.schedule?.slots || []).find((candidate) => candidate.id === slotId)
+  if (!slot) return s
+  const swaps = Array.isArray(s.schedule?.swaps) ? s.schedule.swaps : []
+  const current = swaps.find((swap) => swap.slotId === slotId && swap.date === date)
+  if (!current && routineId === slot.routineId) return s
+  if (current && current.routineId === routineId) return s
+  const rest = swaps.filter((swap) => !(swap.slotId === slotId && swap.date === date))
+  const next = routineId === slot.routineId ? rest : [...rest, { id, slotId, date, routineId }]
+  return { ...s, schedule: { ...s.schedule, swaps: next } }
 }
 
 // req-211 (DEC-117 §2) — "Change day" on a dated day screen: move the slot shown on `date` to
