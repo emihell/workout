@@ -1174,3 +1174,39 @@ html:has(.ui-picker-strip) {
   font-size: var(--ui-text-caption);
   color: var(--ui-ink-2);
 }
+/* req-225 — Home's workout sheet (WorkoutSheet in Today.jsx): ConfirmSheet's look, with the
+ * routine's exercises as a list (name over the routine editor's meta line). A long routine or
+ * a long swap list scrolls inside the sheet, so its buttons stay in reach. */
+.ui-sheet__title > .ui-moved {
+  font-weight: 400;
+}
+.ui-workout-sheet__scroll {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.ui-workout-sheet__list {
+  list-style: none;
+  margin: 0 0 var(--ui-s4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-s2);
+  font-size: var(--ui-text-body);
+  color: var(--ui-ink);
+}
+/* req-225 — today's pending workout name is a button that opens its sheet: it reads as the
+ * name it was (same size and colour), underlined so it reads as tappable, ≥44px tall. */
+.ui-today-workout__open {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-height: 44px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

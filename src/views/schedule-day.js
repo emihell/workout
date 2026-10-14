@@ -4,7 +4,7 @@
 // the loop line and the Remove confirm.
 import { WEEKDAY_ORDER, weekdayName } from '../ids.js'
 import { addDays, coveringWorkout, dateKey, doneEarlier, loopWeekIndex, mondayOf, slotsOn, spotStartOptions, toLocalDate } from '../schedule.js'
-import { parseRoute } from '../route.js'
+import { childLink, parseRoute } from '../route.js'
 import { isCurrentWorkout } from '../current-workout.js'
 import { routineStartable } from '../exercise-names.js'
 import { completedOnDayKey } from '../history-queries.js'
@@ -161,6 +161,29 @@ export function movedFromText(from) {
   return `moved from ${WEEKDAY_SHORT[toLocalDate(from).getDay()]}`
 }
 
+// req-225 (DEC-125 §5) — the line under a spot swapped for one date ("Swap for today").
+export function swappedFromText(name) {
+  return `swapped from ${name}`
+}
+
+// req-225 — Home's workout sheet, "Swap for today": the workouts it can be swapped for, in the
+// order the Workouts list keeps them (store order) — every present, non-archived routine except
+// the one shown and the slot's own (that one is "Back to …" once swapped).
+export function swapChoices(routines, slot) {
+  const exclude = new Set([slot?.routineId, slot?.swappedFrom].filter(Boolean))
+  return (routines || []).filter((routine) => routine && !routine.archivedAt && !exclude.has(routine.id))
+}
+
+// req-225 — the sheet's Edit: the scheduled-workout screen the Schedule opens for this slot,
+// reached through today's dated day screen (`from` carries `?date=` and Home), so it shows the
+// routine the spot stands for today (slotScreenSlot: the swapped-in one when swapped) and its
+// Back returns to that day, then Home.
+export function todaySlotEditPath(schedule, slotId, now = new Date()) {
+  const key = dateKey(now)
+  const day = `/schedule/${loopWeekIndex(schedule, key)}/${toLocalDate(key).getDay()}`
+  return childLink(`${day}/${slotId}`, `${day}?date=${key}`, '/')
+}
+
 // req-213 (DEC-119 §2) — the line on a spot an earlier workout this week covers (doneEarlier):
 // "Done Tue ✓", the weekday the workout finished.
 export function doneEarlierText(workout) {
@@ -180,6 +203,29 @@ export function slotScreenDate(schedule, week, weekday, slotId, from, now = new 
   return slotsOn(schedule, now).some((slot) => slot.id === slotId) ? dateKey(now) : null
 }
 
+// req-225 (DEC-125 §5; review round 1, DEC-126 §1) — the slot as the scheduled-workout screen
+// shows it, and the swap date its sub-screens must carry (`on`, null when none). A one-day swap
+// shows ONLY where it applies: the path's own `on` (the editor's base path carries it, so a
+// sub-screen — which drops `from` — resolves the parent's routine on any day), else a DATED day
+// screen of this week/weekday as `from` (Home's sheet Edit; a dated day screen's row, today's or a
+// Coming up date's). The Whole plan (no `from`, `/schedule`, the undated day screen) always opens
+// the slot's OWN routine, even on a swapped day — its row names that one. No clock fallback.
+export function slotScreenSlot(schedule, week, weekday, slot, from, on = null, now = new Date()) {
+  if (!slot) return { slot, on: null }
+  let date = null
+  if (on && dateKey(on) === on) {
+    date = on
+  } else {
+    const day = from ? parseRoute(from) : null
+    if (day?.name === 'schedule-day' && day.week === Number(week) && day.weekday === Number(weekday)) {
+      date = dayScreenDate(schedule, week, weekday, day.from, day.date, now)
+    }
+  }
+  if (!date) return { slot, on: null }
+  const shown = slotsOn(schedule, date).find((candidate) => candidate.id === slot.id)
+  return shown?.swappedFrom ? { slot: shown, on: date } : { slot, on: null }
+}
+
 // req-214 — that screen's primary Start, or null for none. No Start on an empty routine
 // (req-127). A current in-progress workout of this routine (this spot's occurrence, when the
 // Start is tagged) reads Continue. Today's spot starts tagged — the same slot / date /
@@ -190,7 +236,11 @@ export function slotScreenDate(schedule, week, weekday, slotId, from, now = new 
 export function slotStart({ workouts, schedule, activeWorkout }, routine, slotId, date, now = new Date()) {
   if (!routineStartable(routine)) return null
   const todayKey = dateKey(now)
-  const tagged = date === todayKey && slotsOn(schedule, now).some((slot) => slot.id === slotId)
+  // req-225 (DEC-126 §1) — tagged only when this routine is what the slot stands for today. The
+  // Whole plan opens a slot swapped for today with its OWN routine: that Start is off-schedule
+  // (as on any other date), never today's spot of the swapped-in routine.
+  const tagged =
+    date === todayKey && slotsOn(schedule, now).some((slot) => slot.id === slotId && slot.routineId === routine.id)
   const options = tagged ? spotStartOptions(slotId, todayKey) : null
   const active = activeWorkout
   if (

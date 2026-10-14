@@ -17,8 +17,10 @@ import {
   scheduleRowText,
   slotMenuSheet,
   slotScreenDate,
+  slotScreenSlot,
   slotStart,
   startNowShown,
+  swappedFromText,
 } from './schedule-day.js'
 import { childLink, go, withFrom } from '../route'
 import { nextWorkoutName } from '../plan-templates.js'
@@ -174,7 +176,9 @@ async function slotActions(store, { routines, slot, week, weekday, loop, date, f
     go(withFrom(changedDayPath(week, Number(picked), date), from))
   } else if (choice === 'remove') {
     // req-211 — a slot moved onto this date still repeats on its own day: name that one.
-    if (!(await askConfirm(removeSlotText(name, slot.weekday, slot.week, loop), { confirmLabel: 'Remove' }))) return
+    // req-225 — and a slot swapped for this date repeats with its OWN routine: name that one.
+    const own = slot.swappedFrom ? slotLabel(routines, { ...slot, routineId: slot.swappedFrom }) : name
+    if (!(await askConfirm(removeSlotText(own, slot.weekday, slot.week, loop), { confirmLabel: 'Remove' }))) return
     store.removeSlot(slot.id)
   }
 }
@@ -266,6 +270,10 @@ export function ScheduleDay({ week, weekday, from = null, date: linkDate = null 
             >
               <NavLink to={childLink(dayPathOf(week, weekday, `/${slot.id}`), here, from)}>{slotLabel(routines, slot)}</NavLink>
               {moved ? <span className="ui-moved">{movedFromText(moved.from)}</span> : null}
+              {/* req-225 — a slot swapped for this date (Home's "Swap for today") says so. */}
+              {slot.swappedFrom ? (
+                <span className="ui-moved">{swappedFromText(slotLabel(routines, { ...slot, routineId: slot.swappedFrom }))}</span>
+              ) : null}
               {earlier ? (
                 <span className="ui-moved">
                   <NavLink to={childLink(`/history/${earlier.id}`, here, from)}>{doneEarlierText(earlier)}</NavLink>
@@ -356,7 +364,7 @@ function slotOnDay(schedule, week, weekday, slotId) {
 // `/schedule/0/6?from=/` from Home's week): the slot page's Back returns there, so the day's
 // own Back still ends on Home. Only the slot page itself reads it; its sub-screens keep
 // their fixed parents.
-export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId, exerciseId, from = null }) {
+export function ScheduleSlot({ week, weekday, slotId, on = null, screen = 'detail', itemId, exerciseId, from = null }) {
   const store = useStore()
   const slot = slotOnDay(store.schedule, week, weekday, slotId)
 
@@ -364,7 +372,11 @@ export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId,
     return <Missing>Not on this day.</Missing>
   }
 
-  const { routine } = resolveSlot(store.routines, slot)
+  // req-225 (DEC-126 §1) — the swapped-in routine only where the swap applies (a dated day
+  // screen as `from`, or the path's own `@date`); the Whole plan opens the slot's own routine.
+  // A swapped screen's base path carries `@date`, so its sub-screens resolve the same routine.
+  const shown = slotScreenSlot(store.schedule, week, weekday, slot, from, on)
+  const { routine } = resolveSlot(store.routines, shown.slot)
   if (!routine) {
     return <Missing>Not found.</Missing>
   }
@@ -372,13 +384,15 @@ export function ScheduleSlot({ week, weekday, slotId, screen = 'detail', itemId,
   const loop = clampLoopWeeks(store.schedule?.loopWeeks)
   const extra = `${weekdayName(weekday)}${loop > 1 ? ` · week ${week + 1}` : ''}`
   const dayPath = `/schedule/${week}/${weekday}`
-  const paths = navForBase(`${dayPath}/${slotId}`, from && from.split('?')[0] === dayPath ? from : dayPath, {
+  const base = shown.on ? `${dayPath}/${slotId}@${shown.on}` : `${dayPath}/${slotId}`
+  const paths = navForBase(base, from && from.split('?')[0] === dayPath ? from : dayPath, {
     extra,
     showDelete: false,
   })
 
   // req-214 (DEC-119 §3) — a primary Start at the top (slotStart decides it and its label).
-  const date = slotScreenDate(store.schedule, week, weekday, slotId, from)
+  // req-225 — a swapped screen stands for the swap's date.
+  const date = shown.on || slotScreenDate(store.schedule, week, weekday, slotId, from)
   const start = slotStart(store, routine, slotId, date)
   const top = start ? (
     <Button

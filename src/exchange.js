@@ -64,6 +64,7 @@ export const FIELDS = {
     anchor: 'YYYY-MM-DD Monday of loop week 1. Keep it when editing; if absent the app sets it to the Monday of the import week.',
     slots: 'Calendar entries (see scheduleSlot). A day can hold several routines.',
     moves: 'One-date moves (see scheduleMove). Keep them; drop any whose slot you remove.',
+    swaps: 'One-date routine swaps (see scheduleSwap). Keep them; drop any whose slot you remove.',
   },
   scheduleSlot: {
     id: 'Stable slot id (slot-…). Keep it when the same day/routine stays; history links to it.',
@@ -76,6 +77,12 @@ export const FIELDS = {
     slotId: 'The slot moved; must exist in schedule.slots.',
     from: 'YYYY-MM-DD the slot normally falls on.',
     to: 'YYYY-MM-DD it is on instead, for that one date only (same Monday–Sunday week).',
+  },
+  scheduleSwap: {
+    id: 'Stable swap id.',
+    slotId: 'The slot swapped; must exist in schedule.slots.',
+    date: 'YYYY-MM-DD the swap is for (the date the slot is on, after any move). Every other date keeps the slot\'s own routine.',
+    routineId: 'The routine done instead on that date; must exist in state.routines, not archived, and differ from the slot\'s own.',
   },
   workout: {
     id: 'Stable id (wo-…).',
@@ -241,7 +248,7 @@ export const ASSISTANT = {
       notes: 'Free text cues.',
     },
     schedule:
-      'loopWeeks 1–4. anchor is the YYYY-MM-DD Monday of loop week 1 (keep it when editing; if absent, the app sets it to the Monday of the import week). slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history. moves (optional): one-date moves { id, slotId, from, to } (YYYY-MM-DD, same Mon–Sun week) — that slot is on to instead of from for that one date only; keep them, and drop any whose slot you remove.',
+      'loopWeeks 1–4. anchor is the YYYY-MM-DD Monday of loop week 1 (keep it when editing; if absent, the app sets it to the Monday of the import week). slots: { id, week, weekday, routineId }. weekday 0=Sunday … 6=Saturday. week is 0-based inside the loop. A day can have several routines. Keep slot ids when the same day/routine should stay linked to history. moves (optional): one-date moves { id, slotId, from, to } (YYYY-MM-DD, same Mon–Sun week) — that slot is on to instead of from for that one date only; keep them, and drop any whose slot you remove. swaps (optional): one-date routine swaps { id, slotId, date, routineId } (YYYY-MM-DD) — that slot is routineId instead of its own on that one date only; keep them, and drop any whose slot you remove.',
     workout:
       'Starting copies the routine into snapshot. Logging writes sets. Extra sets live on the live snapshot only. Finish records unlogged planned sets as skipped, and stores the snapshot in workouts. Finish never changes the routine; it changes only when the user edits it, confirms the "Use … kg next time?" offer after an exercise (the kg of that one routine), or applies a History recalculation (suggestedWeights/targets). Do not invent completed workouts.',
     sets:
@@ -320,6 +327,7 @@ export const ASSISTANT = {
         anchor: '2026-08-24',
         slots: [{ id: 'slot-sess-upper', week: 0, weekday: 1, routineId: 'sess-upper' }],
         moves: [{ id: 'mv-1', slotId: 'slot-sess-upper', from: '2026-08-31', to: '2026-09-02' }],
+        swaps: [],
       },
       workouts: 'Keep the existing array exactly as exported unless asked to edit history.',
       plannedWorkouts: [],
@@ -390,7 +398,7 @@ const NESTING = {
   },
   routine: { exercises: ['routineItem'] },
   routineItem: { warmup: 'warmup' },
-  schedule: { slots: ['scheduleSlot'], moves: ['scheduleMove'] },
+  schedule: { slots: ['scheduleSlot'], moves: ['scheduleMove'], swaps: ['scheduleSwap'] },
   workout: {
     snapshot: 'snapshot',
     sets: ['set'],
@@ -649,8 +657,8 @@ function diffById(before, after) {
 }
 
 function scheduleOf(state) {
-  const { loopWeeks, anchor, slots, moves } = state?.schedule || {}
-  return { loopWeeks, anchor, slots, moves }
+  const { loopWeeks, anchor, slots, moves, swaps } = state?.schedule || {}
+  return { loopWeeks, anchor, slots, moves, swaps }
 }
 
 const loggedHistory = (state) => [...(state?.workouts || []), ...(state?.draftWorkouts || [])]
@@ -661,11 +669,11 @@ function historyRecords(state) {
 }
 
 // What a counted area cannot show (review round 1 nit): every root field outside the counted
-// ones, schedule fields beyond loopWeeks/anchor/slots/moves, and the ORDER of the records both
+// ones, schedule fields beyond loopWeeks/anchor/slots/moves/swaps, and the ORDER of the records both
 // sides share (a reorder changes no record).
 function outsideCounts(state, other) {
   const { exercises, routines, workouts, draftWorkouts, activeWorkout: _active, schedule, ...root } = state
-  const { loopWeeks: _l, anchor: _a, slots: _s, moves: _m, ...scheduleRest } = schedule || {}
+  const { loopWeeks: _l, anchor: _a, slots: _s, moves: _m, swaps: _w, ...scheduleRest } = schedule || {}
   const shared = (records, others) => {
     const ids = new Set((others || []).map((record) => record?.id))
     return (records || []).map((record) => record?.id).filter((id) => ids.has(id))
@@ -719,7 +727,7 @@ export function setupKeptForHistory(incoming, records, current, archivedAt) {
 // arrays/objects, so `workouts` is byte-identical when saved). Otherwise (Replace everything,
 // and every no-conflict import): the file as it is. Then, on both, setupKeptForHistory for the
 // records being written; a routine brought back archived loses its schedule slots (and their
-// moves), as removeRoutineFromState drops them. With nothing to bring back the result is the
+// moves and swaps, req-225 — and a swap that swaps it in), as removeRoutineFromState drops them. With nothing to bring back the result is the
 // file (or the Keep merge) unchanged — byte-for-byte the pre-req-220 replace.
 export function importResult(incoming, current, { keepHistory = false, archivedAt = new Date().toISOString() } = {}) {
   const base = keepHistory
@@ -740,7 +748,14 @@ export function importResult(incoming, current, { keepHistory = false, archivedA
     routines: [...(base.routines || []), ...kept.routines],
     exercises: [...(base.exercises || []), ...kept.exercises],
     schedule: archived.size
-      ? { ...base.schedule, slots, moves: (base.schedule?.moves || []).filter((move) => slotIds.has(move.slotId)) }
+      ? {
+          ...base.schedule,
+          slots,
+          moves: (base.schedule?.moves || []).filter((move) => slotIds.has(move.slotId)),
+          ...(Array.isArray(base.schedule?.swaps)
+            ? { swaps: base.schedule.swaps.filter((swap) => slotIds.has(swap.slotId) && !archived.has(swap.routineId)) }
+            : {}),
+        }
       : base.schedule,
   }
 }

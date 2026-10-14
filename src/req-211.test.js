@@ -94,7 +94,9 @@ describe('AC2 migrateState normalises moves (legacy and v9)', () => {
     assert.equal('moves' in main.schedule, false, 'main had no moves')
     assert.deepEqual(branch.schedule.moves, [])
     assert.deepEqual(branch, withEmptyMoves(main))
-    const { moves: _moves, ...rest } = branch.schedule
+    // req-225 test edit: the schedule also carries the additive `swaps: []` now; strip it too.
+    assert.deepEqual(branch.schedule.swaps, [])
+    const { moves: _moves, swaps: _swaps, ...rest } = branch.schedule
     assert.deepEqual(rest, main.schedule, 'the schedule is otherwise main\'s exactly')
   })
   it('one valid and one malformed move → keeps 1', () => {
