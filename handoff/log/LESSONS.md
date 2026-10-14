@@ -541,3 +541,8 @@ parsed, as `NotInWorkout` does.
 
 A failing `assert.equal(bar(), null)` with a happy-dom node made Node print the node, run out of heap (SIGABRT) and take the
 whole test file down with no message. **How to apply:** `assert.ok(!el)` / compare `textContent`.
+
+## L-056 — the L-051 harness swaps a KEYED screen inside one provider  (Builder agent, req-226, 2026-10-14)
+
+Without a key, React reuses the same component instance (and its state) across "mounts" of the same screen type. **How to apply:**
+one `StoreProvider` per test; each screen swap renders `h(Screen, { key: n++ , … })` inside it (`render().rerender` for a root swap).
