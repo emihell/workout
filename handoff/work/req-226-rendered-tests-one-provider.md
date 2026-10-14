@@ -1,4 +1,4 @@
-**Status: READY** **Lane: tooling** — tests only; no `src/` product code changes.
+**Status: BUILT, NOT merged — branch `req-226` (`2d09a01`…`2e2354e`).** **Lane: tooling** — tests only; no `src/` product code changes.
 
 # req-226 — rendered tests keep one StoreProvider (L-051 sweep) + the anti-staleness app-path gaps
 
