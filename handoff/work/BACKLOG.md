@@ -587,7 +587,7 @@ gzip) now loads on the first log-screen open — "each side" can appear a beat l
 ### Gym-flow notes — batch 6, Emilio 2026-10-10..13 (in-app feedback JSON, app `0f9a6ce` / `10c4724`)
 
 Pasted 2026-10-13. [measured] `git log 10c4724..main -- src` is empty → I1..I11 apply to live code. Code facts from a read-only
-rescan of `main` (2026-10-13); paths under `src/`. **Status: recommendations to Emilio, nothing decided.**
+rescan of `main` (2026-10-13); paths under `src/`. **Decided → DEC-125; specced req-221..225 (READY; req-225 data lane).** Order: 221 → 222 → 223 → 224 → 225.
 
 - **I1 — tap a workout on Home → a quick-view sheet: what it is, Edit, Swap for this day only (permanent swaps stay in Schedule).**
   Today's workout name is a plain `<p>` (`views/Today.jsx:157-161`); only Start / StartChooser act. A one-date *move* exists

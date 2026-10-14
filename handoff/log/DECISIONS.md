@@ -2026,3 +2026,25 @@ Emilio asked which API for the in-app AI (DEC-121 §2); Planner recommended; Emi
 `ASSISTANT` as the cached system prompt, streamed chat, plan returned through a strict schema-validated tool, written only via
 req-220's preview + Keep my history / Replace everything; history sent as recent weeks + a summary from real logs. Cheaper model
 and the multi-user cost model stay Emilio's calls. Gated on the backend (DEC-085 §7).
+
+## DEC-125 — feedback batch 6: effort stays per exercise, Start opens the first exercise with "Up next", GO counts the workout, a forgotten finish uses the last set, Home sheet + Swap for today  (Emilio, 2026-10-14)
+
+Emilio's 11 in-app notes 2026-10-10..13 (BACKLOG §batch 6, I1..I11). Planner recommended; Emilio: "ill go with your recommendations".
+Specs: req-221..225.
+
+1. **Effort (I2, I4, I6, I8) → req-221.** Stays once per exercise, Easy · Medium · Hard, **no Failure** (DEC-119 §1 holds). Reason
+   (`progress.js:165-194`): Easy with no missed reps is the only step **up** — without effort the app never suggests heavier; kg and
+   reps can't tell "3 reps left" from "barely made it". Per set is unneeded: missed reps already mark a bad set. Emilio asked "the
+   effort is meant for you … maybe its not needed?" → kept. The "—" segment goes; tap the picked one again to clear.
+   "Hit every rep → go up" without effort is a progression-rule change → req-149, not here.
+2. **Start and moving on (I5, I7) → req-223.** A new Start opens the first exercise; on arrival from Start or a review's Next, an
+   "Up next" bar, 5 s countdown, Skip / Swap / Start now. Option A of A (countdown) / B (no countdown) / C (list + Begin button).
+   Add exercise, workout note and Abandon stay on the list (I7: those four were the list's only extras; Swap/Skip now also on the bar).
+3. **GO pill (I3, I9) → req-222.** Shows from the start of the workout and adds the whole-workout count ("set 2/4 · 3/7").
+4. **Forgotten workout (I11) → req-224.** More than 3 h between the last logged set and Finish → `finishedAt` = that set's
+   `loggedAt`, said plainly on the Finish screen. Real data only (req-212's `loggedAt`), nothing invented.
+5. **Home (I1) → req-225.** Tapping today's workout opens a sheet: its exercises, Edit, **Swap for today** (one date; a new
+   `schedule.swaps` field; permanent swaps stay in Schedule, as DEC-117 §2).
+6. **Plank timer (I10):** the timer exists for timed exercises; Emilio's Plank predates req-180's timed flag → he fixes it in
+   Exercises; the seed Plank is fixed in req-221. **Not built:** an offer to link an own exercise to the library's ("this also might
+   just be a one time thing becouse my the app has grown and my data is older") — revisit if a second case shows up.
