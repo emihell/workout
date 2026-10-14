@@ -102,6 +102,7 @@ async function openScreen(screen, now) {
     captured.store = useStore()
     const active = captured.store.activeWorkout
     if (!active?.sets?.length) return null
+    if (screen === 'none') return null
     if (screen === 'finish') return h(WorkoutFinish, { key: 'finish', routineId: 'sess-lower' })
     return h(AutoCompleteSummary, { key: 'auto', routineId: 'sess-lower', active, store: captured.store, onCancel: () => {}, countdown: false })
   }
@@ -186,5 +187,103 @@ describe('req-227 AC5 — the auto-complete summary says "left open" too', () =>
     assert.equal(/Duration60 min/.test(text), true, text)
     await view.click(view.button('Finish'))
     assert.equal(captured.store.workouts[0].finishedAt, iso(11, 0))
+  })
+})
+
+// ---- review round 1 ---------------------------------------------------------------------
+// A locked / backgrounded phone suspends setInterval: mock.timers.setTime moves Date WITHOUT
+// firing the interval, which is that suspension.
+async function setClock(date) {
+  await act(async () => mock.timers.setTime(date.getTime()))
+}
+async function becomeVisible() {
+  const desc = Object.getOwnPropertyDescriptor(document, 'visibilityState')
+  Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' })
+  try {
+    await act(async () => document.dispatchEvent(new window.Event('visibilitychange')))
+    await flush()
+  } finally {
+    if (desc) Object.defineProperty(document, 'visibilityState', desc)
+    else delete document.visibilityState
+  }
+}
+
+describe('req-227 review round 1 — a suspended tick never saves a stale time', () => {
+  it('(a) hidden → visible refreshes the shown minutes (no tick fired)', async () => {
+    await openScreen('finish', at(10, 51))
+    assert.equal(shown().minutes, 51)
+    await setClock(at(13, 40))
+    assert.equal(shown().minutes, 51) // still the stale render: the interval never fired
+    await becomeVisible()
+    assert.equal(shown().minutes, 220, shown().text)
+  })
+  it('pageshow and focus refresh too', async () => {
+    await openScreen('finish', at(10, 51))
+    await setClock(at(11, 0))
+    await act(async () => window.dispatchEvent(new window.Event('pageshow')))
+    assert.equal(shown().minutes, 60)
+    await setClock(at(11, 10))
+    await act(async () => window.dispatchEvent(new window.Event('focus')))
+    assert.equal(shown().minutes, 70)
+  })
+  it('(b) Finish opened 10:51, phone locked, Save at 13:40 (shown `now` stale > tick + 5 s) → stores 13:40, not 10:51', async () => {
+    const { captured } = await openScreen('finish', at(10, 51))
+    await setClock(at(13, 40))
+    await view.click(view.button('Save'))
+    assert.equal(captured.store.workouts[0].finishedAt, iso(13, 40))
+  })
+  it("(b) stale and past 3 h at the tap (Save 15:00) → the re-derived left-open time, the last set's", async () => {
+    const { captured, sets } = await openScreen('finish', at(10, 51))
+    await setClock(at(15, 0))
+    await view.click(view.button('Save'))
+    assert.equal(captured.store.workouts[0].finishedAt, sets[1].loggedAt)
+  })
+  it('(c) stale by exactly tick + 5 s → still the shown time (the guard is strictly greater)', async () => {
+    const { captured } = await openScreen('finish', at(10, 51))
+    await setClock(new Date(at(10, 51).getTime() + 35000))
+    await view.click(view.button('Save'))
+    assert.equal(captured.store.workouts[0].finishedAt, iso(10, 51))
+  })
+})
+
+describe('req-227 review round 1 — store.finishWorkout validates finishedAt', () => {
+  const bad = [
+    ["''", ''],
+    ['a Date object', new Date(2026, 0, 1)],
+    ['an event-like object', { type: 'click', target: null }],
+    ['unreadable text', 'soon'],
+  ]
+  for (const [label, value] of bad) {
+    it(`${label} → the computed time (left open at 15:00 → the last set's)`, async () => {
+      const { captured, sets } = await openScreen('none', at(15, 0))
+      await act(async () => captured.store.finishWorkout({}, value))
+      assert.equal(captured.store.workouts[0].finishedAt, sets[1].loggedAt)
+    })
+  }
+  it('a readable ISO string → stored as given', async () => {
+    const { captured } = await openScreen('none', at(15, 0))
+    await act(async () => captured.store.finishWorkout({}, iso(12, 34)))
+    assert.equal(captured.store.workouts[0].finishedAt, iso(12, 34))
+  })
+})
+
+describe('req-227 review round 1 — the no-countdown summary updates and saves what it shows', () => {
+  it('last set 10:50, summary from a skip at 10:52 → "52 min", no line; at 15:00 → "50 min" + line; Finish stores 10:50', async () => {
+    const { captured, sets } = await openScreen('auto', at(10, 52))
+    let text = view.text()
+    assert.equal(/Duration52 min/.test(text), true, text)
+    assert.equal(text.includes('You left this workout open'), false)
+    await tick(at(15, 0).getTime() - at(10, 52).getTime())
+    text = view.text()
+    assert.equal(/Duration50 min/.test(text), true, text)
+    assert.equal(text.includes(leftOpenText(sets[1].loggedAt)), true, text)
+    await view.click(view.button('Finish'))
+    assert.equal(captured.store.workouts[0].finishedAt, sets[1].loggedAt)
+  })
+  it('summary opened 10:52, phone locked, Finish at 13:40 → stores 13:40 (stale guard)', async () => {
+    const { captured } = await openScreen('auto', at(10, 52))
+    await setClock(at(13, 40))
+    await view.click(view.button('Finish'))
+    assert.equal(captured.store.workouts[0].finishedAt, iso(13, 40))
   })
 })
