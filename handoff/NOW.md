@@ -17,6 +17,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
+- **Cleanup batch 2026-10-14 APPROVED** (Emilio: "A cleanup batch - do it"): req-226 tests one-provider + staleness gaps → req-227 pill count / Finish time polish. Throwaway agents, Planner merges.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
 - **Done:** DEC-087 follow-ups, library (366 written, 194 staples), DEC-092..095 fixes; req-144 session 1 → DEC-096..101.
 - **NOW (2026-10-11):** DEC-120..123 work all shipped. Open for Emilio: flip the import choice buttons (Keep filled, Replace plain)? — his call, BACKLOG.
