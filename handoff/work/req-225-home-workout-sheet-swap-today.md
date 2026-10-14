@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-225` (`f8ab63e`…`4515a81`).** **Lane: data** — a new optional field `schedule.swaps` in saved state. CLAUDE.md ask-gate #2: Builder states what
+**Status: BUILT AND MERGED, 2026-10-14 — branch `req-225` (`f8ab63e`…`4515a81`, 3 commits).** **Lane: data** — a new optional field `schedule.swaps` in saved state. CLAUDE.md ask-gate #2: Builder states what
 changes and to how many records before writing; **Emilio's eyes before merge** (DEC-035 carve-out); reviewer + backup reminder.
 
 # req-225 — tap today's workout on Home: a sheet with its exercises, Edit, Swap for today
