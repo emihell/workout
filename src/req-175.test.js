@@ -33,9 +33,21 @@ async function harness(payload, { viaImport = false } = {}) {
     captured.store = useStore()
     return children ?? null
   }
+  // L-051 (req-226): one StoreProvider for the whole harness, the screen swapped inside it. The key
+  // gives each mount a fresh screen, as the old per-mount render did; only the provider stays.
+  const host = {}
+  function Host() {
+    const [screen, setScreen] = React.useState({ n: 0, child: null })
+    // oxlint-disable-next-line react/immutability
+    host.swap = setScreen
+    return h(StoreProvider, null, h(Grab, { key: screen.n }, screen.child))
+  }
   const mount = async (child) => {
-    await view?.unmount()
-    view = await render(h(StoreProvider, null, h(Grab, null, child)))
+    if (!host.swap) {
+      await view?.unmount()
+      view = await render(h(Host))
+    }
+    await act(async () => host.swap((screen) => ({ n: screen.n + 1, child })))
   }
   await mount(null)
   if (viaImport) await act(async () => captured.store.applyBackup(payload))

@@ -342,8 +342,8 @@ describe('req-181 — /routines/new offers two starts', () => {
     const plan = links.findIndex(([text]) => text === 'Not sure? Use a plan')
     const blank = links.findIndex(([text]) => text === 'Blank workout')
     assert.ok(machines >= 0 && plan > machines && blank > plan, JSON.stringify(links))
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(RoutineNewBlank)))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(RoutineNewBlank)))
     await view.type(view.input('Name'), 'Legs')
     await view.click(view.button('Next'))
     assert.deepEqual(stored().routines.map((r) => r.name), ['Legs'])

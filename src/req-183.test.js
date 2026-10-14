@@ -122,8 +122,8 @@ describe('live log screen — real store, routine kg blanked on Leg Extension', 
     }
     view = await render(h(StoreProvider, null, h(Screen, { started: false })))
     await act(async () => captured.store.startWorkout('sess-lower'))
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { started: true })))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(Screen, { started: true })))
     const last = lastSetsForExercise(captured.store.workouts, 'ex-leg-extension')
     return { captured, lastKg: historySetPrefill(last, { setType: 'work', workIndex: 0 }).weight }
   }

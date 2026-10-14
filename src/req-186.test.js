@@ -291,8 +291,8 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     }
     view = await render(h(StoreProvider, null, h(Screen, { open: false })))
     await act(async () => captured.store.startWorkout('sess-upper'))
-    await view.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { open: true })))
+    // req-226 (L-051): the same StoreProvider stays mounted; only the screen inside it changes.
+    await view.rerender(h(StoreProvider, null, h(Screen, { open: true })))
     const active = () => captured.store.activeWorkout
     const rows = () => view.all('.ui-setpreview li').map((li) => [li.className.replace('ui-setpreview__row ', ''), li.getAttribute('aria-current'), li.textContent])
 

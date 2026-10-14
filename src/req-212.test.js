@@ -40,9 +40,21 @@ async function harness(payload = DB) {
     captured.store = useStore()
     return child
   }
+  // L-051 (req-226): one StoreProvider for the whole harness, the screen swapped inside it. The key
+  // gives each mount a fresh screen, as the old per-mount render did; only the provider stays.
+  const host = {}
+  function Host() {
+    const [screen, setScreen] = React.useState({ n: 0, child: null })
+    // oxlint-disable-next-line react/immutability
+    host.swap = setScreen
+    return h(StoreProvider, null, h(Screen, { key: screen.n, child: screen.child }), h(ConfirmSheet))
+  }
   const mount = async (child) => {
-    await view?.unmount()
-    view = await render(h(StoreProvider, null, h(Screen, { child }), h(ConfirmSheet)))
+    if (!host.swap) {
+      await view?.unmount()
+      view = await render(h(Host))
+    }
+    await act(async () => host.swap((screen) => ({ n: screen.n + 1, child })))
   }
   await mount(null)
   const { WorkoutItemLog, WorkoutItemDone } = await importJsx('./views/workout/item.jsx', import.meta.url)
@@ -468,5 +480,25 @@ describe('review round 1 — effort is per exercise: Add set and clearing', () =
     await view.click(radio('Medium'))
     assert.deepEqual(t.active().sets.filter((x) => x.routineItemId === CHEST).map((x) => x.rpe), [null, null, null, null])
     assert.equal(view.all('[role="radio"][aria-checked="true"]').length, 0)
+  })
+})
+
+// req-226 AC3 (L-051) — a writing sheet answered after the screen was swapped. The sheet's answer
+// writes through the provider that opened it; with one StoreProvider for the harness (as the app
+// has) the write is stored. Under the old per-mount provider it landed in the unmounted one.
+describe('req-226 — a write answered after a screen swap lands in the one provider', () => {
+  it('Chest Press at 40 kg → "Use 40 kg next time?"; swap to the review; Yes → the stored routine has 40', async () => {
+    const t = await harness()
+    await t.start()
+    await t.mount(t.log(CHEST))
+    await view.click(view.button('Done')) // the warm-up
+    await view.type(view.input('kg'), '40')
+    for (let i = 0; i < 3; i++) await view.click(view.button('Done'))
+    assert.match(getPendingConfirm()?.title ?? '', /Use 40 kg next time\?/, 'the routine-kg sheet is open')
+    await t.mount(t.review(CHEST)) // the screen changes while the sheet is still open
+    await view.click(view.button('Yes'))
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
+    const item = JSON.parse(localStorage.getItem('workout-mvp-v9')).routines.find((r) => r.id === 'sess-upper').exercises.find((i) => i.id === CHEST)
+    assert.deepEqual(item.suggestedWeights, [40, 40, 40])
   })
 })
