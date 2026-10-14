@@ -203,9 +203,9 @@ describe('AC3 / AC8 — the exercise review (render, real store)', () => {
     assert.equal(window.location.hash, doneHash(CHEST), 'the last Done lands on the review')
     await t.mount(t.review(CHEST))
     assert.match(view.text(), /Chest Press/)
-    // review round 1 — clearable: a leading "—" (none) segment, the one selected at first
-    assert.equal(view.all('[role="radio"]').map((b) => b.textContent).join('|'), '—|Easy|Medium|Hard')
-    assert.deepEqual(view.all('[role="radio"][aria-checked="true"]').map((b) => b.textContent), ['—'], 'nothing preselected')
+    // req-221 (DEC-125 §1) replaces review round 1's leading "—" segment: three options, none selected
+    assert.equal(view.all('[role="radio"]').map((b) => b.textContent).join('|'), 'Easy|Medium|Hard')
+    assert.deepEqual(view.all('[role="radio"][aria-checked="true"]').map((b) => b.textContent), [], 'nothing preselected')
     // review round 1 — the old done view's setup lines are back: equipment + the routine note
     assert.match(view.text(), /Chest Press \(Star Trac\)/)
     assert.match(view.text(), /Controlled, near failure/)
@@ -459,14 +459,14 @@ describe('review round 1 — effort is per exercise: Add set and clearing', () =
     assert.deepEqual(t.active().sets.filter((x) => x.routineItemId === CHEST).map((x) => x.rpe), [null, null, null, null])
   })
 
-  it('"—" takes a mis-tap back to none: rpe null on the work sets', async () => {
+  it('tapping the picked one again takes a mis-tap back to none: rpe null on the work sets (req-221 replaces the "—" segment)', async () => {
     const t = await harness()
     await t.start()
     await logChest(t)
     await t.mount(t.review(CHEST))
     await view.click(radio('Medium'))
-    await view.click(radio('—'))
+    await view.click(radio('Medium'))
     assert.deepEqual(t.active().sets.filter((x) => x.routineItemId === CHEST).map((x) => x.rpe), [null, null, null, null])
-    assert.equal(radio('—').getAttribute('aria-checked'), 'true')
+    assert.equal(view.all('[role="radio"][aria-checked="true"]').length, 0)
   })
 })

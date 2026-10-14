@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RPE_OPTIONS, rpeOptionValue } from '../ids'
+import { EFFORT_OPTIONS, RPE_OPTIONS, rpeOptionValue } from '../ids'
 import { kgError } from '../kg-input.js'
 import { secondsError } from '../seconds-input.js'
 import { DISTANCE_UNITS, cardioFormText, cardioValues } from '../cardio-set.js'
@@ -53,6 +53,12 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
   // toggling it to Work starts Effort unset, as a fresh work set would — not "Moderate".
   const [rpe, setRpe] = useState(() =>
     effortFor(set?.setType || 'work') && set?.rpe != null && set.rpe !== '' ? String(rpeOptionValue(set.rpe)) : '',
+  )
+  // req-221 (DEC-125 §1) — Effort offers Easy · Medium · Hard. A set already saved with Failure
+  // (rpe 5) keeps a selected Failure segment, appended for that set only, so opening and saving
+  // it never changes its effort.
+  const [effortOptions] = useState(() =>
+    effortFor(set?.setType || 'work') && rpeOptionValue(set?.rpe) === 5 ? RPE_OPTIONS : EFFORT_OPTIONS,
   )
   const [note, setNote] = useState(set?.note || '')
   const [setType, setSetType] = useState(set?.setType || 'work')
@@ -185,10 +191,10 @@ export function SetEditForm({ set, showLoad, showEffort, showDuration = false, s
       {effortShown ? (
         <>
           <SectionHeader>Effort</SectionHeader>
-          {/* clearable keeps effort resettable, as the old <select> did */}
+          {/* clearable keeps effort resettable: tap the picked one again (req-221) */}
           <SegmentedControl
             clearable
-            options={RPE_OPTIONS}
+            options={effortOptions}
             value={rpe}
             onChange={setRpe}
             ariaLabel="Effort"

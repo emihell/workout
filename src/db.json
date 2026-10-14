@@ -79,6 +79,8 @@
       "muscles": "Core (Rectus Abdominis, Obliques)",
       "cues": "Ribs down; glutes squeezed; neutral neck; steady breathing.",
       "type": "bodyweight",
+      "hasDuration": true,
+      "durationSec": 60,
       "archivedAt": null
     },
     {

@@ -58,15 +58,14 @@ export function Actions({ retreat, lateral, forward, className }) {
 
 // SegmentedControl — radio group as equal-width segments; selected set apart by
 // fill/weight (grayscale). Covers effort on set edit (Easy/Medium/Hard/Failure) and feel.
-// `clearable` prepends a leading "none" segment (`—`, value `''`) that resets the
-// control to empty — the idiom three call sites used to hand-roll. Off by default,
-// so non-clearable controls are unchanged. The `—` label / `''` value are the
-// convention; picking it fires onChange('').
+// `clearable` (req-221, DEC-125 §1): no extra segment. Nothing picked → no segment
+// selected; tapping the SELECTED segment again fires onChange('') (cleared); tapping
+// another picks it. Off by default, so non-clearable controls are unchanged (a tap on
+// the selected one re-fires its own value, as before).
 export function SegmentedControl({ options, value, onChange, ariaLabel, clearable }) {
-  const segments = clearable ? [{ value: '', label: '—' }, ...options] : options
   return (
     <div className="ui-seg" role="radiogroup" aria-label={ariaLabel}>
-      {segments.map((opt) => {
+      {options.map((opt) => {
         const optValue = typeof opt === 'object' ? opt.value : opt
         const optLabel = typeof opt === 'object' ? opt.label : opt
         const selected = String(optValue) === String(value)
@@ -77,7 +76,7 @@ export function SegmentedControl({ options, value, onChange, ariaLabel, clearabl
             role="radio"
             aria-checked={selected}
             className={cx('ui-seg__item', selected && 'is-selected')}
-            onClick={() => onChange?.(optValue)}
+            onClick={() => onChange?.(clearable && selected ? '' : optValue)}
           >
             {optLabel}
           </button>

@@ -168,7 +168,7 @@ export function Showcase() {
       <Block heading="Segmented control (clearable)">
         <SegmentedControl
           clearable
-          options={EFFORT}
+          options={EFFORT.filter((opt) => opt.value !== 5)}
           value={effort}
           onChange={setEffort}
           ariaLabel="Effort (clearable)"

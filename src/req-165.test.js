@@ -18,8 +18,11 @@ import { DEVICE_FILL_KEY, diskValue, filledLike, loadFilledLike } from './test-s
 // req-211 test edit: main's golden predates the additive `schedule.moves`; withEmptyMoves adds
 // exactly `moves: []` to each of its schedules, so the rest still deep-equals main.
 import { withEmptyMoves } from './test-support/moves.js'
+// req-221 test edit: the seed Plank is now timed (DEC-125 §6); withTimedPlank flips exactly the
+// Plank's `hasDuration: false` / 30 in main's golden to true / 60, so the rest still deep-equals main.
+import { withTimedPlank } from './test-support/timed-plank.js'
 
-const golden = JSON.parse(gunzipSync(readFileSync(new URL('./req-165.golden.json.gz', import.meta.url))).toString('utf8'))
+const golden = withTimedPlank(JSON.parse(gunzipSync(readFileSync(new URL('./req-165.golden.json.gz', import.meta.url))).toString('utf8')))
 
 let previous
 let disk
