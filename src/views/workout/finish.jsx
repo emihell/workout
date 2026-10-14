@@ -6,8 +6,8 @@ import { previousSameRoutineWorkouts } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import { Back } from '../shared'
 import { Button, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { anythingLogged, loggedSetCount } from '../../workout-log'
-import { finishSkippedLines } from '../../finish-unfinished.js'
+import { anythingLogged, finishTimeFor, loggedSetCount } from '../../workout-log'
+import { finishSkippedLines, leftOpenText } from '../../finish-unfinished.js'
 import { activeFeel, activeNote } from '../../workout-note.js'
 import { ImprovementLines, NotInWorkout } from './helpers'
 import { abandonWorkout, isActiveFor } from './workout-helpers.js'
@@ -32,7 +32,10 @@ function FinishScreen({ routineId }) {
   // Finish. A legacy active workout without the field reads as '' (activeNote).
   const overallNote = activeNote(active)
   const started = active?.startedAt ? new Date(active.startedAt) : new Date()
-  const [minutes] = useState(() => Math.max(1, Math.round((Date.now() - started.getTime()) / 60000)))
+  // req-224 (DEC-125 §4) — the finish Save writes (finishTimeFor, store.finishWorkout): the
+  // last set's time when the workout was left open > 3 h, else now. Captured at mount.
+  const [finish] = useState(() => finishTimeFor(active, Date.now()))
+  const minutes = Math.max(1, Math.round((Date.parse(finish.finishedAt) - started.getTime()) / 60000))
   // req-116 — only non-skipped sets count (a logged warm-up counts); the auto-complete
   // summary counts the same way (workoutSummaryStats → loggedSetCount).
   const setCount = loggedSetCount(active)
@@ -64,6 +67,7 @@ function FinishScreen({ routineId }) {
       <p className="ui-sub">
         {name} — {minutes} min · {setCount} {setCount === 1 ? 'set' : 'sets'}
       </p>
+      {finish.leftOpen ? <p className="ui-sub">{leftOpenText(finish.finishedAt)}</p> : null}
       {skippedLines.map((line, i) => (
         <p key={i} className="ui-sub">
           {line}

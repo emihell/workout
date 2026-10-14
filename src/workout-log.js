@@ -169,6 +169,37 @@ export function withSkippedUnloggedSets(workout) {
   }
 }
 
+// req-224 (DEC-125 §4) — a workout left open. `lastSetAt`: the latest `loggedAt` (req-212,
+// written on a logged set and on Skip set) among the workout's sets, as the stored string, or
+// null. Sets without a readable `loggedAt` — older sets, and the skipped sets Finish / Skip
+// exercise record (skippedSet has none) — never count. Pure.
+export function lastSetAt(workout) {
+  let last = null
+  let lastMs = -Infinity
+  for (const set of workout?.sets || []) {
+    const ms = Date.parse(set?.loggedAt ?? '')
+    if (Number.isFinite(ms) && ms > lastMs) {
+      last = set.loggedAt
+      lastMs = ms
+    }
+  }
+  return last
+}
+
+// More than this between the last logged set and Finish → the workout was left open.
+export const LEFT_OPEN_MS = 3 * 60 * 60 * 1000
+
+// req-224 — the finish time Finish saves (screen Save and auto-complete, via
+// store.finishWorkout) and the Finish screen / auto-complete summary show: the last set's
+// `loggedAt` when now − lastSetAt > 3 h (exactly 3 h → now), else now. `leftOpen` says which
+// rule answered, so the screen can say so. Real data only: no loggedAt → now. Pure.
+export function finishTimeFor(workout, now = Date.now()) {
+  const nowMs = now instanceof Date ? now.getTime() : Number(now)
+  const last = lastSetAt(workout)
+  if (last && nowMs - Date.parse(last) > LEFT_OPEN_MS) return { finishedAt: last, leftOpen: true }
+  return { finishedAt: new Date(nowMs).toISOString(), leftOpen: false }
+}
+
 // store.finishWorkout's reducer (manual Finish and the req-84 auto-complete both call
 // it). req-158 (audit F-DEAD-4, DEC-085 §3) — a new finished record no longer carries
 // `progression`: nothing read it (History recalc recomputes from the sets,

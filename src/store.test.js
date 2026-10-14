@@ -115,7 +115,9 @@ describe('req-83 store wiring for live seed overrides', () => {
   it('finishWorkout delegates to finishedState (which drops seedOverrides)', () => {
     const body = src.match(/finishWorkout\(args\)\s*\{[\s\S]*?\n {6}\},/)
     assert.ok(body, 'finishWorkout method not found in store.jsx')
-    assert.match(body[0], /setState\(\(s\) => finishedState\(s, args\)\)/)
+    // req-224 — the store now passes the finish time (finishTimeFor: the last set's when
+    // left open > 3 h); still a straight delegation to finishedState.
+    assert.match(body[0], /setState\(\(s\) => finishedState\(s, args, finishTimeFor\(s\.activeWorkout, Date\.now\(\)\)\.finishedAt\)\)/)
   })
 })
 

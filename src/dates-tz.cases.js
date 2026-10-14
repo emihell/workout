@@ -15,6 +15,11 @@ import {
   withDefaultAnchor,
 } from './schedule.js'
 
+import { finishTimeFor, finishedState } from './workout-log.js'
+import { doneEarlierText } from './views/schedule-day.js'
+import { workoutDateKey } from './views/history/helpers.js'
+import { leftOpenText } from './finish-unfinished.js'
+
 const TZ = process.env.TZ
 
 describe(`req-114 dates under TZ=${TZ}`, () => {
@@ -119,5 +124,21 @@ describe(`req-114 dates under TZ=${TZ}`, () => {
     // The same adhoc workout from before midnight: today's R slot is a different day's workout, listed.
     const adhocTuesday = { ...adhocToday, occurrenceId: 'adhoc-r@2026-09-22', performedOn: '2026-09-22' }
     assert.deepEqual(otherTodayOccurrences(todays, adhocTuesday, '2026-09-23').map((x) => x.slot.id), ['slot-wed', 'slot-wed-2'])
+  })
+
+  it('req-224 AC7: started Mon 18:00, last set Mon 19:00, Finish Tue 08:00 → finishedAt Mon 19:00, History day + "Done Mon" read Monday', () => {
+    const set = (h) => ({ routineItemId: 'a', exerciseId: 'e', setType: 'work', weight: 40, reps: '8', loggedAt: new Date(2026, 9, 12, h, 0).toISOString() })
+    const active = {
+      id: 'w', routineId: 'r', performedOn: '2026-10-12', startedAt: new Date(2026, 9, 12, 18, 0).toISOString(), finishedAt: null,
+      snapshot: { routineName: 'Legs', items: [] }, sets: [set(18), set(19)], completedItemIds: [],
+    }
+    const tue8 = new Date(2026, 9, 13, 8, 0) // Tue 08:00 local
+    const t = finishTimeFor(active, tue8)
+    const saved = finishedState({ activeWorkout: active, workouts: [] }, {}, t.finishedAt).workouts[0]
+    assert.equal(saved.finishedAt, active.sets[1].loggedAt)
+    assert.equal(dateKey(saved.finishedAt), '2026-10-12')
+    assert.equal(workoutDateKey(saved), '2026-10-12')
+    assert.equal(doneEarlierText(saved), 'Done Mon ✓')
+    assert.equal(leftOpenText(t.finishedAt, tue8).startsWith('You left this workout open — saved as finished at 19:00 on '), true)
   })
 })
