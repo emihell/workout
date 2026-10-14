@@ -529,3 +529,15 @@ req-221 marked the seed Plank timed; 11 subtests in `req-164` / `req-165` failed
 `db.json`. The spec's READY check said "tests reading db.json stay green" but didn't name the goldens. Fixed with
 `test-support/timed-plank.js` (the `withEmptyMoves` pattern, req-211), goldens not re-recorded. **How to apply:** a req that
 edits `db.json` names `req-164` / `req-165` and says whether to transform or re-record their goldens.
+
+## L-054 — a store-driven redirect races a handler that writes and navigates in one tap; guard it on the parsed route  (Builder agent, req-223, 2026-10-14)
+
+The bar's Skip marks the item done and navigates; the log screen's "done → review" effect then pulled the user back. Fix: redirect
+only while still on that item's log route. The first guard compared the hash **string** and left `…/log?x=1` blank (reviewer);
+compare `parseRoute` name + ids. **How to apply:** any effect that navigates on a store change checks "am I still on my route",
+parsed, as `NotInWorkout` does.
+
+## L-055 — in rendered tests, assert booleans or strings, never `assert.equal(domNode, …)`  (Builder agent, req-223, 2026-10-14)
+
+A failing `assert.equal(bar(), null)` with a happy-dom node made Node print the node, run out of heap (SIGABRT) and take the
+whole test file down with no message. **How to apply:** `assert.ok(!el)` / compare `textContent`.
