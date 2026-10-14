@@ -2048,3 +2048,12 @@ Specs: req-221..225.
 6. **Plank timer (I10):** the timer exists for timed exercises; Emilio's Plank predates req-180's timed flag → he fixes it in
    Exercises; the seed Plank is fixed in req-221. **Not built:** an offer to link an own exercise to the library's ("this also might
    just be a one time thing becouse my the app has grown and my data is older") — revisit if a second case shows up.
+
+## DEC-126 — a one-day swap shows only where it applies, and moves with its workout  (Emilio, 2026-10-14, amends DEC-125 §5)
+
+From req-225's review (two should-fix behaviour calls). Planner recommended; Emilio: "yes".
+1. **The Whole plan always opens a slot's own routine**, even on a day it's swapped; only Home and today's dated day screen show
+   (and edit) the swapped-in one. Reason: the Whole plan is the permanent view (DEC-117 §2) — its row names the own routine, and an
+   edit must land on the routine the row names.
+2. **"Change day" on a swapped spot carries the swap** to the new date: what the move sheet names is what lands there.
+Rule behind both: what a screen says is what you get.
