@@ -115,20 +115,21 @@ describe('§7 the workout pill after an exercise is done', () => {
   const set = (id) => ({ routineItemId: id, exerciseId: `ex-${id}`, setType: 'work', weight: 20, reps: '8' })
   const items = [item('a'), item('b')]
   const now = 1_000_000
+  // req-222 test edit: every label now ends with the whole-workout count (" · 2/2": A done, on B).
   it('AC6: after A\'s last set the pill moves to B with no set count (no "set 1/")', () => {
     const w = { routineId: 'r', snapshot: { items }, sets: [set('a'), set('a'), set('a')], completedItemIds: [], restEndsAt: now + 90_000 }
     const pill = workoutPillState(w, now)
     assert.equal(pill.item.routineItemId, 'b')
     assert.equal(pill.setText, '')
-    assert.equal(pill.label, '1:30')
+    assert.equal(pill.label, '1:30 · 2/2')
     assert.doesNotMatch(pill.label, /set 1\//)
-    assert.equal(workoutPillState({ ...w, restEndsAt: now - 1 }, now).label, 'GO')
+    assert.equal(workoutPillState({ ...w, restEndsAt: now - 1 }, now).label, 'GO · 2/2')
   })
   it('the count returns with B\'s first logged set; mid-exercise is unchanged ("set 2/3")', () => {
     const w = { routineId: 'r', snapshot: { items }, sets: [set('a'), set('a'), set('a'), set('b')], completedItemIds: [] }
-    assert.equal(workoutPillState(w, now).label, 'GO · set 2/3')
+    assert.equal(workoutPillState(w, now).label, 'GO · set 2/3 · 2/2')
     const mid = { routineId: 'r', snapshot: { items }, sets: [set('a')], completedItemIds: [] }
-    assert.equal(workoutPillState(mid, now).label, 'GO · set 2/3')
+    assert.equal(workoutPillState(mid, now).label, 'GO · set 2/3 · 1/2')
   })
 })
 

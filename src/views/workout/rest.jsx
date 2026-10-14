@@ -9,8 +9,9 @@ import { useRestCountdown } from './rest-countdown.js'
 // req-186 (DEC-103 §3) — the one workout pill, replacing req-78's RestPill on every
 // in-workout screen. Self-contained: reads activeWorkout only (rest state is the already
 // persisted restEndsAt / restPausedRemaining, so it survives navigation and reload) and is
-// `position: fixed`. What it shows is the pure workoutPillState (workout-log.js): nothing
-// until a current exercise exists; resting → "1:12 · set 2/4"; rest over → "GO · set 2/4".
+// `position: fixed`. What it shows is the pure workoutPillState (workout-log.js): from the
+// start of the workout (req-222) until all is done; resting → "1:12 · set 2/4 · 3/7"; rest
+// over → "GO · set 2/4 · 3/7".
 // req-192 (DEC-108 §3, supersedes DEC-103 §3's tap rule) — what a tap does depends on where
 // it is: `ownItemKey` is the item whose log screen hosts the pill (item.jsx passes it). On the
 // current exercise's own screen, while resting, a tap SKIPS the rest (the write req-78's pill
@@ -34,5 +35,5 @@ export function WorkoutPill({ ownItemKey = null } = {}) {
     recordButton('workout-pill')
     go(itemLogPath(active.routineId, pill.item))
   }
-  return <UIWorkoutPill clock={pill.clock} setText={pill.setText} go={pill.go} skip={skip} onOpen={onOpen} />
+  return <UIWorkoutPill clock={pill.clock} setText={pill.setText} countText={pill.countText} go={pill.go} skip={skip} onOpen={onOpen} />
 }
