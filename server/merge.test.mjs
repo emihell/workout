@@ -96,3 +96,46 @@ test('the merge is pure: inputs untouched, every output value is an input value'
   assert.equal(state.routines[0], theirs.routines[0])
   assert.equal(state.routines[1], mine.routines[1])
 })
+
+// Review round 2 — the schedule against an anchor-less base (the rev-0 document).
+const base0 = { loopWeeks: 1, slots: [] }
+const slot = (id) => ({ id, weekday: 1 })
+
+test('anchor-less base: an anchor alone is not an edit — the other side’s real change wins, no conflict', () => {
+  const mine = { schedule: { ...base0, anchor: '2026-10-12' } }
+  const theirs = { schedule: { ...base0, anchor: '2026-10-19', slots: [slot('t')] } }
+  const { state, conflicts } = mergeStates({ schedule: base0 }, mine, theirs)
+  assert.equal(state.schedule, theirs.schedule)
+  assert.deepEqual(conflicts, [])
+})
+
+test('anchor-less base: neither side really changed → the current side’s schedule (it has an anchor)', () => {
+  const mine = { schedule: { ...base0, anchor: '2026-10-12' } }
+  const theirs = { schedule: { ...base0, anchor: '2026-10-19' } }
+  assert.equal(mergeStates({ schedule: base0 }, mine, theirs).state.schedule, theirs.schedule)
+  // …and the incoming one when the current side has none.
+  assert.equal(mergeStates({ schedule: base0 }, mine, { schedule: base0 }).state.schedule, mine.schedule)
+})
+
+test('anchor-less base: a real change on the incoming side lands verbatim, anchor included', () => {
+  const mine = { schedule: { ...base0, anchor: '2026-10-12', slots: [slot('m')] } }
+  const theirs = { schedule: { ...base0, anchor: '2026-10-19' } }
+  const { state, conflicts } = mergeStates({ schedule: base0 }, mine, theirs)
+  assert.equal(state.schedule, mine.schedule)
+  assert.deepEqual(conflicts, [])
+})
+
+test('anchor-less base: both really changed → incoming wins, conflict listed', () => {
+  const mine = { schedule: { ...base0, anchor: '2026-10-12', slots: [slot('m')] } }
+  const theirs = { schedule: { ...base0, anchor: '2026-10-19', slots: [slot('t')] } }
+  const { state, conflicts } = mergeStates({ schedule: base0 }, mine, theirs)
+  assert.equal(state.schedule, mine.schedule)
+  assert.deepEqual(conflicts, [{ field: 'schedule', id: null, kind: 'edited-on-both', lost: theirs.schedule }])
+})
+
+test('a base WITH an anchor: an anchor change is still an edit (rule unchanged)', () => {
+  const base = { schedule: { ...base0, anchor: '2026-10-05' } }
+  const mine = { schedule: { ...base0, anchor: '2026-10-12' } }
+  const theirs = { schedule: { ...base0, anchor: '2026-10-05', slots: [slot('t')] } }
+  assert.equal(mergeStates(base, mine, theirs).conflicts.length, 1)
+})

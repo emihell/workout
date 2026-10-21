@@ -122,6 +122,10 @@ export function putState(db, userId, body, at = new Date()) {
       state = validState(result.state)
       conflicts = result.conflicts
     }
+    // Review round 2: compared and returned as it is stored (JSON) — migrateState can leave
+    // `undefined`-valued keys that the stored copy doesn't have, which made an equal state
+    // look changed.
+    state = JSON.parse(JSON.stringify(state))
     if (current.rev > 0 && conflicts.length === 0 && isDeepStrictEqual(state, current.state)) {
       return { rev: current.rev, state: current.state, merged, conflicts, unchanged: true }
     }

@@ -37,6 +37,30 @@ function resolve(b, m, t) {
   return { value: m, conflict: true }
 }
 
+// Review round 2 — the schedule when the base has NO anchor (the rev-0 document): every real
+// device state carries one (emptyState() makes it, loadState saves it — src/persistence.js), so
+// an anchor present only because the base had none is not an edit. Changes are judged ignoring
+// `anchor`; the value stored is still one side's schedule verbatim, anchor included (rule 9).
+// Neither side really changed → the current side's schedule if it has an anchor (what other
+// devices already hold), else the incoming one.
+const isPlain = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
+function withoutAnchor(schedule) {
+  if (!isPlain(schedule)) return schedule
+  const { anchor: _anchor, ...rest } = schedule
+  return rest
+}
+function resolveSchedule(b, m, t) {
+  if (!isPlain(b) || 'anchor' in b) return resolve(b, m, t)
+  if (same(m, t)) return { value: m }
+  const mChanged = !same(withoutAnchor(m), b)
+  const tChanged = !same(withoutAnchor(t), b)
+  if (!mChanged && !tChanged) return { value: isPlain(t) && t.anchor ? t : m }
+  if (!mChanged) return { value: t }
+  if (!tChanged) return { value: m }
+  if (same(withoutAnchor(m), withoutAnchor(t))) return { value: m }
+  return { value: m, conflict: true }
+}
+
 function conflictKind(b, m, t) {
   if (b === undefined) return 'added-on-both'
   if (m === undefined) return 'deleted-vs-edited'
@@ -96,7 +120,7 @@ export function mergeStates(base, mine, theirs) {
       out[field] = collection
       continue
     }
-    const { value, conflict } = resolve(bv, mv, tv)
+    const { value, conflict } = field === 'schedule' ? resolveSchedule(bv, mv, tv) : resolve(bv, mv, tv)
     if (conflict) conflicts.push({ field, id: null, kind: conflictKind(bv, mv, tv), lost: tv ?? null })
     if (value !== undefined) out[field] = value
   }

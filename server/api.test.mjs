@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import { applyBackup, buildBackup } from '../src/exchange.js'
 import { migrateState } from '../src/model.js'
 import { emptyState } from '../src/persistence.js'
+import { defaultAnchor } from '../src/schedule.js'
 import { SESSION_DAYS, bootstrapUser, createInvite, disableUser } from './auth.mjs'
 import { revZeroState } from './store.mjs'
 
@@ -403,31 +404,74 @@ test('R1-2. the rev-0 document is stable: no clock-made anchor, identical a week
   assert.equal('anchor' in s0.state.schedule, false)
   assert.deepEqual(s0.state, revZeroState())
 
-  // Device B (same account) pushes a real schedule as rev 1.
-  const b = client(srv.base)
-  b.cookie = a.cookie
-  const real = structuredClone(s0.state)
-  real.schedule = { ...real.schedule, anchor: '2026-10-19', loopWeeks: 2, slots: [{ id: 'slot-1', weekday: 1 }] }
-  const rev1 = await b.put('/api/state', { baseRev: 0, state: real })
-  assert.equal(rev1.body.rev, 1)
-
-  // A week later device A — still on rev 0, schedule untouched — pushes a new exercise.
   t.mock.timers.enable({ apis: ['Date'], now: Date.now() + 8 * DAY })
   try {
-    const stateA = structuredClone(s0.state)
-    stateA.exercises.push(structuredClone(X))
-    const put = await a.put('/api/state', { baseRev: 0, state: stateA })
-    assert.equal(put.status, 200, JSON.stringify(put.body))
-    assert.equal(put.body.merged, true)
-    assert.deepEqual(put.body.conflicts, [], 'the schedule is not a conflict')
-    assert.deepEqual(put.body.state.schedule, rev1.body.state.schedule, 'the real schedule survives')
-    assert.ok(put.body.state.exercises.some((e) => e.id === X.id))
     assert.deepEqual(revZeroState(), s0.state, 'rev 0 is the same document a week later')
-    // What the old base was: emptyState() moves with the clock (why the probe overwrote).
-    assert.notEqual(emptyState().schedule.anchor, undefined)
   } finally {
     mock.timers.reset()
   }
+})
+
+// Review round 2 — what a device really holds: emptyState() (its schedule carries an anchor,
+// made on the day it was created; loadState saves it). `daysAgo` sets that day.
+function deviceState(daysAgo = 0) {
+  const state = emptyState()
+  state.schedule.anchor = defaultAnchor(new Date(Date.now() - daysAgo * DAY))
+  return state
+}
+
+// A new account whose server schedule already has a real slot (device B, rev 1).
+async function accountWithScheduledSlot() {
+  const a = await newUser()
+  const b = client(srv.base)
+  b.cookie = a.cookie
+  const stateB = deviceState()
+  stateB.schedule = { ...stateB.schedule, loopWeeks: 2, slots: [{ id: 'slot-b', weekday: 1 }] }
+  const rev1 = await b.put('/api/state', { baseRev: 0, state: stateB })
+  assert.equal(rev1.body.rev, 1)
+  return { a, serverSchedule: rev1.body.state.schedule }
+}
+
+test('R2. a device still on rev 0 (its anchor from a week earlier) pushes → the server’s slot survives, no conflict', async () => {
+  const { a, serverSchedule } = await accountWithScheduledSlot()
+  const stateA = deviceState(7)
+  assert.notEqual(stateA.schedule.anchor, serverSchedule.anchor)
+  stateA.exercises.push(structuredClone(X))
+  const put = await a.put('/api/state', { baseRev: 0, state: stateA })
+  assert.equal(put.status, 200, JSON.stringify(put.body))
+  assert.equal(put.body.merged, true)
+  assert.deepEqual(put.body.conflicts, [])
+  assert.deepEqual(put.body.state.schedule, serverSchedule, 'the slot (and the server’s anchor) survive')
+  assert.ok(put.body.state.exercises.some((e) => e.id === X.id), 'the device’s own change lands')
+})
+
+test('R2. a fresh device (emptyState() today) pushes at baseRev 0 → the server’s slot survives, no conflict', async () => {
+  const { a, serverSchedule } = await accountWithScheduledSlot()
+  const put = await a.put('/api/state', { baseRev: 0, state: emptyState() })
+  assert.equal(put.status, 200, JSON.stringify(put.body))
+  assert.deepEqual(put.body.conflicts, [])
+  assert.deepEqual(put.body.state.schedule, serverSchedule)
+  assert.equal(put.body.unchanged, true, 'nothing new to store')
+  assert.equal(put.body.rev, 1)
+})
+
+test('R2. a device that really changed the schedule from rev 0 (added a slot) → that change lands, anchor kept', async () => {
+  const a = await newUser()
+  // The server is at rev 1 from another device that did NOT touch the schedule.
+  const b = client(srv.base)
+  b.cookie = a.cookie
+  const stateB = deviceState()
+  stateB.exercises.push(structuredClone(X))
+  assert.equal((await b.put('/api/state', { baseRev: 0, state: stateB })).body.rev, 1)
+
+  const stateA = deviceState(3)
+  stateA.schedule.slots = [{ id: 'slot-a', weekday: 3 }]
+  const put = await a.put('/api/state', { baseRev: 0, state: stateA })
+  assert.equal(put.status, 200, JSON.stringify(put.body))
+  assert.deepEqual(put.body.conflicts, [])
+  assert.deepEqual(put.body.state.schedule.slots.map((s) => s.id), ['slot-a'])
+  assert.equal(put.body.state.schedule.anchor, stateA.schedule.anchor, 'the device’s anchor is stored as sent')
+  assert.ok(put.body.state.exercises.some((e) => e.id === X.id), 'B’s change kept too')
 })
 
 test('R1-3. a 413 closes its connection cleanly: the next request on the same client works', async () => {
