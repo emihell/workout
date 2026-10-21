@@ -590,3 +590,62 @@ test('R1-7. two concurrent PUTs on the same baseRev both land', async () => {
   assert.equal(final.state.routines[1].name, 'Concurrent B')
   assert.deepEqual([putA.body, putB.body].find((r) => r.rev === 3).conflicts, [])
 })
+
+// ---- Review round 3: records migrateState leaves with `undefined` keys (no routineId) ----
+
+test('R3-A. a set logged on the phone survives a stale laptop’s unrelated push (active workout with no routineId)', async () => {
+  const phone = await newUser()
+  const laptop = client(srv.base)
+  laptop.cookie = phone.cookie
+  const start = deviceState()
+  start.activeWorkout = { id: 'w-free', startedAt: '2026-10-21T10:00:00.000Z', sets: [] }
+  assert.equal((await phone.put('/api/state', { baseRev: 0, state: start })).body.rev, 1)
+
+  const atRev1 = (await laptop.get('/api/state')).body.state // both devices hold rev 1
+  const phoneState = structuredClone(atRev1)
+  phoneState.activeWorkout.sets = [{ id: 'set-1', exerciseId: 'ex-chest-press', reps: 8, kg: 40 }]
+  const rev2 = await phone.put('/api/state', { baseRev: 1, state: phoneState })
+  assert.equal(rev2.body.rev, 2)
+  const loggedSets = rev2.body.state.activeWorkout.sets
+  assert.equal(loggedSets.length, 1)
+
+  const laptopState = structuredClone(atRev1)
+  laptopState.exercises.push(structuredClone(X))
+  const put = await laptop.put('/api/state', { baseRev: 1, state: laptopState })
+  assert.equal(put.status, 200, JSON.stringify(put.body))
+  assert.deepEqual(put.body.conflicts, [])
+  assert.deepEqual(put.body.state.activeWorkout.sets, loggedSets, 'the logged set is still there')
+  assert.ok(put.body.state.exercises.some((e) => e.id === X.id))
+})
+
+test('R3-B. a finished workout (no routineId) deleted on one device stays deleted after a stale push', async () => {
+  const a = await newUser()
+  const b = client(srv.base)
+  b.cookie = a.cookie
+  const start = deviceState()
+  // No routineId and no snapshot: migrateState then leaves `routineId` and `snapshot.routineId`
+  // as undefined-valued keys.
+  start.workouts = [
+    {
+      id: 'w-no-routine',
+      startedAt: '2026-10-20T10:00:00.000Z',
+      finishedAt: '2026-10-20T11:00:00.000Z',
+      performedOn: '2026-10-20',
+      sets: [{ id: 'set-1', exerciseId: 'ex-chest-press', reps: 8, kg: 40 }],
+    },
+  ]
+  assert.equal((await a.put('/api/state', { baseRev: 0, state: start })).body.rev, 1)
+
+  const atRev1 = (await b.get('/api/state')).body.state
+  const stateA = structuredClone(atRev1)
+  stateA.workouts = []
+  assert.equal((await a.put('/api/state', { baseRev: 1, state: stateA })).body.rev, 2)
+
+  const stateB = structuredClone(atRev1)
+  stateB.exercises.push(structuredClone(X))
+  const put = await b.put('/api/state', { baseRev: 1, state: stateB })
+  assert.equal(put.status, 200, JSON.stringify(put.body))
+  assert.deepEqual(put.body.conflicts, [])
+  assert.deepEqual(put.body.state.workouts, [], 'the deleted workout does not come back')
+  assert.ok(put.body.state.exercises.some((e) => e.id === X.id))
+})

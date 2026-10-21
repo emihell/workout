@@ -38,7 +38,11 @@ export function validState(state) {
     const { anchor: _defaulted, ...schedule } = valid.schedule
     valid.schedule = schedule
   }
-  return valid
+  // Review round 3: exactly as it will be stored (JSON). migrateState leaves `undefined`-valued
+  // keys (e.g. `activeWorkout.routineId` when absent) that the stored base/current don't have;
+  // left in, the merge saw every such record as "edited" on the incoming side — a stale device
+  // could overwrite a logged set or resurrect a deleted workout.
+  return JSON.parse(JSON.stringify(valid))
 }
 
 // Review round 1 — the rev-0 document: the app's empty state WITHOUT the clock-made schedule
@@ -122,10 +126,6 @@ export function putState(db, userId, body, at = new Date()) {
       state = validState(result.state)
       conflicts = result.conflicts
     }
-    // Review round 2: compared and returned as it is stored (JSON) — migrateState can leave
-    // `undefined`-valued keys that the stored copy doesn't have, which made an equal state
-    // look changed.
-    state = JSON.parse(JSON.stringify(state))
     if (current.rev > 0 && conflicts.length === 0 && isDeepStrictEqual(state, current.state)) {
       return { rev: current.rev, state: current.state, merged, conflicts, unchanged: true }
     }
