@@ -2070,3 +2070,18 @@ the app". Planner's split, Emilio: "sounds good":
 3. **Training together** (DEC-073) and the in-app AI (DEC-124) after.
 Export and manual Import stay in every stage. DEC-085 §7 backend rules are written before any server code. Hosting details:
 pending — Emilio describes White Sleeve's setup.
+
+## DEC-128 — server stage 1 shape: offline-first phone, White Sleeve's hosting pattern  (Emilio, 2026-10-21, amends DEC-127)
+
+Emilio picked **A** of A (offline-first) / B (server required to log): "a".
+1. **Offline-first:** the phone keeps working as today (browser storage is the working copy); changes go up to the server when
+   online and come down on open. No signal at the gym never blocks logging.
+2. **Conflicts (Planner's call, DEC-095, reversible):** newest edit wins per record (workout, routine, schedule…); the losing version
+   is kept on the server, never silently dropped.
+3. **Hosting pattern from White Sleeve (read-only inspiration, `~/dev/white-sleeve`, never edited):** this Mac; app binds
+   127.0.0.1; reached via `tailscale serve` HTTPS, tailnet-only, funnel off; one SQLite file beside the code; invite-only accounts
+   (password login, a script bootstraps the first login and mints invites); `./start`/`./stop` from the live worktree only; backup
+   before any write + nightly backups kept 7. Public hosting for other users needs its own security review first.
+4. **Data shape (Planner's call):** each user's data is stored in the Export file's shape, so Export/Import stay as they are and
+   the phone's data moves over with one Import. Feedback notes stored per user too.
+5. **Server language (Planner's call):** JavaScript (Node), to reuse the app's own data checks and migrations.

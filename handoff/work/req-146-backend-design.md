@@ -7,11 +7,16 @@ Why (DEC-073): a real product, other users soon, training together. BACKLOG §Ph
 sharing model, live group sessions, migration from localStorage, offline-first in the gym, privacy/GDPR, backups, per-branch
 previews (Emilio, 2026-09-24).
 
+## Stage 1 — decided so far (DEC-127, DEC-128)
+
+Offline-first phone; newest edit wins per record, loser kept; White Sleeve's hosting pattern (Mac, 127.0.0.1, Tailscale serve,
+SQLite, invite-only login, start/stop, backups); per-user data in the Export shape; feedback notes per user; Node server.
+
 ## Open questions (to settle live with Emilio)
 
 1. Hosting: **Emilio's own machine, like White Sleeve (DEC-127)** — setup details pending from Emilio; uptime, security, backups.
 2. Accounts and auth; the sharing data model (shared routine, own values); live group sessions.
-3. Migration from `workout-mvp-v9` localStorage; offline-first logging in the gym; conflict rules.
+3. Migration from `workout-mvp-v9` localStorage — via one Import (DEC-128). Offline-first + conflict rule decided (DEC-128).
 4. Privacy / GDPR: what training data leaves the device, retention, deletion.
 5. Per-branch preview origins over Tailscale (never a path under `emihell.github.io`).
 6. **AI cost model when other users arrive:** per-user limits, a paid tier, or bring-your-own key.
