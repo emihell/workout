@@ -50,6 +50,8 @@ and syncs it with the server. **The GitHub Pages build behaves exactly as today*
 - **One push at a time** (req-229 review, latent): the server has no device identity, so two overlapping pushes from one device
   with the same `baseRev` merge against each other (add R, then delete R → R comes back). The app sends one push at a time and
   adopts the returned `rev` before the next. Test the add-then-delete case.
+- **Oversized upload** (review nit): over the server's 20 MB cap the client sees EPIPE (a network error), not 413 — the app
+  must not read that as "offline, retry forever"; show a clear failure after a bounded retry.
 - **Revision growth** (review, latent): every accepted revision stores the whole doc (`src/db.json` = 197,771 bytes); syncing
   per set adds MBs per workout. Prune old revisions the merge can no longer need (keep any rev a device may still hold as
   base, plus the conflict copies), or sync less often — Builder's choice, stated.
