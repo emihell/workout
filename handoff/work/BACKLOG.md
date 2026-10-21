@@ -659,7 +659,7 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
 ## Phase 3 — the heavy build  (gated on ONE decision)
 
-- **`req-146` backend design** (NEEDS DECISIONS — design doc `work/req-146-backend-design.md`; AI section decided DEC-124; DEC-073). Why: a real product, other users soon,
+- **`req-146` backend design** (stage 1 READY as req-228..231, DEC-127..130; NEEDS DECISIONS for stages 2–3 — design doc `work/req-146-backend-design.md`; AI section decided DEC-124; DEC-073). Why: a real product, other users soon,
   training together (shared routine, own values; one person starts an exercise and it starts for everyone). Decide:
   hosting (own computer vs managed), accounts, the sharing data model, live group sessions, migration from localStorage,
   offline-first in the gym, privacy/GDPR, backups. Planning's concerns to raise: a home server serving other people
@@ -706,7 +706,7 @@ target before starting any of these; each is a milestone, not a `req`.
 - **Tests depend on the machine's locale** (found 2026-10-21): on Emilio's Mac (`LANG=en_GB.UTF-8`) `./check` is RED — 4 tests
   (req-200.test.js:76, req-203.test.js:90, req-209.test.js:114/121) expect en-US dates ("Oct 7") and get "7 Oct".
   [measured] `LANG=en_US.UTF-8 node --test` → pass 1940 / fail 0. CI (en-US) green. Blocks `plan publish` locally; DEC-127's
-  save used `WORKOUT_SKIP_CHECK=1` for a handoff-only change. Fix: pin the locale for the suite (tests, not app behaviour).
+  save used `WORKOUT_SKIP_CHECK=1` for a handoff-only change. Fix: pin the locale for the suite (tests, not app behaviour). → **req-228** READY.
 
 - **`plan closeout` exits 1 silently when the req doc has no `# ` title** (2026-10-11, req-10): `co_title=$(grep -m1 '^# ' …)`
   fails under `set -euo pipefail` before any message. Make the title optional (fall back to the req id) or print why. Small tooling req.

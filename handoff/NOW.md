@@ -17,8 +17,8 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **NOW (2026-10-21, DEC-127): server work starts — req-146 stage 1** (own machine like White Sleeve, workouts + feedback notes
-  online, multi-user model, Export/Import kept). Waiting on: White Sleeve's setup from Emilio.
+- **NOW (2026-10-21, DEC-127..130): server stage 1 READY** — req-228 locale tests → req-229 server → req-230 app sync/offline
+  → req-231 go-live with Emilio. Rules `rules/BACKEND.md`. Emilio's list: req-230 §6–8 (unconfirmed).
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
 - **NOW (2026-10-11):** DEC-120..123 work all shipped. Open for Emilio: flip the import choice buttons (Keep filled, Replace plain)? — his call, BACKLOG.

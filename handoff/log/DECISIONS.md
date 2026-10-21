@@ -2091,3 +2091,13 @@ Emilio picked **A** of A (offline-first) / B (server required to log): "a".
 Emilio picked **A** (keep it as the no-server fallback): "a, when we are full up n runnign, we can close it down". Pages keeps
 deploying on every push to `main` through stage 1; closing it down is a later req once the server has carried real workouts.
 Data moves from it to the server only by Export → Import, never automatically.
+
+## DEC-130 — server stage 1 split into req-228..231; backend rules written  (Planner, 2026-10-21, under DEC-095)
+
+`rules/BACKEND.md` written (DEC-085 §7: secrets, who runs the server, ask-gate 3, restore drill) — the backend lane may start.
+Stage 1 = **req-228** locale-proof tests (unblocks `plan publish`) → **req-229** server core (accounts, per-user data,
+notes, three-way merge) → **req-230** app login / offline / sync (Pages build unchanged) → **req-231** go-live with Emilio.
+Planner's calls: live code runs from a `git archive main` copy and data sits in `~/dev/workout/workout-data/`, both outside
+the worktrees (Builder switches branches in `workout-codebase`); port 8100 behind `tailscale serve :8446` (`:443` stays the
+previews'); DEC-128 §2 "per record" is done as a server-side three-way merge, so **no change to the stored app schema**.
+Behaviour calls marked `(unconfirmed)` in req-230 §6–8 go on Emilio's list.

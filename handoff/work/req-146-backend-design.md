@@ -11,6 +11,7 @@ previews (Emilio, 2026-09-24).
 
 Offline-first phone; newest edit wins per record, loser kept; White Sleeve's hosting pattern (Mac, 127.0.0.1, Tailscale serve,
 SQLite, invite-only login, start/stop, backups); per-user data in the Export shape; feedback notes per user; Node server.
+Rules: `rules/BACKEND.md`. Reqs (DEC-130): req-228 → req-229 → req-230 → req-231. Pages stays until then (DEC-129).
 
 ## Open questions (to settle live with Emilio)
 
