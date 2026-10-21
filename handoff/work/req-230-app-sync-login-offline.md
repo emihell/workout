@@ -37,6 +37,17 @@ and syncs it with the server. **The GitHub Pages build behaves exactly as today*
 9. **Feedback notes:** sent to the server when saved (queued while offline); the on-device list and its export stay.
 10. **Export / Import unchanged** (BACKEND rule 10). An Import is a normal state change → it syncs like any other.
 
+## From req-229's build (2026-10-21) — must be handled here
+
+- **The server serves the built app** (same origin, so the `Secure; SameSite=Strict` cookie works; req-229 doesn't serve it).
+  Check the same-origin guard behind `tailscale serve` (Host / X-Forwarded-Host).
+- **A running cardio stopwatch must survive a sync.** req-229 stores what `applyBackup` returns, which drops
+  `activeWorkout.stopwatch` and defaults a missing schedule anchor. A sync mid-workout must never stop the user's stopwatch —
+  fix on whichever side is right (server keeps it, or the app keeps its local live fields); a test logs with a running
+  stopwatch, syncs, and the stopwatch is still running.
+- **First sync onto an account with data:** a device at `baseRev 0` merges against empty → every differing record is a conflict.
+  §6's rule (device takes the server's, its own downloaded first) avoids that path; assert it's never taken on first login.
+
 ## Out of scope
 
 Server code (req-229). Deploy, moving Emilio's real data (req-231). Sign-up screen for other users (stage 2 — invites only
