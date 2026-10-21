@@ -2587,3 +2587,10 @@ assertion changed, no app file. L-057.
 Gate (tooling): `check: green — lint, skills, no import cycles, 125 test file(s), and the build all passed.` (Planner, throwaway
 worktree, `LANG=en_GB.UTF-8`, a45c845); `LANG=ja_JP.UTF-8 node --test` → pass 1940 / fail 0; removed assert lines 0. Guard fires
 on every locale (agent, criterion 2). No reviewer: tests only. `reports/req-228.md`.
+
+## req-232 — the deploy is green again: req-178's test no longer hard-links across disks  (2026-10-21)
+
+**req-232** (bug lane; throwaway agent). The `--out` hard-link case links a copy of `db.json` inside the temp dir; same refusal
+asserted + the copy unchanged; script untouched. L-058.
+Gate (bug): RAM-disk `TMPDIR` → EXDEV on main `b7bb234`, pass on `220bb4a`; guard fires with the inode check removed (agent).
+`check` green on the merge (closeout). No reviewer: one test. `reports/req-232.md`.

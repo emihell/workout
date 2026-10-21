@@ -553,3 +553,9 @@ Four tests expected en-US dates ("Oct 7"); CI is en-US, Emilio's Mac en-GB, so `
 `plan publish` needed `WORKOUT_SKIP_CHECK=1`. A fifth (`req-224.test.js:134`, `includes('Mon')`) passed on de-DE only by luck.
 **How to apply:** any test that checks formatted date/time text imports `./test-support/locale.js` (pins the default
 locale to en-US for calls that pass none; app output untouched). Gate runs on this Mac use its real `LANG`.
+
+## L-058 — a test must not link or rename between the repo and os.tmpdir()  (Builder agent, req-232, 2026-10-21)
+
+req-178's test hard-linked `src/db.json` into `/tmp`; the GitHub runner's `/tmp` became a separate filesystem → EXDEV, deploy
+`39655468558` red, site not shipped. Passed locally (one disk). **How to apply:** make links/renames inside the temp dir
+(copy the repo file in first). Repro locally with a RAM-disk `TMPDIR` (`hdiutil attach -nomount ram://65536`).
