@@ -30,3 +30,8 @@ screenshots/
 .claude/settings.local.json
 # ephemeral build-agent git worktrees (isolation: worktree)
 .claude/worktrees/
+
+# req-229 — server data and secrets never enter git (BACKEND rule 1)
+.env*
+*.db
+*.db-*
