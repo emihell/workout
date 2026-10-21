@@ -703,6 +703,11 @@ target before starting any of these; each is a milestone, not a `req`.
 
 ## Workflow / tooling backlog (infra, not product)
 
+- **Tests depend on the machine's locale** (found 2026-10-21): on Emilio's Mac (`LANG=en_GB.UTF-8`) `./check` is RED — 4 tests
+  (req-200.test.js:76, req-203.test.js:90, req-209.test.js:114/121) expect en-US dates ("Oct 7") and get "7 Oct".
+  [measured] `LANG=en_US.UTF-8 node --test` → pass 1940 / fail 0. CI (en-US) green. Blocks `plan publish` locally; DEC-127's
+  save used `WORKOUT_SKIP_CHECK=1` for a handoff-only change. Fix: pin the locale for the suite (tests, not app behaviour).
+
 - **`plan closeout` exits 1 silently when the req doc has no `# ` title** (2026-10-11, req-10): `co_title=$(grep -m1 '^# ' …)`
   fails under `set -euo pipefail` before any message. Make the title optional (fall back to the req id) or print why. Small tooling req.
 
