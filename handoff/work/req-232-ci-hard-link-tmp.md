@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: bug**
+**Status: BUILT AND MERGED, 2026-10-21 — branch `req-232` (`220bb4a`…`220bb4a`, 1 commit).** **Lane: bug**
 
 # req-232 — the deploy is red: req-178's test hard-links across disks
 
