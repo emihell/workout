@@ -48,7 +48,7 @@ and syncs it with the server. **The GitHub Pages build behaves exactly as today*
   fix on whichever side is right (server keeps it, or the app keeps its local live fields); a test logs with a running
   stopwatch, syncs, and the stopwatch is still running.
 - **First sync onto an account with data:** a device at `baseRev 0` merges against empty → every differing record is a conflict.
-  §6's rule (device takes the server's, its own downloaded first) avoids that path; assert it's never taken on first login.
+  §6's rule (the device takes the server's) avoids that path; assert it's never taken on first login.
 - **One push at a time** (req-229 review, latent): the server has no device identity, so two overlapping pushes from one device
   with the same `baseRev` merge against each other (add R, then delete R → R comes back). The app sends one push at a time and
   adopts the returned `rev` before the next. Test the add-then-delete case.
