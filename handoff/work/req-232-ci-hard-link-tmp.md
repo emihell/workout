@@ -1,4 +1,4 @@
-**Status: READY** **Lane: bug**
+**Status: BUILT, NOT merged** **Lane: bug**
 
 # req-232 — the deploy is red: req-178's test hard-links across disks
 
