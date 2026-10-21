@@ -7,7 +7,7 @@ import React from 'react'
 import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { linkSync, mkdtempSync } from 'node:fs'
+import { copyFileSync, linkSync, mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
@@ -362,10 +362,18 @@ describe('req-178 AC9 — the dry-run script (same function, read-only)', () => 
     const refused = spawnSync(process.execPath, [script, path, '--out', path], { encoding: 'utf8' })
     assert.equal(refused.status, 1)
     // A hard link to the input is the same file too (re-review nit): refused.
+    // req-232: a hard link can't cross filesystems (CI's /tmp is not the repo's disk → EXDEV), so the
+    // link is made to a copy of db.json inside the temp dir and the script runs on that copy.
+    const input = join(dir, 'input.json')
+    copyFileSync(path, input)
+    const inputSha = () => createHash('sha256').update(readFileSync(input)).digest('hex')
+    const inputBefore = inputSha()
+    assert.equal(inputBefore, before, 'the copy is db.json byte for byte')
     const hard = join(dir, 'hard-link.json')
-    linkSync(path, hard)
-    const refusedLink = spawnSync(process.execPath, [script, path, '--out', hard], { encoding: 'utf8' })
+    linkSync(input, hard)
+    const refusedLink = spawnSync(process.execPath, [script, input, '--out', hard], { encoding: 'utf8' })
     assert.equal(refusedLink.status, 1, refusedLink.stdout)
+    assert.equal(inputSha(), inputBefore, 'the linked input untouched')
     assert.equal(sha(), before)
   })
 })
