@@ -2057,3 +2057,16 @@ From req-225's review (two should-fix behaviour calls). Planner recommended; Emi
    edit must land on the routine the row names.
 2. **"Change day" on a swapped spot carries the swap** to the new date: what the move sheet names is what lands there.
 Rule behind both: what a screen says is what you get.
+
+## DEC-127 — the server starts now: own machine like White Sleeve, data + feedback online, multi-user, export/import kept  (Emilio, 2026-10-21, supersedes DEC-091 §1 order)
+
+Emilio: "i want to run this one a server here, like i run white sleeve … i also want to save feedback notes here, and my user
+workout database as well - i want to keep the options of exporting them and importing manually as well, but i want to have it
+online and add multiplte user support". Why now: "i can tinker with the flow forever, so i need to push forward in other areas of
+the app". Planner's split, Emilio: "sounds good":
+1. **Server + your data:** hosted like White Sleeve; workouts and feedback notes stored on the server; one account (Emilio); data
+   model per-user from day one; phone data moves over through the existing Export/Import.
+2. **Other users:** sign-up/login, each user's data private.
+3. **Training together** (DEC-073) and the in-app AI (DEC-124) after.
+Export and manual Import stay in every stage. DEC-085 §7 backend rules are written before any server code. Hosting details:
+pending — Emilio describes White Sleeve's setup.

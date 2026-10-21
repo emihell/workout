@@ -1,5 +1,5 @@
 **Status: NEEDS DECISIONS** **Lane: design** — no code. Gated by DEC-085 §7 (backend rules written first). Started 2026-10-11 with
-the AI section (DEC-124); the rest is open.
+the AI section (DEC-124). **Active 2026-10-21 (DEC-127):** stages 1 server + own data → 2 other users → 3 together/AI.
 
 # req-146 — backend design (own server, accounts, sharing, in-app AI)
 
@@ -9,7 +9,7 @@ previews (Emilio, 2026-09-24).
 
 ## Open questions (to settle live with Emilio)
 
-1. Hosting: Emilio's own server vs managed; uptime, security, backups (Planner's concerns, DEC-073).
+1. Hosting: **Emilio's own machine, like White Sleeve (DEC-127)** — setup details pending from Emilio; uptime, security, backups.
 2. Accounts and auth; the sharing data model (shared routine, own values); live group sessions.
 3. Migration from `workout-mvp-v9` localStorage; offline-first logging in the gym; conflict rules.
 4. Privacy / GDPR: what training data leaves the device, retention, deletion.
