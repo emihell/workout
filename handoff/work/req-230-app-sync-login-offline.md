@@ -27,15 +27,17 @@ and syncs it with the server. **The GitHub Pages build behaves exactly as today*
 4. **Sync:** after each save (debounced ~2 s), on open, on coming back online/visible. Sends `{baseRev, state}`; takes the
    server's merged result. A local change made while a sync was in flight is never overwritten (re-sync on top).
 5. **Never sync broken data:** while `loadUnreadable` is set, no push and no pull over it (DEC-032 holds).
-6. **First login on a device (unconfirmed):** server has data → the device takes it; if the device had different data of its
-   own, that is **downloaded as an Export file first**, never discarded. Server empty → the device's data goes up.
-7. **Status (unconfirmed):** Settings → Backup & data shows one line: "Synced · 2 min ago" / "Not synced yet — saved on this
-   phone, will send when online". A banner only when a merge reported a conflict: "Your other device changed the same
-   thing. This version is kept; the other one is saved on the server."
-8. **Log out (unconfirmed):** syncs first; if it can't (offline), it says so and doesn't log out. After logout this user's data
-   is removed from the device (it's on the server), so the next person on the device starts clean.
+6. **First login on a device (DEC-132 §1):** the device takes the server's copy — no special handling of data already on the
+   device (one user today; his data goes up once by hand at go-live, req-231). Server empty → the device's data goes up.
+7. **Status (DEC-132 §2):** Settings → Backup & data shows one line: "Synced · 2 min ago" / "Not synced yet — saved on this
+   phone, will send when online". **No conflict banner** (the losing version stays on the server).
+8. **Log out (DEC-132 §3):** always allowed, online or not. Data stays on the device; anything not yet synced goes up on the
+   next login. (Clearing the device on logout returns with other users, stage 2.)
 9. **Feedback notes:** sent to the server when saved (queued while offline); the on-device list and its export stay.
-10. **Export / Import unchanged** (BACKEND rule 10). An Import is a normal state change → it syncs like any other.
+10. **Export / Import unchanged** (BACKEND rule 10). An Import — Keep my history and Replace everything — is a normal state
+    change → it syncs like any other (Emilio: "if the user upload data from the import/export, then we need to upload that to
+    the server as well"). Test both.
+11. **Password rule (DEC-132 §4):** at least 6 characters — change req-229's server check (≥ 8) to match, with its test.
 
 ## From req-229's build (2026-10-21) — must be handled here
 
@@ -73,9 +75,10 @@ via the script). Analytics key (`workout-mvp-analytics`). Any change to `workout
    network back → one sync carries all 3; nothing lost, nothing doubled.
 4. **Failure — unreadable local data:** with `loadUnreadable` set, no request leaves the app (assert fetch not called).
 5. **Merge round trip:** two app instances on one user (two storages): A edits a routine, B logs a workout offline, both sync →
-   both instances end with both changes. Same routine edited on both → the conflict banner shows on the second to sync.
+   both instances end with both changes. Same routine edited on both → no banner; the newest wins, the other is on the server.
 6. **Failure — session expired:** server returns 401 → login prompt; local data byte-identical before/after.
-7. First login with differing local data → an Export download fired (assert the file) before the device takes the server's.
+7. **Logout offline:** log a set offline → log out (allowed) → data still on the device → log in online → the set reaches the
+   server. An Import (each choice) → the server's rev rises and holds the imported data.
 8. Planner's browser run (`plan qa`-style isolated origin + local server): login, log a set, airplane-mode-style offline
    (DevTools), reload → app still opens with the set.
 9. `./check` green.
@@ -83,7 +86,7 @@ via the script). Analytics key (`workout-mvp-analytics`). Any change to `workout
 ## Decisions made on Emilio's behalf
 
 - **implementation:** build flag for sync; service worker for offline open; debounce ~2 s; sync hooked at `saveState`.
-- **behaviour (unconfirmed — on Emilio's list):** §6 first login takes the server's data (device's own downloaded first);
-  §7 status line + conflict banner wording; §8 logout refuses offline and clears the device after; new version on next open.
+- **behaviour:** decided by Emilio 2026-10-21 → DEC-132 (first login, status line, logout, password). New version takes over
+  on the next open (unconfirmed).
 
 Trigger files (`store.jsx`, `persistence.js`): **independent reviewer** + backup reminder before merge (WORKFLOW check 5).

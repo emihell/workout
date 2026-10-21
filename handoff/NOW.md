@@ -18,7 +18,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 
 **READY, held:**
 - **NOW (2026-10-21, DEC-127..130): server stage 1** — req-230 app sync/offline
-  → req-231 go-live with Emilio. Rules `rules/BACKEND.md`. Emilio's list: req-230 §6–8 (unconfirmed).
+  → req-231 go-live with Emilio. Rules `rules/BACKEND.md`. req-230 calls decided (DEC-132).
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
 - **NOW (2026-10-11):** DEC-120..123 work all shipped. Open for Emilio: flip the import choice buttons (Keep filled, Replace plain)? — his call, BACKLOG.

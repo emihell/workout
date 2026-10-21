@@ -2112,3 +2112,15 @@ bootstrap refused once any user exists; data dir refused under any ancestor hold
 `/api/revisions[/:rev]`. Sessions 90 days sliding (cookie re-sent); invites one-use, 7 days; username
 `[a-z0-9][a-z0-9._-]{0,31}`, lower-cased.
 **Behaviour (unconfirmed, Emilio's list):** password ≥ 8 characters.
+
+## DEC-132 — app sync behaviour kept simple for one user  (Emilio, 2026-10-21, on req-230 §6–8 + req-229's password rule)
+
+1. **First login:** the device takes the server's copy; no one-time "phone already has data" flow ("there is only one user
+   right now, and its me, i have a backup of my data, so we can just clean it out, we dont want a solution for one phone one
+   time"). His data goes up by hand at go-live. An Import is uploaded like any change ("if the user upload data from the
+   import/export, then we need to upload that to the server as well").
+2. **Status:** Emilio asked "why?"; Planner: offline-first means data can sit only on the phone, so one Settings line says
+   whether it reached the server; the conflict banner is dropped (one user, rare; the loser stays on the server).
+3. **Logout:** "let user logout, but sync data anyways when possible" → always allowed; data stays; unsynced changes go up on
+   the next login (no session while logged out). Clearing on logout returns with other users.
+4. **Password:** "6 is enough? its just a workout app" → ≥ 6 characters (tailnet-only server). Supersedes DEC-131's ≥ 8.
