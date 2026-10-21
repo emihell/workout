@@ -659,6 +659,8 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
 ## Phase 3 — the heavy build  (gated on ONE decision)
 
+- **Before any public hosting (ask-gate 3; req-229 review):** login rate limiting, a body cap before auth on public routes,
+  pruning expired sessions, a `.env.example` exception in `.gitignore` if one is ever added.
 - **`req-146` backend design** (stage 1 READY as req-228..231, DEC-127..130; NEEDS DECISIONS for stages 2–3 — design doc `work/req-146-backend-design.md`; AI section decided DEC-124; DEC-073). Why: a real product, other users soon,
   training together (shared routine, own values; one person starts an exercise and it starts for everyone). Decide:
   hosting (own computer vs managed), accounts, the sharing data model, live group sessions, migration from localStorage,
