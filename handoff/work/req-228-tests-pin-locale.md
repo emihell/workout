@@ -1,4 +1,4 @@
-**Status: READY** **Lane: tooling**
+**Status: BUILT, NOT merged** **Lane: tooling**
 
 # req-228 — the test suite gives the same result on any machine locale
 
