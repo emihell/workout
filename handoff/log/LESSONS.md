@@ -546,3 +546,10 @@ whole test file down with no message. **How to apply:** `assert.ok(!el)` / compa
 
 Without a key, React reuses the same component instance (and its state) across "mounts" of the same screen type. **How to apply:**
 one `StoreProvider` per test; each screen swap renders `h(Screen, { key: n++ , … })` inside it (`render().rerender` for a root swap).
+
+## L-057 — a test that asserts date text must pin the locale  (Builder agent, req-228, 2026-10-21)
+
+Four tests expected en-US dates ("Oct 7"); CI is en-US, Emilio's Mac en-GB, so `./check` was red only locally and every
+`plan publish` needed `WORKOUT_SKIP_CHECK=1`. A fifth (`req-224.test.js:134`, `includes('Mon')`) passed on de-DE only by luck.
+**How to apply:** any test that checks formatted date/time text imports `./test-support/locale.js` (pins the default
+locale to en-US for calls that pass none; app output untouched). Gate runs on this Mac use its real `LANG`.

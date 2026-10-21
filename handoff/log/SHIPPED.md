@@ -2578,3 +2578,12 @@ Gate (tooling): `check: green — lint, skills, no import cycles, 124 test file(
 
 **req-227** (cleanup batch; ui lane; throwaway agent). `workoutPosition` counts a swapped-away item while not done; `useFinishTime` (`views/workout/finish-time.js`): 30 s tick + refresh on visibilitychange / pageshow / focus; Save stores the shown time unless > 35 s stale (then re-derived — the locked-phone case); `store.finishWorkout(args, finishedAt)` validates the string; auto-complete refreshes too and shows the left-open line. Test edits: req-224 AC6, store.test.js, overview.test.js (reviewer: real changes).
 Gate (ui): `check: green — lint, skills, no import cycles, 125 test file(s), and the build all passed.` (Planner, throwaway worktree, ed29841); `plan qa` smoke green; browser finish-time list YES (5 h gap → line + `finishedAt` === last `loggedAt`). Reviewer (independent, 2 rounds): round 0 one latent (locked phone) + 2 more → fixed 8eb6a73..a01080f; "No blockers." both rounds. Real-device unlock events unverified. `reports/req-227.md`.
+
+## req-228 — the test suite gives the same result on any machine locale  (2026-10-21)
+
+**req-228** (server stage 1 prep; tooling lane; throwaway agent). `src/test-support/locale.js` pins the default date locale to
+en-US for calls that pass none; imported by req-200/203/209/224 tests (224 found by the agent: passed on de-DE by luck). No
+assertion changed, no app file. L-057.
+Gate (tooling): `check: green — lint, skills, no import cycles, 125 test file(s), and the build all passed.` (Planner, throwaway
+worktree, `LANG=en_GB.UTF-8`, a45c845); `LANG=ja_JP.UTF-8 node --test` → pass 1940 / fail 0; removed assert lines 0. Guard fires
+on every locale (agent, criterion 2). No reviewer: tests only. `reports/req-228.md`.
