@@ -52,6 +52,9 @@ and syncs it with the server. **The GitHub Pages build behaves exactly as today*
   adopts the returned `rev` before the next. Test the add-then-delete case.
 - **Oversized upload** (review nit): over the server's 20 MB cap the client sees EPIPE (a network error), not 413 — the app
   must not read that as "offline, retry forever"; show a clear failure after a bounded retry.
+- **Anchor on a rev-0 base** (req-229 review nit): when the base is the anchor-less rev 0, an on-purpose anchor change
+  (an Import keeps the file's anchor) is lost silently if the other side changed slots; matters only with `loopWeeks > 1`.
+  Covered if §6 keeps first login off the baseRev-0 merge path.
 - **Revision growth** (review, latent): every accepted revision stores the whole doc (`src/db.json` = 197,771 bytes); syncing
   per set adds MBs per workout. Prune old revisions the merge can no longer need (keep any rev a device may still hold as
   base, plus the conflict copies), or sync less often — Builder's choice, stated.
