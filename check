@@ -95,7 +95,9 @@ node scripts/check-cycles.mjs >/dev/null || { node scripts/check-cycles.mjs >&2 
 
 # 2. Unit tests (node --test) — the behaviour gate.
 echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
-node --test "${testfiles[@]}" || fail "the test suite"
+# req-229 review round 1: the live-data-path guard (BACKEND rule 8, server/config.mjs) is on for
+# the whole run, not only for test files that import server/test-helpers.mjs.
+WORKOUT_SERVER_TEST=1 node --test "${testfiles[@]}" || fail "the test suite"
 
 # 3. Production build (vite) — main must stay deployable to Pages.
 echo "check: building (vite build)…"

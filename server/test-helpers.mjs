@@ -14,10 +14,10 @@ export function tempDir(prefix = 'workout-server-test-') {
 }
 
 // A throwaway server on a temp data dir and a free port. `close()` removes everything.
-export async function startTestServer() {
+export async function startTestServer(options = {}) {
   const dataDir = tempDir()
   const deps = openDataDir(dataDir)
-  const server = createHttpServer(deps)
+  const server = createHttpServer({ ...deps, ...options })
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
   const base = `http://127.0.0.1:${server.address().port}`
   return {

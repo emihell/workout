@@ -18,13 +18,39 @@ export class ClientError extends Error {
 
 // The incoming `state` through the app's import validator + migration. A reject → 400 with
 // applyBackup's own message.
+//
+// Review round 1 (BACKEND rule 9 — the server stores what the app sent): applyBackup also does
+// two import-only things — it drops a running `activeWorkout.stopwatch` (req-194) and defaults a
+// missing `schedule.anchor` to this Monday (req-114). Both are undone here, so what is stored and
+// returned is the sent state, migrated, with nothing dropped and no clock-made date.
 export function validState(state) {
+  let valid
   try {
-    return applyBackup({ kind: BACKUP_KIND, version: BACKUP_VERSION, state }).state
+    valid = applyBackup({ kind: BACKUP_KIND, version: BACKUP_VERSION, state }).state
   } catch (error) {
     throw new ClientError(400, error.message)
   }
+  const sentStopwatch = state.activeWorkout?.stopwatch
+  if (sentStopwatch !== undefined && valid.activeWorkout) {
+    valid.activeWorkout = { ...valid.activeWorkout, stopwatch: structuredClone(sentStopwatch) }
+  }
+  if (!state.schedule?.anchor && valid.schedule && 'anchor' in valid.schedule) {
+    const { anchor: _defaulted, ...schedule } = valid.schedule
+    valid.schedule = schedule
+  }
+  return valid
 }
+
+// Review round 1 — the rev-0 document: the app's empty state WITHOUT the clock-made schedule
+// anchor, so it is one stable document, identical every time it is used (GET at rev 0 and the
+// merge base for baseRev 0). With the anchor, the base moved every Monday and a baseRev-0 push
+// a week later read as "changed the schedule".
+const REV0 = (() => {
+  const state = emptyState()
+  const { anchor: _clock, ...schedule } = state.schedule
+  return JSON.stringify({ ...state, schedule })
+})()
+export const revZeroState = () => JSON.parse(REV0)
 
 function revisionRow(db, userId, rev) {
   return db
@@ -36,10 +62,10 @@ export function currentRev(db, userId) {
   return db.prepare('SELECT COALESCE(MAX(rev), 0) AS rev FROM revisions WHERE user_id = ?').get(userId).rev
 }
 
-// → {rev, state}. A user with nothing stored yet is rev 0 with the app's empty state.
+// → {rev, state}. A user with nothing stored yet is rev 0 with the stable empty document (REV0).
 export function getState(db, userId) {
   const rev = currentRev(db, userId)
-  if (rev === 0) return { rev: 0, state: emptyState() }
+  if (rev === 0) return { rev: 0, state: revZeroState() }
   return { rev, state: JSON.parse(revisionRow(db, userId, rev).state) }
 }
 
@@ -74,7 +100,7 @@ export function getRevision(db, userId, rev) {
 
 // PUT /api/state. `baseRev` = the rev the device last synced.
 //   baseRev = current → stored as rev+1 (fast-forward).
-//   baseRev < current → three-way merge (base = baseRev's state, rev 0 = the empty state),
+//   baseRev < current → three-way merge (base = baseRev's state, rev 0 = REV0),
 //                       the result stored as rev+1 with its conflicts.
 //   result equals the current state → nothing stored, the current rev returned (`unchanged`).
 export function putState(db, userId, body, at = new Date()) {
@@ -89,7 +115,7 @@ export function putState(db, userId, body, at = new Date()) {
     let conflicts = []
     const merged = baseRev < current.rev
     if (merged) {
-      const base = baseRev === 0 ? emptyState() : JSON.parse(revisionRow(db, userId, baseRev).state)
+      const base = baseRev === 0 ? revZeroState() : JSON.parse(revisionRow(db, userId, baseRev).state)
       const result = mergeStates(base, incoming, current.state)
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.

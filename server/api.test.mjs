@@ -1,12 +1,14 @@
 // req-229 — the API end to end on a throwaway server (temp DB, free port). Acceptance criteria
 // 1–8 are numbered in the test names.
 import { client, startTestServer } from './test-helpers.mjs'
-import test, { after, before } from 'node:test'
+import test, { after, before, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { applyBackup, buildBackup } from '../src/exchange.js'
+import { migrateState } from '../src/model.js'
 import { emptyState } from '../src/persistence.js'
-import { bootstrapUser, createInvite } from './auth.mjs'
+import { SESSION_DAYS, bootstrapUser, createInvite, disableUser } from './auth.mjs'
+import { revZeroState } from './store.mjs'
 
 const dbJson = JSON.parse(readFileSync(new URL('../src/db.json', import.meta.url), 'utf8'))
 const PASSWORD = 'correct horse battery'
@@ -32,6 +34,7 @@ async function newUser() {
   const username = `user${++n}`
   const res = await c.post('/api/register', { code: createInvite(srv.db, srv.secret), username, password: PASSWORD })
   assert.equal(res.status, 201, JSON.stringify(res.body))
+  c.username = username
   return c
 }
 
@@ -41,7 +44,11 @@ test('1. bootstrap → login → GET /api/state on a new user is {rev:0, state: 
   const c = await loggedIn()
   const res = await c.get('/api/state')
   assert.equal(res.status, 200)
-  assert.deepEqual(res.body, { rev: 0, state: emptyState() })
+  assert.deepEqual(res.body, { rev: 0, state: revZeroState() })
+  // = the app's emptyState() minus its clock-made schedule anchor (review round 1).
+  const empty = emptyState()
+  const { anchor: _anchor, ...schedule } = empty.schedule
+  assert.deepEqual(res.body.state, { ...empty, schedule })
 })
 
 test('1. login cookie is HttpOnly; Secure; SameSite=Strict, and the session is stored hashed', async () => {
@@ -242,7 +249,7 @@ test('6. isolation — user 2 can’t read or write user 1’s state, revisions 
   const two = await newUser()
 
   // Every read of user 2 sees only user 2's (empty) data.
-  assert.deepEqual((await two.get('/api/state')).body, { rev: 0, state: emptyState() })
+  assert.deepEqual((await two.get('/api/state')).body, { rev: 0, state: revZeroState() })
   assert.deepEqual((await two.get('/api/revisions')).body, [])
   assert.equal((await two.get('/api/revisions/1')).status, 404)
   assert.deepEqual((await two.get('/api/notes')).body, [])
@@ -363,4 +370,179 @@ test('unknown route → 404; wrong method → 405', async () => {
   const c = client(srv.base)
   assert.equal((await c.get('/api/nothing')).status, 404)
   assert.equal((await c.call('DELETE', '/api/state')).status, 405)
+})
+
+// ---- Review round 1 ----
+
+const DAY = 24 * 60 * 60 * 1000
+const userIdOf = (c) => srv.db.prepare('SELECT id FROM users WHERE username = ?').get(c.username).id
+
+test('R1-1. the session’s sliding expiry reaches the browser: every authed response re-sends the cookie', async () => {
+  const c = await newUser()
+  const token = c.cookie.split('=')[1]
+  const userId = userIdOf(c)
+  // As if the login was 89 days ago: one day left.
+  srv.db
+    .prepare('UPDATE sessions SET expires_at = ? WHERE user_id = ?')
+    .run(new Date(Date.now() + DAY).toISOString(), userId)
+  const res = await c.get('/api/state')
+  assert.equal(res.status, 200)
+  const setCookie = res.headers.get('set-cookie')
+  assert.ok(setCookie, 'an authenticated response re-sends the cookie')
+  assert.equal(setCookie.split(';')[0], `workout_session=${token}`, 'the same session, not a new one')
+  assert.match(setCookie, new RegExp(`Max-Age=${SESSION_DAYS * 24 * 60 * 60}(;|$)`))
+  assert.match(setCookie, /HttpOnly; Secure; SameSite=Strict/)
+  const { expires_at: expires } = srv.db.prepare('SELECT expires_at FROM sessions WHERE user_id = ?').get(userId)
+  assert.ok(Date.parse(expires) > Date.now() + (SESSION_DAYS - 1) * DAY, `server expiry pushed out too: ${expires}`)
+})
+
+test('R1-2. the rev-0 document is stable: no clock-made anchor, identical a week later', async (t) => {
+  const a = await newUser()
+  const s0 = (await a.get('/api/state')).body
+  assert.equal(s0.rev, 0)
+  assert.equal('anchor' in s0.state.schedule, false)
+  assert.deepEqual(s0.state, revZeroState())
+
+  // Device B (same account) pushes a real schedule as rev 1.
+  const b = client(srv.base)
+  b.cookie = a.cookie
+  const real = structuredClone(s0.state)
+  real.schedule = { ...real.schedule, anchor: '2026-10-19', loopWeeks: 2, slots: [{ id: 'slot-1', weekday: 1 }] }
+  const rev1 = await b.put('/api/state', { baseRev: 0, state: real })
+  assert.equal(rev1.body.rev, 1)
+
+  // A week later device A — still on rev 0, schedule untouched — pushes a new exercise.
+  t.mock.timers.enable({ apis: ['Date'], now: Date.now() + 8 * DAY })
+  try {
+    const stateA = structuredClone(s0.state)
+    stateA.exercises.push(structuredClone(X))
+    const put = await a.put('/api/state', { baseRev: 0, state: stateA })
+    assert.equal(put.status, 200, JSON.stringify(put.body))
+    assert.equal(put.body.merged, true)
+    assert.deepEqual(put.body.conflicts, [], 'the schedule is not a conflict')
+    assert.deepEqual(put.body.state.schedule, rev1.body.state.schedule, 'the real schedule survives')
+    assert.ok(put.body.state.exercises.some((e) => e.id === X.id))
+    assert.deepEqual(revZeroState(), s0.state, 'rev 0 is the same document a week later')
+    // What the old base was: emptyState() moves with the clock (why the probe overwrote).
+    assert.notEqual(emptyState().schedule.anchor, undefined)
+  } finally {
+    mock.timers.reset()
+  }
+})
+
+test('R1-3. a 413 closes its connection cleanly: the next request on the same client works', async () => {
+  const small = await startTestServer({ maxBody: 1024 })
+  try {
+    const c = client(small.base)
+    const big = await c.post('/api/login', { username: 'x', password: 'y'.repeat(5000) })
+    assert.equal(big.status, 413)
+    assert.deepEqual(big.body, { error: 'Request too large.' })
+    assert.equal(big.headers.get('connection'), 'close')
+    for (let i = 0; i < 3; i++) assert.equal((await c.get('/api/health')).status, 200)
+    assert.equal((await c.post('/api/login', { username: 'x', password: 'not the password' })).status, 401)
+  } finally {
+    await small.close()
+  }
+})
+
+test('R1-4. the server stores what the app sent: a running stopwatch and an anchor-less schedule come back unchanged', async () => {
+  const c = await newUser()
+  const sent = revZeroState()
+  sent.activeWorkout = migrateState({
+    ...sent,
+    activeWorkout: {
+      id: 'w-live',
+      startedAt: '2026-10-21T10:00:00.000Z',
+      sets: [],
+      stopwatch: { setId: 's1', startedAt: 1761040800000 },
+    },
+  }).activeWorkout
+  // As it travels (and as localStorage holds it): JSON, so no `undefined` members.
+  sent.activeWorkout = JSON.parse(JSON.stringify(sent.activeWorkout))
+  assert.ok(sent.activeWorkout.stopwatch)
+  const put = await c.put('/api/state', { baseRev: 0, state: sent })
+  assert.equal(put.status, 200, JSON.stringify(put.body))
+  assert.deepEqual(put.body.state, sent)
+  const got = (await c.get('/api/state')).body
+  assert.deepEqual(got.state, sent)
+  assert.deepEqual(got.state.activeWorkout.stopwatch, { setId: 's1', startedAt: 1761040800000 })
+  assert.equal('anchor' in got.state.schedule, false)
+  // A sent anchor is kept as sent.
+  const anchored = structuredClone(sent)
+  anchored.schedule.anchor = '2026-09-28'
+  const put2 = await c.put('/api/state', { baseRev: 1, state: anchored })
+  assert.deepEqual(put2.body.state, anchored)
+})
+
+test('R1-5. a JSON body that is not an object → a clean 400 on every write', async () => {
+  const c = await newUser()
+  const raw = async (method, path, text) => {
+    const res = await fetch(srv.base + path, {
+      method,
+      headers: { 'x-workout-request': '1', 'content-type': 'application/json', cookie: c.cookie },
+      body: text,
+    })
+    return { status: res.status, body: await res.json() }
+  }
+  const writes = [
+    ['POST', '/api/login'],
+    ['POST', '/api/register'],
+    ['PUT', '/api/state'],
+    ['POST', '/api/notes'],
+  ]
+  for (const text of ['null', '42', '[]', '"x"']) {
+    for (const [method, path] of writes) {
+      const res = await raw(method, path, text)
+      assert.equal(res.status, 400, `${method} ${path} ${text}`)
+      assert.deepEqual(res.body, { error: 'Request body must be a JSON object.' })
+    }
+  }
+})
+
+test('R1-7. an expired session → 401 (and its row is deleted)', async () => {
+  const c = await newUser()
+  const userId = userIdOf(c)
+  srv.db
+    .prepare('UPDATE sessions SET expires_at = ? WHERE user_id = ?')
+    .run(new Date(Date.now() - 1000).toISOString(), userId)
+  assert.equal((await c.get('/api/state')).status, 401)
+  assert.equal(count('SELECT COUNT(*) AS n FROM sessions WHERE user_id = ?', userId), 0)
+})
+
+test('R1-7. an existing session after `disable` → 401 over HTTP; login refused too', async () => {
+  const c = await newUser()
+  assert.equal((await c.get('/api/state')).status, 200)
+  disableUser(srv.db, c.username)
+  assert.equal((await c.get('/api/state')).status, 401)
+  assert.equal((await c.put('/api/state', { baseRev: 0, state: revZeroState() })).status, 401)
+  const again = await client(srv.base).post('/api/login', { username: c.username, password: PASSWORD })
+  assert.equal(again.status, 401)
+})
+
+test('R1-7. an expired invite → 403, no account made', async () => {
+  const code = createInvite(srv.db, srv.secret, { at: new Date(Date.now() - 8 * DAY) })
+  const res = await client(srv.base).post('/api/register', { code, username: 'late', password: PASSWORD })
+  assert.equal(res.status, 403)
+  assert.deepEqual(res.body, { error: 'That invite code is not valid.' })
+  assert.equal(count('SELECT COUNT(*) AS n FROM users WHERE username = ?', 'late'), 0)
+})
+
+test('R1-7. two concurrent PUTs on the same baseRev both land', async () => {
+  const { a, b, rev1 } = await twoDevices()
+  const stateA = structuredClone(rev1)
+  stateA.routines[0].name = 'Concurrent A'
+  const stateB = structuredClone(rev1)
+  stateB.routines[1].name = 'Concurrent B'
+  const [putA, putB] = await Promise.all([
+    a.put('/api/state', { baseRev: 1, state: stateA }),
+    b.put('/api/state', { baseRev: 1, state: stateB }),
+  ])
+  assert.equal(putA.status, 200)
+  assert.equal(putB.status, 200)
+  assert.deepEqual([putA.body.rev, putB.body.rev].sort(), [2, 3])
+  const final = (await a.get('/api/state')).body
+  assert.equal(final.rev, 3)
+  assert.equal(final.state.routines[0].name, 'Concurrent A')
+  assert.equal(final.state.routines[1].name, 'Concurrent B')
+  assert.deepEqual([putA.body, putB.body].find((r) => r.rev === 3).conflicts, [])
 })

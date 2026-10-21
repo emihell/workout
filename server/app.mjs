@@ -90,25 +90,47 @@ export function csrfProblem(req) {
   return null
 }
 
-async function readJson(req) {
+// Review round 1: a too-large body is refused WITHOUT reading the rest, so the connection can't
+// be reused — the 413 says `connection: close` and the socket is destroyed once it is sent.
+class TooLarge extends ClientError {
+  constructor() {
+    super(413, 'Request too large.')
+  }
+}
+
+async function readJson(req, maxBody) {
+  const declared = Number(req.headers['content-length'])
+  if (declared > maxBody) throw new TooLarge()
   const chunks = []
   let size = 0
   for await (const chunk of req) {
     size += chunk.length
-    if (size > MAX_BODY) throw new ClientError(413, 'Request too large.')
+    if (size > maxBody) throw new TooLarge()
     chunks.push(chunk)
   }
   const text = Buffer.concat(chunks).toString('utf8')
   if (!text) return {}
+  let body
   try {
-    return JSON.parse(text)
+    body = JSON.parse(text)
   } catch {
     throw new ClientError(400, 'Request body is not JSON.')
   }
+  // Review round 1: every write takes a JSON object (`null`, a number, an array → 400, not a
+  // TypeError deeper in).
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+    throw new ClientError(400, 'Request body must be a JSON object.')
+  }
+  return body
 }
 
-export function createApp({ db, secret }) {
-  const authed = (req) => sessionUser(db, secret, readCookie(req.headers.cookie))
+export function createApp({ db, secret, maxBody = MAX_BODY }) {
+  // → {user, token} for a live session (its expiry just pushed SESSION_DAYS out), else null.
+  const authed = (req) => {
+    const token = readCookie(req.headers.cookie)
+    const user = sessionUser(db, secret, token)
+    return user ? { user, token } : null
+  }
 
   const routes = {
     'GET /api/health': () => [200, { ok: true, revisions: revisionTotal(db) }],
@@ -170,23 +192,32 @@ export function createApp({ db, secret }) {
       if (problem) return send(res, problem[0], { error: problem[1] })
     }
     let user = null
+    // Review round 1: the session's expiry slides on use (auth.mjs sessionUser), so the cookie's
+    // Max-Age is re-sent on every authenticated response — the browser's copy slides with it.
+    let refresh = {}
     if (!PUBLIC.has(key)) {
-      user = authed(req)
-      if (!user) return send(res, 401, { error: 'Not signed in.' })
+      const session = authed(req)
+      if (!session) return send(res, 401, { error: 'Not signed in.' })
+      user = session.user
+      refresh = { 'set-cookie': sessionCookie(session.token) }
     }
-    const body = write ? await readJson(req) : null
+    const body = write ? await readJson(req, maxBody) : null
     if (handler === 'rev') {
       const found = getRevision(db, user.id, rev)
-      return found ? send(res, 200, found) : send(res, 404, { error: 'Not found.' })
+      return found ? send(res, 200, found, refresh) : send(res, 404, { error: 'Not found.' }, refresh)
     }
     const [status, payload, headers] = await handler(req, body, user)
-    return send(res, status, payload, headers)
+    return send(res, status, payload, { ...refresh, ...headers })
   }
 
   return async (req, res) => {
     try {
       await handle(req, res)
     } catch (error) {
+      if (error instanceof TooLarge) {
+        res.once('finish', () => req.socket.destroy())
+        return send(res, 413, { error: error.message }, { connection: 'close' })
+      }
       if (error instanceof ClientError) return send(res, error.status, { error: error.message })
       console.error(error)
       if (!res.headersSent) send(res, 500, { error: 'Server error.' })
