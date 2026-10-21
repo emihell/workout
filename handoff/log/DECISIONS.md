@@ -2101,3 +2101,14 @@ Planner's calls: live code runs from a `git archive main` copy and data sits in 
 the worktrees (Builder switches branches in `workout-codebase`); port 8100 behind `tailscale serve :8446` (`:443` stays the
 previews'); DEC-128 §2 "per record" is done as a server-side three-way merge, so **no change to the stored app schema**.
 Behaviour calls marked `(unconfirmed)` in req-230 §6–8 go on Emilio's list.
+
+## DEC-131 — req-229's open choices, recorded  (Planner, 2026-10-21, from `reports/req-229.md`; reversible)
+
+Implementation (Builder's, accepted): no-op PUT stores nothing (`unchanged: true`); `baseRev` ahead → 409; merged array order
+= incoming's, current-only additions after their nearest kept predecessor; conflict record `{field, id, kind, lost}`; the
+rev-0 document is `emptyState()` **without** `schedule.anchor`, built once (stable base); an anchor-less base ignores
+`anchor` when deciding if the schedule changed; incoming state is JSON-normalised before the merge; 20 MB body cap;
+bootstrap refused once any user exists; data dir refused under any ancestor holding `.git`; extra endpoints `/api/me`,
+`/api/revisions[/:rev]`. Sessions 90 days sliding (cookie re-sent); invites one-use, 7 days; username
+`[a-z0-9][a-z0-9._-]{0,31}`, lower-cased.
+**Behaviour (unconfirmed, Emilio's list):** password ≥ 8 characters.

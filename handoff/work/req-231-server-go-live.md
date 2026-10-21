@@ -17,6 +17,14 @@ Emilio** (BACKEND rule 2).
    on his phone (the req-220 preview shows counts) → compare counts on both sides → he logs a workout through it.
 5. **Restore drill** (BACKEND rule 7) before step 4; receipt in the report.
 
+## From req-229's review (latent, verify here)
+
+- **Cookies don't isolate by port:** `tailscale serve` puts :443 / :8443 (White Sleeve) / :8444 / :8445 on the same host as
+  :8446, and the browser sends `workout_session` to all of them; another service could set one with a more specific path.
+  Decide the mitigation (e.g. a distinct cookie name + `Path=/` and reading only ours, or a separate hostname) and test it.
+- **Same-origin check behind `tailscale serve`:** verify what Host / X-Forwarded-Host arrive; if Host is rewritten to
+  `127.0.0.1:8100`, every write would 403. Receipt: a real login + PUT through `:8446`.
+
 ## Out of scope
 
 Other users, invites, public hosting (ask-gate 3). Closing the Pages site (DEC-129: after the server has carried real

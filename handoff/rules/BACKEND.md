@@ -17,7 +17,7 @@ live data. Live runs only from a `main` copy; data sits beside the worktrees lik
 
 ## The rules
 
-1. **Secrets out of git.** No password, key, token or `.env` in the repo; `.env*` and `*.db*` stay in `.gitignore`. A test
+1. **Secrets out of git.** No password, key, token or `.env` in the repo; `.env*`, `*.db` and `*.db-*` are in `.gitignore` (added by req-229; they were missing). A test
    asserts the server refuses to start with its secret inside the repo tree.
 2. **Who runs the server.** Planner deploys and restarts the live server (after a closeout that touches `server/` or the
    sync code). Builder and throwaway agents **never** start, stop or point anything at the live server or live DB — they use a
