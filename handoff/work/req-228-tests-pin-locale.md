@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged** **Lane: tooling**
+**Status: BUILT AND MERGED, 2026-10-21 — branch `req-228` (`a45c845`…`a45c845`, 1 commit).** **Lane: tooling**
 
 # req-228 — the test suite gives the same result on any machine locale
 
