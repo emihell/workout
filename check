@@ -48,6 +48,10 @@ cd "$HERE"
 # `src/*.test.js` glob skips those silently, and `src/**/*.test.js` needs
 # globstar — unavailable in the bash 3.2 this runs under on macOS. `find`
 # recurses portably on both macOS and the Ubuntu CI runner.
+#
+# req-229: the server's tests (server/**/*.test.mjs, temp DBs only — BACKEND rule 8) run in
+# the same `node --test` call. Each side must find at least one file, so a moved folder
+# can't silently drop half the suite.
 testfiles=()
 while IFS= read -r f; do
   testfiles+=("$f")
@@ -55,6 +59,15 @@ done < <(find src -type f -name '*.test.js' | sort)
 if [ "${#testfiles[@]}" -eq 0 ]; then
   echo "check: RED — no test files matched src/**/*.test.js; refusing." >&2
   echo "check: a gate that runs nothing must not pass. Check the path." >&2
+  exit 5
+fi
+servertests=0
+while IFS= read -r f; do
+  testfiles+=("$f")
+  servertests=$((servertests + 1))
+done < <(find server -type f -name '*.test.mjs' | sort)
+if [ "$servertests" -eq 0 ]; then
+  echo "check: RED — no test files matched server/**/*.test.mjs; refusing." >&2
   exit 5
 fi
 
@@ -82,7 +95,9 @@ node scripts/check-cycles.mjs >/dev/null || { node scripts/check-cycles.mjs >&2 
 
 # 2. Unit tests (node --test) — the behaviour gate.
 echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
-node --test "${testfiles[@]}" || fail "the test suite"
+# req-229 review round 1: the live-data-path guard (BACKEND rule 8, server/config.mjs) is on for
+# the whole run, not only for test files that import server/test-helpers.mjs.
+WORKOUT_SERVER_TEST=1 node --test "${testfiles[@]}" || fail "the test suite"
 
 # 3. Production build (vite) — main must stay deployable to Pages.
 echo "check: building (vite build)…"
