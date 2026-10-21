@@ -5,6 +5,7 @@
 // stale Continue row and the day screen.
 import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
+import './test-support/locale.js' // req-228: date text is asserted in en-US on any machine locale
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
