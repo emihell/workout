@@ -2085,3 +2085,9 @@ Emilio picked **A** of A (offline-first) / B (server required to log): "a".
 4. **Data shape (Planner's call):** each user's data is stored in the Export file's shape, so Export/Import stay as they are and
    the phone's data moves over with one Import. Feedback notes stored per user too.
 5. **Server language (Planner's call):** JavaScript (Node), to reuse the app's own data checks and migrations.
+
+## DEC-129 — the GitHub Pages site stays until the server is fully running  (Emilio, 2026-10-21)
+
+Emilio picked **A** (keep it as the no-server fallback): "a, when we are full up n runnign, we can close it down". Pages keeps
+deploying on every push to `main` through stage 1; closing it down is a later req once the server has carried real workouts.
+Data moves from it to the server only by Export → Import, never automatically.
