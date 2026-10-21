@@ -1,4 +1,4 @@
-**Status: READY** **Lane: backend** (rules: `rules/BACKEND.md`) · req-146 stage 1, part 1 of 3 (229 → 230 → 231)
+**Status: BUILT, NOT merged** **Lane: backend** (rules: `rules/BACKEND.md`) · req-146 stage 1, part 1 of 3 (229 → 230 → 231)
 
 # req-229 — the server: accounts, each user's data, feedback notes, sync with merge
 

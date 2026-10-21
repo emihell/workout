@@ -2594,3 +2594,14 @@ on every locale (agent, criterion 2). No reviewer: tests only. `reports/req-228.
 asserted + the copy unchanged; script untouched. L-058.
 Gate (bug): RAM-disk `TMPDIR` → EXDEV on main `b7bb234`, pass on `220bb4a`; guard fires with the inode check removed (agent).
 `check` green on the merge (closeout). No reviewer: one test. `reports/req-232.md`.
+
+## req-229 — the server core: invite-only accounts, per-user data with revisions, three-way merge, notes  (2026-10-21)
+
+**req-229** (server stage 1, part 1; backend lane; throwaway agent). `server/` on Node built-ins (`node:http`, `node:sqlite`,
+`node:crypto`), 127.0.0.1:8100, nothing live. scrypt passwords, hashed sessions/invites, CSRF on every write; every
+revision stored; `applyBackup` validates, the server stores what the app sent; per-id three-way merge, incoming wins, loser in
+`conflicts`. `./check` runs `server/**/*.test.mjs` with `WORKOUT_SERVER_TEST=1`; `.gitignore` +`.env*`/`*.db`/`*.db-*`. DEC-131.
+Gate (backend): `check: green — lint, skills, no import cycles, 128 test file(s), and the build all passed.` (1994 pass;
+server 54 pass on Node 26.8.2 and 22.23.3). Reviewer (independent, 3 rounds): round 0 "No blockers." 3 should-fix + latents →
+8f527bd; round 1 "No blockers." rev-0 schedule overwrite → 29595af; round 2 "No blockers." undefined-key merge data loss →
+124c5e3 (Planner read the diff; fail-without-fix receipts). Latents → req-230/231/backlog. `reports/req-229.md`.
