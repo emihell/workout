@@ -1,4 +1,4 @@
-**Status: BLOCKED ON req-229, req-230** **Lane: data** (Emilio's eyes before go-live) · req-146 stage 1, part 3 of 3
+**Status: BLOCKED ON req-230** **Lane: data** (Emilio's eyes before go-live) · req-146 stage 1, part 3 of 3
 
 # req-231 — go live: the server on this Mac, your data on it
 
