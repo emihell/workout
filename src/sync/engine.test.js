@@ -90,21 +90,27 @@ function deviceFetch() {
   return f
 }
 
-function device(state = fullState()) {
-  const storage = memoryStorage()
+// Review round 1: `storage` / `fetch` can be shared (a reload of the same browser, a second tab);
+// `failSaves` makes the state write fail like a full storage (the listener hears `saved: false`);
+// `adopt: 'async'` applies the store update later, as React does; `adopt: 'never'` never applies
+// it (the tab closed first).
+function device(state = fullState(), { storage = null, fetch: sharedFetch = null, adopt = 'sync' } = {}) {
+  const shared = storage !== null
+  storage ??= memoryStorage()
   const timers = fakeTimers()
-  const fetchFn = deviceFetch()
+  const fetchFn = sharedFetch ?? deviceFetch()
   const listeners = new Set()
   const notes = []
   let unreadable = false
   let current = state
   let detach = null
-  storage.setItem(KEY, JSON.stringify(state))
+  if (!shared) storage.setItem(KEY, JSON.stringify(state))
   const save = (s) => {
     if (unreadable) return false
-    storage.setItem(KEY, JSON.stringify(s))
-    for (const l of listeners) l(s)
-    return true
+    const ok = !d.failSaves
+    if (ok) storage.setItem(KEY, JSON.stringify(s))
+    for (const l of listeners) l(s, ok)
+    return ok
   }
   const engine = createSync({
     fetch: fetchFn,
@@ -118,6 +124,8 @@ function device(state = fullState()) {
     clearTimer: timers.clearTimer,
   })
   const d = {
+    failSaves: false,
+    pendingAdopts: [],
     engine,
     storage,
     timers,
@@ -134,11 +142,18 @@ function device(state = fullState()) {
     // The app mounting: it opens from local data (loadState), then the store attaches.
     mount() {
       current = JSON.parse(storage.getItem(KEY))
-      detach = engine.attach({ state: current, adopt: (fn) => d.change(fn) })
+      const apply = (fn) => d.change(fn)
+      detach = engine.attach({
+        state: current,
+        adopt: adopt === 'sync' ? apply : adopt === 'async' ? (fn) => d.pendingAdopts.push(() => apply(fn)) : () => {},
+      })
     },
     unmount() {
       detach?.()
       detach = null
+    },
+    applyAdopts() {
+      for (const f of d.pendingAdopts.splice(0)) f()
     },
     async login(username) {
       const result = await engine.login(username, PASSWORD)
@@ -301,7 +316,7 @@ describe('req-230 — sync against a throwaway server', () => {
     const lost = getRevision(srv.db, id, conflicted[0].rev).conflicts[0]
     assert.equal(lost.field, 'routines')
     assert.equal(lost.lost.name, 'From A', 'the losing version is still on the server')
-    assert.deepEqual(Object.keys(a.engine.getStatus()).sort(), ['dirty', 'error', 'expired', 'rev', 'syncedAt', 'syncing', 'user'])
+    assert.deepEqual(Object.keys(a.engine.getStatus()).sort(), ['dirty', 'error', 'expired', 'rev', 'syncedAt', 'syncedUser', 'syncing', 'user'])
     assert.equal(a.engine.getStatus().error, null)
   })
 
@@ -510,5 +525,167 @@ describe('req-230 — sync against a throwaway server', () => {
     assert.deepEqual(await d.engine.login(user, 'wrong!'), { error: 'Wrong username or password.' })
     assert.equal(d.engine.getStatus().user, null)
     assert.equal(server(user).rev, 0)
+  })
+})
+
+// ---------------------------------------------------------------------------------------------
+// Review round 1 — each test fails without its fix (receipts in reports/req-230.md).
+
+describe('req-230 review round 1', () => {
+  it('#1 a save lost to a full storage: after a reload the server’s copy (with the set) is taken, never erased', async () => {
+    const user = await newAccount()
+    const a = device()
+    await a.login(user)
+    a.failSaves = true
+    a.change((s) => withSet(s))
+    await a.settle()
+    assert.equal(setNotes(server(user).state).length, 1, 'the set reached the server')
+    assert.equal(setNotes(a.stored()).length, 0, 'but not this phone’s storage')
+    a.unmount()
+    // Reload: storage freed up, the app opens from the stale copy; the user edits right away.
+    const b = device(undefined, { storage: a.storage, fetch: a.fetch })
+    b.mount()
+    b.change((s) => renamed(s, 'rtn-a', 'edited after reload'))
+    await b.engine.idle()
+    await b.settle()
+    const after = server(user).state
+    assert.equal(setNotes(after).length, 1, 'the server’s only copy of the set survives')
+    assert.equal(after.routines.find((r) => r.id === 'rtn-a').name, 'edited after reload')
+    assert.equal(setNotes(b.stored()).length, 1, 'and this phone has it again')
+  })
+
+  it('#1 same rev, nothing marked changed, but the local copy differs → the server’s copy is taken', async () => {
+    const user = await newAccount()
+    const a = device()
+    await a.login(user)
+    a.change((s) => withSet(s))
+    await a.settle()
+    a.unmount()
+    // The stored copy lost the set while the meta still says "synced, rev N" (an older build's meta).
+    const stale = a.stored()
+    stale.activeWorkout = { ...stale.activeWorkout, sets: [] }
+    a.storage.setItem(KEY, JSON.stringify(stale))
+    const b = device(undefined, { storage: a.storage, fetch: a.fetch })
+    b.mount()
+    await b.engine.idle()
+    assert.equal(setNotes(b.state).length, 1)
+    b.change((s) => renamed(s, 'rtn-a', 'next edit'))
+    await b.settle()
+    assert.equal(setNotes(server(user).state).length, 1)
+  })
+
+  it('#2 the server went back (a backup restored): a clean device never takes the older copy, it pushes', async () => {
+    const user = await newAccount()
+    const d = device()
+    await d.login(user)
+    d.change((s) => withSet(s))
+    await d.settle()
+    d.change((s) => withSet(s))
+    await d.settle()
+    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev > 1').run(userId(user)) // restore → rev 1
+    await d.engine.trigger()
+    await d.engine.idle()
+    assert.equal(setNotes(d.state).length, 2, 'this device kept its newer data')
+    const after = server(user)
+    assert.equal(after.rev, 2, 'pushed on top of the restored rev')
+    assert.equal(setNotes(after.state).length, 2)
+    assert.equal(d.engine.getStatus().error, null)
+  })
+
+  it('#2 the server went back: a device with a change waiting pushes instead of a 409 forever', async () => {
+    const user = await newAccount()
+    const d = device()
+    await d.login(user)
+    d.change((s) => withSet(s))
+    await d.settle()
+    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev > 1').run(userId(user))
+    d.change((s) => withSet(s))
+    await d.settle()
+    await d.engine.idle()
+    assert.equal(d.engine.getStatus().error, null)
+    assert.equal(setNotes(server(user).state).length, 2)
+    assert.equal(d.engine.getStatus().dirty, false)
+  })
+
+  it('#4 two tabs: one tab’s sync never clears the other tab’s waiting change', async () => {
+    const user = await newAccount()
+    const a = device()
+    await a.login(user)
+    // Tab B: same storage, offline (its own fetch), opens the app.
+    const b = device(undefined, { storage: a.storage, adopt: 'sync' })
+    b.fetch.offline = true
+    b.mount()
+    // A starts a sync of its own change; while it is out, B logs a set; A's tab closes before
+    // React applies A's update (adopt never runs), so the stored copy is B's.
+    a.unmount()
+    const a2 = device(undefined, { storage: a.storage, fetch: a.fetch, adopt: 'never' })
+    a2.mount()
+    await a2.engine.idle()
+    let release
+    a2.fetch.hold = new Promise((r) => (release = r))
+    a2.change((s) => renamed(s, 'rtn-a', 'from tab A'))
+    const out = a2.engine.flush()
+    await new Promise((r) => setTimeout(r, 30))
+    b.change((s) => withSet(s))
+    a2.fetch.hold = null
+    release()
+    await out
+    assert.equal(JSON.parse(a.storage.getItem(META_KEY)).dirty, true, 'B’s change is still marked')
+    // Next open (B's copy on disk): the set goes up.
+    b.unmount()
+    const c = device(undefined, { storage: a.storage, fetch: a.fetch })
+    c.mount()
+    await c.engine.idle()
+    assert.equal(setNotes(server(user).state).length, 1)
+  })
+
+  it('#5 the store applies the server’s copy LATER (as React does): a sync queued behind it must not revert another device’s change', async () => {
+    const user = await newAccount()
+    const d = device(undefined, { adopt: 'async' })
+    await d.login(user)
+    d.applyAdopts()
+    const other = device(emptyState())
+    await other.login(user)
+    other.change((s) => renamed(s, 'rtn-a', 'renamed elsewhere'))
+    await other.settle()
+    let release
+    d.fetch.hold = new Promise((r) => (release = r))
+    d.change((s) => withSet(s))
+    const first = d.engine.flush()
+    await new Promise((r) => setTimeout(r, 30))
+    d.change((s) => withSet(s))
+    d.engine.flush() // queued behind the first
+    d.fetch.hold = null
+    release()
+    await first
+    await d.engine.idle()
+    d.applyAdopts()
+    await d.settle()
+    const after = server(user).state
+    assert.equal(after.routines.find((r) => r.id === 'rtn-a').name, 'renamed elsewhere', 'P1: not reverted')
+    // …at ANY point: no revision stored after the rename ever carried the old name again (another
+    // device syncing then would have taken the revert).
+    const id = userId(user)
+    const renamedAt = listRevisions(srv.db, id).find((r) => getRevision(srv.db, id, r.rev).state.routines.find((x) => x.id === 'rtn-a').name === 'renamed elsewhere').rev
+    for (const r of listRevisions(srv.db, id).filter((x) => x.rev >= renamedAt)) {
+      assert.equal(getRevision(srv.db, id, r.rev).state.routines.find((x) => x.id === 'rtn-a').name, 'renamed elsewhere', `rev ${r.rev}`)
+    }
+    assert.equal(setNotes(after).length, 2)
+  })
+
+  it('#8 a refused notes upload never blocks the state sync', async () => {
+    const user = await newAccount()
+    const d = device()
+    await d.login(user)
+    d.notes.push({ route: '#/', timestamp: '2026-10-09T17:00:00.000Z', text: 'n', context: {} })
+    d.engine.noteSaved()
+    d.fetch.respond = (e) => (e.path === '/api/notes' ? new Response(JSON.stringify({ error: 'nope' }), { status: 400 }) : null)
+    d.change((s) => withSet(s))
+    await d.settle()
+    assert.equal(setNotes(server(user).state).length, 1, 'the set went up')
+    assert.equal(d.engine.getStatus().error, null, 'no failure shown for the state')
+    d.fetch.respond = null
+    await d.engine.trigger()
+    assert.equal(getNotes(srv.db, userId(user)).length, 1, 'the note goes up later')
   })
 })

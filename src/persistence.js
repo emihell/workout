@@ -5,7 +5,7 @@ import { SCHEMA_VERSION, migrateState } from './model.js'
 import { defaultSchedule, withDefaultAnchor } from './schedule.js'
 import { DEVICE_FILL_KEY, fillRoutineKgFromHistory } from './routine-kg-fill.js'
 
-const STORAGE_KEY = 'workout-mvp-v9'
+export const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
 
 // "Last save failed" signal. saveState writes are unguarded against a throwing
@@ -353,10 +353,12 @@ export function subscribeSaved(listener) {
   return () => savedListeners.delete(listener)
 }
 
-function notifySaved(state) {
+// `saved` = whether the write reached storage (review round 1: a failed write leaves the stored
+// copy behind what sync believes).
+function notifySaved(state, saved) {
   for (const listener of savedListeners) {
     try {
-      listener(state)
+      listener(state, saved)
     } catch (error) {
       console.error('req-230: a save listener failed', error)
     }
@@ -375,11 +377,11 @@ export function saveState(state) {
       deviceMarkPending = false
       markDeviceFilled()
     }
-    notifySaved(state)
+    notifySaved(state, true)
     return true
   } catch {
     setSaveFailed(true)
-    notifySaved(state)
+    notifySaved(state, false)
     return false
   }
 }

@@ -24,6 +24,17 @@
 //     account (rev 0) gets the device's data. Never a baseRev-0 push onto an account with data.
 //   - Log out (DEC-132 §3): always allowed, offline too; local data stays, and anything not yet
 //     synced goes up at the next login as the same user.
+//   Review round 1:
+//   - "Not dirty" is trusted only as far as it was written: equal revs but a local copy that
+//     differs from the server's → the server's copy is taken (a save that failed on a full
+//     storage left the disk behind the meta). A device whose last state save failed (`diskBehind`)
+//     pulls before it pushes, rebasing anything typed since the app opened onto the server's copy.
+//   - The server's rev went BACKWARDS (a backup restored): never take the older copy; this device's
+//     data is pushed as a change on top of the server's current rev (its restored revision stays
+//     on the server as a revision).
+//   - Two tabs: the meta is re-read before each write and `dirty` is sticky — only cleared when no
+//     other tab marked a change after this tab's last one.
+//   - Feedback notes never block the state sync: sent after it, and their failures stay their own.
 import { deepEqual } from './equal.js'
 import { mergeStates } from './merge.js'
 
@@ -45,6 +56,8 @@ const META_DEFAULTS = {
   dirty: false, // a local change the server doesn't have yet
   notesDirty: false, // a feedback note not yet sent
   expired: false, // the server said 401: log in again to sync
+  dirtyMark: null, // who marked `dirty` last (one random id per tab) — review round 1, two tabs
+  diskBehind: false, // the last state save failed: the stored copy is older than this meta says
 }
 
 // State as the server stores it (JSON): drops `undefined`-valued keys, so they never read as a change.
@@ -85,6 +98,9 @@ export function createSync({
   let again = false
   let generation = 0 // bumped by login/logout: a reply from before is ignored
   let status = null
+  let opened = null // the state the app opened with (attach): the base for a pull-first rebase
+  let pullFirst = false
+  const tabMark = Math.random().toString(36).slice(2) // this tab's `dirtyMark`
   const listeners = new Set()
 
   function emit() {
@@ -92,7 +108,15 @@ export function createSync({
     for (const listener of listeners) listener()
   }
   function setMeta(patch) {
-    meta = { ...meta, ...patch }
+    const next = { ...meta, ...patch }
+    // Review round 1 (#4) — another tab may have marked a change since: re-read, and keep `dirty`
+    // unless the last mark is this tab's own (then this tab synced the change it marked).
+    const disk = readMeta(storage)
+    if (!next.dirty && disk.dirty && disk.dirtyMark && disk.dirtyMark !== tabMark) {
+      next.dirty = true
+      next.dirtyMark = disk.dirtyMark
+    }
+    meta = next
     try {
       storage.setItem(META_KEY, JSON.stringify(meta))
     } catch {
@@ -196,16 +220,30 @@ export function createSync({
       return true
     }
     const r = await request('POST', '/api/notes', JSON.stringify({ notes }))
-    if (!settle(r)) return false
+    if (r.status === 401) return settle(r)
+    if (r.blocked || r.network || r.status < 200 || r.status >= 300) return false // stays queued
     setMeta({ notesDirty: false })
     return true
   }
 
-  async function once() {
-    const gen = generation
-    if (meta.notesDirty) {
-      const ok = await sendNotes()
-      if (gen !== generation || !ok) return
+  // Review round 1 (#2) — the server is behind this device (a restored backup): take nothing; send
+  // this device's data as a change on top of the server's current rev. The server's revision stays.
+  function serverBehind(serverRev) {
+    setMeta({ rev: serverRev, dirty: true, dirtyMark: tabMark })
+    again = true
+  }
+
+  async function syncState(gen) {
+    if (pullFirst) {
+      // Review round 1 (#1) — the stored copy is behind this meta (a failed save): pull the server's
+      // copy first and rebase what changed since the app opened (base = what it opened with).
+      const r = await request('GET', '/api/state')
+      if (gen !== generation || !settle(r)) return
+      pullFirst = false
+      if (r.data.rev < meta.rev) return serverBehind(r.data.rev)
+      accept(r.data, opened)
+      if (!deepEqual(norm(latest), r.data.state)) again = true
+      return
     }
     const sent = latest
     const changedHere = meta.dirty || (agreed !== null && !deepEqual(norm(sent), agreed))
@@ -218,20 +256,36 @@ export function createSync({
         return
       }
       const r = await request('PUT', '/api/state', body)
-      if (gen !== generation || !settle(r, size)) return
+      if (gen !== generation) return
+      if (r.status === 409) {
+        // baseRev ahead of the server: it went back (a restore). Push on top of its current rev.
+        const g = await request('GET', '/api/state')
+        if (gen !== generation || !settle(g)) return
+        return serverBehind(g.data.rev)
+      }
+      if (!settle(r, size)) return
       accept(r.data, sent)
       return
     }
     // Nothing changed here since the last sync: only look for a newer server copy.
     const r = await request('GET', '/api/state')
     if (gen !== generation || !settle(r)) return
-    if (r.data.rev === meta.rev) {
-      // Not dirty ⇒ this device's data IS the server's copy at meta.rev.
-      agreed = norm(sent)
+    if (r.data.rev < meta.rev) return serverBehind(r.data.rev)
+    if (r.data.rev === meta.rev && deepEqual(norm(sent), r.data.state)) {
+      agreed = r.data.state
       setMeta({ syncedAt: new Date(now()).toISOString() })
       return
     }
+    // A newer rev — or the same rev with a local copy that isn't the server's while nothing is
+    // marked changed (review round 1 #1: a save lost to a full storage): take the server's copy.
     accept(r.data, sent)
+  }
+
+  async function once() {
+    const gen = generation
+    await syncState(gen)
+    // Review round 1 (#8) — notes after the state, and a note failure never stops the state sync.
+    if (gen === generation && meta.notesDirty && canRun()) await sendNotes()
   }
 
   function run() {
@@ -268,10 +322,14 @@ export function createSync({
     }, DEBOUNCE_MS)
   }
 
-  const unsubscribeSaved = subscribeSaved((state) => {
+  const unsubscribeSaved = subscribeSaved((state, saved = true) => {
     latest = state
     const dirty = agreed === null ? true : !deepEqual(norm(state), agreed)
-    if (dirty !== meta.dirty) setMeta({ dirty })
+    const patch = {}
+    if (dirty) Object.assign(patch, { dirty: true, dirtyMark: tabMark })
+    else if (meta.dirty) patch.dirty = false
+    if (meta.diskBehind !== !saved) patch.diskBehind = !saved
+    if (Object.keys(patch).length) setMeta(patch)
     if (dirty) schedule()
   })
 
@@ -337,6 +395,7 @@ export function createSync({
       if (!status) {
         status = {
           user: meta.user,
+          syncedUser: meta.syncedUser,
           expired: meta.expired,
           dirty: meta.dirty,
           syncedAt: meta.syncedAt,
@@ -355,6 +414,8 @@ export function createSync({
     attach({ state, adopt }) {
       store = { adopt }
       latest = state
+      opened = state
+      pullFirst = meta.diskBehind
       run()
       return () => {
         store = null

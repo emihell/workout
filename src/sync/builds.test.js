@@ -141,11 +141,15 @@ describe('req-230 §2 — the built service worker', () => {
       assert.equal(await sw.dispatch('fetch', { request }), undefined, `${request.method} ${request.url} goes to the network untouched`)
     }
 
-    // An older version's cache is removed on activate; this one never skips waiting.
+    // An older version's cache is removed on activate. It never skips waiting on its own
+    // (install/activate/fetch) — review round 1 (#6): only when the page asks.
     sw.stores.set('workout-app-old', new Map())
     await sw.dispatch('activate')
     assert.deepEqual([...sw.stores.keys()], [name])
+    assert.equal(sw.skipWaiting(), 0, 'not on install, activate or fetch')
+    await sw.dispatch('message', { data: { type: 'other' } })
     assert.equal(sw.skipWaiting(), 0)
-    assert.equal(source.includes('skipWaiting('), false, 'never called')
+    await sw.dispatch('message', { data: { type: 'SKIP_WAITING' } })
+    assert.equal(sw.skipWaiting(), 1, 'the page’s SKIP_WAITING activates the new version')
   })
 })

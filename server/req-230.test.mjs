@@ -129,12 +129,51 @@ test(`revision growth — revisions older than ${PRUNE_DAYS} days are pruned to 
   assert.equal(getState(srv.db, id).state.routines[0].name, 'd1', 'the current document is untouched')
 })
 
-test('a device whose base revision was pruned still syncs: merged against the newest kept one before it', async () => {
+test('a device whose base revision was pruned still syncs: merged without a base, every undecidable record listed', async () => {
   const id = findUser(srv.db, 'pruned').id
   // Rev 4 was pruned; a device still based on it renames the routine → stored, nothing lost.
   const out = putState(srv.db, id, { baseRev: 4, state: named('from an old device') }, new Date('2026-10-22T13:00:00.000Z'))
   assert.equal(out.rev, 10)
   assert.equal(out.state.routines[0].name, 'from an old device')
   assert.equal(out.conflicts.length, 1, 'the server’s version is kept as the losing one')
+  assert.equal(out.conflicts[0].kind, 'no-base-differs')
   assert.equal(out.conflicts[0].lost.name, 'd1')
+})
+
+// Review round 1 (#3) — the reviewer's case: with the base gone, falling back to an older base
+// brought the other device's deletion back and undid this device's own deletion, with conflicts 0.
+test('review #3 — a pruned base never drops or brings back a record without listing it', async () => {
+  const res = await client(srv.base).post('/api/register', { code: createInvite(srv.db, srv.secret), username: 'nobase', password: PASSWORD })
+  assert.equal(res.status, 201)
+  const id = findUser(srv.db, 'nobase').id
+  const routine = (rid, name) => ({ id: rid, name, focus: 'Machines', archivedAt: null, exercises: [] })
+  const withRoutines = (...routines) => ({ ...fullState(), routines })
+  let rev = 0
+  const push = (state, baseRev = rev) => {
+    const out = putState(srv.db, id, { baseRev, state })
+    rev = out.rev
+    return out
+  }
+  push(withRoutines(routine('A', 'a'), routine('B', 'b'), routine('C', 'c'))) // 1
+  push(withRoutines(routine('A', 'a'), routine('B', 'b'), routine('C', 'c'), routine('D', 'd'))) // 2 ← stale device's base
+  push(withRoutines(routine('B', 'b'), routine('C', 'c'), routine('D', 'd'))) // 3: other device deleted A
+  push(withRoutines(routine('B', 'b on server'), routine('C', 'c'), routine('D', 'd'))) // 4: and edited B
+  srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 2').run(id) // pruned
+  // The stale device (base 2): deleted D, edited C.
+  const out = putState(srv.db, id, { baseRev: 2, state: withRoutines(routine('A', 'a'), routine('B', 'b'), routine('C', 'c edited')) })
+  const listed = new Map(out.conflicts.filter((c) => c.field === 'routines').map((c) => [c.id, c]))
+  const names = Object.fromEntries(out.state.routines.map((r) => [r.id, r.name]))
+  // A: on one side only (deleted on the server, or added here?) → kept and listed.
+  assert.equal(names.A, 'a')
+  assert.equal(listed.get('A')?.kind, 'no-base-one-side')
+  // D: on one side only (this device's deletion, or the server's addition?) → kept and listed.
+  assert.equal(names.D, 'd')
+  assert.equal(listed.get('D')?.kind, 'no-base-one-side')
+  // B and C differ → this device's version, the server's listed as lost.
+  assert.equal(names.B, 'b')
+  assert.equal(listed.get('B')?.lost?.name, 'b on server')
+  assert.equal(names.C, 'c edited')
+  assert.equal(listed.get('C')?.lost?.name, 'c')
+  // Every routine that either side had is in the result: nothing dropped.
+  assert.deepEqual(Object.keys(names).sort(), ['A', 'B', 'C', 'D'])
 })

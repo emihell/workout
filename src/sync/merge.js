@@ -129,3 +129,43 @@ export function mergeStates(base, mine, theirs) {
   }
   return { state: out, conflicts }
 }
+
+// req-230 review round 1 (#3) — the merge when the base is GONE (its revision was pruned: a
+// device that hasn't synced for longer than the server keeps every revision). Without a base,
+// "added here" can't be told from "deleted there", nor "edited here" from "edited there", so
+// nothing is decided silently:
+//   - the same on both sides            → that value, no record
+//   - only one side has it              → KEPT (a deletion may come back), listed as a conflict
+//                                         `kind: 'no-base-one-side'`, `lost: null`
+//   - both have it, differently         → the incoming one, the current listed as `lost`
+//                                         (`kind: 'no-base-differs'`)
+// Every value in the result is one of the two inputs' values, verbatim.
+function noBase(field, id, m, t, conflicts) {
+  if (same(m, t)) return m
+  if (m === undefined || t === undefined) {
+    conflicts.push({ field, id, kind: 'no-base-one-side', lost: null })
+    return m === undefined ? t : m
+  }
+  conflicts.push({ field, id, kind: 'no-base-differs', lost: t })
+  return m
+}
+
+export function mergeWithoutBase(mine, theirs) {
+  const conflicts = []
+  const out = {}
+  for (const field of new Set([...Object.keys(mine), ...Object.keys(theirs)])) {
+    const mv = mine[field]
+    const tv = theirs[field]
+    const m = idCollection(mv ?? [])
+    const t = idCollection(tv ?? [])
+    if ((Array.isArray(mv) || Array.isArray(tv)) && m && t) {
+      const kept = new Map()
+      for (const id of new Set([...m.keys(), ...t.keys()])) kept.set(id, noBase(field, id, m.get(id), t.get(id), conflicts))
+      out[field] = mergedOrder(mv ?? [], tv ?? [], kept).map((id) => kept.get(id))
+      continue
+    }
+    const value = noBase(field, null, mv, tv, conflicts)
+    if (value !== undefined) out[field] = value
+  }
+  return { state: out, conflicts }
+}

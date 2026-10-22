@@ -7,7 +7,7 @@ import { isDeepStrictEqual } from 'node:util'
 import { BACKUP_KIND, BACKUP_VERSION, applyBackup, buildBackup } from '../src/exchange.js'
 import { emptyState } from '../src/persistence.js'
 import { inTransaction } from './db.mjs'
-import { mergeStates } from './merge.mjs'
+import { mergeStates, mergeWithoutBase } from './merge.mjs'
 
 export class ClientError extends Error {
   constructor(status, message) {
@@ -120,7 +120,7 @@ export function putState(db, userId, body, at = new Date()) {
     const merged = baseRev < current.rev
     if (merged) {
       const base = baseState(db, userId, baseRev)
-      const result = mergeStates(base, incoming, current.state)
+      const result = base ? mergeStates(base, incoming, current.state) : mergeWithoutBase(incoming, current.state)
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.
       state = validState(result.state)
@@ -143,6 +143,8 @@ export function putState(db, userId, body, at = new Date()) {
 // write that adds a new one. KEPT: every revision from the last PRUNE_DAYS days (any device that
 // synced in that time can still hold one as its base), the newest revision of each older day
 // (UTC), every revision with conflicts (the losing versions, DEC-128 §2), and the current one.
+// A device still based on a pruned revision is merged without a base (mergeWithoutBase): nothing
+// it can't decide is dropped, and every such record is listed in that revision's conflicts.
 export const PRUNE_DAYS = 14
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -160,16 +162,13 @@ export function pruneRevisions(db, userId, at = new Date()) {
   )
 }
 
-// The merge base for `baseRev`: that revision, or — when it was pruned (a device that hasn't
-// synced for over PRUNE_DAYS) — the newest kept revision before it, else the rev-0 document. An
-// older base can only make more records read as "changed on both"; those resolve as conflicts
-// (incoming wins, the server's version kept on the revision), never as silent loss.
+// The merge base for `baseRev`: that revision's state, the rev-0 document, or null when the
+// revision was pruned (review round 1 #3 — putState then merges WITHOUT a base, recording every
+// record it can't decide; an older base would silently undo deletions and lose edits).
 function baseState(db, userId, baseRev) {
   if (baseRev === 0) return revZeroState()
-  const row = db
-    .prepare('SELECT state FROM revisions WHERE user_id = ? AND rev <= ? ORDER BY rev DESC LIMIT 1')
-    .get(userId, baseRev)
-  return row ? JSON.parse(row.state) : revZeroState()
+  const row = revisionRow(db, userId, baseRev)
+  return row ? JSON.parse(row.state) : null
 }
 
 export function exportFile(db, userId) {

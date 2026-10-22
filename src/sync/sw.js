@@ -3,9 +3,12 @@
 // app opens with no signal once it has been loaded.
 //
 //   install   → cache every built file (this version's own cache)
-//   activate  → delete older versions' caches. No skipWaiting: a new version waits until every
-//               tab of the app is closed and takes over on the next open, never mid-workout.
-//               clients.claim() only matters for the very first install (nothing was in control).
+//   activate  → delete older versions' caches. A new version never skips waiting on its own: it
+//               waits for the page to say so (message SKIP_WAITING). The page asks when the app is
+//               opened, reloaded or returned to — and never while a workout is in progress
+//               (src/sync/sw-update.js; review round 1: a tab that is never fully closed, as on
+//               iOS, would otherwise never get the new version).
+//               clients.claim() makes the very first install control the open page.
 //   fetch     → /api/* and anything not a GET or not ours: straight to the network, never cached.
 //               A page load: the cached app (index.html), the network only if it's missing.
 //               Any other file: the cache, then the network.
@@ -25,6 +28,10 @@ function route(request, origin) {
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([SHELL, ...FILES.filter((f) => f !== 'index.html')])))
+})
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
