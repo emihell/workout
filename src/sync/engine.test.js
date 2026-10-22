@@ -799,6 +799,57 @@ describe('req-230 review round 1', () => {
     assert.equal(laptop.engine.getStatus().dirty, false)
   })
 
+  // Review round 5 (#1, reviewer's probe A) — DEC-133 is for a RESTORE only. A stale laptop whose
+  // base was PRUNED, still holding the old workout in progress (wo-2), never replaces the phone's
+  // live one (wo-now, 2 sets). P7 missed it: its laptop had no workout (`null`).
+  it('round 5 probe A — a pruned base never lets a stale laptop’s old workout replace the phone’s live one', async () => {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user) // rev 1: wo-2 in progress
+    const laptop = device(emptyState())
+    await laptop.login(user)
+    laptop.unmount() // put away on rev 1, wo-2 in progress
+    phone.change((s) => finishedState(s, { overallNote: '', overallFeel: '' }, '2026-10-09T18:00:00.000Z'))
+    await phone.settle()
+    phone.change((s) => ({ ...s, activeWorkout: { ...fullState().activeWorkout, id: 'wo-now' } }))
+    phone.change((s) => withSet(withSet(s)))
+    await phone.settle()
+    prune(user, 1)
+    laptop.fetch.offline = true
+    laptop.mount()
+    await laptop.engine.idle()
+    assert.equal(laptop.state.activeWorkout?.id, 'wo-2', 'the laptop still holds the old workout')
+    laptop.change((s) => ({ ...s, exercises: [...s.exercises, { ...s.exercises[0], id: 'ex-laptop', name: 'Laptop exercise' }] }))
+    laptop.fetch.offline = false
+    await laptop.settle()
+    const after = server(user).state
+    assert.equal(after.activeWorkout?.id, 'wo-now', 'the phone’s workout is still in progress')
+    assert.equal(setNotes(after).length, 2, 'with its 2 sets')
+    assert.ok(after.exercises.some((e) => e.id === 'ex-laptop'), 'the laptop’s edit is kept')
+    await phone.engine.trigger()
+    assert.equal(phone.state.activeWorkout?.id, 'wo-now')
+    assert.equal(setNotes(phone.state).length, 2)
+  })
+
+  // Review round 5 (#3) — a restore brings back a workout this device has since FINISHED: it must not
+  // come back as in progress (finishing it again wrote a second history entry with the same id).
+  it('round 5 — a restored workout in progress that the device has finished does not come back as in progress', async () => {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user) // rev 1 ← the backup: wo-2 in progress
+    assert.equal(server(user).state.activeWorkout?.id, 'wo-2')
+    phone.change((s) => finishedState(withSet(s), { overallNote: '', overallFeel: '' }, '2026-10-09T18:00:00.000Z'))
+    await phone.settle() // rev 2: wo-2 finished, nothing in progress
+    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev > 1').run(userId(user)) // restore → rev 1
+    await phone.engine.trigger()
+    await phone.engine.idle()
+    const after = server(user).state
+    assert.equal(after.activeWorkout, null, 'not in progress on the server')
+    assert.equal(phone.state.activeWorkout, null, 'nor on the phone')
+    assert.equal(after.workouts.filter((w) => w.id === 'wo-2').length, 1, 'one history entry for wo-2')
+    assert.ok(lostIn(user).some((c) => c.field === 'activeWorkout' && c.kind === 'no-base-finished' && c.lost?.id === 'wo-2'), 'the dropped copy is listed')
+  })
+
   it('#4 two tabs: one tab’s sync never clears the other tab’s waiting change', async () => {
     const user = await newAccount()
     const a = device()

@@ -143,16 +143,21 @@ export function mergeStates(base, mine, theirs) {
 //                                         incoming side is the one that lost its history (a stale
 //                                         laptop, a pre-restore device) — letting it win put an old
 //                                         `activeWorkout: null` over a workout in progress.
-//   - DEC-133 (review round 4): `activeWorkout` is the exception — a workout in progress on the
-//     incoming device wins over the server's (restored) one, so sets logged after a backup survive
-//     a restore. The server's version is listed as `lost` (`kind: 'no-base-in-progress'`). An
-//     incoming device with NO workout in progress never ends the server's (round 2 P7: a stale
-//     laptop's `null` must not end the phone's workout).
+//   - DEC-133 (review round 4): `activeWorkout` is the exception AFTER A RESTORE (`restored`) — a
+//     workout in progress on the incoming device wins over the server's (restored) one, so sets
+//     logged after a backup survive a restore. The server's version is listed as `lost`
+//     (`kind: 'no-base-in-progress'`). An incoming device with NO workout in progress never ends the
+//     server's (round 2 P7: a stale laptop's `null` must not end the phone's workout).
+//     Review round 5 (#1): never for a PRUNED base — there the server's copy is the newer one, and
+//     a stale laptop's old workout would replace the phone's live one.
+//   - Review round 5 (#3): a finished workout can't be in progress. If the result's `activeWorkout`
+//     has the id of a workout in the merged history, it is `null` instead (the app's own "no workout
+//     in progress", not an invented value), and the dropped one is listed (`kind: 'no-base-finished'`).
 // Every value in the result is one of the two inputs' values, verbatim.
 const inProgress = (v) => v !== null && v !== undefined
-function noBase(field, id, m, t, conflicts) {
+function noBase(field, id, m, t, conflicts, restored = false) {
   if (same(m, t)) return m
-  if (field === 'activeWorkout' && id === null && inProgress(m)) {
+  if (restored && field === 'activeWorkout' && id === null && inProgress(m)) {
     conflicts.push({ field, id, kind: 'no-base-in-progress', lost: t ?? null })
     return m
   }
@@ -164,7 +169,8 @@ function noBase(field, id, m, t, conflicts) {
   return t
 }
 
-export function mergeWithoutBase(mine, theirs) {
+// `restored`: the incoming device's base was replaced by a restore (store.mjs baseStatus), not pruned.
+export function mergeWithoutBase(mine, theirs, { restored = false } = {}) {
   const conflicts = []
   const out = {}
   for (const field of new Set([...Object.keys(mine), ...Object.keys(theirs)])) {
@@ -178,8 +184,13 @@ export function mergeWithoutBase(mine, theirs) {
       out[field] = mergedOrder(mv ?? [], tv ?? [], kept).map((id) => kept.get(id))
       continue
     }
-    const value = noBase(field, null, mv, tv, conflicts)
+    const value = noBase(field, null, mv, tv, conflicts, restored)
     if (value !== undefined) out[field] = value
+  }
+  const active = out.activeWorkout
+  if (inProgress(active) && Array.isArray(out.workouts) && out.workouts.some((w) => w?.id === active.id)) {
+    conflicts.push({ field: 'activeWorkout', id: null, kind: 'no-base-finished', lost: active })
+    out.activeWorkout = null
   }
   return { state: out, conflicts }
 }

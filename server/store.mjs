@@ -174,7 +174,10 @@ export function putState(db, userId, body, at = new Date()) {
     const merged = diverged || baseRev < current.rev
     if (merged) {
       const base = diverged ? null : baseState(db, userId, baseRev)
-      const result = base ? mergeStates(base, incoming, current.state) : mergeWithoutBase(incoming, current.state)
+      // Review round 5 (#1) — DEC-133's "the device's workout wins" holds only after a RESTORE,
+      // never for a pruned base (there the server's copy is the newer one).
+      const restored = diverged && baseStatus(db, userId, baseRev, baseId) === 'restored'
+      const result = base ? mergeStates(base, incoming, current.state) : mergeWithoutBase(incoming, current.state, { restored })
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.
       state = validState(result.state)
