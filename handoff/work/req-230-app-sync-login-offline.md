@@ -1,4 +1,4 @@
-**Status: READY** **Lane: backend + ui** (rules: `rules/BACKEND.md`) · req-146 stage 1, part 2 of 3 · after **req-229**
+**Status: BUILT, NOT merged** **Lane: backend + ui** (rules: `rules/BACKEND.md`) · req-146 stage 1, part 2 of 3 · after **req-229**
 
 # req-230 — the app logs in, works offline, and syncs with the server
 

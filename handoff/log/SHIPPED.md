@@ -2605,3 +2605,19 @@ Gate (backend): `check: green — lint, skills, no import cycles, 128 test file(
 server 54 pass on Node 26.8.2 and 22.23.3). Reviewer (independent, 3 rounds): round 0 "No blockers." 3 should-fix + latents →
 8f527bd; round 1 "No blockers." rev-0 schedule overwrite → 29595af; round 2 "No blockers." undefined-key merge data loss →
 124c5e3 (Planner read the diff; fail-without-fix receipts). Latents → req-230/231/backlog. `reports/req-229.md`.
+
+## req-230 — the app logs in, opens offline, and syncs with the server  (2026-10-22)
+
+**req-230** (server stage 1, part 2; backend + ui lane; throwaway agents). A second build (`dist-server`) adds login, a service
+worker for offline open, and a sync engine (`src/sync/`, own key `workout-sync-v1`, `workout-mvp-v9` unchanged): debounced
+PUT `{baseRev, baseId, state}` or GET, one request at a time, mid-flight edits rebased with the server's merge (shared
+`src/sync/merge.js`), retries 5/20/60 s, 413/oversize refused cleanly, unreadable data never leaves the phone. First login takes
+the server's copy (DEC-132); one Settings status line + Log out, no conflict banner. Revision ids + `pruned_revisions` tell a
+restore from pruning; a clean device on a pruned base takes the server's copy; no-base merge keeps the server's value except a
+live workout after a restore (DEC-133), and a finished workout never returns as in progress.
+Gate (backend + ui): `check: green — lint, skills, no import cycles, 134 test file(s), and the build all passed.` (2055 pass,
+`WORKOUT_SERVER_TEST=1`, 1ec174c). Planner browser QA on a throwaway server (scratch `qa230.mjs`, before rounds 2–5; later
+rounds are merge/server logic under tests). Reviewer (independent, 5 rounds): round 1 nine findings → 291186c; round 2 restore
+rev reuse + stale push → 95ce488; round 3 pruned-vs-restored → 5f287c2; round 4 DEC-133 + prune records + P10 → 1857436; round
+5 pruned-base blocker + finished guard → 1ec174c, "No blockers." Probe C (second device after a restore) → req-231.
+`reports/req-230.md`.
