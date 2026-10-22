@@ -7,7 +7,7 @@ import { startTestServer } from '../../server/test-helpers.mjs'
 import { after, before, describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { createInvite, registerUser, findUser } from '../../server/auth.mjs'
-import { getRevision, getState, listRevisions, getNotes } from '../../server/store.mjs'
+import { dropRevisions, getRevision, getState, listRevisions, getNotes } from '../../server/store.mjs'
 import { MAX_BODY } from '../../server/app.mjs'
 import { buildBackup, commitBackup } from '../exchange.js'
 import { emptyState } from '../persistence.js'
@@ -34,6 +34,8 @@ async function newAccount() {
 }
 const userId = (username) => findUser(srv.db, username).id
 const server = (username) => getState(srv.db, userId(username))
+// Review round 4 (#2): prune one revision the way pruneRevisions does (its id recorded), not a raw DELETE.
+const prune = (username, rev) => dropRevisions(srv.db, userId(username), [rev])
 
 function memoryStorage() {
   const map = new Map()
@@ -578,6 +580,8 @@ describe('req-230 review round 1', () => {
   // Round 1's #2 asserted the device's copy wins after a restore; review round 2 reversed that (a
   // push onto a restored history merges WITHOUT a base: the restored value stays where they differ,
   // the device's is listed as lost; records only the device has are kept and listed).
+  // Review round 4 (DEC-133): except the workout in progress — the device's wins; the restored one
+  // is listed as lost.
   const lostIn = (user) => {
     const id = userId(user)
     return listRevisions(srv.db, id).flatMap((r) => getRevision(srv.db, id, r.rev).conflicts)
@@ -598,9 +602,9 @@ describe('req-230 review round 1', () => {
     const after = server(user)
     assert.equal(after.rev, 2, 'one merged revision on top of the restored one')
     assert.ok(after.state.routines.some((r) => r.id === 'rtn-after-backup'), 'only on the device → kept')
-    assert.equal(setNotes(after.state).length, 0, 'differing → the restored value stays')
+    assert.equal(setNotes(after.state).length, 2, 'DEC-133: the device’s workout in progress wins')
     const lost = lostIn(user)
-    assert.ok(lost.some((c) => c.field === 'activeWorkout' && c.kind === 'no-base-differs' && setNotes({ activeWorkout: c.lost }).length === 2), 'the device’s 2 sets are listed, not dropped')
+    assert.ok(lost.some((c) => c.field === 'activeWorkout' && c.kind === 'no-base-in-progress' && setNotes({ activeWorkout: c.lost }).length === 0), 'the restored workout is listed, not dropped')
     assert.ok(lost.some((c) => c.id === 'rtn-after-backup' && c.kind === 'no-base-one-side'))
     assert.deepEqual(d.state, after.state, 'the device took the merged result')
     assert.equal(d.engine.getStatus().error, null)
@@ -618,7 +622,9 @@ describe('req-230 review round 1', () => {
     await d.engine.idle()
     assert.equal(d.engine.getStatus().error, null, 'no 409')
     assert.equal(d.engine.getStatus().dirty, false)
-    assert.ok(lostIn(user).some((c) => c.field === 'activeWorkout' && setNotes({ activeWorkout: c.lost }).length === 2))
+    // DEC-133: the device's 2 sets win; the restored workout (rev 1: no sets) is the listed one.
+    assert.equal(setNotes(server(user).state).length, 2)
+    assert.ok(lostIn(user).some((c) => c.field === 'activeWorkout' && c.kind === 'no-base-in-progress' && setNotes({ activeWorkout: c.lost }).length === 0))
   })
 
   it('round 2 P6 — a rev number reused after a restore is never read as a fast-forward', async () => {
@@ -665,7 +671,7 @@ describe('req-230 review round 1', () => {
     await phone.settle()
     phone.change((s) => renamed(s, 'rtn-a', 'Upper (current)'))
     await phone.settle()
-    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(userId(user)) // pruned
+    prune(user, 1) // pruned
     const before = laptop.fetch.log.length
     laptop.mount() // opens online, nothing changed on it
     await laptop.engine.idle()
@@ -685,7 +691,7 @@ describe('req-230 review round 1', () => {
     laptop.unmount()
     phone.change((s) => renamed(s, 'rtn-a', 'phone'))
     await phone.settle()
-    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(userId(user))
+    prune(user, 1) // pruned
     laptop.fetch.offline = true
     laptop.mount()
     await laptop.engine.idle()
@@ -710,7 +716,7 @@ describe('req-230 review round 1', () => {
     phone.change((s) => ({ ...s, activeWorkout: { ...fullState().activeWorkout, id: 'wo-now' } }))
     phone.change((s) => renamed(withSet(s), 'rtn-a', 'Upper (current)'))
     await phone.settle()
-    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(userId(user)) // pruned
+    prune(user, 1) // pruned
     // The laptop opens and makes one edit on its old copy (no active workout, old names).
     // Review round 3: offline BEFORE it opens, so the open-time check can't go out and take the
     // server's copy — the stale edit really is pushed onto a pruned base.
@@ -728,6 +734,69 @@ describe('req-230 review round 1', () => {
     assert.equal(phone.state.activeWorkout?.id, 'wo-now')
     assert.equal(setNotes(phone.state).length, 1)
     assert.deepEqual(phone.state.activeWorkout.stopwatch, fullState().activeWorkout.stopwatch)
+  })
+
+  // Review round 4 (#1, DEC-133) — a restore while the phone is mid-workout: the sets logged after
+  // the backup survive (the device's activeWorkout wins the no-base merge); every other record takes
+  // the restored copy, so a routine renamed after the backup reverts (reviewer's P2: intended).
+  it('round 4 DEC-133 — a restore never removes the sets of the workout in progress; a routine edit after the backup reverts', async () => {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user) // rev 1
+    phone.change((s) => withSet(s))
+    await phone.settle() // rev 2 ← the backup
+    const backupName = server(user).state.routines.find((r) => r.id === 'rtn-a').name
+    phone.change((s) => withSet(s))
+    await phone.settle()
+    phone.change((s) => renamed(withSet(s), 'rtn-a', 'renamed after the backup'))
+    await phone.settle()
+    assert.equal(setNotes(phone.state).length, 3)
+    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev > 2').run(userId(user)) // restore → rev 2
+    await phone.engine.trigger() // the app opens / comes back online
+    await phone.engine.idle()
+    const after = server(user).state
+    assert.equal(setNotes(after).length, 3, 'all 3 sets on the server')
+    assert.equal(setNotes(phone.state).length, 3, 'and on the phone')
+    assert.equal(after.routines.find((r) => r.id === 'rtn-a').name, backupName, 'the routine edit reverts to the backup')
+    assert.equal(phone.state.routines.find((r) => r.id === 'rtn-a').name, backupName)
+    const lost = lostIn(user)
+    assert.ok(lost.some((c) => c.id === 'rtn-a' && c.lost?.name === 'renamed after the backup'), 'the phone’s rename is listed')
+    assert.ok(lost.some((c) => c.field === 'activeWorkout' && setNotes({ activeWorkout: c.lost }).length === 1), 'the restored workout is listed')
+    assert.equal(phone.engine.getStatus().dirty, false)
+  })
+
+  // Review round 4 (#3) — reviewer's P10: a laptop opens clean, its base was pruned, and an edit is
+  // made while the open-time check is out. What it opened with is the last-synced state, so the
+  // server's copy is rebased under the edit three-way — the phone's deletion holds, the edit survives.
+  it('round 4 P10 — a clean-opened laptop, base pruned, an edit made right after opening: deletions stay deleted, the edit survives', async () => {
+    const user = await newAccount()
+    const phone = device()
+    phone.change((s) => ({ ...s, routines: [...s.routines, R('rtn-old')] }))
+    await phone.login(user) // rev 1 holds rtn-old
+    const laptop = device(emptyState())
+    await laptop.login(user)
+    laptop.unmount()
+    phone.change((s) => ({ ...s, routines: s.routines.filter((r) => r.id !== 'rtn-old') }))
+    await phone.settle()
+    prune(user, 1)
+    let edited = false
+    laptop.fetch.respond = (e) => {
+      if (e.method === 'GET' && !edited) {
+        edited = true
+        laptop.change((s) => ({ ...s, routines: [...s.routines, R('rtn-lap')] })) // while the GET is out
+      }
+      return null
+    }
+    laptop.mount()
+    await laptop.engine.idle()
+    laptop.fetch.respond = null
+    await laptop.settle()
+    const after = server(user).state
+    const conf = lostIn(user).map((c) => `${c.field}:${c.kind}`)
+    assert.equal(after.routines.some((r) => r.id === 'rtn-old'), false, `rtn-old stays deleted (conflicts: ${conf})`)
+    assert.ok(after.routines.some((r) => r.id === 'rtn-lap'), 'the laptop’s edit survives')
+    assert.deepEqual(laptop.state, after)
+    assert.equal(laptop.engine.getStatus().dirty, false)
   })
 
   it('#4 two tabs: one tab’s sync never clears the other tab’s waiting change', async () => {

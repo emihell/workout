@@ -87,16 +87,20 @@ export function getState(db, userId) {
 
 // GET /api/state?baseRev=&baseId= — also says whether that base is still this server's history
 // (`baseOk`), so a device that synced before a restore knows to merge rather than take or overwrite.
-// Review round 3 — when it isn't, `baseGone` says why: 'pruned' (the row is gone and the rev is not
-// ahead of the server: old history removed, the server's copy is still a descendant — a device
-// with nothing to send just takes it) or 'restored' (a row with that number but another id, or a
-// rev ahead of the server: the history was replaced — the device pushes and the server merges).
+// Review round 3 — when it isn't, `baseGone` says why: 'pruned' (old history removed, the server's
+// copy is still a descendant — a clean device rebases onto it) or 'restored' (the history was
+// replaced — the device pushes and the server merges without a base).
+// Review round 4 (#2) — 'pruned' only when pruning recorded THAT revision (number and id) in
+// `pruned_revisions`. Round 3 read any missing row at or below the current rev as pruned, so after a
+// restore to rev 5, new pushes up to a new rev 7, and that rev 7 pruned 14 days later, a device
+// still based on the old rev 7 read 'pruned' and dropped its pre-restore revs 6–7 silently. A
+// restored DB holds no record of revisions made after its backup, so those read 'restored'.
 export function getStateFor(db, userId, query) {
   const out = getState(db, userId)
   const baseRev = Number(query.get('baseRev'))
   const baseId = query.get('baseId')
   if (baseId && Number.isInteger(baseRev) && baseRev > 0) {
-    const status = baseStatus(db, userId, baseRev, baseId, out.rev)
+    const status = baseStatus(db, userId, baseRev, baseId)
     out.baseOk = status === 'ok'
     if (!out.baseOk) out.baseGone = status
   }
@@ -104,10 +108,13 @@ export function getStateFor(db, userId, query) {
 }
 
 // 'ok' | 'pruned' | 'restored' — see getStateFor.
-function baseStatus(db, userId, baseRev, baseId, currentRev) {
+function baseStatus(db, userId, baseRev, baseId) {
   const row = revisionRow(db, userId, baseRev)
   if (row) return revisionId(row) === baseId ? 'ok' : 'restored'
-  return baseRev <= currentRev ? 'pruned' : 'restored'
+  const pruned = db
+    .prepare('SELECT 1 FROM pruned_revisions WHERE user_id = ? AND rev = ? AND rev_id = ?')
+    .get(userId, baseRev, baseId)
+  return pruned ? 'pruned' : 'restored'
 }
 
 function baseKnown(db, userId, baseRev, baseId) {
@@ -197,16 +204,32 @@ const DAY_MS = 24 * 60 * 60 * 1000
 
 export function pruneRevisions(db, userId, at = new Date()) {
   const cutoff = new Date(at.getTime() - PRUNE_DAYS * DAY_MS).toISOString()
-  return Number(
-    db
-      .prepare(
-        `DELETE FROM revisions
-         WHERE user_id = ? AND created_at < ? AND conflicts = '[]'
-           AND rev < (SELECT MAX(rev) FROM revisions WHERE user_id = ?)
-           AND rev NOT IN (SELECT MAX(rev) FROM revisions WHERE user_id = ? GROUP BY substr(created_at, 1, 10))`,
-      )
-      .run(userId, cutoff, userId, userId).changes,
-  )
+  const revs = db
+    .prepare(
+      `SELECT rev FROM revisions
+       WHERE user_id = ? AND created_at < ? AND conflicts = '[]'
+         AND rev < (SELECT MAX(rev) FROM revisions WHERE user_id = ?)
+         AND rev NOT IN (SELECT MAX(rev) FROM revisions WHERE user_id = ? GROUP BY substr(created_at, 1, 10))`,
+    )
+    .all(userId, cutoff, userId, userId)
+    .map((row) => row.rev)
+  return dropRevisions(db, userId, revs)
+}
+
+// Review round 4 (#2) — removes revisions as pruning does: each one's number and id is recorded in
+// `pruned_revisions` first, so a device still based on it reads 'pruned', not 'restored'. Exported
+// for tests that prune one chosen revision.
+export function dropRevisions(db, userId, revs) {
+  const record = db.prepare('INSERT OR IGNORE INTO pruned_revisions (user_id, rev, rev_id) VALUES (?, ?, ?)')
+  const remove = db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = ?')
+  let removed = 0
+  for (const rev of revs) {
+    const row = revisionRow(db, userId, rev)
+    if (!row) continue
+    record.run(userId, rev, revisionId(row))
+    removed += Number(remove.run(userId, rev).changes)
+  }
+  return removed
 }
 
 // The merge base for `baseRev`: that revision's state, the rev-0 document, or null when the

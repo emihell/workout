@@ -143,9 +143,19 @@ export function mergeStates(base, mine, theirs) {
 //                                         incoming side is the one that lost its history (a stale
 //                                         laptop, a pre-restore device) — letting it win put an old
 //                                         `activeWorkout: null` over a workout in progress.
+//   - DEC-133 (review round 4): `activeWorkout` is the exception — a workout in progress on the
+//     incoming device wins over the server's (restored) one, so sets logged after a backup survive
+//     a restore. The server's version is listed as `lost` (`kind: 'no-base-in-progress'`). An
+//     incoming device with NO workout in progress never ends the server's (round 2 P7: a stale
+//     laptop's `null` must not end the phone's workout).
 // Every value in the result is one of the two inputs' values, verbatim.
+const inProgress = (v) => v !== null && v !== undefined
 function noBase(field, id, m, t, conflicts) {
   if (same(m, t)) return m
+  if (field === 'activeWorkout' && id === null && inProgress(m)) {
+    conflicts.push({ field, id, kind: 'no-base-in-progress', lost: t ?? null })
+    return m
+  }
   if (m === undefined || t === undefined) {
     conflicts.push({ field, id, kind: 'no-base-one-side', lost: null })
     return m === undefined ? t : m

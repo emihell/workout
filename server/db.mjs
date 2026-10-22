@@ -42,6 +42,15 @@ CREATE TABLE IF NOT EXISTS revisions (
   created_at TEXT NOT NULL,
   PRIMARY KEY (user_id, rev)
 );
+-- req-230 review round 4 (#2): one row per revision removed by pruning (store.mjs pruneRevisions) —
+-- its number and id, so a missing base can be told apart: pruned (a row here) or replaced by a
+-- restore (none: a backup never holds a revision made after it). Additive; v1 DBs gain it on open.
+CREATE TABLE IF NOT EXISTS pruned_revisions (
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  rev INTEGER NOT NULL,
+  rev_id TEXT NOT NULL,
+  PRIMARY KEY (user_id, rev, rev_id)
+);
 CREATE TABLE IF NOT EXISTS notes (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id),

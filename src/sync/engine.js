@@ -251,13 +251,18 @@ export function createSync({
     meta.revId ? `/api/state?baseRev=${meta.rev}&baseId=${encodeURIComponent(meta.revId)}` : '/api/state'
 
   // → true when the GET reply says the server's history no longer matches this device's base.
-  function historyGone(data) {
+  // `syncedBase`: the GET went out with nothing changed here, so the copy it was sent from is the
+  // last-synced state (the caller rebases onto the server's copy with that as the base).
+  function historyGone(data, syncedBase) {
     if (data.baseOk === false) {
       // Review round 3 — base PRUNED and nothing to send here: the server's copy descends from
       // this device's, so take it (as before round 2). Pushing a stale copy through the no-base
       // merge would bring back records other devices deleted. Restored history, or a change waiting
       // here: push, and the server merges without a base.
-      if (data.baseGone === 'pruned' && !meta.dirty) return false
+      // Review round 4 (#3, P10) — an edit made while that GET was out is no reason to push: the
+      // device's last-synced copy is known, so the server's copy is rebased under the edit three-way
+      // (accept → rebaseOnto) — another device's deletion holds, the edit survives.
+      if (data.baseGone === 'pruned' && (syncedBase || !meta.dirty)) return false
       diverged()
       return true
     }
@@ -275,7 +280,7 @@ export function createSync({
       const r = await request('GET', stateUrl())
       if (gen !== generation || !settle(r)) return
       pullFirst = false
-      if (historyGone(r.data)) return
+      if (historyGone(r.data, false)) return
       accept(r.data, opened)
       if (!deepEqual(norm(latest), r.data.state)) again = true
       return
@@ -306,7 +311,7 @@ export function createSync({
     // Nothing changed here since the last sync: only look for a newer server copy.
     const r = await request('GET', stateUrl())
     if (gen !== generation || !settle(r)) return
-    if (historyGone(r.data)) return
+    if (historyGone(r.data, true)) return
     if (r.data.rev === meta.rev && deepEqual(norm(sent), r.data.state)) {
       agreed = r.data.state
       setMeta({ syncedAt: new Date(now()).toISOString() })

@@ -9,7 +9,7 @@ import { join } from 'node:path'
 import { fullState } from '../src/test-support/full-state.js'
 import { PASSWORD_MIN, bootstrapUser, createInvite, findUser } from './auth.mjs'
 import { serverConfig, REPO_ROOT } from './config.mjs'
-import { PRUNE_DAYS, getState, getStateFor, listRevisions, putState } from './store.mjs'
+import { PRUNE_DAYS, dropRevisions, getState, getStateFor, listRevisions, putState } from './store.mjs'
 
 const PASSWORD = 'sixsix'
 let srv
@@ -198,8 +198,8 @@ test('round 2 — GET says whether a base is still this history; a PUT on a reus
   assert.equal(getStateFor(srv.db, id, q(2, two.revId)).baseOk, false)
   assert.equal(getStateFor(srv.db, id, q(2, two.revId)).baseGone, 'restored', 'same number, another revision')
   assert.equal(getStateFor(srv.db, id, q(7, 'x')).baseGone, 'restored', 'ahead of the server')
-  srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(id)
-  assert.equal(getStateFor(srv.db, id, q(1, one.revId)).baseGone, 'pruned', 'gone, not ahead')
+  dropRevisions(srv.db, id, [1]) // pruned (round 4: recorded, as pruneRevisions does)
+  assert.equal(getStateFor(srv.db, id, q(1, one.revId)).baseGone, 'pruned', 'pruned')
   // The device still holding the old rev 2 pushes: not a fast-forward.
   const stale = putState(srv.db, id, { baseRev: 2, baseId: two.revId, state: { ...fullState(), routines: [routine('A'), routine('B')] } })
   assert.equal(stale.merged, true)
@@ -211,4 +211,37 @@ test('round 2 — GET says whether a base is still this history; a PUT on a reus
   assert.equal(ahead.merged, true)
   // Without a baseId (an older app), behaviour as before.
   assert.throws(() => putState(srv.db, id, { baseRev: 99, state: fullState() }), /ahead of the server/)
+})
+
+// Review round 4 (#2) — a restore must not read as pruning once the reused rev number is pruned.
+// Device on rev 7 → restore to rev 5 → new pushes make a NEW rev 7 → that one is pruned 14+ days
+// later. Round 3 read the device's base as 'pruned' (row gone, rev ≤ current): a clean device then
+// takes the server's copy and its pre-restore revs 6–7 are dropped silently.
+test('round 4 — a base lost to a restore still reads "restored" after its reused rev number is pruned', async () => {
+  const res = await client(srv.base).post('/api/register', { code: createInvite(srv.db, srv.secret), username: 'restored', password: PASSWORD })
+  assert.equal(res.status, 201)
+  const id = findUser(srv.db, 'restored').id
+  const now = new Date('2026-10-22T12:00:00.000Z')
+  const old = (hour) => new Date(now.getTime() - 30 * DAY + hour * 60 * 60 * 1000)
+  let last = null
+  const push = (name, when) => {
+    last = putState(srv.db, id, { baseRev: last?.rev ?? 0, ...(last ? { baseId: last.revId } : {}), state: named(name) }, when)
+    return last
+  }
+  for (let i = 1; i <= 7; i++) push(`old ${i}`, old(i)) // 1..7
+  const device = { rev: last.rev, revId: last.revId } // the device last synced rev 7
+  assert.equal(device.rev, 7)
+  srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev > 5').run(id) // restore → rev 5
+  last = { rev: 5, revId: getState(srv.db, id).revId }
+  push('new 6', old(8))
+  const seven = push('new 7', old(9)) // a NEW rev 7, another id
+  assert.equal(seven.rev, 7)
+  assert.notEqual(seven.revId, device.revId)
+  push('new 8', old(10)) // newest of that old day — kept
+  push('now', now) // prunes the new 6 and 7
+  assert.deepEqual(listRevisions(srv.db, id).map((r) => r.rev).filter((r) => r > 5), [8, 9], 'the new rev 7 was pruned')
+  const q = new URLSearchParams({ baseRev: '7', baseId: device.revId })
+  assert.equal(getStateFor(srv.db, id, q).baseGone, 'restored', 'the device’s rev 7 was never pruned here — it was replaced')
+  // …while the new rev 7, which pruning removed, reads 'pruned'.
+  assert.equal(getStateFor(srv.db, id, new URLSearchParams({ baseRev: '7', baseId: seven.revId })).baseGone, 'pruned')
 })
