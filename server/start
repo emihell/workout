@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# req-231 — start the server under launchd: starts at login, restarted if it dies (KeepAlive), and
+# a nightly backup at 01:00 (<label>.nightly; missed while asleep → runs on wake). Run from the
+# live copy only: ~/dev/workout/workout-live/server/start. Planner's (BACKEND rule 2).
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$ROOT/server/lib.sh"
+require_live_copy "$ROOT"
+
+NODE="${WORKOUT_NODE:-$(command -v node || true)}"
+[ -x "$NODE" ] || die "node not found (set WORKOUT_NODE)"
+"$NODE" -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>22||(a===22&&b>=16)?0:1)' \
+  || die "$NODE is $("$NODE" --version); the server needs ≥ 22.16"
+[ -f "$ROOT/dist-server/index.html" ] || die "no built app in $ROOT/dist-server (./server/deploy builds it)"
+loaded "$LABEL" && die "$LABEL is already loaded (./server/stop first, or it's running)"
+healthy && die "something already answers on 127.0.0.1:$PORT"
+
+mkdir -p "$DATA_DIR/logs" && chmod 700 "$DATA_DIR"
+mkdir -p "$AGENTS"
+
+plist_env() {
+  cat <<XML
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>WORKOUT_DATA_DIR</key><string>$DATA_DIR</string>
+    <key>WORKOUT_PORT</key><string>$PORT</string>
+    <key>WORKOUT_APP_DIR</key><string>$ROOT/dist-server</string>
+    <key>WORKOUT_LABEL</key><string>$LABEL</string>
+    <key>WORKOUT_LIVE_DIR</key><string>$LIVE_DIR</string>
+  </dict>
+  <key>WorkingDirectory</key><string>$ROOT</string>
+XML
+}
+
+cat > "$AGENTS/$LABEL.plist" <<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>$LABEL</string>
+  <key>ProgramArguments</key>
+  <array><string>$NODE</string><string>$ROOT/server/start.mjs</string></array>
+$(plist_env)
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>StandardOutPath</key><string>$DATA_DIR/logs/server.log</string>
+  <key>StandardErrorPath</key><string>$DATA_DIR/logs/server.log</string>
+</dict>
+</plist>
+XML
+
+cat > "$AGENTS/$LABEL.nightly.plist" <<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>$LABEL.nightly</string>
+  <key>ProgramArguments</key>
+  <array><string>$NODE</string><string>$ROOT/server/ops-cli.mjs</string><string>backup</string><string>--nightly</string></array>
+$(plist_env)
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>1</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardOutPath</key><string>$DATA_DIR/logs/nightly.log</string>
+  <key>StandardErrorPath</key><string>$DATA_DIR/logs/nightly.log</string>
+</dict>
+</plist>
+XML
+
+launchctl bootstrap "$DOMAIN" "$AGENTS/$LABEL.plist"
+launchctl bootstrap "$DOMAIN" "$AGENTS/$LABEL.nightly.plist"
+for _ in $(seq 1 30); do healthy && break; sleep 0.5; done
+healthy || die "loaded, but nothing answers on 127.0.0.1:$PORT after 15 s — see $DATA_DIR/logs/server.log"
+say "running: $LABEL on http://127.0.0.1:$PORT (pid $(launchctl print "$DOMAIN/$LABEL" | awk '/^\tpid = /{print $3}')), data $DATA_DIR"
+say "nightly backup: $LABEL.nightly at 01:00 → $DATA_DIR/backups (keeps 7)"

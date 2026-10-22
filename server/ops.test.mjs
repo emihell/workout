@@ -1,0 +1,267 @@
+// req-231 — backups, the nightly rotation, restores (to a throwaway dir and into the data dir with
+// the DEC-133 marker), the doctor's parsers, and the cookie-isolation mitigation. Temp dirs and
+// port 0 only (BACKEND rules 2 and 8).
+import { client, startTestServer, tempDir } from './test-helpers.mjs'
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { existsSync, mkdirSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { fullState } from '../src/test-support/full-state.js'
+import { COOKIE, createHttpServer } from './app.mjs'
+import { bootstrapUser, findUser } from './auth.mjs'
+import { DB_FILE } from './config.mjs'
+import { openDataDir } from './db.mjs'
+import {
+  NIGHTLY_KEEP,
+  backupDb,
+  counts,
+  integrity,
+  listBackups,
+  listenAddresses,
+  nightly,
+  restoreInto,
+  restoreTo,
+  serveState,
+} from './ops.mjs'
+import { dropRevisions, getState, putState } from './store.mjs'
+
+const PASSWORD = 'sixsix'
+const DAY = 24 * 60 * 60 * 1000
+const routine = (id, name = id) => ({ id, name, focus: 'Machines', archivedAt: null, exercises: [] })
+const withRoutines = (...routines) => ({ ...fullState(), routines })
+
+// A data dir with one user and a few revisions (one pruned), the DB left OPEN like a running server's.
+async function seeded() {
+  const dataDir = tempDir('workout-ops-test-')
+  const deps = openDataDir(dataDir)
+  await bootstrapUser(deps.db, { username: 'drill', password: PASSWORD })
+  const id = findUser(deps.db, 'drill').id
+  let last = null
+  for (const name of ['A', 'B', 'C']) {
+    last = putState(deps.db, id, { baseRev: last?.rev ?? 0, ...(last ? { baseId: last.revId } : {}), state: withRoutines(routine(name)) })
+  }
+  dropRevisions(deps.db, id, [1])
+  return { dataDir, ...deps, id, last, cleanup: () => (deps.db.isOpen && deps.db.close(), rmSync(dataDir, { recursive: true, force: true })) }
+}
+
+test('backup: an online, integrity-checked copy that holds rows still in the -wal file', async () => {
+  const s = await seeded()
+  try {
+    assert.ok(existsSync(join(s.dataDir, `${DB_FILE}-wal`)), 'the DB is in WAL mode and open')
+    const { file, bytes } = await backupDb(s.dataDir, 'before-import', { at: new Date(2026, 9, 22, 9, 5, 7) })
+    assert.match(file, /backups\/workout-20261022-090507-before-import\.db$/)
+    assert.ok(bytes > 0)
+    assert.deepEqual(integrity(file), ['ok'])
+    assert.deepEqual(counts(file), counts(join(s.dataDir, DB_FILE)), 'every row, including the un-checkpointed ones')
+    assert.equal(counts(file).tables.pruned_revisions, 1)
+    // A second backup in the same second gets its own name.
+    const again = await backupDb(s.dataDir, 'before-import', { at: new Date(2026, 9, 22, 9, 5, 7) })
+    assert.notEqual(again.file, file)
+    await assert.rejects(backupDb(s.dataDir, 'Bad Reason'), /lower-case/)
+    await assert.rejects(backupDb(s.dataDir, 'nightly'), /reserved/)
+    assert.deepEqual(readdirSync(join(s.dataDir, 'backups')).filter((f) => f.endsWith('.partial')), [])
+  } finally {
+    s.cleanup()
+  }
+})
+
+test('nightly: keeps the newest 7 nightlies; other backups are never rotated', async () => {
+  const s = await seeded()
+  try {
+    const manual = await backupDb(s.dataDir, 'by-hand', { at: new Date(2026, 9, 1, 12) })
+    let last
+    for (let day = 1; day <= 10; day++) last = await nightly(s.dataDir, { at: new Date(2026, 9, day, 1) })
+    assert.equal(NIGHTLY_KEEP, 7)
+    assert.equal(last.kept, 7)
+    const left = listBackups(s.dataDir)
+    assert.deepEqual(
+      left.filter((b) => b.reason === 'nightly').map((b) => b.stamp.slice(0, 8)),
+      ['20261010', '20261009', '20261008', '20261007', '20261006', '20261005', '20261004'],
+    )
+    assert.ok(left.some((b) => b.file === manual.file), 'the hand-made backup stays')
+  } finally {
+    s.cleanup()
+  }
+})
+
+test('restore --to: a throwaway data dir with the same counts (pruned_revisions included); a non-empty dir is refused', async () => {
+  const s = await seeded()
+  const to = join(tempDir('workout-ops-restore-'), 'instance')
+  try {
+    const { file } = await backupDb(s.dataDir, 'drill')
+    const r = await restoreTo(file, to)
+    assert.deepEqual(r.counts, counts(join(s.dataDir, DB_FILE)))
+    assert.equal(r.counts.tables.pruned_revisions, 1)
+    assert.deepEqual(r.counts.users.map((u) => [u.username, u.rev, u.routines]), [['drill', 3, 1]])
+    await assert.rejects(restoreTo(file, to), /not empty/)
+    // The throwaway instance starts on it and the account logs in (a new secret is made there).
+    const deps = openDataDir(to)
+    const server = createHttpServer({ ...deps })
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+    try {
+      const c = client(`http://127.0.0.1:${server.address().port}`)
+      assert.equal((await c.post('/api/login', { username: 'drill', password: PASSWORD })).status, 200)
+      const got = await c.get('/api/state')
+      assert.equal(got.body.rev, 3)
+      assert.deepEqual(got.body.state.routines.map((x) => x.id), ['C'])
+    } finally {
+      server.closeAllConnections()
+      await new Promise((resolve) => server.close(resolve))
+      deps.db.close()
+    }
+  } finally {
+    s.cleanup()
+    rmSync(join(to, '..'), { recursive: true, force: true })
+  }
+})
+
+test('restore into the data dir: backs the current DB up first, writes a restores marker per user, and the next sync merges', async () => {
+  const s = await seeded()
+  try {
+    const { file } = await backupDb(s.dataDir, 'drill') // at rev 3
+    const four = putState(s.db, s.id, { baseRev: 3, baseId: s.last.revId, state: withRoutines(routine('C'), routine('D')) })
+    s.db.close()
+    const at = new Date('2026-10-22T10:00:00.000Z')
+    const r = await restoreInto(file, s.dataDir, { at })
+    assert.equal(r.before.users[0].rev, 4)
+    assert.equal(r.after.users[0].rev, 3)
+    assert.equal(r.marked, 1)
+    assert.equal(r.after.tables.restores, 1)
+    assert.equal(r.after.tables.pruned_revisions, 1, 'pruned_revisions survives the restore')
+    assert.ok(r.safety && counts(r.safety).users[0].rev === 4, 'the replaced DB is kept as pre-restore')
+    assert.deepEqual(integrity(join(s.dataDir, DB_FILE)), ['ok'])
+
+    // The server on the restored dir; a device that synced rev 4 (now gone) pushes a change.
+    const deps = openDataDir(s.dataDir)
+    try {
+      assert.deepEqual(deps.db.prepare('SELECT user_id, rev, at FROM restores').all().map((x) => ({ ...x })), [
+        { user_id: s.id, rev: 3, at: at.toISOString() },
+      ])
+      const out = putState(deps.db, s.id, {
+        baseRev: 4,
+        baseId: four.revId,
+        state: withRoutines(routine('C', 'C edited'), routine('D')),
+      })
+      assert.equal(out.merged, true, 'never a fast-forward over the restored copy')
+      assert.equal(out.state.routines.find((x) => x.id === 'C').name, 'C', 'the restored copy is kept where they differ')
+      assert.ok(out.conflicts.some((c) => c.id === 'C' && c.lost?.name === 'C edited'), 'the device’s version is listed')
+      assert.ok(out.conflicts.some((c) => c.id === 'D' && c.kind === 'no-base-one-side'), 'D (only on the device) kept and listed')
+      assert.equal(getState(deps.db, s.id).rev, 4)
+    } finally {
+      deps.db.close()
+    }
+  } finally {
+    s.cleanup()
+  }
+})
+
+// DEC-133 round 5 / req-231 — the reviewer's probe C, on the store: phone pushes after the restore,
+// logs a 4th set, then a clean stale laptop (its base also lost to the restore) pushes.
+test('probe C — after a restore the phone keeps its 4th set when a stale laptop pushes', async () => {
+  const s = await seeded()
+  try {
+    const set = (n) => ({ id: `set-${n}`, exerciseId: 'ex-press', reps: 8, kg: 40 })
+    const workout = (n) => ({ id: 'w-live', startedAt: '2026-10-22T09:00:00.000Z', sets: Array.from({ length: n }, (_, i) => set(i + 1)) })
+    const st = (n) => ({ ...withRoutines(routine('C')), activeWorkout: workout(n) })
+    let rev = s.last
+    const push = (state, base = rev) => (rev = putState(s.db, s.id, { baseRev: base.rev, baseId: base.revId, state }))
+    push(st(1)) // rev 4 ← the backup
+    const { file } = await backupDb(s.dataDir, 'probe-c')
+    const laptop = push(st(2)) // rev 5 — the laptop syncs here and stays clean
+    const phoneBase = push(st(3)) // rev 6 — the phone
+    s.db.close()
+    await restoreInto(file, s.dataDir)
+
+    const deps = openDataDir(s.dataDir)
+    try {
+      // 1. The phone pushes after the restore: its workout wins (DEC-133).
+      const first = putState(deps.db, s.id, { baseRev: phoneBase.rev, baseId: phoneBase.revId, state: st(3) })
+      assert.equal(first.state.activeWorkout.sets.length, 3)
+      // 2. It logs a 4th set (a fast-forward on what it just got back).
+      const fourth = putState(deps.db, s.id, { baseRev: first.rev, baseId: first.revId, state: st(4) })
+      assert.equal(fourth.merged, false)
+      // 3. The clean stale laptop pushes its 2-set copy.
+      const stale = putState(deps.db, s.id, { baseRev: laptop.rev, baseId: laptop.revId, state: st(2) })
+      assert.equal(stale.merged, true)
+      assert.equal(stale.state.activeWorkout.sets.length, 4, 'the phone keeps 4 sets')
+      assert.equal(getState(deps.db, s.id).state.activeWorkout.sets.length, 4)
+      assert.ok(stale.conflicts.some((c) => c.field === 'activeWorkout' && c.lost?.sets?.length === 2), 'the laptop’s copy is listed')
+    } finally {
+      deps.db.close()
+    }
+  } finally {
+    s.cleanup()
+  }
+})
+
+test('doctor parsers: the :8446 mapping, funnel state, listen addresses', () => {
+  const want = 'http://127.0.0.1:8100'
+  const status = {
+    TCP: { 443: { HTTPS: true }, 8446: { HTTPS: true } },
+    Web: {
+      'mac.tail.ts.net:443': { Handlers: { '/': { Proxy: 'http://127.0.0.1:4173' } } },
+      'mac.tail.ts.net:8446': { Handlers: { '/': { Proxy: want } } },
+    },
+  }
+  assert.deepEqual(serveState(JSON.stringify(status), 8446, want), { mapped: true, proxy: want, host: 'mac.tail.ts.net', funnel: [] })
+  assert.equal(serveState(JSON.stringify(status), 8447, want).mapped, false)
+  const funnel = { ...status, AllowFunnel: { 'mac.tail.ts.net:8446': true } }
+  assert.deepEqual(serveState(JSON.stringify(funnel), 8446, want).funnel, ['mac.tail.ts.net:8446'])
+  assert.deepEqual(serveState('{}', 8446, want), { mapped: false, proxy: null, host: null, funnel: [] })
+  const lsof = 'COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME\nnode 1 e 20u IPv4 0x1 0t0 TCP 127.0.0.1:8100 (LISTEN)\n'
+  assert.deepEqual(listenAddresses(lsof), ['127.0.0.1:8100'])
+  assert.deepEqual(listenAddresses(lsof + 'node 1 e 21u IPv6 0x2 0t0 TCP *:8100 (LISTEN)\n'), ['127.0.0.1:8100', '*:8100'])
+})
+
+// The latent check from req-229's review: every `tailscale serve` port on this Mac is one host to
+// the browser, so another service there can set (and receives) a cookie with our name.
+test('cookie isolation — __Host- name, every value read, a planted one can’t displace ours', async () => {
+  const srv = await startTestServer()
+  try {
+    await bootstrapUser(srv.db, { username: 'emilio', password: PASSWORD })
+    const res = await fetch(`${srv.base}/api/login`, {
+      method: 'POST',
+      headers: { 'x-workout-request': '1', 'content-type': 'application/json' },
+      body: JSON.stringify({ username: 'emilio', password: PASSWORD }),
+    })
+    const set = res.headers.get('set-cookie')
+    assert.equal(COOKIE, '__Host-workout_session')
+    assert.ok(set.startsWith(`${COOKIE}=`))
+    // What a browser requires before it stores a __Host- cookie.
+    assert.match(set, /; Secure(;|$)/)
+    assert.match(set, /; Path=\/(;|$)/)
+    assert.doesNotMatch(set, /domain=/i)
+    const token = set.split(';')[0].slice(COOKIE.length + 1)
+    const me = (cookie) => fetch(`${srv.base}/api/me`, { headers: { cookie } }).then((r) => r.status)
+    assert.equal(await me(`${COOKIE}=${token}`), 200)
+    // Another service's cookie of our name, sent first (a more specific path sorts first).
+    assert.equal(await me(`${COOKIE}=planted; ${COOKIE}=${token}`), 200)
+    assert.equal(await me(`${COOKIE}=${token}; ${COOKIE}=planted`), 200)
+    // The old, un-prefixed name (any service on the host can set it) is not ours any more.
+    assert.equal(await me(`workout_session=${token}`), 401)
+    // Logout ends the real session even when a planted value comes first.
+    const out = await fetch(`${srv.base}/api/logout`, {
+      method: 'POST',
+      headers: { 'x-workout-request': '1', 'content-type': 'application/json', cookie: `${COOKIE}=planted; ${COOKIE}=${token}` },
+    })
+    assert.equal(out.status, 200)
+    assert.equal(await me(`${COOKIE}=${token}`), 401)
+  } finally {
+    await srv.close()
+  }
+})
+
+// Keeps the helpers above honest about where they write.
+test('the ops functions refuse the live data path under the test suite', async () => {
+  await assert.rejects(backupDb(join(process.env.HOME, 'dev', 'workout', 'workout-data'), 'x'), /live data path/)
+  const dir = tempDir('workout-ops-mtime-')
+  try {
+    mkdirSync(join(dir, 'backups'))
+    const f = join(dir, 'backups', 'workout-20261001-010000-nightly.db')
+    writeFileSync(f, '')
+    utimesSync(f, new Date(Date.now() - 2 * DAY), new Date(Date.now() - 2 * DAY))
+    assert.equal(listBackups(dir)[0].reason, 'nightly')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})

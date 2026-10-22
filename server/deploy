@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# req-231 — ./server/deploy: `git archive main` → a fresh copy, built (npm run build:server), then
+# swapped in as ~/dev/workout/workout-live (the old one kept as workout-live.prev) and restarted if
+# it was running. Backs the DB up first (BACKEND rule 6). Run from a worktree of this repo (it
+# reads `main`, not the checkout). Planner's (BACKEND rule 2).
+set -euo pipefail
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$REPO/server/lib.sh"
+REF="${WORKOUT_DEPLOY_REF:-main}"
+git -C "$REPO" rev-parse --verify --quiet "$REF^{commit}" >/dev/null || die "no $REF in $REPO (run from a worktree of the repo)"
+SHA="$(git -C "$REPO" rev-parse --short "$REF")"
+STAGE="$LIVE_DIR.new"
+PREV="$LIVE_DIR.prev"
+
+if [ -f "$DATA_DIR/workout.db" ]; then
+  node "$REPO/server/ops-cli.mjs" backup "deploy-$SHA"
+fi
+
+rm -rf "$STAGE"
+mkdir -p "$STAGE"
+git -C "$REPO" archive "$REF" | tar -x -C "$STAGE"
+echo "$REF $SHA $(date '+%Y-%m-%d %H:%M:%S')" > "$STAGE/DEPLOYED"
+say "building $REF ($SHA) in $STAGE …"
+(
+  cd "$STAGE"
+  npm ci --ignore-scripts --no-audit --no-fund --loglevel=error >/dev/null
+  npm run --silent build:server >/dev/null
+  rm -rf node_modules # the server needs none at run time (node built-ins + src/)
+) || die "build failed — $LIVE_DIR is unchanged"
+[ -f "$STAGE/dist-server/index.html" ] || die "build made no dist-server/index.html — $LIVE_DIR is unchanged"
+
+was_running=""
+if loaded "$LABEL"; then
+  was_running=1
+  "$LIVE_DIR/server/stop"
+fi
+rm -rf "$PREV"
+[ -d "$LIVE_DIR" ] && mv "$LIVE_DIR" "$PREV"
+mv "$STAGE" "$LIVE_DIR"
+say "deployed $REF ($SHA) → $LIVE_DIR"
+if [ -n "$was_running" ]; then
+  "$LIVE_DIR/server/start"
+else
+  say "not running — start it with $LIVE_DIR/server/start"
+fi

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# req-231 — ./server/doctor: bind address, health, the tailscale :8446 mapping, funnel off, data
+# path outside every worktree, the live copy, the launchd agents, last backup age. Read-only.
+# Exits 1 on any problem.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$ROOT/server/lib.sh"
+exec node "$ROOT/server/ops-cli.mjs" doctor "$@"

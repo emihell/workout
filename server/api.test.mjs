@@ -10,6 +10,7 @@ import { emptyState } from '../src/persistence.js'
 import { defaultAnchor } from '../src/schedule.js'
 import { SESSION_DAYS, bootstrapUser, createInvite, disableUser } from './auth.mjs'
 import { revZeroState } from './store.mjs'
+import { COOKIE } from './app.mjs'
 
 const dbJson = JSON.parse(readFileSync(new URL('../src/db.json', import.meta.url), 'utf8'))
 const PASSWORD = 'correct horse battery'
@@ -390,7 +391,7 @@ test('R1-1. the session’s sliding expiry reaches the browser: every authed res
   assert.equal(res.status, 200)
   const setCookie = res.headers.get('set-cookie')
   assert.ok(setCookie, 'an authenticated response re-sends the cookie')
-  assert.equal(setCookie.split(';')[0], `workout_session=${token}`, 'the same session, not a new one')
+  assert.equal(setCookie.split(';')[0], `${COOKIE}=${token}`, 'the same session, not a new one')
   assert.match(setCookie, new RegExp(`Max-Age=${SESSION_DAYS * 24 * 60 * 60}(;|$)`))
   assert.match(setCookie, /HttpOnly; Secure; SameSite=Strict/)
   const { expires_at: expires } = srv.db.prepare('SELECT expires_at FROM sessions WHERE user_id = ?').get(userId)

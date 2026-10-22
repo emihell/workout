@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# req-231 — ./server/backup <reason>: an online SQLite backup of the data dir's DB into
+# <data>/backups/workout-<stamp>-<reason>.db, integrity-checked (BACKEND rules 5–6). Safe while the
+# server runs. `nightly` is the launchd agent's (backup --nightly, keeps the newest 7).
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$ROOT/server/lib.sh"
+exec node "$ROOT/server/ops-cli.mjs" backup "$@"

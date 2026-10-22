@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# req-231 — restore a backup (BACKEND rule 7):
+#   ./server/restore <backup> --to <new dir>   into a throwaway data dir (the restore drill); the
+#                                              live data is not touched
+#   ./server/restore <backup> [--yes]          into the data dir: refused while the server runs;
+#                                              shows both counts and changes nothing without --yes;
+#                                              backs the current DB up first (pre-restore) and
+#                                              writes the `restores` marker (DEC-133)
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$ROOT/server/lib.sh"
+exec node "$ROOT/server/ops-cli.mjs" restore "$@"
