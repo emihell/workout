@@ -653,6 +653,50 @@ describe('req-230 review round 1', () => {
     assert.deepEqual(b.state, after.state)
   })
 
+  it('round 3 P9 — a CLEAN laptop whose base was pruned takes the server’s copy; the phone’s deletions stay deleted', async () => {
+    const user = await newAccount()
+    const phone = device()
+    phone.change((s) => ({ ...s, routines: [...s.routines, R('rtn-old')] }))
+    await phone.login(user) // rev 1 holds rtn-old
+    const laptop = device(emptyState())
+    await laptop.login(user) // took rev 1
+    laptop.unmount()
+    phone.change((s) => ({ ...s, routines: s.routines.filter((r) => r.id !== 'rtn-old') }))
+    await phone.settle()
+    phone.change((s) => renamed(s, 'rtn-a', 'Upper (current)'))
+    await phone.settle()
+    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(userId(user)) // pruned
+    const before = laptop.fetch.log.length
+    laptop.mount() // opens online, nothing changed on it
+    await laptop.engine.idle()
+    assert.deepEqual(laptop.fetch.log.slice(before).map((e) => e.method), ['GET'], 'no push')
+    const after = server(user).state
+    assert.equal(after.routines.some((r) => r.id === 'rtn-old'), false, 'the deletion holds')
+    assert.deepEqual(laptop.state, after, 'the laptop took the server’s copy')
+    assert.equal(laptop.engine.getStatus().dirty, false)
+  })
+
+  it('round 3 — a pruned base with a change waiting still merges (no-base), the change is not dropped', async () => {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user)
+    const laptop = device(emptyState())
+    await laptop.login(user)
+    laptop.unmount()
+    phone.change((s) => renamed(s, 'rtn-a', 'phone'))
+    await phone.settle()
+    srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(userId(user))
+    laptop.fetch.offline = true
+    laptop.mount()
+    await laptop.engine.idle()
+    laptop.change((s) => ({ ...s, routines: [...s.routines, R('rtn-laptop')] }))
+    laptop.fetch.offline = false
+    await laptop.settle()
+    const after = server(user).state
+    assert.ok(after.routines.some((r) => r.id === 'rtn-laptop'))
+    assert.equal(after.routines.find((r) => r.id === 'rtn-a').name, 'phone')
+  })
+
   it('round 2 P7 — a stale laptop (base pruned) never ends the phone’s workout in progress', async () => {
     const user = await newAccount()
     const phone = device()
@@ -668,8 +712,10 @@ describe('req-230 review round 1', () => {
     await phone.settle()
     srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(userId(user)) // pruned
     // The laptop opens and makes one edit on its old copy (no active workout, old names).
-    laptop.mount()
+    // Review round 3: offline BEFORE it opens, so the open-time check can't go out and take the
+    // server's copy — the stale edit really is pushed onto a pruned base.
     laptop.fetch.offline = true
+    laptop.mount()
     await laptop.engine.idle()
     laptop.change((s) => ({ ...s, activeWorkout: null, exercises: [...s.exercises, { ...s.exercises[0], id: 'ex-laptop', name: 'Laptop exercise' }] }))
     laptop.fetch.offline = false

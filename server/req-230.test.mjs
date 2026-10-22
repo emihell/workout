@@ -196,6 +196,10 @@ test('round 2 — GET says whether a base is still this history; a PUT on a reus
   assert.equal(reused.rev, 2)
   assert.notEqual(reused.revId, two.revId, 'the same number, a different revision')
   assert.equal(getStateFor(srv.db, id, q(2, two.revId)).baseOk, false)
+  assert.equal(getStateFor(srv.db, id, q(2, two.revId)).baseGone, 'restored', 'same number, another revision')
+  assert.equal(getStateFor(srv.db, id, q(7, 'x')).baseGone, 'restored', 'ahead of the server')
+  srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 1').run(id)
+  assert.equal(getStateFor(srv.db, id, q(1, one.revId)).baseGone, 'pruned', 'gone, not ahead')
   // The device still holding the old rev 2 pushes: not a fast-forward.
   const stale = putState(srv.db, id, { baseRev: 2, baseId: two.revId, state: { ...fullState(), routines: [routine('A'), routine('B')] } })
   assert.equal(stale.merged, true)

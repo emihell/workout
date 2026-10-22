@@ -87,12 +87,27 @@ export function getState(db, userId) {
 
 // GET /api/state?baseRev=&baseId= — also says whether that base is still this server's history
 // (`baseOk`), so a device that synced before a restore knows to merge rather than take or overwrite.
+// Review round 3 — when it isn't, `baseGone` says why: 'pruned' (the row is gone and the rev is not
+// ahead of the server: old history removed, the server's copy is still a descendant — a device
+// with nothing to send just takes it) or 'restored' (a row with that number but another id, or a
+// rev ahead of the server: the history was replaced — the device pushes and the server merges).
 export function getStateFor(db, userId, query) {
   const out = getState(db, userId)
   const baseRev = Number(query.get('baseRev'))
   const baseId = query.get('baseId')
-  if (baseId && Number.isInteger(baseRev) && baseRev > 0) out.baseOk = baseKnown(db, userId, baseRev, baseId)
+  if (baseId && Number.isInteger(baseRev) && baseRev > 0) {
+    const status = baseStatus(db, userId, baseRev, baseId, out.rev)
+    out.baseOk = status === 'ok'
+    if (!out.baseOk) out.baseGone = status
+  }
   return out
+}
+
+// 'ok' | 'pruned' | 'restored' — see getStateFor.
+function baseStatus(db, userId, baseRev, baseId, currentRev) {
+  const row = revisionRow(db, userId, baseRev)
+  if (row) return revisionId(row) === baseId ? 'ok' : 'restored'
+  return baseRev <= currentRev ? 'pruned' : 'restored'
 }
 
 function baseKnown(db, userId, baseRev, baseId) {

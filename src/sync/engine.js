@@ -253,6 +253,11 @@ export function createSync({
   // → true when the GET reply says the server's history no longer matches this device's base.
   function historyGone(data) {
     if (data.baseOk === false) {
+      // Review round 3 — base PRUNED and nothing to send here: the server's copy descends from
+      // this device's, so take it (as before round 2). Pushing a stale copy through the no-base
+      // merge would bring back records other devices deleted. Restored history, or a change waiting
+      // here: push, and the server merges without a base.
+      if (data.baseGone === 'pruned' && !meta.dirty) return false
       diverged()
       return true
     }
