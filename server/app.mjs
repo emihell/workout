@@ -5,7 +5,7 @@
 //   POST /api/login    {username, password}        → session cookie
 //   POST /api/logout                                → cookie cleared, session deleted
 //   GET  /api/me                    → {username}
-//   GET  /api/state                 → {rev, state}
+//   GET  /api/state[?baseRev&baseId] → {rev, revId, state[, baseOk]}  (req-230 review round 2)
 //   PUT  /api/state {baseRev, state} → {rev, state, merged, conflicts[, unchanged]}
 //   GET  /api/revisions             → [{rev, baseRev, merged, conflicts, createdAt}]
 //   GET  /api/revisions/:rev        → {rev, …, conflicts, state}
@@ -40,7 +40,7 @@ import {
   exportFile,
   getNotes,
   getRevision,
-  getState,
+  getStateFor,
   listRevisions,
   putState,
   revisionTotal,
@@ -212,7 +212,7 @@ export function createApp({ db, secret, maxBody = MAX_BODY, appDir = null }) {
     },
 
     'GET /api/me': (req, body, user) => [200, { username: user.username }],
-    'GET /api/state': (req, body, user) => [200, getState(db, user.id)],
+    'GET /api/state': (req, body, user) => [200, getStateFor(db, user.id, new URL(req.url, 'http://localhost').searchParams)],
     'PUT /api/state': (req, body, user) => [200, putState(db, user.id, body)],
     'GET /api/revisions': (req, body, user) => [200, listRevisions(db, user.id)],
     'GET /api/export': (req, body, user) => [

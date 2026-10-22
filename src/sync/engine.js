@@ -35,6 +35,12 @@
 //   - Two tabs: the meta is re-read before each write and `dirty` is sticky — only cleared when no
 //     other tab marked a change after this tab's last one.
 //   - Feedback notes never block the state sync: sent after it, and their failures stay their own.
+//   Review round 2:
+//   - Rev numbers are reused after a backup restore, so the device keeps the revision's id
+//     (`revId`) with its rev and sends it back (`baseId`). If the server says that base is no
+//     longer its history (GET `baseOk: false`, or a PUT on it), the push is merged WITHOUT a base
+//     on the server: never a fast-forward, every disagreement listed, the server's value kept
+//     where they differ. The device then takes the result as usual.
 import { deepEqual } from './equal.js'
 import { mergeStates } from './merge.js'
 
@@ -52,6 +58,7 @@ const META_DEFAULTS = {
   user: null, // the logged-in user on this device (null = logged out → login screen)
   syncedUser: null, // the user this device's data last synced as (first login = a different one)
   rev: 0, // the server rev this device's data is based on
+  revId: null, // that revision's id (review round 2: a rev number alone can be reused by a restore)
   syncedAt: null, // when the last sync finished (ISO)
   dirty: false, // a local change the server doesn't have yet
   notesDirty: false, // a feedback note not yet sent
@@ -201,13 +208,13 @@ export function createSync({
     }
   }
 
-  function accept({ rev, state: server }, sent) {
+  function accept({ rev, revId = null, state: server }, sent) {
     agreed = server
     const rebase = rebaseOnto(server, sent)
     // Computed here as well, so a sync queued behind this one sends the rebased state even
     // before React has run the store update.
     latest = rebase(latest)
-    setMeta({ rev, syncedAt: new Date(now()).toISOString(), dirty: !deepEqual(norm(latest), server) })
+    setMeta({ rev, revId, syncedAt: new Date(now()).toISOString(), dirty: !deepEqual(norm(latest), server) })
     if (store) store.adopt(rebase)
   }
 
@@ -226,21 +233,44 @@ export function createSync({
     return true
   }
 
-  // Review round 1 (#2) — the server is behind this device (a restored backup): take nothing; send
-  // this device's data as a change on top of the server's current rev. The server's revision stays.
+  // Review round 1 (#2) — the server is behind this device (a restored backup) and this device has
+  // no revision id (a meta from before round 2): take nothing; push on top of the server's rev.
   function serverBehind(serverRev) {
     setMeta({ rev: serverRev, dirty: true, dirtyMark: tabMark })
     again = true
+  }
+
+  // Review round 2 — the server's history no longer holds this device's base (a restore reused its
+  // rev number, or removed it): take nothing; push, and the server merges without a base.
+  function diverged() {
+    setMeta({ dirty: true, dirtyMark: tabMark })
+    again = true
+  }
+
+  const stateUrl = () =>
+    meta.revId ? `/api/state?baseRev=${meta.rev}&baseId=${encodeURIComponent(meta.revId)}` : '/api/state'
+
+  // → true when the GET reply says the server's history no longer matches this device's base.
+  function historyGone(data) {
+    if (data.baseOk === false) {
+      diverged()
+      return true
+    }
+    if (!meta.revId && data.rev < meta.rev) {
+      serverBehind(data.rev)
+      return true
+    }
+    return false
   }
 
   async function syncState(gen) {
     if (pullFirst) {
       // Review round 1 (#1) — the stored copy is behind this meta (a failed save): pull the server's
       // copy first and rebase what changed since the app opened (base = what it opened with).
-      const r = await request('GET', '/api/state')
+      const r = await request('GET', stateUrl())
       if (gen !== generation || !settle(r)) return
       pullFirst = false
-      if (r.data.rev < meta.rev) return serverBehind(r.data.rev)
+      if (historyGone(r.data)) return
       accept(r.data, opened)
       if (!deepEqual(norm(latest), r.data.state)) again = true
       return
@@ -248,7 +278,7 @@ export function createSync({
     const sent = latest
     const changedHere = meta.dirty || (agreed !== null && !deepEqual(norm(sent), agreed))
     if (changedHere) {
-      const body = JSON.stringify({ baseRev: meta.rev, state: sent })
+      const body = JSON.stringify({ baseRev: meta.rev, ...(meta.revId ? { baseId: meta.revId } : {}), state: sent })
       const size = bytes(body)
       if (size > MAX_BYTES) {
         error = { kind: 'too-large', bytes: size }
@@ -258,7 +288,8 @@ export function createSync({
       const r = await request('PUT', '/api/state', body)
       if (gen !== generation) return
       if (r.status === 409) {
-        // baseRev ahead of the server: it went back (a restore). Push on top of its current rev.
+        // baseRev ahead of the server and no revision id sent (a meta from before round 2): it went
+        // back (a restore). Push on top of its current rev.
         const g = await request('GET', '/api/state')
         if (gen !== generation || !settle(g)) return
         return serverBehind(g.data.rev)
@@ -268,9 +299,9 @@ export function createSync({
       return
     }
     // Nothing changed here since the last sync: only look for a newer server copy.
-    const r = await request('GET', '/api/state')
+    const r = await request('GET', stateUrl())
     if (gen !== generation || !settle(r)) return
-    if (r.data.rev < meta.rev) return serverBehind(r.data.rev)
+    if (historyGone(r.data)) return
     if (r.data.rev === meta.rev && deepEqual(norm(sent), r.data.state)) {
       agreed = r.data.state
       setMeta({ syncedAt: new Date(now()).toISOString() })
@@ -373,6 +404,7 @@ export function createSync({
       user,
       syncedUser: user,
       rev: taken.rev,
+      revId: taken.revId ?? null,
       syncedAt: new Date(now()).toISOString(),
       dirty: false,
       expired: false,

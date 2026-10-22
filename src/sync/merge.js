@@ -137,8 +137,12 @@ export function mergeStates(base, mine, theirs) {
 //   - the same on both sides            → that value, no record
 //   - only one side has it              → KEPT (a deletion may come back), listed as a conflict
 //                                         `kind: 'no-base-one-side'`, `lost: null`
-//   - both have it, differently         → the incoming one, the current listed as `lost`
-//                                         (`kind: 'no-base-differs'`)
+//   - both have it, differently         → the SERVER's current one; the incoming one is listed
+//                                         as `lost` (`kind: 'no-base-differs'`). Review round 2:
+//                                         with no base, which side is newer can't be known, and the
+//                                         incoming side is the one that lost its history (a stale
+//                                         laptop, a pre-restore device) — letting it win put an old
+//                                         `activeWorkout: null` over a workout in progress.
 // Every value in the result is one of the two inputs' values, verbatim.
 function noBase(field, id, m, t, conflicts) {
   if (same(m, t)) return m
@@ -146,8 +150,8 @@ function noBase(field, id, m, t, conflicts) {
     conflicts.push({ field, id, kind: 'no-base-one-side', lost: null })
     return m === undefined ? t : m
   }
-  conflicts.push({ field, id, kind: 'no-base-differs', lost: t })
-  return m
+  conflicts.push({ field, id, kind: 'no-base-differs', lost: m })
+  return t
 }
 
 export function mergeWithoutBase(mine, theirs) {

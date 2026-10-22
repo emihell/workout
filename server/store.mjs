@@ -3,6 +3,7 @@
 // One row per accepted revision (rev 1, 2, 3 …) per user; the newest is the current document.
 // Every query here takes `userId` and filters on it — none reads another user's rows.
 // The validator is the app's own `applyBackup` (src/exchange.js): no second copy of the rules.
+import { createHash } from 'node:crypto'
 import { isDeepStrictEqual } from 'node:util'
 import { BACKUP_KIND, BACKUP_VERSION, applyBackup, buildBackup } from '../src/exchange.js'
 import { emptyState } from '../src/persistence.js'
@@ -66,11 +67,37 @@ export function currentRev(db, userId) {
   return db.prepare('SELECT COALESCE(MAX(rev), 0) AS rev FROM revisions WHERE user_id = ?').get(userId).rev
 }
 
-// → {rev, state}. A user with nothing stored yet is rev 0 with the stable empty document (REV0).
+// req-230 review round 2 — a revision's id: a hash of its number, time and content. Rev numbers
+// are REUSED after a backup restore (the restored DB ends at rev N, the next push is N+1 again),
+// so "rev 2" alone can name two different documents. A device keeps the id with its rev and sends
+// it back as `baseId`; an id that no longer matches means the history it was based on is gone.
+// No schema change: computed from the row. Rev 0 (the stable empty document) needs none.
+export function revisionId(row) {
+  return createHash('sha256').update(`${row.rev}|${row.created_at}|${row.state}`).digest('base64url').slice(0, 22)
+}
+
+// → {rev, revId, state}. A user with nothing stored yet is rev 0 with the stable empty document
+// (REV0), and no revId.
 export function getState(db, userId) {
   const rev = currentRev(db, userId)
   if (rev === 0) return { rev: 0, state: revZeroState() }
-  return { rev, state: JSON.parse(revisionRow(db, userId, rev).state) }
+  const row = revisionRow(db, userId, rev)
+  return { rev, revId: revisionId(row), state: JSON.parse(row.state) }
+}
+
+// GET /api/state?baseRev=&baseId= — also says whether that base is still this server's history
+// (`baseOk`), so a device that synced before a restore knows to merge rather than take or overwrite.
+export function getStateFor(db, userId, query) {
+  const out = getState(db, userId)
+  const baseRev = Number(query.get('baseRev'))
+  const baseId = query.get('baseId')
+  if (baseId && Number.isInteger(baseRev) && baseRev > 0) out.baseOk = baseKnown(db, userId, baseRev, baseId)
+  return out
+}
+
+function baseKnown(db, userId, baseRev, baseId) {
+  const row = revisionRow(db, userId, baseRev)
+  return Boolean(row) && revisionId(row) === baseId
 }
 
 export function listRevisions(db, userId) {
@@ -109,17 +136,22 @@ export function getRevision(db, userId, rev) {
 //   result equals the current state → nothing stored, the current rev returned (`unchanged`).
 export function putState(db, userId, body, at = new Date()) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) throw new ClientError(400, 'Expected {baseRev, state}.')
-  const { baseRev } = body
+  const { baseRev, baseId } = body
   if (!Number.isInteger(baseRev) || baseRev < 0) throw new ClientError(400, 'baseRev must be a whole number ≥ 0.')
+  if (baseId !== undefined && (typeof baseId !== 'string' || !baseId)) throw new ClientError(400, 'baseId must be text.')
   const incoming = validState(body.state)
   return inTransaction(db, () => {
     const current = getState(db, userId)
-    if (baseRev > current.rev) throw new ClientError(409, `baseRev ${baseRev} is ahead of the server (rev ${current.rev}).`)
+    // Review round 2 — with a `baseId`, a base that is not (or no longer) this server's history —
+    // a restore reused its number, or it is ahead of the server — is never a fast-forward: the
+    // push is merged WITHOUT a base, every disagreement listed. Without one (an older app), as before.
+    const diverged = baseId !== undefined && baseRev > 0 && !baseKnown(db, userId, baseRev, baseId)
+    if (!diverged && baseRev > current.rev) throw new ClientError(409, `baseRev ${baseRev} is ahead of the server (rev ${current.rev}).`)
     let state = incoming
     let conflicts = []
-    const merged = baseRev < current.rev
+    const merged = diverged || baseRev < current.rev
     if (merged) {
-      const base = baseState(db, userId, baseRev)
+      const base = diverged ? null : baseState(db, userId, baseRev)
       const result = base ? mergeStates(base, incoming, current.state) : mergeWithoutBase(incoming, current.state)
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.
@@ -127,14 +159,14 @@ export function putState(db, userId, body, at = new Date()) {
       conflicts = result.conflicts
     }
     if (current.rev > 0 && conflicts.length === 0 && isDeepStrictEqual(state, current.state)) {
-      return { rev: current.rev, state: current.state, merged, conflicts, unchanged: true }
+      return { rev: current.rev, revId: current.revId, state: current.state, merged, conflicts, unchanged: true }
     }
     const rev = current.rev + 1
     db.prepare(
       'INSERT INTO revisions (user_id, rev, state, base_rev, merged, conflicts, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
     ).run(userId, rev, JSON.stringify(state), baseRev, merged ? 1 : 0, JSON.stringify(conflicts), at.toISOString())
     pruneRevisions(db, userId, at)
-    return { rev, state, merged, conflicts }
+    return { rev, revId: revisionId(revisionRow(db, userId, rev)), state, merged, conflicts }
   })
 }
 

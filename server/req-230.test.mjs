@@ -9,7 +9,7 @@ import { join } from 'node:path'
 import { fullState } from '../src/test-support/full-state.js'
 import { PASSWORD_MIN, bootstrapUser, createInvite, findUser } from './auth.mjs'
 import { serverConfig, REPO_ROOT } from './config.mjs'
-import { PRUNE_DAYS, getState, listRevisions, putState } from './store.mjs'
+import { PRUNE_DAYS, getState, getStateFor, listRevisions, putState } from './store.mjs'
 
 const PASSWORD = 'sixsix'
 let srv
@@ -134,10 +134,11 @@ test('a device whose base revision was pruned still syncs: merged without a base
   // Rev 4 was pruned; a device still based on it renames the routine → stored, nothing lost.
   const out = putState(srv.db, id, { baseRev: 4, state: named('from an old device') }, new Date('2026-10-22T13:00:00.000Z'))
   assert.equal(out.rev, 10)
-  assert.equal(out.state.routines[0].name, 'from an old device')
-  assert.equal(out.conflicts.length, 1, 'the server’s version is kept as the losing one')
+  // Review round 2: with no base, a differing record keeps the SERVER's value; the device's is listed.
+  assert.equal(out.state.routines[0].name, 'd1')
+  assert.equal(out.conflicts.length, 1, 'the device’s version is kept as the losing one')
   assert.equal(out.conflicts[0].kind, 'no-base-differs')
-  assert.equal(out.conflicts[0].lost.name, 'd1')
+  assert.equal(out.conflicts[0].lost.name, 'from an old device')
 })
 
 // Review round 1 (#3) — the reviewer's case: with the base gone, falling back to an older base
@@ -169,11 +170,41 @@ test('review #3 — a pruned base never drops or brings back a record without li
   // D: on one side only (this device's deletion, or the server's addition?) → kept and listed.
   assert.equal(names.D, 'd')
   assert.equal(listed.get('D')?.kind, 'no-base-one-side')
-  // B and C differ → this device's version, the server's listed as lost.
-  assert.equal(names.B, 'b')
-  assert.equal(listed.get('B')?.lost?.name, 'b on server')
-  assert.equal(names.C, 'c edited')
-  assert.equal(listed.get('C')?.lost?.name, 'c')
+  // B and C differ → the server's version (review round 2), this device's listed as lost.
+  assert.equal(names.B, 'b on server')
+  assert.equal(listed.get('B')?.lost?.name, 'b')
+  assert.equal(names.C, 'c')
+  assert.equal(listed.get('C')?.lost?.name, 'c edited')
   // Every routine that either side had is in the result: nothing dropped.
   assert.deepEqual(Object.keys(names).sort(), ['A', 'B', 'C', 'D'])
+})
+
+// Review round 2 (#1) — rev ids: a reused rev number is told apart from the one a device holds.
+test('round 2 — GET says whether a base is still this history; a PUT on a reused rev number merges without a base', async () => {
+  const res = await client(srv.base).post('/api/register', { code: createInvite(srv.db, srv.secret), username: 'epoch', password: PASSWORD })
+  assert.equal(res.status, 201)
+  const id = findUser(srv.db, 'epoch').id
+  const routine = (rid) => ({ id: rid, name: rid, focus: 'Machines', archivedAt: null, exercises: [] })
+  const one = putState(srv.db, id, { baseRev: 0, state: { ...fullState(), routines: [routine('A')] } })
+  const two = putState(srv.db, id, { baseRev: 1, baseId: one.revId, state: { ...fullState(), routines: [routine('A'), routine('B')] } })
+  assert.equal(two.merged, false, 'a known base at the current rev is a fast-forward')
+  assert.equal(typeof two.revId, 'string')
+  const q = (rev, revId) => new URLSearchParams({ baseRev: String(rev), baseId: revId })
+  assert.equal(getStateFor(srv.db, id, q(2, two.revId)).baseOk, true)
+  srv.db.prepare('DELETE FROM revisions WHERE user_id = ? AND rev = 2').run(id) // restore → rev 1
+  const reused = putState(srv.db, id, { baseRev: 1, baseId: one.revId, state: { ...fullState(), routines: [routine('A'), routine('C')] } })
+  assert.equal(reused.rev, 2)
+  assert.notEqual(reused.revId, two.revId, 'the same number, a different revision')
+  assert.equal(getStateFor(srv.db, id, q(2, two.revId)).baseOk, false)
+  // The device still holding the old rev 2 pushes: not a fast-forward.
+  const stale = putState(srv.db, id, { baseRev: 2, baseId: two.revId, state: { ...fullState(), routines: [routine('A'), routine('B')] } })
+  assert.equal(stale.merged, true)
+  assert.deepEqual(stale.state.routines.map((r) => r.id).sort(), ['A', 'B', 'C'], 'C (only on the server) is not erased')
+  assert.ok(stale.conflicts.some((c) => c.id === 'C' && c.kind === 'no-base-one-side'))
+  assert.ok(stale.conflicts.some((c) => c.id === 'B' && c.kind === 'no-base-one-side'))
+  // A base AHEAD of the server with an id (a restore removed it): merged too, not a 409.
+  const ahead = putState(srv.db, id, { baseRev: 9, baseId: 'gone', state: { ...fullState(), routines: [routine('A')] } })
+  assert.equal(ahead.merged, true)
+  // Without a baseId (an older app), behaviour as before.
+  assert.throws(() => putState(srv.db, id, { baseRev: 99, state: fullState() }), /ahead of the server/)
 })
