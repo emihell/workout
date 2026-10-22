@@ -932,3 +932,57 @@ describe('req-230 review round 1', () => {
     assert.equal(getNotes(srv.db, userId(user)).length, 1, 'the note goes up later')
   })
 })
+
+// req-231 — go-live: a phone whose server-build origin once synced with a TEST server. Which reset
+// keeps test records out of the real history? These pin the answer: clear the origin's whole site
+// data (not only `workout-sync-v1`), and the history epoch (rev ids) is no protection.
+describe('req-231 — a device that synced with a test server, at go-live', () => {
+  const testData = () => {
+    const s = fullState()
+    s.routines = [...s.routines, { id: 'rtn-test', name: 'TEST ONLY', focus: 'Machines', archivedAt: null, exercises: [] }]
+    return s // its finished workout wo-1 stands for a test workout
+  }
+  const realExport = () => {
+    const s = fullState()
+    s.routines = [...s.routines, { id: 'rtn-real', name: 'Real plan', focus: 'Machines', archivedAt: null, exercises: [] }]
+    s.workouts = s.workouts.map((w, i) => ({ ...w, id: `wo-real-${i}` }))
+    return s
+  }
+  const staleMeta = (user) => ({ user, syncedUser: user, rev: 5, revId: 'from-the-test-server', dirty: false })
+
+  it('the epoch alone: the stale device logs in again and its test records are merged INTO the real account', async () => {
+    const user = await newAccount() // the live account, nothing stored yet
+    const d = device(testData())
+    d.storage.setItem(META_KEY, JSON.stringify(staleMeta(user)))
+    await d.login(user) // its test session is not valid here (401) → login as the same user → a normal sync
+    const after = server(user).state
+    assert.ok(after.routines.some((r) => r.id === 'rtn-test'), 'the no-base merge KEEPS one-sided records')
+    assert.ok(after.workouts.some((w) => w.id === 'wo-1'))
+  })
+
+  it('only workout-sync-v1 cleared: the test data goes up as rev 1, and an Import with "Keep my history" keeps the test workouts', async () => {
+    const user = await newAccount()
+    const d = device(testData()) // META_KEY absent
+    await d.login(user) // first login onto an empty account → the device's (test) data goes up
+    assert.equal(server(user).rev, 1)
+    assert.ok(server(user).state.routines.some((r) => r.id === 'rtn-test'))
+    commitBackup(buildBackup(realExport()), (fn) => d.change(fn), { keepHistory: true, current: d.state })
+    await d.settle()
+    assert.ok(server(user).state.workouts.some((w) => w.id === 'wo-1'), 'a test workout in the real history')
+  })
+
+  // Replace everything: "Keep my history" keeps the DEVICE's finished workouts (none on a cleared
+  // origin) and not the file's — the go-live Import must be Replace.
+  it('site data cleared, log in, Import (Replace everything): the server holds exactly the export — no test record, no note', async () => {
+    const user = await newAccount()
+    const d = device(emptyState()) // a cleared origin: the app starts empty, no meta, no notes
+    await d.login(user)
+    commitBackup(buildBackup(realExport()), (fn) => d.change(fn), { keepHistory: false, current: d.state })
+    await d.settle()
+    const after = server(user).state
+    assert.ok(!after.routines.some((r) => r.id === 'rtn-test'))
+    assert.deepEqual(after.workouts.map((w) => w.id), realExport().workouts.map((w) => w.id))
+    assert.deepEqual(after.routines.map((r) => r.id), realExport().routines.map((r) => r.id))
+    assert.equal(getNotes(srv.db, userId(user)).length, 0)
+  })
+})

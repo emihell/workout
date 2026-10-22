@@ -46,7 +46,15 @@ import {
   revisionTotal,
 } from './store.mjs'
 
-export const COOKIE = 'workout_session'
+// req-231 — cookies don't isolate by port: every `tailscale serve` port on this Mac (:443 previews,
+// :8443 White Sleeve, :8444, :8445, :8446 us) is one host to the browser. `__Host-` makes the browser
+// refuse any variant of this name that isn't Secure, Path=/ and host-only, so another service can't
+// plant one with a more specific path (sent first) or for a parent domain; readCookies takes every
+// value of the name and the session is the one that is valid here. Residual (review): a co-hosted
+// service still receives our cookie, and it CAN overwrite `__Host-workout_session` (same host,
+// Secure, Path=/), which logs this app out — a denial of service, not an impersonation: a value it
+// sets is no session here. All of them are this Mac's own processes (BACKEND rule 3, tailnet-only).
+export const COOKIE = '__Host-workout_session'
 export const CSRF_HEADER = 'x-workout-request'
 export const MAX_BODY = 20 * 1024 * 1024
 
@@ -66,12 +74,14 @@ function sessionCookie(token) {
 }
 const CLEARED_COOKIE = `${COOKIE}=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`
 
-export function readCookie(header, name = COOKIE) {
+// Every value sent under `name`, in header order (a browser sends a more specific path first).
+export function readCookies(header, name = COOKIE) {
+  const values = []
   for (const part of String(header ?? '').split(';')) {
     const at = part.indexOf('=')
-    if (at > -1 && part.slice(0, at).trim() === name) return part.slice(at + 1).trim()
+    if (at > -1 && part.slice(0, at).trim() === name) values.push(part.slice(at + 1).trim())
   }
-  return null
+  return values
 }
 
 // → null when the write may proceed, else [status, message].
@@ -180,10 +190,13 @@ async function serveApp(appDir, req, res, pathname) {
 
 export function createApp({ db, secret, maxBody = MAX_BODY, appDir = null }) {
   // → {user, token} for a live session (its expiry just pushed SESSION_DAYS out), else null.
+  // req-231 — any of the values sent under our name (see COOKIE).
   const authed = (req) => {
-    const token = readCookie(req.headers.cookie)
-    const user = sessionUser(db, secret, token)
-    return user ? { user, token } : null
+    for (const token of readCookies(req.headers.cookie)) {
+      const user = sessionUser(db, secret, token)
+      if (user) return { user, token }
+    }
+    return null
   }
 
   const routes = {
@@ -207,7 +220,7 @@ export function createApp({ db, secret, maxBody = MAX_BODY, appDir = null }) {
     },
 
     'POST /api/logout': (req) => {
-      deleteSession(db, secret, readCookie(req.headers.cookie))
+      for (const token of readCookies(req.headers.cookie)) deleteSession(db, secret, token)
       return [200, { ok: true }, { 'set-cookie': CLEARED_COOKIE }]
     },
 

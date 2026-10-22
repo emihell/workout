@@ -176,7 +176,9 @@ export function putState(db, userId, body, at = new Date()) {
       const base = diverged ? null : baseState(db, userId, baseRev)
       // Review round 5 (#1) — DEC-133's "the device's workout wins" holds only after a RESTORE,
       // never for a pruned base (there the server's copy is the newer one).
-      const restored = diverged && baseStatus(db, userId, baseRev, baseId) === 'restored'
+      // req-231 (round 5, option a) — and only while the server's workout is still the restored copy's.
+      const restored =
+        diverged && baseStatus(db, userId, baseRev, baseId) === 'restored' && activeIsRestoredCopy(db, userId)
       const result = base ? mergeStates(base, incoming, current.state) : mergeWithoutBase(incoming, current.state, { restored })
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.
@@ -195,11 +197,45 @@ export function putState(db, userId, body, at = new Date()) {
   })
 }
 
+// req-231 (DEC-133 round 5, option a) — has the server's `activeWorkout` stayed the one the newest
+// restore put back (`restores` marker, written by `./server/restore`) in EVERY revision since? Once a
+// device has pushed its workout over it (the first push after the restore), a second stale device's
+// workout must not win too — that would erase the first device's later sets (probe C). Review: a
+// value check alone let A→B→A through (a workout pushed, then discarded back to the restored `null`,
+// then a stale laptop's copy of it won and the discarded workout came back), so every revision after
+// the marker is checked, and a revision after it that pruning removed (recorded in
+// `pruned_revisions` — a backup holds none made after it) means "can't tell": the server's copy is
+// kept. The newest marker is the last one written (rowid), not the latest clock time. No marker (a
+// restore by hand copy, or none ever): as req-230 round 5, the device's workout may win. The marker's
+// revision is never pruned (pruneRevisions); if it is somehow gone, the server's copy is kept (false).
+function activeIsRestoredCopy(db, userId) {
+  const marker = db.prepare('SELECT rev FROM restores WHERE user_id = ? ORDER BY rowid DESC LIMIT 1').get(userId)
+  if (!marker) return true
+  const restoredState = marker.rev === 0 ? revZeroState() : JSON.parse(revisionRow(db, userId, marker.rev)?.state ?? 'null')
+  if (!restoredState) return false
+  const prunedSince = db.prepare('SELECT 1 FROM pruned_revisions WHERE user_id = ? AND rev > ? LIMIT 1').get(userId, marker.rev)
+  if (prunedSince) return false
+  const restored = restoredState.activeWorkout ?? null
+  const since = db.prepare('SELECT state FROM revisions WHERE user_id = ? AND rev > ? ORDER BY rev').all(userId, marker.rev)
+  return since.every((row) => isDeepStrictEqual(JSON.parse(row.state).activeWorkout ?? null, restored))
+}
+
+// req-231 — written by `./server/restore` into the restored copy: each user's rev at that moment.
+export function markRestore(db, at = new Date()) {
+  return inTransaction(db, () => {
+    const users = db.prepare('SELECT id FROM users ORDER BY id').all()
+    const insert = db.prepare('INSERT INTO restores (user_id, rev, at) VALUES (?, ?, ?)')
+    for (const { id } of users) insert.run(id, currentRev(db, id), at.toISOString())
+    return users.length
+  })
+}
+
 // req-230 — revision growth. Every accepted revision stores the whole document (~200 kB for a
 // real history) and the app syncs after each logged set, so old revisions are pruned in the same
 // write that adds a new one. KEPT: every revision from the last PRUNE_DAYS days (any device that
 // synced in that time can still hold one as its base), the newest revision of each older day
-// (UTC), every revision with conflicts (the losing versions, DEC-128 §2), and the current one.
+// (UTC), every revision with conflicts (the losing versions, DEC-128 §2), the current one, and
+// (req-231) every revision a restore marker names.
 // A device still based on a pruned revision is merged without a base (mergeWithoutBase): nothing
 // it can't decide is dropped, and every such record is listed in that revision's conflicts.
 export const PRUNE_DAYS = 14
@@ -212,9 +248,10 @@ export function pruneRevisions(db, userId, at = new Date()) {
       `SELECT rev FROM revisions
        WHERE user_id = ? AND created_at < ? AND conflicts = '[]'
          AND rev < (SELECT MAX(rev) FROM revisions WHERE user_id = ?)
-         AND rev NOT IN (SELECT MAX(rev) FROM revisions WHERE user_id = ? GROUP BY substr(created_at, 1, 10))`,
+         AND rev NOT IN (SELECT MAX(rev) FROM revisions WHERE user_id = ? GROUP BY substr(created_at, 1, 10))
+         AND rev NOT IN (SELECT rev FROM restores WHERE user_id = ?)`,
     )
-    .all(userId, cutoff, userId, userId)
+    .all(userId, cutoff, userId, userId, userId)
     .map((row) => row.rev)
   return dropRevisions(db, userId, revs)
 }

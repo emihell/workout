@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# req-231 — stop the server and its nightly backup, and keep them off (the launchd agents are
+# removed, so it doesn't come back at login; ./server/start brings both back). Live copy only.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$ROOT/server/lib.sh"
+require_live_copy "$ROOT"
+
+for name in "$LABEL" "$LABEL.nightly"; do
+  if loaded "$name"; then launchctl bootout "$DOMAIN/$name" && say "stopped $name"; fi
+  rm -f "$AGENTS/$name.plist"
+done
+for _ in $(seq 1 20); do healthy || break; sleep 0.5; done
+healthy && die "something still answers on 127.0.0.1:$PORT (not this agent?)"
+say "stopped; nothing on 127.0.0.1:$PORT"

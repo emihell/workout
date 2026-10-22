@@ -51,6 +51,15 @@ CREATE TABLE IF NOT EXISTS pruned_revisions (
   rev_id TEXT NOT NULL,
   PRIMARY KEY (user_id, rev, rev_id)
 );
+-- req-231 (DEC-133 round 5, option a): one row per user each time ./server/restore puts a backup
+-- back into the data dir — the rev the restored copy ended at. A no-base push lets the device's
+-- workout win only while the server's activeWorkout is still that revision's (store.mjs). Additive
+-- like pruned_revisions; v1 DBs gain it on open.
+CREATE TABLE IF NOT EXISTS restores (
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  rev INTEGER NOT NULL,
+  at TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS notes (
   id INTEGER PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id),
