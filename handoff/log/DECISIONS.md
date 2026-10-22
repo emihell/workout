@@ -2146,3 +2146,17 @@ Round 5 outcome (Planner): the "server's `activeWorkout` is still the restored c
 doesn't have, since a restore is a hand file copy. It moves to req-231, whose `restore` script writes a `restores` marker
 (option a). Until then only the first push after a restore gets DEC-133; later pushes' losers stay in conflicts. Nothing
 is live before req-231. The finished-workout guard applies to every no-base merge (it only nulls a workout already in history).
+
+## DEC-134 — req-231's open choices, recorded  (Planner, 2026-10-22, from `reports/req-231.md`; reversible, under DEC-095)
+
+1. **Session cookie `__Host-workout_session`** (Secure, `Path=/`, host-only), all values read. The other tailnet ports on
+   this host can still **overwrite** it (a logout), not impersonate. A separate hostname was rejected (more setup, same tailnet).
+2. **Ops:** `stop` removes the plists (stopped stays stopped across login); the nightly backup is its own LaunchAgent at
+   01:00, keeping 7; `restore` into the data dir needs `--yes`, prints both counts, takes a pre-restore backup (a raw copy when
+   the live DB is unreadable) and swaps by rename; `doctor` fails on funnel on any port and on a backup older than 26 h.
+3. **DEC-133 guard (round 1 fix):** after the newest `restores` marker (by `rowid`), the device's workout wins only if
+   **every** revision since the marker kept the marker's `activeWorkout`; a revision pruned since the marker → the server
+   keeps its copy (can't tell). No marker → req-230 behaviour.
+4. **Go-live order for a device that ever synced with a test server:** clear the whole site data for the `:8446` origin
+   (not only `workout-sync-v1` — the history epoch does not protect: a stale device's no-base merge adds the test records),
+   log in, Import with **Replace everything** (Keep my history keeps the device's workouts, so a cleared phone imports 0).

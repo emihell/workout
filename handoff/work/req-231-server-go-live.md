@@ -1,4 +1,4 @@
-**Status: READY** **Lane: data** (Emilio's eyes before go-live) · req-146 stage 1, part 3 of 3
+**Status: BUILT (scripts, drill, review) — NOT merged** Go-live (ACs 4–5) is Planner + Emilio after merge. **Lane: data** (Emilio's eyes before go-live) · req-146 stage 1, part 3 of 3
 
 # req-231 — go live: the server on this Mac, your data on it
 

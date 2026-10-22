@@ -2621,3 +2621,11 @@ rounds are merge/server logic under tests). Reviewer (independent, 5 rounds): ro
 rev reuse + stale push → 95ce488; round 3 pruned-vs-restored → 5f287c2; round 4 DEC-133 + prune records + P10 → 1857436; round
 5 pruned-base blocker + finished guard → 1ec174c, "No blockers." Probe C (second device after a restore) → req-231.
 `reports/req-230.md`.
+
+## req-231 — the server's ops: deploy, launchd, nightly backups, restore with a marker, doctor  (2026-10-22)
+
+**req-231** (server stage 1, part 3; data/backend lane; Builder). `server/` deploy/start/stop/backup/restore/doctor, launchd
+KeepAlive + nightly agent (keep 7), `tailscale serve :8446 → 127.0.0.1:8100`, `restores` marker for DEC-133, `__Host-` cookie. DEC-134.
+Gate: `./check` green (2070 pass, 7044c4c); AC1 doctor 11/11 ok, AC2 kill -9 → back in 4 s, AC3 drill counts equal +
+`pruned_revisions` 40/40, login + PUT 200 through :8446. Reviewer (independent, 2 rounds): round 1 "No blockers." A→B→A +
+corrupt-DB restore + 6 nits → 7044c4c; round 2 "No blockers." ACs 4–5 at go-live with Emilio. `reports/req-231.md`.
