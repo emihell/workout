@@ -5,7 +5,7 @@ import { SCHEMA_VERSION, migrateState } from './model.js'
 import { defaultSchedule, withDefaultAnchor } from './schedule.js'
 import { DEVICE_FILL_KEY, fillRoutineKgFromHistory } from './routine-kg-fill.js'
 
-const STORAGE_KEY = 'workout-mvp-v9'
+export const STORAGE_KEY = 'workout-mvp-v9'
 const LEGACY_KEYS = ['workout-mvp-v8', 'workout-mvp-v7', 'workout-mvp-v6', 'workout-mvp-v5']
 
 // "Last save failed" signal. saveState writes are unguarded against a throwing
@@ -340,6 +340,31 @@ export function releaseUnreadable() {
   setLoadUnreadable(false)
 }
 
+// req-230 — the one sync hook: after each save of the state, every listener is told the state
+// that was saved. Only the server build subscribes (src/sync/engine.js); the Pages build has no
+// listener, so a save there does exactly what it did before. Not called while the stored data is
+// unreadable (DEC-032: nothing is written, so nothing is sent). Called after a FAILED write too
+// (storage full): the change is still the user's newest, and the server copy is then the only
+// one. A listener that throws never breaks a save.
+const savedListeners = new Set()
+
+export function subscribeSaved(listener) {
+  savedListeners.add(listener)
+  return () => savedListeners.delete(listener)
+}
+
+// `saved` = whether the write reached storage (review round 1: a failed write leaves the stored
+// copy behind what sync believes).
+function notifySaved(state, saved) {
+  for (const listener of savedListeners) {
+    try {
+      listener(state, saved)
+    } catch (error) {
+      console.error('req-230: a save listener failed', error)
+    }
+  }
+}
+
 export function saveState(state) {
   // req-36 / DEC-032 — the stored value was unreadable; refuse to overwrite it so
   // the corrupt-but-possibly-recoverable key is preserved untouched. No setItem.
@@ -352,9 +377,11 @@ export function saveState(state) {
       deviceMarkPending = false
       markDeviceFilled()
     }
+    notifySaved(state, true)
     return true
   } catch {
     setSaveFailed(true)
+    notifySaved(state, false)
     return false
   }
 }

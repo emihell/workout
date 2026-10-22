@@ -109,12 +109,23 @@ export function loadNotes() {
   return readNotes(browserStorage())
 }
 
+// req-230 (§9) — the server build sends notes to the server when one is saved (queued while
+// offline); its engine subscribes here. The Pages build has no listener: saving is as before.
+const noteSavedListeners = new Set()
+
+export function subscribeNoteSaved(listener) {
+  noteSavedListeners.add(listener)
+  return () => noteSavedListeners.delete(listener)
+}
+
 export function saveNote({ text, routeInfo, hash }, at) {
   const note = buildNote(
     { route: hash, text, context: captureContext(routeInfo, { hash, appVersion: appVersion() }) },
     at,
   )
-  return appendNote(browserStorage(), note)
+  const notes = appendNote(browserStorage(), note)
+  for (const listener of noteSavedListeners) listener(note)
+  return notes
 }
 
 export function dropNotes() {

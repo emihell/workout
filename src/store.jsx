@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { uid } from './ids'
 import { commitBackup } from './exchange.js'
 import { buildPlannedWorkout, recalculatedState } from './model'
@@ -41,7 +41,7 @@ import { exerciseFromData } from './exercise-names.js'
 import { nextWorkoutName, planIds, planToState } from './plan-templates.js'
 import { addWorkingSetToState, finishedState, finishTimeFor } from './workout-log'
 
-export function StoreProvider({ children }) {
+export function StoreProvider({ children, sync = null }) {
   const [state, setStateRaw] = useState(loadState)
 
   const setState = useCallback((updater) => {
@@ -51,6 +51,18 @@ export function StoreProvider({ children }) {
       return next
     })
   }, [])
+
+  // req-230 — the server build's sync engine (src/sync/engine.js), attached while mounted. It
+  // takes the server's copy through the same setState (so it is saved like any change), as an
+  // updater on the latest state. The Pages build passes no engine: nothing happens here.
+  const stateRef = useRef(state)
+  useEffect(() => {
+    stateRef.current = state
+  })
+  useEffect(() => {
+    if (!sync) return undefined
+    return sync.attach({ state: stateRef.current, adopt: (fn) => setState(fn) })
+  }, [sync, setState])
 
   const api = useMemo(() => {
     // req-164 (F-STRUCT-6) — every reducer is a pure function in state-reducers.js /

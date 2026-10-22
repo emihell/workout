@@ -5,18 +5,23 @@
 //   POST /api/login    {username, password}        → session cookie
 //   POST /api/logout                                → cookie cleared, session deleted
 //   GET  /api/me                    → {username}
-//   GET  /api/state                 → {rev, state}
+//   GET  /api/state[?baseRev&baseId] → {rev, revId, state[, baseOk]}  (req-230 review round 2)
 //   PUT  /api/state {baseRev, state} → {rev, state, merged, conflicts[, unchanged]}
 //   GET  /api/revisions             → [{rev, baseRev, merged, conflicts, createdAt}]
 //   GET  /api/revisions/:rev        → {rev, …, conflicts, state}
 //   GET  /api/export                → the app's Export file
 //   GET  /api/notes, POST /api/notes
+//   GET  anything else              → the built app from `appDir` (req-230: same origin, so the
+//                                     Secure; SameSite=Strict cookie works; no auth — the app
+//                                     shell holds no data)
 //
 // Every write (any method but GET/HEAD) passes the CSRF guard first: the custom header
 // `X-Workout-Request: 1` (a cross-site page can't send it without a CORS preflight, which this
 // server never answers), JSON content type, and — when the browser sends them — an Origin whose
 // host is ours and a Sec-Fetch-Site of same-origin.
+import { readFile, stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
+import { extname, resolve, sep } from 'node:path'
 import { dateKey } from '../src/schedule.js'
 import {
   INVITE_INVALID,
@@ -35,7 +40,7 @@ import {
   exportFile,
   getNotes,
   getRevision,
-  getState,
+  getStateFor,
   listRevisions,
   putState,
   revisionTotal,
@@ -124,7 +129,56 @@ async function readJson(req, maxBody) {
   return body
 }
 
-export function createApp({ db, secret, maxBody = MAX_BODY }) {
+const TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json',
+  '.txt': 'text/plain; charset=utf-8',
+}
+
+// req-230 — one file of the built app, or null. Never outside `appDir` (a `..` or an encoded one
+// resolves outside and is refused). `/` is index.html; the app routes by hash, so no fallback.
+async function appFile(appDir, pathname) {
+  let path
+  try {
+    path = decodeURIComponent(pathname)
+  } catch {
+    return null
+  }
+  if (path.includes('\0')) return null
+  const root = resolve(appDir)
+  const file = resolve(root, `.${path === '/' ? '/index.html' : path}`)
+  if (!file.startsWith(root + sep)) return null
+  try {
+    if (!(await stat(file)).isFile()) return null
+    return { file, body: await readFile(file) }
+  } catch {
+    return null
+  }
+}
+
+async function serveApp(appDir, req, res, pathname) {
+  const found = appDir ? await appFile(appDir, pathname) : null
+  if (!found) return send(res, 404, { error: 'Not found.' })
+  // Hashed build files never change; index.html and sw.js must be checked on every load so a
+  // new version is seen (the service worker decides when it takes over).
+  const immutable = pathname.startsWith('/assets/')
+  res.writeHead(200, {
+    'content-type': TYPES[extname(found.file)] ?? 'application/octet-stream',
+    'cache-control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
+    'x-content-type-options': 'nosniff',
+    'content-length': found.body.length,
+  })
+  res.end(req.method === 'HEAD' ? undefined : found.body)
+}
+
+export function createApp({ db, secret, maxBody = MAX_BODY, appDir = null }) {
   // → {user, token} for a live session (its expiry just pushed SESSION_DAYS out), else null.
   const authed = (req) => {
     const token = readCookie(req.headers.cookie)
@@ -158,7 +212,7 @@ export function createApp({ db, secret, maxBody = MAX_BODY }) {
     },
 
     'GET /api/me': (req, body, user) => [200, { username: user.username }],
-    'GET /api/state': (req, body, user) => [200, getState(db, user.id)],
+    'GET /api/state': (req, body, user) => [200, getStateFor(db, user.id, new URL(req.url, 'http://localhost').searchParams)],
     'PUT /api/state': (req, body, user) => [200, putState(db, user.id, body)],
     'GET /api/revisions': (req, body, user) => [200, listRevisions(db, user.id)],
     'GET /api/export': (req, body, user) => [
@@ -174,6 +228,9 @@ export function createApp({ db, secret, maxBody = MAX_BODY }) {
   async function handle(req, res) {
     const { pathname } = new URL(req.url, 'http://localhost')
     const method = req.method === 'HEAD' ? 'GET' : req.method
+    if (method === 'GET' && pathname !== '/api' && !pathname.startsWith('/api/')) {
+      return serveApp(appDir, req, res, pathname)
+    }
     let key = `${method} ${pathname}`
     let rev = null
     const revMatch = /^\/api\/revisions\/(\d+)$/.exec(pathname)
