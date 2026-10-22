@@ -2124,3 +2124,25 @@ bootstrap refused once any user exists; data dir refused under any ancestor hold
 3. **Logout:** "let user logout, but sync data anyways when possible" → always allowed; data stays; unsynced changes go up on
    the next login (no session while logged out). Clearing on logout returns with other users.
 4. **Password:** "6 is enough? its just a workout app" → ≥ 6 characters (tailnet-only server). Supersedes DEC-131's ≥ 8.
+
+## DEC-133 — after a server restore, the workout in progress survives  (Emilio, 2026-10-22, on req-230 review round 2)
+
+Rare case: the server is restored from a backup while a device holds changes the backup doesn't have (no shared base).
+Emilio chose **A**: the device's `activeWorkout` wins; every other record takes the restored copy (a routine's kg edited
+after the backup included). The device's losing versions stay in the revision's conflicts, not in the app. Rejected: B
+(phone wins everywhere: a broken phone copy would undo the restore), C (backup wins everywhere: live sets vanish).
+Implementation (round 4, Builder's, Planner accepted): the rule applies only when the device has a workout in progress
+(`activeWorkout` non-null). Otherwise a stale device's `null` would end a live workout (P7). Cost: a backup's in-progress
+workout that the device has since finished comes back as in progress. Nothing is lost, and it is listed in conflicts.
+**Unconfirmed, Emilio's list.** Restore-vs-prune: pruning records each removed revision (`pruned_revisions`, `CREATE TABLE IF
+NOT EXISTS`, schema version stays 1, no live DB yet). A missing base that isn't recorded reads as `'restored'`. No restore
+marker: restore is a hand file copy (BACKEND rule 7), and a backup can't know revisions made after it.
+Round 5 (Planner, from the re-review): the device's workout wins only on a **restored** base, never a pruned one. If it won
+on a pruned base, a stale laptop's old workout would replace the live one. It also wins only while the server's
+`activeWorkout` is still the restored copy's, so a second stale device can't erase the first device's sets. A restored
+`activeWorkout` already in the merged history becomes `null`, so a finished workout never returns as in progress
+(supersedes round 4's "comes back as in progress" cost).
+Round 5 outcome (Planner): the "server's `activeWorkout` is still the restored copy's" guard needs storage the server
+doesn't have, since a restore is a hand file copy. It moves to req-231, whose `restore` script writes a `restores` marker
+(option a). Until then only the first push after a restore gets DEC-133; later pushes' losers stay in conflicts. Nothing
+is live before req-231. The finished-workout guard applies to every no-base merge (it only nulls a workout already in history).

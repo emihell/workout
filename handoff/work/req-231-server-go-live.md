@@ -1,4 +1,4 @@
-**Status: BLOCKED ON req-230** **Lane: data** (Emilio's eyes before go-live) · req-146 stage 1, part 3 of 3
+**Status: READY** **Lane: data** (Emilio's eyes before go-live) · req-146 stage 1, part 3 of 3
 
 # req-231 — go live: the server on this Mac, your data on it
 
@@ -25,6 +25,18 @@ Emilio** (BACKEND rule 2).
 - **Same-origin check behind `tailscale serve`:** verify what Host / X-Forwarded-Host arrive; if Host is rewritten to
   `127.0.0.1:8100`, every write would 403. Receipt: a real login + PUT through `:8446`.
 
+## From req-230's review (verify here)
+
+- **A device that synced with a test server must not push test data over the real history.** Go-live: the phone's
+  `workout-sync-v1` is cleared (or the server's history epoch, req-230 round 2, makes a stale device merge instead of
+  fast-forward) — state which, and show the phone's first sync after the Import adds no test records.
+- **DEC-133 for every device after a restore (req-230 round 5, option a):** the `restore` script also restores *into* the
+  data dir (not only `--to <temp dir>`), and writes a marker `restores(user_id, rev, at)`. The no-base merge lets the
+  device's workout win only if no revision since the newest marker changed `activeWorkout`. Test the reviewer's probe C:
+  phone pushes after the restore, logs a 4th set, a clean stale laptop pushes → the phone keeps 4 sets.
+- **Restore drill + sync:** after restoring a backup, a device's next sync merges (conflicts recorded) and never silently
+  overwrites the restored copy. Receipt from a throwaway instance.
+
 ## Out of scope
 
 Other users, invites, public hosting (ask-gate 3). Closing the Pages site (DEC-129: after the server has carried real
@@ -34,7 +46,7 @@ workouts — its own req).
 
 1. `doctor` → bind `127.0.0.1:8100`, funnel off, data dir outside every worktree. Paste it.
 2. **Failure — server down:** kill it → launchd restarts it within a minute; meanwhile the phone logs offline and syncs after.
-3. Restore drill: newest backup → throwaway instance → login → counts equal live. Paste the counts.
+3. Restore drill: newest backup → throwaway instance → login → counts equal live. Paste the counts. Include `pruned_revisions` (req-230 round 4: a schema change at version 1) and check it survives the restore.
 4. Go-live counts: exercises / routines / workouts on the Pages phone = on the server after Import (Emilio confirms).
 5. Nightly backup present the next morning.
 

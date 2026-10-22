@@ -659,6 +659,10 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
 
 ## Phase 3 — the heavy build  (gated on ONE decision)
 
+- **Sync follow-ups (req-230 review, latent):** a change rebased on the client during an in-flight request isn't recorded as a
+  server conflict (loser survives only as an unmarked revision, pruned after 14 days — short of DEC-128 §2); the expired-session
+  re-login unmounts the open screen (persisted state survives, UI state/timers reset); logging in as a different user on a device
+  with unsynced changes replaces them (stage 2 rule needed before other users).
 - **Before any public hosting (ask-gate 3; req-229 review):** login rate limiting, a body cap before auth on public routes,
   pruning expired sessions, a `.env.example` exception in `.gitignore` if one is ever added.
 - **`req-146` backend design** (stage 1 READY as req-228..231, DEC-127..130; NEEDS DECISIONS for stages 2–3 — design doc `work/req-146-backend-design.md`; AI section decided DEC-124; DEC-073). Why: a real product, other users soon,

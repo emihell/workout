@@ -1,4 +1,4 @@
-**Status: READY** **Lane: backend + ui** (rules: `rules/BACKEND.md`) · req-146 stage 1, part 2 of 3 · after **req-229**
+**Status: BUILT AND MERGED, 2026-10-22 — branch `req-230` (`d2c68db`…`1ec174c`, 7 commits).** **Lane: backend + ui** (rules: `rules/BACKEND.md`) · req-146 stage 1, part 2 of 3 · after **req-229**
 
 # req-230 — the app logs in, works offline, and syncs with the server
 
