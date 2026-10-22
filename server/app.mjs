@@ -50,8 +50,10 @@ import {
 // :8443 White Sleeve, :8444, :8445, :8446 us) is one host to the browser. `__Host-` makes the browser
 // refuse any variant of this name that isn't Secure, Path=/ and host-only, so another service can't
 // plant one with a more specific path (sent first) or for a parent domain; readCookies takes every
-// value of the name and the session is the one that is valid here. Residual: those services still
-// receive the cookie — all are this Mac's own processes (BACKEND rule 3, tailnet-only).
+// value of the name and the session is the one that is valid here. Residual (review): a co-hosted
+// service still receives our cookie, and it CAN overwrite `__Host-workout_session` (same host,
+// Secure, Path=/), which logs this app out — a denial of service, not an impersonation: a value it
+// sets is no session here. All of them are this Mac's own processes (BACKEND rule 3, tailnet-only).
 export const COOKIE = '__Host-workout_session'
 export const CSRF_HEADER = 'x-workout-request'
 export const MAX_BODY = 20 * 1024 * 1024

@@ -95,7 +95,13 @@ async function restore(args) {
   if (launchdLoaded(label)) throw new Error(`Refusing: the server (${label}) is loaded. ./server/stop first.`)
   if (await health(config.port)) throw new Error(`Refusing: something answers on 127.0.0.1:${config.port}. Stop it first.`)
   const dbFile = join(config.dataDir, DB_FILE)
-  if (existsSync(dbFile)) printCounts(`now in ${dbFile}`, ops.counts(dbFile))
+  if (existsSync(dbFile)) {
+    try {
+      printCounts(`now in ${dbFile}`, ops.counts(dbFile))
+    } catch (error) {
+      console.log(`now in ${dbFile}: UNREADABLE (${error.message}) — it will be copied as-is to backups/…-pre-restore-corrupt.db`)
+    }
+  }
   printCounts(`in ${backupFile}`, ops.counts(backupFile))
   if (!rest.includes('--yes')) {
     console.log('\nNothing changed. This replaces the data dir’s DB (backed up first as pre-restore). Re-run with --yes.')
@@ -103,6 +109,7 @@ async function restore(args) {
     return
   }
   const r = await ops.restoreInto(backupFile, config.dataDir)
+  if (r.unreadable) console.log(`\nthe previous DB's counts were unreadable (${r.unreadable}); its files were copied as-is`)
   console.log(`\nrestored ${r.from} → ${r.dbFile}; previous DB kept as ${r.safety ?? '(none — there was no DB)'}`)
   console.log(`restore markers written: ${r.marked} user(s)`)
   printCounts('now', r.after)

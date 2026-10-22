@@ -4,7 +4,7 @@
 //
 // Backups use SQLite's online backup API (node:sqlite `backup`), never a file copy: a `cp` misses
 // rows still in the `-wal` file (BACKEND rule 6). Every backup is integrity-checked before it is kept.
-import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite'
 import { DB_FILE, assertNotLiveUnderTest, assertOutsideRepo } from './config.mjs'
@@ -15,6 +15,7 @@ export const BACKUPS = 'backups'
 export const NIGHTLY = 'nightly'
 export const NIGHTLY_KEEP = 7
 const REASON = /^[a-z0-9][a-z0-9-]{0,39}$/
+const NIGHTLY_EXTRA = /^nightly-\d+$/
 const NAME = /^workout-(\d{8}-\d{6})-([a-z0-9][a-z0-9-]*)\.db$/
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -52,6 +53,9 @@ async function copyDb(source, dest) {
   const poke = setInterval(() => {}, 10)
   try {
     await sqliteBackup(db, partial)
+  } catch (error) {
+    rmSync(partial, { force: true }) // review nit: no half-written .partial left behind
+    throw error
   } finally {
     clearInterval(poke)
     db.close()
@@ -78,7 +82,11 @@ async function copyDb(source, dest) {
 // `./server/backup <reason>` → {file, bytes}. `nightly` is the nightly run's reason only.
 export async function backupDb(dataDir, reason, { at = new Date(), nightly = false } = {}) {
   if (!REASON.test(String(reason))) throw new Error(`Backup reason: lower-case letters, digits and dashes (got "${reason}").`)
-  if (reason === NIGHTLY && !nightly) throw new Error(`"${NIGHTLY}" is reserved for the nightly backup (backup --nightly).`)
+  // Review nit: `nightly-3` (a second nightly in the same second) is rotated like `nightly`, so a
+  // hand-made backup may not take that shape either.
+  if ((reason === NIGHTLY || NIGHTLY_EXTRA.test(reason)) && !nightly) {
+    throw new Error(`"${reason}" is reserved for the nightly backup (backup --nightly).`)
+  }
   assertNotLiveUnderTest(dataDir)
   const dbFile = join(dataDir, DB_FILE)
   if (!existsSync(dbFile)) throw new Error(`No database at ${dbFile}.`)
@@ -108,7 +116,7 @@ export function listBackups(dataDir) {
 // (deploy, pre-restore, by hand) are never deleted here.
 export async function nightly(dataDir, { at = new Date(), keep = NIGHTLY_KEEP } = {}) {
   const made = await backupDb(dataDir, NIGHTLY, { at, nightly: true })
-  const nightlies = listBackups(dataDir).filter((b) => b.reason === NIGHTLY || /^nightly-\d+$/.test(b.reason))
+  const nightlies = listBackups(dataDir).filter((b) => b.reason === NIGHTLY || NIGHTLY_EXTRA.test(b.reason))
   const deleted = []
   for (const old of nightlies.slice(keep)) {
     rmSync(old.file)
@@ -165,13 +173,26 @@ export async function restoreTo(backupFile, dir) {
 // `./server/restore <backup>` (into the data dir; the server is stopped first — the CLI checks).
 // The current DB is backed up first (`pre-restore`); the restored copy gets a `restores` marker
 // per user (DEC-133 round 5, option a) before it replaces workout.db.
+// Review: a CORRUPT current DB is when a restore is needed most, so one that can't be read or
+// fails integrity_check is not a refusal — its files (db, -wal, -shm) are copied as they are to
+// `pre-restore-corrupt` (the online backup can't read it) and `before` is null with the reason.
 export async function restoreInto(backupFile, dataDir, { at = new Date() } = {}) {
   assertIntegrity(backupFile)
   assertOutsideRepo(dataDir)
   assertNotLiveUnderTest(dataDir)
   const dbFile = join(dataDir, DB_FILE)
-  const before = existsSync(dbFile) ? counts(dbFile) : null
-  const safety = before ? await backupDb(dataDir, 'pre-restore', { at }) : null
+  let before = null
+  let unreadable = null
+  let safety = null
+  if (existsSync(dbFile)) {
+    try {
+      assertIntegrity(dbFile)
+      before = counts(dbFile)
+    } catch (error) {
+      unreadable = error.message
+    }
+    safety = unreadable ? rawCopy(dataDir, dbFile, at) : (await backupDb(dataDir, 'pre-restore', { at })).file
+  }
   const incoming = `${dbFile}.restoring`
   rmSync(incoming, { force: true })
   await copyDb(backupFile, incoming)
@@ -185,9 +206,23 @@ export async function restoreInto(backupFile, dataDir, { at = new Date() } = {})
   }
   for (const f of [`${incoming}-wal`, `${incoming}-shm`]) rmSync(f, { force: true })
   assertIntegrity(incoming)
-  for (const f of [dbFile, `${dbFile}-wal`, `${dbFile}-shm`]) rmSync(f, { force: true })
+  // Review nit: the old db is replaced by the rename itself (atomic), never deleted first, so a crash
+  // here leaves one DB or the other — never none. Its -wal/-shm must go first: they belong to it.
+  for (const f of [`${dbFile}-wal`, `${dbFile}-shm`]) rmSync(f, { force: true })
   renameSync(incoming, dbFile)
-  return { dbFile, from: basename(backupFile), safety: safety?.file ?? null, before, after: counts(dbFile), marked }
+  return { dbFile, from: basename(backupFile), safety, before, unreadable, after: counts(dbFile), marked }
+}
+
+// The files of a DB that SQLite can't read, copied byte for byte (db, then any -wal/-shm beside it).
+function rawCopy(dataDir, dbFile, at) {
+  const dir = join(dataDir, BACKUPS)
+  mkdirSync(dir, { recursive: true, mode: 0o700 })
+  let file = join(dir, `workout-${stamp(at)}-pre-restore-corrupt.db`)
+  for (let n = 2; existsSync(file); n++) file = join(dir, `workout-${stamp(at)}-pre-restore-corrupt-${n}.db`)
+  assertNotLiveUnderTest(file)
+  copyFileSync(dbFile, file)
+  for (const side of ['-wal', '-shm']) if (existsSync(dbFile + side)) copyFileSync(dbFile + side, file + side)
+  return file
 }
 
 // ---- doctor: the pure checks (the CLI gathers the inputs) ----

@@ -178,7 +178,7 @@ export function putState(db, userId, body, at = new Date()) {
       // never for a pruned base (there the server's copy is the newer one).
       // req-231 (round 5, option a) — and only while the server's workout is still the restored copy's.
       const restored =
-        diverged && baseStatus(db, userId, baseRev, baseId) === 'restored' && activeIsRestoredCopy(db, userId, current.state)
+        diverged && baseStatus(db, userId, baseRev, baseId) === 'restored' && activeIsRestoredCopy(db, userId)
       const result = base ? mergeStates(base, incoming, current.state) : mergeWithoutBase(incoming, current.state, { restored })
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.
@@ -197,18 +197,27 @@ export function putState(db, userId, body, at = new Date()) {
   })
 }
 
-// req-231 (DEC-133 round 5, option a) — is the server's `activeWorkout` still the one the newest
-// restore put back (`restores` marker, written by `./server/restore`)? Once a device has pushed its
-// workout over it (the first push after the restore), a second stale device's workout must not win
-// too — that would erase the first device's later sets (probe C). No marker (a restore by hand
-// copy, or none ever): as req-230 round 5, the device's workout may win. The marker's revision is
-// never pruned (pruneRevisions); if it is somehow gone, the server's copy is kept (false).
-function activeIsRestoredCopy(db, userId, currentState) {
-  const marker = db.prepare('SELECT rev FROM restores WHERE user_id = ? ORDER BY at DESC, rowid DESC LIMIT 1').get(userId)
+// req-231 (DEC-133 round 5, option a) — has the server's `activeWorkout` stayed the one the newest
+// restore put back (`restores` marker, written by `./server/restore`) in EVERY revision since? Once a
+// device has pushed its workout over it (the first push after the restore), a second stale device's
+// workout must not win too — that would erase the first device's later sets (probe C). Review: a
+// value check alone let A→B→A through (a workout pushed, then discarded back to the restored `null`,
+// then a stale laptop's copy of it won and the discarded workout came back), so every revision after
+// the marker is checked, and a revision after it that pruning removed (recorded in
+// `pruned_revisions` — a backup holds none made after it) means "can't tell": the server's copy is
+// kept. The newest marker is the last one written (rowid), not the latest clock time. No marker (a
+// restore by hand copy, or none ever): as req-230 round 5, the device's workout may win. The marker's
+// revision is never pruned (pruneRevisions); if it is somehow gone, the server's copy is kept (false).
+function activeIsRestoredCopy(db, userId) {
+  const marker = db.prepare('SELECT rev FROM restores WHERE user_id = ? ORDER BY rowid DESC LIMIT 1').get(userId)
   if (!marker) return true
   const restoredState = marker.rev === 0 ? revZeroState() : JSON.parse(revisionRow(db, userId, marker.rev)?.state ?? 'null')
   if (!restoredState) return false
-  return isDeepStrictEqual(currentState.activeWorkout ?? null, restoredState.activeWorkout ?? null)
+  const prunedSince = db.prepare('SELECT 1 FROM pruned_revisions WHERE user_id = ? AND rev > ? LIMIT 1').get(userId, marker.rev)
+  if (prunedSince) return false
+  const restored = restoredState.activeWorkout ?? null
+  const since = db.prepare('SELECT state FROM revisions WHERE user_id = ? AND rev > ? ORDER BY rev').all(userId, marker.rev)
+  return since.every((row) => isDeepStrictEqual(JSON.parse(row.state).activeWorkout ?? null, restored))
 }
 
 // req-231 — written by `./server/restore` into the restored copy: each user's rev at that moment.

@@ -4,7 +4,7 @@
 import { client, startTestServer, tempDir } from './test-helpers.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, mkdirSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fullState } from '../src/test-support/full-state.js'
 import { COOKIE, createHttpServer } from './app.mjs'
@@ -23,7 +23,7 @@ import {
   restoreTo,
   serveState,
 } from './ops.mjs'
-import { dropRevisions, getState, putState } from './store.mjs'
+import { dropRevisions, getState, listRevisions, putState } from './store.mjs'
 
 const PASSWORD = 'sixsix'
 const DAY = 24 * 60 * 60 * 1000
@@ -59,6 +59,7 @@ test('backup: an online, integrity-checked copy that holds rows still in the -wa
     assert.notEqual(again.file, file)
     await assert.rejects(backupDb(s.dataDir, 'Bad Reason'), /lower-case/)
     await assert.rejects(backupDb(s.dataDir, 'nightly'), /reserved/)
+    await assert.rejects(backupDb(s.dataDir, 'nightly-3'), /reserved/, 'review nit: the rotation would delete it')
     // One self-contained file each: no .partial, and no -wal/-shm left beside it (seen in the live-shaped run).
     assert.deepEqual(readdirSync(join(s.dataDir, 'backups')).filter((f) => !f.endsWith('.db')), [])
     assert.equal(counts(file).tables.revisions, 2)
@@ -191,6 +192,125 @@ test('probe C — after a restore the phone keeps its 4th set when a stale lapto
     } finally {
       deps.db.close()
     }
+  } finally {
+    s.cleanup()
+  }
+})
+
+// Review should-fix 1 — A→B→A: the restored copy had no workout; the phone's workout won the first
+// push, then the phone discarded it (back to null, equal to the restored value). A stale laptop's
+// copy of that workout must not win now: something changed since the restore.
+const setOf = (n) => ({ id: `set-${n}`, exerciseId: 'ex-press', reps: 8, kg: 40 })
+const wo = (id, n) => ({ id, startedAt: '2026-10-22T09:00:00.000Z', sets: Array.from({ length: n }, (_, i) => setOf(i + 1)) })
+const withActive = (active) => ({ ...withRoutines(routine('C')), activeWorkout: active })
+
+test('review #1 — A→B→A after a restore: a workout discarded since the restore does not come back from a stale laptop', async () => {
+  const s = await seeded()
+  try {
+    let rev = s.last
+    const push = (state, base = rev) => (rev = putState(s.db, s.id, { baseRev: base.rev, baseId: base.revId, state }))
+    push(withActive(null)) // rev 4 ← the backup: no workout
+    const { file } = await backupDb(s.dataDir, 'aba')
+    const laptop = push(withActive(wo('w1', 1))) // rev 5 — the laptop syncs here, clean
+    const phone = push(withActive(wo('w1', 2))) // rev 6 — the phone
+    s.db.close()
+    await restoreInto(file, s.dataDir)
+    const deps = openDataDir(s.dataDir)
+    try {
+      const put = (base, state) => putState(deps.db, s.id, { baseRev: base.rev, baseId: base.revId, state })
+      const first = put(phone, withActive(wo('w1', 2)))
+      assert.equal(first.state.activeWorkout.sets.length, 2, 'DEC-133: the phone’s workout wins the first push')
+      const discarded = put(first, withActive(null))
+      assert.equal(discarded.merged, false)
+      assert.equal(discarded.state.activeWorkout, null, 'the phone discarded it')
+      const stale = put(laptop, withActive(wo('w1', 1)))
+      assert.equal(getState(deps.db, s.id).state.activeWorkout, null, 'the discarded workout does not come back')
+      assert.ok(stale.conflicts.some((c) => c.field === 'activeWorkout' && c.lost?.sets?.length === 1), 'the laptop’s copy is listed')
+    } finally {
+      deps.db.close()
+    }
+  } finally {
+    s.cleanup()
+  }
+})
+
+test('review #8 — no marker (a restore by hand copy): the device’s workout wins, as in req-230', async () => {
+  const s = await seeded()
+  try {
+    let rev = s.last
+    const push = (state, base = rev) => (rev = putState(s.db, s.id, { baseRev: base.rev, baseId: base.revId, state }))
+    push(withActive(wo('w', 1))) // rev 4 ← the backup
+    const { file } = await backupDb(s.dataDir, 'hand')
+    const phone = push(withActive(wo('w', 3))) // rev 5
+    s.db.close()
+    await restoreInto(file, s.dataDir)
+    const deps = openDataDir(s.dataDir)
+    try {
+      deps.db.exec('DELETE FROM restores') // as a hand copy leaves it
+      const out = putState(deps.db, s.id, { baseRev: phone.rev, baseId: phone.revId, state: withActive(wo('w', 3)) })
+      assert.equal(out.state.activeWorkout.sets.length, 3)
+      assert.ok(out.conflicts.some((c) => c.kind === 'no-base-in-progress'))
+    } finally {
+      deps.db.close()
+    }
+  } finally {
+    s.cleanup()
+  }
+})
+
+test('review #8 — pruning keeps the marker’s revision; a revision pruned since the marker keeps the server’s workout', async () => {
+  const s = await seeded()
+  try {
+    const t0 = new Date('2026-10-01T10:00:00.000Z')
+    const at = (h) => new Date(t0.getTime() + h * 60 * 60 * 1000)
+    let rev = s.last
+    const push = (state, when, base = rev) => (rev = putState(s.db, s.id, { baseRev: base.rev, baseId: base.revId, state }, when))
+    const backupRev = push(withActive(null), at(0)) // rev 4 ← the backup
+    const { file } = await backupDb(s.dataDir, 'prune')
+    const phone = push(withActive(wo('w-phone', 2)), at(0.5)) // rev 5 — lost to the restore
+    s.db.close()
+    await restoreInto(file, s.dataDir, { at: at(1) })
+    const deps = openDataDir(s.dataDir)
+    try {
+      let r = { rev: backupRev.rev, revId: getState(deps.db, s.id).revId }
+      const put = (state, when, base = r) => (r = putState(deps.db, s.id, { baseRev: base.rev, baseId: base.revId, state }, when))
+      put(withActive(wo('w-new', 1)), at(2)) // rev 5' — a workout since the restore…
+      put(withActive(null), at(3)) // rev 6' — …discarded; newest of that day
+      put({ ...withActive(null), routines: [routine('C'), routine('D')] }, at(20 * 24)) // 20 days later: prunes what it can
+      const revs = listRevisions(deps.db, s.id).map((x) => x.rev)
+      assert.ok(revs.includes(backupRev.rev), `the marker’s rev ${backupRev.rev} is kept: ${revs}`)
+      assert.ok(!revs.includes(5), `rev 5 (after the marker) was pruned: ${revs}`)
+      // The phone (base lost to the restore) pushes its workout: a change since the restore can't be
+      // ruled out (rev 5 is gone), so the server's copy (no workout) stays and the phone's is listed.
+      const out = putState(deps.db, s.id, { baseRev: phone.rev, baseId: phone.revId, state: withActive(wo('w-phone', 2)) })
+      assert.equal(out.state.activeWorkout, null)
+      assert.ok(out.conflicts.some((c) => c.field === 'activeWorkout' && c.lost?.id === 'w-phone'))
+    } finally {
+      deps.db.close()
+    }
+  } finally {
+    s.cleanup()
+  }
+})
+
+// Review should-fix 2 — a corrupt DB is when a restore is needed most.
+test('review #2 — restore into a data dir whose DB is corrupt: its files are kept as-is, the restore goes ahead', async () => {
+  const s = await seeded()
+  try {
+    const { file } = await backupDb(s.dataDir, 'good')
+    s.db.close()
+    const dbFile = join(s.dataDir, DB_FILE)
+    writeFileSync(dbFile, Buffer.alloc(8192, 7))
+    writeFileSync(`${dbFile}-wal`, 'junk wal')
+    const r = await restoreInto(file, s.dataDir)
+    assert.equal(r.before, null)
+    assert.match(r.unreadable, /not a database/)
+    assert.match(r.safety, /pre-restore-corrupt\.db$/)
+    assert.deepEqual(readFileSync(r.safety), Buffer.alloc(8192, 7), 'the corrupt file, byte for byte')
+    assert.equal(readFileSync(`${r.safety}-wal`, 'utf8'), 'junk wal')
+    assert.equal(r.after.users[0].rev, 3)
+    assert.ok(!existsSync(`${dbFile}-wal`) || readFileSync(`${dbFile}-wal`, 'utf8') !== 'junk wal', 'the corrupt -wal is not left beside the restored DB')
+    assert.deepEqual(integrity(dbFile), ['ok'])
   } finally {
     s.cleanup()
   }
