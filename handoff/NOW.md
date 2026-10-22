@@ -17,7 +17,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **NOW (2026-10-22, DEC-127..134): server stage 1** — req-231 ops merged → **go-live with Emilio** (req-231 ACs 4–5):
+- **NOW (2026-10-22, DEC-127..134): server stage 1** — ops merged (see SHIPPED) → **go-live with Emilio** (its ACs 4–5):
   `server/deploy`, `start`, doctor; phone: clear `:8446` site data → login → Import **Replace everything** (DEC-134 §4) →
   compare counts → log a workout. Nightly backup checked next morning. Rules `rules/BACKEND.md`, runbook `server/README.md`.
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
