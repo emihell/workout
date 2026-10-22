@@ -2137,3 +2137,8 @@ workout that the device has since finished comes back as in progress. Nothing is
 **Unconfirmed, Emilio's list.** Restore-vs-prune: pruning records each removed revision (`pruned_revisions`, `CREATE TABLE IF
 NOT EXISTS`, schema version stays 1, no live DB yet). A missing base that isn't recorded reads as `'restored'`. No restore
 marker: restore is a hand file copy (BACKEND rule 7), and a backup can't know revisions made after it.
+Round 5 (Planner, from the re-review): the device's workout wins only on a **restored** base, never a pruned one. If it won
+on a pruned base, a stale laptop's old workout would replace the live one. It also wins only while the server's
+`activeWorkout` is still the restored copy's, so a second stale device can't erase the first device's sets. A restored
+`activeWorkout` already in the merged history becomes `null`, so a finished workout never returns as in progress
+(supersedes round 4's "comes back as in progress" cost).

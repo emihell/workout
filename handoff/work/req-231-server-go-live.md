@@ -42,7 +42,7 @@ workouts — its own req).
 
 1. `doctor` → bind `127.0.0.1:8100`, funnel off, data dir outside every worktree. Paste it.
 2. **Failure — server down:** kill it → launchd restarts it within a minute; meanwhile the phone logs offline and syncs after.
-3. Restore drill: newest backup → throwaway instance → login → counts equal live. Paste the counts.
+3. Restore drill: newest backup → throwaway instance → login → counts equal live. Paste the counts. Include `pruned_revisions` (req-230 round 4: a schema change at version 1) and check it survives the restore.
 4. Go-live counts: exercises / routines / workouts on the Pages phone = on the server after Import (Emilio confirms).
 5. Nightly backup present the next morning.
 
