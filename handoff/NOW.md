@@ -17,7 +17,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **NOW (2026-10-22, DEC-127..133): server stage 1** — req-230 shipped → **req-231 go-live with Emilio** (READY; carries
+- **NOW (2026-10-22, DEC-127..133): server stage 1** — part 2 shipped → **req-231 go-live with Emilio** (READY; carries
   the restore marker, DEC-133 round 5). Rules `rules/BACKEND.md`.
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
