@@ -3,6 +3,7 @@
 //   WORKOUT_DATA_DIR  data dir (default ~/dev/workout/workout-data — the LIVE one; see BACKEND.md:
 //                     only Planner starts that, from the live copy)
 //   WORKOUT_PORT      port (default 8100; 0 = any free port)
+//   WORKOUT_APP_DIR   the built app it serves (default <repo>/dist-server — `npm run build:server`)
 // Binds 127.0.0.1 only. Refuses to start with its data/secret path inside a git working tree.
 import { NODE_FLOOR, nodeVersionOk, serverConfig } from './config.mjs'
 
@@ -24,10 +25,10 @@ try {
   process.exit(1)
 }
 
-const server = createHttpServer(deps)
+const server = createHttpServer({ ...deps, appDir: config.appDir })
 server.listen(config.port, config.host, () => {
   const { address, port } = server.address()
-  console.log(`workout server listening on http://${address}:${port} (data: ${config.dataDir})`)
+  console.log(`workout server listening on http://${address}:${port} (data: ${config.dataDir}, app: ${config.appDir})`)
 })
 
 function stop() {

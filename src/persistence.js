@@ -340,6 +340,29 @@ export function releaseUnreadable() {
   setLoadUnreadable(false)
 }
 
+// req-230 — the one sync hook: after each save of the state, every listener is told the state
+// that was saved. Only the server build subscribes (src/sync/engine.js); the Pages build has no
+// listener, so a save there does exactly what it did before. Not called while the stored data is
+// unreadable (DEC-032: nothing is written, so nothing is sent). Called after a FAILED write too
+// (storage full): the change is still the user's newest, and the server copy is then the only
+// one. A listener that throws never breaks a save.
+const savedListeners = new Set()
+
+export function subscribeSaved(listener) {
+  savedListeners.add(listener)
+  return () => savedListeners.delete(listener)
+}
+
+function notifySaved(state) {
+  for (const listener of savedListeners) {
+    try {
+      listener(state)
+    } catch (error) {
+      console.error('req-230: a save listener failed', error)
+    }
+  }
+}
+
 export function saveState(state) {
   // req-36 / DEC-032 — the stored value was unreadable; refuse to overwrite it so
   // the corrupt-but-possibly-recoverable key is preserved untouched. No setItem.
@@ -352,9 +375,11 @@ export function saveState(state) {
       deviceMarkPending = false
       markDeviceFilled()
     }
+    notifySaved(state)
     return true
   } catch {
     setSaveFailed(true)
+    notifySaved(state)
     return false
   }
 }

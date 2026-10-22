@@ -1,4 +1,6 @@
 import { execSync } from 'node:child_process'
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { join, relative, resolve, sep } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
@@ -24,11 +26,47 @@ function buildId(command) {
   return sha === 'unknown' ? 'dev' : sha
 }
 
+// req-230 — the build switch. Sync (login, server sync, the offline service worker) is ON only
+// in the server build: `npm run build:server` (WORKOUT_SYNC=true). Every other build — the Pages
+// deploy (GITHUB_PAGES=true, which always wins), `npm run build`, `npm run dev`, `plan qa` — has
+// it OFF, and main.jsx's sync branch is dropped from the bundle.
+export function syncEnabled(env = process.env) {
+  return env.WORKOUT_SYNC === 'true' && env.GITHUB_PAGES !== 'true'
+}
+
+function filesUnder(dir) {
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => relative(dir, join(entry.parentPath, entry.name)).split(sep).join('/'))
+    .sort()
+}
+
+// req-230 — writes sw.js (from src/sync/sw.js) into the SERVER build, after everything else is
+// written: the build's id, and every built file to cache for opening offline.
+function serviceWorker(version) {
+  let outDir = null
+  return {
+    name: 'workout-service-worker',
+    apply: 'build',
+    configResolved(config) {
+      outDir = resolve(config.root, config.build.outDir)
+    },
+    closeBundle() {
+      const files = filesUnder(outDir).filter((file) => file !== 'sw.js')
+      const source = readFileSync(new URL('./src/sync/sw.js', import.meta.url), 'utf8')
+        .replace('__SW_VERSION__', JSON.stringify(version))
+        .replace('__SW_FILES__', JSON.stringify(files))
+      writeFileSync(join(outDir, 'sw.js'), source)
+    },
+  }
+}
+
 export default defineConfig(({ command }) => ({
-  plugins: [react()],
+  plugins: [react(), ...(syncEnabled() ? [serviceWorker(`${buildId(command)}-${Date.now()}`)] : [])],
   define: {
     __APP_VERSION__: JSON.stringify(gitSha()),
     __BUILD_ID__: JSON.stringify(buildId(command)),
+    __SYNC__: JSON.stringify(syncEnabled()),
   },
   base: process.env.GITHUB_PAGES === 'true' ? '/workout/' : '/',
   // req-165 (F-BUNDLE-1) — the one chunk over Vite's 500 kB default is the LAZY exercise

@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# req-230 — the server build (npm run build:server), served by server/ — never committed
+dist-server
 *.local
 
 # Editor directories and files

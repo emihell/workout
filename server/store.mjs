@@ -119,7 +119,7 @@ export function putState(db, userId, body, at = new Date()) {
     let conflicts = []
     const merged = baseRev < current.rev
     if (merged) {
-      const base = baseRev === 0 ? revZeroState() : JSON.parse(revisionRow(db, userId, baseRev).state)
+      const base = baseState(db, userId, baseRev)
       const result = mergeStates(base, incoming, current.state)
       // Re-validated: the merge only recombines valid records, but the stored document always
       // passes the app's own checks.
@@ -133,8 +133,43 @@ export function putState(db, userId, body, at = new Date()) {
     db.prepare(
       'INSERT INTO revisions (user_id, rev, state, base_rev, merged, conflicts, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
     ).run(userId, rev, JSON.stringify(state), baseRev, merged ? 1 : 0, JSON.stringify(conflicts), at.toISOString())
+    pruneRevisions(db, userId, at)
     return { rev, state, merged, conflicts }
   })
+}
+
+// req-230 — revision growth. Every accepted revision stores the whole document (~200 kB for a
+// real history) and the app syncs after each logged set, so old revisions are pruned in the same
+// write that adds a new one. KEPT: every revision from the last PRUNE_DAYS days (any device that
+// synced in that time can still hold one as its base), the newest revision of each older day
+// (UTC), every revision with conflicts (the losing versions, DEC-128 §2), and the current one.
+export const PRUNE_DAYS = 14
+const DAY_MS = 24 * 60 * 60 * 1000
+
+export function pruneRevisions(db, userId, at = new Date()) {
+  const cutoff = new Date(at.getTime() - PRUNE_DAYS * DAY_MS).toISOString()
+  return Number(
+    db
+      .prepare(
+        `DELETE FROM revisions
+         WHERE user_id = ? AND created_at < ? AND conflicts = '[]'
+           AND rev < (SELECT MAX(rev) FROM revisions WHERE user_id = ?)
+           AND rev NOT IN (SELECT MAX(rev) FROM revisions WHERE user_id = ? GROUP BY substr(created_at, 1, 10))`,
+      )
+      .run(userId, cutoff, userId, userId).changes,
+  )
+}
+
+// The merge base for `baseRev`: that revision, or — when it was pruned (a device that hasn't
+// synced for over PRUNE_DAYS) — the newest kept revision before it, else the rev-0 document. An
+// older base can only make more records read as "changed on both"; those resolve as conflicts
+// (incoming wins, the server's version kept on the revision), never as silent loss.
+function baseState(db, userId, baseRev) {
+  if (baseRev === 0) return revZeroState()
+  const row = db
+    .prepare('SELECT state FROM revisions WHERE user_id = ? AND rev <= ? ORDER BY rev DESC LIMIT 1')
+    .get(userId, baseRev)
+  return row ? JSON.parse(row.state) : revZeroState()
 }
 
 export function exportFile(db, userId) {

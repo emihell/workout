@@ -11,7 +11,8 @@ const scrypt = promisify(scryptCb)
 const SCRYPT = { N: 16384, r: 8, p: 1, keylen: 64 }
 export const SESSION_DAYS = 90
 export const INVITE_DAYS = 7
-export const PASSWORD_MIN = 8
+// DEC-132 §4 (req-230): at least 6 characters — supersedes req-229's 8 (DEC-131).
+export const PASSWORD_MIN = 6
 const DAY_MS = 24 * 60 * 60 * 1000
 const USERNAME = /^[a-z0-9][a-z0-9._-]{0,31}$/
 

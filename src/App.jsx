@@ -256,14 +256,16 @@ function Screen() {
   return <Today />
 }
 
-export default function App() {
+// req-230 — `sync`: the server build's engine (src/sync/boot.jsx); the Pages build renders
+// <App /> with none, exactly as before.
+export default function App({ sync = null }) {
   // req-115 — the outer ErrorBoundary is the last resort: a render throw in
   // StoreProvider, a banner or the menu (outside <main>) shows the fallback instead
   // of unmounting the whole tree to a blank page. The inner one still handles a
   // screen throw with the nav left visible.
   return (
     <ErrorBoundary>
-      <StoreProvider>
+      <StoreProvider sync={sync}>
         <WakeLock />
         <RestEndCue />
         <SaveFailedBanner />

@@ -31,7 +31,9 @@ export function serverConfig(env = process.env) {
   const rawPort = env.WORKOUT_PORT
   const port = rawPort === undefined || rawPort === '' ? DEFAULT_PORT : Number(rawPort)
   if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error(`WORKOUT_PORT is not a port: ${rawPort}`)
-  return { host: HOST, port, dataDir: resolve(env.WORKOUT_DATA_DIR || LIVE_DATA_DIR) }
+  // req-230 — the built app the server serves on the same origin (`npm run build:server`).
+  const appDir = resolve(env.WORKOUT_APP_DIR || join(REPO_ROOT, 'dist-server'))
+  return { host: HOST, port, dataDir: resolve(env.WORKOUT_DATA_DIR || LIVE_DATA_DIR), appDir }
 }
 
 // The real path of `p`, resolving symlinks through its nearest existing ancestor, so a

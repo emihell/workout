@@ -1,0 +1,140 @@
+// req-230 — the server changes that came with the app's sync: the password rule (DEC-132 §4),
+// the built app served on the same origin, the same-origin guard behind `tailscale serve`, and
+// revision pruning. Temp dirs and port 0 only (BACKEND rules 2 and 8).
+import { client, startTestServer, tempDir } from './test-helpers.mjs'
+import test, { after, before } from 'node:test'
+import assert from 'node:assert/strict'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { fullState } from '../src/test-support/full-state.js'
+import { PASSWORD_MIN, bootstrapUser, createInvite, findUser } from './auth.mjs'
+import { serverConfig, REPO_ROOT } from './config.mjs'
+import { PRUNE_DAYS, getState, listRevisions, putState } from './store.mjs'
+
+const PASSWORD = 'sixsix'
+let srv
+let appDir
+before(async () => {
+  appDir = tempDir('workout-app-test-')
+  mkdirSync(join(appDir, 'assets'))
+  writeFileSync(join(appDir, 'index.html'), '<!doctype html><title>app</title>')
+  writeFileSync(join(appDir, 'sw.js'), 'self.x = 1')
+  writeFileSync(join(appDir, 'assets', 'index-abc.js'), 'console.log(1)')
+  srv = await startTestServer({ appDir })
+  await bootstrapUser(srv.db, { username: 'emilio', password: PASSWORD })
+})
+after(async () => {
+  await srv.close()
+  rmSync(appDir, { recursive: true, force: true })
+})
+
+test('DEC-132 §4 — a password of 6 characters is accepted, 5 is refused', async () => {
+  assert.equal(PASSWORD_MIN, 6)
+  const ok = await client(srv.base).post('/api/register', { code: createInvite(srv.db, srv.secret), username: 'six', password: '123456' })
+  assert.equal(ok.status, 201, JSON.stringify(ok.body))
+  const short = await client(srv.base).post('/api/register', { code: createInvite(srv.db, srv.secret), username: 'five', password: '12345' })
+  assert.equal(short.status, 400)
+  assert.equal(short.body.error, 'Password: at least 6 characters.')
+  assert.equal(findUser(srv.db, 'five'), undefined)
+})
+
+test('the server serves the built app on its own origin: /, sw.js and hashed assets, with the right caching', async () => {
+  const root = await fetch(`${srv.base}/`)
+  assert.equal(root.status, 200)
+  assert.match(root.headers.get('content-type'), /^text\/html/)
+  assert.equal(root.headers.get('cache-control'), 'no-cache')
+  assert.equal(await root.text(), '<!doctype html><title>app</title>')
+  const sw = await fetch(`${srv.base}/sw.js`)
+  assert.equal(sw.headers.get('cache-control'), 'no-cache', 'a new version is always seen')
+  assert.match(sw.headers.get('content-type'), /^text\/javascript/)
+  const asset = await fetch(`${srv.base}/assets/index-abc.js`)
+  assert.equal(asset.headers.get('cache-control'), 'public, max-age=31536000, immutable')
+  const head = await fetch(`${srv.base}/`, { method: 'HEAD' })
+  assert.equal(head.status, 200)
+  assert.equal(await head.text(), '')
+})
+
+test('…never a file outside the app folder, and the API is unchanged', async () => {
+  for (const path of ['/../package.json', '/%2e%2e/package.json', '/assets/%2e%2e/%2e%2e/server/app.mjs', '/nope.js', '/%00', '/%E0%A4%A']) {
+    const res = await fetch(`${srv.base}${path}`)
+    assert.equal(res.status, 404, path)
+  }
+  assert.equal((await fetch(`${srv.base}/api/state`)).status, 401, 'data still needs a session')
+  assert.equal((await fetch(`${srv.base}/api/nope`)).status, 404)
+})
+
+test('no app folder (not built) → 404 for the app, the API still works', async () => {
+  const bare = await startTestServer()
+  try {
+    assert.equal((await fetch(`${bare.base}/`)).status, 404)
+    assert.equal((await fetch(`${bare.base}/api/health`)).status, 200)
+  } finally {
+    await bare.close()
+  }
+})
+
+test('config — WORKOUT_APP_DIR, default <repo>/dist-server', () => {
+  assert.equal(serverConfig({ WORKOUT_DATA_DIR: '/tmp/x' }).appDir, join(REPO_ROOT, 'dist-server'))
+  assert.equal(serverConfig({ WORKOUT_DATA_DIR: '/tmp/x', WORKOUT_APP_DIR: '/tmp/app' }).appDir, '/tmp/app')
+})
+
+test('same-origin guard behind `tailscale serve`: Host is the backend, X-Forwarded-Host + Origin are the tailnet name', async () => {
+  const c = client(srv.base)
+  assert.equal((await c.post('/api/login', { username: 'emilio', password: PASSWORD })).status, 200)
+  const proxied = {
+    host: '127.0.0.1:8100',
+    'x-forwarded-host': 'mac.tailnet.ts.net:8446',
+    origin: 'https://mac.tailnet.ts.net:8446',
+    'sec-fetch-site': 'same-origin',
+  }
+  const ok = await c.put('/api/state', { baseRev: 0, state: fullState() }, proxied)
+  assert.equal(ok.status, 200, JSON.stringify(ok.body))
+  const elsewhere = await c.put('/api/state', { baseRev: 1, state: fullState() }, { ...proxied, origin: 'https://evil.example' })
+  assert.equal(elsewhere.status, 403)
+})
+
+const DAY = 24 * 60 * 60 * 1000
+const named = (name) => {
+  const state = fullState()
+  state.routines[0].name = name
+  return state
+}
+
+test(`revision growth — revisions older than ${PRUNE_DAYS} days are pruned to one per day; conflicts and recent ones kept`, async () => {
+  const res = await client(srv.base).post('/api/register', { code: createInvite(srv.db, srv.secret), username: 'pruned', password: PASSWORD })
+  assert.equal(res.status, 201)
+  const id = findUser(srv.db, 'pruned').id
+  const now = new Date('2026-10-22T12:00:00.000Z')
+  const at = (daysAgo, hour) => new Date(now.getTime() - daysAgo * DAY + hour * 60 * 60 * 1000)
+  let rev = 0
+  const push = (name, when, baseRev = rev) => {
+    const out = putState(srv.db, id, { baseRev, state: named(name) }, when)
+    rev = out.rev
+    return out
+  }
+  push('a1', at(40, 0)) // 1
+  push('a2', at(40, 1)) // 2
+  push('a3', at(40, 2)) // 3  ← newest of that day
+  push('b1', at(20, 0)) // 4
+  const conflicted = push('b2-conflict', at(20, 1), 3) // 5: from base 3, both edited → conflict
+  assert.equal(conflicted.conflicts.length, 1)
+  push('b3', at(20, 2)) // 6  ← newest of that day
+  push('c1', at(3, 0)) // 7  recent
+  push('c2', at(3, 1)) // 8  recent
+  push('d1', now) // 9  current; prunes
+  assert.deepEqual(
+    listRevisions(srv.db, id).map((r) => r.rev),
+    [3, 5, 6, 7, 8, 9],
+  )
+  assert.equal(getState(srv.db, id).state.routines[0].name, 'd1', 'the current document is untouched')
+})
+
+test('a device whose base revision was pruned still syncs: merged against the newest kept one before it', async () => {
+  const id = findUser(srv.db, 'pruned').id
+  // Rev 4 was pruned; a device still based on it renames the routine → stored, nothing lost.
+  const out = putState(srv.db, id, { baseRev: 4, state: named('from an old device') }, new Date('2026-10-22T13:00:00.000Z'))
+  assert.equal(out.rev, 10)
+  assert.equal(out.state.routines[0].name, 'from an old device')
+  assert.equal(out.conflicts.length, 1, 'the server’s version is kept as the losing one')
+  assert.equal(out.conflicts[0].lost.name, 'd1')
+})

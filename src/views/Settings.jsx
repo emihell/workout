@@ -14,6 +14,7 @@ import { dateKey } from '../schedule'
 import { useStore } from '../store-context'
 import { Actions, Banner, Button, Checkbox, FileButton, List, Row, Screen, SectionHeader, Title } from '../ui/index.jsx'
 import { Back } from './shared'
+import { SyncSection } from '../sync/settings.jsx'
 
 function backupLines(summary) {
   return `${summary.routines} workouts, ${summary.exercises} exercises, ${summary.workouts} sessions, ${summary.scheduledDays} scheduled days.`
@@ -127,6 +128,8 @@ export function Settings({ dev = null }) {
       </p>
       {message ? <Banner>{message}</Banner> : null}
       {error ? <Banner role="alert">{error}</Banner> : null}
+      {/* req-230 — the server build's status line + Log out; nothing in the Pages build. */}
+      <SyncSection />
       {devTools ? (
         <DeveloperTools
           feedbackEnabled={feedbackEnabled}
