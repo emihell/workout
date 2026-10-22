@@ -30,6 +30,10 @@ Emilio** (BACKEND rule 2).
 - **A device that synced with a test server must not push test data over the real history.** Go-live: the phone's
   `workout-sync-v1` is cleared (or the server's history epoch, req-230 round 2, makes a stale device merge instead of
   fast-forward) — state which, and show the phone's first sync after the Import adds no test records.
+- **DEC-133 for every device after a restore (req-230 round 5, option a):** the `restore` script also restores *into* the
+  data dir (not only `--to <temp dir>`), and writes a marker `restores(user_id, rev, at)`. The no-base merge lets the
+  device's workout win only if no revision since the newest marker changed `activeWorkout`. Test the reviewer's probe C:
+  phone pushes after the restore, logs a 4th set, a clean stale laptop pushes → the phone keeps 4 sets.
 - **Restore drill + sync:** after restoring a backup, a device's next sync merges (conflicts recorded) and never silently
   overwrites the restored copy. Receipt from a throwaway instance.
 

@@ -2142,3 +2142,7 @@ on a pruned base, a stale laptop's old workout would replace the live one. It al
 `activeWorkout` is still the restored copy's, so a second stale device can't erase the first device's sets. A restored
 `activeWorkout` already in the merged history becomes `null`, so a finished workout never returns as in progress
 (supersedes round 4's "comes back as in progress" cost).
+Round 5 outcome (Planner): the "server's `activeWorkout` is still the restored copy's" guard needs storage the server
+doesn't have, since a restore is a hand file copy. It moves to req-231, whose `restore` script writes a `restores` marker
+(option a). Until then only the first push after a restore gets DEC-133; later pushes' losers stay in conflicts. Nothing
+is live before req-231. The finished-workout guard applies to every no-base merge (it only nulls a workout already in history).
