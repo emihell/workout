@@ -59,7 +59,9 @@ test('backup: an online, integrity-checked copy that holds rows still in the -wa
     assert.notEqual(again.file, file)
     await assert.rejects(backupDb(s.dataDir, 'Bad Reason'), /lower-case/)
     await assert.rejects(backupDb(s.dataDir, 'nightly'), /reserved/)
-    assert.deepEqual(readdirSync(join(s.dataDir, 'backups')).filter((f) => f.endsWith('.partial')), [])
+    // One self-contained file each: no .partial, and no -wal/-shm left beside it (seen in the live-shaped run).
+    assert.deepEqual(readdirSync(join(s.dataDir, 'backups')).filter((f) => !f.endsWith('.db')), [])
+    assert.equal(counts(file).tables.revisions, 2)
   } finally {
     s.cleanup()
   }

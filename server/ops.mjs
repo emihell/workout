@@ -57,9 +57,18 @@ async function copyDb(source, dest) {
     db.close()
   }
   try {
+    // The copy keeps the source's WAL mode; reading it would leave `.partial-wal/-shm` beside it
+    // [measured]. As one self-contained file it is safe to move and copy (the server sets WAL again
+    // when it opens a restored DB).
+    const copy = new DatabaseSync(partial)
+    try {
+      copy.exec('PRAGMA journal_mode = DELETE')
+    } finally {
+      copy.close()
+    }
     assertIntegrity(partial)
   } catch (error) {
-    rmSync(partial, { force: true })
+    for (const f of [partial, `${partial}-wal`, `${partial}-shm`]) rmSync(f, { force: true })
     throw error
   }
   renameSync(partial, dest)
