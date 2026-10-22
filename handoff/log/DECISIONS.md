@@ -2124,3 +2124,10 @@ bootstrap refused once any user exists; data dir refused under any ancestor hold
 3. **Logout:** "let user logout, but sync data anyways when possible" → always allowed; data stays; unsynced changes go up on
    the next login (no session while logged out). Clearing on logout returns with other users.
 4. **Password:** "6 is enough? its just a workout app" → ≥ 6 characters (tailnet-only server). Supersedes DEC-131's ≥ 8.
+
+## DEC-133 — after a server restore, the workout in progress survives  (Emilio, 2026-10-22, on req-230 review round 2)
+
+Rare case: the server is restored from a backup while a device holds changes the backup doesn't have (no shared base).
+Emilio chose **A**: the device's `activeWorkout` wins; every other record takes the restored copy (a routine's kg edited
+after the backup included). The device's losing versions stay in the revision's conflicts, not in the app. Rejected: B
+(phone wins everywhere: a broken phone copy would undo the restore), C (backup wins everywhere: live sets vanish).
