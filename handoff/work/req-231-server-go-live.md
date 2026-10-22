@@ -25,6 +25,14 @@ Emilio** (BACKEND rule 2).
 - **Same-origin check behind `tailscale serve`:** verify what Host / X-Forwarded-Host arrive; if Host is rewritten to
   `127.0.0.1:8100`, every write would 403. Receipt: a real login + PUT through `:8446`.
 
+## From req-230's review (verify here)
+
+- **A device that synced with a test server must not push test data over the real history.** Go-live: the phone's
+  `workout-sync-v1` is cleared (or the server's history epoch, req-230 round 2, makes a stale device merge instead of
+  fast-forward) — state which, and show the phone's first sync after the Import adds no test records.
+- **Restore drill + sync:** after restoring a backup, a device's next sync merges (conflicts recorded) and never silently
+  overwrites the restored copy. Receipt from a throwaway instance.
+
 ## Out of scope
 
 Other users, invites, public hosting (ask-gate 3). Closing the Pages site (DEC-129: after the server has carried real
