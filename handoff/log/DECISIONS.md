@@ -2131,3 +2131,9 @@ Rare case: the server is restored from a backup while a device holds changes the
 Emilio chose **A**: the device's `activeWorkout` wins; every other record takes the restored copy (a routine's kg edited
 after the backup included). The device's losing versions stay in the revision's conflicts, not in the app. Rejected: B
 (phone wins everywhere: a broken phone copy would undo the restore), C (backup wins everywhere: live sets vanish).
+Implementation (round 4, Builder's, Planner accepted): the rule applies only when the device has a workout in progress
+(`activeWorkout` non-null). Otherwise a stale device's `null` would end a live workout (P7). Cost: a backup's in-progress
+workout that the device has since finished comes back as in progress. Nothing is lost, and it is listed in conflicts.
+**Unconfirmed, Emilio's list.** Restore-vs-prune: pruning records each removed revision (`pruned_revisions`, `CREATE TABLE IF
+NOT EXISTS`, schema version stays 1, no live DB yet). A missing base that isn't recorded reads as `'restored'`. No restore
+marker: restore is a hand file copy (BACKEND rule 7), and a backup can't know revisions made after it.
