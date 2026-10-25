@@ -1,4 +1,4 @@
-**Status: READY** **Lane: data** (Emilio confirmed the mapping 2026-10-25; Planner reads the diff before the import)
+**Status: BUILT AND MERGED, 2026-10-25 — branch `req-233` (`9bbb64e`…`9bbb64e`, 1 commit).** **Lane: data** (Emilio confirmed the mapping 2026-10-25; Planner reads the diff before the import)
 
 # req-233 — link Emilio's exercises to the library, on a copy of his Export, before the server import
 
@@ -46,7 +46,15 @@ export". Input: `/Users/emilio/dev/workout-database-2026-10-22.json` (exported 2
      | `Rask promenad / jogg` | `own-outdoor-walk` |
 
    - Unchanged: `Kettlebell Lunge Press`, `Löpning`, and the 9 already linked.
-   - Write the mapping as a table in the script, keyed by name, with the library id. The 29 resolved-as-today rows are
+   - **Amended 2026-10-25 (Builder's block, Planner's call):** `libraryEntryFor` doesn't skip hidden entries. 4 of the 31
+     resolve to hidden ones:
+     - `Kettlebell Arnold Press`, `Kettlebell Pirate Ships` and `Kettlebell Pass Between The Legs` are linked anyway. The
+       allowlist covers these 3 names only, and the result is what the resolver gives today.
+     - `Kettlebell Dead Clean` → its merge target `One-Arm_Kettlebell_Clean` (unilateral, so it gains the "one side" line).
+       Emilio: "do it" (2026-10-25).
+     
+     Result: **39** added. Every other id must still be live.
+   - Write the mapping as a table in the script, keyed by name, with the library id. The 28 resolved-as-today rows are
      listed explicitly too, not computed, so a later library change can't move them.
 3. The dry run prints for each exercise: the name, the old → new libraryId, the entry's shown name, `unilateral`, the
    equipment change, and the totals.
@@ -62,7 +70,7 @@ export". Input: `/Users/emilio/dev/workout-database-2026-10-22.json` (exported 2
 
 ## Acceptance criteria
 
-1. Dry run, pasted: 39 libraryIds added (31 name-resolved, 2 of them to a different entry, + 8 unresolved), 3 equipment
+1. Dry run, pasted: 39 libraryIds added (31 name-resolved, 3 of them to a different entry, + 8 unresolved), 3 equipment
    changes, 11 exercises untouched, 0 other changes.
 2. The copy round-trips: `applyBackup(copy)` gives the same 50 / 8 / 23 / 571 as the input, and a field-level diff of input
    vs copy lists only `exercises[].libraryId` and `exercises[].equipment`. Paste the diff summary.
