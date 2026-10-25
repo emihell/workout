@@ -19,10 +19,11 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **READY, held:**
 - **NOW (2026-10-22, DEC-127..134): server stage 1** — ops merged (see SHIPPED) → **go-live with Emilio** (its ACs 4–5):
   `server/deploy`, `start`, doctor; phone: clear `:8446` site data → login → Import **Replace everything** (DEC-134 §4) →
-  compare counts → log a workout. Import the linked copy `~/dev/workout/workout-database-2026-10-22-linked.json` (library links done, see SHIPPED). Nightly backup checked next morning. Rules `rules/BACKEND.md`, runbook `server/README.md`.
+  compare counts → log a workout. **2026-10-25 imported** (Emilio: "can you just add it to the database?"): Planner put the linked copy in as rev 1
+  via the server's own `putState` (app validator), not the app's Import; server = 50 / 8 / 23 / 571 sets, 48 linked; backups
+  before/after. Left: phone login (clear `:8446` site data first) → log a workout; nightly backup next morning. Nightly backup checked next morning. Rules `rules/BACKEND.md`, runbook `server/README.md`.
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
-- **NOW (2026-10-11):** DEC-120..123 work all shipped. Open for Emilio: flip the import choice buttons (Keep filled, Replace plain)? — his call, BACKLOG.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184
   session 2. Batch 192–195 feel list: each req's "Built — calls".
 - **Waiting (Emilio, DEC-075):** req-149 progression rules.
