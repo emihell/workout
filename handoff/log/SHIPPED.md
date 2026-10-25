@@ -2636,3 +2636,10 @@ corrupt-DB restore + 6 nits → 7044c4c; round 2 "No blockers." ACs 4–5 at go-
 lying, Dead Clean → One-Arm_Kettlebell_Clean, 3 hidden kettlebell ids allowlisted), 3 Kettlebell→Kettlebells; input untouched.
 Gate: `./check` green (136 test files); 9 failure tests; Planner's own field diff of input vs copy = `.libraryId: 39, .equipment:
 3`, counts 50/8/23/571 both. No reviewer: no trigger file (a script + its test). `reports/req-233.md`.
+
+## req-234 — `accounts.mjs passwd <user>`: change a password from the terminal  (2026-10-25)
+
+**req-234** (tooling; Builder). Prompts twice (shared `readPassword`, now one readline per piped run), ≥ 6 + scrypt, `setPassword`
+updates the hash and ends all the user's sessions in one transaction; unknown/disabled/mismatch/short → exit 1, hash unchanged.
+Gate: `./check` green; `server/req-234.test.mjs` (subprocess over HTTP); TTY path via `script`. Planner read the diff. No reviewer:
+no trigger file. `reports/req-234.md`.

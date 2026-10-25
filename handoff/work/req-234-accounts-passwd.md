@@ -1,4 +1,4 @@
-**Status: READY** **Lane: tooling** · server stage 1
+**Status: BUILT — NOT merged** **Lane: tooling** · server stage 1
 
 # req-234 — `accounts.mjs passwd <user>`: change a password from the terminal
 
