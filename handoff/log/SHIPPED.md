@@ -2643,3 +2643,10 @@ Gate: `./check` green (136 test files); 9 failure tests; Planner's own field dif
 updates the hash and ends all the user's sessions in one transaction; unknown/disabled/mismatch/short → exit 1, hash unchanged.
 Gate: `./check` green; `server/req-234.test.mjs` (subprocess over HTTP); TTY path via `script`. Planner read the diff. No reviewer:
 no trigger file. `reports/req-234.md`.
+
+## req-235 — one Node floor (22.16), pinned; doctor checks launchd's node  (2026-10-25)
+
+**req-235** (tooling; Builder). `NODE_FLOOR = [22, 16, 0]` read everywhere (`server/start` via `node -e`); `.nvmrc` 22.23,
+`engines >=22.16`; doctor FAILs on a missing / non-executable / below-floor plist node, notes an `~/.nvm` path. Gate: `./check`
+green (137 files); failure case on a throwaway label (+ darwin test). Guards test edit = floor moved, boundaries kept (Planner
+read). No reviewer: no trigger file. Left: `deploy.yml:27` node-version '22' (harmless). `reports/req-235.md`.
