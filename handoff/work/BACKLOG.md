@@ -492,6 +492,12 @@ kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish 
   entry: displayName, aliases, tags, difficulty, text, the common list; restores natural wording in the 19 entries
   req-138 rewrote for originality (list in `reports/req-138.md`); fixes in place. Final safety net: the ≥12-token run
   check only. A coach-eye QA subagent reviews the diff.
+- **Exercise images from Mannequin Studio (2026-10-25, offered by its session at Emilio's request):** `~/Dev/mannequin-studio`,
+  contract `EXPORT.md`. Per exercise: `still.png/webp` 512px, `loop.webp` 384px animated (95–800 KB); `exports/manifest.json`
+  carries library ids, checksums and review verdicts. 9 ready. Planner checked the ids: all 9 are live in `src/library/exercises.json`,
+  and 6 are in Emilio's routines (lat pulldown, leg press, rowing, pull-up, KB swing, jumping jacks). Squat, bench and
+  `Dumbbell_Bicep_Curl` aren't his: his curl is `Machine_Bicep_Curl` since req-233. Requests go in its `requests/<slug>.md`. How images
+  enter the app (bundle size, offline cache, DEC-064 photo rules) is unspecced: Phase 1 gate (milestone), after go-live.
 - **Avatars + the app's pixel-art style (Emilio-led, 2026-09-24)** — Emilio wants avatars in the app and calls them
   "crucial to the style of the app"; he'll supply reference pictures and wants to be closely involved (live lane,
   DEC-055: Emilio + session, not a batch). Planning's notes for the spec: **the avatar is the figure that does the
