@@ -3,22 +3,26 @@
 //   node server/accounts.mjs bootstrap --username <u>   the first account; prompts for a password
 //   node server/accounts.mjs invite                     prints a one-use invite code (7 days)
 //   node server/accounts.mjs disable <u>                disables the account and ends its sessions
+//   node server/accounts.mjs passwd <u>                 req-234: prompts twice for a new password; ends its sessions
 // Works on WORKOUT_DATA_DIR (default: the live data dir). On the live DB this is a non-request
 // write: BACKEND rule 5 (backup first) and rule 4 (inviting a user asks Emilio) apply.
-// The password is read from the terminal without echo, or from stdin when piped.
+// The password is read from the terminal without echo, or from stdin when piped (one line per prompt).
 import { createInterface } from 'node:readline'
 import { NODE_FLOOR, nodeVersionOk, serverConfig } from './config.mjs'
 
-const USAGE = 'usage: accounts.mjs bootstrap --username <u> | invite | disable <u>'
+const USAGE = 'usage: accounts.mjs bootstrap --username <u> | invite | disable <u> | passwd <u>'
+
+// Piped stdin: one readline for the whole run, so a second prompt gets the second line.
+let piped = null
 
 async function readPassword(prompt) {
   if (!process.stdin.isTTY) {
-    const rl = createInterface({ input: process.stdin })
-    for await (const line of rl) {
-      rl.close()
-      return line
+    if (!piped) {
+      const rl = createInterface({ input: process.stdin })
+      piped = { rl, lines: rl[Symbol.asyncIterator]() }
     }
-    return ''
+    const { value, done } = await piped.lines.next()
+    return done ? '' : value
   }
   process.stdout.write(prompt)
   process.stdin.setRawMode(true)
@@ -52,7 +56,7 @@ async function main(argv) {
   const { openDataDir } = await import('./db.mjs')
   const auth = await import('./auth.mjs')
   const [command, ...rest] = argv
-  if (!['bootstrap', 'invite', 'disable'].includes(command)) throw new Error(USAGE)
+  if (!['bootstrap', 'invite', 'disable', 'passwd'].includes(command)) throw new Error(USAGE)
   const { dataDir } = serverConfig()
   const { db, secret } = openDataDir(dataDir)
   try {
@@ -67,12 +71,22 @@ async function main(argv) {
       console.log(`Created ${user.username}.`)
     } else if (command === 'invite') {
       console.log(auth.createInvite(db, secret))
+    } else if (command === 'passwd') {
+      if (!rest[0]) throw new Error(USAGE)
+      const user = auth.findUser(db, auth.normaliseUsername(rest[0]))
+      if (!user) throw new Error(`No such user: ${rest[0]}`)
+      if (user.disabled) throw new Error(`${user.username} is disabled.`)
+      const password = await readPassword('New password: ')
+      if ((await readPassword('Again: ')) !== password) throw new Error('The passwords do not match. Nothing changed.')
+      const ended = await auth.setPassword(db, user.username, password)
+      console.log(`Password changed for ${user.username}; ${ended} session(s) ended.`)
     } else {
       if (!rest[0]) throw new Error(USAGE)
       const user = auth.disableUser(db, rest[0])
       console.log(`Disabled ${user.username}; sessions ended.`)
     }
   } finally {
+    piped?.rl.close()
     db.close()
   }
 }
