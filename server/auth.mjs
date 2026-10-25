@@ -130,6 +130,18 @@ export function disableUser(db, username) {
   return { id: user.id, username: user.username }
 }
 
+// req-234 — set a new password for an enabled account and end all its sessions. → sessions ended.
+export async function setPassword(db, username, password) {
+  const user = findUser(db, normaliseUsername(username))
+  if (!user) throw new Error(`No such user: ${username}`)
+  if (user.disabled) throw new Error(`${user.username} is disabled.`)
+  const hash = await hashPassword(checkPassword(password))
+  return inTransaction(db, () => {
+    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hash, user.id)
+    return Number(db.prepare('DELETE FROM sessions WHERE user_id = ?').run(user.id).changes)
+  })
+}
+
 // → the user on a correct password for an enabled account, else null (same for every failure).
 export async function checkLogin(db, { username, password }) {
   let name
