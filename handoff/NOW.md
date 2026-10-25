@@ -17,11 +17,11 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **Flow audit 2026-09-23 fully LIVE:** Tier 1 req-114..120, Tier 2 req-121..123, Tier 3 req-124..129.
 
 **READY, held:**
-- **NOW (2026-10-22, DEC-127..134): server stage 1** — ops merged (see SHIPPED) → **go-live with Emilio** (its ACs 4–5):
-  `server/deploy`, `start`, doctor; phone: clear `:8446` site data → login → Import **Replace everything** (DEC-134 §4) →
-  compare counts → log a workout. **2026-10-25 imported** (Emilio: "can you just add it to the database?"): Planner put the linked copy in as rev 1
-  via the server's own `putState` (app validator), not the app's Import; server = 50 / 8 / 23 / 571 sets, 48 linked; backups
-  before/after. Left: phone login (clear `:8446` site data first) → log a workout; nightly backup next morning. Nightly backup checked next morning. Rules `rules/BACKEND.md`, runbook `server/README.md`.
+- **NOW (2026-10-25): server LIVE** at `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (req-231/233–235 shipped;
+  Emilio's data in as rev 1 via `putState`, 50/8/23/571, 48 linked; `passwd` set by Emilio; Planner may run `./server/deploy`,
+  `start`, `stop` — allow rules added 2026-10-25). **Left:** (1) Emilio: phone — clear `:8446` site data → login → log a
+  workout; then req-231 AC4/5 done. (2) Planner: check the 01:00 nightly backup (`server/doctor`). (3) **Emilio's call:** off-Mac
+  backup copy — iCloud / external / Time Machine (rule 4). (4) Log only via `:8446` (Pages later, DEC-129). Images: backlog.
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184
