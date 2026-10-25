@@ -663,6 +663,9 @@ once and was flattened away; reintroducing it is a redesign, not a fresh start.
   server conflict (loser survives only as an unmarked revision, pruned after 14 days — short of DEC-128 §2); the expired-session
   re-login unmounts the open screen (persisted state survives, UI state/timers reset); logging in as a different user on a device
   with unsynced changes replaces them (stage 2 rule needed before other users).
+- **Library resolver (req-233 findings):** `libraryEntryFor` (`src/exerciseLibrary.js:588-595`) returns hidden and merged
+  entries by name/alias and doesn't follow `mergedInto`; an unlinked "Biceps Curl" resolves to the dumbbell curl. Fixed only in
+  Emilio's data (req-233), not in the resolver.
 - **Ops follow-ups (req-231 review, nits):** the DEC-133 scan `JSON.parse`s every revision since the marker inside the write
   (slow only after a restore with weeks of unpruned syncs; use `json_extract`); doctor counts a `pre-restore-corrupt` raw copy
   as the last backup; `start` doesn't XML-escape paths in the plist and can leave the nightly agent unloaded if the second

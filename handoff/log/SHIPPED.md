@@ -2629,3 +2629,10 @@ KeepAlive + nightly agent (keep 7), `tailscale serve :8446 → 127.0.0.1:8100`, 
 Gate: `./check` green (2070 pass, 7044c4c); AC1 doctor 11/11 ok, AC2 kill -9 → back in 4 s, AC3 drill counts equal +
 `pruned_revisions` 40/40, login + PUT 200 through :8446. Reviewer (independent, 2 rounds): round 1 "No blockers." A→B→A +
 corrupt-DB restore + 6 nits → 7044c4c; round 2 "No blockers." ACs 4–5 at go-live with Emilio. `reports/req-231.md`.
+
+## req-233 — Emilio's exercises linked to the library, on a copy of his Export  (2026-10-25)
+
+**req-233** (data lane; Builder). `scripts/link-library-ids.mjs` writes a copy: 39 `libraryId`s (Biceps Curl → machine, Leg Curl →
+lying, Dead Clean → One-Arm_Kettlebell_Clean, 3 hidden kettlebell ids allowlisted), 3 Kettlebell→Kettlebells; input untouched.
+Gate: `./check` green (136 test files); 9 failure tests; Planner's own field diff of input vs copy = `.libraryId: 39, .equipment:
+3`, counts 50/8/23/571 both. No reviewer: no trigger file (a script + its test). `reports/req-233.md`.

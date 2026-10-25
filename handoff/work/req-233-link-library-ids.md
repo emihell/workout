@@ -1,4 +1,4 @@
-**Status: READY** **Lane: data** (Emilio confirmed the mapping 2026-10-25; Planner reads the diff before the import)
+**Status: BUILT — NOT merged** **Lane: data** (Emilio confirmed the mapping 2026-10-25; Planner reads the diff before the import)
 
 # req-233 — link Emilio's exercises to the library, on a copy of his Export, before the server import
 
