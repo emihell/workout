@@ -4,10 +4,12 @@
 //
 // Backups use SQLite's online backup API (node:sqlite `backup`), never a file copy: a `cp` misses
 // rows still in the `-wal` file (BACKEND rule 6). Every backup is integrity-checked before it is kept.
-import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
-import { basename, join } from 'node:path'
+import { execFileSync } from 'node:child_process'
+import { accessSync, constants, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { basename, join, sep } from 'node:path'
 import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite'
-import { DB_FILE, assertNotLiveUnderTest, assertOutsideRepo } from './config.mjs'
+import { DB_FILE, NODE_FLOOR_TEXT, assertNotLiveUnderTest, assertOutsideRepo, nodeVersionOk } from './config.mjs'
 import { openDb } from './db.mjs'
 import { markRestore } from './store.mjs'
 
@@ -247,4 +249,39 @@ export function listenAddresses(lsofText) {
     .slice(1)
     .map((line) => /\s(\S+:\d+) \(LISTEN\)/.exec(line)?.[1])
     .filter(Boolean)
+}
+
+// req-235 — the node a launchd plist runs (ProgramArguments[0], as ./server/start writes it).
+export function plistNode(plistText) {
+  const m = /<key>ProgramArguments<\/key>\s*<array>\s*<string>([^<]*)<\/string>/.exec(String(plistText ?? ''))
+  if (!m) return null
+  return m[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&')
+}
+
+// req-235 — does the plist's node exist, run, and meet NODE_FLOOR? launchd has no PATH of ours and
+// KeepAlive can't bring back a binary that's gone (an nvm uninstall), so the doctor FAILs on it.
+// → {ok, text, note}: `note` is set for a path under ~/.nvm.
+export function launchdNode(plistFile, home = homedir()) {
+  const note = (node) =>
+    node && (node + sep).startsWith(join(home, '.nvm') + sep)
+      ? `      note: ${node} is an nvm node — if that version is uninstalled, re-run server/start`
+      : null
+  if (!existsSync(plistFile)) return { ok: false, text: `launchd node: no plist at ${plistFile}`, note: null }
+  const node = plistNode(readFileSync(plistFile, 'utf8'))
+  if (!node) return { ok: false, text: `launchd node: no ProgramArguments node in ${plistFile}`, note: null }
+  const fail = (why) => ({ ok: false, text: `launchd node: ${node} — ${why}`, note: note(node) })
+  if (!existsSync(node)) return fail('MISSING')
+  try {
+    accessSync(node, constants.X_OK)
+  } catch {
+    return fail('not executable')
+  }
+  let version
+  try {
+    version = execFileSync(node, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).trim()
+  } catch (error) {
+    return fail(`\`--version\` failed (${error.message.split('\n')[0]})`)
+  }
+  if (!nodeVersionOk(version)) return fail(`${version}, below the floor ${NODE_FLOOR_TEXT}`)
+  return { ok: true, text: `launchd node: ${node} ${version} (floor ${NODE_FLOOR_TEXT})`, note: note(node) }
 }

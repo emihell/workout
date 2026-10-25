@@ -4,10 +4,10 @@ import { tempDir } from './test-helpers.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawn, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, rmSync, statSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { LIVE_DATA_DIR, REPO_ROOT, assertOutsideRepo, nodeVersionOk, serverConfig } from './config.mjs'
+import { LIVE_DATA_DIR, NODE_FLOOR, NODE_FLOOR_TEXT, REPO_ROOT, assertOutsideRepo, nodeVersionOk, serverConfig } from './config.mjs'
 import { openDb, openDataDir, prepareDataDir } from './db.mjs'
 import { checkLogin, disableUser, findUser, userCount } from './auth.mjs'
 
@@ -57,13 +57,24 @@ test('config — port from env, default 8100; host is always 127.0.0.1', () => {
   assert.throws(() => serverConfig({ WORKOUT_PORT: 'abc' }), /not a port/)
 })
 
-test('Node floor — node:sqlite needs ≥ 22.13.0', () => {
-  assert.equal(nodeVersionOk('22.12.9'), false)
-  assert.equal(nodeVersionOk('22.13.0'), true)
+test('Node floor — one constant (req-235), boundary at NODE_FLOOR', () => {
+  const [major, minor] = NODE_FLOOR
+  assert.equal(NODE_FLOOR_TEXT, NODE_FLOOR.join('.'))
+  assert.equal(nodeVersionOk(`${major}.${minor - 1}.99`), false)
+  assert.equal(nodeVersionOk(`${major}.${minor}.0`), true)
+  assert.equal(nodeVersionOk(`v${major}.${minor}.0\n`), true, '`node --version` output')
+  assert.equal(nodeVersionOk(`v${major}.${minor - 1}.0`), false)
   assert.equal(nodeVersionOk('22.23.3'), true)
-  assert.equal(nodeVersionOk('21.99.0'), false)
+  assert.equal(nodeVersionOk(`${major - 1}.99.0`), false)
   assert.equal(nodeVersionOk('26.8.2'), true)
   assert.equal(nodeVersionOk(), true, `this Node (${process.versions.node}) meets the floor`)
+})
+
+// .nvmrc and package.json engines agree with the floor (req-235).
+test('Node pin — .nvmrc meets the floor; engines states it', () => {
+  const [major, minor] = NODE_FLOOR
+  assert.equal(nodeVersionOk(`${readFileSync(join(REPO_ROOT, '.nvmrc'), 'utf8').trim()}.0`), true)
+  assert.equal(JSON.parse(readFileSync(join(REPO_ROOT, 'package.json'), 'utf8')).engines.node, `>=${major}.${minor}`)
 })
 
 test('start.mjs — a throwaway instance binds 127.0.0.1, answers health, makes a mode-600 secret', async () => {

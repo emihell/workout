@@ -8,7 +8,7 @@
 // write: BACKEND rule 5 (backup first) and rule 4 (inviting a user asks Emilio) apply.
 // The password is read from the terminal without echo, or from stdin when piped (one line per prompt).
 import { createInterface } from 'node:readline'
-import { NODE_FLOOR, nodeVersionOk, serverConfig } from './config.mjs'
+import { NODE_FLOOR_TEXT, nodeVersionOk, serverConfig } from './config.mjs'
 
 const USAGE = 'usage: accounts.mjs bootstrap --username <u> | invite | disable <u> | passwd <u>'
 
@@ -52,7 +52,7 @@ async function readPassword(prompt) {
 }
 
 async function main(argv) {
-  if (!nodeVersionOk()) throw new Error(`Needs Node ≥ ${NODE_FLOOR.join('.')} (node:sqlite).`)
+  if (!nodeVersionOk()) throw new Error(`Needs Node ≥ ${NODE_FLOOR_TEXT}.`)
   const { openDataDir } = await import('./db.mjs')
   const auth = await import('./auth.mjs')
   const [command, ...rest] = argv

@@ -6,21 +6,21 @@
 //   counts [<db file>]                   record counts (default: the data dir's DB)
 //   doctor                               bind, funnel, tailscale mapping, data path, launchd, last backup
 // Environment, as the scripts set it: WORKOUT_DATA_DIR, WORKOUT_PORT, WORKOUT_HTTPS_PORT (8446),
-// WORKOUT_LABEL (com.workout.server), WORKOUT_LIVE_DIR (~/dev/workout/workout-live).
+// WORKOUT_LABEL (com.workout.server), WORKOUT_LIVE_DIR (~/dev/workout/workout-live),
+// WORKOUT_AGENTS_DIR (~/Library/LaunchAgents — where the doctor reads <label>.plist; a test seam).
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { DB_FILE, SECRET_FILE, isInside, realish, serverConfig } from './config.mjs'
+import { DB_FILE, NODE_FLOOR_TEXT, SECRET_FILE, isInside, nodeVersionOk, realish, serverConfig } from './config.mjs'
 
 export const HTTPS_PORT = 8446
 export const LABEL = 'com.workout.server'
 export const LIVE_DIR = join(homedir(), 'dev', 'workout', 'workout-live')
 const BACKUP_MAX_HOURS = 26
 
-const [major, minor] = process.versions.node.split('.').map(Number)
-if (major < 22 || (major === 22 && minor < 16)) {
-  console.error(`These scripts need Node ≥ 22.16 (node:sqlite backup); this is ${process.versions.node}.`)
+if (!nodeVersionOk()) {
+  console.error(`These scripts need Node ≥ ${NODE_FLOOR_TEXT}; this is ${process.versions.node}.`)
   process.exit(1)
 }
 const ops = await import('./ops.mjs')
@@ -30,6 +30,7 @@ const config = serverConfig(env)
 const httpsPort = Number(env.WORKOUT_HTTPS_PORT || HTTPS_PORT)
 const label = env.WORKOUT_LABEL || LABEL
 const liveDir = resolve(env.WORKOUT_LIVE_DIR || LIVE_DIR)
+const agentsDir = resolve(env.WORKOUT_AGENTS_DIR || join(homedir(), 'Library', 'LaunchAgents'))
 
 const run = (cmd, args) => {
   try {
@@ -160,6 +161,9 @@ async function doctor() {
   if (process.platform === 'darwin') {
     check(launchdLoaded(label), `launchd: ${label} ${launchdLoaded(label) ? 'loaded' : 'NOT loaded'}`)
     check(launchdLoaded(`${label}.nightly`), `launchd: ${label}.nightly ${launchdLoaded(`${label}.nightly`) ? 'loaded' : 'NOT loaded'}`)
+    const n = ops.launchdNode(join(agentsDir, `${label}.plist`))
+    check(n.ok, n.text)
+    if (n.note) lines.push(n.note)
   }
 
   const newest = ops.listBackups(config.dataDir)[0]
