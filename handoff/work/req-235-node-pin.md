@@ -1,4 +1,4 @@
-**Status: READY** **Lane: tooling** · server stage 1 ops (req-231 follow-up)
+**Status: BUILT AND MERGED, 2026-10-25 — branch `req-235` (`744dcd3`…`744dcd3`, 1 commit).** **Lane: tooling** · server stage 1 ops (req-231 follow-up)
 
 # req-235 — one Node floor, pinned, and doctor checks the Node launchd runs
 
