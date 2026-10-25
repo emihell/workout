@@ -16,11 +16,15 @@ export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 export const DB_FILE = 'workout.db'
 export const SECRET_FILE = 'secret'
 
-// node:sqlite is unflagged from Node 22.13.0 (it needed --experimental-sqlite on 22.5–22.12).
-export const NODE_FLOOR = [22, 13, 0]
+// req-235 — the one Node floor, read by start.mjs, accounts.mjs, ops-cli.mjs and ./server/start
+// (through `node -e`), and checked against the launchd plist's node by the doctor. 22.16.0: the
+// node:sqlite online `backup` (req-231) lands there; plain node:sqlite is unflagged from 22.13.
+export const NODE_FLOOR = [22, 16, 0]
+export const NODE_FLOOR_TEXT = NODE_FLOOR.join('.')
 
+// `version` as process.versions.node gives it, or as `node --version` prints it (a leading v).
 export function nodeVersionOk(version = process.versions.node) {
-  const parts = version.split('.').map(Number)
+  const parts = String(version).trim().replace(/^v/, '').split('.').map(Number)
   for (let i = 0; i < 3; i++) {
     if (parts[i] !== NODE_FLOOR[i]) return parts[i] > NODE_FLOOR[i]
   }

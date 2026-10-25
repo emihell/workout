@@ -5,10 +5,10 @@
 //   WORKOUT_PORT      port (default 8100; 0 = any free port)
 //   WORKOUT_APP_DIR   the built app it serves (default <repo>/dist-server — `npm run build:server`)
 // Binds 127.0.0.1 only. Refuses to start with its data/secret path inside a git working tree.
-import { NODE_FLOOR, nodeVersionOk, serverConfig } from './config.mjs'
+import { NODE_FLOOR_TEXT, nodeVersionOk, serverConfig } from './config.mjs'
 
 if (!nodeVersionOk()) {
-  console.error(`The server needs Node ≥ ${NODE_FLOOR.join('.')} (node:sqlite); this is ${process.versions.node}.`)
+  console.error(`The server needs Node ≥ ${NODE_FLOOR_TEXT}; this is ${process.versions.node}.`)
   process.exit(1)
 }
 

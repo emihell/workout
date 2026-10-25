@@ -9,8 +9,9 @@ require_live_copy "$ROOT"
 
 NODE="${WORKOUT_NODE:-$(command -v node || true)}"
 [ -x "$NODE" ] || die "node not found (set WORKOUT_NODE)"
-"$NODE" -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>22||(a===22&&b>=16)?0:1)' \
-  || die "$NODE is $("$NODE" --version); the server needs ≥ 22.16"
+# The floor is server/config.mjs's NODE_FLOOR (req-235), checked by the node launchd will run.
+FLOOR="$("$NODE" --input-type=module -e "import { NODE_FLOOR_TEXT, nodeVersionOk } from '$ROOT/server/config.mjs'; console.log(NODE_FLOOR_TEXT); process.exit(nodeVersionOk() ? 0 : 1)")" \
+  || die "$NODE is $("$NODE" --version); the server needs ≥ ${FLOOR:-the floor in server/config.mjs}"
 [ -f "$ROOT/dist-server/index.html" ] || die "no built app in $ROOT/dist-server (./server/deploy builds it)"
 loaded "$LABEL" && die "$LABEL is already loaded (./server/stop first, or it's running)"
 healthy && die "something already answers on 127.0.0.1:$PORT"

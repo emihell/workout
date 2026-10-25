@@ -4,21 +4,25 @@
 import { client, startTestServer, tempDir } from './test-helpers.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { chmodSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { fullState } from '../src/test-support/full-state.js'
 import { COOKIE, createHttpServer } from './app.mjs'
 import { bootstrapUser, findUser } from './auth.mjs'
-import { DB_FILE } from './config.mjs'
+import { DB_FILE, NODE_FLOOR } from './config.mjs'
 import { openDataDir } from './db.mjs'
 import {
   NIGHTLY_KEEP,
   backupDb,
   counts,
   integrity,
+  launchdNode,
   listBackups,
   listenAddresses,
   nightly,
+  plistNode,
   restoreInto,
   restoreTo,
   serveState,
@@ -333,6 +337,81 @@ test('doctor parsers: the :8446 mapping, funnel state, listen addresses', () => 
   const lsof = 'COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME\nnode 1 e 20u IPv4 0x1 0t0 TCP 127.0.0.1:8100 (LISTEN)\n'
   assert.deepEqual(listenAddresses(lsof), ['127.0.0.1:8100'])
   assert.deepEqual(listenAddresses(lsof + 'node 1 e 21u IPv6 0x2 0t0 TCP *:8100 (LISTEN)\n'), ['127.0.0.1:8100', '*:8100'])
+})
+
+// req-235 — a throwaway plist in a temp dir (never ~/Library/LaunchAgents, never the live agent),
+// shaped like the one ./server/start writes.
+const plistFor = (dir, node, name = 'com.workout.req235-test.plist') => {
+  const file = join(dir, name)
+  writeFileSync(
+    file,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0">\n<dict>\n  <key>Label</key><string>x</string>\n` +
+      `  <key>ProgramArguments</key>\n  <array><string>${node}</string><string>/x/server/start.mjs</string></array>\n</dict>\n</plist>\n`,
+  )
+  return file
+}
+const fakeNode = (dir, version, name = 'node') => {
+  const file = join(dir, name)
+  writeFileSync(file, `#!/bin/sh\necho ${version}\n`)
+  chmodSync(file, 0o755)
+  return file
+}
+
+test('doctor: the launchd plist’s node — missing, not executable, below the floor, ok, nvm note', () => {
+  const dir = tempDir('workout-plist-test-')
+  const [major, minor] = NODE_FLOOR
+  try {
+    assert.equal(plistNode(readFileSync(plistFor(dir, '/a &amp; b/node'), 'utf8')), '/a & b/node')
+    assert.equal(plistNode('<plist/>'), null)
+
+    const gone = join(dir, 'v26.8.2', 'bin', 'node')
+    const missing = launchdNode(plistFor(dir, gone))
+    assert.equal(missing.ok, false)
+    assert.equal(missing.text, `launchd node: ${gone} — MISSING`)
+
+    const old = launchdNode(plistFor(dir, fakeNode(dir, `v${major}.${minor - 1}.1`)))
+    assert.equal(old.ok, false)
+    assert.match(old.text, new RegExp(`node — v${major}\\.${minor - 1}\\.1, below the floor ${NODE_FLOOR.join('\\.')}$`))
+
+    const noexec = fakeNode(dir, `v${major}.${minor}.0`, 'noexec')
+    chmodSync(noexec, 0o644)
+    assert.equal(launchdNode(plistFor(dir, noexec)).text, `launchd node: ${noexec} — not executable`)
+
+    const ok = launchdNode(plistFor(dir, process.execPath))
+    assert.equal(ok.ok, true, ok.text)
+    assert.match(ok.text, new RegExp(`v${process.versions.node.replaceAll('.', '\\.')}`))
+
+    assert.equal(launchdNode(join(dir, 'none.plist')).ok, false)
+
+    // An nvm path gets the note, failing or not; the home is the test's, not ~.
+    const home = join(dir, 'home')
+    const nvmNode = join(home, '.nvm', 'versions', 'node', 'v26.8.2', 'bin', 'node')
+    const nvm = launchdNode(plistFor(dir, nvmNode), home)
+    assert.equal(nvm.ok, false)
+    assert.match(nvm.note, /nvm node — if that version is uninstalled, re-run server\/start$/)
+    assert.equal(missing.note, null)
+    assert.equal(launchdNode(plistFor(dir, process.execPath), home).note, null)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+// The CLI end to end, on a throwaway label + agents dir: the doctor FAILs naming the path.
+test('doctor CLI: a throwaway plist whose node is missing → FAIL naming the path', { skip: process.platform !== 'darwin' && 'launchd checks are macOS-only' }, () => {
+  const dir = tempDir('workout-plist-test-')
+  try {
+    const label = 'com.workout.req235-test'
+    const gone = join(dir, 'gone', 'node')
+    plistFor(dir, gone, `${label}.plist`)
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('./ops-cli.mjs', import.meta.url)), 'doctor'], {
+      encoding: 'utf8',
+      env: { ...process.env, WORKOUT_LABEL: label, WORKOUT_AGENTS_DIR: dir, WORKOUT_DATA_DIR: join(dir, 'data'), WORKOUT_PORT: '1', WORKOUT_LIVE_DIR: join(dir, 'live') },
+    })
+    assert.equal(r.status, 1)
+    assert.match(r.stdout, new RegExp(`^FAIL  launchd node: ${gone.replaceAll('.', '\\.')} — MISSING$`, 'm'))
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
 })
 
 // The latent check from req-229's review: every `tailscale serve` port on this Mac is one host to
