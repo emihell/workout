@@ -1,4 +1,4 @@
-**Status: BUILT — NOT merged** **Lane: tooling** · server stage 1
+**Status: BUILT AND MERGED, 2026-10-25 — branch `req-234` (`ce5bb95`…`ce5bb95`, 1 commit).** **Lane: tooling** · server stage 1
 
 # req-234 — `accounts.mjs passwd <user>`: change a password from the terminal
 
