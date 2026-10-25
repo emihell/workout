@@ -19,7 +19,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
 **READY, held:**
 - **NOW (2026-10-22, DEC-127..134): server stage 1** — ops merged (see SHIPPED) → **go-live with Emilio** (its ACs 4–5):
   `server/deploy`, `start`, doctor; phone: clear `:8446` site data → login → Import **Replace everything** (DEC-134 §4) →
-  compare counts → log a workout. Nightly backup checked next morning. Rules `rules/BACKEND.md`, runbook `server/README.md`.
+  compare counts → log a workout. **First req-233** (READY, building): link his exercises to the library on a copy of the Export. Nightly backup checked next morning. Rules `rules/BACKEND.md`, runbook `server/README.md`.
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
 - **NOW (2026-10-11):** DEC-120..123 work all shipped. Open for Emilio: flip the import choice buttons (Keep filled, Replace plain)? — his call, BACKLOG.
