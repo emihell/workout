@@ -24,14 +24,11 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   specs, `git diff --stat c3596e8 main -- src` touches only `src/req-200.test.js`]. Left: README (code-side) still says "browser-only MVP" → a tiny req.
 
 **Stage 1 fallout — finish before anything else (DEC-143):**
-- Emilio: phone go-live (clear `:8446` site data → log in → log a workout).
-- Pages leftovers: done — req-238 shipped, CI green on `main` (run 40354463101), red probe went red.
-- Pages leftovers, comments: ~10 code comments still say "the Pages build" (now the plain build) — `src/main.jsx:10`,
-  `store.jsx:57`, `App.jsx:259`, `persistence.js:344`, `sync/boot.jsx:2`, `sync/status.js:5`, `sync/ui.test.js`, `dev/dev-notes.js:113`.
-  req-238's AC grepped `GITHUB_PAGES` only. Tiny comment-only req.
-- Phone (2026-10-26 16:16Z): Emilio says it works, but the server's last authed request was 07:33Z (session `expires_at` − 90 d),
-  no login since 10-25, no rev after the coach's rev 5 → the phone hasn't reached the server since 08:33 local.
-- Ops: no req needed — `./server/doctor` after every server deploy is now CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
+- Phone go-live: **done** 2026-10-26 16:26Z [measured, read-only]: the phone pulled the coach's rev 5, then pushed revs 6–12
+  (a test workout to 9 sets, then abandoned; rev 12 byte-identical to rev 5). Login was proven by the 10-25 session.
+- Pages leftovers: req-238 shipped (CI run 40354463101 green, red probe red). **req-247** (READY): the ~16 comments
+  that still say "the Pages build".
+- Ops: `./server/doctor` after every server deploy is CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
 
 **READY, held:**
 - req-239 → req-240 → req-241, req-242, req-243; req-244 (GO pill, look A). Batch 7, DEC-138/139. Emilio: "wait".
