@@ -83,3 +83,13 @@ No import file yet: that comes once Emilio likes the proposals.
   rewritten and had not been performed; history is under older names (Upper/Lower Body, Push/Pull, Core, John). History is
   the truth; a routine's kg is a proposal to check against it.
 - **Intake gaps:** add bodyweight + waist (+ target) and which kettlebells/plates exist; ask why training gaps happen.
+
+**Run 2 (2026-10-26):**
+- **Calibration, defined:** an exercise's first 2 sessions ever, plus the first session back after > 8 weeks off. Never call those
+  progress or a stall.
+- **Going up (the coach's advice rule, Planner's call — the app's own rules wait for req-149):** every set at target and Easy,
+  **or Medium with the target beaten by 2+ reps** → one step (machines 5 kg, Leg Press 10, dumbbells 2, kettlebells next bell,
+  barbell next plate pair). Hard or missed reps → hold.
+- **Unchanged data → corrections only.** If nothing new was logged since the last run, say so first and only correct or answer.
+- **The rev-4 routines are a draft** with some kg the coach corrects; Emilio's choices are what he logs, not what the routine says.
+- Machine weights in 2025 that don't exist on the machine (26, 32, 37, 74): the notes hold the real nearest step.
