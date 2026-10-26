@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · the gate itself. Before req-240 (it guards the rest of batch 7).
+**Status: BUILT, NOT merged — branch `req-248` (`ba91d9f`)** · **Lane: tooling** · the gate itself. Before req-240 (it guards the rest of batch 7).
 
 # req-248 — a hanging test turns the gate red instead of hanging it
 
