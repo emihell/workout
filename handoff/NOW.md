@@ -20,8 +20,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   `./server/ops plan`. Run 3 written as rev 5 (2026-10-26, backup `…122551-before-plan-coach.db`). Iterate as Emilio logs.
 - **Feedback notes:** server table `notes` (read-only). 0 rows on 2026-10-26.
 - **Cleanup 2026-10-26** (Emilio: "we dont want anything old and we want to update what we have before we start soemthing
-  new"): docs now describe the live server, and BACKLOG holds only open items. Next: rescan the held reqs below against `main`
-  before any of them is built. Then README (code-side, Builder) still says "browser-only MVP" → a tiny tooling req.
+  new"): docs now describe the live server, and BACKLOG holds only open items. Held reqs are current [measured: since their
+  specs, `git diff --stat c3596e8 main -- src` touches only `src/req-200.test.js`]. Left: README (code-side) still says "browser-only MVP" → a tiny req.
 
 **READY, held:**
 - req-239 → req-240 → req-241, req-242, req-243; req-244 (GO pill, look A). Batch 7, DEC-138/139. Emilio: "wait".
