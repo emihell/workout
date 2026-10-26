@@ -2703,3 +2703,14 @@ green (13 steps); 1 no "First time"/"I'll enter it" · 2 link top 396 px under k
 `firstTimeSetup` null · 4 tap → guide line, `{"mode":"setup"}`, "How was that?" after Done · 5 no link on set 2 (1 logged, kg "40"),
 timed, Chest Press work set · AC 4 stored `manual` → no link. No dialogs, no "Not found.". No reviewer: no trigger file.
 Feel (Emilio, after): it renders as an outlined button, not a text link — wording + look are `(unconfirmed)`. `reports/req-239.md`.
+
+## req-248 — a hanging test turns the gate red instead of hanging it  (2026-10-26)
+
+**req-248** (tooling; Builder; from req-239's mutation check). `./check`: `node --test --test-timeout=60000 --test-force-exit`
++ an outside watchdog (900 s, `WORKOUT_TEST_LIMIT` overrides, loudly) that names and kills still-running test files;
+`deploy.yml` job `timeout-minutes: 10`. **Beyond the spec, accepted:** force-exit (a cancelled test with an open timer kept
+the run alive) and the watchdog (req-239's hang is a synchronous render loop; no in-process timer fires — L-062). **Review
+round 1 (Planner):** 20 s → 60 s, sized from the loaded run (288 s) not the quiet one. Gate: async probe → `timed out after
+60000ms`, RED, exit 1, 160 s; sync `for(;;)` with limit 150 → "Still running: <file>", RED; req-239's real mutation → RED
+naming `src/req-10.test.js`; green in 90 s. Watchdog unproven on the Ubuntu runner (CI's 10 min fires first there). No
+reviewer: no trigger file. `reports/req-248.md`.

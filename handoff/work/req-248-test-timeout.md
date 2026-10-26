@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · the gate itself. Before req-240 (it guards the rest of batch 7).
+**Status: BUILT AND MERGED, 2026-10-26 — branch `req-248` (`0227517`…`ba91d9f`, 3 commits).** · **Lane: tooling** · the gate itself. Before req-240 (it guards the rest of batch 7).
 
 # req-248 — a hanging test turns the gate red instead of hanging it
 

@@ -123,6 +123,9 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   `--test-timeout`, and `deploy.yml` sets no `timeout-minutes` (GitHub's default is 6 h). A regression that leaves a rendered test
   waiting (req-239's mutation did) never goes red. With a timeout, the hang is a cancelled test → exit 1 (a 1.5 s probe: exit 1).
   → **req-248** (READY).
+- **Fail `./check` when the test count drops** (req-248 report): one pre-watchdog run ended at 2096 of 2108 tests — req-10's
+  12 rendered tests missing, no ✖ line for the file; red only by luck (an unrelated unit failure). Not reproduced. A floor
+  (e.g. the count can't fall below main's without a named test edit) would catch a silently dropped file.
 - **CI actions on Node 20** (req-238 run 40354463101): `actions/checkout@v4` / `setup-node@v4` are deprecated, forced to Node 24.
   Bump both to their current majors when it's convenient.
 - **[optional] Slim the readiness taxonomy** (`scripts/check_handoff.py`). Only if it gets in the way.
