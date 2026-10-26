@@ -21,7 +21,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
   Emilio's data in as rev 1 via `putState`, 50/8/23/571, 48 linked; `passwd` set by Emilio; Planner may run `./server/deploy`,
   `start`, `stop` — allow rules added 2026-10-25). **Left:** (1) Emilio: phone — clear `:8446` site data → login → log a
   workout; then the go-live ACs 4–5 are done. (2) **Nightly did NOT fire 10-26 01:00** (Mac awake, `runs = 0`, cause unknown; kickstart → exit 0). Doctor said ok — it ages *any* backup → req. Re-check 10-27. (3) **Emilio's call:** off-Mac
-  backup copy — iCloud / external / Time Machine (rule 4). (4) Log only via `:8446` (Pages later, DEC-129). Images: backlog.
+  backup copy — iCloud / external / Time Machine (rule 4). (4) Pages shut down (DEC-135); `gh-pages` delete is Emilio's. Images: backlog.
 - **Cleanup batch 2026-10-14 DONE** (Emilio: "A cleanup batch - do it"): both shipped. Next: Emilio trains on batch 6 → feedback batch 7.
 - **Batch 6 (DEC-125/126) DONE 2026-10-14 — all five shipped.** Emilio's feel list: each req's calls in SHIPPED; follow-ups BACKLOG §batch 6.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184

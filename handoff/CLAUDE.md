@@ -42,12 +42,12 @@ is the live example.
 npm run dev        # http://localhost:5173  — single dev instance
 npm run lint       # oxlint
 node --test        # unit tests — every *.test.js under src/ (nested included)
-npm run build      # production build (what GitHub Pages deploys)
+npm run build      # production build
 ./check            # the full gate: lint + tests + build
 ```
 
-Live site (Pages, `gh-pages` branch): https://emihell.github.io/workout/ — every
-push to `main` triggers a build-and-deploy (`.github/workflows/deploy.yml`).
+Live app: Emilio's own server (`./server/deploy` from `main`), `https://macbookpro-intel-2017.tail58ea74.ts.net:8446`.
+GitHub Pages is shut down (DEC-135); `.github/workflows/deploy.yml` is disabled on GitHub.
 
 ## handoff/ is read-only to you
 

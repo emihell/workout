@@ -2160,3 +2160,11 @@ is live before req-231. The finished-workout guard applies to every no-base merg
 4. **Go-live order for a device that ever synced with a test server:** clear the whole site data for the `:8446` origin
    (not only `workout-sync-v1` — the history epoch does not protect: a stale device's no-base merge adds the test records),
    log in, Import with **Replace everything** (Keep my history keeps the device's workouts, so a cleared phone imports 0).
+
+## DEC-135 — GitHub Pages shut down  (Emilio, 2026-10-26; supersedes DEC-129)
+
+Emilio: "we can shut down the github pages, i have everyhting ineed from there". The server is the only live app.
+Done 2026-10-26: workflow "Deploy GitHub Pages" disabled on GitHub (`gh workflow disable`, reversible). The Pages API
+refuses to deactivate a branch-sourced site (422), so the site comes down by deleting the `gh-pages` branch (build output
+only, rebuildable from any `main` commit) — Emilio runs it; the auto-mode classifier blocks Planner's remote delete.
+Follow-up req: `deploy.yml` becomes a check-only CI gate (no Pages steps), so pushes to `main` are tested again.
