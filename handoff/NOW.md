@@ -20,10 +20,10 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
   Emilio's data in as rev 1 via `putState`, 50/8/23/571, 48 linked; `passwd` set by Emilio; Planner may run `./server/deploy`,
   `start`, `stop` — allow rules added 2026-10-25). **Left:** (1) Emilio: phone — clear `:8446` site data → login → log a
   workout; then the go-live ACs 4–5 are done. (2) **Nightly did NOT fire 10-26 01:00** (Mac awake, cause unknown;
-  kickstart → exit 0); doctor missed it → req-237. Re-check 10-27. (3) **Emilio's call:** off-Mac backup copy — iCloud /
+  kickstart → exit 0); doctor missed it → req-237. Backups go weekly (DEC-136). (3) **Emilio's call:** off-Mac backup copy — iCloud /
   external / Time Machine (rule 4). (4) Pages shut down, site 404 (DEC-135). Images: backlog.
 - **READY 2026-10-26, unbuilt:** req-236 (req-200 test red on Mondays — till then `plan publish` needs `WORKOUT_SKIP_CHECK=1`
-  on Mondays) → req-238 (CI check-only, re-enable); req-237 (doctor checks the nightly + hourly catch-up), independent.
+  on Mondays) → req-238 (CI check-only, re-enable); req-237 (weekly backup + hourly catch-up + doctor), independent.
 - **Cleanup batch 2026-10-14 + batch 6 (DEC-125/126) DONE.** Next: Emilio trains on batch 6 → feedback batch 7. Feel list: SHIPPED; follow-ups BACKLOG §batch 6.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184
   session 2. Batch 192–195 feel list: each req's "Built — calls".

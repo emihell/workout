@@ -2168,3 +2168,10 @@ Done 2026-10-26: workflow "Deploy GitHub Pages" disabled on GitHub (`gh workflow
 refuses to deactivate a branch-sourced site (422), so the site comes down by deleting the `gh-pages` branch (build output
 only, rebuildable from any `main` commit); deleted 2026-10-26 on Emilio's explicit ask → site 404, Pages API 404.
 Follow-up req: `deploy.yml` becomes a check-only CI gate (no Pages steps), so pushes to `main` are tested again.
+
+## DEC-136 — The scheduled backup is weekly, not nightly  (Emilio, 2026-10-26; amends BACKEND rule 6)
+
+Emilio: "we dont need a backup . every night, once a week is fine now". The scheduled backup runs once a week; the
+before-deploy and before-write backups (rule 5/6) stay. Planner's calls (reversible): keep the newest **4** weeklies
+(~a month; old `nightly` files count toward the 4 and rotate out); the hourly catch-up from req-237 stays, so "weekly"
+means "due 7 days after the newest one". Built by req-237.

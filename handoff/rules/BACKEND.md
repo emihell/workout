@@ -29,7 +29,7 @@ live data. Live runs only from a `main` copy; data sits beside the worktrees lik
 5. **The live DB is the user's history (CLAUDE.md gate 2 applies).** Written only by the server's normal request path.
    Anything else that writes it — a script, a migration, a repair — takes a backup first (`./server/backup <reason>`) and
    asks Emilio with the record counts.
-6. **Backups.** Before any non-request write (rule 5), before each deploy, and nightly (keep the last 7). SQLite's online
+6. **Backups.** Before any non-request write (rule 5), before each deploy, and weekly (keep the last 4; DEC-136). SQLite's online
    backup API, integrity-checked, never a plain `cp` (White Sleeve L: a `cp` misses rows still in the `-wal` file).
 7. **Restore drill.** Before go-live and after any server schema change: restore the newest backup into a throwaway instance,
    log in, and compare record counts with the live DB. The receipt goes in the req's report.
