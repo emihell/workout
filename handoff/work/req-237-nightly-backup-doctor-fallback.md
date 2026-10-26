@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · server ops (req-231 follow-up). Server files only; no app code, no stored records.
+**Status: BUILT AND MERGED, 2026-10-26 — branch `req-237` (`a4c9626`…`97a67eb`, 2 commits).** · **Lane: tooling** · server ops (req-231 follow-up). Server files only; no app code, no stored records.
 
 # req-237 — the scheduled backup goes weekly, catches up within the hour, and doctor checks it
 
