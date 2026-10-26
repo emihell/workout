@@ -2681,3 +2681,7 @@ sync only on `WORKOUT_SYNC=true`), `qa.mjs`, `plan`; README, `check`, `smoke.mjs
 `./check` green (138 files, Builder); AC 6 grep empty; AC 8 red (2 fail, syncEnabled forced true) → green 4/4. Diff read by
 Planner: `builds.test.js` keeps every marker on the plain build, `/workout/` base assertion → `/` (not weakened). AC 1's
 validator didn't run (npx blocked) — GitHub's own parse in AC 4 stands in. No reviewer: no DEC-057 trigger file. `reports/req-238.md`.
+After merge (Planner): `gh workflow enable deploy.yml` → `CI active 346040229`. AC 4: run `40354463101` on main **success**
+(./check + smoke steps success). AC 5: `ci-red-probe` (one failing test) run `40354531074` **failure at `Run ./check`**; branch
+deleted local + origin. No `gh-pages` branch on origin. Note: actions/checkout@v4 + setup-node@v4 warn "Node.js 20 is
+deprecated" (forced to 24) → BACKLOG tooling.

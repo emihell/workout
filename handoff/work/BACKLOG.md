@@ -18,7 +18,6 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 - **Batch 7** (feedback J1..J8, 2026-10-16..22; DEC-138/139): req-239 (J2 first-time prompt) → 240 (J3+J6 one side, timed and
   own exercises) → 241 (J4+J7 next on the log screen, Skip a done set), 242 (J8 the whole routine row opens it, Change exercise),
   243 (J1 Home sheet "Swap" label); req-244 (J5 GO pill, look A).
-- **req-238** CI check-only.
 
 ## Phase 1 — the in-gym flow
 
@@ -120,6 +119,8 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
   `dates-tz.cases.js` defines (L-045).
 - **`plan qa --empty`**: serve a true first-time user. The seed is re-injected whenever storage is empty (`scripts/qa.mjs`).
+- **CI actions on Node 20** (req-238 run 40354463101): `actions/checkout@v4` / `setup-node@v4` are deprecated, forced to Node 24.
+  Bump both to their current majors when it's convenient.
 - **[optional] Slim the readiness taxonomy** (`scripts/check_handoff.py`). Only if it gets in the way.
 
 ## Already built — don't re-spec

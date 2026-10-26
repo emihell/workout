@@ -48,7 +48,7 @@ npm run build      # production build
 ```
 
 Live app: Emilio's own server (`./server/deploy` from `main`), `https://macbookpro-intel-2017.tail58ea74.ts.net:8446`.
-GitHub Pages is shut down (DEC-135); `.github/workflows/deploy.yml` is disabled on GitHub.
+GitHub Pages is shut down (DEC-135); `.github/workflows/deploy.yml` is now check-only CI (`./check` + smoke on every push to `main`, req-238).
 
 ## handoff/ is read-only to you
 
