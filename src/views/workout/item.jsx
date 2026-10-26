@@ -562,9 +562,10 @@ function WorkoutItemLive({ routineId, item }) {
   // Review round 1 — the guide belongs to the item the prompt was answered on.
   const showSetupGuide =
     setupEntry?.mode === 'setup' && setupEntry.itemKey === itemKey(item) && currentType === 'work' && state.workLogged.length === 0
-  function answerSetupPrompt(mode) {
-    recordButton(mode === 'setup' ? 'setup-start' : 'setup-manual')
-    store.patchActive((current) => firstTimeSetupPatch(current, item.exerciseId, { mode, itemKey: itemKey(item) }))
+  // req-239 — the only answer now: 'manual' is never written (old entries still hide the link).
+  function startSetup() {
+    recordButton('setup-start')
+    store.patchActive((current) => firstTimeSetupPatch(current, item.exerciseId, { mode: 'setup', itemKey: itemKey(item) }))
   }
 
   // req-80 — the note affordance moved out of SetLogForm to sit beside the exercise
@@ -676,26 +677,9 @@ function WorkoutItemLive({ routineId, item }) {
           while the pill counts down (D2, self-paced). The form remounts per set by
           `key`; rest ending doesn't change the key, so in-progress edits survive. Once
           the exercise is planned-done, completeSet has already advanced to the overview. */}
-      {/* req-10 (DEC-123 §1) — first-time setup, kept beside the form (SetLogForm untouched):
-          the prompt at the first work set of a no-history exercise; in setup, the guide line on
-          set 1; on set 2, the reason for its suggested prefill. */}
-      {logging && showSetupPrompt ? (
-        <div className="ui-first-time" role="group" aria-label="First time">
-          <p className="ui-sub">{SETUP_TEXT.prompt}</p>
-          <Actions
-            lateral={
-              <Button variant="quiet" onClick={() => answerSetupPrompt('manual')}>
-                {SETUP_TEXT.manual}
-              </Button>
-            }
-            forward={
-              <Button variant="secondary" onClick={() => answerSetupPrompt('setup')}>
-                {SETUP_TEXT.setUp}
-              </Button>
-            }
-          />
-        </div>
-      ) : null}
+      {/* req-10 (DEC-123 §1) — first-time setup, kept beside the form (SetLogForm untouched): in
+          setup, the guide line on set 1; on set 2, the reason for its suggested prefill. req-239
+          (DEC-138) — the "First time" question is gone; its trigger is the link under the form. */}
       {logging && showSetupGuide ? (
         <p className="ui-field-note ui-first-time__guide">{ex.type === 'bodyweight' ? SETUP_TEXT.guideBodyweight : SETUP_TEXT.guideWeighted}</p>
       ) : null}
@@ -735,6 +719,18 @@ function WorkoutItemLive({ routineId, item }) {
         />
         </Fragment>
       )}
+      {/* req-239 (DEC-138) — no question: the form logs set 1 as is; this quiet link starts the
+          guided setup (today's [Set it up]) at the first work set of a no-history exercise. */}
+      {logging && showSetupPrompt ? (
+        <Actions
+          className="ui-first-time"
+          lateral={
+            <Button variant="quiet" onClick={startSetup}>
+              {SETUP_TEXT.helpLink}
+            </Button>
+          }
+        />
+      ) : null}
       {/* req-109 — exercise-level lateral actions, in normal flow below the form (the
           set-level bar stays pinned at the bottom).
           req-188 (DEC-103 §2) — Skip exercise and Swap exercise moved to the workout list's

@@ -1,5 +1,6 @@
-// req-10 (DEC-012, amended by DEC-123 §1) — first-time guided setup. "First time — [Set it up]
-// [I'll enter it]" at the first work set of a no-history weighted / bodyweight exercise; in setup,
+// req-10 (DEC-012, amended by DEC-123 §1) — first-time guided setup. req-239 (DEC-138): a "Not sure
+// what weight? Help me find it" link under the form at the first work set of a no-history weighted /
+// bodyweight exercise (was "First time — [Set it up] [I'll enter it]"); in setup,
 // set 1's Done asks "How was that?" once and the answer ONLY seeds set 2 (an editable prefill with
 // a reason line). Never a kg on set 1 the routine didn't have; the answer is never stored on a set.
 import { describe, it, afterEach } from 'node:test'
@@ -240,7 +241,9 @@ describe('req-10 — firstTimeSetup is transient session state', () => {
 })
 
 // ---- Rendered against the real store and the real ConfirmSheet (one StoreProvider, L-051) ----
-describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 2', () => {
+describe('req-10 (rendered) — link → Done → sheet → set 2', () => {
+  // req-239 test edit: every trigger is this link (was the [Set it up] button); assertions unchanged.
+  const LINK = 'Not sure what weight? Help me find it'
   let view
   afterEach(async () => {
     if (getPendingConfirm()) answerConfirm(false)
@@ -286,7 +289,9 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
       view = await render(h(Host))
       await open(itemId)
     }
-    return { stored, open, reload }
+    // req-239 test edit: writes an older in-progress workout's state (a 'manual' entry) through the store.
+    const patchActive = async (fn) => act(async () => captured.store.patchActive(fn))
+    return { stored, open, reload, patchActive }
   }
   const sheetOf = () => view.container.querySelector('[role="dialog"]')
   const inSheet = (label) => [...sheetOf().querySelectorAll('label')].find((l) => l.textContent.trim().startsWith(label))?.querySelector('input')
@@ -296,14 +301,13 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
   const kg = () => view.input('kg')?.value
   const reps = () => view.input('Reps')?.value
 
-  it('weighted, routine kg blank: prompt → Set it up → set 1 blank + guide → Done → sheet → Easy → set 2 = one step up, with the reason; sets keep rpe null', async () => {
+  it('weighted, routine kg blank: link → set 1 blank + guide → Done → sheet → Easy → set 2 = one step up, with the reason; sets keep rpe null', async () => {
     const t = await harness([routineItem('ia', 'ex', 3)])
     await t.open('ia')
-    assert.ok(view.button('Set it up'), 'the prompt shows')
-    assert.ok(view.button("I'll enter it"))
-    assert.match(view.text(), /First time/)
-    await view.click(view.button('Set it up'))
-    assert.equal(view.button('Set it up'), null, 'answered: the prompt is gone')
+    // req-239 test edit: the link shows (was: the prompt's two buttons and "First time").
+    assert.ok(view.button(LINK), 'the link shows')
+    await view.click(view.button(LINK))
+    assert.equal(view.button(LINK), null, 'answered: the link is gone')
     assert.match(view.text(), /Pick a weight you could lift about 15 times/)
     assert.equal(kg(), '', 'set 1: no kg the routine did not have (DESIGN §1)')
     await view.type(view.input('kg'), '20')
@@ -331,7 +335,7 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
   it('a kept suggestion carries to set 3 even over a routine kg (DEC-052); set 1 shows the routine kg only', async () => {
     const t = await harness([routineItem('ia', 'ex', 3, [20, 20, 20])])
     await t.open('ia')
-    await view.click(view.button('Set it up'))
+    await view.click(view.button(LINK))
     assert.equal(kg(), '20', 'set 1 = the routine kg, nothing else')
     await view.click(view.button('Done'))
     await view.click(view.button('Easy'))
@@ -345,7 +349,7 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
   it('failure case: Skip on the sheet → set 2 is the plain carry, no reason line', async () => {
     const t = await harness([routineItem('ia', 'ex', 3)])
     await t.open('ia')
-    await view.click(view.button('Set it up'))
+    await view.click(view.button(LINK))
     await view.type(view.input('kg'), '20')
     await view.click(view.button('Done'))
     await view.click(view.button('Skip'))
@@ -358,31 +362,65 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
 
   it('failure case: an exercise with history shows no prompt and no sheet', async () => {
     await harness([routineItem('ia', 'ex', 3)], { workouts: [finishedWith('ex')] }).then((t) => t.open('ia'))
-    assert.equal(view.button('Set it up'), null)
+    assert.equal(view.button(LINK), null)
     assert.doesNotMatch(view.text(), /First time/)
     await view.type(view.input('kg'), '40')
     await view.click(view.button('Done'))
     assert.equal(sheet(), null)
   })
 
-  it("I'll enter it → today's form: no guide, no sheet after set 1, plain carry", async () => {
+  // req-239 test edit: replaces "I'll enter it → today's form" (that button is gone; DEC-138).
+  it('req-239 — no question: set 1 logs straight from the form, no firstTimeSetup entry, no guide, no sheet, plain carry', async () => {
     const t = await harness([routineItem('ia', 'ex', 3)])
     await t.open('ia')
-    await view.click(view.button("I'll enter it"))
+    assert.doesNotMatch(view.text(), /First time/)
+    assert.equal(view.button("I'll enter it"), null)
     assert.equal(view.button('Set it up'), null)
+    const link = view.button(LINK)
+    assert.ok(link, 'the link shows')
+    const form = view.input('kg').closest('form') ?? view.input('kg')
+    assert.ok(form.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING, 'the link sits under the form')
     assert.doesNotMatch(view.text(), /Pick a weight/)
     assert.equal(kg(), '')
     await view.type(view.input('kg'), '20')
     await view.click(view.button('Done'))
     assert.equal(sheet(), null)
     assert.equal(kg(), '20')
-    assert.equal(t.stored().activeWorkout.firstTimeSetup.ex.mode, 'manual')
+    assert.deepEqual(t.stored().activeWorkout.sets.map((s) => s.weight), [20])
+    assert.equal(t.stored().activeWorkout.firstTimeSetup?.ex, undefined, 'no entry written')
+    assert.equal(view.button(LINK), null, 'set 2: no link')
   })
 
-  it('bodyweight: Set it up → Done → Easy → set 2 reps +1, no kg box', async () => {
+  it('req-239 failure case: an exercise with history, a timed exercise, and set 2 of a new exercise → no link', async () => {
+    await harness([routineItem('ia', 'ex', 3)], { workouts: [finishedWith('ex')] }).then((t) => t.open('ia'))
+    assert.equal(view.button(LINK), null, 'with history')
+    await view.unmount()
+    await harness([routineItem('it', 'tx', 2, [], ['30 s', '30 s'])], { exercises: [weighted({ id: 'tx', name: 'Plank hold', hasDuration: true })] }).then((t) => t.open('it'))
+    assert.equal(view.button(LINK), null, 'timed')
+    await view.unmount()
+    const t = await harness([routineItem('ia', 'ex', 3)])
+    await t.open('ia')
+    assert.ok(view.button(LINK), 'set 1 of the new exercise: the link (control)')
+    await view.type(view.input('kg'), '20')
+    await view.click(view.button('Done'))
+    assert.equal(view.button(LINK), null, 'set 2 of the new exercise')
+  })
+
+  it("req-239 right mechanism: an in-progress workout carrying firstTimeSetup {ex: {mode: 'manual'}} → no link for that exercise", async () => {
+    const t = await harness([routineItem('ia', 'ex', 3)])
+    await t.open('ia')
+    assert.ok(view.button(LINK), 'control: the link shows before the entry')
+    await t.patchActive((current) => ({ firstTimeSetup: { ...(current.firstTimeSetup || {}), ex: { mode: 'manual', itemKey: 'ia' } } }))
+    await t.reload('ia')
+    assert.equal(t.stored().activeWorkout.firstTimeSetup.ex.mode, 'manual')
+    assert.equal(view.button(LINK), null)
+    assert.doesNotMatch(view.text(), /Pick a weight/)
+  })
+
+  it('bodyweight: link → Done → Easy → set 2 reps +1, no kg box', async () => {
     const t = await harness([routineItem('ib', 'bw', 3)], { exercises: [bodyweight()] })
     await t.open('ib')
-    await view.click(view.button('Set it up'))
+    await view.click(view.button(LINK))
     assert.match(view.text(), /Do the reps you can do with good form/)
     assert.equal(view.input('kg'), null)
     assert.equal(reps(), '10')
@@ -397,7 +435,7 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
   it('review round 1 — editing set 1 (20 → 30) after Easy re-seeds set 2 at 32.5 with the same reason; a reload keeps it', async () => {
     const t = await harness([routineItem('ia', 'ex', 3)])
     await t.open('ia')
-    await view.click(view.button('Set it up'))
+    await view.click(view.button(LINK))
     await view.type(view.input('kg'), '20')
     await view.click(view.button('Done'))
     await view.click(view.button('Easy'))
@@ -420,7 +458,7 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
   it('review round 1 — bodyweight target 10, set 1 did 15: Medium → set 2 is the plain carry (15), no reason line', async () => {
     const t = await harness([routineItem('ib', 'bw', 3)], { exercises: [bodyweight()] })
     await t.open('ib')
-    await view.click(view.button('Set it up'))
+    await view.click(view.button(LINK))
     await view.type(view.input('Reps'), '15')
     await view.click(view.button('Done'))
     await view.click(view.button('Medium'))
@@ -433,10 +471,10 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
   it('review round 1 — a second item of the same exercise shows neither prompt nor guide', async () => {
     const t = await harness([routineItem('ia', 'ex', 2), routineItem('ia2', 'ex', 2)])
     await t.open('ia')
-    await view.click(view.button('Set it up'))
+    await view.click(view.button(LINK))
     assert.match(view.text(), /Pick a weight/)
     await t.open('ia2')
-    assert.equal(view.button('Set it up'), null)
+    assert.equal(view.button(LINK), null)
     assert.doesNotMatch(view.text(), /Pick a weight/)
     await view.type(view.input('kg'), '20')
     await view.click(view.button('Done'))
@@ -445,7 +483,7 @@ describe('req-10 (rendered) — prompt → Set it up → Done → sheet → set 
 
   it('failure case: a cardio exercise shows no prompt', async () => {
     await harness([routineItem('ic', 'cx', 1, [], ['20 min'])], { exercises: [{ id: 'cx', name: 'Bike', type: 'cardio', weightStep: '' }] }).then((t) => t.open('ic'))
-    assert.equal(view.button('Set it up'), null)
+    assert.equal(view.button(LINK), null)
     assert.doesNotMatch(view.text(), /First time/)
   })
 })
