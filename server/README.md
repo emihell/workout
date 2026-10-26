@@ -20,6 +20,18 @@ throwaway instance (set `WORKOUT_LIVE_DIR`, `WORKOUT_DATA_DIR`, `WORKOUT_PORT`, 
 | `server/restore <backup> [--yes]` | anywhere, server stopped | into the data dir: shows both counts, needs `--yes`, backs up `pre-restore`, writes the `restores` marker (DEC-133) |
 | `server/doctor` | anywhere | bind 127.0.0.1, health, :8446 mapping, funnel off, data dir outside every worktree, modes, agents (`.weekly` loaded, its last exit 0, `.nightly` gone), newest weekly (or old nightly) backup ≤ 8 days |
 | `node server/ops-cli.mjs counts [db]` | anywhere | record counts per table and per user |
+| `server/ops plan preview <file> [--user <u>]` | anywhere | req-245: the coach's plan file (the app's Export, or a bare state) against the DB, as Import's **Keep my history** would write it — the import lines + counts (routines added/changed/removed/archived, exercises, slots before → after, logged workouts identical). Opens the DB read-only |
+| `server/ops plan apply <file> --source <s> --note "<t>" [--yes]` | anywhere | the same preview; with `--yes`: backup `before-plan-<s>`, then one new revision through `putState` (fast-forward only from the previewed rev) carrying `source`/`note`. Refused, with nothing written and no backup, while a workout is in progress, when the file's logged workouts differ from the server's (ones logged since the export are fine), or for an invalid file |
+| `server/ops plan revert <rev> [--yes] [--note "<t>"]` | anywhere | revision `<rev>`'s setup written back as a new revision (Keep my history: workouts logged since stay), backup `before-plan-revert`, `source: revert` |
+
+## Plan changes (req-245, DEC-141)
+
+The coach's change goes into the DB as a revision, not as an import file; the phone picks it up on its
+next sync. On the live DB `apply` and `revert` are non-request writes (BACKEND rule 5): preview first,
+then Emilio's yes with the counts, then `--yes`. `--user` is needed only when the DB has more than one
+account. Every revision lists `source` and `note` in `GET /api/revisions` (null for a device push); a
+revision written by `plan apply`/`plan revert` is never pruned, so it can always be reverted to.
+Without `--yes`, `apply` and `revert` exit 2 and write nothing.
 
 ## Restore drill (BACKEND rule 7)
 

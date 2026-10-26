@@ -59,7 +59,9 @@ export const revZeroState = () => JSON.parse(REV0)
 
 function revisionRow(db, userId, rev) {
   return db
-    .prepare('SELECT rev, state, base_rev, merged, conflicts, created_at FROM revisions WHERE user_id = ? AND rev = ?')
+    // `*`, not a column list: a DB opened read-only before req-245's columns were added still reads
+    // (source/note undefined → null in getRevision).
+    .prepare('SELECT * FROM revisions WHERE user_id = ? AND rev = ?')
     .get(userId, rev)
 }
 
@@ -125,7 +127,7 @@ function baseKnown(db, userId, baseRev, baseId) {
 export function listRevisions(db, userId) {
   return db
     .prepare(
-      `SELECT rev, base_rev AS baseRev, merged, conflicts, created_at AS createdAt
+      `SELECT rev, base_rev AS baseRev, merged, conflicts, created_at AS createdAt, source, note
        FROM revisions WHERE user_id = ? ORDER BY rev`,
     )
     .all(userId)
@@ -135,6 +137,9 @@ export function listRevisions(db, userId) {
       merged: row.merged === 1,
       conflicts: JSON.parse(row.conflicts).length,
       createdAt: row.createdAt,
+      // req-245 — who wrote it and why (`ops plan apply` / `plan revert`); null for a device push.
+      source: row.source ?? null,
+      note: row.note ?? null,
     }))
 }
 
@@ -147,6 +152,8 @@ export function getRevision(db, userId, rev) {
     merged: row.merged === 1,
     conflicts: JSON.parse(row.conflicts),
     createdAt: row.created_at,
+    source: row.source ?? null,
+    note: row.note ?? null,
     state: JSON.parse(row.state),
   }
 }
@@ -156,7 +163,11 @@ export function getRevision(db, userId, rev) {
 //   baseRev < current → three-way merge (base = baseRev's state, rev 0 = REV0),
 //                       the result stored as rev+1 with its conflicts.
 //   result equals the current state → nothing stored, the current rev returned (`unchanged`).
-export function putState(db, userId, body, at = new Date()) {
+// req-245 — `meta` is for the ops CLI only (`plan apply`/`plan revert`), never the HTTP route:
+//   source, note        stored on the new revision (who wrote it and why; null for a device push)
+//   fastForwardOnly     refuse (409) instead of merging when the server moved past `baseRev` — the
+//                       apply was previewed against `baseRev`, so it writes that or nothing
+export function putState(db, userId, body, at = new Date(), { source = null, note = null, fastForwardOnly = false } = {}) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) throw new ClientError(400, 'Expected {baseRev, state}.')
   const { baseRev, baseId } = body
   if (!Number.isInteger(baseRev) || baseRev < 0) throw new ClientError(400, 'baseRev must be a whole number ≥ 0.')
@@ -172,6 +183,9 @@ export function putState(db, userId, body, at = new Date()) {
     let state = incoming
     let conflicts = []
     const merged = diverged || baseRev < current.rev
+    if (fastForwardOnly && merged) {
+      throw new ClientError(409, `The server moved to rev ${current.rev} since rev ${baseRev} was previewed; nothing written. Run it again.`)
+    }
     if (merged) {
       const base = diverged ? null : baseState(db, userId, baseRev)
       // Review round 5 (#1) — DEC-133's "the device's workout wins" holds only after a RESTORE,
@@ -190,8 +204,8 @@ export function putState(db, userId, body, at = new Date()) {
     }
     const rev = current.rev + 1
     db.prepare(
-      'INSERT INTO revisions (user_id, rev, state, base_rev, merged, conflicts, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    ).run(userId, rev, JSON.stringify(state), baseRev, merged ? 1 : 0, JSON.stringify(conflicts), at.toISOString())
+      'INSERT INTO revisions (user_id, rev, state, base_rev, merged, conflicts, created_at, source, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    ).run(userId, rev, JSON.stringify(state), baseRev, merged ? 1 : 0, JSON.stringify(conflicts), at.toISOString(), source, note)
     pruneRevisions(db, userId, at)
     return { rev, revId: revisionId(revisionRow(db, userId, rev)), state, merged, conflicts }
   })
@@ -234,8 +248,9 @@ export function markRestore(db, at = new Date()) {
 // real history) and the app syncs after each logged set, so old revisions are pruned in the same
 // write that adds a new one. KEPT: every revision from the last PRUNE_DAYS days (any device that
 // synced in that time can still hold one as its base), the newest revision of each older day
-// (UTC), every revision with conflicts (the losing versions, DEC-128 §2), the current one, and
-// (req-231) every revision a restore marker names.
+// (UTC), every revision with conflicts (the losing versions, DEC-128 §2), the current one,
+// (req-231) every revision a restore marker names, and (req-245) every revision the ops CLI wrote
+// (`source` set: `plan apply`, `plan revert`) — the coach's changes stay revertable forever.
 // A device still based on a pruned revision is merged without a base (mergeWithoutBase): nothing
 // it can't decide is dropped, and every such record is listed in that revision's conflicts.
 export const PRUNE_DAYS = 14
@@ -246,7 +261,7 @@ export function pruneRevisions(db, userId, at = new Date()) {
   const revs = db
     .prepare(
       `SELECT rev FROM revisions
-       WHERE user_id = ? AND created_at < ? AND conflicts = '[]'
+       WHERE user_id = ? AND created_at < ? AND conflicts = '[]' AND source IS NULL
          AND rev < (SELECT MAX(rev) FROM revisions WHERE user_id = ?)
          AND rev NOT IN (SELECT MAX(rev) FROM revisions WHERE user_id = ? GROUP BY substr(created_at, 1, 10))
          AND rev NOT IN (SELECT rev FROM restores WHERE user_id = ?)`,
