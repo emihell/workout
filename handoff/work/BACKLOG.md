@@ -107,9 +107,10 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   in-flight sync isn't recorded as a conflict (the loser survives only as an unmarked revision, pruned after 14 days).
 - **Before any public hosting** (ask-gate 3, req-229 review): login rate limiting, a body cap before auth, pruning expired
   sessions.
-- **Ops nits** (req-231 review): the DEC-133 scan `JSON.parse`s every revision since the marker (use `json_extract`); doctor
-  counts a `pre-restore-corrupt` copy as the last backup; `start` doesn't XML-escape plist paths and can leave the nightly agent
-  unloaded if the second bootstrap fails.
+- **Ops nits** (req-231 review; not fallout, DEC-143): the DEC-133 scan `JSON.parse`s every revision since the marker (slow
+  only after a restore; use `json_extract`); `start` doesn't XML-escape plist paths (none have `&<>` today); launchd runs an
+  nvm node. The half-loaded-agents case → req-246. The corrupt-copy-as-backup nit is fixed (req-237's doctor counts only
+  scheduled backups).
 - **Full visual-design pass**: its own milestone.
 
 ## Tooling
