@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # req-231 — start the server under launchd: starts at login, restarted if it dies (KeepAlive), and
-# a nightly backup at 01:00 (<label>.nightly; missed while asleep → runs on wake). Run from the
-# live copy only: ~/dev/workout/workout-live/server/start. Planner's (BACKEND rule 2).
+# the weekly backup (<label>.weekly, req-237 / DEC-136): it runs at load and hourly, and backs up only
+# when the newest weekly is ≥ 7 days old, so a run missed while asleep or off lands within the hour.
+# Run from the live copy only: ~/dev/workout/workout-live/server/start. Planner's (BACKEND rule 2).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 . "$ROOT/server/lib.sh"
@@ -18,6 +19,8 @@ healthy && die "something already answers on 127.0.0.1:$PORT"
 
 mkdir -p "$DATA_DIR/logs" && chmod 700 "$DATA_DIR"
 mkdir -p "$AGENTS"
+# req-231's nightly agent is replaced by the weekly one: a deploy leaves exactly one scheduled agent.
+remove_legacy_nightly
 
 plist_env() {
   cat <<XML
@@ -51,26 +54,26 @@ $(plist_env)
 </plist>
 XML
 
-cat > "$AGENTS/$LABEL.nightly.plist" <<XML
+cat > "$AGENTS/$LABEL.weekly.plist" <<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>Label</key><string>$LABEL.nightly</string>
+  <key>Label</key><string>$LABEL.weekly</string>
   <key>ProgramArguments</key>
-  <array><string>$NODE</string><string>$ROOT/server/ops-cli.mjs</string><string>backup</string><string>--nightly</string></array>
+  <array><string>$NODE</string><string>$ROOT/server/ops-cli.mjs</string><string>backup</string><string>--weekly</string><string>--if-due</string></array>
 $(plist_env)
-  <key>StartCalendarInterval</key>
-  <dict><key>Hour</key><integer>1</integer><key>Minute</key><integer>0</integer></dict>
-  <key>StandardOutPath</key><string>$DATA_DIR/logs/nightly.log</string>
-  <key>StandardErrorPath</key><string>$DATA_DIR/logs/nightly.log</string>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>3600</integer>
+  <key>StandardOutPath</key><string>$DATA_DIR/logs/weekly.log</string>
+  <key>StandardErrorPath</key><string>$DATA_DIR/logs/weekly.log</string>
 </dict>
 </plist>
 XML
 
 launchctl bootstrap "$DOMAIN" "$AGENTS/$LABEL.plist"
-launchctl bootstrap "$DOMAIN" "$AGENTS/$LABEL.nightly.plist"
+launchctl bootstrap "$DOMAIN" "$AGENTS/$LABEL.weekly.plist"
 for _ in $(seq 1 30); do healthy && break; sleep 0.5; done
 healthy || die "loaded, but nothing answers on 127.0.0.1:$PORT after 15 s — see $DATA_DIR/logs/server.log"
 say "running: $LABEL on http://127.0.0.1:$PORT (pid $(launchctl print "$DOMAIN/$LABEL" | awk '/^\tpid = /{print $3}')), data $DATA_DIR"
-say "nightly backup: $LABEL.nightly at 01:00 → $DATA_DIR/backups (keeps 7)"
+say "weekly backup: $LABEL.weekly, checked hourly, made when the newest is ≥ 7 days old → $DATA_DIR/backups (keeps 4)"

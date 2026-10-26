@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# req-231 — stop the server and its nightly backup, and keep them off (the launchd agents are
-# removed, so it doesn't come back at login; ./server/start brings both back). Live copy only.
+# req-231 — stop the server and its weekly backup (req-237), and keep them off (the launchd agents
+# are removed, so it doesn't come back at login; ./server/start brings both back). Also removes
+# req-231's old <label>.nightly agent if it is still there. Live copy only.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 . "$ROOT/server/lib.sh"
 require_live_copy "$ROOT"
 
-for name in "$LABEL" "$LABEL.nightly"; do
+for name in "$LABEL" "$LABEL.weekly" "$LABEL.nightly"; do
   if loaded "$name"; then launchctl bootout "$DOMAIN/$name" && say "stopped $name"; fi
   rm -f "$AGENTS/$name.plist"
 done

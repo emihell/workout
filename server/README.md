@@ -7,18 +7,18 @@ throwaway instance (set `WORKOUT_LIVE_DIR`, `WORKOUT_DATA_DIR`, `WORKOUT_PORT`, 
 | Where | What |
 |---|---|
 | `~/dev/workout/workout-live/` | the running code: `git archive main` + `dist-server/`, `DEPLOYED` says which commit |
-| `~/dev/workout/workout-data/` | `workout.db`, `secret`, `backups/`, `logs/` (server.log, nightly.log) |
-| `~/Library/LaunchAgents/com.workout.server{,.nightly}.plist` | written by `start`, removed by `stop` |
+| `~/dev/workout/workout-data/` | `workout.db`, `secret`, `backups/`, `logs/` (server.log, weekly.log) |
+| `~/Library/LaunchAgents/com.workout.server{,.weekly}.plist` | written by `start`, removed by `stop` |
 | `https://<this mac>.ts.net:8446` | `tailscale serve --bg --https=8446 http://127.0.0.1:8100` (tailnet only; `:443` is the previews') |
 
 | Command | Run from | Does |
 |---|---|---|
 | `./server/deploy` | a worktree | backup `deploy-<sha>` → archive `main` → build → swap in (old copy kept as `workout-live.prev`) → restart if it was running |
-| `server/start`, `server/stop` | the live copy only | launchd agent: at login, restarted if it dies, nightly backup 01:00 keeping 7; `stop` keeps it off |
+| `server/start`, `server/stop` | the live copy only | launchd agent: at login, restarted if it dies; weekly backup (`.weekly`: at load and hourly, made when the newest weekly is ≥ 7 days old, keeps 4 — DEC-136); both remove the old `.nightly` agent; `stop` keeps it off |
 | `server/backup <reason>` | anywhere | online SQLite backup, integrity-checked, safe while running |
 | `server/restore <backup> --to <dir>` | anywhere | the restore drill: a throwaway data dir, live untouched |
 | `server/restore <backup> [--yes]` | anywhere, server stopped | into the data dir: shows both counts, needs `--yes`, backs up `pre-restore`, writes the `restores` marker (DEC-133) |
-| `server/doctor` | anywhere | bind 127.0.0.1, health, :8446 mapping, funnel off, data dir outside every worktree, modes, agents, last backup ≤ 26 h |
+| `server/doctor` | anywhere | bind 127.0.0.1, health, :8446 mapping, funnel off, data dir outside every worktree, modes, agents (`.weekly` loaded, its last exit 0, `.nightly` gone), newest weekly (or old nightly) backup ≤ 8 days |
 | `node server/ops-cli.mjs counts [db]` | anywhere | record counts per table and per user |
 
 ## Restore drill (BACKEND rule 7)
