@@ -621,6 +621,37 @@ rescan of `main` (2026-10-13); paths under `src/`. **Decided → DEC-125; specce
   265-270`), `finishedAt` stamped at save (`workout-log.js:187,200`) → the whole gap counts. No stale-workout handling; past 6 h it's
   an "in progress" peek row with Continue (`current-workout.js:10-17`, `Today.jsx:265-280`). Sets carry `loggedAt` since req-212.
 
+### Gym-flow notes — batch 7, Emilio 2026-10-16..22 (feedback JSON pasted by hand, app `a895ce4` / `4441b52`)
+
+Pasted 2026-10-26 with the batch-6 notes (I1..I11, done). The notes came from the old Pages site, so the server's `notes` table
+has 0 rows [measured, read-only]. [measured] `git log a895ce4..main` on the touched views/ui is empty → J1..J8 apply to live
+code. Exercises identified from Emilio's server data (read-only, rev 4). **DEC-137 check against `reference/PAGES.md`:**
+J2 goes against an E line → Emilio's call. The rest go against no E decision → Planner's to fix. J5 is a visual redesign,
+so Emilio judges the look (DEC-095 §2).
+
+- **J1 (Home) — "Om det är idag, så kan ja ju inte byta passet till idag"** ("if it's today, I can't swap it *to* today"). Planner's
+  reading: the sheet's button "Swap for today" reads as "move it to today" on a workout that is already today's
+  (`views/Today.jsx:252`). Fix the wording only, e.g. "Swap"; the sheet already says "Only today" (`:205`). DEC-125 §5's
+  one-date swap is unchanged.
+- **J2 (log, Back Extension, first time) — "Do I need two buttons to press? Enter it? Can't I just enter it?"** The first-time
+  prompt "First time — [I'll enter it] [Set it up]" (`views/workout/item.jsx:682-696`, `first-time-setup.js:26-29`) must be answered
+  before logging. **Clashes with E:** DEC-012 / DEC-123 §1 (the prompt appears on its own). → Emilio.
+- **J3 (review, Side Plank) — "Should be one on each side."** Side_Bridge is unilateral in the library (`library/common.js:161`),
+  but a timed set's label is plain "Duration" (`item.jsx:492,813`); "each side" is reps only (req-217). Fix: timed one-sided
+  sets read "30 s each side".
+- **J4 (log) — "Would be nice to see what's next as well."** "Up next" shows only on arrival (req-223); the log screen doesn't
+  name the next exercise until the review's "Next:" (`item.jsx:905`). Fix: a quiet "Next: {name}" line on the log screen.
+- **J5 (log) — "The GO is a bit messy right now, need a redesign."** Pill content is E (DEC-103 §3, DEC-125 §3: countdown,
+  set counts, GO); the look is open. Planner drafts 2–3 looks at 390×844 → Emilio picks.
+- **J6 (log, Kettlebell Lunge Press) — "Is this ex two on each side for each set?"** Own exercise, no library link, `unilateral`
+  unset, and no switch for it in exercise settings (`views/Exercises.jsx`: none). Fix: a "One side at a time" switch on own
+  exercises; on, it reads "8 each side" like library ones (DEC-122 §2).
+- **J7 (review) — "Should be able to press skip if I accidentally chose done."** A done set's sheet has fields + Save only
+  (DEC-119 §1). Fix: "Skip set" in that sheet.
+- **J8 (scheduled workout) — "Click on exercise to change it or edit delete."** Only the name text is a link (`views/Routine.jsx:269`);
+  the item editor has Remove (`:647`) but no way to change the exercise. Fix: the whole row opens the editor; the editor gets
+  "Change exercise" (whole-library picker; the new exercise's kg from its history, else blank, DEC-096 §2).
+
 ## Phase 2 — the program-creation flow  (next; the hard one)
 
 - **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
