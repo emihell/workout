@@ -2209,3 +2209,17 @@ Emilio's note: "The go is a bit messy right now need a redesing." Options in req
 only); Emilio: "a". Line 1 the rest clock or GO (pulse kept); line 2 "Set 2 of 4 · Ex 3 of 7"; on the exercise's own screen
 while resting, line 2 reads "Tap to skip rest". Content and tap rules unchanged (DEC-103 §3, DEC-108 §3, DEC-125 §3).
 Rejected: B (the workout count loses its number), C (undoes DEC-125 §3). Built as req-244.
+
+## DEC-140 — a coach agent, run from here first; a proposal Emilio reads, then imports  (Emilio, 2026-10-26)
+
+Emilio: "something i want is a coach agent, where i can send my user data and get an improved workout schedule"; on where
+(A in-app / B run from here / C both, B first): "for now, i want coach to be something from here, so we can work on it for a
+few runs … it should challange one self and be focused on getting results" → **B**.
+1. **Brief:** `handoff/coach/COACH.md` (persona, inputs, rules, output), tuned by a "Lessons from runs" section after each run.
+2. **Runs:** Planner spawns a fresh agent with the brief + his newest server revision (read-only). Output goes to
+   `~/dev/workout/workout-data/coach/run-N/` — **outside git** (the repo is public; this is health data).
+3. **Into the app** only through Import's preview (DEC-123 §2), once he accepts a proposal. History never changes.
+4. **Never invent his numbers:** kg from that exercise's history moved by its real step, else blank (DESIGN §1, DEC-096).
+5. The in-app coach (DEC-124) stays the later step; the brief becomes its prompt.
+Intake run 1: goal lean; 45 min pure training; keep the current weekly shape (Johns Kettlebell, the fat burner, a dumbbell,
+a barbell and a machines session; weekends bodyweight at home or running).
