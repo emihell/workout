@@ -25,7 +25,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 
 **Stage 1 fallout — finish before anything else (DEC-143):**
 - Emilio: phone go-live (clear `:8446` site data → log in → log a workout).
-- Pages leftovers: req-238 CI check-only + the dead `GITHUB_PAGES` build path (`vite.config.js:31-34,71`) + README "browser-only".
+- Pages leftovers: **req-238, widened** (CI check-only + the dead `GITHUB_PAGES` build mode + README). READY.
 - Ops review nits (req-231): doctor counts a corrupt copy as a backup; `start` can leave the backup agent unloaded; nvm node.
 
 **READY, held:**
