@@ -567,3 +567,13 @@ a skill and `handoff/`, so `./check` on main went red. Planner didn't see it: ev
 `WORKOUT_SKIP_CHECK=1` for the Monday req-200 failure, which skipped the skills check too. The req-236 build agent found it.
 **Rule:** cite skills (and rules) by file:line. **And:** with `WORKOUT_SKIP_CHECK=1`, run `python3 scripts/check_skills.py` and
 `python3 scripts/check_handoff.py` by hand before publishing a handoff change — the skip covers more than the one known red test.
+
+## L-060 — "we dont want anything old" was taken as a command; 860 lines deleted without weighing it  (Planner, 2026-10-26)
+
+Emilio said "we dont want anything old and we want to update what we have before we start soemthing new". Planner cut BACKLOG
+820 → ~120 lines in one go, without asking. Costs it missed: the old notes held his raw gym quotes and **rejected ideas with
+their reasons** (H19 start values from body data, DESIGN §1) — CLAUDE.md's "keep what was rejected and why". And it ranked a doc
+tidy-up above the open data-safety items (an unexplained missed nightly backup, the phone go-live test). Recovered losslessly as
+`log/BACKLOG-archive-2026-10.md`. Emilio: "i need you to do more pushback and be critial … we are a team, not a master and a slave".
+**Rule:** weigh a broad instruction against the rules and the priorities before acting; name the cost and the better order first.
+A bulk delete of planning history gets one line of "this is what goes, ok?" even when it's recoverable.

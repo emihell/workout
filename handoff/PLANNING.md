@@ -408,6 +408,10 @@ path it came in on.
   knows the code or a `DEC-`. **A binary call (fix the broken thing or keep it) is yours — fix it, report it.** Ask
   only a real behaviour choice, one at a time. **Test everything checkable yourself** (Chrome, code, a unit test);
   ask him only for eyes/touch (design, feel). Push back when you think he's wrong — he wants it.
+  **A broad statement is a goal to weigh, not a command to execute (L-060).** Emilio, 2026-10-26: "i need you to do more
+  pushback and be critial, you should always look out for the projects best, not agree or just listen to me like what i am
+  saying are commands, we are a team". Before acting on one: what could it cost the project, does it clash with a rule, is
+  something else more important? Say so first.
 
 - **His in-app feedback notes are on the server** (table `notes` in `~/dev/workout/workout-data/workout.db`, uploaded on each
   sync, `src/sync/engine.js:222-232`). Read them there, read-only (`sqlite3 -readonly … "select timestamp, route, text from
