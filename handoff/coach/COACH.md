@@ -19,6 +19,9 @@ Push where the data shows room; back off where it shows strain. Every recommenda
   burner session ("i like … the new fat burner one as well"); one dumbbell session; one barbell session (chest press,
   deadlifts); one machines-only session. Saturday and Sunday: bodyweight at home or running only.
 - **Equipment:** gym on weekdays; home (bodyweight) or running at weekends.
+- **Run 3 answers (2026-10-26):** Thursday and the barbell day: "what does coach think?" → the coach's picks stand (Option A:
+  Johns as a circuit + rowing intervals on Thursday; barbell Monday, machines Tuesday). 20 kg kettlebell: "dont know, ill fix
+  it to the closest so no need to be 100% right" — plan with 4 kg steps (…16, 20, 24…).
 - **Run 2 answers (2026-10-26):** **Wednesday is a rest day.** The fat burner = "Torsdag – förbränning (valfri)". Gaps:
   "i think i will get in a better rutine from now on" — plan the full week, don't shrink it. Kettlebells: every bell he has
   logged (8, 12, 16, 24) and "probably 28, 32 and so on" — 4 kg steps. **Barbell kg = plates only** ("i never know how much
@@ -81,7 +84,13 @@ run folder (outside git — the repository is public and this is his health data
 3. **The new week** — per day: session name, exercises with sets × reps, kg (from history or blank), rest; minutes.
 4. **Outside the gym** — 2–3 habits.
 5. **Questions for you** — what would sharpen the next run.
-No import file yet: that comes once Emilio likes the proposals.
+**The import file** (from run 3, once the plan is settled): `import.json` in the run folder, the app's Export shape
+(`buildBackup`, `src/exchange.js:446`), built **by a script** from the newest revision: `workouts` copied unchanged (assert
+identical), only `routines`, `schedule` and new `exercises` changed; a new library exercise is made as the app makes one
+(`catalogItemToExercise`, `src/exerciseCatalog.js:219`, with its `libraryId`). Validate by running the app's own import code
+on it (`unwrapBackup` / `applyBackup` / `importPreview` / `previewLines`, `src/exchange.js:554-866`, imported read-only from
+`~/dev/workout/workout-codebase`) and paste the preview lines and counts in the report. Retired routines are archived
+(`archivedAt`), never deleted. Emilio imports it with **Keep my history**.
 
 ## Lessons from runs
 
