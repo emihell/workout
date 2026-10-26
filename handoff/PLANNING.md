@@ -409,6 +409,9 @@ path it came in on.
   only a real behaviour choice, one at a time. **Test everything checkable yourself** (Chrome, code, a unit test);
   ask him only for eyes/touch (design, feel). Push back when you think he's wrong — he wants it.
 
+- **His in-app feedback notes are on the server** (table `notes` in `~/dev/workout/workout-data/workout.db`, uploaded on each
+  sync, `src/sync/engine.js:222-232`). Read them there, read-only (`sqlite3 -readonly … "select timestamp, route, text from
+  notes order by timestamp"`) — he no longer pastes them (2026-10-26).
 - **Feedback on a page → check `reference/PAGES.md` first (DEC-137).** Clashes with an **E** line (his decision) or a
   DESIGN value → bring him the old decision, why, and options. A **P** line or nothing → fix it, report it.
 - **One thing at a time.** Finish the thing in front of you. Don't narrate the
