@@ -2166,5 +2166,5 @@ is live before req-231. The finished-workout guard applies to every no-base merg
 Emilio: "we can shut down the github pages, i have everyhting ineed from there". The server is the only live app.
 Done 2026-10-26: workflow "Deploy GitHub Pages" disabled on GitHub (`gh workflow disable`, reversible). The Pages API
 refuses to deactivate a branch-sourced site (422), so the site comes down by deleting the `gh-pages` branch (build output
-only, rebuildable from any `main` commit) — Emilio runs it; the auto-mode classifier blocks Planner's remote delete.
+only, rebuildable from any `main` commit); deleted 2026-10-26 on Emilio's explicit ask → site 404, Pages API 404.
 Follow-up req: `deploy.yml` becomes a check-only CI gate (no Pages steps), so pushes to `main` are tested again.
