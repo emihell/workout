@@ -110,7 +110,7 @@ export function loadNotes() {
 }
 
 // req-230 (§9) — the server build sends notes to the server when one is saved (queued while
-// offline); its engine subscribes here. The Pages build has no listener: saving is as before.
+// offline); its engine subscribes here. The plain build has no listener: saving is as before.
 const noteSavedListeners = new Set()
 
 export function subscribeNoteSaved(listener) {

@@ -54,7 +54,7 @@ export function StoreProvider({ children, sync = null }) {
 
   // req-230 — the server build's sync engine (src/sync/engine.js), attached while mounted. It
   // takes the server's copy through the same setState (so it is saved like any change), as an
-  // updater on the latest state. The Pages build passes no engine: nothing happens here.
+  // updater on the latest state. The plain build passes no engine: nothing happens here.
   const stateRef = useRef(state)
   useEffect(() => {
     stateRef.current = state

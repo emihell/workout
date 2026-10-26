@@ -128,7 +128,7 @@ export function Settings({ dev = null }) {
       </p>
       {message ? <Banner>{message}</Banner> : null}
       {error ? <Banner role="alert">{error}</Banner> : null}
-      {/* req-230 — the server build's status line + Log out; nothing in the Pages build. */}
+      {/* req-230 — the server build's status line + Log out; nothing in the plain build. */}
       <SyncSection />
       {devTools ? (
         <DeveloperTools

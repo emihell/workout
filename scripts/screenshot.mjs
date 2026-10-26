@@ -92,7 +92,7 @@ const CONTENT_TYPES = {
 
 // Serve dist/ for the screenshot. The app uses hash routing, so every real
 // request is for `/` or a fingerprinted `/assets/*` file; anything else falls back
-// to index.html (SPA), matching how Pages would serve it.
+// to index.html (SPA), matching how a static host would serve it.
 function serveDist() {
   return new Promise((resolveServer) => {
     const server = createServer((req, res) => {

@@ -1,5 +1,5 @@
 // req-230 — the server build's entry. main.jsx imports this ONLY when the build flag `__SYNC__`
-// is on (vite.config.js), so the Pages build contains no login screen, no sync code and no
+// is on (vite.config.js), so the plain build contains no login screen, no sync code and no
 // service worker (src/sync/builds.test.js checks the built files).
 import { StrictMode } from 'react'
 import { loadNotes, subscribeNoteSaved } from '../dev/dev-notes.js'
