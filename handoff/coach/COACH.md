@@ -116,3 +116,10 @@ on it (`unwrapBackup` / `applyBackup` / `importPreview` / `previewLines`, `src/e
 - **Unchanged data → corrections only.** If nothing new was logged since the last run, say so first and only correct or answer.
 - **The rev-4 routines are a draft** with some kg the coach corrects; Emilio's choices are what he logs, not what the routine says.
 - Machine weights in 2025 that don't exist on the machine (26, 32, 37, 74): the notes hold the real nearest step.
+
+**Run 3 (2026-10-26):**
+- **Count balance with arms inside "upper"** too: run 2 looked fine on push/pull but arms + Johns' shoulder work tipped
+  upper : lower to 1.65.
+- **Retired = archived** only when nothing points at it; a routine kept as a swap-in stays live, unscheduled.
+- Existing kettlebell exercises still carry `weightStep: "2"`; the coach leaves existing exercises alone unless the plan says
+  so — a step fix is a change Emilio sees, listed in the report.
