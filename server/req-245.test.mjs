@@ -6,7 +6,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
@@ -15,7 +15,7 @@ import { fullState } from '../src/test-support/full-state.js'
 import { bootstrapUser, findUser } from './auth.mjs'
 import { DB_FILE } from './config.mjs'
 import { openDataDir, openDb } from './db.mjs'
-import { listBackups } from './ops.mjs'
+import { listBackups, liveBuildCheck } from './ops.mjs'
 import { PlanRefused, applyPlan, planChange, previewPlan, readPlanFile, revertPlan } from './plan.mjs'
 import { ClientError, getRevision, getState, listRevisions, putState, validState } from './store.mjs'
 
@@ -114,6 +114,7 @@ test('AC1 — preview prints the import lines and counts; the DB is byte-unchang
     const dry = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'week 3')
     assert.equal(dry.status, 2, dry.stderr)
     assert.match(dry.stdout, /Nothing written\. With --yes: a backup \(before-plan-coach\), then one new revision\./)
+    assert.match(dry.stdout, /^To write it: plan apply .* --source coach --note "…" --yes --expect-rev 1$/m)
     assert.equal(sha(s.dbFile), before.sha)
     assert.deepEqual(readdirSync(s.dataDir).filter((f) => !sidecars.includes(f)).sort(), before.files)
   } finally {
@@ -129,7 +130,7 @@ test('AC2 — apply --yes: one backup, rev+1 with source/note, workouts identica
     const before = getState(s.db, s.id)
     const coach = coachState()
     const file = writeJson(dir, 'plan.json', buildBackup(coach))
-    const r = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'week 3: arms day', '--yes')
+    const r = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'week 3: arms day', '--yes', '--expect-rev', '1')
     console.log(r.stdout)
     assert.equal(r.status, 0, r.stderr)
     assert.match(r.stdout, /^wrote rev 2 \(source coach\)/m)
@@ -150,7 +151,7 @@ test('AC2 — apply --yes: one backup, rev+1 with source/note, workouts identica
     assert.deepEqual({ rev: listed.rev, source: listed.source, note: listed.note, merged: listed.merged }, { rev: 2, source: 'coach', note: 'week 3: arms day', merged: false })
     assert.deepEqual(listRevisions(s.db, s.id)[0].source, null, 'a device push: null')
     // The same file again: nothing to change → nothing written, no backup.
-    const again = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'again', '--yes')
+    const again = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'again', '--yes', '--expect-rev', '2')
     assert.equal(again.status, 0, again.stderr)
     assert.match(again.stdout, /Nothing to change/)
     assert.equal(listBackups(s.dataDir).length, 1)
@@ -187,7 +188,7 @@ test('AC3 — refused, nothing written, no backup: history differs; a workout in
     const coach = coachState()
     coach.workouts[0] = { ...coach.workouts[0], overallNote: 'edited by the coach' }
     const file = writeJson(dir, 'history.json', buildBackup(coach))
-    const r = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes')
+    const r = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes', '--expect-rev', '1')
     console.log(r.stdout)
     assert.equal(r.status, 1)
     assert.match(r.stdout, /REFUSED: The file’s logged history differs from the server’s: 1 record\(s\) — wo-1 \(differs from the server’s\)/)
@@ -211,7 +212,7 @@ test('AC3 — refused, nothing written, no backup: history differs; a workout in
   try {
     assert.ok(getState(live.db, live.id).state.activeWorkout)
     const file = writeJson(dir, 'plan.json', buildBackup(coachState()))
-    const r = cli(live.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes')
+    const r = cli(live.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes', '--expect-rev', '1')
     assert.equal(r.status, 1)
     assert.match(r.stdout, /^ {2}workout in progress: YES$/m)
     assert.match(r.stdout, /REFUSED: A workout is in progress/)
@@ -227,7 +228,7 @@ test('AC3 — refused, nothing written, no backup: history differs; a workout in
   const bad = await seeded()
   try {
     const file = writeJson(dir, 'bad.json', { kind: 'workout-mvp-backup', version: 1, state: { exercises: 'nope', routines: [] } })
-    const r = cli(bad.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes')
+    const r = cli(bad.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes', '--expect-rev', '1')
     assert.equal(r.status, 1)
     assert.match(r.stderr, /Not a workout plan/)
     writeFileSync(join(dir, 'garbage.json'), '{not json')
@@ -432,4 +433,114 @@ test('planChange is pure: the result keeps the current history objects as they a
   assert.equal(out.counts.workoutsIdentical, true)
   assert.deepEqual(out.refusals, [])
   assert.equal(planChange(current, current).unchanged, true)
+})
+
+// ---- review fixes ----
+
+test('review 1 — --yes needs --expect-rev, and a different current rev is refused: exit 1, nothing written, no backup', async () => {
+  const s = await seeded()
+  const dir = tempDir('workout-req245-file-')
+  try {
+    const file = writeJson(dir, 'plan.json', buildBackup(coachState()))
+    const missing = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes')
+    assert.equal(missing.status, 1)
+    assert.match(missing.stderr, /--yes needs --expect-rev <n>/)
+    // the phone syncs after the preview (rev 1 → 2): the yes was for rev 1
+    const cur = getState(s.db, s.id)
+    putState(s.db, s.id, { baseRev: 1, baseId: cur.revId, state: { ...cur.state, workouts: [{ ...cur.state.workouts[0], id: 'wo-since' }, ...cur.state.workouts] } })
+    const stale = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes', '--expect-rev', '1')
+    console.log(stale.stdout)
+    assert.equal(stale.status, 1)
+    assert.match(stale.stdout, /REFUSED: The server is at rev 2, not the previewed rev 1\./)
+    assert.match(stale.stdout, /Nothing written, no backup taken\./)
+    const rv = cli(s.dataDir, 'revert', '1', '--yes', '--expect-rev', '1')
+    assert.equal(rv.status, 1)
+    assert.match(rv.stdout, /REFUSED: The server is at rev 2, not the previewed rev 1\./)
+    assert.equal(getState(s.db, s.id).rev, 2)
+    assert.deepEqual(listBackups(s.dataDir), [])
+    // with the current rev it writes
+    const ok = cli(s.dataDir, 'apply', file, '--source', 'coach', '--note', 'x', '--yes', '--expect-rev', '2')
+    assert.equal(ok.status, 0, ok.stderr)
+    assert.match(ok.stdout, /^wrote rev 3 \(source coach\)/m)
+  } finally {
+    s.cleanup()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('review 2 — a plan file whose schedule has no anchor keeps the server’s anchor', async () => {
+  const s = await seeded()
+  try {
+    assert.equal(getState(s.db, s.id).state.schedule.anchor, '2026-09-28')
+    const coach = coachState()
+    delete coach.schedule.anchor
+    const incoming = readPlanFile(buildBackup(coach))
+    assert.equal(incoming.schedule.anchor, undefined, 'validState leaves a missing anchor missing')
+    await applyPlan(s.db, s.dataDir, s.id, incoming, { source: 'coach', note: 'no anchor', expectRev: 1 })
+    const now = getState(s.db, s.id).state.schedule
+    assert.equal(now.anchor, '2026-09-28')
+    assert.equal(now.slots.length, 2)
+    // a file WITH an anchor sets it
+    const moved = { ...coachState(), schedule: { ...coachState().schedule, anchor: '2026-10-05' } }
+    await applyPlan(s.db, s.dataDir, s.id, readPlanFile(moved), { source: 'coach', note: 'new anchor', expectRev: 2 })
+    assert.equal(getState(s.db, s.id).state.schedule.anchor, '2026-10-05')
+  } finally {
+    s.cleanup()
+  }
+})
+
+test('review 3 — liveBuildCheck: the DEPLOYED sha must hold server/plan.mjs', () => {
+  const dir = tempDir('workout-req245-git-')
+  try {
+    const repo = join(dir, 'repo')
+    const live = join(dir, 'live')
+    const git = (...args) => spawnSync('git', ['-C', repo, ...args], { encoding: 'utf8' })
+    spawnSync('git', ['init', '-q', repo])
+    git('config', 'user.email', 't@example.com')
+    git('config', 'user.name', 't')
+    writeFileSync(join(repo, 'README'), 'x')
+    git('add', '.')
+    git('commit', '-qm', 'before req-245')
+    const before = git('rev-parse', '--short', 'HEAD').stdout.trim()
+    mkdirSync(join(repo, 'server'))
+    mkdirSync(live)
+    writeFileSync(join(repo, 'server', 'plan.mjs'), '// plan')
+    git('add', '.')
+    git('commit', '-qm', 'req-245')
+    const after = git('rev-parse', '--short', 'HEAD').stdout.trim()
+    assert.equal(liveBuildCheck(live, [repo]).ok, false, 'no DEPLOYED file')
+    writeFileSync(join(live, 'DEPLOYED'), `main ${before} 2026-10-26 10:00:00\n`)
+    const old = liveBuildCheck(live, [repo])
+    assert.equal(old.ok, false)
+    assert.match(old.text, /has no server\/plan\.mjs/)
+    writeFileSync(join(live, 'DEPLOYED'), `main ${after} 2026-10-26 11:00:00\n`)
+    assert.equal(liveBuildCheck(live, [repo]).ok, true)
+    assert.equal(liveBuildCheck(live, [dir]).ok, false, 'a sha no repo knows is a no')
+    writeFileSync(join(live, 'DEPLOYED'), 'garbage\n')
+    assert.match(liveBuildCheck(live, [repo]).text, /names no commit/)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('review 5–7 — preview exits 1 on REFUSED; dry runs check --source/--note; a plan with zero routines is refused', async () => {
+  const s = await seeded({ state: fullState() }) // a workout in progress → refused
+  const dir = tempDir('workout-req245-file-')
+  try {
+    const file = writeJson(dir, 'plan.json', buildBackup(coachState()))
+    const r = cli(s.dataDir, 'preview', file)
+    assert.equal(r.status, 1)
+    assert.match(r.stdout, /REFUSED: A workout is in progress/)
+    const noSource = cli(s.dataDir, 'apply', file, '--note', 'x')
+    assert.equal(noSource.status, 1)
+    assert.match(noSource.stderr, /--source/)
+    const noNote = cli(s.dataDir, 'apply', file, '--source', 'coach')
+    assert.equal(noNote.status, 1)
+    assert.match(noNote.stderr, /--note/)
+    assert.throws(() => readPlanFile({ ...coachState(), routines: [] }), /no routines/)
+    assert.deepEqual(listBackups(s.dataDir), [])
+  } finally {
+    s.cleanup()
+    rmSync(dir, { recursive: true, force: true })
+  }
 })

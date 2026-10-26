@@ -6,8 +6,9 @@
 //   counts [<db file>]                   record counts (default: the data dir's DB)
 //   doctor                               bind, funnel, tailscale mapping, data path, launchd, weekly backup
 //   plan preview <file> [--user <u>]     req-245: the coach's plan file against the DB (reads only)
-//   plan apply <file> --source <s> --note <t> [--yes] [--user <u>]   backup, then one new revision
-//   plan revert <rev> [--yes] [--note <t>] [--user <u>]             that revision's setup, as a new revision
+//   plan apply <file> --source <s> --note <t> [--yes --expect-rev <n>] [--user <u>]   backup, then one new revision
+//   plan revert <rev> [--yes --expect-rev <n>] [--note <t>] [--user <u>]             that revision's setup, as a new one
+//   (WORKOUT_REPO_DIR: where the live DEPLOYED sha is looked up; default this checkout, then ~/dev/workout/workout-codebase)
 // Environment, as the scripts set it: WORKOUT_DATA_DIR, WORKOUT_PORT, WORKOUT_HTTPS_PORT (8446),
 // WORKOUT_LABEL (com.workout.server), WORKOUT_LIVE_DIR (~/dev/workout/workout-live),
 // WORKOUT_AGENTS_DIR (~/Library/LaunchAgents — where the doctor reads <label>.plist; a test seam).
@@ -16,7 +17,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { DB_FILE, NODE_FLOOR_TEXT, SECRET_FILE, isInside, nodeVersionOk, realish, serverConfig } from './config.mjs'
+import { DB_FILE, LIVE_DATA_DIR, NODE_FLOOR_TEXT, REPO_ROOT, SECRET_FILE, isInside, nodeVersionOk, realish, serverConfig } from './config.mjs'
 
 export const HTTPS_PORT = 8446
 export const LABEL = 'com.workout.server'
@@ -287,6 +288,7 @@ async function plan(args) {
       const out = p.previewPlan(db, user.id, incoming)
       printPlan(`plan preview: ${resolve(positional[0])} for ${user.username}, against rev ${out.rev}`, out)
       console.log('Nothing written (preview).')
+      if (out.refusals.length) process.exitCode = 1
     } finally {
       db.close()
     }
@@ -295,9 +297,29 @@ async function plan(args) {
 
   if (sub === 'apply' || sub === 'revert') {
     const apply = sub === 'apply'
-    const { positional, opts } = parseArgs(rest, apply ? ['--user', '--source', '--note'] : ['--user', '--note'], ['--yes'])
+    const { positional, opts } = parseArgs(rest, apply ? ['--user', '--source', '--note', '--expect-rev'] : ['--user', '--note', '--expect-rev'], ['--yes'])
     if (positional.length !== 1) {
-      throw new Error(apply ? 'usage: plan apply <file> --source <name> --note "<text>" [--yes] [--user <name>]' : 'usage: plan revert <rev> [--yes] [--note "<text>"] [--user <name>]')
+      throw new Error(
+        apply
+          ? 'usage: plan apply <file> --source <name> --note "<text>" [--yes --expect-rev <n>] [--user <name>]'
+          : 'usage: plan revert <rev> [--yes --expect-rev <n>] [--note "<text>"] [--user <name>]',
+      )
+    }
+    // Review nit: the dry run checks the flags too, so the approved command line is the one that runs.
+    if (apply) p.checkMeta(opts.source, opts.note)
+    let expectRev
+    if (opts.yes) {
+      // Review: --yes is tied to the approved preview — the rev it was computed against.
+      expectRev = Number(opts['expect-rev'])
+      if (opts['expect-rev'] === undefined || !Number.isInteger(expectRev) || expectRev < 0) {
+        throw new Error('--yes needs --expect-rev <n>: the rev the approved preview printed ("against rev n").')
+      }
+      // Review (deploy order): on the live data dir, only once the live server runs a req-245+ build.
+      if (isInside(config.dataDir, LIVE_DATA_DIR)) {
+        const repos = [env.WORKOUT_REPO_DIR, REPO_ROOT, join(homedir(), 'dev', 'workout', 'workout-codebase')].filter((d) => d && existsSync(d))
+        const live = ops.liveBuildCheck(liveDir, [...new Set(repos)])
+        if (!live.ok) throw new Error(`Refusing, nothing written: ${live.text}. The old server's pruning would drop plan revisions.`)
+      }
     }
     let incoming
     let rev
@@ -309,6 +331,7 @@ async function plan(args) {
     const dbFile = dbFileOf()
     if (!opts.yes) {
       // The preview of what --yes would write; still reads only.
+      let previewedRev
       const db = new DatabaseSync(dbFile, { readOnly: true })
       try {
         const user = pickUser(db, opts.user)
@@ -318,13 +341,16 @@ async function plan(args) {
           incoming = row.state
         }
         const out = p.previewPlan(db, user.id, incoming, { checkFileHistory: apply })
+        previewedRev = out.rev
         printPlan(`plan ${sub}: ${apply ? resolve(positional[0]) : `rev ${rev}’s setup`} for ${user.username}, against rev ${out.rev}`, out)
         if (out.refusals.length) process.exitCode = 1
       } finally {
         db.close()
       }
       if (!process.exitCode) {
-        console.log(`\nNothing written. With --yes: a backup (before-plan-${apply ? opts.source ?? '<source>' : 'revert'}), then one new revision.`)
+        const rerun = apply ? `plan apply ${positional[0]} --source ${opts.source} --note "…"` : `plan revert ${rev}`
+        console.log(`\nNothing written. With --yes: a backup (before-plan-${apply ? opts.source : 'revert'}), then one new revision.`)
+        console.log(`To write it: ${rerun} --yes --expect-rev ${previewedRev}`)
         process.exitCode = 2
       }
       return
@@ -336,8 +362,8 @@ async function plan(args) {
       let out
       try {
         out = apply
-          ? await p.applyPlan(db, config.dataDir, user.id, incoming, { source: opts.source, note: opts.note, at })
-          : await p.revertPlan(db, config.dataDir, user.id, rev, { note: opts.note, at })
+          ? await p.applyPlan(db, config.dataDir, user.id, incoming, { source: opts.source, note: opts.note, at, expectRev })
+          : await p.revertPlan(db, config.dataDir, user.id, rev, { note: opts.note, at, expectRev })
       } catch (error) {
         if (report(error)) return
         throw error

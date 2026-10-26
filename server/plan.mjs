@@ -38,6 +38,8 @@ export function readPlanFile(payload) {
   if (!state || typeof state !== 'object' || !Array.isArray(state.exercises) || !Array.isArray(state.routines)) {
     throw new ClientError(400, 'Not a workout plan: the file’s state needs `exercises` and `routines` arrays.')
   }
+  // Review nit: a plan with no routines would archive or drop every routine the server has.
+  if (state.routines.length === 0) throw new ClientError(400, 'Not a workout plan: the file has no routines.')
   return validState(state)
 }
 
@@ -72,8 +74,18 @@ export function historyMismatch(file, current) {
   return out
 }
 
+// Review: a file whose schedule has no `anchor` keeps the server's — the schedule is taken from the
+// file, and without this the server's anchor would be dropped (and every device would fall back to
+// its own clock-made Monday). A file with an anchor sets it; a server without one stays without.
+export function withCurrentAnchor(incoming, current) {
+  const anchor = current?.schedule?.anchor
+  if (!anchor || incoming?.schedule?.anchor) return incoming
+  return { ...incoming, schedule: { ...(incoming.schedule || {}), anchor } }
+}
+
 // Pure: what writing `incoming` over `current` with Keep my history would store, and why it may not.
 export function planChange(current, incoming, { archivedAt = new Date().toISOString(), checkFileHistory = true } = {}) {
+  incoming = withCurrentAnchor(incoming, current)
   const result = validState(keptHistoryState(incoming, current, archivedAt))
   const kept = (state) => ({ workouts: state.workouts || [], draftWorkouts: state.draftWorkouts || [], activeWorkout: state.activeWorkout ?? null })
   const workoutsIdentical = isDeepStrictEqual(kept(result), kept(current))
@@ -115,7 +127,7 @@ export function previewPlan(db, userId, incoming, options) {
   return { rev: current.rev, revId: current.revId, ...planChange(current.state, incoming, options) }
 }
 
-function checkMeta(source, note) {
+export function checkMeta(source, note) {
   if (!SOURCE.test(String(source ?? ''))) throw new Error(`--source: lower-case letters, digits and dashes, ≤ 28 characters (got "${source ?? ''}").`)
   if (typeof note !== 'string' || !note.trim()) throw new Error('--note: say what changed and why.')
 }
@@ -123,10 +135,15 @@ function checkMeta(source, note) {
 // → the preview plus {written, rev, backup}. Refused (PlanRefused) before any backup is taken. A
 // device push that lands between the preview and the write makes putState refuse (fastForwardOnly)
 // and the backup just taken is removed — no backup is left claiming a write that didn't happen.
-export async function applyPlan(db, dataDir, userId, incoming, { source, note, at = new Date(), checkFileHistory = true, reserved = false } = {}) {
+// `expectRev` (the CLI always passes it, from --expect-rev): the rev the approved preview was computed
+// against. A different current rev → PlanRefused before any backup — the yes was for another state.
+export async function applyPlan(db, dataDir, userId, incoming, { source, note, at = new Date(), checkFileHistory = true, reserved = false, expectRev } = {}) {
   checkMeta(source, note)
   if (source === REVERT && !reserved) throw new Error('--source revert is the revert command’s own.')
   const plan = previewPlan(db, userId, incoming, { archivedAt: at.toISOString(), checkFileHistory })
+  if (expectRev !== undefined && plan.rev !== expectRev) {
+    plan.refusals.unshift(`The server is at rev ${plan.rev}, not the previewed rev ${expectRev}. Preview again and get a yes on the new counts.`)
+  }
   if (plan.refusals.length) throw new PlanRefused(plan)
   if (plan.unchanged) return { ...plan, fromRev: plan.rev, written: false }
   const backup = await backupDb(dataDir, `before-plan-${source}`, { at })
@@ -142,7 +159,7 @@ export async function applyPlan(db, dataDir, userId, incoming, { source, note, a
 
 // `plan revert <rev>`: that revision's setup back, Keep my history again (history logged since stays).
 // Its own logged history is not compared — it is older than the server's by design.
-export async function revertPlan(db, dataDir, userId, rev, { note, at = new Date() } = {}) {
+export async function revertPlan(db, dataDir, userId, rev, { note, at = new Date(), expectRev } = {}) {
   const row = getRevision(db, userId, rev)
   if (!row) throw new Error(`Revision ${rev} is not kept (pruned, or never written). GET /api/revisions lists the kept ones.`)
   return applyPlan(db, dataDir, userId, row.state, {
@@ -151,5 +168,6 @@ export async function revertPlan(db, dataDir, userId, rev, { note, at = new Date
     at,
     checkFileHistory: false,
     reserved: true,
+    expectRev,
   })
 }

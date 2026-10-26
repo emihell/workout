@@ -99,7 +99,17 @@ export function openDb(file) {
 export const REVISION_COLUMNS = ['source', 'note']
 function addRevisionColumns(db) {
   const have = new Set(db.prepare('PRAGMA table_info(revisions)').all().map((c) => c.name))
-  for (const name of REVISION_COLUMNS) if (!have.has(name)) db.exec(`ALTER TABLE revisions ADD COLUMN ${name} TEXT`)
+  for (const name of REVISION_COLUMNS) {
+    if (have.has(name)) continue
+    try {
+      db.exec(`ALTER TABLE revisions ADD COLUMN ${name} TEXT`)
+    } catch (error) {
+      // Review nit: another process (the server, an ops command) added it between our check and ALTER.
+      if (!/duplicate column name/i.test(error.message)) throw error
+      const now = new Set(db.prepare('PRAGMA table_info(revisions)').all().map((c) => c.name))
+      if (!now.has(name)) throw error
+    }
+  }
 }
 
 // Run `fn` in one write transaction (BEGIN IMMEDIATE), rolling back on a throw.

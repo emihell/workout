@@ -20,18 +20,29 @@ throwaway instance (set `WORKOUT_LIVE_DIR`, `WORKOUT_DATA_DIR`, `WORKOUT_PORT`, 
 | `server/restore <backup> [--yes]` | anywhere, server stopped | into the data dir: shows both counts, needs `--yes`, backs up `pre-restore`, writes the `restores` marker (DEC-133) |
 | `server/doctor` | anywhere | bind 127.0.0.1, health, :8446 mapping, funnel off, data dir outside every worktree, modes, agents (`.weekly` loaded, its last exit 0, `.nightly` gone), newest weekly (or old nightly) backup ≤ 8 days |
 | `node server/ops-cli.mjs counts [db]` | anywhere | record counts per table and per user |
-| `server/ops plan preview <file> [--user <u>]` | anywhere | req-245: the coach's plan file (the app's Export, or a bare state) against the DB, as Import's **Keep my history** would write it — the import lines + counts (routines added/changed/removed/archived, exercises, slots before → after, logged workouts identical). Opens the DB read-only |
-| `server/ops plan apply <file> --source <s> --note "<t>" [--yes]` | anywhere | the same preview; with `--yes`: backup `before-plan-<s>`, then one new revision through `putState` (fast-forward only from the previewed rev) carrying `source`/`note`. Refused, with nothing written and no backup, while a workout is in progress, when the file's logged workouts differ from the server's (ones logged since the export are fine), or for an invalid file |
-| `server/ops plan revert <rev> [--yes] [--note "<t>"]` | anywhere | revision `<rev>`'s setup written back as a new revision (Keep my history: workouts logged since stay), backup `before-plan-revert`, `source: revert` |
+| `server/ops plan preview <file> [--user <u>]` | anywhere | req-245: the coach's plan file (the app's Export, or a bare state, with routines) against the DB, as Import's **Keep my history** would write it — the import lines + counts (routines added/changed/removed/archived, exercises, slots before → after, logged workouts identical) and the rev it was computed against. Opens the DB read-only; exit 1 when it prints REFUSED |
+| `server/ops plan apply <file> --source <s> --note "<t>" [--yes --expect-rev <n>]` | anywhere | the same preview (exit 2, prints the `--expect-rev` to use); with `--yes --expect-rev <n>`: refused unless the server is still at rev `n`, then backup `before-plan-<s>` and one new revision through `putState` (fast-forward only) carrying `source`/`note`. Refused, with nothing written and no backup, while a workout is in progress, when the file's logged workouts differ from the server's (ones logged since the export are fine), or for an invalid file. A file whose schedule has no `anchor` keeps the server's |
+| `server/ops plan revert <rev> [--yes --expect-rev <n>] [--note "<t>"]` | anywhere | revision `<rev>`'s setup written back as a new revision (Keep my history: workouts logged since stay), backup `before-plan-revert`, `source: revert` |
 
 ## Plan changes (req-245, DEC-141)
 
+**Deploy first.** `plan apply`/`plan revert` run against the live DB only once the live server runs a req-245+ build:
+an older server prunes without the `source` rule and would drop the plan revisions within 14 days. On the live data dir
+the CLI checks it and refuses otherwise: the sha in `~/dev/workout/workout-live/DEPLOYED` must contain
+`server/plan.mjs` (`git cat-file -e <sha>:server/plan.mjs`, looked up in `WORKOUT_REPO_DIR`, this checkout, then
+`~/dev/workout/workout-codebase`). A non-live `WORKOUT_DATA_DIR` (a throwaway instance, the tests) skips the check.
+
 The coach's change goes into the DB as a revision, not as an import file; the phone picks it up on its
-next sync. On the live DB `apply` and `revert` are non-request writes (BACKEND rule 5): preview first,
-then Emilio's yes with the counts, then `--yes`. `--user` is needed only when the DB has more than one
-account. Every revision lists `source` and `note` in `GET /api/revisions` (null for a device push); a
-revision written by `plan apply`/`plan revert` is never pruned, so it can always be reverted to.
-Without `--yes`, `apply` and `revert` exit 2 and write nothing.
+next sync. On the live DB `apply` and `revert` are non-request writes (BACKEND rule 5):
+
+1. `server/ops plan apply <file> --source coach --note "…"` — the preview; it ends `To write it: … --yes --expect-rev <n>`.
+2. Emilio's yes on those counts.
+3. That exact command with `--yes --expect-rev <n>`. If anything synced in between (the rev moved), it is refused with
+   nothing written: preview again and ask again.
+
+`--user` is needed only when the DB has more than one account. Every revision lists `source` and `note` in
+`GET /api/revisions` (null for a device push); a revision written by `plan apply`/`plan revert` is never pruned, so it
+can always be reverted to.
 
 ## Restore drill (BACKEND rule 7)
 
