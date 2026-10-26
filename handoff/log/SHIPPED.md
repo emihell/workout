@@ -2657,3 +2657,10 @@ read). No reviewer: no trigger file. Left: `deploy.yml:27` node-version '22' (ha
 assertions unchanged. Gate: fails on main (Monday, `click target not found`), passes on the branch (6/6, Planner re-ran); per-weekday
 run all green but Monday-on-main; leak probe diff 0 ms. Red `./check` was `check_skills` from req-238's spec quote → fixed in
 handoff (L-059). No reviewer: no trigger file. `reports/req-236.md`.
+
+## req-237 — weekly scheduled backup, hourly catch-up, doctor checks it  (2026-10-26)
+
+**req-237** (tooling; throwaway agent). `<label>.weekly` (RunAtLoad + hourly, `backup --weekly --if-due`, due at ≥ 7 d by the
+name's stamp), keeps 4 weekly+legacy nightly; start/stop remove the old `.nightly`; doctor FAILs on no scheduled backup or > 8 d,
+launchd last-exit ≠ 0. Gate: `./check` green (2089 pass); server suite 88/88 (Planner re-ran on the branch); guard self-test
+(old any-backup logic → 2 doctor tests fail). Diff read by Planner. No reviewer: no DEC-057 trigger file. `reports/req-237.md`.
