@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS revisions (
   merged INTEGER NOT NULL DEFAULT 0,
   conflicts TEXT NOT NULL DEFAULT '[]',
   created_at TEXT NOT NULL,
+  source TEXT,
+  note TEXT,
   PRIMARY KEY (user_id, rev)
 );
 -- req-230 review round 4 (#2): one row per revision removed by pruning (store.mjs pruneRevisions) —
@@ -80,6 +82,7 @@ export function openDb(file) {
   if (file !== ':memory:') db.exec('PRAGMA journal_mode = WAL')
   db.exec('PRAGMA busy_timeout = 5000')
   db.exec(SCHEMA)
+  addRevisionColumns(db)
   const { user_version: version } = db.prepare('PRAGMA user_version').get()
   if (version === 0) db.exec(`PRAGMA user_version = ${DB_SCHEMA_VERSION}`)
   else if (version !== DB_SCHEMA_VERSION) {
@@ -87,6 +90,26 @@ export function openDb(file) {
     throw new Error(`Database schema v${version} is not the v${DB_SCHEMA_VERSION} this server knows.`)
   }
   return db
+}
+
+// req-245 (DEC-141) — who wrote a revision and why: `source`/`note`, set by `./server/ops plan apply`
+// and `plan revert`, null for a device push. Additive like pruned_revisions: a DB made before req-245
+// (a backup restored later included) gains both columns when it is opened. No schema-version bump —
+// an older server reading a newer DB ignores two nullable columns.
+export const REVISION_COLUMNS = ['source', 'note']
+function addRevisionColumns(db) {
+  const have = new Set(db.prepare('PRAGMA table_info(revisions)').all().map((c) => c.name))
+  for (const name of REVISION_COLUMNS) {
+    if (have.has(name)) continue
+    try {
+      db.exec(`ALTER TABLE revisions ADD COLUMN ${name} TEXT`)
+    } catch (error) {
+      // Review nit: another process (the server, an ops command) added it between our check and ALTER.
+      if (!/duplicate column name/i.test(error.message)) throw error
+      const now = new Set(db.prepare('PRAGMA table_info(revisions)').all().map((c) => c.name))
+      if (!now.has(name)) throw error
+    }
+  }
 }
 
 // Run `fn` in one write transaction (BEGIN IMMEDIATE), rolling back on a throw.

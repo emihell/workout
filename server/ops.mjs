@@ -249,6 +249,26 @@ function rawCopy(dataDir, dbFile, at) {
   return file
 }
 
+// req-245 review (deploy order) — does the LIVE server run a req-245+ build? A server from before it
+// prunes without the `source IS NULL` rule and would drop the plan revisions. Read from the live
+// copy's DEPLOYED (`<ref> <sha> <date>`, server/deploy): that sha must hold server/plan.mjs in one of
+// `repoDirs` (`git cat-file -e <sha>:server/plan.mjs`). Anything it can't confirm is a no.
+export function liveBuildCheck(liveDir, repoDirs) {
+  const file = join(liveDir, 'DEPLOYED')
+  if (!existsSync(file)) return { ok: false, text: `no ${file} — is the server deployed?` }
+  const sha = readFileSync(file, 'utf8').trim().split(/\s+/)[1]
+  if (!/^[0-9a-f]{4,40}$/.test(sha ?? '')) return { ok: false, text: `${file} names no commit` }
+  for (const repo of repoDirs) {
+    try {
+      execFileSync('git', ['-C', repo, 'cat-file', '-e', `${sha}:server/plan.mjs`], { stdio: 'ignore' })
+      return { ok: true, sha, text: `the live build ${sha} has server/plan.mjs` }
+    } catch {
+      // not in this repo, or the commit lacks the file — try the next
+    }
+  }
+  return { ok: false, sha, text: `the live build ${sha} has no server/plan.mjs (checked ${repoDirs.join(', ') || 'no repo'}) — deploy a req-245+ main first` }
+}
+
 // ---- doctor: the pure checks (the CLI gathers the inputs) ----
 
 // `tailscale serve status --json` → {mapped, funnel}: is :httpsPort a tailnet-only proxy to

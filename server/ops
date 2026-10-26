@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# req-245 — ./server/ops plan preview|apply|revert … (DEC-141): the coach's plan change into the DB
+# as a new revision. Works on WORKOUT_DATA_DIR (default: the LIVE data dir — Planner only, with
+# Emilio's yes; BACKEND rule 5). The other ops-cli commands (backup, restore, counts, doctor) work too.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+. "$ROOT/server/lib.sh"
+exec node "$ROOT/server/ops-cli.mjs" "$@"

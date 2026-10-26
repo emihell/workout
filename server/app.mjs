@@ -7,7 +7,7 @@
 //   GET  /api/me                    → {username}
 //   GET  /api/state[?baseRev&baseId] → {rev, revId, state[, baseOk]}  (req-230 review round 2)
 //   PUT  /api/state {baseRev, state} → {rev, state, merged, conflicts[, unchanged]}
-//   GET  /api/revisions             → [{rev, baseRev, merged, conflicts, createdAt}]
+//   GET  /api/revisions             → [{rev, baseRev, merged, conflicts, createdAt, source, note}]  (req-245)
 //   GET  /api/revisions/:rev        → {rev, …, conflicts, state}
 //   GET  /api/export                → the app's Export file
 //   GET  /api/notes, POST /api/notes

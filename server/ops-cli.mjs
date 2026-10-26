@@ -5,14 +5,19 @@
 //   restore <backup> [--yes]             into the data dir: server stopped, pre-restore backup, marker
 //   counts [<db file>]                   record counts (default: the data dir's DB)
 //   doctor                               bind, funnel, tailscale mapping, data path, launchd, weekly backup
+//   plan preview <file> [--user <u>]     req-245: the coach's plan file against the DB (reads only)
+//   plan apply <file> --source <s> --note <t> [--yes --expect-rev <n>] [--user <u>]   backup, then one new revision
+//   plan revert <rev> [--yes --expect-rev <n>] [--note <t>] [--user <u>]             that revision's setup, as a new one
+//   (WORKOUT_REPO_DIR: where the live DEPLOYED sha is looked up; default this checkout, then ~/dev/workout/workout-codebase)
 // Environment, as the scripts set it: WORKOUT_DATA_DIR, WORKOUT_PORT, WORKOUT_HTTPS_PORT (8446),
 // WORKOUT_LABEL (com.workout.server), WORKOUT_LIVE_DIR (~/dev/workout/workout-live),
 // WORKOUT_AGENTS_DIR (~/Library/LaunchAgents — where the doctor reads <label>.plist; a test seam).
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { DB_FILE, NODE_FLOOR_TEXT, SECRET_FILE, isInside, nodeVersionOk, realish, serverConfig } from './config.mjs'
+import { DB_FILE, LIVE_DATA_DIR, NODE_FLOOR_TEXT, REPO_ROOT, SECRET_FILE, isInside, nodeVersionOk, realish, serverConfig } from './config.mjs'
 
 export const HTTPS_PORT = 8446
 export const LABEL = 'com.workout.server'
@@ -193,15 +198,201 @@ async function doctor() {
   if (failed) process.exitCode = 1
 }
 
+// ---- req-245: plan preview | apply | revert ----
+
+// `--flag value` and bare `--flag` options after the positional arguments.
+function parseArgs(args, valued, bare) {
+  const positional = []
+  const opts = {}
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i]
+    if (valued.includes(a)) {
+      if (args[i + 1] === undefined) throw new Error(`${a} needs a value.`)
+      opts[a.slice(2)] = args[++i]
+    } else if (bare.includes(a)) opts[a.slice(2)] = true
+    else if (a.startsWith('--')) throw new Error(`unknown option ${a}`)
+    else positional.push(a)
+  }
+  return { positional, opts }
+}
+
+const fileHash = (file) => (existsSync(file) ? createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 16) : 'none')
+
+// --user, or the only account.
+function pickUser(db, name) {
+  const users = db.prepare('SELECT id, username FROM users ORDER BY id').all()
+  if (name) {
+    const user = users.find((u) => u.username === name)
+    if (!user) throw new Error(`No user "${name}". Users: ${users.map((u) => u.username).join(', ') || 'none'}.`)
+    return user
+  }
+  if (users.length !== 1) throw new Error(`--user is needed: ${users.length} users (${users.map((u) => u.username).join(', ') || 'none'}).`)
+  return users[0]
+}
+
+function printPlan(title, plan) {
+  const c = plan.counts
+  const d = (x) => `${x.added} added, ${x.changed} changed, ${x.removed} removed`
+  console.log(title)
+  for (const line of plan.lines) console.log(`  ${line}`)
+  console.log('counts')
+  console.log(`  routines: ${d(c.routines)}, ${c.routines.archived} archived`)
+  console.log(`  exercises: ${d(c.exercises)}`)
+  console.log(`  schedule slots: ${c.slots.before} → ${c.slots.after}`)
+  console.log(`  logged workouts: ${c.workouts} · identical after: ${c.workoutsIdentical ? 'yes' : 'NO'}`)
+  console.log(`  workout in progress: ${c.activeWorkout ? 'YES' : 'no'}`)
+  if (plan.unchanged) console.log('Nothing to change: the result equals the current state.')
+  for (const r of plan.refusals) console.log(`REFUSED: ${r}`)
+}
+
+function readJson(file) {
+  const path = resolve(file)
+  if (!existsSync(path)) throw new Error(`No such file: ${path}`)
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'))
+  } catch (error) {
+    throw new Error(`${path} is not JSON: ${error.message}`)
+  }
+}
+
+function dbFileOf() {
+  const dbFile = join(config.dataDir, DB_FILE)
+  if (!existsSync(dbFile)) throw new Error(`No database at ${dbFile}.`)
+  return dbFile
+}
+
+async function plan(args) {
+  const [sub, ...rest] = args
+  const { DatabaseSync } = await import('node:sqlite')
+  const { openDb } = await import('./db.mjs')
+  const p = await import('./plan.mjs')
+  const { getRevision } = await import('./store.mjs')
+  const report = (refusedOrPlan) => {
+    if (refusedOrPlan instanceof p.PlanRefused) {
+      printPlan('', refusedOrPlan.plan)
+      console.log('Nothing written, no backup taken.')
+      process.exitCode = 1
+      return true
+    }
+    return false
+  }
+
+  if (sub === 'preview') {
+    const { positional, opts } = parseArgs(rest, ['--user'], [])
+    if (positional.length !== 1) throw new Error('usage: plan preview <file> [--user <name>]')
+    const incoming = p.readPlanFile(readJson(positional[0]))
+    // Read-only: preview never writes the DB, not even a schema addition.
+    const db = new DatabaseSync(dbFileOf(), { readOnly: true })
+    try {
+      const user = pickUser(db, opts.user)
+      const out = p.previewPlan(db, user.id, incoming)
+      printPlan(`plan preview: ${resolve(positional[0])} for ${user.username}, against rev ${out.rev}`, out)
+      console.log('Nothing written (preview).')
+      if (out.refusals.length) process.exitCode = 1
+    } finally {
+      db.close()
+    }
+    return
+  }
+
+  if (sub === 'apply' || sub === 'revert') {
+    const apply = sub === 'apply'
+    const { positional, opts } = parseArgs(rest, apply ? ['--user', '--source', '--note', '--expect-rev'] : ['--user', '--note', '--expect-rev'], ['--yes'])
+    if (positional.length !== 1) {
+      throw new Error(
+        apply
+          ? 'usage: plan apply <file> --source <name> --note "<text>" [--yes --expect-rev <n>] [--user <name>]'
+          : 'usage: plan revert <rev> [--yes --expect-rev <n>] [--note "<text>"] [--user <name>]',
+      )
+    }
+    // Review nit: the dry run checks the flags too, so the approved command line is the one that runs.
+    if (apply) p.checkMeta(opts.source, opts.note)
+    let expectRev
+    if (opts.yes) {
+      // Review: --yes is tied to the approved preview — the rev it was computed against.
+      expectRev = Number(opts['expect-rev'])
+      if (opts['expect-rev'] === undefined || !Number.isInteger(expectRev) || expectRev < 0) {
+        throw new Error('--yes needs --expect-rev <n>: the rev the approved preview printed ("against rev n").')
+      }
+      // Review (deploy order): on the live data dir, only once the live server runs a req-245+ build.
+      if (isInside(config.dataDir, LIVE_DATA_DIR)) {
+        const repos = [env.WORKOUT_REPO_DIR, REPO_ROOT, join(homedir(), 'dev', 'workout', 'workout-codebase')].filter((d) => d && existsSync(d))
+        const live = ops.liveBuildCheck(liveDir, [...new Set(repos)])
+        if (!live.ok) throw new Error(`Refusing, nothing written: ${live.text}. The old server's pruning would drop plan revisions.`)
+      }
+    }
+    let incoming
+    let rev
+    if (apply) incoming = p.readPlanFile(readJson(positional[0]))
+    else {
+      rev = Number(positional[0])
+      if (!Number.isInteger(rev) || rev < 1) throw new Error(`plan revert: <rev> is a revision number (got "${positional[0]}").`)
+    }
+    const dbFile = dbFileOf()
+    if (!opts.yes) {
+      // The preview of what --yes would write; still reads only.
+      let previewedRev
+      const db = new DatabaseSync(dbFile, { readOnly: true })
+      try {
+        const user = pickUser(db, opts.user)
+        if (!apply) {
+          const row = getRevision(db, user.id, rev)
+          if (!row) throw new Error(`Revision ${rev} is not kept (pruned, or never written).`)
+          incoming = row.state
+        }
+        const out = p.previewPlan(db, user.id, incoming, { checkFileHistory: apply })
+        previewedRev = out.rev
+        printPlan(`plan ${sub}: ${apply ? resolve(positional[0]) : `rev ${rev}’s setup`} for ${user.username}, against rev ${out.rev}`, out)
+        if (out.refusals.length) process.exitCode = 1
+      } finally {
+        db.close()
+      }
+      if (!process.exitCode) {
+        const rerun = apply ? `plan apply ${positional[0]} --source ${opts.source} --note "…"` : `plan revert ${rev}`
+        console.log(`\nNothing written. With --yes: a backup (before-plan-${apply ? opts.source : 'revert'}), then one new revision.`)
+        console.log(`To write it: ${rerun} --yes --expect-rev ${previewedRev}`)
+        process.exitCode = 2
+      }
+      return
+    }
+    const db = openDb(dbFile)
+    try {
+      const user = pickUser(db, opts.user)
+      const at = new Date()
+      let out
+      try {
+        out = apply
+          ? await p.applyPlan(db, config.dataDir, user.id, incoming, { source: opts.source, note: opts.note, at, expectRev })
+          : await p.revertPlan(db, config.dataDir, user.id, rev, { note: opts.note, at, expectRev })
+      } catch (error) {
+        if (report(error)) return
+        throw error
+      }
+      printPlan(`plan ${sub} for ${user.username}, against rev ${out.fromRev}`, out)
+      if (!out.written) {
+        console.log('Nothing written, no backup taken.')
+        return
+      }
+      console.log(`backup: ${out.backup} (sha256 ${fileHash(out.backup)})`)
+      console.log(`wrote rev ${out.rev} (source ${apply ? opts.source : 'revert'}); the phone picks it up on its next sync.`)
+    } finally {
+      db.close()
+    }
+    return
+  }
+  throw new Error('usage: plan preview|apply|revert …')
+}
+
 const [command, ...args] = process.argv.slice(2)
 const commands = {
   backup,
   restore,
   doctor,
+  plan,
   counts: async ([file]) => printCounts(file ?? join(config.dataDir, DB_FILE), ops.counts(resolve(file ?? join(config.dataDir, DB_FILE)))),
 }
 if (!commands[command]) {
-  console.error('usage: ops-cli.mjs backup|restore|counts|doctor …')
+  console.error('usage: ops-cli.mjs backup|restore|counts|doctor|plan …')
   process.exit(1)
 }
 try {
