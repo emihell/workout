@@ -17,8 +17,8 @@ DEC-135: Pages shut down; "Follow-up req: `deploy.yml` becomes a check-only CI g
 - Last runs: 4× success, newest `40234225874` 2026-10-25T21:10Z (`gh run list --workflow deploy.yml -L 4`) — so
   `./check` incl. the server tests (req-229) and the smoke run green on ubuntu.
 - Stale "Pages" text: `check:8-10` ("main auto-deploys to GitHub Pages"), `check:21` ("the Pages deploy always runs
-  it"), `scripts/smoke.mjs:2-3` ("It gates the Pages deploy"), `.claude/skills/closeout/SKILL.md:3,18-20` ("the deploy's
-  CI run … a red run means the site did not ship").
+  it"), `scripts/smoke.mjs:2-3` ("It gates the Pages deploy"), `.claude/skills/closeout/SKILL.md:3,18-20` (its
+  deploy-CI-run step and the line after it — cited, not quoted: a quote trips `check_skills.py`, L-059).
 
 ## Scope
 

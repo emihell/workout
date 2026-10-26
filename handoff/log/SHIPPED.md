@@ -2650,3 +2650,10 @@ no trigger file. `reports/req-234.md`.
 `engines >=22.16`; doctor FAILs on a missing / non-executable / below-floor plist node, notes an `~/.nvm` path. Gate: `./check`
 green (137 files); failure case on a throwaway label (+ darwin test). Guards test edit = floor moved, boundaries kept (Planner
 read). No reviewer: no trigger file. Left: `deploy.yml:27` node-version '22' (harmless). `reports/req-235.md`.
+
+## req-236 — req-200's /schedule test pinned to a Wednesday  (2026-10-26)
+
+**req-236** (bug, test-only; throwaway agent). The `:93` test pins `Date` to Wed 7 Oct 2026 (`mock.timers`, reset in `finally`);
+assertions unchanged. Gate: fails on main (Monday, `click target not found`), passes on the branch (6/6, Planner re-ran); per-weekday
+run all green but Monday-on-main; leak probe diff 0 ms. Red `./check` was `check_skills` from req-238's spec quote → fixed in
+handoff (L-059). No reviewer: no trigger file. `reports/req-236.md`.
