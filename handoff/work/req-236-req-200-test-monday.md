@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · test-only
+**Status: BUILT AND MERGED, 2026-10-26 — branch `req-236` (`fbc383c`…`fbc383c`, 1 commit).** · **Lane: bug** · test-only
 
 # req-236 — src/req-200.test.js fails every Monday: pin its clock
 
