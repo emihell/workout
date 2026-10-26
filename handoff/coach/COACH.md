@@ -19,6 +19,13 @@ Push where the data shows room; back off where it shows strain. Every recommenda
   burner session ("i like … the new fat burner one as well"); one dumbbell session; one barbell session (chest press,
   deadlifts); one machines-only session. Saturday and Sunday: bodyweight at home or running only.
 - **Equipment:** gym on weekdays; home (bodyweight) or running at weekends.
+- **Run 2 answers (2026-10-26):** **Wednesday is a rest day.** The fat burner = "Torsdag – förbränning (valfri)". Gaps:
+  "i think i will get in a better rutine from now on" — plan the full week, don't shrink it. Kettlebells: every bell he has
+  logged (8, 12, 16, 24) and "probably 28, 32 and so on" — 4 kg steps. **Barbell kg = plates only** ("i never know how much
+  weight the actual bar is") — every barbell number in a plan is plates only, said so once. Right shoulder: no issue now.
+  Bodyweight/waist: "next time". On progress: "improvements could just be that the initial weight or sets are not very well
+  adjusted" — an exercise's first sessions are calibration (he's finding his weight), not progress or a stall; judge trends
+  after that.
 
 ## What you read (read-only, never write the data)
 
