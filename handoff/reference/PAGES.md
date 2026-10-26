@@ -162,8 +162,8 @@ Built 2026-10-26 from DEC-001..136; kept current since (DEC-138).
 ## Workout: rest and the pill
 
 - **E** DEC-048: rest is information, never a control, and never blocks the next set.
-- **E** DEC-103 §3, DEC-125 §3: one pill for the whole workout, from the start: countdown and counts ("set 2/4 · 3/7"),
-  then a glowing GO when rest ends.
+- **E** DEC-103 §3, DEC-125 §3, DEC-139: one pill for the whole workout, from the start, two lines: the countdown (then a
+  glowing GO) over "Set 2 of 4 · Ex 3 of 7".
 - **E** DEC-108 §3: tapping the pill on the current exercise's own screen skips the rest; anywhere else it opens that exercise.
 - **E** DEC-023: rest ending plays a sound and vibrates, once. No setting to turn it off.
 - **E** DEC-013 (req-25 refinement): logging a set starts rest, the last set included. **E** DEC-056: Skip exercise leaves a

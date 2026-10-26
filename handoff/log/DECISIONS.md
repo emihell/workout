@@ -2202,3 +2202,10 @@ options A keep / B link / C drop guided setup; Emilio: "your rec" → **B**.
    weighted or bodyweight, nothing logged).
 3. Guided setup itself is kept (rejected C: beginners lose the only weight help); the prompt is dropped (rejected A).
 Built as req-239.
+
+## DEC-139 — the workout pill: two lines, words not fractions  (Emilio, 2026-10-26, batch 7 J5)
+
+Emilio's note: "The go is a bit messy right now need a redesing." Options in req-244 (A two lines / B fill bar / C clock
+only); Emilio: "a". Line 1 the rest clock or GO (pulse kept); line 2 "Set 2 of 4 · Ex 3 of 7"; on the exercise's own screen
+while resting, line 2 reads "Tap to skip rest". Content and tap rules unchanged (DEC-103 §3, DEC-108 §3, DEC-125 §3).
+Rejected: B (the workout count loses its number), C (undoes DEC-125 §3). Built as req-244.

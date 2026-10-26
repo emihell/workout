@@ -23,7 +23,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
   kickstart → exit 0); doctor missed it → req-237. Backups go weekly (DEC-136). (3) Off-Mac backup copy: Emilio handles it himself ("ill worry about ecternal backup", 2026-10-26) — not tracked. (4) Pages shut down, site 404 (DEC-135). Images: backlog.
 - **READY 2026-10-26, unbuilt:** req-236 (req-200 test red on Mondays — till then `plan publish` needs `WORKOUT_SKIP_CHECK=1`
   on Mondays) → req-238 (CI check-only, re-enable); req-237 (weekly backup + hourly catch-up + doctor), independent.
-- **Batch 7 (BACKLOG §batch 7):** READY 239 → 240 → 241, 242, 243; req-244 GO pill NEEDS DECISIONS (A/B/C). Held for go.
+- **Batch 7 (BACKLOG §batch 7):** READY 239 → 240 → 241, 242, 243; 244 (GO pill, look A). Held for go.
 - **Cleanup batch 2026-10-14 + batch 6 (DEC-125/126) DONE.** Feel list: SHIPPED; follow-ups BACKLOG §batch 6.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184
   session 2. Batch 192–195 feel list: each req's "Built — calls".

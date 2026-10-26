@@ -627,7 +627,7 @@ Pasted 2026-10-26 with the batch-6 notes (I1..I11, done). The notes came from th
 has 0 rows [measured, read-only]. [measured] `git log a895ce4..main` on the touched views/ui is empty → J1..J8 apply to live
 code. Exercises identified from Emilio's server data (read-only, rev 4). **DEC-137 check against `reference/PAGES.md`:**
 J2 goes against an E line → Emilio's call. The rest go against no E decision → Planner's to fix. J5 is a visual redesign,
-so Emilio judges the look (DEC-095 §2). **J2 → DEC-138. Specced: req-239 (J2), 240 (J3+J6), 241 (J4+J7), 242 (J8), 243 (J1) READY; req-244 (J5) NEEDS DECISIONS.**
+so Emilio judges the look (DEC-095 §2). **J2 → DEC-138. Specced: req-239 (J2), 240 (J3+J6), 241 (J4+J7), 242 (J8), 243 (J1) READY; req-244 (J5) READY (look A, DEC-139).**
 
 - **J1 (Home) — "Om det är idag, så kan ja ju inte byta passet till idag"** ("if it's today, I can't swap it *to* today"). Planner's
   reading: the sheet's button "Swap for today" reads as "move it to today" on a workout that is already today's

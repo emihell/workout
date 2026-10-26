@@ -1,12 +1,12 @@
-**Status: NEEDS DECISIONS** · **Lane: ui** · batch 7 (J5). Look only; no stored-data change.
+**Status: READY** · **Lane: ui** · batch 7 (J5). Look only; no stored-data change.
 
 # req-244 — the workout pill, redesigned
 
 Emilio, 2026-10-19 (log screen): "The go is a bit messy right now need a redesing."
 
-## Open question (Emilio's — the look)
+## Decided — look A (DEC-139, Emilio: "a")
 
-Which look? Content stays (DEC-103 §3, DEC-125 §3, DEC-108 §3 — all **E**): rest countdown, then GO; the current exercise's
+The options as shown to him. Content stays (DEC-103 §3, DEC-125 §3, DEC-108 §3 — all **E**): rest countdown, then GO; the current exercise's
 set count; the whole workout's count; tap skips rest on the exercise's own screen, else opens it.
 
 ```
@@ -31,13 +31,13 @@ Planner recommends **A**: same size class as today, words instead of fractions, 
   (`views/workout/rest.jsx:12-31`). Render: `ui/index.jsx:390-415` — one line `lead · tail`, `.ui-restpill`, GO pulse
   `.ui-restpill--go`; `skip` replaces the tail with "skip" (`:396`).
 
-## Scope (once picked)
+## Scope
 
 1. Restyle `UIWorkoutPill` to the chosen look; words "Set N of M", "Ex N of M" (A) — the state helper unchanged.
 2. Skip state on the own screen keeps "skip" (A: second line "Tap to skip rest").
 3. Showcase (`#/components`) shows rest / GO / skip states.
 
-## Acceptance criteria (for A; adjusted to the pick)
+## Acceptance criteria
 
 1. Resting: line 1 "1:12", line 2 "Set 2 of 4 · Ex 3 of 7"; rest over: line 1 "GO" with the pulse.
 2. **Failure case:** first exercise, nothing logged → no set count → line 2 shows only "Ex 1 of 7" (no stray separator).
