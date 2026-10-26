@@ -27,11 +27,11 @@ function buildId(command) {
 }
 
 // req-230 — the build switch. Sync (login, server sync, the offline service worker) is ON only
-// in the server build: `npm run build:server` (WORKOUT_SYNC=true). Every other build — the Pages
-// deploy (GITHUB_PAGES=true, which always wins), `npm run build`, `npm run dev`, `plan qa` — has
-// it OFF, and main.jsx's sync branch is dropped from the bundle.
+// in the server build: `npm run build:server` (WORKOUT_SYNC=true). Every other build —
+// `npm run build`, `npm run dev`, `plan qa` — has it OFF, and main.jsx's sync branch is dropped
+// from the bundle. req-238: the GitHub Pages build mode is gone (DEC-135); every build is base '/'.
 export function syncEnabled(env = process.env) {
-  return env.WORKOUT_SYNC === 'true' && env.GITHUB_PAGES !== 'true'
+  return env.WORKOUT_SYNC === 'true'
 }
 
 function filesUnder(dir) {
@@ -68,7 +68,7 @@ export default defineConfig(({ command }) => ({
     __BUILD_ID__: JSON.stringify(buildId(command)),
     __SYNC__: JSON.stringify(syncEnabled()),
   },
-  base: process.env.GITHUB_PAGES === 'true' ? '/workout/' : '/',
+  base: '/',
   // req-165 (F-BUNDLE-1) — the one chunk over Vite's 500 kB default is the LAZY exercise
   // library (exerciseLibrary.js loadExerciseLibrary → library/exercises.json), measured
   // 1,538.3 kB (263.6 kB gzip) on 2026-09-25; only the Library's search screen loads it.

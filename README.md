@@ -1,6 +1,8 @@
 # Workout MVP product contract
 
-This browser-only MVP supports one trustworthy loop: set up exercises and reusable routines, schedule them, start a workout snapshot, log sets, and keep an editable historical record.
+This MVP supports one trustworthy loop: set up exercises and reusable routines, schedule them, start a workout snapshot, log sets, and keep an editable historical record.
+
+It runs from Emilio's own server (`./server/deploy` from `main`) at `https://macbookpro-intel-2017.tail58ea74.ts.net:8446`: invite-only login, reachable on the tailnet only. It opens offline and syncs to the server when it can. Details: [`server/README.md`](server/README.md).
 
 ## Entity ownership
 
@@ -32,7 +34,7 @@ Finishing a workout never changes the routine. Correcting history offers an upda
 
 ## Persistence and migration
 
-The seed in `src/db.json` is provenance and reference only — it is not loaded at runtime; first run starts from an empty state (`emptyState()` returns empty arrays). Live state is stored in browser `localStorage` under `workout-mvp-v9`. On load, older v5–v8 keys are migrated up to schema version 9 (`workout-mvp-v8` is now a legacy key read only for migration): `sessions`/`programs` become `routines`, slot and workout `sessionId` becomes `routineId`, and leftover program wrapping is dropped. Existing opaque ids (`sess-…`, `si-…`) are kept.
+The seed in `src/db.json` is provenance and reference only — it is not loaded at runtime; first run starts from an empty state (`emptyState()` returns empty arrays). The phone's working copy is stored in browser `localStorage` under `workout-mvp-v9`; `src/sync/` pushes it to the server, which keeps it per user as revisions. On load, older v5–v8 keys are migrated up to schema version 9 (`workout-mvp-v8` is now a legacy key read only for migration): `sessions`/`programs` become `routines`, slot and workout `sessionId` becomes `routineId`, and leftover program wrapping is dropped. Existing opaque ids (`sess-…`, `si-…`) are kept.
 
 ## Setup (first time on a machine)
 
@@ -118,11 +120,9 @@ node --test        # runs every *.test.js under src/, nested folders included
 
 Dev server: a single instance at http://localhost:5173/
 
-Live (after GitHub Pages is set to the `gh-pages` branch): https://emihell.github.io/workout/
-
 ## Deferred scope
 
-No accounts, sharing, collaboration, sheet-import UI, insights, charts, GPS, social features, or visual-design pass are part of this MVP. This is the browser-only MVP. The product is headed for other users and training together on a server (DEC-073); that scope opens with the backend design (req-146), not before.
+No accounts for others, sharing, training together, sheet-import UI, insights, charts, GPS, social features, or visual-design pass are part of this MVP. The product is headed for other users and training together (DEC-073); that scope opens with req-146 stages 2–3, not before.
 
 ## Planning workflow
 

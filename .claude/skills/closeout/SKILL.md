@@ -1,6 +1,6 @@
 ---
 name: closeout
-description: Load FIRST, before reading any file, whenever asked to close out, merge and record, ship, or finish off req-N after its gate passed (planning session). The checklist — recording pass, `./plan save`, `./plan closeout req-N`, push receipts, the deploy's CI run.
+description: Load FIRST, before reading any file, whenever asked to close out, merge and record, ship, or finish off req-N after its gate passed (planning session). The checklist — recording pass, `./plan save`, `./plan closeout req-N`, push receipts, the CI run.
 ---
 
 The process is `handoff/rules/CLOSEOUT.md` — read it in full; this is the checklist that runs it. Merge only on
@@ -15,6 +15,6 @@ the gate the lane sets (`handoff/rules/WORKFLOW.md` §Requirement lanes; DEC-035
 5. **Receipts to paste:** `closeout`'s tail (merge commit, `./check` green line, push lines),
    `git log origin/main --oneline -1`, and `./plan status` showing "planning is fully merged, both worktrees clean"
    (§Done when).
-6. **The deploy:** `gh run list --workflow deploy.yml --limit 1`, then `gh run watch <id> --exit-status`.
-   Paste the run id and its result, the smoke step included. A red run means the site did not ship — say so and
+6. **The CI run:** `gh run list --workflow deploy.yml --limit 1`, then `gh run watch <id> --exit-status`.
+   Paste the run id and its result, the smoke step included. A red run means `main` is red — say so and
    open a bug-lane req; don't re-push blind.

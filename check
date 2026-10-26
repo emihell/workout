@@ -5,9 +5,9 @@
 # it cannot. `./plan publish` runs it before merging and refuses on failure.
 #
 # Three gates, cheap to expensive: lint, unit tests, production build. The
-# build is a real gate here, not a nicety — main auto-deploys to GitHub Pages
-# on every push (.github/workflows/deploy.yml), so a main that doesn't build
-# ships a broken site.
+# build is a real gate here, not a nicety — CI runs this gate on every push to
+# main (.github/workflows/deploy.yml), and `./server/deploy` ships the build, so a
+# main that doesn't build can't ship.
 #
 # The bypass is one explicit, echoed env flag, mirroring the handoff hook's
 # HANDOFF=1: WORKOUT_SKIP_CHECK=1 skips the checks and says so loudly on
@@ -18,7 +18,7 @@
 # error). The one argument it reads WIDENS it: `--smoke` (req-159) adds the
 # headless browser smoke test (scripts/smoke.mjs — the core loop by real clicks
 # on an isolated build of HEAD, ~5s). Off by default so every ./check stays
-# fast; the Pages deploy always runs it.
+# fast; CI always runs it.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -99,7 +99,7 @@ echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
 # the whole run, not only for test files that import server/test-helpers.mjs.
 WORKOUT_SERVER_TEST=1 node --test "${testfiles[@]}" || fail "the test suite"
 
-# 3. Production build (vite) — main must stay deployable to Pages.
+# 3. Production build (vite) — main must stay deployable (`./server/deploy` builds it).
 echo "check: building (vite build)…"
 npm run --silent build >/dev/null || fail "the production build"
 

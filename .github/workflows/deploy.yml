@@ -1,47 +1,33 @@
-name: Deploy GitHub Pages
+# req-238 — check-only CI. This no longer deploys anything: GitHub Pages is shut down (DEC-135)
+# and the live app ships from Emilio's own server via `./server/deploy`. The file keeps its
+# name so the workflow id, `gh workflow enable deploy.yml` and the closeout skill's
+# `--workflow deploy.yml` stay the same.
+name: CI
 
 on:
+  # No paths filter: ./check covers server/**, scripts/** and the skills check reads handoff/,
+  # so any push to main can turn it red.
   push:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - 'index.html'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'vite.config.js'
-      - '.github/workflows/deploy.yml'   # so changes to the deploy itself still deploy
-      - 'scripts/smoke.mjs'              # req-159: the deploy's smoke gate, and
-      - 'scripts/qa.mjs'                 # the isolated build it runs on
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  deploy:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # req-34: run the same gate the local flow runs (lint + tests + build)
-      # before deploying, so a red suite blocks the Pages deploy. ./check is the
-      # one source of truth — CI can't drift from what `plan publish` enforces.
-      # It builds too (without GITHUB_PAGES), so the deploy build below is the
-      # only Pages-configured build that ships.
+      # req-34: the same gate the local flow runs (lint + tests + build). ./check is the one
+      # source of truth — CI can't drift from what `plan publish` enforces.
       - run: ./check
-      # req-159: the core loop by real clicks in headless Chrome (scripts/smoke.mjs)
-      # on an isolated build of this commit; a red smoke blocks the deploy. Chrome
-      # comes from puppeteer's npm ci download; CI=true makes it run --no-sandbox
-      # (Ubuntu 23.10+ runners can block Chrome's user-namespace sandbox; not yet run on one).
+      # req-159: the core loop by real clicks in headless Chrome (scripts/smoke.mjs) on an
+      # isolated build of this commit. Chrome comes from puppeteer's npm ci download; CI=true
+      # makes it run --no-sandbox (Ubuntu 23.10+ runners can block Chrome's user-namespace sandbox).
       - run: node scripts/smoke.mjs
-      - run: npm run build
-        env:
-          GITHUB_PAGES: 'true'
-      - uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
