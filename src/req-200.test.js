@@ -3,7 +3,7 @@
 // from). The screens are rendered as the whole App under happy-dom (test-support/render.js),
 // as in req-198/199. req-204 (DEC-113) replaced Home's week list; what remains here is the
 // stale Continue row and the day screen.
-import { describe, it, afterEach } from 'node:test'
+import { describe, it, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import './test-support/locale.js' // req-228: date text is asserted in en-US on any machine locale
 import React from 'react'
@@ -91,11 +91,20 @@ describe('req-200 — the day screen', () => {
   })
 
   it('from /schedule: Back stays /schedule (and the Today link shows)', async () => {
-    await open('/schedule')
-    await tap(link('Monday — Upper Body›'))
-    assert.equal(window.location.hash, '#/schedule/0/1')
-    assert.equal(backHref(), '#/schedule')
-    assert.equal(link('Today')?.getAttribute('href'), '#/')
+    // req-236 test edit: the clock is pinned to a Wednesday. Schedule marks today's row
+    // "Today" (req-209), so on a real Monday the Monday row reads "Monday — Upper BodyToday›"
+    // and the exact-text link below is not found. Keep the pin; a Monday date fails this.
+    // setTimeout stays real: flush() needs it.
+    mock.timers.enable({ apis: ['setInterval', 'Date'], now: new Date(2026, 9, 7, 10, 0) }) // Wed 7 Oct 2026
+    try {
+      await open('/schedule')
+      await tap(link('Monday — Upper Body›'))
+      assert.equal(window.location.hash, '#/schedule/0/1')
+      assert.equal(backHref(), '#/schedule')
+      assert.equal(link('Today')?.getAttribute('href'), '#/')
+    } finally {
+      mock.timers.reset()
+    }
   })
 
   it('AC5: Home → a day row → Start now → a workout starts (activeWorkout.routineId)', async () => {
