@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · CI + Pages leftovers (DEC-135 follow-up; stage-1 fallout, DEC-143). req-236 (its
+**Status: BUILT, NOT merged — branch `req-238` (`a2af718`)** · **Lane: tooling** · CI + Pages leftovers (DEC-135 follow-up; stage-1 fallout, DEC-143). req-236 (its
 prerequisite) shipped. **Widened 2026-10-26:** every GitHub Pages leftover, not only CI (scope 6–8).
 
 # req-238 — no GitHub Pages left: check-only CI, one build mode, README says where the app lives

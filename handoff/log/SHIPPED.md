@@ -2672,3 +2672,12 @@ guard; `revisions.source/note` (nullable, added on open); sourced revisions neve
 server suite 104/104 (Planner re-ran on `2c19b34`); restore drill on a throwaway :8199 instance; Planner previewed coach run 3
 on a copy of the live DB (23 workouts identical). Reviewer: independent subagent — no blockers; 3 should-fix + 5 nits fixed
 in `2c19b34` (DEC-142). `reports/req-245.md`.
+
+## req-238 — no GitHub Pages left: check-only CI, one build mode, README says where the app lives  (2026-10-26)
+
+**req-238** (tooling; Builder). `deploy.yml` → `CI` / job `check` (npm ci → `./check` → smoke), every push to `main` +
+`workflow_dispatch`, no paths filter, `contents: read`, Node from `.nvmrc`; `GITHUB_PAGES` gone from `vite.config.js` (base `/`,
+sync only on `WORKOUT_SYNC=true`), `qa.mjs`, `plan`; README, `check`, `smoke.mjs`, closeout skill describe the server. Gate:
+`./check` green (138 files, Builder); AC 6 grep empty; AC 8 red (2 fail, syncEnabled forced true) → green 4/4. Diff read by
+Planner: `builds.test.js` keeps every marker on the plain build, `/workout/` base assertion → `/` (not weakened). AC 1's
+validator didn't run (npx blocked) — GitHub's own parse in AC 4 stands in. No reviewer: no DEC-057 trigger file. `reports/req-238.md`.
