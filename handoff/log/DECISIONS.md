@@ -2258,3 +2258,7 @@ server move (stage 1, DEC-127) has no fallout left. **Fallout** = work the chang
 leftovers, stage-1 promises not yet met (backups, conflicts kept), go-live checks. **Not fallout:** the next stage's work
 (other users, public hosting, AI — req-146 stages 2–3) and bugs the move merely uncovered in older code (the library
 resolver, req-233). Planner's split, proposed to Emilio 2026-10-26; the list lives in NOW.md until it is empty.
+**DEC-143 addition (Emilio, 2026-10-26):** one device only — "no i dont, and even if you do, the latest save should be the truth?
+its on you if you edit on multiplate devies". DEC-128 §2 already is newest-edit-wins; the "loser kept as a conflict" gap
+(req-230 review) is **not** stage-1 fallout → stage 2 (other users). The coach (`./server/ops plan`) is the one second writer
+today, guarded by `--expect-rev` and refused mid-workout (DEC-142).
