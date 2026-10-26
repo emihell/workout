@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: backend** · DEC-141. Writes the live DB through the normal path; one server-DB schema addition.
+**Status: BUILT AND MERGED, 2026-10-26 — branch `req-245` (`c29c96e`…`2c19b34`, 2 commits).** · **Lane: backend** · DEC-141. Writes the live DB through the normal path; one server-DB schema addition.
 
 # req-245 — `ops plan`: preview, apply and revert a plan change on the live server
 
