@@ -2249,3 +2249,12 @@ thinggs?"
 6. Apply/revert on the live dir refuse unless the live build contains `server/plan.mjs` (deploy first). 7. Revert restores
    that revision's whole setup (later setup edits included), never history; refused during a workout in progress.
 `(unconfirmed)` for Emilio: 1 and 7 (what a write may overwrite).
+
+## DEC-143 — an architectural change is finished 100% before new or feedback work starts  (Emilio, 2026-10-26)
+
+Emilio: "when we do architectual changes - big changes - we should make sure its 100% done and no reqs that have been created
+becouse of the change are left - then we can build new stuff or feedback stuff". So batch 7 (req-239..244) waits until the
+server move (stage 1, DEC-127) has no fallout left. **Fallout** = work the change itself caused or left half-done: Pages
+leftovers, stage-1 promises not yet met (backups, conflicts kept), go-live checks. **Not fallout:** the next stage's work
+(other users, public hosting, AI — req-146 stages 2–3) and bugs the move merely uncovered in older code (the library
+resolver, req-233). Planner's split, proposed to Emilio 2026-10-26; the list lives in NOW.md until it is empty.
