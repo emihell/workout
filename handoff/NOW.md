@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-10-26. **Shipped: everything through req-245** except req-32 (dropped), req-77 (PAUSED) and the reqs below —
+Updated 2026-10-26. **Shipped: everything through req-245, req-238** except req-32 (dropped), req-77 (PAUSED) and the reqs below —
 `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md` (rewritten 2026-10-26 to open items only). ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -26,7 +26,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 **Stage 1 fallout — finish before anything else (DEC-143):**
 - Emilio: phone go-live (clear `:8446` site data → log in → log a workout).
 - Pages leftovers: **req-238, widened** (CI check-only + the dead `GITHUB_PAGES` build mode + README). READY.
-- Ops review nits (req-231): doctor counts a corrupt copy as a backup; `start` can leave the backup agent unloaded; nvm node.
+- Ops: no req needed — `./server/doctor` after every server deploy is now CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
 
 **READY, held:**
 - req-239 → req-240 → req-241, req-242, req-243; req-244 (GO pill, look A). Batch 7, DEC-138/139. Emilio: "wait".
