@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: ui** · batch 7 (J2). No stored-data change.
+**Status: BUILT, NOT merged — branch `req-239` (`975b938`)** · **Lane: ui** · batch 7 (J2). No stored-data change.
 
 # req-239 — first-time exercise: no question, a "Help me find it" link
 

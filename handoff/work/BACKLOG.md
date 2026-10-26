@@ -119,6 +119,10 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
   `dates-tz.cases.js` defines (L-045).
 - **`plan qa --empty`**: serve a true first-time user. The seed is re-injected whenever storage is empty (`scripts/qa.mjs`).
+- **A hanging test hangs the gate** (req-239 report, [measured 2026-10-26]): `./check:100` runs `node --test` with no
+  `--test-timeout`, and `deploy.yml` sets no `timeout-minutes` (GitHub's default is 6 h). A regression that leaves a rendered test
+  waiting (req-239's mutation did) never goes red. With a timeout, the hang is a cancelled test → exit 1 (a 1.5 s probe: exit 1).
+  Small tooling req: a per-test timeout in `./check`, `timeout-minutes` on the CI job.
 - **CI actions on Node 20** (req-238 run 40354463101): `actions/checkout@v4` / `setup-node@v4` are deprecated, forced to Node 24.
   Bump both to their current majors when it's convenient.
 - **[optional] Slim the readiness taxonomy** (`scripts/check_handoff.py`). Only if it gets in the way.
