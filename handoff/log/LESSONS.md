@@ -559,3 +559,11 @@ locale to en-US for calls that pass none; app output untouched). Gate runs on th
 req-178's test hard-linked `src/db.json` into `/tmp`; the GitHub runner's `/tmp` became a separate filesystem → EXDEV, deploy
 `39655468558` red, site not shipped. Passed locally (one disk). **How to apply:** make links/renames inside the temp dir
 (copy the repo file in first). Repro locally with a RAM-disk `TMPDIR` (`hdiutil attach -nomount ram://65536`).
+
+## L-059 — a spec cites a skill by file:line, never quotes it; and a skipped gate hides a red one  (Planner, req-236, 2026-10-26)
+
+req-238's spec quoted `.claude/skills/closeout/SKILL.md:19` word for word; `check_skills.py` flags any 8+-word run shared between
+a skill and `handoff/`, so `./check` on main went red. Planner didn't see it: every `plan publish` that day ran with
+`WORKOUT_SKIP_CHECK=1` for the Monday req-200 failure, which skipped the skills check too. The req-236 build agent found it.
+**Rule:** cite skills (and rules) by file:line. **And:** with `WORKOUT_SKIP_CHECK=1`, run `python3 scripts/check_skills.py` and
+`python3 scripts/check_handoff.py` by hand before publishing a handoff change — the skip covers more than the one known red test.
