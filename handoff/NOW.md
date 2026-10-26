@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-10-26. **Shipped: everything through req-245** except req-32 (dropped), req-77 (PAUSED) and the reqs below —
+Updated 2026-10-26. **Shipped: everything through req-245, req-247** except req-32 (dropped), req-77 (PAUSED) and the reqs below —
 `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md` (rewritten 2026-10-26 to open items only). ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -26,8 +26,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 **Stage 1 fallout — finish before anything else (DEC-143):**
 - Phone go-live: **done** 2026-10-26 16:26Z [measured, read-only]: the phone pulled the coach's rev 5, then pushed revs 6–12
   (a test workout to 9 sets, then abandoned; rev 12 byte-identical to rev 5). Login was proven by the 10-25 session.
-- Pages leftovers: req-238 shipped (CI run 40354463101 green, red probe red). **req-247** (READY): the ~16 comments
-  that still say "the Pages build".
+- Pages leftovers: req-238 + req-247 shipped. **Stage-1 fallout list is empty → batch 7 unblocked (DEC-143).**
 - Ops: `./server/doctor` after every server deploy is CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
 
 **READY, held:**

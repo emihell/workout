@@ -577,3 +577,8 @@ tidy-up above the open data-safety items (an unexplained missed nightly backup, 
 `log/BACKLOG-archive-2026-10.md`. Emilio: "i need you to do more pushback and be critial … we are a team, not a master and a slave".
 **Rule:** weigh a broad instruction against the rules and the priorities before acting; name the cost and the better order first.
 A bulk delete of planning history gets one line of "this is what goes, ok?" even when it's recoverable.
+
+## L-061 — a diff-shape AC must exclude `reports/`  (Builder, req-247, 2026-10-26)
+
+req-247's AC 2 (`git diff main..req-N | grep` for non-comment lines) also matched the committed report, which quotes those lines.
+**Rule:** an AC that greps a branch diff scopes it `-- . ':!reports'`.
