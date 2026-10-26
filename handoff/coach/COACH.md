@@ -84,7 +84,8 @@ run folder (outside git — the repository is public and this is his health data
 3. **The new week** — per day: session name, exercises with sets × reps, kg (from history or blank), rest; minutes.
 4. **Outside the gym** — 2–3 habits.
 5. **Questions for you** — what would sharpen the next run.
-**The import file** (from run 3, once the plan is settled): `import.json` in the run folder, the app's Export shape
+**The plan file** (from run 3, once the plan is settled; DEC-141 — it goes into the live DB through `./server/ops plan apply`,
+req-245, not through the app's Import): `import.json` in the run folder, the app's Export shape
 (`buildBackup`, `src/exchange.js:446`), built **by a script** from the newest revision: `workouts` copied unchanged (assert
 identical), only `routines`, `schedule` and new `exercises` changed; a new library exercise is made as the app makes one
 (`catalogItemToExercise`, `src/exerciseCatalog.js:219`, with its `libraryId`). Validate by running the app's own import code

@@ -2223,3 +2223,19 @@ few runs … it should challange one self and be focused on getting results" →
 5. The in-app coach (DEC-124) stays the later step; the brief becomes its prompt.
 Intake run 1: goal lean; 45 min pure training; keep the current weekly shape (Johns Kettlebell, the fat burner, a dumbbell,
 a barbell and a machines session; weekends bodyweight at home or running).
+
+## DEC-141 — the coach's plan goes straight into the server database, through one apply tool  (Emilio, 2026-10-26)
+
+Emilio: "as we now have the database locally, no more import or export files, just update the database accordingly, made we
+need functinality to do it well, as it will continuasly change, maybe even an event based database is better for some
+thinggs?"
+1. **Coach changes are written to the live DB as a new revision**, not handed over as an import file. Built as req-245: an
+   `ops` command that previews (the app's own import preview), backs up, and writes through `putState` like any device push,
+   so the phone picks it up on its next sync. The coach agent never writes the DB itself.
+2. **Each write still asks Emilio** with the counts (BACKEND rule 5; DEC-095 §1) until he says otherwise. Undo = a revert
+   command that writes the setup of an earlier revision back as a new revision (history never touched).
+3. **Not an event database (Planner's recommendation, Emilio's question).** The server already keeps every revision as a whole
+   state — all of the last 14 days, then the last of each day, forever (`server/store.mjs:235-257`) — so "what changed when,
+   and undo" exist. Events would mean rewriting sync and merge for one user. Where they would earn their place: live group
+   workouts (DEC-073), where sets stream between people. Revisit there.
+4. Export/Import in the app stay (BACKEND rule 10, DEC-127); only the coach's file hand-off goes.
