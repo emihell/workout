@@ -20,7 +20,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
   Emilio's data in as rev 1 via `putState`, 50/8/23/571, 48 linked; `passwd` set by Emilio; Planner may run `./server/deploy`,
   `start`, `stop` — allow rules added 2026-10-25). **Left:** (1) Emilio: phone — clear `:8446` site data → login → log a
   workout; then the go-live ACs 4–5 are done. (2) **Nightly did NOT fire 10-26 01:00** (Mac awake, cause unknown;
-  kickstart → exit 0); doctor missed it → req-237. Backups weekly (DEC-136, req-237). (3) Off-Mac backup copy: Emilio handles it himself ("ill worry about ecternal backup", 2026-10-26) — not tracked. Images: backlog.
+  kickstart → exit 0); fixed: weekly backup + hourly catch-up + doctor check (DEC-136). (3) Off-Mac backup copy: Emilio handles it himself ("ill worry about ecternal backup", 2026-10-26) — not tracked. Images: backlog.
 - **IN FLIGHT 2026-10-26 (Emilio: "do it"):** deploy of the weekly backup (Emilio runs `./server/deploy`) · req-245 (`ops plan`, DEC-141); then apply coach run 3
   (Emilio's yes). READY, held: req-238 (CI check-only).
 - **Coach (DEC-140):** `coach/COACH.md`, run 1 → `…/workout-data/coach/run-N/`; plans go into the DB via req-245 (DEC-141). **Batch 7 (BACKLOG §batch 7):** READY 239 → 240 → 241, 242, 243; 244 (GO pill, look A). Held (Emilio: "wait").
