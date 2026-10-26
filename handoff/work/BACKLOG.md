@@ -1,820 +1,128 @@
 # Backlog
 
-Things to build. **Nothing here is a requirement yet** — each becomes a
-`work/req-NN-name.md` when it comes up, and only a `READY` requirement (behaviour
-questions answered) goes to Claude Code (`rules/WORKFLOW.md`).
-
-Seeded 2026-09-06; revised 2026-09-07 (code review, gym-flow view review, Emilio's
-direction). Ordered against the milestone below, not a flat list.
-
-## The order Emilio set (2026-09-07)
-
-> *"before we build anything heavy, i want the actual flow of using the app in the
-> gym to be flawless. then the flow to create programs — that is probably the most
-> difficult flow."*
-
-```
-Phase 1  the in-gym usage flow is flawless        ← now (stays browser-only)
-Phase 2  the program-creation flow                ← next (the hard one)
-Phase 3  the heavy build                          ← gated on the backend decision
-         (database + users, own exercise DB, animations, AI, full styling)
-```
-
----
-
-## Phase 1 — the in-gym flow, flawless  (now)
-
-The bar: starting a workout, logging every set, warm-ups / extra sets / skips,
-resting, finishing — zero friction, zero lost input, zero ambiguity — on a phone, in
-a gym, one-handed. UX hardening on the **existing** browser-only app; no backend, no
-new data model.
-
-**Grounded in the 2026-09-07 gym-flow review** (views + live-workout flow). Finding:
-the logic layer is sound — the state machine, rest timing, snapshot-on-start,
-skipped-at-finish and draft-on-switch all work. "Flawless" is mostly a **design/UX
-pass on ~4 screens** plus a few gym-ergonomic gaps. These are the candidates:
-
-- **`req-196` app organisation** (DECIDED → DEC-110, req-198..202: bar+backup, workouts list, Home week, rename, small cuts) — where things live, Settings/Schedule/Exercises/naming. `work/req-196-app-organisation/`.
-- **`req-203` Lena run 3 fixes** (READY, ui) — done day opens its sets, Home done link, plain backup, By-exercise kg. `work/req-203-lena-run-3-fixes.md`.
-- **`req-209` Noa run fixes** (READY, ui). `work/req-209-noa-run-fixes/`.
-- **`req-210` arrow / reps / Total lifted / days** (READY). **`req-211` one-date move** (READY, data lane: reviewer + Emilio's eyes + backup). **CSV export** later (DEC-117 §5).
-- **Open from Noa run (Emilio, mostly decided → DEC-117):** per-exercise progress, last time on the set screen, a one-date move, reps carry when changed, Total lifted, CSV export, the 2-day default; plank/timer layout; a design-system pass (destructive style, Edit placement, sheet titles).
-- **Open from Lena run 3 (Emilio's list):** a day "Move to…"; choosing days in setup; a default plan name other than "Workout"; a 400 kg sanity note with no history.
-- **`req-197` analytics per day + build, reset on export** (READY, tooling). `work/req-197-analytics-by-day.md`.
-
-> Historical list (2026-09-07). All shipped since: req-01, the styling reqs, the rest cue/wake-lock, req-24.
-
-- **`req-01` guard `saveState`** (SHIPPED) — the persist path can throw and
-  lose data silently; the floor under "flawless". `work/req-01-guard-savestate.md`.
-- **Style the live-workout screens — the core of "flawless".** The app currently has
-  **zero CSS** (raw HTML; set-to-set navigation is small text links). One-handed in a
-  gym that is the biggest friction there is. Big tap targets, current-set focus, thumb
-  reach, legible numbers across `Start → Workout → log → rest → Finish`. Here "style
-  the app" and "flawless gym flow" are one job; the full app-wide design language
-  stays Phase 3. Expect heavy iteration + the "use it" gate (`rules/WORKFLOW.md`).
-- **Rest-end cue + keep the screen awake.** Rest is a stored endpoint + a 250ms
-  interval that only ticks while the log screen is foregrounded — no sound / vibration
-  / notification when rest ends, and no wake-lock (screen can sleep mid-set). Add a
-  rest-done cue and hold a wake-lock during an active workout. Behaviour Qs: which
-  cue(s), and how to respect silent mode.
-- **Replace native `alert`/`confirm` with inline UI.** 13 `window.alert`/`window.confirm`
-  across the flow (Abandon?, Save draft?, Replace all data?, and a *dead* "Pick effort"
-  guard). Jarring on mobile, breaks the one-screen-per-action feel. Inline confirms /
-  toasts instead.
-- **Abandon should offer save-as-draft** (behaviour call). Switching routines mid-
-  workout saves a draft, but **Abandon** hard-deletes the active workout + its logged
-  sets behind one confirm — asymmetric for a data-trust app. Decide: offer "save as
-  draft" on Abandon?
-- **Make "effort = hold" legible** (behaviour call). Effort defaults to **Moderate**,
-  and Moderate/Hard hold — so weight only climbs when the user marks a set **Easy**
-  and only drops on **Failure**/missed reps. Safe default, but worth surfacing: should
-  Finish show "held — effort was Moderate" so loads sitting still is never a surprise?
-  (Also remove the unreachable `alert('Pick effort')` guard — dead given the default.)
-- **`req-99` reach exercise settings from the routine editor** (READY, held) — Emilio couldn't
-  find the **Timed** flag from inside a routine (it lives on the exercise Details editor). Add an
-  "Edit exercise settings →" link + a hint when the exercise isn't timed; editing from there returns
-  to the routine. Link + hint, not a duplicate control. `work/req-99-exercise-settings-from-routine.md`.
-- **History recalc from a non-latest workout** — correcting an old session silently
-  overwrites the routine's current loads. Behaviour call: only-if-latest, or always?
-- **Auto-backup before a destructive import** — import replaces all state after a
-  confirm without offering to download current state first. Also **consolidate the
-  duplicated import path** (Today empty-state + Settings both do confirm + applyBackup).
-  Speced READY: `work/req-07-backup-before-import.md` (DEC-004: auto-download current state first).
-- **Legacy `localStorage` key cleanup** — `workout-mvp-v5..v7` read for migration but
-  never removed. Low severity. Speced READY: `work/req-06-legacy-key-cleanup.md`.
-
-### Gym-flow notes — Emilio, 2026-09-10 (from real gym use)
-
-Raw notes captured while using the styled app in the gym. All Phase 1 (gym-flow flawless).
-Grounded against the code; disposition + open questions noted. **Not yet specced as reqs** —
-several need a behaviour call from Emilio first. Sequencing insight below.
-
-1. **Show the "upcoming" set's weight during rest, editable while resting.** While the rest
-   timer runs, surface the next set's prescribed weight and let it be changed then (not only
-   once you're back on the log screen). [measured] rest is a workout-level countdown shown by
-   `RestBar` (`Workout.jsx:630+`); the next set's seed is `initialSetFields` (req-17). *Disp:*
-   READY-able. *Q:* show upcoming only when the weight **changes** from the last set, or always?
-2. **Remove the informational text under the buttons.** The lines under the log buttons
-   (effort/held/target hints) are clutter mid-set. [measured] set-log form + hint lines in
-   `WorkoutItemLive`/`SetLogForm` (`Workout.jsx:~455–460`, the `ExerciseSetupHeader`/cues lines).
-   *Disp:* READY-able, small. Pairs with the "effort = hold legible" item above — decide together.
-3. **Hide the note field behind an "Add note" button.** Note input is always shown; make it a
-   button that reveals the field. [measured] `SetLogForm` renders the note `Textarea` inline.
-   *Disp:* READY-able, small. Ties to req-18 (set-edit forms) — see sequencing.
-4. **Spatial button rule — forward/primary right, back/previous left.** RECORDED as a rule in
-   `rules/DESIGN.md §4` (2026-09-10). *Disp:* needs an **audit req** — sweep every two-action
-   screen and fix sides. Touches the same rows/forms as req-20/23/18.
-5. **BUG — rest timer doesn't fire on a re-done set after Previous.** "Go Previous after a set,
-   then forward → no timer; and a timer that already ran won't run again for that set."
-   [measured] `previousSet` (`Workout.jsx:379`) calls `removeActiveSet`, which clears
-   `restEndsAt`/`restPausedRemaining` (`store.jsx:311`); re-completing calls `completeSet` →
-   `restAfterSet(done)` (`Workout.jsx:321`), which returns **no rest when `done` is true**
-   (`finishAfterThisSet`). Likely: after the restore the set counts as the last one, so `done`
-   suppresses rest. *Disp:* real bug — spec as a fix req; CC to repro + root-cause. Relates to
-   req-03 (persistent rest timer).
-6. **Timed exercises (duration sets) — e.g. plank.** Any exercise should be able to carry a
-   **weight and/or a timer**; a timed exercise shows a count-**down** during the set that you
-   start, with a sound when done. [measured] exercises have `restSec` already (`model.js:41`) but
-   no per-set *work* duration; `EXERCISE_TYPES = ['machine','free','bodyweight','cardio']`
-   (`ids.js:51`) has no "timed" concept. *Disp:* **biggest of the batch — persisted-data +
-   model + UI.** Needs a decision (below). The "sound when done" reuses the still-open rest-end-cue
-   backlog item.
-7. **Show completed routines on the main (Today) page.** [measured] `Today`/`WorkoutRow` already
-   marks a slot `Done {date}` when a covering workout exists (`Today.jsx:29–38`); the ask is a
-   visible list/section of what's been completed, not just the per-slot label. *Disp:* READY-able.
-   *Q:* today's completed only, or a recent-history glance?
-
-**#6 timed exercises — PARKED (Emilio, 2026-09-10).** Model shape (orthogonal weight/duration
-flag vs a new `EXERCISE_TYPES` value) is **not decided yet**; captured as a Phase-1/2 feature but
-not to be specced until Emilio picks the shape. Persisted-data ask-gate applies when it revives.
-
-**Sequencing — DECIDED (Emilio, 2026-09-10): refactor fully first, gym-flow notes after.** Finish
-the refactor batch (req-16..19) as specced — **pure refactors, no UX change folded in** — then
-spec these notes fresh against the refactored code. Cleaner diffs; accepts touching the same files
-twice. So notes #1/#2/#3/#4/#5/#7 stay parked here until req-16..19 (at least req-18/23/20) land.
-Note: bug #5 is a *logic* defect (rest timer), not a form-layout change, so it does **not** collide
-with the UI refactor and could be pulled forward if the timer misbehaviour bites — default is still
-after the batch.
-
-**Status (2026-09-10):** bug #5 **shipped as req-25** (rest-on-overview; reproduced + fixed +
-verified; see SHIPPED / DEC-013 refinement). The rest specced and queued (all ux-feel, serial):
-#2+#3 → **req-26** (declutter set-log), #1 → **req-27** (upcoming weight during rest), #7 → **req-28**
-(completed on Today), #4 → **req-29** (button-placement audit, DESIGN §4). Timed exercises (#6) still
-PARKED on Emilio's model decision — note: Rowing already uses a "Duration" field (cardio), so a
-duration concept partly exists; may inform #6.
-
-### Gym-flow notes — batch 2, Emilio 2026-09-14 (in-gym, on the shipped req-25..31 flow)
-
-Raw notes captured after using the flow that batch-1 (req-25..29) built. All Phase 1. Grounded
-against the code; disposition + open questions noted. **Not yet specced as reqs.** Several need a
-behaviour call first. Numbered N1..N11 in Emilio's order.
-
-- **N1 — empty-today Start → "Start new workout" (ad-hoc).** When nothing is scheduled, the Start
-  should start a workout, not sit dead. [measured] `TodayEmpty` renders Start **disabled**
-  (`Today.jsx:191`); `startOrContinue` requires a `routineId` (`workout-actions.js:14`) — no
-  ad-hoc/blank-workout path exists. *Disp:* needs a decision. *Q:* start a **blank** ad-hoc workout
-  (new model capability) or open a **routine picker**?
-- **N2 — timed exercises.** *Already captured* as batch-1 **#6**, PARKED on the model-shape decision
-  (Emilio 2026-09-10; above). Not a new item and not yet a req — still waiting on his call
-  (orthogonal weight/duration flag vs a new `EXERCISE_TYPES` value). Persisted-data ask-gate applies.
-- **N3 — Continue lands straight in the current exercise, not the overview.** [measured]
-  `startOrContinue` resumes onto the Workout **overview** (`/workout/:routineId`, `overview.jsx`
-  lists items); the current item is already computable (`itemCurrentPath`/`completed`,
-  `overview.jsx:105,136`). *Disp:* READY-able, small. *Q:* define "current" = first not-done item?
-- **N4 — active-workout affordance from elsewhere in the app** — a floating button, or a signal on
-  the Workout tab. *Disp:* ux-feel, READY-able. *Q:* floating persistent Continue vs a badge/dot on
-  the tab (recommend the tab badge — a floating button competes with the log UI).
-- **N5 — rest timer as a small floating pill, folded into the next-set page.** Shrink the rest UI to
-  a pill/button (absolute), and on completing a set move **straight to the next set** carrying the
-  rest pill — removing the dedicated timer screen and one button press. [measured] rest is the
-  persistent `RestBar`/rest view (`workout/rest.jsx`; req-25 rest-on-overview + req-27 upcoming
-  weight shipped here). *Disp:* ux-feel, **medium — reworks the surface req-25/27 built.** *Q:*
-  confirm removing the dedicated rest view entirely.
-  **SHIPPED as req-78 (2026-09-16), DEC-048.** Two consequences Emilio judged "nice to have" —
-  **deferred, not scheduled:** (a) re-add **+30s / Pause** to the pill *if* real gym use wants to
-  extend a rest (DEC-048 allows an optional nudge without contradiction); (b) **re-surface the req-27
-  progression ↑/↓ marker** somewhere on the next-set form (it was dropped with the RestUpcoming panel).
-- **N6 — bigger done/not-done contrast in the active exercise list.** De-emphasize done exercises so
-  the eye lands on the not-done ones. [measured] `overview.jsx:110` shows only a `· done` text
-  suffix; no visual de-emphasis. *Disp:* ux-feel, small, READY-able.
-- **N7 — during an exercise: Previous/Skip/Next to the absolute bottom; "Add note" a small control
-  beside the exercise title.** [measured] pairs with DESIGN §4 button placement (req-29 shipped) and
-  req-26 (note behind a button). *Disp:* ux-feel, small–medium.
-- **N8 — dev-only "note on this page" button** (very small/unimposing) — jots a note tied to the
-  current page/route so a req can be made from it (an in-app backlog-capture pipe). *Disp:*
-  **meta/dev-tooling, not product** — unusual scope. *Q:* build it (where do notes persist —
-  localStorage? exported how?), or keep capturing verbally? Recommend a dev-flag-gated localStorage
-  jotpad with export-to-clipboard, never shipped to the live build.
-- **N9 — a set-setting changed mid-workout becomes the future default.** e.g. bump 4kg→5kg in warm-up
-  → 5kg is the default next time. [measured] prefills already come from the **last finished workout's**
-  per-field value (history-prefill rule / DESIGN §1; req-17 `initialSetFields`) — so after *this*
-  workout finishes, the next prefill is already 5kg. What is genuinely new/unclear: does he also want
-  the change to (a) update the **routine template's** prescribed value immediately, and/or (b) apply
-  live to the **remaining sets of this same workout**? *Disp:* **needs a behaviour decision — brushes
-  the core prefill rule.** *Q for Emilio.*
-- **N10 — auto-complete a finished routine.** When every exercise is done, a ~10s "great job" summary
-  (stats/improvement vs last time), then auto-finish with an option to edit — minimize taps vs the
-  current "all done → press Finish". [measured] Finish is a manual Row (`overview.jsx:116`) →
-  `WorkoutFinish`. *Disp:* ux-feel + behaviour; auto-writing a finish touches data-trust. *Q:*
-  auto-finish on expiry vs countdown-then-confirm (recommend countdown with a visible Cancel/Edit,
-  auto-commit on expiry).
-- **N11 — Today page: drop the duplicate "Completed today", and maybe unify the list model.**
-  [measured] a workout finished today renders in **both** "Completed today" (`Today.jsx:301`) **and**
-  the recent peek (`:314`) — a genuine duplicate. The Today screen is one file with ~8 sub-components
-  and overlapping state flags (`activeStartedToday`/stale/done/`completedToday`); a prior unification
-  attempt, **req-32**, was **dropped** (DEC-025). *Disp:* dedup is READY-able-small; the broader
-  refactor is dropped-req-32 territory — decide whether to revive it. His "several components → weird
-  states" read is half-right: one file, many blocks, real state overlap.
-
-- **Load recommendation is retired-in-practice (req-96 aftermath).** [measured, corrected 2026-09-17]
-  Only `formatProgressionLine` was actually dead → deleted in **req-97**. The rest is LIVE:
-  `buildFinishProgression`/`progressionForItem` still feed `applyProgressionToRoutines`
-  (`store.jsx:351,377`), which updates routine templates at finish (a no-op without RPE, but wired); the
-  persisted `workout.progression` field is write-only but harmless. *Open (not urgent):* the RPE-driven
-  progression is retired in practice because RPE isn't logged — a later req could decide whether to keep
-  the routine-template auto-update at all. Not dead code; a product call. See DEC-050 / req-96 / req-97.
-
-- **req-85 v1 timed gaps (deferred).** (a) **set-edit.jsx has no duration field** — you can't edit a
-  logged timed set's duration in history (only live logging is editable, `SetLogForm` DurationTimer).
-  (b) a timed **bodyweight** set still asks effort. Small; unblock when timed logging is actually in use.
-  Discovered via req-98 (which fixed the beat-last-time timed comparison, not these).
-
-**Sequencing insight:** N3/N4/N5/N6/N7 are ux-feel refinements on the shipped in-gym flow and can be
-specced fresh against the current code (batch-1's "refactor first" collision is past — that flow is
-merged). N1/N9/N10 carry behaviour decisions; N2/N8 are their own decisions. Order once decided.
-
-### Gym-flow notes — batch 4, Emilio 2026-09-17..20 (in-app feedback JSON, app `378e47f`)
-
-Pasted 2026-09-23. [measured] `git log 378e47f..main -- src` is empty, so every note still applies to
-live code. All Phase 1. **All specced and LIVE 2026-09-23** (req-103..112, see the mapping line below). F1..F10 in Emilio's order.
-
-- **F1 — routine editor list is messy; two lines per row? drop "Main".** `/routines/:id`.
-  [measured] `Routine.jsx:154` renders `name — Main · WU set · 3 sets · 20/22/24 kg` on one line
-  with Up/Down buttons beside it. req-93 already made main implied in the *workout* list; the editor
-  was not touched. *Disp:* small, READY-able: name line + muted meta line; main unlabelled (req-93 rule).
-- **F2 — "if I can't do a machine I should be able to add another exercise"** (workout overview).
-  [measured] no path exists: the workout's items are a snapshot fixed at Start (`model.js`), and
-  setup (`workout/setup.jsx`) only edits an existing item's exercise details. *Disp:* medium,
-  **behaviour Q:** *swap* this exercise for another (the original counts as skipped) vs *add* an extra
-  exercise to the list, or both. Pairs with F8. Writes `activeWorkout.snapshot` (transient, no schema bump).
-- **F3 — done view: "don't need to show Previous".** [measured] `WorkoutItemDone` (`item.jsx`) renders
-  Today sets, then a **Previous** section (last finished workout's sets). *Disp:* tiny, READY: remove it.
-- **F4 — at the start of an exercise, a small preview of all its sets + weights at the bottom** of the
-  log screen, "so you can grab all weights at the start". [measured] nothing like it; each set's seed is
-  computed only for the current set (`initialSetFields`, `item.jsx`). *Disp:* small–medium. **Guard
-  (DESIGN §1):** each preview line must come from the same seed the log form would show for that set
-  (history per set index / carry / target); a no-history set shows no kg, never an invented one.
-  *Q:* show only before the first set, or always (shrinking as sets are logged)? Recommend always.
-- **F5 — log screen: exercise title much smaller.** [measured] `ExerciseTitle` uses the page `Title`
-  (`item.jsx`). *Disp:* tiny, READY.
-- **F6 — Finish: make it the last row of the list or its own thing at the bottom; when everything is done
-  make it easy to press (floating button?).** [measured] Finish is a lone `Row` in a second `List` right
-  under the exercises (`overview.jsx`) so it reads as another exercise. When all are done the req-84
-  auto-complete summary replaces the list — but once Cancelled, the plain Finish row is all that's left.
-  *Disp:* small. *Q:* recommend a bottom **Finish button** (not a row) that turns **primary** when all
-  exercises are done; a floating button only if that isn't enough (DEC-048 already floats the rest pill).
-- **F7 — "able to add notes here as well"** (workout overview). [measured] the only workout-level note is
-  Finish's `overallNote` (`finish.jsx:23`, component state), and auto-complete finishes with
-  `overallNote: ''` (`auto-complete.jsx:50`). *Disp:* small–medium: a note on the overview, held on
-  `activeWorkout` (optional transient field, no schema bump), pre-filling Finish's Note — and
-  auto-complete must carry it, or the note is silently lost.
-- **F8 — "add ability to skip whole exercise?"** [measured] only per-set Skip exists (`skipSet`,
-  `item.jsx`). *Disp:* small–medium. *Q:* recommend "Skip exercise" = log every remaining set as skipped
-  (the same record `skipSet` writes), so history shows it was skipped, not missing. Pairs with F2.
-- **F9 — "set 1 change also changes set 2 — each set is separate".** Push-ups (bodyweight → reps).
-  [measured] **this is req-83 working as built** — `nextSeedOverrides` (`workout-log.js:244`) carries a
-  changed weight **and** reps to the remaining sets of that exercise; Emilio chose that live-apply on
-  2026-09-16 (req-83 §Decisions, option (c)). **A reversal — his call.** Options: (a) remove the carry entirely; (b) keep the
-  weight carry, stop the reps carry (reps targets are per set; a weight change is usually meant for the
-  rest). Recommend (b).
-- **F10 — Today: "show 2x routines or similar if a day has more than one routine".** [measured] today
-  renders one full `TodayWorkout` block per routine (each with its own date line + full-width Start,
-  `Today.jsx:310`); the upcoming peek shows the next 2 *slots*, so a future day with two routines fills
-  both rows with the same date (`Today.jsx:223`). *Q:* **which surface** (today's block, the upcoming
-  peek, or the schedule) and what should "2x" look like (a count badge, one date header with the routines
-  grouped under it)?
-
-- **History detail still prints "Main"** (req-103 follow-up) — `history/detail.jsx:68,120`; apply the req-93 rule. Small.
-
-- **Done view: exercise title renders below Add set** (req-104 follow-up) — `WorkoutItemDone` markup order. Small.
-
-- ~~**Tooling: `npm run shot` can't reach states behind a click**~~ — already done on main (req-129: `--click`, `--scroll-bottom`); req-168 confirmed. (req-105) — add `--click <text>` / `--scroll-bottom`.
-
-- **req-111 follow-ups:** ~~(a)~~ ~~(b)~~ — both fixed (req-128/req-152; warm-up-only prior skip in req-163). Was: (a) the auto-complete "vs last time" volume (`workoutSummaryStats`) still compares
-  against an all-skipped prior; (b) an exercise with only warm-up history gets neither a work prefill nor the
-  DEC-002 kg carry (pre-existing). Small.
-
-- **req-109 follow-ups:** (a) ~~Q: Skip exercise leaves a running rest going~~ — **keep** (Emilio, DEC-056). ~~(b)~~ fixed in req-128 (pinned by req-163). Was: `historyPrescription` / beat-last-time take the FIRST snapshot item of an exercise, so after a
-  replacement they read its rest 0. (c) routine lost per-set weights on a skipped set → **fixed in req-112** (DEC-056).
-
-**On-device test list — CLOSED 2026-09-24, run by Planner, not Emilio** (desktop Chrome at 500 px + a 375 px iframe,
-throwaway `main` build `9f7ebcc` on `127.0.0.1`, seeded from `src/db.json`; Emilio: touch/one-handed feel is caught in real
-use). **12/12 pass** — results below the list. Items: 1 routine-editor rows two-line, no "Main" · 2 log title smaller,
-Add note beside it · 3 done view has no Previous · 4 Finish is a bottom button, black when all done · 5 set preview
-before set 1, gone after · 6 overview note → same on Finish, survives reload · 7 push-ups set 2 shows its own target;
-weight change carries · 8 two-routine day under one date · 9 Skip exercise two-tap, row reads skipped · 10 Replace →
-original skipped, blank replacement under it · 11 after a skip, weights come back from the last real time · 12 Finish
-leaves the routine alone; History correct → Apply changes it.
-Results [measured, browser]: 1 rows "WU set · 3 sets · 25/30/30 kg", no Main · 2 title + Add note on one row · 3 done view
-has no Previous · 4 Finish `rgb(242,242,242)` → `rgb(28,28,28)` all done · 5 preview before set 1, gone after · 6 note kept
-through reload and shown on Finish · 7 pull-ups 4 reps on set 1 → set 2 shows 5; kg 18→20 on set 1 → next set 20 · 8 two
-routines under "Thu, Sep 24" · 9 two taps (3 s arm) → "· skipped" · 10 Leg Curl skipped, Lat Pulldown under it, kg from its
-own history · 11 after the skip Leg Extension prefills 9/18/22/25 (last real) · 12 routine unchanged by Finish; History
-edit → Update? → Apply → routine [65,70,70].
-
-**QA findings, Planner's browser run 2026-09-24** → **`req-152`** (READY, after req-24):
-- **QA-1 Back after Finish lands on "Not found."** — after Save, browser Back goes to `#/workout/<id>/finish` → bare
-  "Not found.", one more Back → the done workout. The finish route stays in history after save.
-- **QA-2 rest pill's tap area overlaps Back at 375 px** — pill `[103,8,272,54]` vs "‹ Exercises" `[24,40,115,84]`
-  (12×14 px). Text isn't covered; a tap on the link's top-right can hit the pill (skip rest). Batch-3 "pill overlap".
-- **QA-3 Add set on a done exercise prefills reps but not kg** — Leg Press done at 70 kg → Add set shows kg blank, reps
-  10, though `withOneMoreSet` appends the last suggested weight (`workout-log.js:34-44`). Weight should carry (req-108).
-  Cause [inferred]; check the seed for an added index.
-- **QA-4 History detail doesn't say skipped** — a fully skipped exercise reads "WU set · 4 sets" (the overview says
-  "· skipped").
-- Minor: Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown anywhere today).
-- Import asks "Replace all data?" before validating → fixed in **req-24** (merged).
-- **Dead first Back after finishing an exercise** (parked, DEC-084 — req-153's fix dropped as too fragile). History ends
-  `[…, /workout/x, /workout/x]`, so the first device Back does nothing. Idea to try, small: on a popstate that lands on an
-  entry identical to the one just left, step back once more. Test on the iPhone before merging anything here.
-- **req-152 follow-ups** → **`req-153`** (a, b, d; c stays Emilio's) (small; from the reviewer + Builder): (a) after an overview → item (push) → last set → replace
-  back, history holds `/workout/x` twice, so the first device Back visibly does nothing (`item.jsx:99,110,304,316`,
-  `replace.jsx:31`); (b) after Save, the **second** Back reaches an earlier in-workout item page → "Not found." once the
-  workout isn't active; (c) the pill's reserved top space (~30 px, always) — Emilio to judge on the phone; (d) 4 of
-  req-152's tests are source-regex guards (brittle).
-- **req-24 reviewer nits** → **`req-153`**: the no-native-dialog guard misses `window['confirm']`,
-  `const { confirm } = window`, `.mjs` files, and skips lines starting `*` (`req-24.test.js:17,30`); Today's first-run
-  import error (`Today.jsx:269,330`) isn't cleared on a later cancel/new pick.
-
-**Batch-3 feel list — CLOSED 2026-09-24** (Planner, same run): pill overlap → **QA-2** · iPhone no-zoom: every input/textarea/
-select ≥17 px on log, routine editor, exercise edit, history add set, finish, replace [measured]; the zoom itself is
-device-only, untested · beat line reads "↑Heavier on Incline DB Press" (judgement: clear) · Timed: the routine editor
-says "Not timed. Edit exercise settings to add a duration." (judgement: findable).
-
-- **Dropped report items (retro 2026-09-23), small:** Abandon falls below the fold with the overview note open on
-  an 8-exercise routine (req-107); the `.ui-navlink` left inset misaligns a second line under a link (req-103 gotcha).
-
-- ~~**Tooling: the pre-push fast-forward guard false-positives**~~ — already fixed (req-129); req-168 sandbox: 5 empty branches pass, a real FF refused. when a req branch was just created at main's tip
-  (2026-09-23: `req-120 (1dd4b54)` refused while the build agent hadn't committed yet). Exempt a branch with no
-  commits beyond main. Small.
-- ~~**Tooling: `plan publish` reads a throwaway agent's nested worktree**~~ — already fixed (req-129); req-168 confirmed. (`workout-codebase/.claude/worktrees/agent-*`)
-  as the code worktree and refuses ("code worktree is on 'req-120'"), 2026-09-23. Resolve the code worktree by exact path.
-- → **`req-168`** · **req-117 follow-ups (low):** (a) no component-level test that History's Add set doesn't write before Save, or that
-  `item.jsx` passes the restored duration to the form (covered by puppeteer only) — a small jsdom/puppeteer smoke;
-  ~~(b)~~ fixed in req-163. Was: History Add/Edit set can't capture `durationSec` for a timed exercise (pre-existing, joins the req-85 gap).
-- → **`req-168`** · **req-119 follow-ups (low):** the logged-sets branch of `exerciseInActiveWorkout` is untested (probably unreachable);
-  legacy `draftWorkouts` aren't counted as references.
-- ~~**Tooling: `plan closeout` warns when … names no reviewer**~~ — done in req-166 (it refuses before merging).
-
-**Specced 2026-09-23:** F1→req-103, F3+F5→req-104, F6→req-105, F4→req-106, F7→req-107, F9→req-108 (DEC-052), F10→req-110; F2+F8→req-109 (blank-state replace; external review found the migrate-on-load blockers); review also found → req-111 (DEC-053). **Grouping (original):** one small ux batch F1+F3+F5+F6 (F6 after its Q); F4, F7 each on their own; F2+F8 one req
-(both are "I can't / won't do this exercise"); F9 a decision, then a small change; F10 needs clarifying.
-
-### Flow audit — 2026-09-23 (5 parallel read-only reviewers; every item carries evidence in its reviewer's report)
-
-Emilio asked for a start-to-finish scan of every flow plus component-library use. 34 new findings. **Tier 1 (A–G) SHIPPED
-2026-09-23 as req-114..120** (DEC-058); Tiers 2–3 below are still open. Planner spot-checked
-the top three in code (`Routine.jsx:305-309` splits kg on `,`; `store.jsx:379` runs `applyBackupFn` inside the
-setState updater; `model.js:124-130` backfills empty targets/weights from logged sets). **Not yet specced.** Grouped
-into proposed reqs. **[P]** = persisted-data / shared-model (DEC-057: reviewer + backup before merge).
-
-**Tier 1 test list — CLOSED 2026-09-24, run by Planner** (same run as batch 4): **10 pass, 1 by unit test only** — #3
-midnight needs a faked clock; covered by `dates-tz.cases.js:82` (23:50 → 00:05 current), not browser-run. Pass [measured]:
-#1 `22,5` → `[22.5,22.5]`, `8/8/8` on 2 sets → "2 sets, 3 reps given." · #2 analytics file → "Not a workout database
-backup.", data intact (3 routines, 13 workouts) · #4 Push/Pull in progress, Upper still Start · #5 Edit → Hard → Back: no
-countdown, Hard kept · #6 Back after save shows Done, no Start · #7 "Nothing logged." · #8 Remove set → 4 sets again · #9
-Cancel → workout byte-identical · #10 archived, workout finished with its 4 sets · #11 stored `[]`, empty after reload.
-Items: 1 routine editor: Kg "22,5" saves 22.5; Sets 2 + Reps 8/8/8
-shows an error · 2 importing the analytics file shows an error, app stays up · 3 a workout past midnight stays the Today hero ·
-4 two routines today, one in progress → the other still has Start · 5 all done → Edit → pick Feel → Back → no countdown, Feel
-kept · 6 after Finish, Back never offers Start · 7 skip everything → Finish says "Nothing logged" · 8 Add set on a done exercise
-→ Remove set undoes it · 9 History Add set → Cancel leaves the workout unchanged · 10 delete an exercise you're using mid-workout
-→ archived, the workout still finishes · 11 clear a routine's Kg → reload → stays empty.
-
-**Tier 1 — data and trust bugs**
-- **A. Routine editor parsing** (`Routine.jsx:305-322`): kg `22,5` → 2 sets `[22,5]`; lowering Sets doesn't take
-  (count = max of all lists); a non-numeric kg shifts later weights onto the wrong sets (`abc/20` → set 1 = 20);
-  negative kg accepted; a blank Duration → a `0` s target (beats the exercise default). *Q:* accept `,` as a
-  decimal point (Swedish keyboard)? Recommend yes, with `/` the only separator.
-- **B. Setup edits reach into the live workout [P]:** deleting an exercise or routine that's in the active
-  workout hard-deletes it (`store.jsx:44-66,191-200` count only finished workouts), so history later points at
-  nothing, and Today shows the first-run "No data" screen mid-workout (`Today.jsx:268`). A Library edit (type,
-  Timed) changes the live set form (`item.jsx:35-44,295`) although the snapshot says otherwise (DESIGN §3).
-- **C. Load-time backfill invents plan values [P]** (`model.js:124-130`): an item with empty targets/weights gets
-  them from the logged sets on every load, on history and on the active workout. A mid-workout reload gives
-  set 2 a target from set 1's reps (DESIGN §1). Limit it to legacy (pre-v9) snapshots.
-- **D. A bad import blanks the app** (`store.jsx:379-386`): `applyBackupFn` throws inside the updater and above the
-  ErrorBoundary. Reachable by picking the analytics export. Stored data survives. Also: a v9 value that parses to
-  a non-object is overwritten and the v8 key deleted (`storage.js:169-178`, nit). Validate one level deeper.
-- **E. Finish navigation:** Back from Finish when all done re-arms the 10s auto-finish and drops the chosen Feel
-  (`finish.jsx:24,53`, `overview.jsx:45`), measured in the running app. After Finish, browser Back lands on a working
-  Start for the same routine (navigate with `replace`, measured).
-- **F. Irreversible taps:** a mis-tapped "Add set" on a done exercise can't be removed and writes a skipped set
-  (`item.jsx:469`, `workout-log.js:26-57`); Previous on a timed set loses its duration (`item.jsx:132-142`); History
-  "Add set" writes a placeholder set before Save (`history/helpers.js:81-120`).
-- **G. Dates and schedule [P for the anchor]:** the workout preview uses the UTC date (`overview.jsx:55`; found by
-  two reviewers); an imported schedule has no `anchor`, so weeks 2–4 never show (`exchange.js:109`, `schedule.js:32`);
-  the anchor is parsed as UTC (`schedule.js:7,32`); Today doesn't clamp `loopWeeks` (`Today.jsx:244`); `Done` prints a
-  raw ISO date (`Today.jsx:104,132`).
-
-**Needs Emilio's call**
-- **Midnight:** a workout started 23:50 stops being the Today hero at 00:05, and Start then offers to abandon it
-  (`Today.jsx:257`, `workout-actions.js:44`). *Q:* stale = started more than N hours ago?
-- **Two-routine day while one is in progress:** the hero hides the second routine (`Today.jsx:328`; the gap between
-  DEC-038 and req-110). *Q:* show the hero plus the remaining routine under the date?
-- **Finish with nothing logged** saves a workout of skipped sets and marks the day Done (`workout-log.js:112`); the
-  auto-finish does too after Skip ×N. *Q:* warn and offer Abandon?
-- **Changing the loop length** moves "this week" (`store.jsx:127-136`). *Q:* re-anchor?
-
-**Tier 2 — component library** (adoption is high; findings are concentrated) → **SHIPPED 2026-09-23 as req-121..123**
-- 5 navigation-only `<Button onClick={go}>` → NavLink (DEC-040): `Today.jsx:221`, `Routine.jsx:96,365`,
-  `setup.jsx:70`, `auto-complete.jsx:93`.
-- The `App.jsx:36,54,73` banners are raw unstyled divs and the Reload button is raw → `Banner`/`Button`.
-- The library `NavLink` (`ui/index.jsx:32`) is imported by 0 views; views hand-add `ui-btn …` classes 10× → one
-  NavLink with a `look` prop. An `Actions` row primitive (12 `ui-actions` sites), fixing `history/list.jsx:44-45`
-  (Continue left of Abandon).
-- `--ui-fs-lg` is undefined and `28px` hardcoded (`ui.css:578,611`); dead `.ui-showcase__row`; Showcase lacks
-  secondary/quiet/block buttons, back-chevron and button-look NavLinks, and two-action rows.
-- Tap targets below 44px: `.ui-addnote` ≈ 22px on the in-gym screens (`ui.css:660`). Long unbroken names overflow
-  at 390px (no `overflow-wrap`).
-
-**Tier 3 — improvements** → **SHIPPED 2026-09-23 as req-124..129** (DEC-059) — *except* its dead-code items: `plannedWorkouts` and route.js's unread visit stack are still on `main` (audit 2026-09-24); Phase 2 items stay for program-creation planning
-- A replacement starts with 1 set (a 3-set swap costs 6 extra taps); Replace should land on the new exercise.
-- Typed-but-uncompleted set values are lost on navigation/reload (`SetLogForm` local state). Keep a draft on the
-  active workout.
-- Wake-lock holds for a days-old stale workout (`wake-lock.js:21`); Finish's "N sets" counts skipped sets.
-- Dead code: `plannedWorkouts` is never written [P]; `nextOccurrence`/`nextDateForSlot` have test-only callers;
-  route.js's visits stack.
-- Setup data quality: free-text weight step and invented catalog steps (`exerciseCatalog.js:131`); blank or
-  duplicate names; re-adding an archived exercise splits its history (no un-archive); Start on an empty routine
-  (`Routine.jsx:68`).
-- **Phase 2 input** (routine-creation friction): four parallel slash-strings (Sets/Reps/Kg/Duration) → a per-set
-  grid; the catalog search should be in the picker, multi-select; required Focus; one tap per reorder step; per-item rest.
-- Tests: TZ-set schedule tests; a StoreProvider render test for import; a v9 snapshot round-trip test.
-- ~~Stale backlog notes~~: native-dialog count is **14** (req-24); N1's "Start disabled" was fixed by req-82 (routine picker).
-
-### Exercise library + "how to do it" — Emilio 2026-09-24 (DEC-060)
-
-- **`req-130` our own library** (READY) — free-db copy + aliases + muscle groups + picture links + RepDB credit.
-- **`req-131` "How to" button** — log screen + exercise page; opens free-db start/end photos
-  auto-flipping (~0.7 s), else the exercise's video link; hidden when none. **No RepDB pictures (DEC-069).** Shows our
-  text (req-138). Mind: a renamed exercise keeps its `libraryId` (req-130), so the picture follows the id. New optional
-  per-exercise **video link** field (edit form). Uses `libraryEntryFor` (req-130). Offline → cues only, no broken
-  image. After req-130.
-- **`req-132` one Add screen** — replaces Add manually / Search: typing shows your exercises first (req-127 match),
-  then library hits (tap = add, linked), then "Create '<name>' as my own". Offline: no library hits, never blocks.
-  Plus **"Link to library"** on an unlinked exercise's page (best alias matches; optional). After req-130.
-- **`req-133` content pass** — per entry: **aliases for the whole library** (moved from req-130), a one-line
-  description, tips, instructions rewritten clearer. Written from
-  free-db's instructions + general knowledge; **never from RepDB text** (DEC-060 §3). Content job for agents in
-  batches, sample-reviewed. After req-130.
-- **`req-134` muscle search + filter** — group chips (beginner) with "More specific" → muscles/parts (advanced);
-  several = either, "must hit all" toggle (DEC-062 §5); the search box also matches muscle aliases ("deltoid").
-  **Rank `common` entries first** in search — receipt: "air bike" → Fan Bike (free-db's crunch is *named* "Air Bike",
-  so no alias can win it; req-133 left it) and "shoulder press" → Dumbbell Shoulder Press (today Shoulder Press - With Bands).
-  Custom exercises need a muscle pick from the same tree (stored field → persisted-data). After req-133.
-- **`req-135` alternatives button** — same pattern + same primary muscle, family first, your equipment first;
-  linked exercises only until custom ones have muscles. After req-133 (+req-134 for custom).
-- **Assisted machines log backwards** (req-133 tag review, for req-132): on an assisted pull-up/dip machine the kg is
-  *assistance*, so a higher number is easier, but `progress.js` reads more kg as progress. The own-assisted-* entries
-  are `weight-reps` for now. Needs a decision (an `assisted` logAs, or inverting progress for it) before req-132 sets
-  type from `logAs`. Also note: Hyperextensions / Russian Twist are `bodyweight-reps` but are often done with a plate.
-- **`req-138` library text pass** (READY — `work/req-138-library-text-pass.md`; split from req-133 by its spec review) — for the common entries: `description`
-  (≤120 chars), `cues` (2–3, ≤70 chars each), `steps` (≥3, clear), `mistakes` (1–3). Ours, from free-db's
-  instructions + general knowledge, never RepDB (DEC-060 §3). Feeds req-131; runs before it.
-- **`req-136` "something's wrong" tap** — *mostly covered already*: the feedback note button (req-86..88, behind the
-  Settings toggle) works on every screen and records route + exerciseId. Remaining gap: the note doesn't carry the
-  **libraryId**. Planning's call 2026-09-24: don't build 136 standalone; fold "add libraryId (and shown name) to the
-  note context on exercise/library screens" into req-134.
-- **`req-137` offline library + images** — keep the library chunk (and later pictures) available with no signal
-  (service worker / cache). Infra; before own images.
-- **Emilio's backup conversion** — one-off script: match → show mapping → write on his OK (DEC-063 §2, ask-gate #2).
-- **`req-139` library polish** (READY) — display names, ~10 missing staples, search = our library only, common first
-  (DEC-064).
-- **Order (DEC-064, supersedes DEC-063 §4):** 139 → 138 → 134 → 136 → 132 (+ live library link) → 137 → 131 → 135 →
-  own images (pilot early).
-- **Gyms (future, Emilio 2026-09-24)** — a user adds their own gym, or picks one from a gym library, and lists its
-  equipment, so the app knows what's available and can filter alternatives / build programs within it. Notes for
-  the spec: equipment uses the DEC-062 `equipmentList` vocabulary (maybe + specific machines, e.g. "Star Trac leg
-  curl"); **weight step belongs to a gym's machine, not the exercise** (the same exercise steps differently per gym
-  — DEC-059 §2); a workout needs "which gym am I at" (default: the user's home gym). A user's own gyms fit
-  browser-only; a **shared** gym library that users contribute to needs the backend (Phase 3 fork). Feeds
-  req-135 (alternatives with what's here) and Phase 2 programs.
-- **Programs from the library (Phase 2)** — patterns + muscles + level balance a program. After req-133.
-- **`req-140` library parity, batch 1** (READY) — gap table checkpoint, then ≤40 promote/add + aliases + `difficulty`
-  + the `staple` flag (DEC-065/066). **Later batches** (req-140b…) work through the queue from the gap table, ≤40 each.
-- **`req-143` library triage** (READY) — every rough entry → finish (queue) / merge (alias + hide) / hide (DEC-070).
-- **Parity batches `req-140b`…** — ≤40 each from `work/req-140-parity-queue.md` (+ req-143's finish list) until up to par.
-- **`req-142` remove RepDB completely** (DEC-069/070) — **only when up to par** (every RepDB exercise covered or
-  deliberately skipped; no rough entry shown): drop the Settings credit, RepDB comments,
-  `scripts/library-gap.mjs`, the originality script's RepDB comparison, `.vendor-cache/`; req-131 uses free-db photos +
-  video link only. Small.
-- **`req-141` fresh-eyes library audit** — **after req-142** (DEC-070 §3), over **all** our exercises. A fresh agent with **no RepDB context** audits every common
-  entry: displayName, aliases, tags, difficulty, text, the common list; restores natural wording in the 19 entries
-  req-138 rewrote for originality (list in `reports/req-138.md`); fixes in place. Final safety net: the ≥12-token run
-  check only. A coach-eye QA subagent reviews the diff.
-- **Exercise images from Mannequin Studio (2026-10-25, offered by its session at Emilio's request):** `~/Dev/mannequin-studio`,
-  contract `EXPORT.md`. Per exercise: `still.png/webp` 512px, `loop.webp` 384px animated (95–800 KB); `exports/manifest.json`
-  carries library ids, checksums and review verdicts. 9 ready. Planner checked the ids: all 9 are live in `src/library/exercises.json`,
-  and 6 are in Emilio's routines (lat pulldown, leg press, rowing, pull-up, KB swing, jumping jacks). Squat, bench and
-  `Dumbbell_Bicep_Curl` aren't his: his curl is `Machine_Bicep_Curl` since req-233. Requests go in its `requests/<slug>.md`. How images
-  enter the app (bundle size, offline cache, DEC-064 photo rules) is unspecced: Phase 1 gate (milestone), after go-live.
-- **Avatars + the app's pixel-art style (Emilio-led, 2026-09-24)** — Emilio wants avatars in the app and calls them
-  "crucial to the style of the app"; he'll supply reference pictures and wants to be closely involved (live lane,
-  DEC-055: Emilio + session, not a batch). Planning's notes for the spec: **the avatar is the figure that does the
-  exercises**, so one character carries the whole app, and exercise figures follow the avatar style (supersedes the
-  separate style pilot); build as **skeleton + layers** (body, hair, clothes…) from day 1 so every exercise animation
-  works with any avatar; a **dedicated pixel-art agent** (its own definition: grid size, palette, outline and frame
-  rules, Emilio's references) plus a **deterministic renderer + validator** (palette-only, on-grid), so consistency
-  comes from constraints rather than taste. References: Emilio's own and free-db photos. **RepDB images (DEC-069 §2):
-  Emilio wants to browse them for inspiration himself when this starts; they are never given to the pixel-art agent as
-  input, reference or conditioning, and nothing is traced from them (RepDB licence term 5).**
-  No prior req exists [measured: grep of handoff + git log for "avatar"]. Before own figures.
-- **Our own styled exercise figures** (now under Avatars above) (after req-131) — **one base animation per movement pattern** + equipment
-  variants (DEC-063 §4), 5-exercise style pilot early; pose keyframes + a shared renderer, animated,
-  offline, one style, can show all the time. Prototype 2026-09-24 (leg press, 48×32 pixel sprite, 2 poses
-  interpolated) reads but is crude — style needs iteration. **Reference only free-db photos / general knowledge,
-  never RepDB images** (DEC-060 §3). Cost [inferred]: ~10–15k tokens per exercise with 2–3 rounds.
-
-### req-176 follow-ups — 2026-09-25
-- **Latent (`workout-log.js`):** a snapshot item with neither `id` nor `routineItemId` — skipped sets added for one such item
-  count as logged for the next, so Save under-records skips (and the Finish list mirrors it). No known producer (DEC-088
-  items keep `routineItemId`). Reviewer-trigger file if fixed.
-- **Feel:** fold the unlogged warm-up into the Finish line silently? One-line change in `finishSkippedLine`.
-
-### req-173 follow-ups — 2026-09-25
-- **The active set edit (SetEditForm) saves a blank kg as 0 with no note**; History keeps `''`. Add the note there too?
-- **Unexplained `targetWeight: 60`** on a stored set whose seed routine item had no suggested weights (req-173 AC3 run,
-  seed `db.json` via v8→v9 migration — likely `legacyRecommendations`). Not shown to the user; check before req-144.
-
-### req-171 follow-ups (Back / `?from=`, DEC-092) — 2026-09-25
-- **Active workout overview Back → Today** even when started from Routines (treated as the workout's hub). Decide with
-  req-144: is the overview "where you came from" or home base?
-- **recalc → Routine → an inner editor screen** loses the chain (`navForBase` paths are used as URL prefixes).
-- **A stale id with a valid shape** (`/history/<deleted>`) is accepted as `from` → Back lands on "Not found.". Rare.
-
-### Gym-flow notes — batch 5, Emilio 2026-10-07..09 (in-app feedback JSON, app `daaa957` / `5233458`)
-
-Pasted 2026-10-10. [measured] `git log 5233458..main -- src` is empty → H3..H22 apply to live code; H1/H2 predate req-209.
-Code facts from a read-only rescan of `main` (2026-10-10); paths under `src/`. **Decided → DEC-119; specced req-212..217 (READY).**
-Later from H8: a rest timer learned from the user's own set gaps (needs req-212's `loggedAt` history first).
-**req-220 follow-ups (2026-10-11):** (a) Emilio's call — import choice sheet styles "Replace everything" filled (DEC-017 destructive
-look) and the default "Keep my history" plain; Planner recommends flipping (Keep filled, Replace plain + "can't be undone"); (b) the
-anti-staleness app-path test doesn't cover History edit/recalc, Swap/Add/Add set/timed/Skip through the UI, `applyPlan`, or extra
-editor-form fields (reviewer latent).
-**Batch-5 follow-ups (2026-10-10):** (a) Emilio's call — missed reps lower only that set even when the exercise is Easy (req-212
-kept the per-set rule; "any missed set → all down" is a `progress.js` change); (b) req-218 sweep: 11 rendered tests still remount
-StoreProvider per screen — safe today, convert to the L-051 one-provider pattern before one answers a saving confirm after a swap;
-(c) req-212 latent: a workout in progress at deploy inherits its old uniform per-set effort on new sets (transitional, no fix);
-(d) the Days row text in a multi-week loop reads long ("Wed (week 1) and Wed (week 2)"); (e) req-217: the library chunk (264 kB
-gzip) now loads on the first log-screen open — "each side" can appear a beat late on a slow connection.
-
-**Log screen (one req, the "set flow" — H5..H8, H11, H12):**
-- **H5 — log screen messy, align, use the right components.** Set list is ad-hoc `ui-setpreview` markup (`views/workout/item.jsx:540-564`), not a
-  library component; `ui-item-note` has no CSS rule; head is an ad-hoc div (`item.jsx:66-85`). No inline styles.
-- **H6 — bottom bar cluttered; "a Completed button, then pick effort?"** Bar today (`ui/index.jsx:813-857`): Previous · Skip set · (Next/Save) on top,
-  caption + Easy/Medium/Hard/Failure below (DEC-108 §1, 4 days old).
-- **H7 — "only easy medium hard?"** `RPE_OPTIONS` 2/3/4/5 (`ids.js:23-28`).
-- **H8 — effort once per exercise, at the end; an end-of-exercise review (all sets, efforts, progress, next / choose exercise); later an auto
-  rest timer learned from your own set gaps.** Effort is stored per set (`rpe`, `item.jsx:267`); `recommendNextPrescription` reads each set's
-  own rpe positionally (`progress.js:165-203`), reached only from History recalc (`store.jsx:225`). Last set → overview, no auto-advance
-  (`item.jsx:283-287`). **Sets carry no timestamps** (`item.jsx:258-274`) → the auto-timer needs a new optional field first.
-- **H11 — Previous button not needed; tapping a done set already opens it.** `openLoggedSet` (`item.jsx:328-333`) does what Previous does.
-- **H12 — editing a logged set should be a popup with just its fields, not the screen switching.** Viewing is `viewIndex` state re-rendering the
-  same form with Next/Save (`item.jsx:337-368`); future sets are inert (`item.jsx:555-559`).
-
-**Workout list / Home / schedule:**
-- **H1 — /routines "start and edit?"** Rows now open the editor and carry a Start (`views/Routine.jsx:61-68`; hidden on an empty workout). Likely done.
-- **H2 — "Your exercises" holds favourites and exercises in workouts.** No favourite concept exists; the list is every own exercise ever added
-  (`views/Exercises.jsx:73-127`). Meaning unclear → ask.
-- **H3 — a workout done earlier in the loop week drops from its next spot** (lower body Tue → not again Thu). No such logic: Done matches same
-  routine + slot + date (`schedule.js:140-171`); Coming up has no done check (`schedule.js:179-186`).
-- **H4 — Start from the schedule-slot screen.** It renders the editor (`views/Schedule.jsx:344-374` → `RoutineDetail`), no Start.
-- **H20 — today's done workout as one line: "Core   Done · See details ›".** Now name line + a "Done ✓ — see your sets" link (`Today.jsx:110-132`).
-- **H21 — 2+ workouts today: one primary Start that asks which in a sheet.** Now each has its own full-width Start (`Today.jsx:134-150`).
-
-**Creating workouts:**
-- **H13 — "Use a plan here? What if I already have one?"** `/routines/new` offers Pick exercises / Use a plan / Blank (`Routine.jsx:117-138`);
-  with a schedule, plans leave it alone and say so only at the end (`Plan.jsx:165-182`).
-- **H14 — New workout shouldn't handle days; scheduling is a separate thing.** Machines flow has a days step + weekday chips (DEC-116/117,
-  `Plan.jsx:319-336`, shown only on an empty schedule).
-- **H15/H16 — picker: show what's been added, a small list.** Multi-select + "Add N" exists (`ExercisePicker.jsx:49, 254-263`); picks show only
-  as ticks; exercises already in this workout are not marked.
-- **H17 — put this workout on a day from its own screen.** Not possible (`Routine.jsx:159-260`); only the day screen's Add workout.
-
-**First time / guidance:**
-- **H9 — one-arm row: is a set per arm?** Library has `unilateral` (62 entries) but it isn't copied to stored exercises
-  (`exerciseCatalog.js:219-235`) and nothing shows it.
-- **H10 — never reads notes; show them as tips during rest.** Routine note under the title (`item.jsx:538`); library cues never on the log
-  screen; nothing shows during rest. Exercise-specific — distinct from the parked generic tips (DEC-108 §6).
-- **H18 — first time on an exercise: a guide?** None on the log screen; `libraryEntryFor` unused (`exerciseLibrary.js:586-595`). → req-10.
-- **H19 — start values from height / weight / level.** **Conflicts with DESIGN §1 and DEC-012** (rejected: an initial weight from a heuristic).
-  No body data stored (`persistence.js:110-121`).
-
-### Gym-flow notes — batch 6, Emilio 2026-10-10..13 (in-app feedback JSON, app `0f9a6ce` / `10c4724`)
-
-Pasted 2026-10-13. [measured] `git log 10c4724..main -- src` is empty → I1..I11 apply to live code. Code facts from a read-only
-rescan of `main` (2026-10-13); paths under `src/`. **Decided → DEC-125; specced req-221..225 (READY; req-225 data lane).** Order: 221 → 222 → 223 → 224 → 225.
-**req-222 follow-ups (reviewer, 2026-10-14):** (a) latent — Add set on a swapped-away exercise reopens it but `workoutPosition` doesn't count it; the cap (`workout-log.js:1157`) hides "5/4" as "4/4"; (b) nit — stale "shows no pill" comment `workout-log.js:1052`; (c) nit — an in-progress workout swapped before req-188's `replacesItemId` counts both items (display only).
-**req-224 follow-ups (reviewer, 2026-10-14):** (a) Finish screen computes the time at mount, the store at Save — open Finish at 10:55, Save at 15:00 → screen said 55 min, History says 50 (saved value right, no line shown); (b) a left-open workout from an earlier day, saved > 6 h after its last set, no longer trips req-116's Back-after-Finish guard (`finishedForPlan`) → preview offers Start; (c) auto-complete summary shows the shorter Duration with no "left open" line.
-**req-225 follow-ups (reviewer, 2026-10-14):** (a) past swaps are never pruned (~100 ms at 20k entries; one per tap); (b) an imported swap whose slot's own routine is missing has no "Back to" / "swapped from".
-
-- **I1 — tap a workout on Home → a quick-view sheet: what it is, Edit, Swap for this day only (permanent swaps stay in Schedule).**
-  Today's workout name is a plain `<p>` (`views/Today.jsx:157-161`); only Start / StartChooser act. A one-date *move* exists
-  (req-211, `Schedule.jsx:150-163` → `store.moveSlotOnDate`, `store.jsx:137-140`); a one-date *swap* does not → a new override kind
-  in saved state (ask-gate #2). Reusable sheet: `ConfirmSheet` / `askChoice` (`ui/confirm.js:27,35`); no general popover.
-- **I2, I4, I6, I8 — "did we remove effort per set?", "effort by set or whole exercise?", "what is effort –?"** Effort is once per
-  exercise on the review screen by decision (DEC-119 §1). The "–" is the clearable SegmentedControl's empty segment
-  (`ui/index.jsx:66`), selected by default because nothing is preselected (`:72`) → reads as an option called "–". Same control in
-  History set edit (`views/set-edit.jsx:189-194`).
-- **I3 — "first time I open an exercise, should I not get the Go?"** The GO pill (`ui/index.jsx:389-415`, `views/workout/rest.jsx`)
-  is hidden until a set is logged: `currentWorkoutItem` returns null with no logged set (`workout-log.js:1067`).
-- **I5 — Start → straight to the first exercise, maybe a 5 s countdown with Replace / Skip; "give me some options".** Start always
-  lands on the overview list (`workout-actions.js:55-66`); Continue resumes at the first not-done exercise (`:24-31`).
-- **I7 — "now we go ex to ex, are we missing functionality?"** Review → `Next: <name>` (`item.jsx:796-799`, `nextNotDoneItem`
-  `workout-log.js:840-849`, wraps); the overview list is still there, just never on the path. Nothing removed.
-- **I9 — show how much of the whole workout is left, maybe in the GO pill.** Nothing shows "N of M" anywhere; the pill shows only
-  "set N/M" of the current exercise (`workout-log.js:1086,1116`).
-- **I10 — plank needs a timer.** A countdown exists (`DurationTimer`, `ui/index.jsx:440-488`) but only for `hasDuration` exercises.
-  The seeded Plank (`db.json:75-82`) has no `hasDuration`; library-created Planks do (req-180, `exerciseCatalog.js:216-232`).
-  User fix today: exercise settings → timed (`views/Exercises.jsx:423`). Logs typed seconds, not actual (`ui/index.jsx:437-438`).
-- **I11 — forgot to close a workout; the time is wrong.** Duration isn't stored; it's `finishedAt − startedAt` (`history-queries.js:
-  265-270`), `finishedAt` stamped at save (`workout-log.js:187,200`) → the whole gap counts. No stale-workout handling; past 6 h it's
-  an "in progress" peek row with Continue (`current-workout.js:10-17`, `Today.jsx:265-280`). Sets carry `loggedAt` since req-212.
-
-### Gym-flow notes — batch 7, Emilio 2026-10-16..22 (feedback JSON pasted by hand, app `a895ce4` / `4441b52`)
-
-Pasted 2026-10-26 with the batch-6 notes (I1..I11, done). The notes came from the old Pages site, so the server's `notes` table
-has 0 rows [measured, read-only]. [measured] `git log a895ce4..main` on the touched views/ui is empty → J1..J8 apply to live
-code. Exercises identified from Emilio's server data (read-only, rev 4). **DEC-137 check against `reference/PAGES.md`:**
-J2 goes against an E line → Emilio's call. The rest go against no E decision → Planner's to fix. J5 is a visual redesign,
-so Emilio judges the look (DEC-095 §2). **J2 → DEC-138. Specced: req-239 (J2), 240 (J3+J6), 241 (J4+J7), 242 (J8), 243 (J1) READY; req-244 (J5) READY (look A, DEC-139).**
-
-- **J1 (Home) — "Om det är idag, så kan ja ju inte byta passet till idag"** ("if it's today, I can't swap it *to* today"). Planner's
-  reading: the sheet's button "Swap for today" reads as "move it to today" on a workout that is already today's
-  (`views/Today.jsx:252`). Fix the wording only, e.g. "Swap"; the sheet already says "Only today" (`:205`). DEC-125 §5's
-  one-date swap is unchanged.
-- **J2 (log, Back Extension, first time) — "Do I need two buttons to press? Enter it? Can't I just enter it?"** The first-time
-  prompt "First time — [I'll enter it] [Set it up]" (`views/workout/item.jsx:682-696`, `first-time-setup.js:26-29`) must be answered
-  before logging. **Clashes with E:** DEC-012 / DEC-123 §1 (the prompt appears on its own). → Emilio.
-- **J3 (review, Side Plank) — "Should be one on each side."** Side_Bridge is unilateral in the library (`library/common.js:161`),
-  but a timed set's label is plain "Duration" (`item.jsx:492,813`); "each side" is reps only (req-217). Fix: timed one-sided
-  sets read "30 s each side".
-- **J4 (log) — "Would be nice to see what's next as well."** "Up next" shows only on arrival (req-223); the log screen doesn't
-  name the next exercise until the review's "Next:" (`item.jsx:905`). Fix: a quiet "Next: {name}" line on the log screen.
-- **J5 (log) — "The GO is a bit messy right now, need a redesign."** Pill content is E (DEC-103 §3, DEC-125 §3: countdown,
-  set counts, GO); the look is open. Planner drafts 2–3 looks at 390×844 → Emilio picks.
-- **J6 (log, Kettlebell Lunge Press) — "Is this ex two on each side for each set?"** Own exercise, no library link, `unilateral`
-  unset, and no switch for it in exercise settings (`views/Exercises.jsx`: none). Fix: a "One side at a time" switch on own
-  exercises; on, it reads "8 each side" like library ones (DEC-122 §2).
-- **J7 (review) — "Should be able to press skip if I accidentally chose done."** A done set's sheet has fields + Save only
-  (DEC-119 §1). Fix: "Skip set" in that sheet.
-- **J8 (scheduled workout) — "Click on exercise to change it or edit delete."** Only the name text is a link (`views/Routine.jsx:269`);
-  the item editor has Remove (`:647`) but no way to change the exercise. Fix: the whole row opens the editor; the editor gets
-  "Change exercise" (whole-library picker; the new exercise's kg from its history, else blank, DEC-096 §2).
-
-## Phase 2 — the program-creation flow  (next; the hard one)
-
-- **Deliberate "review and update the routine" step (DEC-056).** Finish no longer rewrites the routine; updating it
-  becomes a clean choice, e.g. at the end of a schedule loop (Emilio, 2026-09-23). Shape open: when it's offered,
-  what it shows (last loop's actuals vs the routine), per-exercise accept. Note (req-112): the recalc "Update?" screen shows no numbers today. The review step should show them.
-
-Emilio's "we should start creating programs." Today the app has **routines** (reusable
-templates) and a **schedule** (weekly slots). A "program" is the layer above: a multi-
-week structure that owns routines and their placement. The code still carries legacy
-`programs`/`programName` remnants (`model.js`, `storage.js`) — a program layer existed
-once and was flattened away; reintroducing it is a redesign, not a fresh start.
-
-- **req-180 picker follow-ups** (QA 2026-09-26, small, ui): the sticky Cancel/Add N bar has no background, so a sliver of
-  list shows between it and the dock; empty-search grouping by an entry's *first* muscle group puts Burpee under Chest.
-- **`req-150` progression safe-hold** (READY) — the three wrong cases hold instead of guessing (DEC-075).
-- **`req-149` progression rules** (later, a design req; DEC-075) — the rules and code for how the app upgrades routines:
-  rep ranges, AMRAP, an assisted flag, when to suggest vs apply. Inputs: DEC-056, req-144 prep §A.
-- **Progression bugs found by the req-144 prep** (→ req-150 now, req-149 properly) [measured, `work/req-144-creation-design/prep.md` §A]: a rep-range target ("8-12")
-  parses to NaN, so a set can never count as missed (5 reps on 8–12 holds the load); AMRAP progresses on effort only;
-  assisted machines progress backwards (a miss lowers assistance = harder). Load recommendations the user sees, so
-  these are bugs (CLAUDE.md "reasoning made visible"). Small fix req, independent of the design; the proper model
-  (real ranges, assisted flag) comes from req-144.
-- **`req-184` creation design session 2** (NEEDS DECISIONS — advanced users, programs; feedback part done 2026-10-05 → DEC-103).
-- **`req-186` / `req-187` / `req-188`** (READY, ui, DEC-103): workout pill + set list + Previous-views; kg confirm on last
-  Complete; Swap/Skip exercise in the list, Add exercise, whole-library swap. Build in that order.
-- **`req-189` / `req-190`** (READY, ui, DEC-105/106 — Lena run): first-workout fixes; machines-first setup + start today.
-- **`req-192`–`req-195`** (READY, ui, DEC-108): effort buttons + pill; weight steps; cardio fields; today block.
-- **Tips during rest** (Emilio 2026-10-06 G5: form / motivation / routine tips, science-based, more advanced with experience).
-  Parked (DEC-108 §6): no app does it; no evidence in-rest content helps (may lengthen rest); needs a curated, cited tip
-  set (content lane). Revisit after the flow is flawless.
-- **Edit rest during an exercise** (DEC-104 §3 follow-up; Emilio: "rest can be filled in during the sets") — a mid-workout item
-  added with blank rest has no way to set one on the log screen today. Small ui req.
-- **req-188 review latents:** a fast double tap on the picker's Add N / the step's Swap can commit twice (masked by the
-  navigation; ExercisePicker has the same pattern); Sets has no upper bound (99999 accepted).
-- **`req-144` creation design** (SESSION 1 DONE → DEC-096..102; was NEEDS DECISIONS — a design req, no code; planning + Emilio live) — personas, the
-  simplicity rule, the parameter table, flows, model + library asks. Absorbs req-10 and the DEC-056 review step.
-- **Define the model first** — program vs routine vs schedule; what a program owns, how
-  it maps onto the weekly loop, how progression flows through it. A decision doc before
-  any build (`rules/WORKFLOW.md`, readiness).
-- **Then the creation UX** — the hardest flow in the app. Budget the review, not just
-  the build.
-
-## Phase 3 — the heavy build  (gated on ONE decision)
-
-- **Sync follow-ups (req-230 review, latent):** a change rebased on the client during an in-flight request isn't recorded as a
-  server conflict (loser survives only as an unmarked revision, pruned after 14 days — short of DEC-128 §2); the expired-session
-  re-login unmounts the open screen (persisted state survives, UI state/timers reset); logging in as a different user on a device
-  with unsynced changes replaces them (stage 2 rule needed before other users).
-- **Library resolver (req-233 findings):** `libraryEntryFor` (`src/exerciseLibrary.js:588-595`) returns hidden and merged
-  entries by name/alias and doesn't follow `mergedInto`; an unlinked "Biceps Curl" resolves to the dumbbell curl. Fixed only in
-  Emilio's data (req-233), not in the resolver.
-- **Ops follow-ups (req-231 review, nits):** the DEC-133 scan `JSON.parse`s every revision since the marker inside the write
-  (slow only after a restore with weeks of unpruned syncs; use `json_extract`); doctor counts a `pre-restore-corrupt` raw copy
-  as the last backup; `start` doesn't XML-escape paths in the plist and can leave the nightly agent unloaded if the second
-  bootstrap fails (doctor shows it); `.nvmrc` says 22 but the scripts need ≥ 22.16.
-- **Before any public hosting (ask-gate 3; req-229 review):** login rate limiting, a body cap before auth on public routes,
-  pruning expired sessions, a `.env.example` exception in `.gitignore` if one is ever added.
-- **`req-146` backend design** (stage 1 READY as req-228..231, DEC-127..130; NEEDS DECISIONS for stages 2–3 — design doc `work/req-146-backend-design.md`; AI section decided DEC-124; DEC-073). Why: a real product, other users soon,
-  training together (shared routine, own values; one person starts an exercise and it starts for everyone). Decide:
-  hosting (own computer vs managed), accounts, the sharing data model, live group sessions, migration from localStorage,
-  offline-first in the gym, privacy/GDPR, backups. Planning's concerns to raise: a home server serving other people
-  needs uptime, security and backups; live group workouts are a large feature on their own.
-  **Part of the server setup (Emilio, 2026-09-24): per-branch previews** — the server also hosts each branch's build
-  (static, over Tailscale HTTPS), each on its **own origin** (port or subdomain, never a path under `emihell.github.io`,
-  whose `localStorage` holds his real history), so planning can browser-check a branch before merge. No Cloudflare/Netlify.
-
-
-**The fork that gates most of this: browser-only (localStorage) vs a backend
-(client–server)?** "A database" and "users" are effectively the same decision — real
-accounts need a server store, and an AI API key can't live in a browser. Decide the
-target before starting any of these; each is a milestone, not a `req`.
-
-- **Database (backend).** Move off `localStorage`. Enables multi-device and users.
-  Biggest architectural change; needs a migration path from existing local data.
-- **Users / accounts.** Depends on the database. Reopens deferred scope (`README.md`).
-- **Own exercise database + tagging.** *(Browser-only part pulled forward 2026-09-24 → §Exercise library, req-130.)* Curate our own library (seed from a free open
-  DB), tagged with muscles, equipment, movement pattern. **The enabler** for filters,
-  recommendations, and AI generation — do it before those. Decisions: which source DB
-  and **its licence** (verify each); the tag schema; bundled JSON vs backend.
-- **Animations for basic exercises.** *(Pulled forward 2026-09-24 → §Exercise library, req-131 + own figures.)* Demos keyed to the library. Decisions: source
-  (make / licence / generate), format (video / gif / lottie), hosting (bundle bloat vs
-  backend/CDN). Depends on the exercise DB.
-- **AI program generation.** Composes programs from *our* tagged exercises. Depends on
-  the exercise DB **and** the program model **and** a backend (key + cost can't sit
-  client-side). Falls under the backend rules' ask-gate (DEC-085 §7). `exchange.js` already
-  prototypes the "AI edits the database" idea manually.
-- **Full visual-design pass.** A real design language app-wide (beyond the Phase-1
-  gym-flow polish). Its own milestone.
-
----
-
-- → **`req-168`** · **req-161 nits** (small): one Import's copies can carry different timestamps when one is reused (no loss; harder to
-  group by hand); add the quota → free space → retry → release test (the reviewer's probe passed).
-
-- **→ `req-169` (DEC-089)** — was: known, minor (req-168 review): (a) the delete confirm for setup referenced only by a legacy draft
-  says "has past workouts" — a draft isn't a finished workout (wording; the archive is right); (b) an exercise that sits in
-  a finished workout's snapshot with zero logged sets isn't a reference, so it hard-deletes — main's behaviour per DEC-031
-  (History still renders from the stored `exerciseName`). Emilio's call whether either matters.
-
-## Workflow / tooling backlog (infra, not product)
-
-- **Tests depend on the machine's locale** (found 2026-10-21): on Emilio's Mac (`LANG=en_GB.UTF-8`) `./check` is RED — 4 tests
-  (req-200.test.js:76, req-203.test.js:90, req-209.test.js:114/121) expect en-US dates ("Oct 7") and get "7 Oct".
-  [measured] `LANG=en_US.UTF-8 node --test` → pass 1940 / fail 0. CI (en-US) green. Blocks `plan publish` locally; DEC-127's
-  save used `WORKOUT_SKIP_CHECK=1` for a handoff-only change. Fix: pin the locale for the suite (tests, not app behaviour). → **req-228** READY.
-
-- **`plan closeout` exits 1 silently when the req doc has no `# ` title** (2026-10-11, req-10): `co_title=$(grep -m1 '^# ' …)`
-  fails under `set -euo pipefail` before any message. Make the title optional (fall back to the req id) or print why. Small tooling req.
-
-- **dates-tz guard asserts the exact case count** (L-045, req-185 report): `/# pass [1-9]/` at `src/dates-tz.test.js`
-  passes on an empty cases file (`# pass 1`). Assert the count `dates-tz.cases.js` defines (9 today). Small, bug lane.
-
-- **`plan qa --empty`** (2026-09-25): serve a true first-time user. The seed is re-injected whenever storage is empty
-  (`scripts/qa.mjs:66-67`), so clearing storage brings the demo back — it misled the beginner-persona run.
-
-- **`check_handoff` knows lanes** (DEC-085 §6, WORKFLOW §Requirement lanes): accept a `Lane:` tag and a `DECIDED <date> →
-  DEC-…, req-…` terminal status for design reqs (today `classify_tag` has merged/not-merged/blocked/unknown only,
-  `scripts/check_handoff.py:214-247`); give req-146/149 their `work/` docs when they start. Small, tooling lane.
-
-- **[optional, Builder] Slim the readiness taxonomy.** The 6-state tag set (READY / NEEDS DECISIONS /
-  BLOCKED / SHELVED / WITHDRAWN / BUILT-MERGED) is more than a solo backlog needs (workflow audit
-  2026-09-14 §3). Slimming it means editing `scripts/check_handoff.py:220-248`, which validates the exact
-  tags — a Builder/code change for marginal benefit. Do only if the taxonomy actually gets in the way.
-
-- **Per-branch preview deploy** → moved into the server setup (`req-146`, Phase 3), Emilio 2026-09-24.
-
-## Dependency map (why the order is what it is)
-
-```
-req-01 (save safety) ─ under everything
-gym-flow polish ─ the bulk of Phase 1 (styling + ergonomics on a sound logic layer)
-program model ─→ program-creation UX (Phase 2)
-              └─→ AI generation (Phase 3)
-own exercise DB ─→ filters/recommendations
-                └─→ animations
-                └─→ AI generation
-backend (database) ─→ users ─→ (multi-device)
-                   └─→ AI generation (key can't live in browser)
-```
-
-## Already built — do not re-spec (review check, `NOTES.md` rail 1)
-
-- **Export / backup + AI-coaching import.** `src/exchange.js` + Settings `Export`/
-  `Import` already export the full database as `workout-mvp-backup` JSON (optionally
-  with an assistant prompt) and re-import it with a replace-confirm. What's missing is
-  only the auto-backup-before-import net (Phase 1).
-
-## Current shape (reference, not a task list)
-
-> Stale (2026-09-12 shape) — the tree below is history. Current module map: `reports/req-164.md` (persistence /
-> history-queries / state-reducers / set-rules; storage.js a re-export). Stored fields: `reference/schema.md`.
-
-```
-src/
-  model.js          entities + invariants; carries legacy programs/programName remnants
-  storage.js        localStorage load/save + v5–v8 migrations
-  progress.js       load recommendation (valid increments; Easy→up, Mod/Hard→hold, Failure/miss→down)
-  schedule.js       recurring week/day slots + loop-week math
-  route.js          hash routing (one screen per set/action)
-  workout-log.js    live workout / set logging + skipped-at-finish
-  exchange.js       backup export + AI-assistant import contract
-  store.jsx         the single store (all mutations) + localStorage persistence
-  ids.js            id minting + enums (RPE_OPTIONS, weekdays, types, roles)
-  exerciseCatalog.js / exerciseExtras.js   exercise library (bundled)
-  views/            Exercises, Routine, Schedule, Start, Today, Workout, History, Settings (no CSS yet)
-```
+Open items only. Nothing here is a requirement yet: each becomes `work/req-NN-name.md` when it comes up, and only a
+`READY` req goes to Builder (`rules/WORKFLOW.md`). Shipped work is in `log/SHIPPED.md`, and the reasons are in
+`log/DECISIONS.md`. **Rewritten 2026-10-26** (Emilio: "we dont want anything old"): every shipped, superseded or
+already-fixed entry was removed after a check against `main`. The old notes are in git (`git log -- handoff/work/BACKLOG.md`).
+
+## The order (Emilio, 2026-09-07)
+
+> *"before we build anything heavy, i want the actual flow of using the app in the gym to be flawless. then the flow to
+> create programs — that is probably the most difficult flow."*
+
+Phase 1 in-gym flow flawless (now) → Phase 2 program creation → Phase 3 other users, training together, AI.
+The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer gates anything for him.
+
+## Held — READY, waiting for Emilio's go
+
+- **Batch 7** (feedback J1..J8, 2026-10-16..22; DEC-138/139): req-239 (J2 first-time prompt) → 240 (J3+J6 one side, timed and
+  own exercises) → 241 (J4+J7 next on the log screen, Skip a done set), 242 (J8 the whole routine row opens it, Change exercise),
+  243 (J1 Home sheet "Swap" label); req-244 (J5 GO pill, look A).
+- **req-238** CI check-only.
+
+## Phase 1 — the in-gym flow
+
+**Open, needs a call or a spec**
+- **Changing the loop length moves "this week"** [measured 2026-10-26: `loopWeeksState` drops slots past the new length,
+  no re-anchor, `src/state-reducers.js:289`]. *Q (Emilio):* re-anchor so this week stays this week?
+- **Edit rest during an exercise** (DEC-104 §3 follow-up; Emilio: "rest can be filled in during the sets"): an item added
+  mid-workout with blank rest can't get a rest on the log screen. Small ui req.
+- **A rest timer learned from your own set gaps** (H8, DEC-119). Sets carry `loggedAt` since req-212, so the data exists.
+- **Dead first Back after finishing an exercise** (parked, DEC-084; req-153's fix dropped as too fragile). History ends
+  `[…, /workout/x, /workout/x]`. Idea: on a popstate that lands on the entry just left, step back once more. iPhone test first.
+- **Tips during rest** (generic form/motivation tips) — parked (DEC-108 §6): no evidence it helps, needs a cited tip set.
+- **req-77 active-workout affordance** — PAUSED (Emilio, 2026-09-16). Don't raise it until he revives it.
+
+**Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
+one is specced.
+- req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).
+- req-173: the active set edit (SetEditForm) saves a blank kg as 0 with no note (History keeps `''`); an unexplained
+  `targetWeight: 60` on a seed set after the v8→v9 migration (probably `legacyRecommendations`; not shown to the user).
+- req-171: recalc → Routine → an inner editor loses the Back chain (`navForBase`); a stale `from` id (`/history/<deleted>`)
+  lands Back on "Not found.".
+- req-220: *(Emilio's call)* the import sheet fills "Replace everything" and leaves "Keep my history" plain. Planner
+  recommends flipping that. Separately, the anti-staleness app-path test doesn't cover History edit/recalc, Swap/Add/timed/Skip, or `applyPlan`.
+- Batch 5: *(Emilio's call)* a missed rep lowers only that set, even on an Easy exercise. 11 rendered tests still remount
+  StoreProvider per screen (move them to the L-051 pattern). The Days row reads long in a multi-week loop. The library chunk
+  (264 kB gzip) loads on the first log-screen open.
+- req-222: Add set on a swapped-away exercise isn't counted by `workoutPosition` (the cap hides "5/4" as "4/4",
+  `workout-log.js:1157`). A pre-req-188 swap counts both items.
+- req-224: Finish computes its time at mount but the store saves at Save (55 min shown, 50 saved). A left-open earlier-day
+  workout saved > 6 h after its last set skips req-116's Back-after-Finish guard. Auto-complete shows the shorter Duration
+  with no "left open" line.
+- req-225: past one-date swaps are never pruned. An imported swap whose slot routine is missing has no "Back to".
+- req-180 picker: the sticky Cancel/Add N bar has no background. Empty-search grouping by first muscle puts Burpee under Chest.
+- req-188: a fast double tap on Add N or Swap can commit twice. Sets has no upper bound (99999 accepted).
+- Abandon falls below the fold with the overview note open on a long routine (req-107). The `.ui-navlink` inset misaligns a
+  wrapped second line. Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown).
+
+## Phase 2 — program creation
+
+- **Define the model first** — program vs routine vs schedule: what a program owns, how it maps onto the weekly loop, how
+  progression flows through it. A decision doc before any build. **`req-184` creation design session 2** (NEEDS DECISIONS:
+  advanced users, programs) is where this happens. Session 1 → DEC-096..102.
+- **The "review and update the routine" step** (DEC-056). Finish doesn't rewrite the routine, so updating it is a deliberate
+  choice, e.g. at the end of a loop. Shape open. The History "Update?" screen still shows no numbers [measured 2026-10-26,
+  `src/views/history/recalc.jsx`]. The review step must show them.
+- **`req-149` progression rules** (waiting on Emilio, DEC-075): rep ranges, AMRAP, an assisted flag (req-150 holds today:
+  `ASSISTED_LIBRARY_IDS`, `progress.js:114`), suggest vs apply, the missed-rep rule above, whether the routine auto-update stays.
+- **Active overview Back → Today** even when started from Routines (req-171). Is the overview home base? Decide with req-184.
+- **Creation friction** (flow audit 2026-09-23): the parallel Sets/Reps/Kg/Duration strings → a per-set grid; one tap per
+  reorder step; per-item rest. Data quality: free-text weight step, blank or duplicate names, no un-archive (re-adding an
+  archived exercise splits its history), Start on an empty routine.
+- **Gyms** (Emilio, 2026-09-24): your own gym(s) with their equipment (DEC-062 vocabulary), so alternatives and programs fit
+  what's there. The weight step belongs to a gym's machine, not the exercise. A workout knows which gym. A shared gym library
+  needs other users (Phase 3).
+- **Programs from the library**: movement patterns + muscles + level balance a program.
+
+## Exercise library (DEC-060/064)
+
+Shipped: req-130, 133, 138–143. **Next, in order:** req-134 → 132 → 137 → 131 → 135 → own images / avatars.
+- **`req-134` muscle search + filter**: group chips with "More specific" → muscles; "must hit all" toggle (DEC-062 §5);
+  aliases match. Rank `common` entries first ("air bike" → Fan Bike, "shoulder press" → Dumbbell Shoulder Press). Custom
+  exercises get a muscle pick (stored field → persisted-data gate). Also the feedback note carries `libraryId` (was req-136).
+- **`req-132` one Add screen**: your exercises first, then library hits, then "Create '<name>'". "Link to library" on an
+  unlinked exercise. Offline never blocks.
+- **`req-137` offline library + images** (service worker cache). Before own images.
+- **`req-131` "How to" button**: free-db start/end photos flipping, else the exercise's video link (new optional field).
+  No RepDB pictures (DEC-069).
+- **`req-135` alternatives**: same pattern + primary muscle, your equipment first.
+- **Resolver bug** (req-233): `libraryEntryFor` (`src/exerciseLibrary.js:588-595`) returns hidden and merged entries by
+  name/alias and doesn't follow `mergedInto`. An unlinked "Biceps Curl" resolves to the dumbbell curl. Only Emilio's
+  data was fixed. Small bug req.
+- Hyperextensions and Russian Twist are `bodyweight-reps` but are often done with a plate.
+- **Images from Mannequin Studio** (offered 2026-10-25): `~/Dev/mannequin-studio`, contract `EXPORT.md`. 9 ready, all live
+  ids, 6 in Emilio's routines. How images enter the app (bundle size, offline cache, DEC-064 photo rules) is unspecced.
+- **Avatars + pixel-art style** (Emilio-led, live lane): the avatar is the figure that does the exercises; skeleton + layers;
+  a pixel-art agent with a deterministic renderer + validator. RepDB images are never input to it (DEC-069 §2). Supersedes
+  the separate style pilot.
+
+## Phase 3 — other users, training together, AI (`work/req-146-backend-design.md`)
+
+Stage 1 (own server, own data) is live. Stage 2 (other users) and stage 3 (together, AI) need Emilio's decisions:
+accounts and the sharing model (shared routine, own values), privacy/GDPR (what leaves the device, retention, deletion),
+AI cost per user, live group sessions. The in-app AI design is decided (DEC-124).
+- **Before a second user logs in** (req-230 review): logging in as someone else on a device with unsynced changes replaces
+  them; an expired-session re-login unmounts the open screen (data survives, timers reset); a change rebased during an
+  in-flight sync isn't recorded as a conflict (the loser survives only as an unmarked revision, pruned after 14 days).
+- **Before any public hosting** (ask-gate 3, req-229 review): login rate limiting, a body cap before auth, pruning expired
+  sessions.
+- **Ops nits** (req-231 review): the DEC-133 scan `JSON.parse`s every revision since the marker (use `json_extract`); doctor
+  counts a `pre-restore-corrupt` copy as the last backup; `start` doesn't XML-escape plist paths and can leave the nightly agent
+  unloaded if the second bootstrap fails.
+- **Full visual-design pass**: its own milestone.
+
+## Tooling
+
+- **`plan closeout` exits 1 silently when the req doc has no `# ` title**: `co_title=$(grep -m1 '^# ' …)` under `set -euo
+  pipefail` [still there 2026-10-26, `plan:890`]. Fall back to the req id or print why.
+- **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
+  `dates-tz.cases.js` defines (L-045).
+- **`plan qa --empty`**: serve a true first-time user. The seed is re-injected whenever storage is empty (`scripts/qa.mjs`).
+- **[optional] Slim the readiness taxonomy** (`scripts/check_handoff.py`). Only if it gets in the way.
+
+## Already built — don't re-spec
+
+Export/Import (`src/exchange.js`, Keep my history / Replace everything, a copy kept first), the feedback note on every
+screen (synced to the server `notes` table), the coach round-trip (`./server/ops plan`, DEC-140/141). Module map:
+`reports/req-164.md`; stored fields: `reference/schema.md`; pages: `reference/PAGES.md`.

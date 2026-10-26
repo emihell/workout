@@ -205,10 +205,11 @@ printed.
 
 Then, and only then, close out (`rules/CLOSEOUT.md`).
 
-## Persisted data has no backup. Treat a migration like surgery.
+## Persisted data is the user's history. Treat a migration like surgery.
 
 The user's real state is their workout history in `localStorage` (`workout-mvp-v9`; `v8` and
-older are legacy keys read for migration). There is no server copy and no undo. `src/db.json` is
+older are legacy keys read for migration), synced to the live server DB (`rules/BACKEND.md`). A bad
+write syncs up like a good one; server backups exist but there is no undo in the app. `src/db.json` is
 seed/provenance, not the live store; the existing **v5→v9 migration** is the pattern to preserve,
 not break — a test must prove an older v5–v8 key survives the upgrade.
 

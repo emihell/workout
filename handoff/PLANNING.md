@@ -72,7 +72,7 @@ two-agent build loop below (and `DEC-009`).
 ## How to work
 
 **Verify, don't recall.** This is the whole job. Any number, limit, field name,
-schema shape, or "that isn't possible" is a claim to be tested. In a browser-only
+schema shape, or "that isn't possible" is a claim to be tested. In this
 app the cheap test is a unit test, a console line against the real model, or
 reading the actual `src/` — not reasoning harder.
 

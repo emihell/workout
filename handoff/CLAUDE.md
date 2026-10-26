@@ -23,10 +23,11 @@ back to Planner, not to Emilio's terminal, and do **not** tag.
 
 ## The project
 
-A browser-only workout app. React + Vite, no server. One trustworthy loop: set up
+A workout app: React + Vite in the browser, offline-first, synced to Emilio's own server (`server/`, Node + SQLite,
+invite-only login, tailnet-only; rules in `handoff/rules/BACKEND.md`). One trustworthy loop: set up
 exercises and reusable routines, schedule them, start a workout snapshot, log
-sets, and keep an editable historical record. State lives in the browser under
-`localStorage` — there is no backend and no account model (`README.md` is the
+sets, and keep an editable historical record. The phone's working copy lives in
+`localStorage`; `src/sync/` pushes it to the server, which stores it per user as revisions (`README.md` is the
 product contract; read it).
 
 **It is a logging tool built on one rule: history is the source of truth, and the
@@ -152,7 +153,7 @@ is quoted.
 ## Rules that have been earned
 
 **Verify, don't recall.** Any number, limit, field name, schema shape, or "that
-isn't possible" is a claim to be tested, not trusted. In a browser-only app the
+isn't possible" is a claim to be tested, not trusted. In this app the
 cheap test is a unit test or a console line against the real model — one run
 beats an hour of reasoning.
 
@@ -194,8 +195,8 @@ are yours; behaviour is his.
 
 **2. Any change to the persisted-data schema or a bulk write to saved state.**
 This app's data is the user's own workout history in `localStorage`
-(`workout-mvp-v9`; `v8` and older are legacy keys read for migration), and there is
-no backup and no undo. A schema-version bump, a
+(`workout-mvp-v9`; `v8` and older are legacy keys read for migration), synced to the live server DB. A bad write
+syncs up like a good one, and there is no undo in the app. A schema-version bump, a
 migration, or anything that rewrites many stored records is the counterpart of an
 irreversible external call: say **what will change and to how many records**
 before doing it, and add a migration test that proves an older key survives the

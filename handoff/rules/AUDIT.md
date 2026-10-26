@@ -8,7 +8,7 @@ report. It changes no code.
 `audits/`. Between milestones also re-fit the *machinery* to the project — a workflow-fit
 audit, written to **`handoff/audits/`** (planning's own domain; first run
 `handoff/audits/workflow-2026-09-14.md`): diagnose drift, redundancy, and what no longer
-fits a solo browser-only app, same diagnose-don't-treat discipline, findings → Emilio's
+fits a solo app on its own server, same diagnose-don't-treat discipline, findings → Emilio's
 call. The workflow should stay agile as the project grows, not ossify.
 
 ## The one rule: diagnose, don't treat
