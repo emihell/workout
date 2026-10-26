@@ -53,8 +53,9 @@ Push where the data shows room; back off where it shows strain. Every recommenda
 
 ## Output
 
-Into the run folder Planner gives you (outside git — the repository is public and this is his health data):
-`report.md`, in plain words, in this order:
+**Return the report as your final message** (a subagent can't write report files); Planner saves it as `report.md` in the
+run folder (outside git — the repository is public and this is his health data). Scripts may go in the run folder's
+`scripts/`. In plain words, in this order:
 1. **The verdict** — 3–5 lines: what's working, what's holding results back.
 2. **What I'd change** — numbered, each: the change, why (the data), what he'd notice.
 3. **The new week** — per day: session name, exercises with sets × reps, kg (from history or blank), rest; minutes.
@@ -64,4 +65,14 @@ No import file yet: that comes once Emilio likes the proposals.
 
 ## Lessons from runs
 
-(none yet)
+**Run 1 (2026-10-26):**
+- **Data quirks:** snapshot items have no `id` — sets join on `routineItemId`. Older workouts keep AMRAP reps and real kg in set
+  `note`s ("did 15 kg"). `startedAt`/`finishedAt` are nonsense on a workout left open (450, 1785 min) and `loggedAt` can span
+  days: use only plausible session times. `weightStep` is `"n/a"` on some exercises (Romanian Deadlift, Kettlebell Swing) —
+  then say "next bell / next plate" and leave the number to him. Kettlebells: step by the bells he has logged (8/12/16/24),
+  not the stored 2 kg.
+- **Session length rule (keep runs comparable):** 40 s per set + the rest as written + 1 min per station change.
+- **The routines may be an unrun draft:** on 2026-10-25 the routines (Helkropp A/B/C, Helg, löprunda, förbränning) were
+  rewritten and had not been performed; history is under older names (Upper/Lower Body, Push/Pull, Core, John). History is
+  the truth; a routine's kg is a proposal to check against it.
+- **Intake gaps:** add bodyweight + waist (+ target) and which kettlebells/plates exist; ask why training gaps happen.
