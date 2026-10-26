@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // req-231 — the command line behind ./server/backup, ./server/restore, ./server/doctor (ops.mjs).
-//   backup <reason> | backup --nightly
+//   backup <reason> | backup --weekly [--if-due]   (--if-due: only when the newest weekly is ≥ 7 days old)
 //   restore <backup> --to <new dir>      the backup as a throwaway data dir (the drill)
 //   restore <backup> [--yes]             into the data dir: server stopped, pre-restore backup, marker
 //   counts [<db file>]                   record counts (default: the data dir's DB)
-//   doctor                               bind, funnel, tailscale mapping, data path, launchd, last backup
+//   doctor                               bind, funnel, tailscale mapping, data path, launchd, weekly backup
 // Environment, as the scripts set it: WORKOUT_DATA_DIR, WORKOUT_PORT, WORKOUT_HTTPS_PORT (8446),
 // WORKOUT_LABEL (com.workout.server), WORKOUT_LIVE_DIR (~/dev/workout/workout-live),
 // WORKOUT_AGENTS_DIR (~/Library/LaunchAgents — where the doctor reads <label>.plist; a test seam).
@@ -17,7 +17,6 @@ import { DB_FILE, NODE_FLOOR_TEXT, SECRET_FILE, isInside, nodeVersionOk, realish
 export const HTTPS_PORT = 8446
 export const LABEL = 'com.workout.server'
 export const LIVE_DIR = join(homedir(), 'dev', 'workout', 'workout-live')
-const BACKUP_MAX_HOURS = 26
 
 if (!nodeVersionOk()) {
   console.error(`These scripts need Node ≥ ${NODE_FLOOR_TEXT}; this is ${process.versions.node}.`)
@@ -47,7 +46,8 @@ function tailscaleBin() {
   return null
 }
 
-const launchdLoaded = (name) => process.platform === 'darwin' && run('launchctl', ['print', `gui/${process.getuid()}/${name}`]).ok
+const launchdPrint = (name) => (process.platform === 'darwin' ? run('launchctl', ['print', `gui/${process.getuid()}/${name}`]) : { ok: false, out: '' })
+const launchdLoaded = (name) => launchdPrint(name).ok
 
 async function health(port) {
   try {
@@ -70,11 +70,16 @@ function printCounts(title, c) {
 }
 
 async function backup(args) {
-  if (args[0] === '--nightly') {
-    const r = await ops.nightly(config.dataDir)
-    console.log(`${new Date().toISOString()} nightly: ${r.file} (${r.bytes} bytes, integrity ok); kept ${r.kept}, deleted ${r.deleted.length ? r.deleted.join(', ') : 'none'}`)
+  if (args[0] === '--weekly') {
+    const rest = args.slice(1)
+    if (rest.some((a) => a !== '--if-due')) throw new Error('usage: backup --weekly [--if-due]')
+    const r = await ops.weekly(config.dataDir, { ifDue: rest.includes('--if-due') })
+    // Not due: silent, exit 0 — the agent runs hourly and its log would fill with "not yet".
+    if (!r.made) return
+    console.log(`${new Date().toISOString()} weekly: ${r.file} (${r.bytes} bytes, integrity ok); kept ${r.kept}, deleted ${r.deleted.length ? r.deleted.join(', ') : 'none'}`)
     return
   }
+  if (args[0] === '--nightly') throw new Error('backup --nightly is gone: the scheduled backup is weekly (backup --weekly, DEC-136).')
   if (args.length !== 1) throw new Error('usage: backup <reason>   (e.g. backup before-import)')
   const r = await ops.backupDb(config.dataDir, args[0])
   console.log(`backup: ${r.file} (${r.bytes} bytes, integrity ok)`)
@@ -123,6 +128,7 @@ async function doctor() {
     lines.push(`${ok ? 'ok  ' : 'FAIL'}  ${text}`)
     if (!ok) failed++
   }
+  const info = (text) => lines.push(`info  ${text}`)
   const want = `http://127.0.0.1:${config.port}`
 
   const lsof = run('lsof', ['-nP', `-iTCP:${config.port}`, '-sTCP:LISTEN'])
@@ -160,18 +166,26 @@ async function doctor() {
 
   if (process.platform === 'darwin') {
     check(launchdLoaded(label), `launchd: ${label} ${launchdLoaded(label) ? 'loaded' : 'NOT loaded'}`)
-    check(launchdLoaded(`${label}.nightly`), `launchd: ${label}.nightly ${launchdLoaded(`${label}.nightly`) ? 'loaded' : 'NOT loaded'}`)
+    const weekly = launchdPrint(`${label}.weekly`)
+    check(weekly.ok, `launchd: ${label}.weekly ${weekly.ok ? 'loaded' : 'NOT loaded'}`)
+    if (weekly.ok) {
+      const w = ops.launchdRuns(weekly.out)
+      info(`launchd: ${label}.weekly runs = ${w.runs ?? '?'} (since it was last loaded — every deploy reloads it)`)
+      if (w.lastExit !== null) check(w.lastExit === 0, `launchd: ${label}.weekly last exit code = ${w.lastExit}${w.lastExit ? ` — see ${join(config.dataDir, 'logs', 'weekly.log')}` : ''}`)
+    }
+    // req-231's agent; server/start and server/stop remove it (req-237).
+    const legacy = launchdLoaded(`${label}.nightly`)
+    check(!legacy, `launchd: ${label}.nightly ${legacy ? 'STILL loaded (re-run server/stop, then server/start)' : 'not loaded'}`)
     const n = ops.launchdNode(join(agentsDir, `${label}.plist`))
     check(n.ok, n.text)
     if (n.note) lines.push(n.note)
   }
 
-  const newest = ops.listBackups(config.dataDir)[0]
-  if (!newest) check(false, 'last backup: none')
-  else {
-    const hours = (Date.now() - newest.mtimeMs) / 3600000
-    check(hours <= BACKUP_MAX_HOURS, `last backup: ${newest.name}, ${hours.toFixed(1)} h ago`)
-  }
+  // req-237: the scheduled backup is checked; the newest of any reason is information only.
+  const backups = ops.listBackups(config.dataDir)
+  const sched = ops.scheduledBackupCheck(backups)
+  check(sched.ok, sched.text)
+  info(backups[0] ? `newest backup (any reason): ${backups[0].name}, ${((Date.now() - backups[0].takenMs) / 3600000).toFixed(1)} h ago` : 'newest backup (any reason): none')
 
   console.log(`doctor — data ${config.dataDir}, port ${config.port}, label ${label}`)
   for (const line of lines) console.log(line)

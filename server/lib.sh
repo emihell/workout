@@ -3,7 +3,7 @@
 #   WORKOUT_LIVE_DIR   ~/dev/workout/workout-live   the `git archive main` copy the server runs from
 #   WORKOUT_DATA_DIR   ~/dev/workout/workout-data   the DB, secret, backups/, logs/
 #   WORKOUT_PORT       8100                          bound on 127.0.0.1 only
-#   WORKOUT_LABEL      com.workout.server            the launchd agent (+ <label>.nightly)
+#   WORKOUT_LABEL      com.workout.server            the launchd agent (+ <label>.weekly)
 #   WORKOUT_NODE       `command -v node`             the node launchd runs (it has no PATH of yours)
 LIVE_DIR="${WORKOUT_LIVE_DIR:-$HOME/dev/workout/workout-live}"
 DATA_DIR="${WORKOUT_DATA_DIR:-$HOME/dev/workout/workout-data}"
@@ -27,4 +27,10 @@ require_live_copy() {
   live_real="$(cd "$LIVE_DIR" 2>/dev/null && pwd -P)" || die "refusing: no live copy at $LIVE_DIR (run ./server/deploy from the repo)"
   [ "$root" = "$live_real" ] || die "refusing: run this from the live copy ($live_real/server/$(basename "$0")), not $root"
   [ ! -e "$root/.git" ] || die "refusing: $root is a git checkout, not the deployed copy"
+}
+
+# req-237 — req-231's nightly backup agent, replaced by <label>.weekly: booted out if loaded, plist removed.
+remove_legacy_nightly() {
+  if loaded "$LABEL.nightly"; then launchctl bootout "$DOMAIN/$LABEL.nightly" && say "removed the old $LABEL.nightly agent"; fi
+  rm -f "$AGENTS/$LABEL.nightly.plist"
 }

@@ -1,4 +1,4 @@
-// req-231 — the live server's housekeeping: backups, the nightly rotation, restores, record counts
+// req-231 — the live server's housekeeping: backups, the weekly rotation (req-237, DEC-136), restores, record counts
 // and the doctor's checks. The shell scripts beside this file (backup, restore, doctor …) call
 // ops-cli.mjs, which calls these; the tests call them on temp dirs (BACKEND rule 8).
 //
@@ -14,10 +14,16 @@ import { openDb } from './db.mjs'
 import { markRestore } from './store.mjs'
 
 export const BACKUPS = 'backups'
-export const NIGHTLY = 'nightly'
-export const NIGHTLY_KEEP = 7
+// req-237 / DEC-136: the scheduled backup is weekly, keeps 4. `nightly` is the reason req-231's
+// nightly agent used; those files count as scheduled backups (age, rotation) until they rotate out.
+export const WEEKLY = 'weekly'
+export const WEEKLY_KEEP = 4
+export const WEEKLY_DUE_DAYS = 7
+const DAY_MS = 24 * 60 * 60 * 1000
 const REASON = /^[a-z0-9][a-z0-9-]{0,39}$/
-const NIGHTLY_EXTRA = /^nightly-\d+$/
+// `weekly`, `weekly-2` (a second one in the same second), and the legacy `nightly`, `nightly-3`.
+const SCHEDULED = /^(weekly|nightly)(-\d+)?$/
+export const isScheduled = (reason) => SCHEDULED.test(String(reason))
 const NAME = /^workout-(\d{8}-\d{6})-([a-z0-9][a-z0-9-]*)\.db$/
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -81,13 +87,13 @@ async function copyDb(source, dest) {
   return dest
 }
 
-// `./server/backup <reason>` → {file, bytes}. `nightly` is the nightly run's reason only.
-export async function backupDb(dataDir, reason, { at = new Date(), nightly = false } = {}) {
+// `./server/backup <reason>` → {file, bytes}. `weekly` is the scheduled run's reason only.
+export async function backupDb(dataDir, reason, { at = new Date(), scheduled = false } = {}) {
   if (!REASON.test(String(reason))) throw new Error(`Backup reason: lower-case letters, digits and dashes (got "${reason}").`)
-  // Review nit: `nightly-3` (a second nightly in the same second) is rotated like `nightly`, so a
-  // hand-made backup may not take that shape either.
-  if ((reason === NIGHTLY || NIGHTLY_EXTRA.test(reason)) && !nightly) {
-    throw new Error(`"${reason}" is reserved for the nightly backup (backup --nightly).`)
+  // Review nit: `weekly-3` / `nightly-3` are rotated like `weekly`, so a hand-made backup may not
+  // take those shapes either (the rotation would delete it).
+  if (isScheduled(reason) && !scheduled) {
+    throw new Error(`"${reason}" is reserved for the scheduled weekly backup (backup --weekly).`)
   }
   assertNotLiveUnderTest(dataDir)
   const dbFile = join(dataDir, DB_FILE)
@@ -109,22 +115,38 @@ export function listBackups(dataDir) {
     .filter(({ match }) => match)
     .map(({ name, match }) => {
       const file = join(dir, name)
-      return { file, name, stamp: match[1], reason: match[2], mtimeMs: statSync(file).mtimeMs }
+      return { file, name, stamp: match[1], reason: match[2], mtimeMs: statSync(file).mtimeMs, takenMs: stampMs(match[1]) }
     })
     .sort((a, b) => b.stamp.localeCompare(a.stamp) || b.mtimeMs - a.mtimeMs)
 }
 
-// The nightly backup, then the rotation: the newest NIGHTLY_KEEP nightlies stay; other backups
-// (deploy, pre-restore, by hand) are never deleted here.
-export async function nightly(dataDir, { at = new Date(), keep = NIGHTLY_KEEP } = {}) {
-  const made = await backupDb(dataDir, NIGHTLY, { at, nightly: true })
-  const nightlies = listBackups(dataDir).filter((b) => b.reason === NIGHTLY || NIGHTLY_EXTRA.test(b.reason))
+// The name's stamp (local time, see stamp()) → epoch ms: when the backup was taken. The age checks
+// use this, not mtime — a copied or touched file keeps the time it was taken.
+export function stampMs(s) {
+  const m = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})$/.exec(String(s))
+  return m ? new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]).getTime() : NaN
+}
+
+// Newest first: the scheduled backups (weekly, and legacy nightly).
+export const scheduledBackups = (dataDir) => listBackups(dataDir).filter((b) => isScheduled(b.reason))
+
+// The weekly backup, then the rotation: the newest `keep` scheduled backups (weekly and legacy
+// nightly together) stay; other backups (deploy, pre-restore, by hand) are never deleted here.
+// `ifDue`: only when the newest scheduled backup is ≥ WEEKLY_DUE_DAYS old, or there is none — the
+// hourly agent's catch-up (req-237). Not due → {made: false, newest}, nothing written.
+export async function weekly(dataDir, { at = new Date(), keep = WEEKLY_KEEP, ifDue = false } = {}) {
+  if (ifDue) {
+    const newest = scheduledBackups(dataDir)[0]
+    if (newest && at.getTime() - newest.takenMs < WEEKLY_DUE_DAYS * DAY_MS) return { made: false, newest: newest.name }
+  }
+  const made = await backupDb(dataDir, WEEKLY, { at, scheduled: true })
+  const scheduled = scheduledBackups(dataDir)
   const deleted = []
-  for (const old of nightlies.slice(keep)) {
+  for (const old of scheduled.slice(keep)) {
     rmSync(old.file)
     deleted.push(old.name)
   }
-  return { ...made, kept: Math.min(nightlies.length, keep), deleted }
+  return { made: true, ...made, kept: Math.min(scheduled.length, keep), deleted }
 }
 
 // What a DB holds: every table's row count, and per user the current revision's record counts —
@@ -240,6 +262,27 @@ export function serveState(statusJson, httpsPort, want) {
   const handlers = web?.[1]?.Handlers ?? null
   const proxy = handlers?.['/']?.Proxy ?? null
   return { mapped: proxy === want && Object.keys(handlers).length === 1, proxy, host: web ? web[0].replace(/:\d+$/, '') : null, funnel }
+}
+
+// req-237 — the doctor's scheduled-backup line: the newest weekly-or-legacy-nightly exists and is
+// ≤ maxDays old (7 days + 1 day slack). Deploy and by-hand backups don't count: a fresh deploy
+// backup hid the missed 2026-10-26 nightly (req-237 §The failure).
+export const SCHEDULED_MAX_DAYS = WEEKLY_DUE_DAYS + 1
+export function scheduledBackupCheck(backups, now = Date.now(), maxDays = SCHEDULED_MAX_DAYS) {
+  const newest = backups.find((b) => isScheduled(b.reason))
+  if (!newest) return { ok: false, text: `scheduled backup: none (weekly or nightly) — want one ≤ ${maxDays} days old` }
+  const days = (now - newest.takenMs) / DAY_MS
+  return { ok: days <= maxDays, text: `scheduled backup: ${newest.name}, ${days.toFixed(1)} days ago (want ≤ ${maxDays})` }
+}
+
+// req-237 — `launchctl print gui/<uid>/<label>` → {runs, lastExit}: `runs` (since the agent was last
+// loaded — every deploy reloads it, so information only) and `last exit code` as a number, or null
+// when absent or "(never exited)".
+export function launchdRuns(printText) {
+  const text = String(printText ?? '')
+  const runs = /^\truns = (\d+)\s*$/m.exec(text)
+  const exit = /^\tlast exit code = (-?\d+)/m.exec(text)
+  return { runs: runs ? Number(runs[1]) : null, lastExit: exit ? Number(exit[1]) : null }
 }
 
 // `lsof -nP -iTCP:<port> -sTCP:LISTEN` output → the listening addresses.
