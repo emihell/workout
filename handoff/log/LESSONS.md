@@ -582,3 +582,10 @@ A bulk delete of planning history gets one line of "this is what goes, ok?" even
 
 req-247's AC 2 (`git diff main..req-N | grep` for non-comment lines) also matched the committed report, which quotes those lines.
 **Rule:** an AC that greps a branch diff scopes it `-- . ':!reports'`.
+
+## L-062 — an in-process test timeout can't stop a synchronous loop  (Builder, req-248, 2026-10-26)
+
+req-239's mutation hung its rendered test file in a render loop (178% CPU, 3 GB): `--test-timeout` never fired, because no
+timer runs while the loop holds the thread; `--test-force-exit` is needed for the async kind (an open timer keeps the process).
+**Rule:** a gate needs an outside bound too — `./check`'s watchdog, CI's `timeout-minutes`. And a per-test timeout is sized
+from the **loaded** run, not the quiet one: a flaky gate gets skipped (Planner's change to req-248: 20 s → 60 s).
