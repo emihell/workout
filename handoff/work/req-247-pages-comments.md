@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-247` (`36f7e09`)** · **Lane: tooling** · comments + test names only (stage-1 fallout, DEC-143; follow-up to req-238).
+**Status: BUILT AND MERGED, 2026-10-26 — branch `req-247` (`c91f5f4`…`36f7e09`, 2 commits).** · **Lane: tooling** · comments + test names only (stage-1 fallout, DEC-143; follow-up to req-238).
 
 # req-247 — no comment or test name says "the Pages build" any more
 
