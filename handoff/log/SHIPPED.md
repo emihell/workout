@@ -2664,3 +2664,11 @@ handoff (L-059). No reviewer: no trigger file. `reports/req-236.md`.
 name's stamp), keeps 4 weekly+legacy nightly; start/stop remove the old `.nightly`; doctor FAILs on no scheduled backup or > 8 d,
 launchd last-exit ≠ 0. Gate: `./check` green (2089 pass); server suite 88/88 (Planner re-ran on the branch); guard self-test
 (old any-backup logic → 2 doctor tests fail). Diff read by Planner. No reviewer: no DEC-057 trigger file. `reports/req-237.md`.
+
+## req-245 — `./server/ops plan preview|apply|revert`: a plan into the live DB as a revision  (2026-10-26)
+
+**req-245** (backend; throwaway agent). Keep-my-history write via fast-forward `putState`, backup first, `--expect-rev`, live-build
+guard; `revisions.source/note` (nullable, added on open); sourced revisions never pruned. Gate: `./check` green (138 files);
+server suite 104/104 (Planner re-ran on `2c19b34`); restore drill on a throwaway :8199 instance; Planner previewed coach run 3
+on a copy of the live DB (23 workouts identical). Reviewer: independent subagent — no blockers; 3 should-fix + 5 nits fixed
+in `2c19b34` (DEC-142). `reports/req-245.md`.

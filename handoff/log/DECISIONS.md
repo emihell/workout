@@ -2239,3 +2239,13 @@ thinggs?"
    and undo" exist. Events would mean rewriting sync and merge for one user. Where they would earn their place: live group
    workouts (DEC-073), where sets stream between people. Revisit there.
 4. Export/Import in the app stay (BACKEND rule 10, DEC-127); only the coach's file hand-off goes.
+
+## DEC-142 — req-245's open choices, recorded  (Planner, 2026-10-26, from `reports/req-245.md` + review; reversible, under DEC-095)
+
+1. **History check = "the file would change history":** a workout only the server has (logged after the plan was built) is
+   allowed; any logged record the file differs on → refused. 2. **A plan file must hold `exercises` and `routines`, at least one
+   routine.** 3. **Revisions with a `source` (apply, revert) are never pruned.** 4. **`--yes` needs `--expect-rev N`** (the rev
+   the preview showed); the write refuses if the server moved. 5. A plan without `schedule.anchor` keeps the server's anchor.
+6. Apply/revert on the live dir refuse unless the live build contains `server/plan.mjs` (deploy first). 7. Revert restores
+   that revision's whole setup (later setup edits included), never history; refused during a workout in progress.
+`(unconfirmed)` for Emilio: 1 and 7 (what a write may overwrite).
