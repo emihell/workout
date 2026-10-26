@@ -2691,4 +2691,4 @@ deprecated" (forced to 24) → BACKLOG tooling.
 **req-247** (tooling; Builder). 16 comment lines + 3 `ui.test.js` strings → "the plain build"; `scripts/screenshot.mjs:95`
 ("a static host", not in the spec's list, found by AC 1's grep). Gate: `./check` green (2106 pass); AC 1 grep → only
 `builds.test.js:3`, `vite.config.js:32`; AC 2 (Planner re-ran with `':!reports'`) → only the 3 `ui.test.js` string pairs,
-assertions unchanged. No reviewer: no trigger file. Stage-1 fallout list empty after this (DEC-143). `reports/req-247.md`.
+assertions unchanged. No reviewer: no trigger file. Stage-1 fallout list empty after this (DEC-143). `reports/req-247.md`. CI on the merge: run 40361844171 success.
