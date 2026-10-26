@@ -409,6 +409,8 @@ path it came in on.
   only a real behaviour choice, one at a time. **Test everything checkable yourself** (Chrome, code, a unit test);
   ask him only for eyes/touch (design, feel). Push back when you think he's wrong — he wants it.
 
+- **Feedback on a page → check `reference/PAGES.md` first (DEC-137).** Clashes with an **E** line (his decision) or a
+  DESIGN value → bring him the old decision, why, and options. A **P** line or nothing → fix it, report it.
 - **One thing at a time.** Finish the thing in front of you. Don't narrate the
   next two steps.
 - **Don't run ahead.** Verifying something is not permission to merge it. Ask.

@@ -32,7 +32,8 @@ pushed, the branch is not deleted, and a re-run after fixing the gate recovers f
 
 ## Assistant, at close-out
 1. Do the recording pass (Status still "NOT merged", `DEC-`/`L-`, `NOW.md` line moved
-   to Recently shipped, `SHIPPED.md` narrative). Keep any "Spawned by:"-style note
+   to Recently shipped, `SHIPPED.md` narrative). Each new DEC a user would see adds or
+   replaces its line in `reference/PAGES.md`, marked E or P (DEC-137). Keep any "Spawned by:"-style note
    **after** the closing `**` of the Status span — `closeout` replaces the whole Status
    bold and would drop a note living inside it.
 2. Confirm state read-only: `git -C <code> --no-optional-locks rev-parse --short req-N`,

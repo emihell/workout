@@ -41,6 +41,7 @@ later DEC replaced carries a `> SUPERSEDED` marker at its top. Refreshed 2026-09
   (via `./plan save` only, L-032), `publish` and `closeout`. → **DEC-005**, **DEC-008**, **DEC-026**
 - **Merge shape** — every req reaches `main` via `--no-ff` (pre-push guard). → **DEC-045**
 - **No auto-memory** for either session; licensed third-party data only in a gitignored dir. → **DEC-068**
+- **Page feedback** — checked against `reference/PAGES.md`; only a clash with an Emilio (E) decision needs him. → **DEC-137**
 - **Session boot** — planning reads `handoff/PLANNING.md` directly. → **DEC-044**
 - **Audits 2026-09-24** — all recommendations taken (req-156..160, planning docs, Emilio's actions). → **DEC-085**
 
@@ -2175,3 +2176,17 @@ Emilio: "we dont need a backup . every night, once a week is fine now". The sche
 before-deploy and before-write backups (rule 5/6) stay. Planner's calls (reversible): keep the newest **4** weeklies
 (~a month; old `nightly` files count toward the 4 and rotate out); the hourly catch-up from req-237 stays, so "weekly"
 means "due 7 days after the newest one". Built by req-237.
+
+## DEC-137 — page feedback is checked against that page's decisions; only a clash with Emilio's needs him  (Emilio, 2026-10-26)
+
+Emilio: "for every page in the app, decisions … when i give feedback on a page, we can see if it goes agansst or reverts a
+previous dec, if this is the case, my involvent is needed as we need to find a new solution, but if feedback does not have a
+dec aganst it, you can solve it". Planner added the split by whose call it was; Emilio: "yes".
+1. **`reference/PAGES.md`** lists, per page plus an "Every page" section, the live decisions that shape it, each marked
+   **E** (Emilio decided or confirmed) or **P** (Planner's/Builder's call, unconfirmed under DEC-095).
+2. **Feedback on a page:** against an **E** line or a DESIGN.md value → Planner stops and brings Emilio the decision in plain
+   words, why it was made, and two or three options. Against a **P** line or nothing listed → Planner fixes it (DEC-095) and
+   reports. Either way the outcome is a new DEC.
+3. **Upkeep:** each new DEC that a user would see adds or replaces its PAGES.md line in the same save (CLOSEOUT.md recording
+   pass). A stale map is the cost; this is the guard.
+Amends DEC-095's ask-list: a clash with an E decision is a fourth reason to ask.

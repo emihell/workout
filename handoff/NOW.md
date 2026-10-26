@@ -45,5 +45,5 @@ to later days; routine kg fill once per device, an imported old backup keeps its
 
 ## Where to read
 
-`PLANNING.md` (planning role + the two-agent build loop) → `work/BACKLOG.md` → `rules/DESIGN.md`
+`PLANNING.md` (planning role + the two-agent build loop) → `reference/PAGES.md` for page feedback (DEC-137) → `work/BACKLOG.md` → `rules/DESIGN.md`
 before UI/UX → `rules/WORKFLOW.md` for process → `rules/CLOSEOUT.md` to close a req. `README.md` is the product contract.
