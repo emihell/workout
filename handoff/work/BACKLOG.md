@@ -109,7 +109,7 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   sessions.
 - **Ops nits** (req-231 review; not fallout, DEC-143): the DEC-133 scan `JSON.parse`s every revision since the marker (slow
   only after a restore; use `json_extract`); `start` doesn't XML-escape plist paths (none have `&<>` today); launchd runs an
-  nvm node. The half-loaded-agents case → req-246. The corrupt-copy-as-backup nit is fixed (req-237's doctor counts only
+  nvm node. A failed bootstrap already fails the deploy (`set -e`); the doctor runs after each deploy (CLOSEOUT step 4). The corrupt-copy-as-backup nit is fixed (req-237's doctor counts only
   scheduled backups).
 - **Full visual-design pass**: its own milestone.
 

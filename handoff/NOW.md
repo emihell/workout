@@ -26,7 +26,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 **Stage 1 fallout — finish before anything else (DEC-143):**
 - Emilio: phone go-live (clear `:8446` site data → log in → log a workout).
 - Pages leftovers: **req-238, widened** (CI check-only + the dead `GITHUB_PAGES` build mode + README). READY.
-- **req-246** (READY): `./server/deploy` ends with the doctor and fails on a problem (half-loaded agents, a gone node).
+- Ops: no req needed — `./server/doctor` after every server deploy is now CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
 
 **READY, held:**
 - req-239 → req-240 → req-241, req-242, req-243; req-244 (GO pill, look A). Batch 7, DEC-138/139. Emilio: "wait".

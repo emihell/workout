@@ -40,6 +40,9 @@ pushed, the branch is not deleted, and a re-run after fixing the gate recovers f
    `git -C <code> --no-optional-locks log main..req-N --oneline`. Let `closeout` do the
    checkout/merge/publish/push — don't run those by hand.
 3. Run `./plan closeout req-N` yourself (after the merge gate). Nothing else.
+4. If the req touched `server/` or the sync code (BACKEND rule 2): `./server/deploy`, then **`./server/doctor`** — paste its
+   last line in SHIPPED. Not `all ok` → fix before reporting the close-out done (DEC-143; the doctor is what catches a
+   missing backup agent, a gone node, a funnel left on).
 
 ## The reviewer gate (req-166)
 `./plan closeout` refuses **before** merging when the diff touches a DEC-057 §1 trigger file and the SHIPPED entry's gate

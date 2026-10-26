@@ -1,4 +1,7 @@
-**Status: READY** · **Lane: tooling** · server ops (stage-1 fallout, DEC-143). Independent of req-238.
+**Status: WITHDRAWN 2026-10-26 (Planner)** · **Lane: tooling** — its premise was wrong. `server/deploy` runs under
+`set -euo pipefail` (`server/deploy:6`), so a failed second bootstrap already fails the deploy loudly, and `server/start`
+already refuses a node below the floor. What was left — "nothing runs the doctor" — is a process step, not code: added to
+`rules/CLOSEOUT.md` step 4. The spec below is kept as written.
 
 # req-246 — `./server/deploy` ends with the doctor, and fails if it finds a problem
 
