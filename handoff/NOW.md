@@ -23,7 +23,7 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
   kickstart → exit 0); fixed: weekly backup + hourly catch-up + doctor check (DEC-136). (3) Off-Mac backup copy: Emilio handles it himself ("ill worry about ecternal backup", 2026-10-26) — not tracked. Images: backlog.
 - **IN FLIGHT 2026-10-26 (Emilio: "do it"):** deploy (Emilio runs `./server/deploy` in Terminal), then apply coach run 3 with `ops plan`
   (Emilio's yes on the counts). READY, held: req-238 (CI check-only).
-- **Coach (DEC-140):** `coach/COACH.md`, run 1 → `…/workout-data/coach/run-N/`; plans go into the DB via req-245 (DEC-141). **Batch 7 (BACKLOG §batch 7):** READY 239 → 240 → 241, 242, 243; 244 (GO pill, look A). Held (Emilio: "wait").
+- **Coach (DEC-140):** `coach/COACH.md`, run 1 → `…/workout-data/coach/run-N/`; plans go into the DB via `./server/ops plan` (DEC-141). **Batch 7 (BACKLOG §batch 7):** READY 239 → 240 → 241, 242, 243; 244 (GO pill, look A). Held (Emilio: "wait").
 - **Cleanup batch 2026-10-14 + batch 6 (DEC-125/126) DONE.** Feel list: SHIPPED; follow-ups BACKLOG §batch 6.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184
   session 2. Batch 192–195 feel list: each req's "Built — calls".
