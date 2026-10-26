@@ -15,7 +15,7 @@ DEC-095). Library content calls are P too (DEC-067).
 - **Keep it current:** each new DEC that a user would see adds or replaces its line here in the same `./plan save`
   (CLOSEOUT.md, recording pass).
 
-Built 2026-10-26 from DEC-001..136.
+Built 2026-10-26 from DEC-001..136; kept current since (DEC-138).
 
 ## Every page
 
@@ -150,8 +150,9 @@ Built 2026-10-26 from DEC-001..136.
   last set comes the exercise review: the sets, ↑ N%, one effort (Easy · Medium · Hard, no Failure; tap again to clear).
 - **E** DEC-103 §1: when the logged kg differs from the routine, the exercise's end asks "Use 25 kg next time in {workout}?"
   [Update routine] [Keep 20 kg]. Never automatic.
-- **E** DEC-123 §1, DEC-012: a first-time exercise asks "How was that?" after set 1 and moves set 2's kg one step, editable,
-  with the reason shown. The app never suggests a starting weight.
+- **E** DEC-138, DEC-123 §1, DEC-012: a first-time exercise asks nothing; a quiet "Not sure what weight? Help me find it" link
+  starts guided setup ("How was that?" after set 1 moves set 2's kg one step, editable, reason shown). The app never
+  suggests a starting weight.
 - **E** DEC-108 §4: cardio sets have a stopwatch, Level and Distance. **P** DEC-109: a single-time target prefills Duration;
   a range stays blank.
 - **E** DEC-119 §6: one-arm reps read "each side"; the exercise note and form cues show during rest.

@@ -2190,3 +2190,15 @@ dec aganst it, you can solve it". Planner added the split by whose call it was; 
 3. **Upkeep:** each new DEC that a user would see adds or replaces its PAGES.md line in the same save (CLOSEOUT.md recording
    pass). A stale map is the cost; this is the guard.
 Amends DEC-095's ask-list: a clash with an E decision is a fourth reason to ask.
+
+## DEC-138 — first-time exercises: no question, a help link instead  (Emilio, 2026-10-26, batch 7 J2; amends DEC-012 / DEC-123 §1)
+
+Emilio's note (2026-10-16, Back Extension): "Do i need two buttons to press? Enter it? Can't i just enter it?" The prompt
+"First time — [I'll enter it] [Set it up]" sits above a form that already works (`views/workout/item.jsx:682-696`). Planner's
+options A keep / B link / C drop guided setup; Emilio: "your rec" → **B**.
+1. **No question.** The set form is ready to type; logging set 1 works as for any exercise.
+2. **One quiet link under the form on set 1:** "Not sure what weight? Help me find it" → the guided setup exactly as today
+   (guide line, then "How was that?" after set 1, DEC-123 §1). It shows where the prompt showed (first work set, no history,
+   weighted or bodyweight, nothing logged).
+3. Guided setup itself is kept (rejected C: beginners lose the only weight help); the prompt is dropped (rejected A).
+Built as req-239.
