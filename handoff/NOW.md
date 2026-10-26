@@ -21,8 +21,8 @@ Sam run done (req-144 prep §G). req-182 shipped. **Next: Emilio's end-of-batch 
   `start`, `stop` — allow rules added 2026-10-25). **Left:** (1) Emilio: phone — clear `:8446` site data → login → log a
   workout; then the go-live ACs 4–5 are done. (2) **Nightly did NOT fire 10-26 01:00** (Mac awake, cause unknown;
   kickstart → exit 0); doctor missed it → req-237. Backups go weekly (DEC-136). (3) Off-Mac backup copy: Emilio handles it himself ("ill worry about ecternal backup", 2026-10-26) — not tracked. Images: backlog.
-- **READY 2026-10-26, unbuilt:** req-236 (req-200 test red on Mondays — till then `plan publish` needs `WORKOUT_SKIP_CHECK=1`
-  on Mondays) → req-238 (CI check-only, re-enable); req-237 (weekly backup + hourly catch-up + doctor), independent.
+- **IN FLIGHT 2026-10-26 (Emilio: "do it"):** req-237 (weekly backup) → req-245 (`ops plan`, DEC-141); then apply coach run 3
+  (Emilio's yes). req-236 shipped. READY, held: req-238 (CI check-only).
 - **Coach (DEC-140):** `coach/COACH.md`, run 1 → `…/workout-data/coach/run-N/`; plans go into the DB via req-245 (DEC-141). **Batch 7 (BACKLOG §batch 7):** READY 239 → 240 → 241, 242, 243; 244 (GO pill, look A). Held (Emilio: "wait").
 - **Cleanup batch 2026-10-14 + batch 6 (DEC-125/126) DONE.** Feel list: SHIPPED; follow-ups BACKLOG §batch 6.
 - **Batch 2026-10-07 — app organisation (DEC-110..112): DONE, 198–211 shipped. Open: CSV export (later), progress (later), req-184 session 2**, throwaway agents, Planner closes. Then req-184
