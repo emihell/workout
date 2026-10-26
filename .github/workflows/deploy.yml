@@ -18,7 +18,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     # req-248 (from req-239): a hang goes red in 10 min, not GitHub's 360-min default. ~3x the
-    # green run's 2m03s (run 40354463101). ./check's --test-timeout catches an async hang in 20 s;
+    # green run's 2m03s (run 40354463101). ./check's --test-timeout catches an async hang in 60 s;
     # a synchronous one (its 900 s watchdog is longer than this) is caught here.
     timeout-minutes: 10
     steps:
