@@ -11,7 +11,7 @@ import { leaveWorkoutToToday } from './workout-actions.js'
 import { inWorkoutFallback } from './workout-paths.js'
 import { historyGroupRowMeta } from './views/history/helpers.js'
 
-const BASE = 'http://localhost:5173/workout/'
+const BASE = 'http://localhost:5173/'
 
 function fakeBrowser(startHash = '#/') {
   const entries = [BASE + startHash]

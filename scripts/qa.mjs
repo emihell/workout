@@ -37,7 +37,7 @@ export function resolveRef(ref, cwd = ROOT) {
   return execFileSync('git', ['rev-parse', '--verify', `${ref}^{commit}`], { cwd, encoding: 'utf8' }).trim()
 }
 
-// Export `sha` and build it into `dist` (base '/', GITHUB_PAGES unset). Nothing is
+// Export `sha` and build it into `dist` (base '/'). Nothing is
 // written to a worktree: the export and the build are both under tmpdir.
 export function buildRef(sha, dist, { cwd = ROOT, nodeModules = join(ROOT, 'node_modules') } = {}) {
   if (!existsSync(join(nodeModules, 'vite/bin/vite.js'))) throw new Error(`no vite under ${nodeModules} — run npm ci there, or pass --node-modules`)
@@ -45,11 +45,8 @@ export function buildRef(sha, dist, { cwd = ROOT, nodeModules = join(ROOT, 'node
   try {
     execSync(`git archive --format=tar ${sha} | tar -x -C "${src}"`, { cwd, stdio: ['ignore', 'ignore', 'inherit'] })
     symlinkSync(nodeModules, join(src, 'node_modules'), 'dir')
-    const env = { ...process.env }
-    delete env.GITHUB_PAGES
     execFileSync(process.execPath, [join(nodeModules, 'vite/bin/vite.js'), 'build', '--outDir', dist, '--emptyOutDir', '--logLevel', 'error'], {
       cwd: src,
-      env,
       stdio: ['ignore', 'ignore', 'inherit'],
     })
   } finally {

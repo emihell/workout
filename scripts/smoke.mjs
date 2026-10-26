@@ -1,6 +1,6 @@
 // req-159 — the scripted smoke test: the app's core loop by real clicks in headless
-// Chrome, against an isolated build on its own origin. It gates the Pages deploy
-// (.github/workflows/deploy.yml) and runs locally behind `./check --smoke`.
+// Chrome, against an isolated build on its own origin. CI runs it on every push
+// to main (.github/workflows/deploy.yml) and runs locally behind `./check --smoke`.
 //
 //   node scripts/smoke.mjs                 build HEAD in a temp dir (scripts/qa.mjs), serve, test
 //   node scripts/smoke.mjs --ref <ref>     same, for another ref

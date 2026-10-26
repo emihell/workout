@@ -1,5 +1,6 @@
 // req-230 — the two builds from one code base, checked on the BUILT files:
-//   Pages (GITHUB_PAGES=true): no login screen, no sync code, no service worker — as before.
+//   plain (`npm run build`, no WORKOUT_SYNC): no login screen, no sync code, no service worker.
+//   req-238: this was the GitHub Pages build until that mode was removed (DEC-135).
 //   server (WORKOUT_SYNC=true): all three, and sw.js caches every built file.
 // Then the built sw.js itself, run in a fake service-worker scope: what it caches, what it
 // serves offline, what it never touches (/api), and that a new version waits (no skipWaiting).
@@ -19,7 +20,6 @@ const VITE = join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js')
 function build(env) {
   const out = mkdtempSync(join(tmpdir(), 'workout-req230-build-'))
   const clean = { ...process.env }
-  delete clean.GITHUB_PAGES
   delete clean.WORKOUT_SYNC
   execFileSync(process.execPath, [VITE, 'build', '--outDir', out, '--emptyOutDir', '--logLevel', 'error'], {
     cwd: ROOT,
@@ -35,32 +35,31 @@ const files = (dir) =>
     .sort()
 const scripts = (dir) => files(dir).filter((f) => f.endsWith('.js')).map((f) => readFileSync(join(dir, f), 'utf8')).join('\n')
 
-let pages
+let plain
 let serverBuild
 before(() => {
-  pages = build({ GITHUB_PAGES: 'true' })
+  plain = build({})
   serverBuild = build({ WORKOUT_SYNC: 'true' })
 })
 after(() => {
-  for (const dir of [pages, serverBuild]) if (dir) rmSync(dir, { recursive: true, force: true })
+  for (const dir of [plain, serverBuild]) if (dir) rmSync(dir, { recursive: true, force: true })
 })
 
 describe('req-230 — the build switch', () => {
-  it('sync is on only with WORKOUT_SYNC=true, and GITHUB_PAGES=true always turns it off', () => {
+  it('sync is on only with WORKOUT_SYNC=true', () => {
     assert.equal(syncEnabled({}), false)
+    assert.equal(syncEnabled({ WORKOUT_SYNC: 'false' }), false)
     assert.equal(syncEnabled({ WORKOUT_SYNC: 'true' }), true)
-    assert.equal(syncEnabled({ WORKOUT_SYNC: 'true', GITHUB_PAGES: 'true' }), false)
-    assert.equal(syncEnabled({ GITHUB_PAGES: 'true' }), false)
   })
 
-  it('1. the Pages build: no login screen, no request to the server, no service worker', () => {
-    const js = scripts(pages)
+  it('1. the plain build: no login screen, no request to the server, no service worker', () => {
+    const js = scripts(plain)
     assert.ok(js.length > 100000, 'the app is there')
     for (const marker of ['/api/', 'Log in', 'workout-sync-v1', 'serviceWorker', 'x-workout-request', 'sw.js']) {
-      assert.equal(js.includes(marker), false, `Pages bundle contains ${marker}`)
+      assert.equal(js.includes(marker), false, `plain bundle contains ${marker}`)
     }
-    assert.equal(existsSync(join(pages, 'sw.js')), false)
-    assert.match(readFileSync(join(pages, 'index.html'), 'utf8'), /src="\/workout\/assets\//, 'still served under /workout/')
+    assert.equal(existsSync(join(plain, 'sw.js')), false)
+    assert.match(readFileSync(join(plain, 'index.html'), 'utf8'), /src="\/assets\//, 'served from /')
   })
 
   it('the server build has them, and sw.js lists every built file', () => {
