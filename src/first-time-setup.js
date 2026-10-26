@@ -1,6 +1,6 @@
 // req-10 (DEC-012, amended by DEC-123 §1) — first-time guided setup for an exercise with no
 // finished history. Pure, so every decision is unit-tested and inspectable:
-//   - setupPromptShows: when "First time — [Set it up] [I'll enter it]" shows;
+//   - setupPromptShows: when the "Help me find it" link shows (req-239; was a "First time" question);
 //   - setTwoSeed: after set 1 in setup, "How was that?" → set 2's editable prefill + its reason.
 // The answer is NEVER stored on a set (set 1 and set 2 keep `rpe: null`): req-212's rule writes
 // an item's effort onto later work sets (item.jsx completeSet), so a stored answer would spread
@@ -24,9 +24,7 @@ export const SETUP_FEELS = [
 ]
 
 export const SETUP_TEXT = {
-  prompt: 'First time',
-  setUp: 'Set it up',
-  manual: "I'll enter it",
+  helpLink: 'Not sure what weight? Help me find it',
   guideWeighted: 'Pick a weight you could lift about 15 times. Log the set, then tell us how it felt.',
   guideBodyweight: 'Do the reps you can do with good form. Log the set, then tell us how it felt.',
   sheetTitle: 'How was that?',
@@ -38,7 +36,9 @@ export const SETUP_TEXT = {
 // doesn't show again for that exercise in this workout):
 //   { mode: 'setup' | 'manual', itemKey, answered?: 'easy' | 'medium' | 'hard' | 'skip',
 //     seed?: { itemKey, workIndex: 1, weight?, reps?, reason, overrideWeight } }
-// `itemKey`: the item the prompt was answered on (the guide line and the sheet belong to it).
+// req-239: only 'setup' is written now; a 'manual' entry from an older in-progress workout still
+// hides the link. `itemKey`: the item the prompt was answered on (the guide line and the sheet
+// belong to it).
 // `answered` is the sheet's answer: so it asks once, and so an edit of set 1 can recompute the
 // seed (setupAfterSetOneEdit). `overrideWeight`: this exercise's session kg override when the seed
 // was written — a later override (the user's own kg) beats the seed (setupSeedFor, workout-log.js).
@@ -60,8 +60,9 @@ export function setupApplies(ex) {
   return ex.type === 'bodyweight' || isWeightedType(ex.type)
 }
 
-// The prompt: at the first work set (nothing of it logged yet, warm-up done) of an exercise with
-// no finished history (`hasHistory` = lastSetsForExercise is non-null), not yet answered.
+// The prompt (req-239: the link): at the first work set (nothing of it logged yet, warm-up done)
+// of an exercise with no finished history (`hasHistory` = lastSetsForExercise is non-null), not
+// yet answered.
 export function setupPromptShows({ ex, hasHistory, currentType, workLogged, entry }) {
   if (hasHistory || !setupApplies(ex)) return false
   if (currentType !== 'work' || (workLogged || []).length > 0) return false

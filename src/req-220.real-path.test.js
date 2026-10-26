@@ -111,7 +111,7 @@ describe('req-220 item 5 — every field the app itself writes is described', ()
       await flush()
     }
     await logFirstVisible('10', '12') // the warm-up set
-    await view.click(view.button('Set it up')) // the prompt shows on the first working set
+    await view.click(view.button('Not sure what weight? Help me find it')) // req-239 test edit: the link replaces [Set it up]
     await logFirstVisible('20', '10') // set 1
     if (getPendingConfirm()?.title === 'How was that?' || view.button('Easy')) await view.click(view.button('Easy'))
     await flush()
