@@ -2692,3 +2692,14 @@ deprecated" (forced to 24) → BACKLOG tooling.
 ("a static host", not in the spec's list, found by AC 1's grep). Gate: `./check` green (2106 pass); AC 1 grep → only
 `builds.test.js:3`, `vite.config.js:32`; AC 2 (Planner re-ran with `':!reports'`) → only the 3 `ui.test.js` string pairs,
 assertions unchanged. No reviewer: no trigger file. Stage-1 fallout list empty after this (DEC-143). `reports/req-247.md`. CI on the merge: run 40361844171 success.
+
+## req-239 — first-time exercise: no question, a "Help me find it" link  (2026-10-26)
+
+**req-239** (ui; Builder; J2, DEC-138). The "First time — I'll enter it / Set it up" prompt is gone; a quiet Button "Not sure what
+weight? Help me find it" (an Actions lateral row, like Remove set) under the form starts req-10's guided setup. Gate: `./check`
+green (2108); mutation check on `setupPromptShows` (unit red; the rendered file hangs → cancelled, see BACKLOG tooling). Planner's
+browser run (`plan qa req-239`, seed = db.json + a no-history machine + a no-history timed exercise first in Upper Body): smoke
+green (13 steps); 1 no "First time"/"I'll enter it" · 2 link top 396 px under kg 291 px · 3 Done → set 1 `{w:40,r:"10"}`, no sheet,
+`firstTimeSetup` null · 4 tap → guide line, `{"mode":"setup"}`, "How was that?" after Done · 5 no link on set 2 (1 logged, kg "40"),
+timed, Chest Press work set · AC 4 stored `manual` → no link. No dialogs, no "Not found.". No reviewer: no trigger file.
+Feel (Emilio, after): it renders as an outlined button, not a text link — wording + look are `(unconfirmed)`. `reports/req-239.md`.
