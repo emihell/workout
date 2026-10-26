@@ -2,7 +2,7 @@
 // version of a record edited on two devices stays on the server.
 import { createContext } from 'react'
 
-// The engine of the server build, or null (the Pages build never provides one).
+// The engine of the server build, or null (the plain build never provides one).
 export const SyncContext = createContext(null)
 
 export const NOT_SYNCED = 'Not synced yet — saved on this phone, will send when online'

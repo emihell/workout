@@ -1,4 +1,4 @@
-// req-230 — rendered: the Pages app never calls the network (criterion 1, at run time), and the
+// req-230 — rendered: the plain build never calls the network (criterion 1, at run time), and the
 // server build's screens — login, the Settings line, Log out, the 401 prompt, unreadable data.
 // The real StoreProvider / persistence / App under happy-dom; the server is a mocked fetch here
 // (src/sync/engine.test.js runs the engine against a real throwaway server).
@@ -35,12 +35,12 @@ afterEach(async () => {
   globalThis.fetch = realFetch
 })
 
-describe('1. the Pages build’s state path never calls the network', () => {
+describe('1. the plain build’s state path never calls the network', () => {
   it('open, edit through the store, Import (both choices), a feedback note, Settings → fetch is never called', async () => {
     const calls = []
     globalThis.fetch = (...args) => {
       calls.push(args)
-      throw new Error('the Pages build must not call the network')
+      throw new Error('the plain build must not call the network')
     }
     localStorage.setItem(KEY, JSON.stringify(fullState()))
     const { default: App } = await importJsx('../App.jsx', import.meta.url)
@@ -64,7 +64,7 @@ describe('1. the Pages build’s state path never calls the network', () => {
     view = await render(h(App))
     await flush()
     assert.ok(view.text().includes('Backup & data'))
-    assert.equal(view.text().includes('Sync'), false, 'no sync section in the Pages build')
+    assert.equal(view.text().includes('Sync'), false, 'no sync section in the plain build')
     assert.equal(view.button('Log out'), null)
     assert.deepEqual(calls, [])
   })

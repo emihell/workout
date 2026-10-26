@@ -256,7 +256,7 @@ function Screen() {
   return <Today />
 }
 
-// req-230 — `sync`: the server build's engine (src/sync/boot.jsx); the Pages build renders
+// req-230 — `sync`: the server build's engine (src/sync/boot.jsx); the plain build renders
 // <App /> with none, exactly as before.
 export default function App({ sync = null }) {
   // req-115 — the outer ErrorBoundary is the last resort: a render throw in

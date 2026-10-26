@@ -1,5 +1,5 @@
 // req-230 §2 — the service worker of the SERVER build only (vite.config.js writes it to sw.js
-// with the build's file list and id; the Pages build has none). It keeps the app's files so the
+// with the build's file list and id; the plain build has none). It keeps the app's files so the
 // app opens with no signal once it has been loaded.
 //
 //   install   → cache every built file (this version's own cache)

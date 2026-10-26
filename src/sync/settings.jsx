@@ -1,5 +1,5 @@
 // req-230 (DEC-132 §2–3) — Backup & data's sync part: the one status line and Log out. Renders
-// nothing without an engine (the Pages build), so that screen reads exactly as before there.
+// nothing without an engine (the plain build), so that screen reads exactly as before there.
 import { useContext, useEffect, useState, useSyncExternalStore } from 'react'
 import { Actions, Button, SectionHeader } from '../ui/index.jsx'
 import { SyncContext, syncLine } from './status.js'

@@ -341,7 +341,7 @@ export function releaseUnreadable() {
 }
 
 // req-230 — the one sync hook: after each save of the state, every listener is told the state
-// that was saved. Only the server build subscribes (src/sync/engine.js); the Pages build has no
+// that was saved. Only the server build subscribes (src/sync/engine.js); the plain build has no
 // listener, so a save there does exactly what it did before. Not called while the stored data is
 // unreadable (DEC-032: nothing is written, so nothing is sent). Called after a FAILED write too
 // (storage full): the change is still the user's newest, and the server copy is then the only
