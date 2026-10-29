@@ -596,3 +596,9 @@ Pages deployed every push to `main`; the server deploys nothing by itself. CLOSE
 `server/` or sync", so req-239 and req-240 (both `src/`) merged on 10-26..29 while the live copy stayed at `7e6d7b9`
 (`./server/doctor`: `live copy … main 7e6d7b9`) — Emilio's phone ran neither. Found at req-240's closeout; deployed `d1f52ad`,
 doctor all ok. **Rule:** step 4 now fires on any change the server serves (src/, public/, build config, server/).
+
+## L-064 — a failing `assert.equal(domNode, null)` hangs instead of failing  (Builder, req-241, 2026-10-29)
+
+When the assert fails, node tries to print the happy-dom node and hangs (req-248's timeout then cancels the file instead of
+naming the assert). **Rule:** assert presence as `assert.equal(Boolean(node), false)` / `assert.ok(node)`, never compare a DOM
+node itself. Also: `timeout(1)` isn't on macOS — don't build test plumbing on it.
