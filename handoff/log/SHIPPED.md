@@ -2765,3 +2765,5 @@ Planner's browser run (`plan qa req-241`): smoke green; 3 no Next line during th
 1 "Next: Lat Pulldown" · 6 set 1 40 kg → set 2 40 → Skip set 1 → set 2 "35" (routine 35) · 7 typed 45 → keeps "45" · 4 review
 row "2 · skipped" in place · 5 skipped set: no Skip set; 30 × 9 + Save → "2 · 30 kg × 9" · 2 last exercise: no Next line.
 Feel (Emilio): Skip set's place in the sheet; the Next line on a small screen. `reports/req-241.md`.
+Deploy (CLOSEOUT step 4): req-241..243 live 2026-10-30 as `2acb12f` — `live copy … (main 2acb12f 2026-10-30 00:01:04)`, `doctor: all ok`;
+CI run 40970092841 success.

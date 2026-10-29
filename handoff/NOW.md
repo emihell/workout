@@ -1,7 +1,7 @@
 # Now
 
-Updated 2026-10-26. **Shipped: everything through req-248, req-240–243** except req-32 (dropped), req-77 (PAUSED) and the reqs below —
-`log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md` (rewritten 2026-10-26 to open items only). ≤50 lines.
+Updated 2026-10-30. **Shipped: everything through req-248** except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -9,30 +9,29 @@ Updated 2026-10-26. **Shipped: everything through req-248, req-240–243** excep
 
 Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / training together / AI (req-146 stages 2–3).
 
-## Where things stand
+## Where things stand (2026-10-30)
 
-- **Server LIVE** at `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1, DEC-127..136). Deployed `7e6d7b9`, doctor
-  all ok. Planner may run `./server/deploy`, `start`, `stop`. Off-Mac backup: Emilio's own ("ill worry about ecternal backup").
-- **Left for go-live (Emilio):** on the phone, clear `:8446` site data → log in → log a workout. That closes go-live ACs 4–5.
-- **Watch:** the nightly backup didn't fire 10-26 01:00 (cause unknown). Weekly backup + hourly catch-up + doctor check
-  added (DEC-136). Confirm a scheduled run fired.
-- **Coach (DEC-140/141):** brief `coach/COACH.md`; runs in `~/dev/workout/workout-data/coach/run-N/`; plans into the DB via
-  `./server/ops plan`. Run 3 written as rev 5 (2026-10-26, backup `…122551-before-plan-coach.db`). Iterate as Emilio logs.
-- **Feedback notes:** server table `notes` (read-only). 0 rows on 2026-10-26.
-- **Cleanup 2026-10-26** (Emilio: "we dont want anything old and we want to update what we have before we start soemthing
-  new"): docs now describe the live server, and BACKLOG holds only open items. Held reqs are current [measured: since their
-  specs, `git diff --stat c3596e8 main -- src` touches only `src/req-200.test.js`]. Left: README (code-side) still says "browser-only MVP" → a tiny req.
-
-**Stage 1 fallout — finish before anything else (DEC-143):**
-- Phone go-live: **done** 2026-10-26 16:26Z [measured, read-only]: the phone pulled the coach's rev 5, then pushed revs 6–12
-  (a test workout to 9 sets, then abandoned; rev 12 byte-identical to rev 5). Login was proven by the 10-25 session.
-- Pages leftovers: req-238 + req-247 shipped. **Stage-1 fallout list is empty → batch 7 unblocked (DEC-143).**
-- Ops: `./server/doctor` after every server deploy is CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
+- **Nothing in flight.** No branch open, no agent running; the Builder session is being shut down (Emilio). Code + planning
+  worktrees on `main`/`planning` at `2acb12f`, clean; old agent worktrees and merged branches removed.
+- **Live = `2acb12f`** (req-239..243 included), deployed 2026-10-30 00:01, `doctor: all ok`; CI run 40970092841 green.
+  Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
+- **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
+  fully proven. **Next for the coach (DEC-140/141):** review that workout against run 3 (`coach/COACH.md`).
+- **Backups:** weekly agent loaded, exit 0; newest scheduled backup 10-26 09:00; the next is due ≥ 11-02 (7 days). Confirm it fires.
+- **Feedback notes:** server `notes` table, 0 rows (2026-10-30).
+- **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
+  served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
 
 **READY, held:**
-- Batch 7 (2026-10-29): **req-241 building** (Builder session); **req-242, req-243 building** (throwaway agents, own worktrees,
-  DEC-055; **req-243 QA passed, recorded — closeout waits for the code worktree to be back on main**); req-244 (GO pill, look A) after req-241 merges (same files). Live = `d1f52ad`. Each: QA + review + closeout + deploy (L-063).
-  Batch 7, DEC-138/139, unblocked by DEC-143 (its first req shipped 2026-10-26).
+- req-244 (GO pill, look A; DEC-139). Not started — Emilio: finish what was started, no new batch yet. Spec predates
+  req-239..243: re-find its file:line refs before building.
+
+**Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
+tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
+path for copy/comment-only reqs (tests + one SHIPPED line) — open.
+
+**Emilio's calls, any time:** loop-length re-anchor; import sheet highlight (Keep vs Replace); missed rep lowers one set even
+on Easy; Change-exercise type carry-over (req-242); req-239/240/242/243 copy `(unconfirmed)`; timer runs once per side (req-240).
 
 ## Needs decisions — parked until their phase
 
