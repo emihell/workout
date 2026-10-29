@@ -51,6 +51,10 @@ describe('req-240 — isEachSide: own value wins, absent follows the library (pu
     assert.equal(isEachSide(plank({ unilateral: null }), LIB), true)
     assert.equal(isEachSide(own({ unilateral: 'true' }), LIB), false)
   })
+  it('cardio is never each side: an own true, or a library-unilateral entry, still reads false', () => {
+    assert.equal(isEachSide(own({ type: 'cardio', unilateral: true }), LIB), false)
+    assert.equal(isEachSide(plank({ type: 'cardio' }), LIB), false)
+  })
 })
 
 describe('req-240 — what the Details Save writes (unilateralPatch, pure)', () => {
@@ -108,6 +112,16 @@ describe('req-240 — the field survives load and Export → Import (criterion 4
     assert.equal(pick(back, 'ex-overhead-db-press').unilateral, true)
     assert.equal(pick(back, 'ex-one-arm-db-row').unilateral, false)
     assert.equal('unilateral' in pick(back, 'ex-leg-curl'), false)
+  })
+  it('an imported cardio record carrying unilateral: true keeps the field but is not each side', () => {
+    const s = structuredClone(DB)
+    const cardio = s.exercises.find((x) => x.type === 'cardio')
+    cardio.unilateral = true
+    const back = applyBackup(JSON.parse(JSON.stringify(buildBackup(migrateState(s))))).state
+    const got = pick(back, cardio.id)
+    assert.equal(got.unilateral, true, 'import keeps the stored value')
+    assert.equal(isEachSide(got, LIB), false)
+    assert.equal(setPreviewText({ label: '1', durationSec: 600 }, false, isEachSide(got, LIB)), '1 · 600s')
   })
 })
 
@@ -258,6 +272,37 @@ describe('req-240 — the own "One side at a time" box (criteria 2–3)', () => 
     await view.click(view.button('Save'))
     await settle()
     assert.equal('unilateral' in t.stored().exercises.find((x) => x.id === 'ex-one-arm-db-row'), false)
+  })
+
+  it('failure: tick + Save, then Type → Cardio + Save → the stored true stays, but nothing reads "each side"', async () => {
+    const t = await harness(ownPress())
+    await t.edit('ex-overhead-db-press')
+    await waitFor(() => Boolean(sideBox()))
+    await view.click(sideBox())
+    await view.click(view.button('Save'))
+    await settle()
+    assert.equal(t.stored().exercises.find((x) => x.id === 'ex-overhead-db-press').unilateral, true)
+    await t.edit('ex-overhead-db-press')
+    await waitFor(() => Boolean(sideBox()))
+    const typeSelect = view.all('label').find((l) => l.textContent.trim().startsWith('Type'))?.querySelector('select')
+    assert.ok(typeSelect, 'the Type select')
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set.call(typeSelect, 'cardio')
+      typeSelect.dispatchEvent(new window.Event('change', { bubbles: true }))
+    })
+    assert.equal(sideBox(), undefined, 'cardio hides the box')
+    await view.click(view.button('Save'))
+    await settle()
+    const saved = t.stored().exercises.find((x) => x.id === 'ex-overhead-db-press')
+    assert.equal(saved.type, 'cardio')
+    assert.equal(saved.unilateral, true, 'the patch is skipped for cardio, so the field stays')
+    assert.equal(isEachSide(saved, LIB), false)
+    await t.start()
+    await t.log(PRESS)
+    await settle()
+    await doneWarmup()
+    assert.equal(/each side/i.test(view.text()), false)
+    assert.equal(view.text().includes(ONE_SIDE_LINE), false)
   })
 
   it('cardio shows no box', async () => {

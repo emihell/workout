@@ -9,8 +9,10 @@ export const REST_CUES_MAX = 3
 
 // req-240 (DEC-137, DEC-063 §3) — the exercise's own `unilateral` boolean (the Details
 // checkbox, written only by the user's edit) wins when present; absent → the library entry,
-// true only when it is marked `unilateral: true`.
+// true only when it is marked `unilateral: true`. Never for cardio (the spec: every type but
+// cardio; Details hides the box there, so a stored true left from an earlier type can't be unticked).
 export function isEachSide(exercise, library) {
+  if (exercise?.type === 'cardio') return false
   if (typeof exercise?.unilateral === 'boolean') return exercise.unilateral
   return libraryEachSide(exercise, library)
 }
