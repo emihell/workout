@@ -22,6 +22,9 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 ## Phase 1 — the in-gym flow
 
 **Open, needs a call or a spec**
+- **Change exercise across types** (req-242 review, latent): a no-history change keeps the item's sets/reps/rest whatever the
+  types — strength → cardio keeps 3 × "8" (Add makes 1 set); timed → strength keeps per-set `durations`. No kg is invented.
+  *Q (Emilio):* reset to the new type's default plan when the type changes, or keep as is?
 - **Changing the loop length moves "this week"** [measured 2026-10-26: `loopWeeksState` drops slots past the new length,
   no re-anchor, `src/state-reducers.js:289`]. *Q (Emilio):* re-anchor so this week stays this week?
 - **Edit rest during an exercise** (DEC-104 §3 follow-up; Emilio: "rest can be filled in during the sets"): an item added

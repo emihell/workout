@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: ui** · batch 7 (J1). Copy only.
+**Status: BUILT, NOT merged — branch `req-243` (`96f9f2e`)** · **Lane: ui** · batch 7 (J1). Copy only.
 
 # req-243 — Home's workout sheet: "Swap for today" → "Swap"
 
