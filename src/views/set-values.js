@@ -10,8 +10,8 @@
 import { kgToSave } from '../kg-input.js'
 import { secondsToSave } from '../seconds-input.js'
 import { isSkippedSet } from '../set-rules.js'
-import { nextSeedOverrides } from '../workout-log.js'
-import { cardioPatch } from '../cardio-set.js'
+import { nextSeedOverrides, seedOverrideKey } from '../workout-log.js'
+import { CARDIO_KEYS, cardioPatch } from '../cardio-set.js'
 
 function effortValue(rpe) {
   return rpe === '' || rpe == null ? null : Number(rpe)
@@ -77,6 +77,39 @@ export function viewedSetSave(values, { weighted, timed = false, initialEffort, 
     logged: { weight: setPatch.weight },
   })
   return { setPatch, seedOverrides: overrides }
+}
+
+// req-241 — "Skip set" in a done set's sheet: the set becomes a skip record (as Skip set on the
+// log screen writes it: weight 0, reps/note 'skipped', rpe null; a timed or cardio value goes,
+// `loggedAt` and the targets stay), and the session carry re-runs for it (DEC-052: a skipped set
+// carries no kg). Only the item's latest set of that type can be the carry's source (as in
+// viewedSetSave), and only when the carried kg is its kg: then the carry falls back to the latest
+// remaining non-skipped set of that kind (carryForSet's rule), or goes when there is none, so the
+// next set seeds from the routine / history again. Otherwise `seedOverrides` comes back as the SAME map.
+export function skippedSetSave({ weighted, set, seedOverrides, sets = [], setIndex = -1 }) {
+  const setPatch = { weight: 0, reps: 'skipped', note: 'skipped', rpe: null }
+  for (const key of CARDIO_KEYS) if (key in set) setPatch[key] = undefined
+  const type = set.setType === 'wu' ? 'wu' : 'work'
+  const sameKind = (other) =>
+    (other.routineItemId || '') === (set.routineItemId || '') &&
+    other.exerciseId === set.exerciseId &&
+    (other.setType === 'wu' ? 'wu' : 'work') === type
+  const unchanged = { setPatch, seedOverrides }
+  if (!weighted || sets.slice(setIndex + 1).some(sameKind)) return unchanged
+  const map = seedOverrides || {}
+  const key = seedOverrideKey(set.exerciseId, type)
+  const prev = map[key]
+  if (prev?.weight == null || prev.weight === '' || Number(prev.weight) !== Number(set.weight)) return unchanged
+  const source = sets.filter((other, i) => i !== setIndex && sameKind(other) && !isSkippedSet(other) && Number(other.weight) > 0).at(-1)
+  if (source) {
+    if (Number(source.weight) === Number(prev.weight)) return unchanged
+    return { setPatch, seedOverrides: { ...map, [key]: { ...prev, weight: String(source.weight) } } }
+  }
+  const { weight: _dropped, ...rest } = prev
+  const next = { ...map }
+  if (Object.keys(rest).length) next[key] = rest
+  else delete next[key]
+  return { setPatch, seedOverrides: next }
 }
 
 // WorkoutSetEdit's patch. `showLoad` false (cardio / bodyweight): the kg field isn't

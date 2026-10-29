@@ -886,6 +886,8 @@ export function SetEditSheet({
   initialCardio = null,
   cardioHint = '',
   skipped = false,
+  // req-241 — a done (not skipped) set offers "Skip set": the caller rewrites it as a skip record.
+  onSkip,
   onSave,
   onCancel,
 }) {
@@ -992,6 +994,11 @@ export function SetEditSheet({
               </p>
             ) : null,
           )}
+          {onSkip && !skipped ? (
+            <Button variant="quiet" block onClick={onSkip}>
+              Skip set
+            </Button>
+          ) : null}
           <div className="ui-sheet__actions">
             <Button variant="secondary" onClick={() => onCancel?.()}>
               Cancel
