@@ -2738,3 +2738,14 @@ Close, "Only today" shown); main's Today.jsx → 2 fail. Planner's browser run (
 `["Edit","Swap","Close"]`, no "Swap for today" · 2 picker "Swap Upper Body for which workout?" + "Only today — the Schedule stays
 as it is." · 3 picked Lower Body → Home shows it + "swapped from", `schedule.swaps` stored. No reviewer: no trigger file.
 "Swap" stays `(unconfirmed)`. `reports/req-243.md`.
+
+## req-242 — a workout's exercise row opens its editor; the editor can change the exercise  (2026-10-29)
+
+**req-242** (ui; throwaway agent; J8). Whole row → item editor (not in Reorder); "Change exercise ›" → single-pick picker
+("Change"); item keeps id/note/role/warm-up; history → its prescription, none → sets/reps/rest kept, kg blank. New
+`store.changeRoutineExercise` + `src/routine-item-change.js`. Gate: `./check` green (140 files, 2140). Test edit
+`req-225.test.js`: two selectors → `a.ui-row__link` (assertions unchanged). Planner's browser run (seed + own no-history QA Cable
+Kickback; a workout started first): smoke green; 1 meta line → `/routines/sess-upper/exercise/si-…chest-press` · 2 Reorder: 9 Up,
+0 row links · 3 Change above Remove, "Change" disabled until a pick · 4 Chest Press → Leg Press: h1 Leg Press, stored
+`targets [12,11,10] kg [60,70,70] rest 90`, note + role kept · 5 Lat Pulldown → QA Cable Kickback: sets/targets/rest kept, kg `[]`
+· 6 active snapshot same, finished workouts byte-identical · 7 Schedule → Thu slot → row → Change → stored `ex-leg-curl`.
