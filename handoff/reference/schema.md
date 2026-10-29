@@ -58,6 +58,8 @@ State (`workout-mvp-v9`):
 - `hasDuration` (bool, M → false).
 - `durationSec` (number, M → default).
 - `libraryId` (string, optional; set by the library picker).
+- `unilateral` (bool, optional; req-240 — written only when the user changes "One side at a time" in Details; absent → the
+  library entry decides "each side", `library-hints.js` `isEachSide`). Not shown for cardio.
 - plus the library fields the picker copies.
 
 **Routine** (E):
