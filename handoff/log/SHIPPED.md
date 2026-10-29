@@ -2714,3 +2714,16 @@ round 1 (Planner):** 20 s → 60 s, sized from the loaded run (288 s) not the qu
 60000ms`, RED, exit 1, 160 s; sync `for(;;)` with limit 150 → "Still running: <file>", RED; req-239's real mutation → RED
 naming `src/req-10.test.js`; green in 90 s. Watchdog unproven on the Ubuntu runner (CI's 10 min fires first there). No
 reviewer: no trigger file. `reports/req-248.md`.
+
+## req-240 — one side, timed and own exercises  (2026-10-29)
+
+**req-240** (ui; Builder; J3+J6, DEC-122). One-sided timed sets read "30s each side", field "Duration each side (s)", head line
+"the full time on one side, then the other"; Details "One side at a time" (not cardio) writes optional `exercise.unilateral`
+only when changed (schema.md); own value wins, else the library; never for cardio. Gate: `./check` green (139 files); mutation
+checks. **Reviewer:** independent subagent — No blockers; should-fix (cardio could be "each side", unclearable) → `ecd0e7e`;
+accepted nits: box unticked while the library loads, import keeps a non-boolean (masked by `typeof`). **Planner's browser run**
+(seed + Side Plank `Side_Bridge`, own KB Lunge Press, One-Arm DB Row linked) found a second should-fix: after cardio → Free the
+box showed the saved type's value (unticked) while Save kept true → `dc39352` (box reads the form's type). Final run on
+`dc39352`: 6/6 + both cardio items YES with stored receipts; smoke green. Test edit `req-217.test.js:62` judged a real change
+(AC 1 requires it). By design: a mid-workout type change keeps the snapshot's "each side" (DESIGN §3). Feel (Emilio): the timer
+runs once, so you start it again for side two; the copy is `(unconfirmed)`. `reports/req-240.md`.
