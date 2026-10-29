@@ -325,15 +325,19 @@ describe('req-125 no mid-typing reset (static)', () => {
   const item = readFileSync(new URL('./views/workout/item.jsx', import.meta.url), 'utf8')
   const ui = readFileSync(new URL('./ui/index.jsx', import.meta.url), 'utf8')
 
-  it('item.jsx reads the draft only in the setSeedKey-keyed snapshot, and keys the form by it', () => {
+  it('item.jsx reads the draft only in the keyed snapshot (setSeedKey + carry), and keys the form by it', () => {
     const reads = item.split('\n').filter((line) => line.includes('setDraftFor('))
     // req-186 — 3 → 4: Next (back from a logged set Previous showed) re-snaps the current
     // set's draft into draftSnap, the same keyed read; the line check below still holds.
     // req-212 test edit — 4 → 3: Previous / Next are gone (DEC-119 §1), so is Next's re-snap.
     assert.equal(reads.length, 3)
     for (const line of reads) assert.match(line, /setDraftFor\(active, setSeedKey\)/)
-    assert.match(item, /if \(draftSnap\.key !== setSeedKey\) setDraftSnap\(/)
-    assert.match(item, /key=\{setSeedKey\}/)
+    // req-241 test edit — the snapshot and the form are keyed by `formKey`: the set key plus this set
+    // kind's carried kg, so a carry re-run from the done-set sheet re-seeds the form (the draft is
+    // read again with it). Still one keyed read; still never a live draft seed.
+    assert.match(item, /const formKey = `\$\{setSeedKey\}\\u0000\$\{override\?\.weight \?\? ''\}`/)
+    assert.match(item, /if \(draftSnap\.key !== formKey\) setDraftSnap\(/)
+    assert.match(item, /key=\{formKey\}/)
     // the form's initial values come from formInit (seed + snapshot), never active.setDraft
     assert.doesNotMatch(item, /active\.setDraft|activeWorkout\.setDraft/)
   })

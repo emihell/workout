@@ -42,7 +42,7 @@ import {
   stopwatchFor,
   stopwatchOwner,
 } from '../../workout-log'
-import { liveSetWeight, viewedSetSave } from '../set-values.js'
+import { liveSetWeight, skippedSetSave, viewedSetSave } from '../set-values.js'
 import { ExercisesLink, Missing } from '../shared'
 import {
   Actions,
@@ -471,6 +471,9 @@ function WorkoutItemLive({ routineId, item }) {
   function openLoggedSet(row) {
     if (!state.logged.includes((active.sets || [])[row.setIndex])) return
     recordButton('open-logged-set')
+    // req-241 — the form underneath may remount when the sheet changes the carry (formKey
+    // below); write any typing still waiting on the debounce first, so the remount reads it.
+    draftWriter.flush()
     setEditIndex(row.setIndex)
   }
 
@@ -578,9 +581,12 @@ function WorkoutItemLive({ routineId, item }) {
   // same moment SetLogForm remounts), never as a live seed, so a debounced write landing
   // mid-typing can't reset a field. The form starts from seed + draft; `seed` alone stays
   // req-83's comparison base in completeSet.
-  const [draftSnap, setDraftSnap] = useState(() => ({ key: setSeedKey, draft: setDraftFor(active, setSeedKey) }))
-  if (draftSnap.key !== setSeedKey) setDraftSnap({ key: setSeedKey, draft: setDraftFor(active, setSeedKey) })
-  const draft = draftSnap.key === setSeedKey ? draftSnap.draft : setDraftFor(active, setSeedKey)
+  // req-241 — `formKey`: also a new carry for this set kind (a done set's Save or Skip set in the
+  // sheet re-runs it, DEC-052), so the form re-seeds from it, with the draft read again.
+  const formKey = `${setSeedKey}\u0000${override?.weight ?? ''}`
+  const [draftSnap, setDraftSnap] = useState(() => ({ key: formKey, draft: setDraftFor(active, setSeedKey) }))
+  if (draftSnap.key !== formKey) setDraftSnap({ key: formKey, draft: setDraftFor(active, setSeedKey) })
+  const draft = draftSnap.key === formKey ? draftSnap.draft : setDraftFor(active, setSeedKey)
   const formInit = formFieldsWithDraft({ seed, draft, weighted, durationTarget })
   const noteSeed = formInit.note
   // req-165 (F-LINT-1) — re-seeded when the set (or its seed) changes by adjusting state
@@ -619,6 +625,7 @@ function WorkoutItemLive({ routineId, item }) {
       })
     : null
   const restNotes = logging && restNotesShowing(active, item, now) ? restNotesFor(item, ex, library) : null
+  const nextItem = nextNotDoneItem(active, item)
 
   return (
     <Screen className="ui-screen--rest">
@@ -652,6 +659,9 @@ function WorkoutItemLive({ routineId, item }) {
       {/* req-192 (DEC-108 §6) — the set list sits under the title, above kg / reps.
           req-212 — the library SetList; a done row opens that set in the edit sheet. */}
       {setRows ? <SetList rows={setRows} onOpen={openLoggedSet} /> : null}
+      {/* req-241 — what comes after this exercise (the review's Next), quiet; the Up next bar
+          already says it, so not while that shows. None left → nothing. */}
+      {nextItem && !showUpNext ? <p className="ui-sub">Next: {exerciseName(nextItem)}</p> : null}
       {/* req-217 — the routine note, then up to 3 form cues; gone when the rest ends or is skipped. */}
       {restNotes ? <RestNotes note={restNotes.note} cues={restNotes.cues} /> : null}
       {/* req-80 — the note field the "Add note" control reveals, rendered by the
@@ -691,7 +701,7 @@ function WorkoutItemLive({ routineId, item }) {
       {plannedDone ? null : (
         <Fragment key={setupSeed ? `setup|${setupSeed.weight ?? ''}|${setupSeed.reps ?? ''}` : 'plain'}>
         <SetLogForm
-          key={setSeedKey}
+          key={formKey}
           weighted={weighted}
           timed={timedSet}
           repsLabel={repsLabel}
@@ -802,6 +812,17 @@ function LoggedSetSheet({ item, ex, index, eachSide = false, onClose, onSaved })
     onSaved?.()
     onClose()
   }
+  // req-241 — Done tapped by mistake: the set becomes a skip record through the same writes as
+  // Save (one updateActiveSet, the carry re-run, set 1's setup seed); no confirm, since filling it
+  // back in and saving un-skips it. A skip has no effort, so the review's onSaved isn't run.
+  function skip() {
+    const result = skippedSetSave({ weighted, set, seedOverrides: active.seedOverrides, sets: active.sets || [], setIndex: index })
+    recordButton('skip-done-set')
+    store.updateActiveSet(index, result.setPatch)
+    if (result.seedOverrides !== active.seedOverrides) store.patchActive({ seedOverrides: result.seedOverrides })
+    if (type === 'work' && workIndex === 0) store.patchActive((current) => setupAfterSetOneEdit(current, item, ex))
+    onClose()
+  }
   return (
     <SetEditSheet
       title={type === 'wu' ? 'Warm-up set' : `Set ${workIndex + 1}`}
@@ -816,6 +837,7 @@ function LoggedSetSheet({ item, ex, index, eachSide = false, onClose, onSaved })
       // Review round 1 — a skipped timed set starts blank: the target is never written as if measured.
       initialDuration={timed && !skipped ? init.durationSec ?? durationTargetFor(item, ex, workIndex) : ''}
       skipped={skipped}
+      onSkip={skipped ? undefined : skip}
       initialCardio={cardio ? cardioFormText(set, lastDistanceUnit(last?.sets)) : null}
       cardioHint={cardio && set.durationSec == null && init.reps ? `Logged as ${init.reps}` : ''}
       onSave={save}
