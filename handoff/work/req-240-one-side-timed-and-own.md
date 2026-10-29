@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-240` (`dc39352`)** · **Lane: ui** · batch 7 (J3, J6). Adds one optional field on an exercise, written only by the user's own
+**Status: BUILT AND MERGED, 2026-10-29 — branch `req-240` (`a6478ca`…`dc39352`, 3 commits).** · **Lane: ui** · batch 7 (J3, J6). Adds one optional field on an exercise, written only by the user's own
 edit; no migration, no bulk write.
 
 # req-240 — "each side" for timed sets, and a "One side at a time" switch for your own exercises
