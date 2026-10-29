@@ -362,8 +362,8 @@ const nameButton = (name) => [...block().querySelectorAll('.ui-today-workout__op
 const saved = () => JSON.parse(localStorage.getItem('workout-mvp-v9'))
 const STORE = () => v9(sched())
 
-describe('AC6 Home → sheet → Edit / Swap for today / Back', () => {
-  it('tapping the name opens the sheet with the routine\'s exercises and Edit · Swap for today · Close', async () => {
+describe('AC6 Home → sheet → Edit / Swap / Back', () => {
+  it('tapping the name opens the sheet with the routine\'s exercises and Edit · Swap · Close', async () => {
     const stored = STORE()
     await open(stored)
     assert.equal(Boolean(sheet()), false)
@@ -377,7 +377,10 @@ describe('AC6 Home → sheet → Edit / Swap for today / Back', () => {
     assert.equal(lower.exercises.length > 0, true)
     assert.match(sheet().querySelector('.ui-workout-sheet__list .ui-row__meta').textContent, /\d+ × /)
     assert.equal(Boolean(inSheet('Edit')), true)
-    assert.equal(Boolean(inSheet('Swap for today')), true)
+    // req-243 — the label is "Swap"; its old text must be gone from the sheet, not merely "Swap" present.
+    assert.equal(Boolean(inSheet('Swap')), true)
+    assert.equal(sheet().textContent.includes('Swap for today'), false)
+    assert.deepEqual([...sheet().querySelectorAll('button, a')].map((b) => b.textContent.trim()), ['Edit', 'Swap', 'Close'])
     assert.equal(Boolean(inSheet('Back to Lower Body')), false)
     await tap(inSheet('Close'))
     assert.equal(Boolean(sheet()), false)
@@ -394,11 +397,12 @@ describe('AC6 Home → sheet → Edit / Swap for today / Back', () => {
     assert.equal(view.text().includes('Lower Body'), true)
   })
 
-  it('Swap for today → pick → Home shows the new name + "swapped from"; Back to → original, swaps empty', async () => {
+  it('Swap → pick → Home shows the new name + "swapped from"; Back to → original, swaps empty', async () => {
     const before = STORE()
     await open(before)
     await tap(nameButton('Lower Body'))
-    await tap(inSheet('Swap for today'))
+    await tap(inSheet('Swap'))
+    assert.equal(sheet().textContent.includes('Only today — the Schedule stays as it is.'), true)
     const picks = [...sheet().querySelectorAll('.ui-sheet__choices button')].map((b) => b.textContent)
     assert.deepEqual(picks, ['Upper Body', 'Push / Pull'])
     await tap(inSheet('Upper Body'))
