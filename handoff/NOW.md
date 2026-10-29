@@ -31,7 +31,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 
 **READY, held:**
 - Batch 7 (2026-10-29): **req-241 building** (Builder session); **req-242, req-243 building** (throwaway agents, own worktrees,
-  DEC-055); req-244 (GO pill, look A) after req-241 merges (same files). Live = `d1f52ad`. Each: QA + review + closeout + deploy (L-063).
+  DEC-055; **req-243 QA passed, recorded — closeout waits for the code worktree to be back on main**); req-244 (GO pill, look A) after req-241 merges (same files). Live = `d1f52ad`. Each: QA + review + closeout + deploy (L-063).
   Batch 7, DEC-138/139, unblocked by DEC-143 (its first req shipped 2026-10-26).
 
 ## Needs decisions — parked until their phase

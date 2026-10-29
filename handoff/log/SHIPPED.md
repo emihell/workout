@@ -2729,3 +2729,12 @@ box showed the saved type's value (unticked) while Save kept true → `dc39352` 
 runs once, so you start it again for side two; the copy is `(unconfirmed)`. `reports/req-240.md`.
 Deploy (late, L-063): req-239 + req-240 went live 2026-10-29 as `d1f52ad` — `live copy … (main d1f52ad 2026-10-29 23:12:35)`,
 `doctor: all ok`.
+
+## req-243 — Home's workout sheet: "Swap for today" → "Swap"  (2026-10-29)
+
+**req-243** (ui; throwaway agent; J1). Button label only (`Today.jsx:252`); picker unchanged. Gate: `./check` green (139 files);
+test edit in `req-225.test.js` AC6 suite = label lookups renamed + new asserts (no "Swap for today", buttons exactly Edit/Swap/
+Close, "Only today" shown); main's Today.jsx → 2 fail. Planner's browser run (`plan qa req-243`): smoke green; 1 sheet
+`["Edit","Swap","Close"]`, no "Swap for today" · 2 picker "Swap Upper Body for which workout?" + "Only today — the Schedule stays
+as it is." · 3 picked Lower Body → Home shows it + "swapped from", `schedule.swaps` stored. No reviewer: no trigger file.
+"Swap" stays `(unconfirmed)`. `reports/req-243.md`.
