@@ -169,8 +169,8 @@ function SwappedMark({ store, slot }) {
 // req-225 (DEC-125 §5, Emilio I1: "a quick overview of it … With a edit button? And switch?") —
 // tapping a pending workout's name in today's block opens this sheet: the name, its exercises
 // (name + the routine editor's own meta line, routineItemMeta), then Edit (the scheduled-workout
-// screen the Schedule opens for this slot), Swap for today, and — on a swapped spot — Back to
-// {its own}. Swap for today turns the sheet into the list of other workouts (swapChoices); a pick
+// screen the Schedule opens for this slot), Swap (req-243; was "Swap for today"), and — on a swapped spot — Back to
+// {its own}. Swap turns the sheet into the list of other workouts (swapChoices); a pick
 // saves the one-date swap (store.swapSlotOnDate) and closes. Swapping and Back are reversible, so
 // neither asks to confirm. Its own small sheet, not askChoice (text + buttons only): the same
 // backdrop/sheet look as ConfirmSheet; Close / backdrop / Escape close it, writing nothing.
@@ -249,7 +249,7 @@ function WorkoutSheet({ store, slot, routine, date, onClose }) {
                 Edit
               </NavLink>
               <Button block onClick={() => setPicking(true)}>
-                Swap for today
+                Swap
               </Button>
               {own ? (
                 <Button block onClick={() => swapTo(own.id)}>
