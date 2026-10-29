@@ -23,8 +23,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
 
 **READY, held:**
-- req-244 (GO pill, look A; DEC-139). Not started — Emilio: finish what was started, no new batch yet. Spec predates
-  req-239..243: re-find its file:line refs before building.
+- req-244 (GO pill, look A; DEC-139). Not started — Emilio: finish what was started, no new batch yet. Its spec predates the
+  last four batch-7 builds: re-find its file:line refs before building.
 
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
