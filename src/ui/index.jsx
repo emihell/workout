@@ -438,7 +438,7 @@ export function WorkoutPill({ clock = null, setText = '', countText = '', go = f
 // and beeps once at zero (defaultBeep, fail-silent); the logged value is the target,
 // not a stopwatch actual (v1). Local state resets per set because SetLogForm remounts
 // by `key`.
-function DurationTimer({ seconds, onSecondsChange }) {
+function DurationTimer({ seconds, onSecondsChange, label = 'Duration (s)' }) {
   const [deadline, setDeadline] = useState(null)
   const [now, setNow] = useState(() => 0)
   const firedRef = useRef(false)
@@ -472,7 +472,7 @@ function DurationTimer({ seconds, onSecondsChange }) {
   return (
     <div className="ui-setlog__timer">
       <NumberField
-        label="Duration (s)"
+        label={label}
         min="1"
         selectOnFocus
         value={seconds}
@@ -592,6 +592,8 @@ export function SetLogForm({
   weighted = true,
   timed = false,
   repsLabel = 'Reps',
+  // req-240 — the timed field's label ("Duration each side (s)" on a one-sided exercise).
+  durationLabel = 'Duration (s)',
   initialWeight = '',
   initialReps = '',
   initialDuration = 0,
@@ -729,7 +731,7 @@ export function SetLogForm({
             }}
           />
         ) : timed ? (
-          <DurationTimer seconds={duration} onSecondsChange={(value) => edit('duration', value)} />
+          <DurationTimer seconds={duration} label={durationLabel} onSecondsChange={(value) => edit('duration', value)} />
         ) : (
           <Field
             label={repsLabel}
@@ -875,6 +877,8 @@ export function SetEditSheet({
   timed = false,
   cardio = false,
   repsLabel = 'Reps',
+  // req-240 — as SetLogForm's.
+  durationLabel = 'Duration (s)',
   kgLabel = 'kg',
   initialWeight = '',
   initialReps = '',
@@ -960,7 +964,7 @@ export function SetEditSheet({
               />
             ) : timed ? (
               <NumberField
-                label="Duration (s)"
+                label={durationLabel}
                 selectOnFocus
                 value={duration}
                 onChange={(e) => {

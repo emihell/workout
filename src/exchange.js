@@ -39,6 +39,7 @@ export const FIELDS = {
     hasDuration: 'true for a timed exercise (a plank, a hang): sets log seconds instead of reps.',
     durationSec: 'Default target seconds per set for a timed exercise.',
     libraryId: 'Optional. Id of the built-in library entry it was picked from. Keep it; omit it on exercises you create.',
+    unilateral: 'Optional. true / false: the user\'s "One side at a time" setting (reps or seconds are per side). Absent → the built-in library entry decides. Keep it; never add it yourself.',
   },
   routine: {
     id: 'Stable id (rtn-…, older ones sess-…). Keep it when editing.',
@@ -230,7 +231,7 @@ export const ASSISTANT = {
     summary:
       'Browser-only gym log. Exercises are the library. Routines are reusable templates with the full prescription (state.routines). Schedule is only the calendar. A live workout is a snapshot of a routine at Start. History is finished snapshots plus their logged sets. Extra sets stay on today only until Finish; then skipped unlogged planned sets are recorded. Each working set starts at the routine kg (suggestedWeights) next time. In the app\'s screens a routine is called a "Workout" (the plan), and a logged workout is shown as a session, by its name and date; the JSON keeps routines and workouts.',
     exercises:
-      'Library of movements. type is machine | free | bodyweight | cardio. weightStep is a kg step, Steps A/B (two step sizes that alternate, A added first), Alt 4/5 (legacy: 5 then 4, from 9 when no lightestWeight), or n/a. lightestWeight (optional, kg) is the first weight of the stack; suggestions count from it. hasDuration marks a timed exercise (sets log seconds; durationSec is its default). libraryId links a built-in library entry: keep it. Routines point at exercises by exerciseId.',
+      'Library of movements. type is machine | free | bodyweight | cardio. weightStep is a kg step, Steps A/B (two step sizes that alternate, A added first), Alt 4/5 (legacy: 5 then 4, from 9 when no lightestWeight), or n/a. lightestWeight (optional, kg) is the first weight of the stack; suggestions count from it. hasDuration marks a timed exercise (sets log seconds; durationSec is its default). libraryId links a built-in library entry: keep it. unilateral (optional) is the user\'s own one-side setting: keep it. Routines point at exercises by exerciseId.',
     routines:
       'Reusable templates. Ordered list of routine exercises. This is the source of truth for next time. Schedule does not store kg or reps. JSON field is state.routines.',
     routineExercise: {

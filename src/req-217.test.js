@@ -59,7 +59,10 @@ describe('req-217 — the text', () => {
     assert.equal(setPreviewText({ label: '1', weight: '14', reps: '12' }, true, true), '1 · 14 kg × 12 each side')
     assert.equal(setPreviewText({ label: '1', weight: '14', reps: '12' }, true), '1 · 14 kg × 12')
     assert.equal(setPreviewText({ label: '1', weight: '', reps: '' }, true, true), '1 · — × —')
-    assert.equal(setPreviewText({ label: '1', durationSec: 30 }, false, true), '1 · 30s')
+    // req-240 test edit (DEC-137, its AC 1): seconds now read "each side" too (was '1 · 30s');
+    // without eachSide they stay unchanged.
+    assert.equal(setPreviewText({ label: '1', durationSec: 30 }, false, true), '1 · 30s each side')
+    assert.equal(setPreviewText({ label: '1', durationSec: 30 }, false), '1 · 30s')
     const set = { setType: 'work', weight: 14, reps: '12' }
     assert.equal(loggedSetRowText('1', set, true, false, true), '1 · 14 kg × 12 each side')
     assert.equal(set.reps, '12')

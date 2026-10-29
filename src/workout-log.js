@@ -1004,9 +1004,9 @@ export function setPreview({ item, ex, weighted, hasHistory, historyFor, seedOve
 // the kg slot (absent, not invented); bodyweight shows the reps alone; a timed set
 // shows its seconds ("30s", as formatSetLine does) in place of reps.
 // req-217 — `eachSide`: a reps amount reads "12 each side" (a set = both sides, reps per side);
-// seconds and a blank "—" are unchanged.
+// a blank "—" is unchanged. req-240 — seconds too: "30s each side" (a hold per side).
 export function setPreviewText({ label, weight, reps, durationSec }, weighted, eachSide = false) {
-  const amount = durationSec != null ? `${durationSec}s` : reps ? eachSideReps(reps, eachSide) : '—'
+  const amount = durationSec != null ? eachSideReps(`${durationSec}s`, eachSide) : reps ? eachSideReps(reps, eachSide) : '—'
   const body = weighted ? `${weight ? `${weight} kg` : '—'} × ${amount}` : amount
   return `${label} · ${body}`
 }
@@ -1074,7 +1074,7 @@ export function loggedSetRowText(label, set, weighted, cardio = false, eachSide 
 }
 
 // req-217 (DEC-119 §6) — a unilateral exercise's reps are per side: "12" → "12 each side". Display
-// only; the stored reps stay "12". Blank stays blank.
+// only; the stored reps stay "12". Blank stays blank. req-240 — also takes "30s" (timed sets).
 export function eachSideReps(reps, eachSide = true) {
   const text = reps == null ? '' : String(reps)
   return eachSide && text.trim() !== '' ? `${text} each side` : text
