@@ -111,6 +111,7 @@ describe('req-178 AC5 — the "update routine" offer', () => {
       routineId: 'dayA',
       routineName: 'Day A',
       itemId: 'ia',
+      exerciseId: 'ex', // req-242 review — the offer carries the item's exercise (test edit: field added)
       from: [100, 100, 100],
       to: [105, 105, 100],
     })

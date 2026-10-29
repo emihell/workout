@@ -18,6 +18,7 @@ import {
   RoutineEdit,
   RoutineExercisePick,
   RoutineExerciseNew,
+  RoutineExerciseChange,
   RoutineExerciseEdit,
 } from './views/Routine'
 import { Schedule, ScheduleLoop, ScheduleDay, ScheduleDayAdd, ScheduleSlot } from './views/Schedule'
@@ -149,6 +150,15 @@ function Screen() {
         key={`${route.routineId}-${route.exerciseId}`}
         routineId={route.routineId}
         exerciseId={route.exerciseId}
+      />
+    )
+  }
+  if (route.name === 'routine-exercise-change') {
+    return (
+      <RoutineExerciseChange
+        key={`${route.routineId}-${route.itemId}`}
+        routineId={route.routineId}
+        itemId={route.itemId}
       />
     )
   }

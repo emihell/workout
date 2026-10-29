@@ -22,7 +22,8 @@ describe('req-187 — offerOnFinishingSet: sheet vs no sheet on the finishing se
 
   it('kg 25 on every set vs routine 20 → an offer, computed WITH the finishing set included', () => {
     const offer = offerOnFinishingSet(active([set(25), set(25)]), routines, item, set(25), true)
-    assert.deepEqual(offer, { routineId: 'up', routineName: 'Upper body', itemId: 'ia', from: [20, 20, 20], to: [25, 25, 25] })
+    // req-242 review — test edit: the offer now carries the item's exerciseId.
+    assert.deepEqual(offer, { routineId: 'up', routineName: 'Upper body', itemId: 'ia', exerciseId: 'ex', from: [20, 20, 20], to: [25, 25, 25] })
     // Only the finishing set differs: the store's own append (withLoggedSet) is what counts.
     const lastOnly = offerOnFinishingSet(active([set(20), set(20)]), routines, item, set(22.5), true)
     assert.deepEqual(lastOnly.to, [20, 20, 22.5])
