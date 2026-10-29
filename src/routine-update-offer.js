@@ -16,17 +16,20 @@ export function sameKgList(a, b) {
   return x.every((value, i) => (Number(value) || 0) === (Number(y[i]) || 0))
 }
 
-// → { routineId, routineName, itemId, from, to } | null. `to` is the routine's kg with each
+// → { routineId, routineName, itemId, exerciseId, from, to } | null. `to` is the routine's kg with each
 // logged, non-skipped work set's kg (> 0) at its index, up to the routine item's set count.
-// null: nothing differs, all skipped, a mid-workout replacement, an unweighted exercise, or
-// the routine / its item no longer there (deleted or archived).
+// null: nothing differs, all skipped, a mid-workout replacement, an unweighted exercise,
+// the routine / its item no longer there (deleted or archived), or the item now holds another
+// exercise (req-242). `exerciseId` lets the write re-check that (store.applyRoutineUpdate).
 export function routineUpdateOffer(active, routines, item) {
   if (!active || !item || item.addedMidWorkout) return null
   if (!isWeightedType(item.exerciseType)) return null
   const routine = routineById(routines, active.routineId || active.snapshot?.routineId)
   if (!routine || routine.archivedAt) return null
   const live = (routine.exercises || []).find((candidate) => candidate.id === itemKey(item))
-  if (!live) return null
+  // req-242 review — the item's exercise was changed since the workout started ("Change
+  // exercise"): its kg is another exercise's, so no offer (DESIGN §1).
+  if (!live || live.exerciseId !== item.exerciseId) return null
   const sets = Math.max(1, Number(live.sets) || 1)
   const from = Array.isArray(live.suggestedWeights) ? live.suggestedWeights : []
   const to = [...from]
@@ -38,7 +41,7 @@ export function routineUpdateOffer(active, routines, item) {
     to[i] = kg
   })
   if (sameKgList(from, to)) return null
-  return { routineId: routine.id, routineName: routine.name, itemId: live.id, from, to }
+  return { routineId: routine.id, routineName: routine.name, itemId: live.id, exerciseId: live.exerciseId, from, to }
 }
 
 // "105/105/100" — a set with no weight reads "—" (req-113).

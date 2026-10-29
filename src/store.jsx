@@ -114,7 +114,9 @@ export function StoreProvider({ children, sync = null }) {
       applyRoutineUpdate(offer) {
         patchRoutine(offer.routineId, (routine) => {
           const index = (routine.exercises || []).findIndex((item) => item.id === offer.itemId)
-          return index < 0 ? routine : routineItemUpdated(routine, index, { suggestedWeights: offer.to })
+          // req-242 review — and only while that item still holds the offer's exercise.
+          if (index < 0 || routine.exercises[index].exerciseId !== offer.exerciseId) return routine
+          return routineItemUpdated(routine, index, { suggestedWeights: offer.to })
         })
       },
       moveRoutineExercise(routineId, index, dir) {

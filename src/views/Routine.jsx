@@ -664,6 +664,8 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
 // req-242 — the routine's whole-library picker in single-pick mode (the Add picker, DEC-097 §1;
 // a library pick creates your exercise as Add does). The pick replaces this item's exercise
 // (store.changeRoutineExercise → routine-item-change.js), then back to the item editor.
+const CHANGE_KEEPS_LABEL = 'Keeps sets, reps and rest — kg blank'
+
 export function RoutineExerciseChange({ routineId, itemId, paths }) {
   const store = useStore()
   const routine = routineById(store.routines, routineId)
@@ -685,6 +687,9 @@ export function RoutineExerciseChange({ routineId, itemId, paths }) {
         cancelTo={back}
         max={1}
         addLabel={() => 'Change'}
+        // req-242 review — a no-history pick keeps the item's own plan (not the Add picker's
+        // starting plan), so its row says what will happen.
+        startingLabel={CHANGE_KEEPS_LABEL}
         inWorkout={new Set(routine.exercises.map((candidate) => candidate.exerciseId))}
         onAdd={([picked]) => {
           if (picked) store.changeRoutineExercise(routine.id, itemId, picked.exerciseId)

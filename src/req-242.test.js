@@ -10,6 +10,7 @@ import { fullState } from './test-support/full-state.js'
 import { loadExerciseCatalog } from './exerciseCatalog.js'
 import { changedRoutineItem, routineItemExerciseChanged } from './routine-item-change.js'
 import { parseRoute } from './route.js'
+import { routineUpdateOffer } from './routine-update-offer.js'
 
 await loadExerciseCatalog()
 
@@ -184,5 +185,67 @@ describe('req-242 — Change exercise (rendered)', () => {
     await mount(h(HistoryDetail, { workoutId: 'wo-1' }))
     console.log('history', JSON.stringify(view.text().slice(0, 300)))
     assert.match(view.text(), /Chest Press/)
+  })
+})
+
+// ---- independent review fixes ----
+
+describe('req-242 review s1 — no "update routine" offer onto a changed item', () => {
+  // Start the routine (fullState's active workout holds si-press = Chest Press), change
+  // si-press to Seated Row mid-workout, then log Chest Press at 40 kg.
+  const s = fullState()
+  const snapItem = s.activeWorkout.snapshot.items.find((i) => (i.routineItemId || i.id) === 'si-press')
+  const logged40 = {
+    ...s.activeWorkout,
+    sets: [
+      ...s.activeWorkout.sets.filter((set) => set.routineItemId !== 'si-press'),
+      { routineItemId: 'si-press', exerciseId: 'ex-press', setType: 'work', weight: 40, reps: '8', rpe: 3, note: '' },
+    ],
+  }
+  const changed = s.routines.map((r) => routineItemExerciseChanged(r, 'si-press', 'ex-row', s.workouts))
+
+  it('control: unchanged item → an offer of 40 kg (the sequence reaches the offer)', () => {
+    const offer = routineUpdateOffer(logged40, s.routines, snapItem)
+    console.log('before change', JSON.stringify(offer))
+    assert.equal(offer?.itemId, 'si-press')
+    assert.equal(offer.to[0], 40)
+  })
+  it('item changed to Seated Row → no offer', () => {
+    const offer = routineUpdateOffer(logged40, changed, snapItem)
+    console.log('after change', JSON.stringify(offer))
+    assert.equal(offer, null)
+  })
+  it('a stale offer (computed before the change) applied after it writes nothing', async () => {
+    const offer = routineUpdateOffer(logged40, s.routines, snapItem)
+    localStorage.clear()
+    localStorage.setItem(KEY, JSON.stringify(fullState()))
+    const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
+    const { useStore } = await import('./store-context.js')
+    const captured = {}
+    function Grab() {
+      // oxlint-disable-next-line react/immutability
+      captured.store = useStore()
+      return null
+    }
+    view = await render(h(StoreProvider, null, h(Grab)))
+    await act(async () => captured.store.changeRoutineExercise('rtn-a', 'si-press', 'ex-row'))
+    await act(async () => captured.store.applyRoutineUpdate(offer))
+    const item = itemOf(stored(), 'si-press')
+    console.log('after apply', JSON.stringify(item))
+    assert.equal(item.exerciseId, 'ex-row')
+    assert.deepEqual(item.suggestedWeights, [], 'Chest Press kg not written into Seated Row')
+  })
+})
+
+describe('req-242 review s2 — the Change picker previews what a no-history pick does', () => {
+  it('ticking a no-history exercise reads "Keeps sets, reps and rest — kg blank"', async () => {
+    const mount = await harness(fullState())
+    const { RoutineExerciseChange } = await importJsx('./views/Routine.jsx', import.meta.url)
+    await mount(h(RoutineExerciseChange, { routineId: 'rtn-a', itemId: 'si-press' }))
+    await view.click(box('Seated Row'))
+    const row = view.all('label.ui-check').find((node) => node.textContent.trim().startsWith('Seated Row'))
+    console.log('row', JSON.stringify(row.textContent))
+    assert.match(row.textContent, /Keeps sets, reps and rest — kg blank/)
+    assert.doesNotMatch(row.textContent, /Starting plan/)
   })
 })
