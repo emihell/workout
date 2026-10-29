@@ -2727,3 +2727,5 @@ box showed the saved type's value (unticked) while Save kept true → `dc39352` 
 `dc39352`: 6/6 + both cardio items YES with stored receipts; smoke green. Test edit `req-217.test.js:62` judged a real change
 (AC 1 requires it). By design: a mid-workout type change keeps the snapshot's "each side" (DESIGN §3). Feel (Emilio): the timer
 runs once, so you start it again for side two; the copy is `(unconfirmed)`. `reports/req-240.md`.
+Deploy (late, L-063): req-239 + req-240 went live 2026-10-29 as `d1f52ad` — `live copy … (main d1f52ad 2026-10-29 23:12:35)`,
+`doctor: all ok`.

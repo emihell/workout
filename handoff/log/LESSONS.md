@@ -589,3 +589,10 @@ req-239's mutation hung its rendered test file in a render loop (178% CPU, 3 GB)
 timer runs while the loop holds the thread; `--test-force-exit` is needed for the async kind (an open timer keeps the process).
 **Rule:** a gate needs an outside bound too — `./check`'s watchdog, CI's `timeout-minutes`. And a per-test timeout is sized
 from the **loaded** run, not the quiet one: a flaky gate gets skipped (Planner's change to req-248: 20 s → 60 s).
+
+## L-063 — merged is not live: the app reaches the phone only through `./server/deploy`  (Planner, 2026-10-29)
+
+Pages deployed every push to `main`; the server deploys nothing by itself. CLOSEOUT step 4 said "deploy if the req touched
+`server/` or sync", so req-239 and req-240 (both `src/`) merged on 10-26..29 while the live copy stayed at `7e6d7b9`
+(`./server/doctor`: `live copy … main 7e6d7b9`) — Emilio's phone ran neither. Found at req-240's closeout; deployed `d1f52ad`,
+doctor all ok. **Rule:** step 4 now fires on any change the server serves (src/, public/, build config, server/).

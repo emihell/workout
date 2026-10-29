@@ -30,7 +30,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - Ops: `./server/doctor` after every server deploy is CLOSEOUT step 4 (req-246 withdrawn, wrong premise).
 
 **READY, held:**
-- Batch 7: req-240 → req-241, req-242, req-243; req-244 (GO pill, look A). **req-240 building** (Builder).
+- Batch 7: req-241 → req-242, req-243; req-244 (GO pill, look A). **req-241 building** (Builder). Live = `d1f52ad`.
   Batch 7, DEC-138/139, unblocked by DEC-143 (its first req shipped 2026-10-26).
 
 ## Needs decisions — parked until their phase
