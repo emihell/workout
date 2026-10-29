@@ -2749,3 +2749,19 @@ Kickback; a workout started first): smoke green; 1 meta line → `/routines/sess
 0 row links · 3 Change above Remove, "Change" disabled until a pick · 4 Chest Press → Leg Press: h1 Leg Press, stored
 `targets [12,11,10] kg [60,70,70] rest 90`, note + role kept · 5 Lat Pulldown → QA Cable Kickback: sets/targets/rest kept, kg `[]`
 · 6 active snapshot same, finished workouts byte-identical · 7 Schedule → Thu slot → row → Change → stored `ex-leg-curl`.
+**Reviewer:** independent subagent — No blockers; 2 should-fix → `6aa044d`: (1) the Update-routine offer matched the item by id
+only, so a mid-workout change could write Chest Press's 40 kg into Seated Row — now no offer / no apply unless the item still
+holds the logged exercise; (2) the picker previewed "Starting plan: 3 × 8" while the change keeps the item's plan → label "Keeps
+sets, reps and rest — kg blank" `(unconfirmed)`. Re-review: No blockers; test edits req-178/187 add the offer's new `exerciseId`
+(real change). Planner re-ran 1–7 on `6aa044d`: all YES. Open for Emilio: type carry-over on a no-history change (BACKLOG). `reports/req-242.md`.
+
+## req-241 — the log screen names what's next; a done set can be skipped  (2026-10-29)
+
+**req-241** (ui; Builder; J4+J7). Quiet "Next: {name}" under the set list (hidden during the Up next bar and on the last
+exercise); "Skip set" in a done set's sheet rewrites it as a skip record and re-runs the kg carry (`views/set-values.js`
+`skippedSetSave`; form keyed by `formKey` = seed key + override kg). Gate: `./check` green (140 files); 5 mutations each caught.
+Test edit `req-125.test.js`: the static key check now pins `formKey` (real change). No reviewer: no DEC-057 trigger file.
+Planner's browser run (`plan qa req-241`): smoke green; 3 no Next line during the bar, "Next: Chest Press" after Start now ·
+1 "Next: Lat Pulldown" · 6 set 1 40 kg → set 2 40 → Skip set 1 → set 2 "35" (routine 35) · 7 typed 45 → keeps "45" · 4 review
+row "2 · skipped" in place · 5 skipped set: no Skip set; 30 × 9 + Save → "2 · 30 kg × 9" · 2 last exercise: no Next line.
+Feel (Emilio): Skip set's place in the sheet; the Next line on a small screen. `reports/req-241.md`.

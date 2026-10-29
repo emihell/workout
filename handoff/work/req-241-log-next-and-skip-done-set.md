@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: ui** · batch 7 (J4, J7). No stored-data shape change.
+**Status: BUILT, NOT merged — branch `req-241` (`7967a98`)** · **Lane: ui** · batch 7 (J4, J7). No stored-data shape change.
 
 # req-241 — the log screen names what's next; a done set can be turned into a skip
 
