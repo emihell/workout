@@ -248,6 +248,9 @@ export function RoutineDetail({ routineId, paths, top = null }) {
           return (
             <Row
               key={item.id || `${item.exerciseId}-${index}`}
+              // req-242 — the whole row (name + meta) opens the item editor; in Reorder mode it
+              // stays a plain row (Up/Down beside it, the name still a link).
+              to={showMoves ? undefined : nav.item(item.id)}
               action={
                 showMoves ? (
                   <>
@@ -265,9 +268,13 @@ export function RoutineDetail({ routineId, paths, top = null }) {
                 ) : null
               }
             >
-              {/* req-103 — two lines: name (link to the item editor), then a muted meta line. */}
+              {/* req-103 — two lines: name, then a muted meta line. */}
               <span className="ui-row__stack">
-                <NavLink to={nav.item(item.id)}>{ex?.name || item.exerciseId}</NavLink>
+                {showMoves ? (
+                  <NavLink to={nav.item(item.id)}>{ex?.name || item.exerciseId}</NavLink>
+                ) : (
+                  <span>{ex?.name || item.exerciseId}</span>
+                )}
                 <span className="ui-row__meta">{routineItemMeta(item, { timed: Boolean(ex?.hasDuration) })}</span>
               </span>
             </Row>
@@ -637,6 +644,10 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
           go(parent)
         }}
       />
+      {/* req-242 — swap this item's exercise (same item: id, note, role, warm-up switch kept). */}
+      <p>
+        <NavLink to={nav.change(itemId)} chevron="forward">Change exercise</NavLink>
+      </p>
       <Button
         onClick={async () => {
           if (!(await askConfirm(`Remove ${ex?.name || 'this exercise'}?`, { confirmLabel: 'Remove' }))) return
@@ -650,6 +661,40 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
   )
 }
 
+// req-242 — the routine's whole-library picker in single-pick mode (the Add picker, DEC-097 §1;
+// a library pick creates your exercise as Add does). The pick replaces this item's exercise
+// (store.changeRoutineExercise → routine-item-change.js), then back to the item editor.
+export function RoutineExerciseChange({ routineId, itemId, paths }) {
+  const store = useStore()
+  const routine = routineById(store.routines, routineId)
+  const nav = pathsFor(routineId, paths)
+  const item = routine?.exercises?.find((candidate) => candidate.id === itemId)
+  const ex = exerciseById(store.exercises, item?.exerciseId)
+
+  if (!routine || !item) {
+    return <Missing>Not found.</Missing>
+  }
+
+  const back = nav.item(itemId)
+  return (
+    <Screen>
+      <Back to={back} />
+      <p className="ui-sub">{ex?.name || item.exerciseId}</p>
+      <Title>Change exercise</Title>
+      <ExercisePicker
+        cancelTo={back}
+        max={1}
+        addLabel={() => 'Change'}
+        inWorkout={new Set(routine.exercises.map((candidate) => candidate.exerciseId))}
+        onAdd={([picked]) => {
+          if (picked) store.changeRoutineExercise(routine.id, itemId, picked.exerciseId)
+          go(back)
+        }}
+      />
+    </Screen>
+  )
+}
+
 export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, exerciseId, top = null }) {
   if (screen === 'edit') return <RoutineEdit routineId={routineId} paths={paths} />
   if (screen === 'exercise-pick') return <RoutineExercisePick routineId={routineId} paths={paths} />
@@ -658,6 +703,9 @@ export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, ex
   if (screen === 'exercise-create-search') return <ExerciseNewSearch returnBase={paths.base} />
   if (screen === 'exercise-new') {
     return <RoutineExerciseNew routineId={routineId} exerciseId={exerciseId} paths={paths} />
+  }
+  if (screen === 'exercise-change') {
+    return <RoutineExerciseChange routineId={routineId} itemId={itemId} paths={paths} />
   }
   if (screen === 'exercise') {
     return <RoutineExerciseEdit routineId={routineId} itemId={itemId} paths={paths} />

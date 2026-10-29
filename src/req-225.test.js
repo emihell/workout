@@ -443,7 +443,8 @@ describe('AC6 Home → sheet → Edit / Swap for today / Back', () => {
     assert.equal(view.text().includes('Upper Body'), true)
     assert.equal(view.text().includes('Lower Body'), false)
     // an exercise of the swapped-in routine opens (its sub-screen carries no `from`)
-    const item = [...view.container.querySelectorAll('.ui-row__stack a')][0]
+    // req-242 — the whole row is the link now (was: the name inside the row's stack).
+    const item = [...view.container.querySelectorAll('a.ui-row__link')][0]
     assert.equal(Boolean(item), true)
     await tap(item)
     assert.match(window.location.hash, new RegExp(`^#/schedule/0/4/s-thu@${THU}/exercise/`)) // round 1: the base path carries the swap date
@@ -507,7 +508,10 @@ describe('round 1 §1 — the Whole plan opens the own routine; a swap only wher
     assert.equal(view.text().includes('Lower Body'), true)
     const lower = stored.routines.find((r) => r.id === 'sess-lower')
     const lowerFirst = stored.exercises.find((e) => e.id === lower.exercises[0].exerciseId).name
-    const item = [...view.container.querySelectorAll('.ui-row__stack a')].find((a) => a.textContent.trim() === lowerFirst)
+    // req-242 — the whole row is the link now; its name is the stack's first line.
+    const item = [...view.container.querySelectorAll('a.ui-row__link')].find(
+      (a) => a.querySelector('.ui-row__stack > span')?.textContent.trim() === lowerFirst,
+    )
     assert.equal(Boolean(item), true)
     await tap(item)
     assert.match(window.location.hash, new RegExp(`^#/schedule/0/2/s-tue@${NEXT_TUE}/exercise/`))

@@ -17,5 +17,7 @@ export function navForBase(base, done, { extra = null, showDelete = true, showDa
     createSearch: `${base}/exercise/create/search`,
     newItem: (exerciseId) => `${base}/exercise/new/${exerciseId}`,
     item: (itemId) => `${base}/exercise/${itemId}`,
+    // req-242 — the item editor's "Change exercise" picker.
+    change: (itemId) => `${base}/exercise/${itemId}/change`,
   }
 }

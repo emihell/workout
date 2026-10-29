@@ -142,6 +142,8 @@ function parseRoutineNested(rest) {
     return { screen: 'exercise-new', exerciseId: rest[2] }
   }
   if (rest[0] === 'exercise' && rest[1] === 'new') return { screen: 'exercise-pick' }
+  // req-242 — an item's "Change exercise" picker.
+  if (rest[0] === 'exercise' && rest[1] != null && rest[2] === 'change') return { screen: 'exercise-change', itemId: rest[1] }
   if (rest[0] === 'exercise' && rest[1] != null) return { screen: 'exercise', itemId: rest[1] }
   return { screen: 'detail' }
 }
@@ -336,6 +338,9 @@ function matchRoute(rawPath) {
     }
     if (parts[1] && parts[2] === 'exercise' && parts[3] === 'new') {
       return { name: 'routine-exercise-pick', routineId: parts[1] }
+    }
+    if (parts[1] && parts[2] === 'exercise' && parts[3] != null && parts[4] === 'change') {
+      return { name: 'routine-exercise-change', routineId: parts[1], itemId: parts[3] }
     }
     if (parts[1] && parts[2] === 'exercise' && parts[3] != null) {
       return { name: 'routine-exercise', routineId: parts[1], itemId: parts[3] }

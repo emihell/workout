@@ -37,6 +37,7 @@ import {
   workoutUpdatedState,
 } from './state-reducers.js'
 import { StoreContext } from './store-context'
+import { routineItemExerciseChanged } from './routine-item-change.js'
 import { exerciseFromData } from './exercise-names.js'
 import { nextWorkoutName, planIds, planToState } from './plan-templates.js'
 import { addWorkingSetToState, finishedState, finishTimeFor } from './workout-log'
@@ -101,6 +102,11 @@ export function StoreProvider({ children, sync = null }) {
       },
       removeRoutineExercise(routineId, index) {
         patchRoutine(routineId, (routine) => routineItemRemoved(routine, index))
+      },
+      // req-242 — "Change exercise": the item (by id) takes another exercise; its values come
+      // from that exercise's history or stay, kg blank (routine-item-change.js).
+      changeRoutineExercise(routineId, itemId, exerciseId) {
+        setState((s) => routinePatchedState(s, routineId, (routine) => routineItemExerciseChanged(routine, itemId, exerciseId, s.workouts)))
       },
       // req-178 (DEC-096 §3–4) — the confirmed "update routine" offer (routine-update-offer.js):
       // that routine's item only, through the normal edit path. Located by item id at write
