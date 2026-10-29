@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-242` (`6aa044d`)** · **Lane: ui** · batch 7 (J8). One routine item edited through the normal path; no bulk write.
+**Status: BUILT AND MERGED, 2026-10-29 — branch `req-242` (`086ab16`…`6aa044d`, 2 commits).** · **Lane: ui** · batch 7 (J8). One routine item edited through the normal path; no bulk write.
 
 # req-242 — a workout's exercise row opens its editor; the editor can change the exercise
 
