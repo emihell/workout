@@ -178,6 +178,15 @@ const doneWarmup = async () => {
   const pill = view.container.querySelector('.ui-restpill')
   if (pill) await view.click(pill)
 }
+// The Details Type <select>: render's type() fires `input`, a select's onChange needs `change`.
+const selectType = async (value) => {
+  const select = view.all('label').find((l) => l.textContent.trim().startsWith('Type'))?.querySelector('select')
+  assert.ok(select, 'the Type select')
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set.call(select, value)
+    select.dispatchEvent(new window.Event('change', { bubbles: true }))
+  })
+}
 // A library load is async; wait until the box reflects it (or give up after a few ticks).
 const waitFor = async (check) => {
   for (let i = 0; i < 50 && !check(); i++) await settle()
@@ -284,12 +293,7 @@ describe('req-240 — the own "One side at a time" box (criteria 2–3)', () => 
     assert.equal(t.stored().exercises.find((x) => x.id === 'ex-overhead-db-press').unilateral, true)
     await t.edit('ex-overhead-db-press')
     await waitFor(() => Boolean(sideBox()))
-    const typeSelect = view.all('label').find((l) => l.textContent.trim().startsWith('Type'))?.querySelector('select')
-    assert.ok(typeSelect, 'the Type select')
-    await act(async () => {
-      Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set.call(typeSelect, 'cardio')
-      typeSelect.dispatchEvent(new window.Event('change', { bubbles: true }))
-    })
+    await selectType('cardio')
     assert.equal(sideBox(), undefined, 'cardio hides the box')
     await view.click(view.button('Save'))
     await settle()
@@ -303,6 +307,26 @@ describe('req-240 — the own "One side at a time" box (criteria 2–3)', () => 
     await doneWarmup()
     assert.equal(/each side/i.test(view.text()), false)
     assert.equal(view.text().includes(ONE_SIDE_LINE), false)
+  })
+
+  it('failure: stored cardio + unilateral: true, Type → Free in the form → the box shows ticked; an untouched Save keeps it', async () => {
+    const payload = ownPress()
+    Object.assign(payload.exercises.find((x) => x.id === 'ex-overhead-db-press'), { type: 'cardio', unilateral: true })
+    const t = await harness(payload)
+    await t.edit('ex-overhead-db-press')
+    await settle()
+    assert.equal(sideBox(), undefined, 'cardio: no box')
+    await selectType('free')
+    await waitFor(() => Boolean(sideBox()))
+    assert.equal(sideBox().checked, true, 'the form type decides: the stored true shows')
+    await view.click(view.button('Save'))
+    await settle()
+    const saved = t.stored().exercises.find((x) => x.id === 'ex-overhead-db-press')
+    assert.equal(saved.type, 'free')
+    assert.equal(saved.unilateral, true)
+    await t.edit('ex-overhead-db-press')
+    await waitFor(() => Boolean(sideBox()))
+    assert.equal(sideBox().checked, true, 'reopened: the same as what the form showed before Save')
   })
 
   it('cardio shows no box', async () => {

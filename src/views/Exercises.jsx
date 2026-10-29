@@ -480,7 +480,9 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         {type === 'cardio' ? null : <WeightStepField step={step} exercise={{ ...ex, name, type }} />}
         <Checkbox label="Timed (count down a duration)" checked={hasDuration} onChange={setHasDuration} />
         {type === 'cardio' ? null : (
-          <Checkbox label="One side at a time" checked={sideChoice ?? isEachSide(ex, library)} onChange={setSideChoice} />
+          // Resolved with the form's type, not the saved one: a stored cardio record switched back
+          // shows the true it still holds, so what the box shows is what Save keeps.
+          <Checkbox label="One side at a time" checked={sideChoice ?? isEachSide({ ...ex, type }, library)} onChange={setSideChoice} />
         )}
         {hasDuration ? (
           <NumberField
