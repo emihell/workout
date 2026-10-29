@@ -91,7 +91,7 @@ import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCar
 import { equipmentLabel } from '../../equipment-label.js'
 import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
-import { ONE_SIDE_LINE, isEachSide, restNotesFor, restNotesShowing } from '../../library-hints.js'
+import { durationLabel, isEachSide, oneSideLine, restNotesFor, restNotesShowing } from '../../library-hints.js'
 import { useExerciseLibrary } from './use-library.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
@@ -108,6 +108,7 @@ function exerciseEditorPath(routineId, item) {
 // passes the "Add note" toggle here so it sits next to the exercise name.
 // req-212 (H5) — the head is the library's ExerciseHead (was ad-hoc markup here).
 // req-219 — `eachSide` (a unilateral library entry) adds one quiet line under the head.
+// req-240 — `eachSide` is isEachSide (own setting, else library); a timed exercise gets the hold line.
 function ExerciseTitle({ routineId, item, ex, bits, aside, eachSide = false }) {
   const inLibrary = Boolean(item?.exerciseId && ex?.id === item.exerciseId)
   const name = exerciseName(item)
@@ -118,7 +119,7 @@ function ExerciseTitle({ routineId, item, ex, bits, aside, eachSide = false }) {
         aside={aside}
         subtitle={(bits || []).filter(Boolean).join(' · ')}
       />
-      {eachSide ? <p className="ui-sub">{ONE_SIDE_LINE}</p> : null}
+      {eachSide ? <p className="ui-sub">{oneSideLine(ex)}</p> : null}
     </>
   )
 }
@@ -694,6 +695,7 @@ function WorkoutItemLive({ routineId, item }) {
           weighted={weighted}
           timed={timedSet}
           repsLabel={repsLabel}
+          durationLabel={durationLabel(eachSide)}
           initialWeight={formInit.weight}
           initialReps={formInit.reps}
           initialDuration={formInit.durationSec}
@@ -807,6 +809,7 @@ function LoggedSetSheet({ item, ex, index, eachSide = false, onClose, onSaved })
       timed={timed}
       cardio={cardio}
       repsLabel={ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : eachSide ? 'Reps each side' : 'Reps'}
+      durationLabel={durationLabel(eachSide)}
       kgLabel={kgLabelFor(ex)}
       initialWeight={weighted ? init.weight : ''}
       initialReps={init.reps}

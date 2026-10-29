@@ -16,6 +16,8 @@ import { askConfirm } from '../ui/confirm.js'
 import { exerciseLastTimeText } from './history/helpers.js'
 import { equipmentLabel } from '../equipment-label.js'
 import { exerciseUseSplit } from '../exercise-use.js'
+import { isEachSide, unilateralPatch } from '../library-hints.js'
+import { useExerciseLibrary } from './workout/use-library.js'
 
 const TYPE_LABELS = {
   machine: 'Machine',
@@ -428,6 +430,10 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
   // the first Save attempt, like the name) instead of silently keeping the default.
   const duration = defaultDurationToSave(durationSec, DEFAULT_DURATION_SEC)
   const durationError = tried && hasDuration ? duration.error ?? null : null
+  // req-240 — "One side at a time": shows the resolved value (own field, else the library, which
+  // loads async); `sideChoice` stays null until the box is changed, so an untouched Save writes nothing.
+  const library = useExerciseLibrary()
+  const [sideChoice, setSideChoice] = useState(null)
 
   if (!ex) {
     return <Missing>Not found.</Missing>
@@ -461,6 +467,8 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
             cues: cues.trim(),
             hasDuration,
             durationSec: hasDuration ? duration.value : ex.durationSec ?? DEFAULT_DURATION_SEC,
+            // req-240 — cardio shows no box, so nothing is written for it.
+            ...(type === 'cardio' ? {} : unilateralPatch(ex, library, sideChoice)),
           })
           go(back)
         }}
@@ -471,6 +479,11 @@ export function ExerciseEdit({ exerciseId, returnTo = null }) {
         <Field label="Equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} />
         {type === 'cardio' ? null : <WeightStepField step={step} exercise={{ ...ex, name, type }} />}
         <Checkbox label="Timed (count down a duration)" checked={hasDuration} onChange={setHasDuration} />
+        {type === 'cardio' ? null : (
+          // Resolved with the form's type, not the saved one: a stored cardio record switched back
+          // shows the true it still holds, so what the box shows is what Save keeps.
+          <Checkbox label="One side at a time" checked={sideChoice ?? isEachSide({ ...ex, type }, library)} onChange={setSideChoice} />
+        )}
         {hasDuration ? (
           <NumberField
             label="Default duration (s)"
