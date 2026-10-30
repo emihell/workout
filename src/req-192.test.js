@@ -158,7 +158,7 @@ describe('the log screen (real store)', () => {
     await view.click(view.button('Done'))
     await view.click(view.button('Done')) // req-212 test edit: one Done (was Medium)
     let pill = view.container.querySelector('.ui-restpill')
-    assert.match(pill.textContent, /·skip$/)
+    assert.match(pill.textContent, /Tap to skip rest$/) // req-244 test edit (DEC-139): was "· skip"
     assert.match(pill.getAttribute('aria-label'), /skip the rest/)
     await view.click(pill)
     assert.equal(t.active().restEndsAt, null)
@@ -173,7 +173,8 @@ describe('the log screen (real store)', () => {
     await t.mount(h(Workout, { routineId: 'sess-upper' }))
     pill = view.container.querySelector('.ui-restpill')
     // req-222 test edit: the pill now ends with the whole-workout count after the set count.
-    assert.match(pill.textContent, /set \d\/\d · \d\/\d$/)
+    // req-244 test edit (DEC-139): the same two counts, in words.
+    assert.match(pill.textContent, /Set \d of \d · Ex \d of \d$/)
     await view.click(pill)
     assert.equal(window.location.hash, `#/workout/sess-upper/item/${CHEST}/log`)
     assert.equal(t.active().restEndsAt, restEndsAt, 'opening does not skip')
