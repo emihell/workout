@@ -742,10 +742,13 @@ PY
 # a re-run, or an entry the author has since filled, is left untouched, never
 # doubled — so a closeout re-run is safe.
 
-# Append a "## req-N — <title>  (merged <date>)" heading + a one-line placeholder
-# to SHIPPED.md, UNLESS an entry for req-N is already there. The guard both makes
+# Append a "## req-N — <title>  (merged <date>)" heading + three labelled placeholder
+# lines (What / Gate / Report — req-252, DEC-087 §2: SHIPPED ≤3 lines per req) to
+# SHIPPED.md, UNLESS an entry for req-N is already there. The guard both makes
 # re-runs idempotent and refuses to clobber prose the author has since written
-# under that heading (the append is the boilerplate; the paragraph is the signal).
+# under that heading (the append is the boilerplate; the lines are the signal).
+# The Gate placeholder must not contain the word "reviewer": shipped_names_reviewer
+# greps for it from "Gate" onward, so an unfilled stub would pass the DEC-057 check.
 append_shipped_stub() {
   local path="$1" reqid="$2" title="$3" adate="$4"
   if grep -Eq "^## ${reqid} " "$path"; then
@@ -753,8 +756,8 @@ append_shipped_stub() {
     return 0
   fi
   # Two spaces before "(merged …)" to match the existing entries' heading style.
-  printf '\n## %s — %s  (merged %s)\n\n_Stub — Planner: one paragraph (what changed, merge commit, gate result), then delete this line._\n' \
-    "$reqid" "$title" "$adate" >> "$path"
+  printf '\n## %s — %s  (merged %s)\n\nWhat: _Stub — one line: what changed, for the user._\nGate: _Stub — the gate receipt (./check green line, QA, merge commit)._\nReport: _Stub — reports/%s.md (+ deploy: doctor live copy line)._\n' \
+    "$reqid" "$title" "$adate" "$reqid" >> "$path"
   echo "plan closeout: SHIPPED.md — appended a ${reqid} stub (fill in the substance)."
 }
 
@@ -835,6 +838,30 @@ reviewer_trigger_files() {
   local code_dir="$1" branch="$2"
   git -C "$code_dir" diff --name-only "main...$branch" 2>/dev/null \
     | grep -Ev '\.test\.(js|jsx|mjs)$' | grep -E "$REVIEWER_TRIGGER_RE" || true
+}
+
+# req-252 (DEC-144 §3, L-063: merged is not live) — the paths the server serves or runs
+# (CLOSEOUT.md step 4). A merge whose diff touches one needs Emilio's deploy, on the
+# server machine; closeout prints the line last, after the push.
+DEPLOY_PATHS_RE='^(src/|public/|server/|index\.html$|vite\.config\.js$|package(-lock)?\.json$)'
+DEPLOY_LINE='DEPLOY (Emilio, on the server machine):  ! ./server/deploy && ./server/doctor'
+
+# Prints the DEPLOY line or "no deploy needed" for merge commit $2 in repo $1 (its diff
+# against the first parent = what the merge brought to main). No merge commit (a
+# fast-forwarded re-run) → says so; the check is then CLOSEOUT step 4 by hand.
+deploy_line() {
+  local code_dir="$1" merge="$2"
+  if [ -z "$merge" ]; then
+    echo "plan closeout: deploy — no merge commit found; check CLOSEOUT step 4 by hand."
+    return 0
+  fi
+  local files
+  files="$(git -C "$code_dir" diff --name-only "$merge^1" "$merge")"   # not piped into grep -q: SIGPIPE + pipefail
+  if grep -Eq "$DEPLOY_PATHS_RE" <<<"$files"; then
+    echo "$DEPLOY_LINE"
+  else
+    echo "no deploy needed"
+  fi
 }
 
 # The req's SHIPPED.md entry (its "## req-N " heading up to the next "## "), recorded by
@@ -1130,13 +1157,17 @@ cmd_closeout() {
   echo
   echo "plan closeout: done — ${reqid} merged; SHIPPED stub + NOW shipped-range written and published."
   echo "Still yours (prose — a fresh save/publish, DEC-009 step 9):"
-  echo "  1. SHIPPED.md — replace the ${reqid} stub line with the real entry (what changed / verified)."
+  echo "  1. SHIPPED.md — fill the ${reqid} stub's What / Gate / Report lines (≤3 lines, DEC-087 §2)."
   echo "  2. NOW.md — move the \"Building:\" marker off ${reqid}; add any DEC-/L- from the build."
   echo "  3. ./plan save \"$reqid ledger\"  &&  ./plan publish --push"
   if [ -n "$review_warn" ]; then
     echo
     printf '%s\n' "$review_warn"
   fi
+
+  # 8. req-252 — last: does this merge need a deploy? (The push above succeeded: set -e.)
+  echo
+  deploy_line "$CODE_DIR" "$merge_commit"
 }
 
 # req-33: one read-only command that verifies first-machine setup and explains
