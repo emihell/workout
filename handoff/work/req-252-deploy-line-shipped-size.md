@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144 §3; DEC-087 §2. After req-251 (stacks on its branch).
+**Status: BUILT AND MERGED, 2026-10-30 — branch `req-252` (`2938a29`…`fa3ea44`, 2 commits).** (into `wf-2026-10-30`) · **Lane: tooling** · DEC-144 §3; DEC-087 §2. After req-251 (stacks on its branch).
 
 # req-252 — closeout prints the deploy line; SHIPPED entries stay short
 
