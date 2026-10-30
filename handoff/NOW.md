@@ -12,8 +12,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 ## Where things stand (2026-10-30)
 
 - **Nothing in flight.** No branch open, no agent running; the Builder session is being shut down (Emilio). Code + planning
-  worktrees on `main`/`planning` at `2acb12f`, clean; old agent worktrees and merged branches removed.
-- **Live = `2acb12f`** (req-239..243 included), deployed 2026-10-30 00:01, `doctor: all ok`; CI run 40970092841 green.
+  worktrees on `main`/`planning` at `5483a31`, clean; old agent worktrees and merged branches removed.
+- **Live = `5483a31`** (req-239..244 included), deployed 2026-10-30 21:33, `doctor: all ok`; CI run 41123118664 green.
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
   fully proven. **Next for the coach (DEC-140/141):** review that workout against run 3 (`coach/COACH.md`).
@@ -22,7 +22,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
 
-**Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green); **not yet deployed** (deploy needs Emilio's OK) — the batch's last req.
+**Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green); deployed 21:33 — the batch's last req. `./server/deploy` is blocked for Planner by the auto-mode classifier: Emilio runs it (`! ./server/deploy && ./server/doctor`) unless he adds an allow rule.
 
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
