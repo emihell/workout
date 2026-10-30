@@ -13,18 +13,16 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 
 - **Nothing in flight.** No branch open, no agent running; the Builder session is being shut down (Emilio). Code + planning
   worktrees on `main`/`planning` at `2acb12f`, clean; old agent worktrees and merged branches removed.
-- **Live copy = `5483a31`** (all of batch 7), deployed by Emilio 2026-10-30 21:30:34; **server health OPEN** — deploy said "not
-  running"; Planner's doctor (sandboxed, node 22.23): 9 FAIL (nothing on :8100, launchd agents + plist not found, data dir
-  not found). Unconfirmed whether the sandbox hides them. Next: Emilio checks outside the sandbox before anything is restarted.
+- **Live = `2acb12f`** (req-239..243 included), deployed 2026-10-30 00:01, `doctor: all ok`; CI run 40970092841 green.
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
   fully proven. **Next for the coach (DEC-140/141):** review that workout against run 3 (`coach/COACH.md`).
-- **Backups:** newest scheduled backup 10-26 09:00 (last known); weekly agent reported NOT loaded 10-30 (see above). Due ≥ 11-02.
+- **Backups:** weekly agent loaded, exit 0; newest scheduled backup 10-26 09:00; the next is due ≥ 11-02 (7 days). Confirm it fires.
 - **Feedback notes:** server `notes` table, 0 rows (2026-10-30).
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
 
-**Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green), deployed in `5483a31`.
+**Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green); **not yet deployed** (deploy needs Emilio's OK) — the batch's last req.
 
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
