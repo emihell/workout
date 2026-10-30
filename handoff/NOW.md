@@ -22,7 +22,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
 
-**Batch 7 done:** req-244 (GO pill, two lines) merged + deployed 2026-10-30 — the batch's last req.
+**Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green); **not yet deployed** (deploy needs Emilio's OK) — the batch's last req.
 
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
