@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-10-30. **Shipped: everything through req-248** except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-30. **Shipped: everything through req-248** (batch 7 complete with req-244) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)
@@ -22,16 +22,15 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
 
-**READY, held:**
-- req-244 (GO pill, look A; DEC-139). Not started — Emilio: finish what was started, no new batch yet. Its spec predates the
-  last four batch-7 builds: re-find its file:line refs before building.
+**Batch 7 done:** req-244 (GO pill, two lines) merged + deployed 2026-10-30 — the batch's last req.
 
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
 path for copy/comment-only reqs (tests + one SHIPPED line) — open.
 
 **Emilio's calls, any time:** loop-length re-anchor; import sheet highlight (Keep vs Replace); missed rep lowers one set even
-on Easy; Change-exercise type carry-over (req-242); req-239/240/242/243 copy `(unconfirmed)`; timer runs once per side (req-240).
+on Easy; Change-exercise type carry-over (req-242); req-239/240/242/243 copy `(unconfirmed)`; timer runs once per side (req-240);
+"Ex" vs "Exercise" and what N counts in the pill (req-244, BACKLOG §Phase 1).
 
 ## Needs decisions — parked until their phase
 

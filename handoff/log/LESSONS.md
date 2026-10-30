@@ -602,3 +602,10 @@ doctor all ok. **Rule:** step 4 now fires on any change the server serves (src/,
 When the assert fails, node tries to print the happy-dom node and hangs (req-248's timeout then cancels the file instead of
 naming the assert). **Rule:** assert presence as `assert.equal(Boolean(node), false)` / `assert.ok(node)`, never compare a DOM
 node itself. Also: `timeout(1)` isn't on macOS — don't build test plumbing on it.
+
+## L-065 — the shell's default node is below the floor; the gate goes red on the server tests  (Planner, 2026-10-30)
+
+`./plan publish` refused: 7 server tests red. Cause: nvm's default is v22.14.0; `node:sqlite` has no `backup` export there
+(`NODE_FLOOR` is 22.16, `.nvmrc` 22.23). On `~/.nvm/versions/node/v22.23.4/bin` first in PATH: green. **Rule:** a red gate
+with `does not provide an export named 'backup'` is the node version, not the code — check `node --version` first; give
+throwaway build agents the PATH line. Fix for good: `nvm alias default 22.23` (Emilio's machine).

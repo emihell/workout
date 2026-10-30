@@ -15,9 +15,7 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 
 ## Held — READY, waiting for Emilio's go
 
-- **Batch 7** (feedback J1..J8, 2026-10-16..22; DEC-138/139): req-239 (J2 first-time prompt) → 240 (J3+J6 one side, timed and
-  own exercises) → 241 (J4+J7 next on the log screen, Skip a done set), 242 (J8 the whole routine row opens it, Change exercise),
-  243 (J1 Home sheet "Swap" label); req-244 (J5 GO pill, look A).
+- Nothing held. Batch 7 (req-239..244) shipped 2026-10-30.
 
 ## Phase 1 — the in-gym flow
 
@@ -47,6 +45,8 @@ one is specced.
 - Batch 5: *(Emilio's call)* a missed rep lowers only that set, even on an Easy exercise. 11 rendered tests still remount
   StoreProvider per screen (move them to the L-051 pattern). The Days row reads long in a multi-week loop. The library chunk
   (264 kB gzip) loads on the first log-screen open.
+- req-222/244: `workoutPosition` N = done + 1, so opening exercise 2 before finishing 1 shows "Ex 1 of 9" — in words
+  (req-244) it reads as "you are on exercise 1". Emilio's call: done count vs the current row's place.
 - req-222: Add set on a swapped-away exercise isn't counted by `workoutPosition` (the cap hides "5/4" as "4/4",
   `workout-log.js:1157`). A pre-req-188 swap counts both items.
 - req-224: Finish computes its time at mount but the store saves at Save (55 min shown, 50 saved). A left-open earlier-day

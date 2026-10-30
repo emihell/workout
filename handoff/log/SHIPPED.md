@@ -2767,3 +2767,18 @@ row "2 · skipped" in place · 5 skipped set: no Skip set; 30 × 9 + Save → "2
 Feel (Emilio): Skip set's place in the sheet; the Next line on a small screen. `reports/req-241.md`.
 Deploy (CLOSEOUT step 4): req-241..243 live 2026-10-30 as `2acb12f` — `live copy … (main 2acb12f 2026-10-30 00:01:04)`, `doctor: all ok`;
 CI run 40970092841 success.
+
+## req-244 — the workout pill: two lines, words not fractions (DEC-139)  (2026-10-30)
+
+**req-244** (ui; throwaway agent; J5, batch 7's last). `WorkoutPill` (`ui/index.jsx`) renders line 1 clock/GO, line 2 "Set 2 of
+4 · Ex 3 of 7" / "Ex 1 of 7" / "Tap to skip rest"; words from numbers in new `ui/workout-pill.js` (`workoutPillLines` — a helper
+exported from `index.jsx` fails lint `only-export-components`); `rest.jsx` passes `{current,total}`; `workoutPillState` unchanged
+(its `countText`/`label` now feed tests only). `--ui-restpill-h` grows to two lines (`ui.css:52`). Showcase: 4 states in flow.
+Gate: Planner's `./check` on a throwaway worktree of `826c408`: green (142 files). Test edits: req-186:317, req-192:161/176,
+req-222:132 — text follows the new words, none weaker; new `req-244.test.js` (10) incl. the failure case. Planner's browser run
+(`plan qa req-244`): smoke green; 1 fresh overview "GO"/"Ex 1 of 9", no "·" · 2 resting overview "1:29"/"Set 4 of 4 · Ex 1 of 9",
+tap → `…chest-press/log` · 3 own screen "1:30"/"Tap to skip rest", tap → GO, stored `restEndsAt` null · 4 `.ui-restpill--go` on
+GO · 5 showcase `["1:12 / Set 2 of 4 · Ex 3 of 7","GO / Set 2 of 4 · Ex 3 of 7","GO / Ex 1 of 7","1:12 / Tap to skip rest"]` ·
+6 pill box 8..74px, overlap with any link/button/input/heading `[]` at 390×844 and 320×640 (screenshots looked at); 0 dialogs,
+0 page errors. Seen: "Ex 1 of 9" on Chest Press opened out of order — req-222's N = done + 1, unchanged; the words make it read
+as "you are on exercise 1" (BACKLOG note). No reviewer: no trigger file. "Ex" stays `(unconfirmed)`. `reports/req-244.md`.
