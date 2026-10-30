@@ -8,7 +8,7 @@ This whole sequence is one command — `./plan closeout req-N`. The manual block
 is the fallback if `closeout` can't run.
 
 ## Preconditions
-- CC reports the branch built + human-verified, NOT merged.
+- The build agent reports the branch built, with its QA receipts (`## What I ran`), NOT merged.
 - Planning has recorded it: `work/req-N-*.md` Status = "BUILT ... NOT merged", any
   `DEC-`/`L-` appended, `NOW.md` + `SHIPPED.md`-when-merged handled. **`closeout` does
   NOT record — it only merges, flips the doc Status, publishes, pushes, deletes the
@@ -41,9 +41,9 @@ pushed, the branch is not deleted, and a re-run after fixing the gate recovers f
    checkout/merge/publish/push — don't run those by hand.
 3. Run `./plan closeout req-N` yourself (after the merge gate). Nothing else.
 4. If the merge changes anything the server serves or runs — `src/`, `public/`, `index.html`, `vite.config.js`, `package*.json`,
-   `server/` (L-063: the live app is the server's copy of `main`; nothing deploys it for you since Pages): `./server/deploy`,
-   then **`./server/doctor`** — paste its `live copy` line and last line in SHIPPED. Not `all ok` → fix before reporting the close-out done (DEC-143; the doctor is what catches a
-   missing backup agent, a gone node, a funnel left on).
+   `server/` (L-063: merged is not live) — `closeout` prints the `DEPLOY` line (`! ./server/deploy && ./server/doctor`), else
+   `no deploy needed`. **Emilio runs it, on the server machine** (DEC-144 §3). Record "deployed" only from the doctor's output:
+   its `live copy` line and last line go in SHIPPED. Not `all ok` → fix before reporting the close-out done (DEC-143).
 
 ## The reviewer gate (req-166)
 `./plan closeout` refuses **before** merging when the diff touches a DEC-057 §1 trigger file and the SHIPPED entry's gate

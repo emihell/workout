@@ -1,7 +1,7 @@
 # Backlog
 
 Open items only. Nothing here is a requirement yet: each becomes `work/req-NN-name.md` when it comes up, and only a
-`READY` req goes to Builder (`rules/WORKFLOW.md`). Shipped work is in `log/SHIPPED.md`, and the reasons are in
+`READY` req goes to a build agent (`rules/WORKFLOW.md`). Shipped work is in `log/SHIPPED.md`, and the reasons are in
 `log/DECISIONS.md`. **Rewritten 2026-10-26** (Emilio: "we dont want anything old"): every shipped, superseded or
 already-fixed entry was removed after a check against `main`. The old notes are in git (`git log -- handoff/work/BACKLOG.md`).
 
@@ -116,6 +116,10 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - **Full visual-design pass**: its own milestone.
 
 ## Tooling
+
+- **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
+  non-planning worktree wins", so `CODE_DIR` — and closeout's merge — may point at an agent/scratch worktree. White-sleeve
+  refuses closeout while >1 non-planning worktree exists. Also: `plan ping` still prints the pre-BUILDER.md handover.
 
 - **`plan closeout` exits 1 silently when the req doc has no `# ` title**: `co_title=$(grep -m1 '^# ' …)` under `set -euo
   pipefail` [still there 2026-10-26, `plan:890`]. Fall back to the req id or print why.

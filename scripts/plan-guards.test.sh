@@ -27,7 +27,7 @@ git symbolic-ref HEAD refs/heads/main
 mkdir -p scripts handoff/work
 cp "$ROOT/plan" ./plan
 cp "$ROOT/scripts/check_handoff.py" scripts/check_handoff.py
-printf '# Now\n\nUpdated. **Shipped: req-01.**\n' > handoff/NOW.md
+printf '# Now\n\nUpdated. **Shipped: req-01.**\n**Next:** build req-050 (fixture)\n' > handoff/NOW.md
 printf '# spec\n' > handoff/work/req-050-onmain.md
 git add -A
 git commit -qm init
@@ -35,6 +35,33 @@ PLAN="$CODE/plan"
 
 PLAN_WT="$SB/planning"
 git worktree add -q -b planning "$PLAN_WT"
+
+echo "# next — both worktrees clean, planning published (req-250) → CLEAN POINT + NOW.md's Next text"
+out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] \
+    && printf '%s' "$out" | grep -q '^CLEAN POINT — good time to /clear. Then paste:$' \
+    && printf '%s' "$out" | grep -qF '  Planner: resume from handoff/NOW.md (Next: build req-050 (fixture))'; } \
+  && ok "next, clean + published: prints CLEAN POINT and the Next line from main (exit $rc)" \
+  || bad "next should print CLEAN POINT — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+
+echo "# next — planning tree dirty (req-250 failure case) → no CLEAN POINT"
+( cd "$PLAN_WT" && printf 'scratch\n' > handoff/scratch.md )
+out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'planning has unsaved edits' \
+    && ! printf '%s' "$out" | grep -q 'CLEAN POINT'; } \
+  && ok "next, dirty planning: 'unsaved edits', no CLEAN POINT" \
+  || bad "next with dirty planning must not print CLEAN POINT — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+rm -f "$PLAN_WT/handoff/scratch.md"
+
+echo "# next — planning commit not on main → no CLEAN POINT"
+( cd "$PLAN_WT" && printf '# x\n' > handoff/unpub.md && git add -A && git commit -qm unpub )
+out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
+{ printf '%s' "$out" | grep -q 'not on main' && ! printf '%s' "$out" | grep -q 'CLEAN POINT'; } \
+  && ok "next, unpublished planning: points to publish, no CLEAN POINT" \
+  || bad "next with unpublished planning must not print CLEAN POINT — rc=$rc out=$out"
+( cd "$PLAN_WT" && git reset -q --hard HEAD~1 )
 
 echo "# ping — doc on main + planning published → success"
 out="$(cd "$CODE" && "$PLAN" ping req-050 2>&1)"; rc=$?
@@ -87,7 +114,7 @@ status="$(cd "$PLAN_WT" && git status --porcelain handoff/NOW.md)"
 
 echo "# save — NOW.md at exactly the limit (50) → proceeds and commits"
 before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
-( cd "$PLAN_WT" && printf 'line %d\n' $(seq 1 50) > handoff/NOW.md )
+( cd "$PLAN_WT" && { printf 'line %d\n' $(seq 1 49); printf '**Next:** fixture\n'; } > handoff/NOW.md )  # 50 lines; req-250's Next line keeps later `status` drift-clean
 out="$(cd "$PLAN_WT" && "$PLAN" save "at limit ok" 2>&1)"; rc=$?
 after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
 { [ $rc -eq 0 ] && [ "$before" != "$after" ] && printf '%s' "$out" | grep -q 'committed'; } \
@@ -121,6 +148,155 @@ out="$(cd "$PLAN_WT" && "$PLAN" publish 2>&1)"; rc=$?
 out="$(cd "$CODE" && "$PLAN" status 2>&1)"; rc=$?
 [ $rc -eq 0 ] && ok "status also runs with the nested worktree present (exit $rc)" || bad "status — rc=$rc out=$out"
 git -C "$CODE" worktree remove --force "$CODE/.claude/worktrees/zz-agent-req120"
+
+echo "# save — local planning BEHIND origin/planning (req-249) → refuse, commit nothing; level → commits"
+# A fake origin (bare repo in the sandbox) and a second clone that pushes one commit to its
+# planning: the sandbox's local planning is then one behind after save's own fetch.
+ORIGIN="$SB/origin.git"
+git init -q --bare "$ORIGIN"
+git -C "$CODE" remote add origin "$ORIGIN"
+git -C "$CODE" push -q origin main planning
+OTHER="$SB/other"
+git clone -q -b planning "$ORIGIN" "$OTHER"
+( cd "$OTHER" && git config user.email t@example.com && git config user.name tester \
+    && printf '# other session\n' > handoff/work/req-090-other.md && git add -A && git commit -qm "other session" && git push -q origin planning )
+before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+( cd "$PLAN_WT" && printf '# mine\n' > handoff/work/req-091-mine.md )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked: behind" 2>&1)"; rc=$?
+after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+staged="$(cd "$PLAN_WT" && git diff --cached --name-only)"
+{ [ $rc -eq 1 ] && [ "$before" = "$after" ] && [ -z "$staged" ] \
+    && printf '%s' "$out" | grep -q '1 commit(s) BEHIND origin/planning' \
+    && printf '%s' "$out" | grep -q 'git log --oneline planning..origin/planning' \
+    && printf '%s' "$out" | grep -q 'plan save: refusing — local planning is 1 commit(s) behind'; } \
+  && ok "save refuses when planning is 1 behind origin/planning: exit 1, no commit, nothing staged" \
+  || bad "save should refuse when behind — rc=$rc same_head=$([ "$before" = "$after" ] && echo y || echo n) staged='$staged' out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+( cd "$PLAN_WT" && git merge -q --ff-only origin/planning )
+before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+out="$(cd "$PLAN_WT" && "$PLAN" save "level with origin" 2>&1)"; rc=$?
+after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+{ [ $rc -eq 0 ] && [ "$before" != "$after" ] && printf '%s' "$out" | grep -q 'committed'; } \
+  && ok "save commits once level with origin/planning (exit $rc)" \
+  || bad "save level with origin should commit — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+( cd "$PLAN_WT" && git reset -q --hard HEAD~2 )   # behind origin/planning by one again
+out="$(cd "$CODE" && "$PLAN" status 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'BEHIND origin/planning'; } \
+  && ok "status, 1 behind, still only warns (exit $rc)" || bad "status should only warn — rc=$rc out=$out"
+
+echo "# brief — req-251: the dispatch prompt (req path, base, BUILDER.md, the four mechanical lines)"
+# A fake HOME with three installed nodes: .nvmrc "22.23" must resolve to the highest v22.23.x
+# (v22.23.4), never v22.230.0 (a prefix of the string, not of the version).
+FAKEHOME="$SB/home"
+mkdir -p "$FAKEHOME/.nvm/versions/node/v22.23.1" "$FAKEHOME/.nvm/versions/node/v22.23.4" "$FAKEHOME/.nvm/versions/node/v22.230.0"
+( cd "$CODE" && printf '22.23\n' > .nvmrc && git add -A && git commit -qm "nvmrc" )
+out="$(cd "$CODE" && HOME="$FAKEHOME" "$PLAN" brief req-050 --base main 2>&1)"; rc=$?
+count="$(printf '%s\n' "$out" | grep -c 'PATH=\|node_modules\|commit early\|do not merge')"
+{ [ $rc -eq 0 ] && [ "$count" -eq 4 ] \
+    && printf '%s' "$out" | grep -qF 'handoff/work/req-050-onmain.md' \
+    && printf '%s' "$out" | grep -qF 'git checkout -b req-050 main' \
+    && printf '%s' "$out" | grep -qF 'Read handoff/BUILDER.md first and follow it' \
+    && printf '%s' "$out" | grep -qF 'export PATH="$HOME/.nvm/versions/node/v22.23.4/bin:$PATH"' \
+    && printf '%s' "$out" | grep -qF 'ln -s ~/projects/workout/workout-codebase/node_modules node_modules'; } \
+  && ok "brief req-050: 4 mechanical lines, req path, base main, BUILDER.md, node v22.23.4 from .nvmrc (exit $rc)" \
+  || bad "brief req-050 — rc=$rc count=$count out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+out="$(cd "$CODE" && HOME="$FAKEHOME" "$PLAN" brief 050 --base planning 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -qF 'git checkout -b req-050 planning'; } \
+  && ok "brief 050 --base planning: names the base (exit $rc)" || bad "brief --base — rc=$rc out=$out"
+out="$(cd "$CODE" && "$PLAN" brief 999 2>&1)"; rc=$?
+{ [ $rc -eq 1 ] && printf '%s' "$out" | grep -q 'no requirement doc'; } \
+  && ok "brief 999 → exit 1, 'no requirement doc'" || bad "brief 999 — rc=$rc out=$out"
+out="$(cd "$CODE" && "$PLAN" brief 050 --base no-such-ref 2>&1)"; rc=$?
+[ $rc -eq 1 ] && ok "brief --base no-such-ref → exit 1" || bad "brief bad base — rc=$rc out=$out"
+
+echo "# closeout — req-251: refuse BEFORE merging unless reports/req-N.md has its receipts"
+# Planning level with origin again (the save scenario left it one behind), the req doc on
+# planning, and a req-095 branch whose report is rewritten per case. main must not move on a
+# refusal; the complete report proceeds past the check (and, in this fixture, all the way).
+( cd "$PLAN_WT" && git merge -q --ff-only origin/planning \
+    && printf '# req-095 — receipts fixture\n\n**Status: READY**\n' > handoff/work/req-095-receipts.md \
+    && git add -A && git commit -qm "req-095 spec" )
+git -C "$CODE" checkout -q -b req-095
+( cd "$CODE" && mkdir -p reports && printf 'feature\n' > feature.txt && printf '# req-095\n' > reports/req-095.md \
+    && git add -A && git commit -qm "req-095 work" )
+git -C "$CODE" checkout -q main
+set_report() {  # $1 = the report text, or ABSENT to delete it; amends req-095's tip, back on main
+  git -C "$CODE" checkout -q req-095
+  if [ "$1" = ABSENT ]; then
+    git -C "$CODE" rm -q reports/req-095.md
+  else
+    mkdir -p "$CODE/reports" && printf '%s' "$1" > "$CODE/reports/req-095.md"
+    git -C "$CODE" add reports/req-095.md
+  fi
+  git -C "$CODE" commit -qm "report" --amend
+  git -C "$CODE" checkout -q main
+}
+FENCE='```'
+refuse_case() {  # $1 label, $2 report text, $3 expected stderr fragment
+  set_report "$2"
+  local before after out rc
+  before="$(git -C "$CODE" rev-parse main)"
+  out="$(cd "$CODE" && "$PLAN" closeout req-095 2>&1)"; rc=$?
+  after="$(git -C "$CODE" rev-parse main)"
+  { [ $rc -eq 1 ] && [ "$before" = "$after" ] && printf '%s' "$out" | grep -qF "$3" \
+      && printf '%s' "$out" | grep -q 'main untouched' \
+      && git -C "$CODE" rev-parse --verify -q refs/heads/req-095 >/dev/null; } \
+    && ok "closeout, $1: exit 1, main unchanged ($before), branch kept" \
+    || bad "closeout, $1 — rc=$rc main $before -> $after out=$out"
+  printf '%s\n' "$out" | sed 's/^/    | /'
+}
+refuse_case "report has no fenced block" \
+  $'# req-095\n\n## What I ran\n\n./check was green.\n\n## For Emilio\n\nnothing\n' \
+  '`## What I ran` has no fenced block with output in it'
+refuse_case "fenced block is empty" \
+  $'# req-095\n\n## What I ran\n\n'"$FENCE"$'\n\n'"$FENCE"$'\n\n## For Emilio\n\nnothing\n' \
+  '`## What I ran` has no fenced block with output in it'
+refuse_case "no For Emilio section (its heading only inside a fence)" \
+  $'# req-095\n\n## What I ran\n\n'"$FENCE"$'\ncheck: all green\n## For Emilio\n'"$FENCE"$'\n' \
+  'no `## For Emilio` section'
+refuse_case "empty report" "" 'reports/req-095.md:'
+refuse_case "report file absent" ABSENT 'no reports/req-095.md on req-095'
+set_report $'# req-095\n\n## What I ran\n\n'"$FENCE"$'\ncheck: all green\n'"$FENCE"$'\n\n## For Emilio\n\nnothing\n'
+before="$(git -C "$CODE" rev-parse main)"
+out="$(cd "$CODE" && "$PLAN" closeout req-095 2>&1)"; rc=$?
+{ printf '%s' "$out" | grep -qF 'reports/req-095.md has its receipts' \
+    && printf '%s' "$out" | grep -qF 'merging req-095 into main' \
+    && [ "$(git -C "$CODE" rev-parse main)" != "$before" ] \
+    && git -C "$CODE" cat-file -e main:feature.txt; } \
+  && ok "closeout with receipts: passes the check and merges (exit $rc)" \
+  || bad "closeout with receipts should merge — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+
+echo "# closeout — req-252: the last line is the DEPLOY line iff the merge touches a served path"
+# $1 req id, $2 slug, $3 the path the branch changes (besides its report).
+closeout_deploy_case() {
+  local id="$1" slug="$2" path="$3" out rc last
+  ( cd "$PLAN_WT" && printf '# %s — deploy fixture\n\n**Status: READY**\n' "$id" > "handoff/work/$id-$slug.md" \
+      && git add -A && git commit -qm "$id spec" )
+  git -C "$CODE" checkout -q -b "$id"
+  ( cd "$CODE" && mkdir -p "$(dirname "$path")" reports && printf 'change\n' > "$path" \
+      && printf '# %s\n\n## What I ran\n\n%s\ncheck: all green\n%s\n\n## For Emilio\n\nnothing\n' "$id" "$FENCE" "$FENCE" > "reports/$id.md" \
+      && git add -A && git commit -qm "$id work" )
+  git -C "$CODE" checkout -q main
+  out="$(cd "$CODE" && "$PLAN" closeout "$id" 2>&1)"; rc=$?
+  last="$(printf '%s\n' "$out" | tail -1)"
+  printf '%s\t%s\t%s\n' "$rc" "$last" "$(git -C "$CODE" cat-file -e "main:$path" 2>/dev/null && echo merged || echo not-merged)"
+}
+res="$(closeout_deploy_case req-096 src-change src/app.js)"
+rc="$(printf '%s' "$res" | cut -f1)"; last="$(printf '%s' "$res" | cut -f2)"; merged="$(printf '%s' "$res" | cut -f3)"
+{ [ "$rc" -eq 0 ] && [ "$merged" = merged ] \
+    && [ "$last" = 'DEPLOY (Emilio, on the server machine):  ! ./server/deploy && ./server/doctor' ]; } \
+  && ok "closeout req-096 (touches src/): exit 0, last line is the DEPLOY line" \
+  || bad "closeout req-096 should end with the DEPLOY line — rc=$rc merged=$merged last=[$last]"
+printf '    | last line: %s\n' "$last"
+res="$(closeout_deploy_case req-097 handoff-only handoff/notes.md)"
+rc="$(printf '%s' "$res" | cut -f1)"; last="$(printf '%s' "$res" | cut -f2)"; merged="$(printf '%s' "$res" | cut -f3)"
+{ [ "$rc" -eq 0 ] && [ "$merged" = merged ] && [ "$last" = 'no deploy needed' ]; } \
+  && ok "closeout req-097 (touches only handoff/ + its report): exit 0, last line 'no deploy needed'" \
+  || bad "closeout req-097 should end 'no deploy needed' — rc=$rc merged=$merged last=[$last]"
+printf '    | last line: %s\n' "$last"
 
 echo
 if [ "$fails" -eq 0 ]; then echo "plan-guards: all checks passed."; else echo "plan-guards: $fails FAILED"; exit 1; fi

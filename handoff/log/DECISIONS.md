@@ -2262,3 +2262,19 @@ resolver, req-233). Planner's split, proposed to Emilio 2026-10-26; the list liv
 its on you if you edit on multiplate devies". DEC-128 §2 already is newest-edit-wins; the "loser kept as a conflict" gap
 (req-230 review) is **not** stage-1 fallout → stage 2 (other users). The coach (`./server/ops plan`) is the one second writer
 today, guarded by `--expect-rev` and refused mid-workout (DEC-142).
+
+## DEC-144 — the workflow update: stop at every closeout, agents build and QA, one brief, Emilio deploys  (Emilio, 2026-10-30)
+
+From the 10-30 audits + an independent review (`handoff/audits/workflow-plan-2026-10-30.md`). Emilio: "planner … can run
+several requirments in a row without ever stopping, this eats up tokens"; "use external throwaway agents instead of builder
+… the builder has its place when we are building something that needs me in the loop". Picked the review's five (A each):
+1. **Stop after every req**, batch or not: closeout ends with `./plan next`'s clean-point line + a resume prompt that points
+   at NOW.md (state goes in NOW, not the prompt). Emilio decides the `/clear`. Supersedes PLANNING's batch "skip /clear".
+2. **The building agent runs its own QA** (`plan qa`, smoke, the req's test list) into its report; Planner spot-checks one
+   item. The reviewer gate on trigger files stays.
+3. **Emilio runs the deploy** from the line closeout prints (`! ./server/deploy && ./server/doctor`); "deployed" is recorded
+   only from the doctor's output. Amends BACKEND rule 2.
+4. DECISIONS split + digest: after Phase 1.
+5. **One brief** (`handoff/BUILDER.md`) for throwaway agents and a live Builder; a Builder session only for in-the-loop
+   feel work, opened and closed for it. Supersedes DEC-055's standing Builder lane.
+Built as req-249 (guards), req-250 (stop), req-251 (brief + ready report), req-252 (deploy line, SHIPPED size).

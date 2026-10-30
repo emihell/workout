@@ -2,9 +2,9 @@
 
 How this project gets built, and the rules for the files in `handoff/`.
 
-**Owns:** the durable build/engineering rules and the planning micro-loop. The
-two-agent build loop is in `PLANNING.md` (loop specifics in `DEC-009`); the planning
-role is in `PLANNING.md`; Claude Code's operational guide is `CLAUDE.md`. This is a
+**Owns:** the durable build/engineering rules and the planning micro-loop. Dispatch,
+review, close and stop are in `PLANNING.md` §Build (DEC-144); the planning role is in
+`PLANNING.md`; a build agent's brief is `BUILDER.md`. This is a
 **reference — load a section on demand, don't read end-to-end.** It states durable
 rules, not current code-state — mechanisms and what each req changed live in the
 code and `DECISIONS.md`; a copied fact drifts.
@@ -75,7 +75,7 @@ answer.
 ## Requirement lanes — each type gets its own bar and gate (DEC-085 §6)
 
 Every requirement names its **`Lane:`** (replaces the old `Gate:` tag, which DEC-057 had emptied — safety now follows the
-files touched). Who builds it (Builder session / throwaway agent / live with Emilio, DEC-055) is separate from its lane.
+files touched). Who builds it (a throwaway agent, or a live Builder for feel work, DEC-144 §5) is separate from its lane.
 Source: `handoff/audits/workflow-2026-09-24.md` §A.
 
 | Lane | Ready when | Gate before merge | Report | Emilio |
@@ -215,7 +215,7 @@ not break — a test must prove an older v5–v8 key survives the upgrade.
 
 The rule that governs any schema-version change or bulk rewrite of stored records —
 state what changes and to how many records, add the survives-upgrade test — is **CC's
-ask-gate #2 in `CLAUDE.md`; see it.** (A read, a single edit through the normal UI, or
+ask-gate #2 in `BUILDER.md`; see it.** (A read, a single edit through the normal UI, or
 work against a throwaway/mocked store needs none of it.) It exists because a bad
 migration silently destroys data the user can't get back.
 
@@ -258,38 +258,17 @@ work/req-NN-name.md      the requirement
 git branch req-NN-name   the work
 ```
 
-Claude Code implements on the branch; the planning session tests what it can reach by
-its own hand and merges on that (**DEC-035**, including its two carve-outs). Git is the
+A build agent implements and QAs on the branch; the planning session reads its receipts,
+spot-checks one, and merges on that (**DEC-035**, its two carve-outs; DEC-144 §2). Git is the
 ticket system.
 
-## Batch mode (DEC-047) — the opt-in exception, not the norm
+## Batch mode (DEC-047, DEC-144) — the opt-in exception, not the norm
 
-**The default stays: one req at a time, human-gate testing per req (DEC-035).** Do not
-loosen it. **Batch mode** is a distinct exception, entered **only** by Emilio's explicit
-approval **with planning up front** (which reqs, what order) before any of them starts.
-Inside an approved batch:
-
-- **Serial-but-continuous.** One req/branch at a time (a **throwaway build agent per req**, DEC-055;
-  Planner merges), but **don't stop between them** — build → `./check` → merge →
-  dispatch the next — and give **one summary at the end**, not per-req.
-- **Relaxed per-req testing — but "feel" is deferrable, "does it render / is it visible"
-  is NOT.** Merge on `./check` green without holding for Emilio to *feel* each `ux-feel`
-  req (spacing, wording, gym-flow) — he iterates after the batch. But whether a UI control
-  **renders, is on-screen, and is not occluded** is an objective, binary fact, not a feel
-  judgement, and it must be confirmed **before merge** by whoever merges — never swept into
-  the deferred-feel bucket. (2026-09-16: req-88 shipped an invisible feedback button because
-  batch mode let visibility ride as "feel"; nobody saw it until Emilio hunted for it.) With
-  no browser in either session, the pre-merge visibility check is a scripted screenshot of
-  the changed screen (see the UI-visibility check tool) or, until that exists, Emilio's
-  fast eyeball on the deployed change — but it is a gate, not an after-thought.
-- **No `/clear` needed mid-batch.** Each req gets a fresh agent (DEC-055), and the Planner's session
-  stays alive for continuity. The Builder session is for live and single work, not batches.
-- **Record the approval.** The batch's reqs, order and Emilio's go (quoted) go in NOW.md before the first
-  dispatch (DEC-047 requires it, and 2026-09-23 had no receipt).
-- **The behaviour-decision gate still applies.** A gated req still needs Emilio's call,
-  resolved in the pre-batch planning. Only *testing* is relaxed, never *decisions*.
-
-Outside an explicitly approved batch, none of the above is in effect.
+Default: one req at a time, gated per req (DEC-035). A batch starts only on Emilio's explicit approval with the planning
+up front; the reqs, order and his go (quoted) go in NOW.md before the first dispatch. Inside it: one throwaway agent per
+req, serial, and still a stop at every closeout (PLANNING §Build) — the approval only lets the resumed session dispatch
+the next req without asking again. Feel is deferrable; visibility is not (`BUILDER.md` §QA, req-88). Only *testing* is
+relaxed, never *decisions*: a gated req's behaviour call is settled in the pre-batch planning.
 
 ## After each requirement lands
 

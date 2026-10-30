@@ -13,6 +13,10 @@ fixes is "nobody ran the check", not "there's no check to run":
      own "keep this under 50 lines", which is a rule to enforce, not a
      fact to verify.
 
+Later additions: NOW.md carries exactly one `**Next:**` line (req-250), and
+a SHIPPED entry dated after 2026-10-30 with more than 3 body lines warns
+(req-252; a warning, never a failure).
+
 (A former backlog-index check — `## Sections` / `### N.N` against
 `work/backlog/tier-*.md` — was retired in req-102 when that structure
 was abandoned; see the note where it stood.)
@@ -609,12 +613,80 @@ def check_size_claims(repo: str, ref: str) -> list[Finding]:
     return findings
 
 
+# ------------------------------------------------- check 3: NOW.md's Next line
+
+# req-250 (DEC-144 §1) — every closeout is a clean point, and `./plan next` prints the
+# resume line from NOW.md's `**Next:**` line on main. So NOW.md must carry exactly one
+# line starting `**Next:**`: none and `plan next` has nothing to print, two and it can't
+# tell which is current. A missing NOW.md is not this check's to report.
+NEXT_LINE_PREFIX = "**Next:**"
+
+
+def check_next_line(repo: str, ref: str) -> list[Finding]:
+    text = read_file(repo, ref, NOW_MD_PATH)
+    if text is None:
+        return []
+    n = sum(1 for line in text.splitlines() if line.startswith(NEXT_LINE_PREFIX))
+    if n == 1:
+        return []
+    if n == 0:
+        msg = f"has no line starting `{NEXT_LINE_PREFIX}` — `./plan next` prints it at a clean point (req-250)"
+    else:
+        msg = f"has {n} lines starting `{NEXT_LINE_PREFIX}` — keep exactly one (req-250)"
+    return [Finding("next", "fail", NOW_MD_PATH, msg)]
+
+
+# ------------------------------------------- check 4: SHIPPED entries stay short
+
+# req-252 (DEC-087 §2, WORKFLOW §Requirement lanes): a SHIPPED entry is ≤3 lines — what,
+# gate receipt, report path. A warning, not a failure: the size is a writing rule, and a
+# long entry blocks nothing. Only entries dated AFTER the cutoff are checked — the entries
+# up to and including 2026-10-30 average 6.35 lines, and a warning each on every run
+# would be noise nobody reads. The date is the last YYYY-MM-DD in the `## req-N …`
+# heading ("(merged 2026-10-31)" from the closeout stub, or "(2026-10-31)").
+SHIPPED_PATH = "handoff/log/SHIPPED.md"
+SHIPPED_MAX_BODY_LINES = 3
+SHIPPED_SIZE_CUTOFF = "2026-10-30"
+SHIPPED_HEADING_RE = re.compile(r"^## (req-\d+)\b")
+ISO_DATE_RE = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+
+
+def check_shipped_size(repo: str, ref: str) -> list[Finding]:
+    text = read_file(repo, ref, SHIPPED_PATH)
+    if text is None:
+        return []
+    findings: list[Finding] = []
+    lines = text.splitlines()
+    i = 0
+    while i < len(lines):
+        m = SHIPPED_HEADING_RE.match(lines[i])
+        if not m:
+            i += 1
+            continue
+        start = i
+        j = i + 1
+        while j < len(lines) and not lines[j].startswith("#") and lines[j].strip() != "---":
+            j += 1
+        dates = ISO_DATE_RE.findall(lines[start])
+        body = sum(1 for line in lines[start + 1:j] if line.strip())
+        if dates and dates[-1] > SHIPPED_SIZE_CUTOFF and body > SHIPPED_MAX_BODY_LINES:
+            findings.append(Finding(
+                "shipped-size", "warn", f"{SHIPPED_PATH}:{start + 1}",
+                f"the {m.group(1)} entry has {body} non-blank lines — keep it ≤ {SHIPPED_MAX_BODY_LINES} "
+                f"(What / Gate / Report; DEC-087 §2)",
+            ))
+        i = j
+    return findings
+
+
 # --------------------------------------------------------------------- driver
 
 def run_checks(repo: str, ref: str) -> list[Finding]:
     findings: list[Finding] = []
     findings.extend(check_status_lines(repo, ref))
     findings.extend(check_size_claims(repo, ref))
+    findings.extend(check_next_line(repo, ref))
+    findings.extend(check_shipped_size(repo, ref))
     return findings
 
 

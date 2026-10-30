@@ -16,6 +16,20 @@ export WORKOUT_DATA_DIR="$DATA_DIR" WORKOUT_PORT="$PORT" WORKOUT_LABEL="$LABEL" 
 say() { echo "$(basename "$0"): $*"; }
 die() { echo "$(basename "$0"): $*" >&2; exit 1; }
 
+# req-249 (DEC-144) — the data dir is what makes a machine the server machine. Without it, a deploy
+# built a stray live copy and the doctor's FAILs meant "wrong machine", not "server down" (10-30).
+# Called by deploy, doctor, ops, backup and restore BEFORE any write, build or check. The one
+# override is a first setup's deploy (`require_server_machine --first-deploy-ok` honours
+# WORKOUT_FIRST_DEPLOY=1; ./server/start creates the data dir afterwards); no other script takes it.
+require_server_machine() {
+  [ -d "$DATA_DIR" ] && return 0
+  if [ "${1:-}" = "--first-deploy-ok" ] && [ "${WORKOUT_FIRST_DEPLOY:-}" = "1" ]; then
+    say "WORKOUT_FIRST_DEPLOY=1 — no $DATA_DIR yet; going on as a first setup"
+    return 0
+  fi
+  die "not the server machine (no $DATA_DIR) — nothing done"
+}
+
 loaded() { launchctl print "$DOMAIN/$1" >/dev/null 2>&1; }
 
 healthy() { curl -fsS --max-time 2 "http://127.0.0.1:$PORT/api/health" >/dev/null 2>&1; }

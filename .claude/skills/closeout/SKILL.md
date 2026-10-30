@@ -18,3 +18,5 @@ the gate the lane sets (`handoff/rules/WORKFLOW.md` §Requirement lanes; DEC-035
 6. **The CI run:** `gh run list --workflow deploy.yml --limit 1`, then `gh run watch <id> --exit-status`.
    Paste the run id and its result, the smoke step included. A red run means `main` is red — say so and
    open a bug-lane req; don't re-push blind.
+7. **Last step: run `./plan next`; end your message with its output, verbatim.** Every closeout is a clean point
+   (DEC-144 §1, req-250): its `CLEAN POINT` line and resume text are what Emilio pastes after `/clear`.
