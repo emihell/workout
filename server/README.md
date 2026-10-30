@@ -4,6 +4,9 @@ Rules: `handoff/rules/BACKEND.md`. Planner runs the live server; Builder and age
 throwaway instance (set `WORKOUT_LIVE_DIR`, `WORKOUT_DATA_DIR`, `WORKOUT_PORT`, `WORKOUT_LABEL` —
 `server/lib.sh` lists them).
 
+**req-249:** `deploy`, `doctor`, `ops`, `backup` and `restore` refuse, exit 1, before doing anything, when the data dir
+doesn't exist: `not the server machine (no <dir>) — nothing done`. A first setup's deploy only: `WORKOUT_FIRST_DEPLOY=1`.
+
 | Where | What |
 |---|---|
 | `~/dev/workout/workout-live/` | the running code: `git archive main` + `dist-server/`, `DEPLOYED` says which commit |
