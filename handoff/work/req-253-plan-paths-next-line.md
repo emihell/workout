@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144 §1 (clean point), L-048 (node_modules), L-065 (node). After req-250/251 (edits their code).
+**Status: BUILT AND MERGED, 2026-10-30 — branch `req-253` (`a7973d7`…`ab7c028`, 2 commits).** · **Lane: tooling** · DEC-144 §1 (clean point), L-048 (node_modules), L-065 (node). After req-250/251 (edits their code).
 
 # req-253 — `plan brief` derives the code worktree; `plan next` reads a multi-line **Next:**
 

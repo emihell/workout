@@ -2793,3 +2793,8 @@ trimmed). Gate on `52637e6`: `smoke: green — 13 steps` · `check: green — �
 passed.` · `check_handoff` exit 0; CI 41134719643 success. Branches `wf-2026-10-30`, `audit-2026-10-30` deleted on origin.
 Deployed 2026-10-30 23:06 (Emilio ran it): `live copy: … (main 52637e6 2026-10-30 23:06:43)` · `doctor: all ok`; pre-deploy
 backup `workout-20261030-230642-deploy-52637e6.db` integrity ok.
+
+## req-253 — plan brief derives the code worktree; plan next reads a multi-line Next  (2026-10-30)
+
+Tooling; throwaway agent, `ab7c028`. Gate: plan-guards `all checks passed`, check-handoff `all passed`, `./check` green; 6 new
+tests fail on main's `plan`; Planner re-ran both suites + the 10-30 truncated Next. No reviewer: no trigger file. `reports/req-253.md`.
