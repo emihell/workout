@@ -314,7 +314,8 @@ describe('acceptance 4 / 5 — the log screen (render, real store)', () => {
     assert.ok(view.container.querySelector('.ui-restpill'), 'the pill shows')
     // req-192 test edit (DEC-108 §3): resting on its own exercise the pill reads "1:30 · skip"
     // (was "· set 3/4"; the set count is on the list).
-    assert.match(view.container.querySelector('.ui-restpill').textContent, /·skip$/) // the separator is its own span
+    // req-244 test edit (DEC-139): the skip state is now line 2, in words ("Tap to skip rest").
+    assert.match(view.container.querySelector('.ui-restpill').textContent, /Tap to skip rest$/)
     // scope 5 — the title's small "N/M" is gone
     for (const sub of view.all('.ui-sub')) assert.doesNotMatch(sub.textContent, /\d\/\d/)
 

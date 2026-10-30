@@ -228,8 +228,24 @@ export function Showcase() {
       </Block>
 
       <Block heading="Workout pill">
-        {/* position: fixed — one at a time; the GO state is .ui-restpill--go */}
-        <WorkoutPill clock="1:12" setText="set 2/4" countText="3/7" onOpen={() => {}} />
+        {/* req-244 — rest / GO / skip. The real pill is position: fixed; here each sits in a
+            box that takes it out of fixed flow so all three show at once. */}
+        <div className="ui-showcase__pill">
+          <WorkoutPill clock="1:12" set={{ current: 2, total: 4 }} exercise={{ current: 3, total: 7 }} onOpen={() => {}} />
+        </div>
+        <p className="ui-field__label">resting — a tap opens the exercise</p>
+        <div className="ui-showcase__pill">
+          <WorkoutPill go set={{ current: 2, total: 4 }} exercise={{ current: 3, total: 7 }} onOpen={() => {}} />
+        </div>
+        <p className="ui-field__label">rest over — GO pulses (.ui-restpill--go)</p>
+        <div className="ui-showcase__pill">
+          <WorkoutPill go exercise={{ current: 1, total: 7 }} onOpen={() => {}} />
+        </div>
+        <p className="ui-field__label">no set logged yet — only the workout count</p>
+        <div className="ui-showcase__pill">
+          <WorkoutPill clock="1:12" set={{ current: 2, total: 4 }} exercise={{ current: 3, total: 7 }} skip onOpen={() => {}} />
+        </div>
+        <p className="ui-field__label">resting on its own exercise — a tap skips the rest</p>
       </Block>
 
       {/* req-212 (H5) — the exercise head and the set list, as the set screen and the review use them. */}

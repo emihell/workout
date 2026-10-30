@@ -130,7 +130,9 @@ describe('AC7 — the overview of a just-started workout', () => {
     assert.equal(active.snapshot.items.length, 9)
     const pill = view.container.querySelector('.ui-restpill')
     assert.ok(pill, 'the pill is on the overview')
-    assert.equal(pill.textContent.replace(/\s+/g, ''), 'GO·1/9')
+    // req-244 test edit (DEC-139): two lines, words — "GO" over "Ex 1 of 9" (was "GO · 1/9").
+    assert.equal(pill.querySelector('.ui-restpill__time').textContent, 'GO')
+    assert.equal(pill.querySelector('.ui-restpill__sub').textContent, 'Ex 1 of 9')
     await view.click(pill)
     assert.equal(window.location.hash, `#/workout/sess-upper/item/${itemKey(active.snapshot.items[0])}/log`)
   })

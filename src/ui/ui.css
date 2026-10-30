@@ -47,9 +47,14 @@
   /* req-123 — the rest-pill countdown: read at a glance mid-rest, between section
    * and title. Was a raw 28px on .ui-restpill__time. */
   --ui-text-emphasis: 28px;
-  /* req-152 (QA-2) — the rest pill's box height: its 28px line + s2 padding top and
-   * bottom + the 1px border twice. Screens that host the pill reserve it (.ui-screen--rest). */
-  --ui-restpill-h: calc(var(--ui-text-emphasis) + 2 * var(--ui-s2) + 2px);
+  /* req-152 (QA-2) — the rest pill's box height. Screens that host the pill reserve it
+   * (.ui-screen--rest). req-244 (DEC-139) — two lines now: the 28px clock/GO line (line-height
+   * 1) + the body-size words line (line-height 1.2) + s2 padding top and bottom + the 1px
+   * border twice. */
+  --ui-restpill-line2: 1.2;
+  --ui-restpill-h: calc(
+    var(--ui-text-emphasis) + var(--ui-text-body) * var(--ui-restpill-line2) + 2 * var(--ui-s2) + 2px
+  );
 }
 
 /* Base link treatment (req-15): the app is fully migrated onto the library, so
@@ -730,11 +735,13 @@ html:has(.ui-picker-strip) {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  /* req-244 (DEC-139) — two stacked lines, centred: the clock/GO over the words. */
   display: inline-flex;
-  align-items: baseline;
-  gap: var(--ui-s2);
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
   min-height: auto;
-  /* req-152 — one line at every width: `left: 50%` caps a fixed box's shrink-to-fit
+  /* req-152 — one line at every width (req-244: each of the two lines): `left: 50%` caps a fixed box's shrink-to-fit
    * width at half the viewport, so at 320px "rest · skip" wrapped and the pill grew
    * to 60px tall, past the reserved --ui-restpill-h. */
   white-space: nowrap;
@@ -761,14 +768,12 @@ html:has(.ui-picker-strip) {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-/* req-186 (DEC-103 §3) — the pill is the workout pill: "1:12 · set 2/4" / "GO · set 2/4".
- * The set count is body size and bold (F9: "make the 1 of 3 bigger"), not a caption. */
-.ui-restpill__sep {
+/* req-186 (DEC-103 §3) — the pill is the workout pill. req-244 (DEC-139) — its counts are
+ * line 2, in words: "Set 2 of 4 · Ex 3 of 7" (or "Tap to skip rest"). Body size and bold
+ * (F9: "make the 1 of 3 bigger"), not a caption; its line-height is the reserve's. */
+.ui-restpill__sub {
   font-size: var(--ui-text-body);
-  opacity: 0.6;
-}
-.ui-restpill__set {
-  font-size: var(--ui-text-body);
+  line-height: var(--ui-restpill-line2);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -1082,6 +1087,11 @@ html:has(.ui-picker-strip) {
 /* ---- Showcase scaffolding only ---- */
 .ui-showcase__block {
   margin-bottom: var(--ui-s4);
+}
+/* req-244 — the showcase lays the pill's states out side by side: in flow, not fixed. */
+.ui-showcase__pill .ui-restpill {
+  position: static;
+  transform: none;
 }
 
 /* req-109 — the exercise-level lateral actions (Skip exercise · Replace exercise) on
