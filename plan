@@ -490,11 +490,16 @@ cmd_brief() {
     echo "plan brief: WARNING — no ~/.nvm/versions/node/v$nvmrc* installed here; printing v$nvmrc" >&2
   fi
 
-  # node_modules comes from the code worktree (L-048: never the planning one's). BUILDER.md's
-  # literal path, not find_worktrees: with extra top-level worktrees listed (a scratch
-  # checkout on some branch) its "last non-planning worktree" pick is the wrong one
-  # (measured 2026-10-30: it printed a scratchpad worktree).
-  local code_dir="~/projects/workout/workout-codebase"
+  # node_modules comes from the code worktree (L-048: never the planning one's): the main
+  # worktree, always the first `git worktree list` entry. Not find_worktrees: with extra
+  # top-level worktrees listed (a scratch checkout on some branch) its "last non-planning
+  # worktree" pick is the wrong one (measured 2026-10-30: it printed a scratchpad worktree).
+  # Not a literal path either: it differs per machine (~/projects/workout vs ~/dev/workout).
+  local code_dir
+  code_dir="$(git -C "$root" worktree list --porcelain | sed -n '1s/^worktree //p')"
+  if [ ! -d "$code_dir/node_modules" ]; then
+    echo "plan brief: WARNING — no node_modules/ in $code_dir (run npm install there)" >&2
+  fi
 
   # Each mechanical line is one line, and each names its keyword once (lowercase), so
   # `grep -c 'PATH=\|node_modules\|commit early\|do not merge'` counts exactly 4 (req-251 #1).

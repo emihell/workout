@@ -3,8 +3,8 @@
 Updated 2026-10-30. **Shipped: everything through req-252** (batch 7 complete; the workflow update req-249..252 merged + deployed) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** a gym session on batch 7 / coach review. Before the first dispatch here: `./plan brief`'s and BUILDER.md's
-`node_modules` symlink is hardcoded `~/projects/workout/…` (this machine: `~/dev/workout/`); BUILDER.md's node `v22.23.4` too (brief resolves it right) (open).
+**Next:** a gym session on batch 7 / coach review. (Done 2026-10-30: `./plan brief` takes `node_modules` from the main
+worktree, BUILDER.md no longer hardcodes a path or node patch. Still `~/projects/workout/` in WORKFLOW/CLOSEOUT/PLANNING (open).)
 
 ## Milestone (Emilio, 2026-09-07)
 

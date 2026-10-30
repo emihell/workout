@@ -12,10 +12,11 @@ not to Emilio's terminal, and does **not** tag. Only a live Builder session tags
 
 ## The mechanical lines — every build
 
-- **Node:** first, `export PATH="$HOME/.nvm/versions/node/v22.23.4/bin:$PATH"` (the `.nvmrc` version). The shell's default
+- **Node:** first, put the `.nvmrc` version on PATH — `./plan brief` prints the exact line for this machine (today
+  `v22.23.3` here; the patch differs per machine, so don't copy a version from a doc). The shell's default
   node is below the floor; a red gate with `does not provide an export named 'backup'` is the node version, not the code (L-065).
-- **`node_modules`:** in an isolated worktree, symlink the code worktree's:
-  `ln -s ~/projects/workout/workout-codebase/node_modules node_modules` — never the planning worktree's (L-048).
+- **`node_modules`:** in an isolated worktree, symlink the code worktree's `node_modules` — the
+  main worktree, first in `git worktree list` (`./plan brief` prints the full path) — never the planning worktree's (L-048).
 - **Commit early**, once a coherent part passes tests. A killed agent loses everything uncommitted (L-052).
 - **A smoke receipt names the sha** and comes from that sha's own `scripts/smoke.mjs`, run after the commit (L-049).
 - **Do not merge or push.** Ever, even when every check is green — merging is Planner's (DEC-035).
