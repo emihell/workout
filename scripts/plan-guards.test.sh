@@ -269,5 +269,34 @@ out="$(cd "$CODE" && "$PLAN" closeout req-095 2>&1)"; rc=$?
   || bad "closeout with receipts should merge — rc=$rc out=$out"
 printf '%s\n' "$out" | sed 's/^/    | /'
 
+echo "# closeout — req-252: the last line is the DEPLOY line iff the merge touches a served path"
+# $1 req id, $2 slug, $3 the path the branch changes (besides its report).
+closeout_deploy_case() {
+  local id="$1" slug="$2" path="$3" out rc last
+  ( cd "$PLAN_WT" && printf '# %s — deploy fixture\n\n**Status: READY**\n' "$id" > "handoff/work/$id-$slug.md" \
+      && git add -A && git commit -qm "$id spec" )
+  git -C "$CODE" checkout -q -b "$id"
+  ( cd "$CODE" && mkdir -p "$(dirname "$path")" reports && printf 'change\n' > "$path" \
+      && printf '# %s\n\n## What I ran\n\n%s\ncheck: all green\n%s\n\n## For Emilio\n\nnothing\n' "$id" "$FENCE" "$FENCE" > "reports/$id.md" \
+      && git add -A && git commit -qm "$id work" )
+  git -C "$CODE" checkout -q main
+  out="$(cd "$CODE" && "$PLAN" closeout "$id" 2>&1)"; rc=$?
+  last="$(printf '%s\n' "$out" | tail -1)"
+  printf '%s\t%s\t%s\n' "$rc" "$last" "$(git -C "$CODE" cat-file -e "main:$path" 2>/dev/null && echo merged || echo not-merged)"
+}
+res="$(closeout_deploy_case req-096 src-change src/app.js)"
+rc="$(printf '%s' "$res" | cut -f1)"; last="$(printf '%s' "$res" | cut -f2)"; merged="$(printf '%s' "$res" | cut -f3)"
+{ [ "$rc" -eq 0 ] && [ "$merged" = merged ] \
+    && [ "$last" = 'DEPLOY (Emilio, on the server machine):  ! ./server/deploy && ./server/doctor' ]; } \
+  && ok "closeout req-096 (touches src/): exit 0, last line is the DEPLOY line" \
+  || bad "closeout req-096 should end with the DEPLOY line — rc=$rc merged=$merged last=[$last]"
+printf '    | last line: %s\n' "$last"
+res="$(closeout_deploy_case req-097 handoff-only handoff/notes.md)"
+rc="$(printf '%s' "$res" | cut -f1)"; last="$(printf '%s' "$res" | cut -f2)"; merged="$(printf '%s' "$res" | cut -f3)"
+{ [ "$rc" -eq 0 ] && [ "$merged" = merged ] && [ "$last" = 'no deploy needed' ]; } \
+  && ok "closeout req-097 (touches only handoff/ + its report): exit 0, last line 'no deploy needed'" \
+  || bad "closeout req-097 should end 'no deploy needed' — rc=$rc merged=$merged last=[$last]"
+printf '    | last line: %s\n' "$last"
+
 echo
 if [ "$fails" -eq 0 ]; then echo "plan-guards: all checks passed."; else echo "plan-guards: $fails FAILED"; exit 1; fi

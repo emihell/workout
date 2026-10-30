@@ -44,7 +44,13 @@ echo "# append_shipped_stub"
 S="$TMP/SHIPPED.md"; shipped_fixture "$S"
 append_shipped_stub "$S" "req-90" "plan closeout auto-ledger" "2026-09-16" >/dev/null
 has "$S" '^## req-90 — plan closeout auto-ledger  \(merged 2026-09-16\)' "stub heading appended with title + merge date"
-has "$S" '_Stub — Planner:' "one-line placeholder appended"
+has "$S" '^What: _Stub' "req-252: What: placeholder line appended"
+has "$S" '^Gate: _Stub' "req-252: Gate: placeholder line appended"
+has "$S" '^Report: _Stub — reports/req-90\.md' "req-252: Report: placeholder names reports/req-90.md"
+body="$(awk '/^## req-90 /{on=1;next} on && NF' "$S" | wc -l | tr -d ' ')"
+[ "$body" = "3" ] && ok "req-252: stub body is exactly 3 non-blank lines" || bad "stub body is $body lines, want 3"
+# The Gate placeholder must not satisfy the DEC-057 reviewer check (it greps "reviewer" from "Gate" on).
+shipped_names_reviewer "$S" "req-90" && bad "an unfilled stub must not name a reviewer" || ok "req-252: unfilled stub names no reviewer"
 # idempotent: re-run does NOT double-append
 append_shipped_stub "$S" "req-90" "plan closeout auto-ledger" "2026-09-16" >/dev/null
 [ "$(count "$S" '^## req-90 ')" = "1" ] && ok "re-run does not double-append (still 1 heading)" || bad "re-run doubled the heading"
@@ -53,7 +59,7 @@ S2="$TMP/SHIPPED2.md"; shipped_fixture "$S2"
 printf '\n## req-91 — preview deploy  (merged 2026-09-17)\n\nAuthor already filled this in fully.\n' >> "$S2"
 append_shipped_stub "$S2" "req-91" "preview deploy" "2026-09-17" >/dev/null
 has "$S2" 'Author already filled this in fully\.' "existing filled entry left untouched"
-hasnt "$S2" '_Stub — Planner:' "no stub written over a filled entry"
+hasnt "$S2" '_Stub' "no stub written over a filled entry"
 
 echo "# bump_now_range — contiguous extend"
 N="$TMP/NOW.md"; now_fixture "$N"

@@ -307,6 +307,65 @@ out="$(run_check)"; rc=$?
   && ok "req-250: NOW.md with two **Next:** lines -> exit $rc, keep exactly one" \
   || bad "req-250: two **Next:** lines should fail — rc=$rc out=[$out]"
 
+# --- req-252: SHIPPED entries dated after 2026-10-30 stay ≤3 lines (warn) ---
+# NOW.md is the correct layout (silent), so any output below is the SHIPPED check's.
+set_now "$NOW_CORRECT"
+mkdir -p "$CODE/handoff/log"
+set_shipped() { printf '%s' "$1" > "$CODE/handoff/log/SHIPPED.md"; ( cd "$CODE" && git add -A && git commit -qm shipped ); }
+SHIPPED_OLD_LONG='# Shipped
+
+---
+
+## req-190 — an old long entry  (2026-10-30)
+
+line one
+line two
+line three
+line four
+line five
+
+## req-191 — older, merged form  (merged 2026-09-01)
+
+a
+b
+c
+d
+'
+set_shipped "$SHIPPED_OLD_LONG"
+out="$(run_check)"; rc=$?
+{ [ $rc -eq 0 ] && [ -z "$out" ]; } \
+  && ok "req-252: long entries dated ≤ 2026-10-30 -> exit 0, no warning" \
+  || bad "req-252: old long entries must not warn — rc=$rc out=[$out]"
+
+set_shipped "$SHIPPED_OLD_LONG
+## req-192 — new, three lines  (merged 2026-10-31)
+
+What: x
+
+Gate: y
+Report: reports/req-192.md
+"
+out="$(run_check)"; rc=$?
+{ [ $rc -eq 0 ] && [ -z "$out" ]; } \
+  && ok "req-252: new 3-line entry (blank lines not counted) -> exit 0, no warning" \
+  || bad "req-252: a 3-line entry must not warn — rc=$rc out=[$out]"
+
+set_shipped "$SHIPPED_OLD_LONG
+## req-193 — new, four lines  (merged 2026-10-31)
+
+What: x
+Gate: y
+Report: reports/req-193.md
+Deployed: one line too many
+"
+out="$(run_check)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -qF '[warn] shipped-size' \
+    && printf '%s' "$out" | grep -qF 'req-193 entry has 4 non-blank lines' \
+    && ! printf '%s' "$out" | grep -q 'req-19[0-2]'; } \
+  && ok "req-252: new 4-line entry -> warns, exit 0, names only req-193" \
+  || bad "req-252: a 4-line new entry should warn with exit 0 — rc=$rc out=[$out]"
+printf '    | %s\n' "$out"
+
 # ----------------------------------------------------------------------------
 if [ "$fails" -eq 0 ]; then
   printf '\nall passed\n'; exit 0
