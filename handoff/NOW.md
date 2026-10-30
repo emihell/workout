@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-10-30. **Shipped: everything through req-248** (batch 7 complete with req-244) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-30. **Shipped: everything through req-248, req-244** (batch 7 complete with req-244) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 ## Milestone (Emilio, 2026-09-07)

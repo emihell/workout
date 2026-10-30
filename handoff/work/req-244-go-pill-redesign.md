@@ -1,4 +1,4 @@
-**Status: BUILT, 2026-10-30 — branch `req-244` (`826c408`), NOT merged.** · **Lane: ui** · batch 7 (J5). Look only; no stored-data change.
+**Status: BUILT AND MERGED, 2026-10-30 — branch `req-244` (`826c408`…`826c408`, 1 commit).** · **Lane: ui** · batch 7 (J5). Look only; no stored-data change.
 
 # req-244 — the workout pill, redesigned
 
