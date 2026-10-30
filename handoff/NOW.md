@@ -1,9 +1,10 @@
 # Now
 
-Updated 2026-10-30. **Shipped: everything through req-248, req-244** (batch 7 complete with req-244) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-30. **Shipped: everything through req-252** (batch 7 complete; the workflow update req-249..252 merged + deployed) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** the workflow update (req-249..252) on branch wf-2026-10-30 — merge on the server machine, then a gym session on batch 7 / coach review.
+**Next:** a gym session on batch 7 / coach review. Before the first dispatch here: `./plan brief`'s and BUILDER.md's
+`node_modules` symlink is hardcoded `~/projects/workout/…` (this machine: `~/dev/workout/`); BUILDER.md's node `v22.23.4` too (brief resolves it right) (open).
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -14,8 +15,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 ## Where things stand (2026-10-30)
 
 - **Nothing in flight.** No branch open, no agent running; the Builder session is being shut down (Emilio). Code + planning
-  worktrees on `main`/`planning` at `5483a31`, clean; old agent worktrees and merged branches removed.
-- **Live = `5483a31`** (req-239..244 included), deployed 2026-10-30 21:33, `doctor: all ok`; CI run 41123118664 green.
+  worktrees on `main`/`planning` at `52637e6`, clean; old agent worktrees and merged branches removed.
+- **Live = `52637e6`** (through req-252), deployed 2026-10-30 23:06, `doctor: all ok`; CI run 41134719643 green.
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
   fully proven. **Next for the coach (DEC-140/141):** review that workout against run 3 (`coach/COACH.md`).

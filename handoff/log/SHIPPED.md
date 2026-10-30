@@ -2784,3 +2784,12 @@ GO · 5 showcase `["1:12 / Set 2 of 4 · Ex 3 of 7","GO / Set 2 of 4 · Ex 3 of 
 as "you are on exercise 1" (BACKLOG note). No reviewer: no trigger file. "Ex" stays `(unconfirmed)`. `reports/req-244.md`.
 Deployed 2026-10-30 21:33 (Emilio ran it; the classifier blocks Planner's `./server/deploy`): `live copy: … (main 5483a31
 2026-10-30 21:33:30)` · `doctor: all ok`; pre-deploy backup `workout-20261030-213329-deploy-5483a31.db` integrity ok.
+
+## req-249..252 — the workflow update (DEC-144): guards, clean-point stop, BUILDER.md, deploy line  (2026-10-30)
+
+**req-249..252** (tooling; throwaway agents on the other computer, merged into `wf-2026-10-30`; receipts `reports/req-249..252.md`).
+Merged to `main` `--no-ff` as `52637e6` with the 10-30 audits, DEC-144 and the doc split (`handoff/BUILDER.md`; PLANNING/CLAUDE
+trimmed). Gate on `52637e6`: `smoke: green — 13 steps` · `check: green — … 143 test file(s), the build, and the smoke test all
+passed.` · `check_handoff` exit 0; CI 41134719643 success. Branches `wf-2026-10-30`, `audit-2026-10-30` deleted on origin.
+Deployed 2026-10-30 23:06 (Emilio ran it): `live copy: … (main 52637e6 2026-10-30 23:06:43)` · `doctor: all ok`; pre-deploy
+backup `workout-20261030-230642-deploy-52637e6.db` integrity ok.
