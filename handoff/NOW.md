@@ -1,9 +1,9 @@
 # Now
 
-Updated 2026-10-30. **Shipped: everything through req-252** (batch 7 complete; the workflow update req-249..252 merged + deployed) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-30. **Shipped: everything through req-253** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** close out req-253 (plan brief path + multi-line Next), then a gym session on the new build / coach review.
+**Next:** a gym session on the new build, then coach review of it (`coach/COACH.md`).
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -13,7 +13,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 
 ## Where things stand (2026-10-30)
 
-- **In flight:** req-253 (tooling) dispatched 2026-10-30. Still `~/projects/workout/` in WORKFLOW/CLOSEOUT/PLANNING (Planner, open).
+- **Nothing in flight.** req-253 merged 2026-10-30 (tooling, no deploy). Still `~/projects/workout/` in WORKFLOW/CLOSEOUT/PLANNING (Planner, open).
 - **Live = `52637e6`** (through req-252), deployed 2026-10-30 23:06, `doctor: all ok`; CI run 41134719643 green.
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
