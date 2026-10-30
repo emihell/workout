@@ -60,6 +60,7 @@ run_check() { python3 "$CHECK" --repo "$CODE" --ref HEAD 2>&1; }
 NOW_DRIFT_READY='# Now
 
 Updated. **Shipped: req-01.**
+**Next:** pick up the queue.
 
 ## Next — READY, held for go
 
@@ -77,6 +78,7 @@ nothing
 NOW_DRIFT_NEEDS='# Now
 
 Updated. **Shipped: req-01.**
+**Next:** pick up the queue.
 
 ## Needs decisions — parked until their phase
 
@@ -91,6 +93,7 @@ nothing
 NOW_CORRECT='# Now
 
 Updated. **Shipped: req-200.** req-201 still pending.
+**Next:** pick up the queue.
 
 ## Next — READY, held for go
 
@@ -208,6 +211,7 @@ PY
 NOW_FIX3='# Now
 
 Updated. **Shipped: req-01.**
+**Next:** pick up the queue.
 
 ## Next — READY, held for go
 
@@ -272,6 +276,36 @@ PY
 printf '%s' "$reverted3_out" | grep -q 'req-200' \
   && ok "Fix 3: pre-req-102 (findall) parser DOES fire the false finding (proves the fix is load-bearing)" \
   || bad "Fix 3: pre-req-102 parser should have produced the false finding — out=[$reverted3_out]"
+
+# --- req-250: NOW.md must carry exactly one `**Next:**` line -----------------
+# (The fixtures above carry one, so their exit-0 cases test only what they name.)
+NOW_NO_NEXT='# Now
+
+Updated. **Shipped: req-200.** req-201 still pending.
+
+## Where to read
+
+nothing
+'
+set_now "$NOW_NO_NEXT"
+out="$(run_check)"; rc=$?
+{ [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'no line starting `\*\*Next:\*\*`'; } \
+  && ok "req-250: NOW.md without **Next:** -> exit $rc, names the missing line" \
+  || bad "req-250: missing **Next:** should fail — rc=$rc out=[$out]"
+printf '    | %s\n' "$out"
+
+set_now "$NOW_CORRECT"
+out="$(run_check)"; rc=$?
+{ [ $rc -eq 0 ] && [ -z "$out" ]; } \
+  && ok "req-250: NOW.md with one **Next:** -> exit 0, silent" \
+  || bad "req-250: one **Next:** should pass — rc=$rc out=[$out]"
+
+set_now "$NOW_CORRECT**Next:** a second one
+"
+out="$(run_check)"; rc=$?
+{ [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'has 2 lines starting'; } \
+  && ok "req-250: NOW.md with two **Next:** lines -> exit $rc, keep exactly one" \
+  || bad "req-250: two **Next:** lines should fail — rc=$rc out=[$out]"
 
 # ----------------------------------------------------------------------------
 if [ "$fails" -eq 0 ]; then

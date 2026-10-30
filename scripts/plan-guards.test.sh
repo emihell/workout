@@ -27,7 +27,7 @@ git symbolic-ref HEAD refs/heads/main
 mkdir -p scripts handoff/work
 cp "$ROOT/plan" ./plan
 cp "$ROOT/scripts/check_handoff.py" scripts/check_handoff.py
-printf '# Now\n\nUpdated. **Shipped: req-01.**\n' > handoff/NOW.md
+printf '# Now\n\nUpdated. **Shipped: req-01.**\n**Next:** build req-050 (fixture)\n' > handoff/NOW.md
 printf '# spec\n' > handoff/work/req-050-onmain.md
 git add -A
 git commit -qm init
@@ -35,6 +35,33 @@ PLAN="$CODE/plan"
 
 PLAN_WT="$SB/planning"
 git worktree add -q -b planning "$PLAN_WT"
+
+echo "# next — both worktrees clean, planning published (req-250) → CLEAN POINT + NOW.md's Next text"
+out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] \
+    && printf '%s' "$out" | grep -q '^CLEAN POINT — good time to /clear. Then paste:$' \
+    && printf '%s' "$out" | grep -qF '  Planner: resume from handoff/NOW.md (Next: build req-050 (fixture))'; } \
+  && ok "next, clean + published: prints CLEAN POINT and the Next line from main (exit $rc)" \
+  || bad "next should print CLEAN POINT — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+
+echo "# next — planning tree dirty (req-250 failure case) → no CLEAN POINT"
+( cd "$PLAN_WT" && printf 'scratch\n' > handoff/scratch.md )
+out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'planning has unsaved edits' \
+    && ! printf '%s' "$out" | grep -q 'CLEAN POINT'; } \
+  && ok "next, dirty planning: 'unsaved edits', no CLEAN POINT" \
+  || bad "next with dirty planning must not print CLEAN POINT — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+rm -f "$PLAN_WT/handoff/scratch.md"
+
+echo "# next — planning commit not on main → no CLEAN POINT"
+( cd "$PLAN_WT" && printf '# x\n' > handoff/unpub.md && git add -A && git commit -qm unpub )
+out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
+{ printf '%s' "$out" | grep -q 'not on main' && ! printf '%s' "$out" | grep -q 'CLEAN POINT'; } \
+  && ok "next, unpublished planning: points to publish, no CLEAN POINT" \
+  || bad "next with unpublished planning must not print CLEAN POINT — rc=$rc out=$out"
+( cd "$PLAN_WT" && git reset -q --hard HEAD~1 )
 
 echo "# ping — doc on main + planning published → success"
 out="$(cd "$CODE" && "$PLAN" ping req-050 2>&1)"; rc=$?
@@ -87,7 +114,7 @@ status="$(cd "$PLAN_WT" && git status --porcelain handoff/NOW.md)"
 
 echo "# save — NOW.md at exactly the limit (50) → proceeds and commits"
 before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
-( cd "$PLAN_WT" && printf 'line %d\n' $(seq 1 50) > handoff/NOW.md )
+( cd "$PLAN_WT" && { printf 'line %d\n' $(seq 1 49); printf '**Next:** fixture\n'; } > handoff/NOW.md )  # 50 lines; req-250's Next line keeps later `status` drift-clean
 out="$(cd "$PLAN_WT" && "$PLAN" save "at limit ok" 2>&1)"; rc=$?
 after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
 { [ $rc -eq 0 ] && [ "$before" != "$after" ] && printf '%s' "$out" | grep -q 'committed'; } \

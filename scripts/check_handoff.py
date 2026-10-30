@@ -609,12 +609,36 @@ def check_size_claims(repo: str, ref: str) -> list[Finding]:
     return findings
 
 
+# ------------------------------------------------- check 3: NOW.md's Next line
+
+# req-250 (DEC-144 §1) — every closeout is a clean point, and `./plan next` prints the
+# resume line from NOW.md's `**Next:**` line on main. So NOW.md must carry exactly one
+# line starting `**Next:**`: none and `plan next` has nothing to print, two and it can't
+# tell which is current. A missing NOW.md is not this check's to report.
+NEXT_LINE_PREFIX = "**Next:**"
+
+
+def check_next_line(repo: str, ref: str) -> list[Finding]:
+    text = read_file(repo, ref, NOW_MD_PATH)
+    if text is None:
+        return []
+    n = sum(1 for line in text.splitlines() if line.startswith(NEXT_LINE_PREFIX))
+    if n == 1:
+        return []
+    if n == 0:
+        msg = f"has no line starting `{NEXT_LINE_PREFIX}` — `./plan next` prints it at a clean point (req-250)"
+    else:
+        msg = f"has {n} lines starting `{NEXT_LINE_PREFIX}` — keep exactly one (req-250)"
+    return [Finding("next", "fail", NOW_MD_PATH, msg)]
+
+
 # --------------------------------------------------------------------- driver
 
 def run_checks(repo: str, ref: str) -> list[Finding]:
     findings: list[Finding] = []
     findings.extend(check_status_lines(repo, ref))
     findings.extend(check_size_claims(repo, ref))
+    findings.extend(check_next_line(repo, ref))
     return findings
 
 

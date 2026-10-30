@@ -461,6 +461,16 @@ cmd_next() {
 
   echo "  both worktrees clean, planning fully published"
   echo "  ->  nothing pending. Pick a READY requirement from handoff/NOW.md."
+
+  # req-250 (DEC-144 §1): this branch, and only this one, is a clean point. The resume line
+  # is NOW.md's `**Next:**` line on main (check_handoff requires exactly one).
+  local next_text
+  next_text="$(git -C "$CODE_DIR" show main:handoff/NOW.md 2>/dev/null \
+    | grep -m1 '^\*\*Next:\*\*' | sed 's/^\*\*Next:\*\*[[:space:]]*//')"
+  [ -n "$next_text" ] || next_text="(NOW.md on main has no **Next:** line — add one)"
+  echo
+  echo "CLEAN POINT — good time to /clear. Then paste:"
+  echo "  Planner: resume from handoff/NOW.md (Next: $next_text)"
 }
 
 cmd_status() {
