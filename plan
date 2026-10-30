@@ -12,6 +12,12 @@ plan next              the single next command to run, and why
 plan ping req-N        verify req-N's doc is on main AND planning is fully
                         published, then print a ready-to-paste handoff ping.
                         Read-only; refuses (pointing to publish) otherwise.
+plan brief req-N [--base <ref>]
+                        print the ready-to-paste dispatch prompt for a build
+                        agent: req path, base branch (default main), "read
+                        handoff/BUILDER.md", and the four mechanical lines
+                        (node PATH from .nvmrc, node_modules symlink, commit
+                        early, no merge/push). Read-only. (req-251)
 plan sync              both directions of staleness: unpublished planning
                         AND the planning worktree's own code falling behind
 plan closeout req-N    merge a built branch, flip its doc status, publish,
@@ -19,6 +25,9 @@ plan closeout req-N    merge a built branch, flip its doc status, publish,
                         Refuses BEFORE merging when the diff touches a DEC-057
                         trigger file and the SHIPPED gate line names no reviewer;
                         override: --no-reviewer "<reason>" (recorded in SHIPPED)
+                        Also refuses before merging unless the branch's
+                        reports/req-N.md has `## What I ran` with a non-empty
+                        fenced block and a `## For Emilio` section (req-251)
 plan preview [req-N]   build the checked-out (or a named req-N) branch and
                         serve it over Tailscale (HTTPS) to test on the phone
                         before merge; run in the CODE worktree (DEC-041)
@@ -409,6 +418,138 @@ Branch $reqid, run ./check, write reports/$reqid.md, report back ready-to-look-a
      verify yourself         judgement about how it feels
 ────────────────────────────────────────
 EOF
+}
+
+# req-251 (DEC-144 §5): the dispatch prompt for a build agent, printed instead of retyped
+# from memory (L-048, L-049, L-052, L-065 all said "put it in the brief"). The brief itself
+# is handoff/BUILDER.md; this prints the pointer to it plus the four mechanical lines in full,
+# so they survive a brief that wasn't read. Read-only: no commits, merges, or fetch.
+#
+# Node: .nvmrc holds a version prefix ("22.23"); it resolves to the highest installed
+# ~/.nvm/versions/node/v<prefix>[.x] dir. None installed → the bare .nvmrc version, with a
+# warning on stderr (the prompt is still printed: it may be for another machine).
+nvm_node_dir() {
+  local want="$1" d best="" v
+  for d in "$HOME"/.nvm/versions/node/v*; do
+    [ -d "$d" ] || continue
+    v="${d##*/}"
+    case "$v" in
+      "v$want"|"v$want".*) best="$(printf '%s\n%s\n' "$best" "$v" | sed '/^$/d' | sort -V | tail -1)" ;;
+    esac
+  done
+  printf '%s' "$best"
+}
+
+cmd_brief() {
+  local arg="" base="main"
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --base)
+        [ -n "${2:-}" ] || { echo 'plan brief: --base needs a ref, e.g. --base wf-2026-10-30' >&2; exit 1; }
+        base="$2"; shift 2 ;;
+      --base=*) base="${1#--base=}"; shift ;;
+      *) [ -z "$arg" ] && arg="$1" || { echo "plan brief: unexpected argument '$1'" >&2; exit 1; }; shift ;;
+    esac
+  done
+  if [ -z "$arg" ]; then
+    echo 'plan brief: needs a requirement, e.g. ./plan brief req-251' >&2
+    exit 1
+  fi
+  local n reqid
+  n="${arg#req-}"
+  if ! [[ "$n" =~ ^[0-9]+$ ]]; then
+    echo "plan brief: '$arg' is not a requirement id (expected req-N or N)" >&2
+    exit 1
+  fi
+  reqid="req-$n"
+
+  # The doc is looked up in the checkout this runs from (planning or code worktree alike).
+  local root doc="" f
+  root="$(git rev-parse --show-toplevel)"
+  for f in "$root"/handoff/work/"$reqid"-*.md "$root"/handoff/work/"$reqid"-*/README.md; do
+    [ -e "$f" ] && { doc="${f#"$root"/}"; break; }
+  done
+  if [ -z "$doc" ]; then
+    echo "plan brief: no requirement doc handoff/work/$reqid-*.md in $root" >&2
+    exit 1
+  fi
+  if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+    echo "plan brief: base '$base' is not a ref here" >&2
+    exit 1
+  fi
+
+  local nvmrc="" node_v
+  [ -f "$root/.nvmrc" ] && nvmrc="$(tr -d ' \tv\r\n' < "$root/.nvmrc")"
+  if [ -z "$nvmrc" ]; then
+    echo "plan brief: no .nvmrc in $root" >&2
+    exit 1
+  fi
+  node_v="$(nvm_node_dir "$nvmrc")"
+  if [ -z "$node_v" ]; then
+    node_v="v$nvmrc"
+    echo "plan brief: WARNING — no ~/.nvm/versions/node/v$nvmrc* installed here; printing v$nvmrc" >&2
+  fi
+
+  # node_modules comes from the code worktree (L-048: never the planning one's). BUILDER.md's
+  # literal path, not find_worktrees: with extra top-level worktrees listed (a scratch
+  # checkout on some branch) its "last non-planning worktree" pick is the wrong one
+  # (measured 2026-10-30: it printed a scratchpad worktree).
+  local code_dir="~/projects/workout/workout-codebase"
+
+  # Each mechanical line is one line, and each names its keyword once (lowercase), so
+  # `grep -c 'PATH=\|node_modules\|commit early\|do not merge'` counts exactly 4 (req-251 #1).
+  cat <<EOT
+Build $reqid. Spec and acceptance criteria: $doc
+
+Start: git checkout -b $reqid $base
+Read handoff/BUILDER.md first and follow it (role, QA, the report). Then root CLAUDE.md and $doc. handoff/ is read-only to you.
+
+The mechanical lines (also in BUILDER.md; they hold even if you read nothing else):
+- Node: first in every shell, export PATH="\$HOME/.nvm/versions/node/$node_v/bin:\$PATH" (the .nvmrc version; L-065).
+- Deps: in an isolated worktree, ln -s $code_dir/node_modules node_modules (the code worktree's, never the planning one's; L-048).
+- Commits: commit early, once a coherent part passes tests; a killed agent loses everything uncommitted (L-052).
+- Hand-off: do not merge or push, ever, even when every check is green; merging is Planner's (DEC-035).
+
+Report: reports/$reqid.md on the branch, with ## What I ran (fenced, pasted output per criterion), ## For Emilio, ## Technical, ## Workflow. plan closeout refuses without the first two.
+Report back ready-to-look-at: branch + sha, what it does, each criterion yes/no with its receipt, any choice the spec left open.
+EOT
+}
+
+# req-251 (DEC-144 §2): closeout's receipt check, ported from white-sleeve's ready-file
+# check. Reads the report on stdin; prints one problem per line (empty = complete).
+# Sections split on `## ` headings outside fences; `## What I ran` needs a fenced block
+# with a non-blank line in it; `## For Emilio` must exist (it may just say "nothing").
+report_receipt_problems() {
+  python3 -c '
+import sys
+lines = sys.stdin.read().splitlines()
+sections, current, fenced = {}, None, False
+for line in lines:
+    if line.lstrip().startswith("```"):
+        fenced = not fenced
+    elif not fenced and line.startswith("## "):
+        current = line[3:].strip()
+        sections.setdefault(current, [])
+        continue
+    if current is not None:
+        sections[current].append(line)
+ran = sections.get("What I ran")
+if ran is None:
+    print("no `## What I ran` section")
+else:
+    has_output, inside, body = False, False, []
+    for line in ran:
+        if line.lstrip().startswith("```"):
+            if inside and any(b.strip() for b in body):
+                has_output = True
+            inside, body = not inside, []
+        elif inside:
+            body.append(line)
+    if not has_output:
+        print("`## What I ran` has no fenced block with output in it")
+if "For Emilio" not in sections:
+    print("no `## For Emilio` section (it may say \"nothing\", but it must be there)")
+'
 }
 
 cmd_next() {
@@ -841,6 +982,25 @@ cmd_closeout() {
   if [ -n "$(git -C "$CODE_DIR" status --porcelain)" ]; then
     echo "plan closeout: refusing — code worktree ($CODE_DIR) has uncommitted changes." >&2
     exit 1
+  fi
+
+  # 2a. req-251 (DEC-144 §2) — the report's receipts, BEFORE anything is merged: the
+  # branch's reports/req-N.md must have `## What I ran` with a non-empty fenced block and
+  # a `## For Emilio` section. No bypass flag: fix the report on the branch. Skipped on the
+  # re-run path (already merged), like the reviewer check — refusing there blocks recovery.
+  if [ -z "$already_merged" ]; then
+    local report_problems
+    if ! git -C "$CODE_DIR" cat-file -e "$branch:reports/$reqid.md" 2>/dev/null; then
+      report_problems="no reports/$reqid.md on $branch"
+    else
+      report_problems="$(git -C "$CODE_DIR" show "$branch:reports/$reqid.md" | report_receipt_problems)"
+    fi
+    if [ -n "$report_problems" ]; then
+      printf '%s\n' "$report_problems" | sed "s|^|plan closeout: refusing — reports/$reqid.md: |" >&2
+      echo "plan closeout: main untouched, doc not flipped. Fix the report on $branch (BUILDER.md, The report)." >&2
+      exit 1
+    fi
+    echo "plan closeout: reports/$reqid.md has its receipts (## What I ran, ## For Emilio)"
   fi
 
   # 2b. req-166 (DEC-057 §1) — the reviewer check, BEFORE anything is merged. The diff
@@ -1424,6 +1584,10 @@ case "${1:-}" in
   ping)
     shift
     cmd_ping "$@"
+    ;;
+  brief)
+    shift
+    cmd_brief "$@"
     ;;
   sync)
     cmd_sync
