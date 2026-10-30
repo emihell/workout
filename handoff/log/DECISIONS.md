@@ -2262,13 +2262,3 @@ resolver, req-233). Planner's split, proposed to Emilio 2026-10-26; the list liv
 its on you if you edit on multiplate devies". DEC-128 §2 already is newest-edit-wins; the "loser kept as a conflict" gap
 (req-230 review) is **not** stage-1 fallout → stage 2 (other users). The coach (`./server/ops plan`) is the one second writer
 today, guarded by `--expect-rev` and refused mid-workout (DEC-142).
-
-## DEC-144 — which machine a session is on: the server machine unless Emilio says otherwise  (Emilio, 2026-10-30)
-
-The server, its DB (`~/dev/workout/workout-data`), backups, launchd agents and coach outputs live on
-**macbookpro-intel-2017**. A session can also run on **job-pro**, which has none of them. Emilio: "i will specifically tell
-you if we are running on the server less computer". **Rule:** assume the server machine. When Emilio says it's job-pro, don't
-run `./server/deploy|doctor|ops`, accounts or backup checks, and don't do coach or data work there: on job-pro, deploy builds a
-stray `~/dev/workout/workout-live` (happened 2026-10-30, deleted), and doctor's FAILs mean nothing. Planning, `./check`, `plan
-qa` and CI work on both machines. Inside the sandbox, Planner's doctor can also report false FAILs on the server machine; a
-doctor result counts only if it's from Emilio's terminal or an unsandboxed run.
