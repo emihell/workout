@@ -25,7 +25,7 @@ doc req-303 '**Status: READY** — Gate: functional. A legacy Gate tag.'
 doc req-304 '**Status: READY** — no lane, no gate.'
 doc req-305 '**Status: DECIDED 2026-09-25 → DEC-090, req-306.** A design req, finished.'
 doc req-307 '**Status: BUILT AND MERGED, 2026-01-01.** An old shipped req with neither tag.'
-printf '# Now\n\nUpdated. **Shipped: req-305, req-307.**\n' > handoff/NOW.md
+printf '# Now\n\nUpdated. **Shipped: req-305, req-307.**\n**Next:** pick up the queue.\n' > handoff/NOW.md  # req-250: NOW.md needs its Next line
 git add -A && git commit -qm init
 printf 'export const app = 2\n' > app.js && git commit -qam "req-307: ship it"
 

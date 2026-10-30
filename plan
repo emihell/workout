@@ -133,8 +133,12 @@ now_md_limit() {
 # that already exists (L-014 lost a whole session to it). Never blocks and never prompts:
 # offline or no origin → a note, and the check uses the last-fetched refs. Stalls are cut
 # off by http.lowSpeed*; GIT_TERMINAL_PROMPT=0 stops a credential prompt from hanging.
+# req-249: also sets PLANNING_BEHIND (local planning's commits behind origin/planning), which
+# `plan save` refuses on; status/next only warn.
+PLANNING_BEHIND=0
 fetch_origin_and_warn() {
   local label="$1" b behind
+  PLANNING_BEHIND=0
   if ! git -C "$CODE_DIR" remote get-url origin >/dev/null 2>&1; then
     echo "$label: no 'origin' remote — nothing fetched" >&2
     return 0
@@ -148,6 +152,7 @@ fetch_origin_and_warn() {
     git -C "$CODE_DIR" rev-parse --verify --quiet "refs/remotes/origin/$b" >/dev/null || continue
     behind="$(git -C "$CODE_DIR" rev-list --count "$b..origin/$b" 2>/dev/null || echo 0)"
     if [ "${behind:-0}" -gt 0 ]; then
+      [ "$b" = planning ] && PLANNING_BEHIND="$behind"
       echo "$label: WARNING — local $b is $behind commit(s) BEHIND origin/$b (L-014). Look first:" >&2
       echo "    git log --oneline $b..origin/$b     then merge it in before you rely on $b" >&2
     fi
@@ -170,6 +175,13 @@ cmd_save() {
     exit 1
   fi
   fetch_origin_and_warn "plan save"
+  # req-249 (10-30: two sessions committed on the same parent, aeb887f/aceaba9) — a save on a
+  # planning branch behind origin forks it. Refuse before anything is staged; the two "look first"
+  # lines above say how to catch up.
+  if [ "$PLANNING_BEHIND" -gt 0 ]; then
+    echo "plan save: refusing — local planning is $PLANNING_BEHIND commit(s) behind origin/planning; nothing committed." >&2
+    exit 1
+  fi
 
   # req-100 (R2): NOW.md exceeding its own ≤N-line rule is the one drift that is
   # always the author's to fix in the SAME edit — so block it BEFORE the commit
@@ -449,6 +461,16 @@ cmd_next() {
 
   echo "  both worktrees clean, planning fully published"
   echo "  ->  nothing pending. Pick a READY requirement from handoff/NOW.md."
+
+  # req-250 (DEC-144 §1): this branch, and only this one, is a clean point. The resume line
+  # is NOW.md's `**Next:**` line on main (check_handoff requires exactly one).
+  local next_text
+  next_text="$(git -C "$CODE_DIR" show main:handoff/NOW.md 2>/dev/null \
+    | grep -m1 '^\*\*Next:\*\*' | sed 's/^\*\*Next:\*\*[[:space:]]*//')"
+  [ -n "$next_text" ] || next_text="(NOW.md on main has no **Next:** line — add one)"
+  echo
+  echo "CLEAN POINT — good time to /clear. Then paste:"
+  echo "  Planner: resume from handoff/NOW.md (Next: $next_text)"
 }
 
 cmd_status() {
