@@ -609,3 +609,10 @@ node itself. Also: `timeout(1)` isn't on macOS — don't build test plumbing on 
 (`NODE_FLOOR` is 22.16, `.nvmrc` 22.23). On `~/.nvm/versions/node/v22.23.4/bin` first in PATH: green. **Rule:** a red gate
 with `does not provide an export named 'backup'` is the node version, not the code — check `node --version` first; give
 throwaway build agents the PATH line. Fix for good: `nvm alias default 22.23` (Emilio's machine).
+
+## L-066 — Planner read the training data itself instead of spawning the coach  (Planner, 2026-10-30)
+
+Resuming "coach review" from `NOW.md`, Planner queried the live DB and tabulated a workout's skipped sets for Emilio. Emilio:
+"this sounds like coach review work, not planner work? coach review should be another agent." **Rule:** Planner doesn't read
+or interpret training data — that's the coach agent's (DEC-140). Planner checks only that new data exists, spawns the coach
+with `coach/COACH.md` + a run folder, saves its report, and keeps for itself only what is app work (a flow bug → a req).
