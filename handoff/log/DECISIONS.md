@@ -2278,3 +2278,22 @@ several requirments in a row without ever stopping, this eats up tokens"; "use e
 5. **One brief** (`handoff/BUILDER.md`) for throwaway agents and a live Builder; a Builder session only for in-the-loop
    feel work, opened and closed for it. Supersedes DEC-055's standing Builder lane.
 Built as req-249 (guards), req-250 (stop), req-251 (brief + ready report), req-252 (deploy line, SHIPPED size).
+
+## DEC-145 — Coach is a role; it builds plans from a capability file, and sends what the app can't express to Planner  (Emilio, 2026-10-31)
+
+Emilio: "i think we should maybe have a new folder called the coach? like the builder and planner? that could also be run as
+an instance within planner if needed?"; "coach will be more focused instances, and will rely more on data in database than on
+code, but ofcourse it show know how to setup workouts an excercises, for that it should have a file on what it can do or just
+relay that owrk to planner/builder" → Planner's proposal (both, split on "can the app express it?"); Emilio: "go".
+1. **Coach is a third role**, tag `[COACH]`. Two ways to run it from one brief (`handoff/coach/COACH.md`): Emilio opens a
+   session in the code worktree ("you are Coach"), or Planner spawns it as a subagent (DEC-140). No worktree of its own: it
+   writes nothing in the repo. It works in `~/dev/workout/workout-data/coach/` and reads the DB read-only.
+2. **The client's facts leave the public repo:** `~/dev/workout/workout-data/coach/CLIENT.md` (outside git, like the run
+   reports, DEC-140), owned and updated by Coach. `handoff/coach/` keeps the method, rules and lessons — Planner's to edit;
+   Coach's lessons come back in a run's "For Planner" section. (The old client section is still in git history.)
+3. **What the app can express, Coach builds itself**, from `handoff/coach/CAPABILITIES.md` (Planner-owned; field truth stays
+   in `reference/schema.md`). **What it can't, Coach never works around:** it goes to "For Planner" → a req → a Builder,
+   and Planner updates CAPABILITIES once it ships.
+4. **Next, a Builder req (queued, BACKLOG §Tooling):** a fixed plan-builder tool, a short change list → a checked plan file
+   for `./server/ops plan`, so Coach stops writing a build script against `src/` each run. Until then, runs do as run 4 did.
+5. Unchanged: Coach never writes the DB; `ops plan apply` asks Emilio (DEC-141/142). History is never changed.

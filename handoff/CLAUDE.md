@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 Building? Read `handoff/BUILDER.md`. Planning? `handoff/PLANNING.md` (for you `handoff/` is yours to write, not read-only).
+Coaching? `handoff/coach/COACH.md` (DEC-145: you read the DB and the repo, write only in `~/dev/workout/workout-data/coach/`).
 
 Instructions for Claude Code working in this repository.
 

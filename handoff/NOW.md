@@ -3,7 +3,9 @@
 Updated 2026-10-30. **Shipped: everything through req-253** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** a gym session on the new build, then coach review of it (`coach/COACH.md`).
+**Next:** Coach (DEC-145, now a role: `[COACH]`) takes Emilio's pasted 10-30 barbell session — after he answers: which day, does
+he log it in the app himself, the bar = 20 kg vs plates-only, his 10/8/6 rep rule (`CLIENT.md` §New). Run 4's `import.json`
+(Helkropp A/C reorder, Leg Press 90) is unapplied, built on rev 78. Then spec the plan-builder (BACKLOG §Tooling).
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -19,6 +21,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
   fully proven. **Next for the coach (DEC-140/141):** review that workout against run 3 (`coach/COACH.md`).
 - **Backups:** weekly agent loaded, exit 0; newest scheduled backup 10-26 09:00; the next is due ≥ 11-02 (7 days). Confirm it fires.
+- **Coach run 4 done** 2026-10-30 (report in `workout-data/coach/run-4/`): 2 sessions since run 3 (10-28, 10-30, both on the old
+  build), so a session on the new build is still to come.
 - **Feedback notes:** server `notes` table, 0 rows (2026-10-30).
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Every req → a throwaway agent; stop at every closeout (DEC-144).
