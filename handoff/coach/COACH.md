@@ -123,3 +123,9 @@ on it (`unwrapBackup` / `applyBackup` / `importPreview` / `previewLines`, `src/e
 - **Retired = archived** only when nothing points at it; a routine kept as a swap-in stays live, unscheduled.
 - Existing kettlebell exercises still carry `weightStep: "2"`; the coach leaves existing exercises alone unless the plan says
   so — a step fix is a change Emilio sees, listed in the report.
+
+**Run 4 (2026-10-30):**
+- **Read how a session was really done before trusting a minute estimate:** sort the sets by `loggedAt`. Emilio did the
+  planned supersets as straight sets (≈55 min, not ≈43), so the last pair and the finisher fell off. Don't place a session's
+  only hinge/hamstring exercise last; it's what gets dropped.
+- A skipped `setType: "wu"` is a warm-up, not a working set. Don't count it against the plan.
