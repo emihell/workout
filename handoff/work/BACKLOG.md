@@ -1,7 +1,7 @@
 # Backlog
 
 Open items only. Nothing here is a requirement yet: each becomes `work/req-NN-name.md` when it comes up, and only a
-`READY` req goes to Builder (`rules/WORKFLOW.md`). Shipped work is in `log/SHIPPED.md`, and the reasons are in
+`READY` req goes to a build agent (`rules/WORKFLOW.md`). Shipped work is in `log/SHIPPED.md`, and the reasons are in
 `log/DECISIONS.md`. **Rewritten 2026-10-26** (Emilio: "we dont want anything old"): every shipped, superseded or
 already-fixed entry was removed after a check against `main`. The old notes are in git (`git log -- handoff/work/BACKLOG.md`).
 

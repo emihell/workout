@@ -3,6 +3,8 @@
 Updated 2026-10-30. **Shipped: everything through req-248, req-244** (batch 7 complete with req-244) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
+**Next:** the workflow update (req-249..252) on branch wf-2026-10-30 — merge on the server machine, then a gym session on batch 7 / coach review.
+
 ## Milestone (Emilio, 2026-09-07)
 
 > In-gym flow **flawless** first, then **program-creation**. Nothing heavy before the flow is flawless.
@@ -20,7 +22,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **Backups:** weekly agent loaded, exit 0; newest scheduled backup 10-26 09:00; the next is due ≥ 11-02 (7 days). Confirm it fires.
 - **Feedback notes:** server `notes` table, 0 rows (2026-10-30).
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
-  served change (CLOSEOUT step 4, L-063). Batches → throwaway agents (DEC-055).
+  served change (CLOSEOUT step 4, L-063). Every req → a throwaway agent; stop at every closeout (DEC-144).
 
 **Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green); deployed 21:33 — the batch's last req. `./server/deploy` is blocked for Planner by the auto-mode classifier: Emilio runs it (`! ./server/deploy && ./server/doctor`) unless he adds an allow rule.
 
@@ -40,6 +42,6 @@ on Easy; Change-exercise type carry-over (req-242); req-239/240/242/243 copy `(u
 
 ## Where to read
 
-`PLANNING.md` (planning role + the two-agent build loop) → `reference/PAGES.md` for page feedback (DEC-137) → `work/BACKLOG.md` → `rules/DESIGN.md`
+`PLANNING.md` (planning role + dispatch/review/close/stop) · `BUILDER.md` (the build brief) → `reference/PAGES.md` for page feedback (DEC-137) → `work/BACKLOG.md` → `rules/DESIGN.md`
 before UI/UX → `rules/WORKFLOW.md` for process → `rules/CLOSEOUT.md` to close a req → `rules/BACKEND.md` for the server.
 `README.md` is the product contract.

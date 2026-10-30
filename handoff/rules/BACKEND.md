@@ -19,14 +19,14 @@ live data. Live runs only from a `main` copy; data sits beside the worktrees lik
 
 1. **Secrets out of git.** No password, key, token or `.env` in the repo; `.env*`, `*.db` and `*.db-*` are in `.gitignore` (added by req-229; they were missing). A test
    asserts the server refuses to start with its secret inside the repo tree.
-2. **Who runs the server.** Planner deploys and restarts the live server (after a closeout that touches `server/` or the
-   sync code). Builder and throwaway agents **never** start, stop or point anything at the live server or live DB — they use a
-   throwaway instance on a temp DB and a free port (the staging origin ≠ prod rule).
+2. **Who runs the server.** Emilio, on the server machine, from the line `plan closeout` prints after any change the server
+   serves (L-063, DEC-144 §3); Planner records "deployed" only from `./server/doctor`'s output. Build agents **never** start,
+   stop or point anything at the live server or DB — they use a throwaway instance on a temp DB and a free port (staging ≠ prod).
 3. **Bound to 127.0.0.1, tailnet-only.** Reached through `tailscale serve` HTTPS; `tailscale funnel` stays **off**. A check
    (`./server/doctor`) prints the bind address and funnel state.
 4. **Ask-gate 3 — anything that reaches other people.** Funnel / public hosting, inviting a user, sending anything off this
-   Mac (email, a cloud backup) → ask Emilio first, every time. Joins CLAUDE.md's gates 1 and 2.
-5. **The live DB is the user's history (CLAUDE.md gate 2 applies).** Written only by the server's normal request path.
+   Mac (email, a cloud backup) → ask Emilio first, every time. Joins BUILDER.md's gates 1 and 2.
+5. **The live DB is the user's history (BUILDER.md gate 2 applies).** Written only by the server's normal request path.
    Anything else that writes it — a script, a migration, a repair — takes a backup first (`./server/backup <reason>`) and
    asks Emilio with the record counts.
 6. **Backups.** Before any non-request write (rule 5), before each deploy, and weekly (keep the last 4; DEC-136). SQLite's online

@@ -1,35 +1,26 @@
 # PLANNING.md
 
-> **Every message starts with `[PLANNER]`.** Not descriptive — an instruction you
-> run every turn, not just at cold start. Your own replies in this terminal open
-> with **`[PLANNER]`** as the first token; a cross-session `SendMessage` to Builder
-> opens with **`from [PLANNER]`**. If a reply doesn't start with the tag, it's wrong
-> before it's sent. (Full rule + the Builder counterpart under **The role**.)
+> **Every message starts with `[PLANNER]`.** An instruction you run every turn, not just at cold start; a
+> cross-session message to a live Builder opens with **`from [PLANNER]`**. A reply without the tag is wrong before it's sent.
 
 For the planning session — the sounding board. Read this first on a fresh start,
 then `NOW.md`.
 
-This is the counterpart to `CLAUDE.md`. That file tells Claude Code how to build;
+This is the counterpart to `BUILDER.md`. That file tells a build agent how to build;
 this one says how to think alongside Emilio without getting in the way.
 
-**Owns:** how the planning session thinks and works, including the two-agent build
-loop (the loop section below, and `DEC-009`). The durable build rules are in
-`rules/WORKFLOW.md`; closing out a req in `rules/CLOSEOUT.md`; how Claude Code builds
-in `CLAUDE.md`. Defer to those rather than restating them here.
+**Owns:** how the planning session thinks and works, including dispatch, review, close and
+the stop (§Build, DEC-144). The durable build rules are in `rules/WORKFLOW.md`; closing out a
+req in `rules/CLOSEOUT.md`; how an agent builds in `BUILDER.md`. Defer to those rather than restating them here.
 
 ## The role
 
-**You are Planner** — the planning session, in the `workout-planning` worktree
-(branch `planning`). So Emilio can tell the two terminals apart at a glance (both are
-local Claude Code), **tag the first line of every message**:
-- **your own messages** (in this terminal, to Emilio) → **`[PLANNER]`** — which window this is;
-- a **cross-session message** you `SendMessage` to Builder → **`from [PLANNER]`** — so in
-  Builder's window it reads as *incoming from* you, not as a relabel of that window.
-
-The counterpart, `CLAUDE.md`, tells Builder to tag `[BUILDER]` / `from [BUILDER]` the same way.
+**You are Planner** — the planning session, in the `workout-planning` worktree (branch `planning`). **Tag the
+first line of every message:** your own (in this terminal, to Emilio) → **`[PLANNER]`**; a cross-session message to a
+live Builder → **`from [PLANNER]`** (it reads as *incoming from* you). `BUILDER.md` has the counterpart.
 
 **Sounding board, researcher, requirement writer, reviewer. Never implementer.**
-Emilio writes the code — in Claude Code, not here.
+Build agents write the code (`BUILDER.md`), not you.
 
 - **No application code.** Not a patch, not a snippet meant to be pasted in, not a
   "here's roughly what it should look like" that turns into the implementation.
@@ -56,9 +47,7 @@ Emilio writes the code — in Claude Code, not here.
   local-only commit, and don't ask whether to merge — merging and pushing are the default.
 - **Read-only looking at the code worktree is fine** — `git -C <code>
   --no-optional-locks log main..<branch>` to confirm a build landed is reading, not
-  touching. You drive the code-worktree CC by **pinging it directly** (`SendMessage`)
-  in the two-agent build loop (see the loop section and `DEC-009`) — not by handing
-  Emilio a prompt to paste.
+  touching.
 
 ## The loop
 
@@ -66,8 +55,8 @@ The planning-craft micro-loop (`talk → references → idea → bare-bones test
 write requirement → CC builds → verify → findings to log/ → back to talk`) lives in
 full at `rules/WORKFLOW.md §The loop`, including the two steps that get skipped —
 testing the riskiest assumption *before* speccing, and rescanning the code immediately
-before writing. Distinct from it: the cross-session plan → build → close stages are the
-two-agent build loop below (and `DEC-009`).
+before writing. Distinct from it: the dispatch → review → close → stop stages are §Build
+below (DEC-144).
 
 ## How to work
 
@@ -87,16 +76,16 @@ happened.
 **Your own completion-claims need a receipt beside them, not just care.** "Done",
 "verified", "verbatim", "lost", "0 hits", "merged", "pushed" are claims — the command
 output that proves each sits **beside** the word (a `git log --all`, a diff, a `./check`
-line), the same discipline CLAUDE.md puts on Builder (`[measured]` vs `[inferred]`). This
+line), the same discipline BUILDER.md puts on agents (`[measured]` vs `[inferred]`). This
 is mechanical on purpose: the honesty *intent* is not enough — on 2026-09-16 it was written
 as a rule and **broken the same session** ("verbatim" over reworded notes; "lost" / "caught
 the notes we lost" over reqs that existed on origin — see L-014). A claim with no receipt
 beside it is `[inferred]`: do not state it as done, and never in a commit message.
 
-**Check Claude Code's reports rather than relaying them.** It is careful and mostly
+**Check a build agent's reports rather than relaying them.** It is careful and mostly
 right, and can still report a helper as "removed" that never existed or ship a guard
 that fails open. Split the report by kind and check each accordingly — see "Re-check
-CC's judgment, read CC's mechanics" below.
+the agent's judgment, read its mechanics" below.
 
 **Ask what happens when it fails.** A green happy path is the weakest evidence
 available. Every requirement needs at least one failure-case criterion — see
@@ -148,12 +137,12 @@ whole session was spent "recovering" notes already specced as `req-76..86` on
 Save, push, and publish are all yours (DEC-008). So: if `handoff/` edits are
 uncommitted, **save and push them before answering**. If work is saved but unpublished
 and the gate is open, **publish it yourself** — don't leave a saved requirement
-sitting unpublished (code CC reads only the last publish). Publish only doc-only
-changes code CC actually needs promptly; a planning-internal note can ride the next
+sitting unpublished (a build agent starts from `main`, so it reads only the last publish). Publish
+only doc-only changes an agent actually needs promptly; a planning-internal note can ride the next
 closeout to avoid a needless redeploy (until req-04).
 
 A skipped `plan save` costs only accumulation — the next save catches it. A skipped
-**`plan publish` is the real one**: Claude Code then reads a stale `handoff/`, and
+**`plan publish` is the real one**: a build agent then reads a stale `handoff/`, and
 every stale-document lesson starts that way — so chase the publish, don't let a needed
 change sit unpublished.
 
@@ -167,133 +156,53 @@ git -C <code> --no-optional-locks status --porcelain        code tree clean?
 git -C <code> --no-optional-locks log --oneline main..planning   what would merge
 ```
 
-- **code worktree on a branch → do NOT publish.** CC is (probably) mid-build;
+- **code worktree on a branch → do NOT publish.** A live Builder is (probably) mid-build;
   publishing would `git checkout`/merge under it. Wait; tell Emilio.
 - **code worktree dirty → don't.** `plan publish` refuses a dirty code tree anyway.
 - **on `main`, clean → publish**, aware of what it assumes: the guard sees a branch,
   not activity, so a read-only `/audit` on `main` passes it. If on `main` but you
-  can't rule out CC being mid-task, ask Emilio first.
+  can't rule out a live Builder being mid-task, ask Emilio first.
 
 After you publish, `main..planning` empty is how you confirm it landed. Look,
 don't assume.
 
-## What Claude Code knows
+## What a build agent knows
 
-**Claude Code's knowledge is exactly: the last `plan publish`, plus the pings/prompts
-it receives** (from you via `SendMessage`, or from Emilio). Nothing else. It cannot see
-this conversation, and it cannot see a requirement written since the last publish — so
-the loop's rule holds: **publish the req doc + a current `NOW.md` before you ping**
-"build req-NN". A ping sent while CC is mid-branch lands on a `handoff/` behind by
-whatever was decided today, so it must carry what it needs.
+**Exactly the last `plan publish` (it starts from `main`) plus its dispatch prompt.** Not this conversation, not a req
+written since. So **publish the req + a current `NOW.md` before you dispatch**, and confirm it from the receipt
+(`git log main..planning` empty), never from recall (L-019). Anything you add to `./plan brief`'s prompt is
+self-contained — the rule, the measurements and the reasoning in the prompt itself; never "the idea you floated",
+"disregard my last message", or a step that is unpublished. A prompt shown to Emilio is a draft until he pastes it.
 
-A ping/prompt must be **self-contained**:
+## Build: dispatch, review, close, stop (DEC-144)
 
-```
-never        "the idea you floated"        it was floated here
-never        "disregard my last message"   it may never have been sent
-never        "read step 0c"                unpublished, so it does not exist
-always       the rule, the measurements, and the reasoning, in the prompt itself
-```
+**Only `READY` reqs with their Lane tag go out;** a `NEEDS DECISION` req is settled with Emilio first. Pre-spec a known
+work-list up front (several `READY` reqs published at once); builds still run one at a time.
 
-And do not describe a draft as sent. A prompt shown here is a draft until Emilio
-pastes it; he reads them first and sometimes doesn't send them.
+1. **Dispatch.** `./plan brief req-N` → paste its output to a fresh agent in an isolated worktree (one per req, never a
+   reused session). It builds `req-N` off `main`, runs its own QA, writes `reports/req-N.md` (`BUILDER.md`). On an agent
+   failure, look at its worktree before relaunching (L-052).
+2. **Review.** Read its `## What I ran` — reading the receipts is the mechanical check (§Re-check below); spot-check one
+   test-list item yourself; read the diff for the judgment calls. A diff touching a trigger file (DEC-057 §1: store,
+   model, storage, migration, wide blast radius) → the reviewer, spawned by you, reading the committed diff cold.
+   Gaps → back to the same agent, still its branch.
+3. **Merge gate (DEC-035, amended by DEC-144 §2).** Receipts + your spot-check + the reviewer → merge, ux-feel and
+   persisted-data included. A real migration or bulk rewrite → **Emilio's eyes** first (BUILDER.md ask-gate 2), and
+   remind him to export a fresh backup (Settings → Export, DEC-046). Real-device feel is his, after; it doesn't block.
+4. **Close.** Recording pass, then `./plan closeout req-N` (`rules/CLOSEOUT.md`). It prints a `DEPLOY` line or
+   `no deploy needed`; Emilio runs the DEPLOY line on the server machine. Record "deployed" only from the doctor's output.
+5. **Stop.** End your message with `./plan next`'s CLEAN POINT output, verbatim. Emilio decides the `/clear`. A batch
+   approval (WORKFLOW §Batch mode) only means the resumed session may dispatch the next req without asking again.
 
-## The two-agent build loop (DEC-009)
+**Don't clear** mid-req; when the next req touches the same files; when an agreement lives only in chat (write it to
+`NOW.md` first); or before a tiny next item.
 
-The primary way build work flows now: **you ping code CC directly** (`SendMessage` to its
-session, e.g. `workout-codebase-a4`), it builds and reports back, you verify and close.
+**A live Builder session only for feel work** with Emilio in the loop (unsettled design, DEC-037): opened for it, on
+`BUILDER.md`, closed after. It closes like any req — write the result up as a req doc (+ any `DEC-`), then steps 2–5.
 
-**Choose the lane by whether the DESIGN is settled (DEC-037), not by tag or batch/single:**
-- **Lanes are DEC-055** (batch → throwaway agents; live/feel and watched single reqs → Builder session).
-- **Settled + mechanical → autonomous ephemeral agents (batches).** Spawn a fresh
-  general-purpose build agent **per req in its own isolated worktree** (no `/clear` — there
-  is none; the fix is not reusing a session). It builds branch `req-N` off `main`, runs
-  `./check`, writes `reports/req-N.md`, reports to you; you test by your own hand, run the
-  independent reviewer for shared code, close out, and give Emilio **one test list at the
-  end**. Agent setup gotcha: symlink the code worktree's `node_modules` (L-048); agent must not
-  merge/push.
-- **Unsettled design/feel → Emilio + code CC live.** Code CC reports to *Emilio*; they
-  iterate on screen; fold the result in when it lands. Ephemeral batches free code CC for
-  this to run in parallel. **It closes like any other req:** once the design settles, you
-  write the result up as a req doc (+ any `DEC-` for what was decided), then run the normal
-  gate + `closeout` — the live iteration is the build, not a bypass of the record.
-- **Functional single reqs → the planning-driven loop below**, Emilio at the gates.
+**Report findings during the run and reflect at the end** — patch this file / a `DEC-`/`L-`.
 
-**Precondition — only READY, tagged reqs enter the loop.** A req is pingable only when it is
-`READY` (no open decisions) and carries its **Gate** tag (functional / ux-feel / persisted-data /
-infra — set in the req header at spec time). A `NEEDS DECISION` req is resolved with Emilio
-*before* it enters the loop — never ping an underspecified req and let code CC stall on the
-question mid-build.
-
-The full cycle:
-
-```
-1. publish first    the req's doc + a current NOW.md must be on main — CC only sees the last publish
-2. ping             ONLY after the receipt: `git log main..planning` empty (or `plan status` "fully
-                    published"). Never tell CC work is "on main" from recall — that's L-019. Then
-                    SendMessage "build req-NN"; CC reads handoff/work/req-NN-*.md itself
-3. build            CC builds on a branch, reports back (SendMessage); notify_when_idle as backstop
-4. review           read the diff + the failure-case test yourself — "done" is a signal, not proof
-5. loop back        gaps → SendMessage CC to fix (still its branch); not a new decision, just the spec
-6. verify           run the gate; browser-test where behaviour only shows in the running app
-7. merge gate       your own testing (DEC-035, below)
-8. closeout         plan closeout req-NN  (yours, after the gate)
-9. maintain         immediately: prune NOW.md (it is ≤50 lines — cut a line for every line you add,
-                    in the SAME edit; don't defer it to the save-drift warning), write SHIPPED, publish
-10. stop            do not auto-start the next; wait for Emilio's trigger
-```
-
-**The merge gate — you merge on your own testing (DEC-035; see it for the full model, both
-carve-outs, and the throwaway-worktree method).** Operationally: test everything reachable by your
-own hand — `node --test` / `./check`, a **throwaway git worktree of the branch** (symlink the
-code worktree's `node_modules` (L-048), stays inside DEC-005), the acceptance checks, browser where
-reachable — don't trust CC's pasted `./check`. All green → merge, persisted-data and ux-feel
-included (persisted-data *thoroughly* — migration round-trips, anti-clobber/corruption tests). Only
-the genuinely-untestable (real-device gym feel) is left for Emilio after, and it does not block.
-Two guards before an autonomous merge (DEC-035): a real migration / bulk rewrite of stored records
-→ **Emilio's eyes** (CLAUDE.md ask-gate #2 fires regardless); anything touching store / model /
-storage / migration or wide blast radius → an **independent reviewer subagent you (not code CC)
-spawn**, reading the committed diff cold — skip it for trivial reqs.
-
-**Back up before you touch his data (DEC-046).** The store has no undo and no automatic backup.
-Before merging any persisted-data / migration req, remind Emilio to **export a fresh backup first**
-(Settings → Export); and periodically remind him to keep one.
-
-**Ask batch or single at the start of every run (DEC-035); never assume, a mode holds for that run.**
-- **Single** — one req: test all reachable → merge if green → complete → stop.
-- **Batch** — build → test all reachable → merge → complete → continue to the next until the batch is
-  done, no per-req pause. Choosing batch is the approval for continuous building AND for skipping
-  `/clear` between the batch's reqs (supersedes the "batch needs a separate OK" step above).
-
-**`/clear` code CC between reqs — a manual step (no programmatic `/clear` exists; the
-claude-code-guide finding is recorded in DEC-037).** In single mode, at each close tell
-Emilio: *"req-NN closed — `/clear` code CC, then say build the next."* Don't re-investigate
-automating it (the only alternative, a fresh `claude` session per req, changes its `SendMessage`
-address each time). A batch skips the clears — its fresh-agent-per-req construction (DEC-037) gives
-the clean context a `/clear` would — and **choosing batch is itself the approval** (DEC-035);
-don't ask a separate per-batch OK, and don't assume one batch's approval carries to the next run.
-
-**Pre-spec a known work-list; don't spec one-at-a-time reactively.** When the reqs are already
-known (an audit's findings, a batch of small fixes), write and publish several `READY` req docs
-*up front* — the planning side parallelizes even though builds still run one at a time. In the
-2026-09-12 audit run each req was specced only after the previous merged, which serialized planning
-needlessly. This is separate from build-batching (skipping `/clear`, above) — pre-speccing needs no
-Emilio OK; it's just getting the specs ready ahead of the loop.
-
-**Either side stops** for a question; you stop at a human gate. **Loop-hang recovery:** if the
-idle notice fires but the branch has no ready commit, CC probably stopped to ask Emilio in its own
-session — surface *"CC went idle without a ready branch — did it hit a question?"*, don't wait blind.
-
-**The idle notice trails CC's report — CC's `SendMessage` report is the real completion signal.**
-The `notify_when_idle` echo fires on CC's *prior* turn's idle, so its harness summary names the req
-you already handled (looks "stale"). Don't act on the idle notice as a completion — act on CC's
-report message. Keep `notify_when_idle` only as the **stall backstop** (the req-40 usage-limit case:
-CC went idle *without* reporting). Setting it on every dispatch just adds trailing echoes.
-
-**Report findings during the run and reflect at the end** — patch this file / a `DEC-`/`L-`. The
-loop improves by use.
-
-## Handing over a requirement — the four parts (still used when Emilio pastes, not the loop)
+## Handing over a requirement — the four parts (when Emilio pastes to a live Builder)
 
 ```
 1. what it's about        2-4 sentences, plain
@@ -303,7 +212,7 @@ loop improves by use.
 ```
 
 **Step 3 is the one that gets skipped.** A requirement written earlier goes stale
-within hours — CC moves the codebase between conversations. Rescan the specific
+within hours — agents move the codebase between conversations. Rescan the specific
 things the requirement asserts: file paths, function names, counts. Say explicitly
 that it still applies, or fix it first. Step 2 is a re-check: if the tag says
 `NEEDS DECISIONS`, it doesn't go over at all.
@@ -324,13 +233,8 @@ cd <code> && ./plan publish && git push origin main planning   # publish docs to
 Run each as a separate tool call, not one long `&&` chain across a paste boundary. Report
 what landed in one line; don't narrate every step.
 
-**You drive the code-worktree CC by pinging it** (`SendMessage`), not by handing Emilio a
-prompt (the two-agent loop). A ping **must be self-contained** (see the CC-knows section)
-and **name its branch** — the code worktree may not be on the requirement's branch when a
-test is due.
-
-**The only things you hand Emilio now:** the `/clear` reminder at each close, the migration
-carve-out (a real migration or bulk rewrite → his eyes before merge, DEC-035), a genuine
+**The only things you hand Emilio now:** the DEPLOY line and the CLEAN POINT at each close, the
+migration carve-out (a real migration or bulk rewrite → his eyes before merge, DEC-035), a genuine
 decision, or a command your own grant blocks.
 Fenced blocks are for those and for code; comparisons and tables go in prose, never in a
 fence used to align columns.
@@ -370,29 +274,29 @@ and *what now*; the file says *why*.
 1. the answer                     1-3 sentences
 2. detail, only if it changes     optional
    his decision
-3. what's next, if anything       a `/clear` reminder, the migration carve-out,
+3. what's next, if anything       the DEPLOY line, the CLEAN POINT, the migration carve-out,
                                   or a decision he owns — else nothing
 ```
 
 You run the git and drive the loop yourself, so most turns end with a one-line note of
 what you saved/published/merged — not a command block. Emilio has to act only for a
-`/clear`, the migration carve-out, or a decision. The test before sending:
+deploy, a `/clear`, the migration carve-out, or a decision. The test before sending:
 **does this sentence change what Emilio does next?** If no, it belongs in a file.
 
 ## Reports come back in `reports/`, not in `handoff/`
 
 ```
-planning -> CC     handoff/              requirements and rules, via plan publish
-CC -> planning     reports/req-NN.md     in the code repo, committed on the work's branch
+planning -> agent  handoff/              requirements and rules, via plan publish
+agent -> planning  reports/req-NN.md     in the code repo, committed on the work's branch
 ```
 
-`handoff/` is read-only to Claude Code by design; a work report is an artefact of a
+`handoff/` is read-only to build agents by design; a work report is an artefact of a
 session, not project truth, so it belongs in the code repo beside the diff it
 describes. Don't build a mailbox inside `handoff/`.
 
 ## Sometimes work happens outside the workflow — fold it in when the report arrives
 
-Sometimes Emilio and CC start on something straight away, with no requirement yet —
+Sometimes Emilio and a live Builder start on something straight away, with no requirement yet —
 he knows what he wants and wants it done. Normal is still normal; this is a named
 exception. When the report lands, treat it exactly like a requirement that was
 `READY` and got built: review it, record decisions in `DECISIONS.md`, and if it's
@@ -422,7 +326,7 @@ path it came in on.
   next two steps.
 - **Don't run ahead.** Verifying something is not permission to merge it. Ask.
 - **Expand your own shorthand.** `DEC-`/`L-`/`req-NN` are fine in files and in
-  prompts to CC. In conversation, say what the decision was.
+  prompts to agents. In conversation, say what the decision was.
 - **Concise and blunt.** Short sentences, no preamble, no recap.
 - **Answer "which is best" with an answer** — recommend, give the deciding reason,
   note the honest cost.
@@ -452,22 +356,22 @@ of this app: **history is the record, the routine is the user's plan, and the ap
 invents data it doesn't have** (DEC-096). Trust in the record beats every convenience that would fabricate
 one.
 
-## Re-check CC's judgment, read CC's mechanics
+## Re-check the agent's judgment, read its mechanics
 
-Split a CC report by kind:
+Split a build agent's report by kind:
 
 - **Mechanical / deterministic** — the suite passed, `./check` is green,
-  `check_handoff` exits 0, a command printed X. CC runs these and puts the
-  **output** in the report; reading that output **is** the check. Don't re-run a
-  green suite — it only reproduces what CC already showed and costs a round trip.
+  `check_handoff` exits 0, the QA receipts. The agent runs these and puts the
+  **output** in `## What I ran`; reading that output **is** the check. Don't re-run a
+  green suite — it only reproduces what the agent already showed and costs a round trip.
 - **Judgment** — is a test edit a real change or a weakening? is the failure case
   covered or only the happy path? is the root-cause right? does the diff do what
   the report says? These get the second set of eyes, because they are exactly what
-  CC has been wrong about. Judgment is **reading the diff and the real data
+  agents have been wrong about. Judgment is **reading the diff and the real data
   yourself**, never re-executing.
 - **Feel / UX** — genuinely-untestable real-device feel (gym, one-handed). You test all
   you *can* reach and merge on that (DEC-035); Emilio feels the rest *after* and flags
   regressions — it does not block the merge.
 
-The test before re-running anything CC reported: *would running it give an answer
-different from what CC already showed?* If no, read the report.
+The test before re-running anything the agent reported: *would running it give an answer
+different from what it already showed?* If no, read the report.
