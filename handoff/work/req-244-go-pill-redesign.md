@@ -25,11 +25,18 @@ C  bare    [ 1:12 ]                           clock / GO only; "Set 2 of 4 · Ex
 
 Planner recommends **A**: same size class as today, words instead of fractions, nothing removed.
 
-## Code facts (rescanned 2026-10-26, `main` 103678a)
+## Code facts (rescanned 2026-10-30, `main` 2acb12f — after req-239..243)
 
-- Data: `workoutPillState` (`workout-log.js`) → `clock`, `setText` ("set 2/4"), `countText` ("3/7"), `go`
-  (`views/workout/rest.jsx:12-31`). Render: `ui/index.jsx:390-415` — one line `lead · tail`, `.ui-restpill`, GO pulse
-  `.ui-restpill--go`; `skip` replaces the tail with "skip" (`:396`).
+- Data: `workoutPillState` (`workout-log.js:1150-1173`) → `clock`, `current`/`total`, `setText` ("set 2/4", '' before the
+  first logged set), `countText` ("3/7"), `go`, `label`. Wired at `views/workout/rest.jsx:38`. Render: `WorkoutPill`
+  `ui/index.jsx:390-415` — one line `lead · tail`, `.ui-restpill`, GO pulse `.ui-restpill--go`; `skip` replaces the tail with
+  "skip" (`:396`).
+- **Height:** the pill is one line today and the screen reserves exactly that: `--ui-restpill-h` (`ui/ui.css:52`) feeds
+  `.ui-screen--rest` padding (`ui.css:722`); pill rules `ui.css:727-790`. Two lines must grow that reserve with it, or the
+  pill covers the screen's first row (criterion 3).
+- Tests pinning today's text/CSS (expect edits, each justified): `req-222.test.js` (`label` "1:30 · 3/7" — the helper's
+  `label` may stay), `req-186.test.js:317` (`/·skip$/`), `req-152.test.js:124-125` (nowrap, padding formula),
+  `ui/type-scale.test.js:49` (`.ui-restpill__time` size). Showcase: `ui/Showcase.jsx:232`.
 
 ## Scope
 
