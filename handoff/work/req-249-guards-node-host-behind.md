@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144; workflow audit 2026-10-30 B1, B2, B4. No stored-data change.
+**Status: BUILT AND MERGED, 2026-10-30 — branch `req-249` (`dd3be0d`…`466e856`, 3 commits).** (into `wf-2026-10-30`) · **Lane: tooling** · DEC-144; workflow audit 2026-10-30 B1, B2, B4. No stored-data change.
 
 # req-249 — three refusals for 10-30's slips: wrong node, wrong machine, behind origin
 

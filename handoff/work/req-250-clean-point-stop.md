@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144 §1. After req-249 (stacks on its branch).
+**Status: BUILT AND MERGED, 2026-10-30 — branch `req-250` (`8007206`…`b9d007a`, 2 commits).** (into `wf-2026-10-30`) · **Lane: tooling** · DEC-144 §1. After req-249 (stacks on its branch).
 
 # req-250 — every closeout ends at a clean point, printed by code
 
