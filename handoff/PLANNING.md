@@ -324,7 +324,7 @@ path it came in on.
   DESIGN value → bring him the old decision, why, and options. A **P** line or nothing → fix it, report it.
 - **One thing at a time.** Finish the thing in front of you. Don't narrate the
   next two steps.
-- **Don't run ahead.** Verifying something is not permission to merge it. Ask.
+- **Don't run ahead.** Merge on your own testing (DEC-035), then stop at the clean point (DEC-144); never start the next req unasked.
 - **Expand your own shorthand.** `DEC-`/`L-`/`req-NN` are fine in files and in
   prompts to agents. In conversation, say what the decision was.
 - **Concise and blunt.** Short sentences, no preamble, no recap.
