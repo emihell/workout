@@ -2782,3 +2782,5 @@ GO · 5 showcase `["1:12 / Set 2 of 4 · Ex 3 of 7","GO / Set 2 of 4 · Ex 3 of 
 6 pill box 8..74px, overlap with any link/button/input/heading `[]` at 390×844 and 320×640 (screenshots looked at); 0 dialogs,
 0 page errors. Seen: "Ex 1 of 9" on Chest Press opened out of order — req-222's N = done + 1, unchanged; the words make it read
 as "you are on exercise 1" (BACKLOG note). No reviewer: no trigger file. "Ex" stays `(unconfirmed)`. `reports/req-244.md`.
+Deployed 2026-10-30 21:33 (Emilio ran it; the classifier blocks Planner's `./server/deploy`): `live copy: … (main 5483a31
+2026-10-30 21:33:30)` · `doctor: all ok`; pre-deploy backup `workout-20261030-213329-deploy-5483a31.db` integrity ok.
