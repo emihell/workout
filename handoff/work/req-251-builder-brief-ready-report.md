@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144 §2, §5. After req-250 (stacks on its branch).
+**Status: BUILT AND MERGED, 2026-10-30 — branch `req-251` (`93c7751`…`7092d54`, 3 commits).** (into `wf-2026-10-30`) · **Lane: tooling** · DEC-144 §2, §5. After req-250 (stacks on its branch).
 
 # req-251 — one build brief, and closeout refuses a report without receipts
 

@@ -117,6 +117,10 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 
 ## Tooling
 
+- **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
+  non-planning worktree wins", so `CODE_DIR` — and closeout's merge — may point at an agent/scratch worktree. White-sleeve
+  refuses closeout while >1 non-planning worktree exists. Also: `plan ping` still prints the pre-BUILDER.md handover.
+
 - **`plan closeout` exits 1 silently when the req doc has no `# ` title**: `co_title=$(grep -m1 '^# ' …)` under `set -euo
   pipefail` [still there 2026-10-26, `plan:890`]. Fall back to the req id or print why.
 - **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
