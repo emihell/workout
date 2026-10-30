@@ -9,4 +9,5 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 . "$ROOT/server/lib.sh"
+require_server_machine # req-249
 exec node "$ROOT/server/ops-cli.mjs" restore "$@"

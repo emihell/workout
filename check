@@ -23,6 +23,16 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# req-249 (L-065) — first thing: the node on PATH must meet server/config.mjs's NODE_FLOOR (one
+# source, req-235). Below it, node:sqlite has no online `backup` and 7 server tests go red for a
+# reason that has nothing to do with the code (10-30: nvm's default 22.14 under `plan publish`).
+# Compared on `node --version`'s text, so the message names exactly the node that would run.
+nodever="$(node --version 2>/dev/null)" || { echo "check: no node on PATH — run: nvm use" >&2; exit 1; }
+if ! floor="$(node --input-type=module -e "import { NODE_FLOOR_TEXT, nodeVersionOk } from '$HERE/server/config.mjs'; console.log(NODE_FLOOR_TEXT); process.exit(nodeVersionOk(process.argv[1]) ? 0 : 1)" "$nodever")"; then
+  echo "check: node $nodever < floor v${floor:-? (server/config.mjs unreadable)} — run: nvm use" >&2
+  exit 1
+fi
+
 if [ -n "${WORKOUT_SKIP_CHECK:-}" ]; then
   echo "check: SKIPPED — nothing was run (WORKOUT_SKIP_CHECK=$WORKOUT_SKIP_CHECK)" >&2
   echo "check: explicit bypass of the gate; main is unverified." >&2

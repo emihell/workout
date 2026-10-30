@@ -122,5 +122,41 @@ out="$(cd "$CODE" && "$PLAN" status 2>&1)"; rc=$?
 [ $rc -eq 0 ] && ok "status also runs with the nested worktree present (exit $rc)" || bad "status — rc=$rc out=$out"
 git -C "$CODE" worktree remove --force "$CODE/.claude/worktrees/zz-agent-req120"
 
+echo "# save — local planning BEHIND origin/planning (req-249) → refuse, commit nothing; level → commits"
+# A fake origin (bare repo in the sandbox) and a second clone that pushes one commit to its
+# planning: the sandbox's local planning is then one behind after save's own fetch.
+ORIGIN="$SB/origin.git"
+git init -q --bare "$ORIGIN"
+git -C "$CODE" remote add origin "$ORIGIN"
+git -C "$CODE" push -q origin main planning
+OTHER="$SB/other"
+git clone -q -b planning "$ORIGIN" "$OTHER"
+( cd "$OTHER" && git config user.email t@example.com && git config user.name tester \
+    && printf '# other session\n' > handoff/work/req-090-other.md && git add -A && git commit -qm "other session" && git push -q origin planning )
+before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+( cd "$PLAN_WT" && printf '# mine\n' > handoff/work/req-091-mine.md )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked: behind" 2>&1)"; rc=$?
+after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+staged="$(cd "$PLAN_WT" && git diff --cached --name-only)"
+{ [ $rc -eq 1 ] && [ "$before" = "$after" ] && [ -z "$staged" ] \
+    && printf '%s' "$out" | grep -q '1 commit(s) BEHIND origin/planning' \
+    && printf '%s' "$out" | grep -q 'git log --oneline planning..origin/planning' \
+    && printf '%s' "$out" | grep -q 'plan save: refusing — local planning is 1 commit(s) behind'; } \
+  && ok "save refuses when planning is 1 behind origin/planning: exit 1, no commit, nothing staged" \
+  || bad "save should refuse when behind — rc=$rc same_head=$([ "$before" = "$after" ] && echo y || echo n) staged='$staged' out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+( cd "$PLAN_WT" && git merge -q --ff-only origin/planning )
+before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+out="$(cd "$PLAN_WT" && "$PLAN" save "level with origin" 2>&1)"; rc=$?
+after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+{ [ $rc -eq 0 ] && [ "$before" != "$after" ] && printf '%s' "$out" | grep -q 'committed'; } \
+  && ok "save commits once level with origin/planning (exit $rc)" \
+  || bad "save level with origin should commit — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+( cd "$PLAN_WT" && git reset -q --hard HEAD~2 )   # behind origin/planning by one again
+out="$(cd "$CODE" && "$PLAN" status 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'BEHIND origin/planning'; } \
+  && ok "status, 1 behind, still only warns (exit $rc)" || bad "status should only warn — rc=$rc out=$out"
+
 echo
 if [ "$fails" -eq 0 ]; then echo "plan-guards: all checks passed."; else echo "plan-guards: $fails FAILED"; exit 1; fi

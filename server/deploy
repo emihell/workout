@@ -6,6 +6,7 @@
 set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 . "$REPO/server/lib.sh"
+require_server_machine --first-deploy-ok # req-249: before any build or write
 REF="${WORKOUT_DEPLOY_REF:-main}"
 git -C "$REPO" rev-parse --verify --quiet "$REF^{commit}" >/dev/null || die "no $REF in $REPO (run from a worktree of the repo)"
 SHA="$(git -C "$REPO" rev-parse --short "$REF")"
