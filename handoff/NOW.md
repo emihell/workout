@@ -3,8 +3,7 @@
 Updated 2026-10-30. **Shipped: everything through req-252** (batch 7 complete; the workflow update req-249..252 merged + deployed) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** a gym session on batch 7 / coach review. (Done 2026-10-30: `./plan brief` takes `node_modules` from the main
-worktree, BUILDER.md no longer hardcodes a path or node patch. Still `~/projects/workout/` in WORKFLOW/CLOSEOUT/PLANNING (open).)
+**Next:** close out req-253 (plan brief path + multi-line Next), then a gym session on the new build / coach review.
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -14,8 +13,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 
 ## Where things stand (2026-10-30)
 
-- **Nothing in flight.** No branch open, no agent running; the Builder session is being shut down (Emilio). Code + planning
-  worktrees on `main`/`planning` at `52637e6`, clean; old agent worktrees and merged branches removed.
+- **In flight:** req-253 (tooling) dispatched 2026-10-30. Still `~/projects/workout/` in WORKFLOW/CLOSEOUT/PLANNING (Planner, open).
 - **Live = `52637e6`** (through req-252), deployed 2026-10-30 23:06, `doctor: all ok`; CI run 41134719643 green.
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
