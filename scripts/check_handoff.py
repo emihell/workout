@@ -616,9 +616,11 @@ def check_size_claims(repo: str, ref: str) -> list[Finding]:
 # ------------------------------------------------- check 3: NOW.md's Next line
 
 # req-250 (DEC-144 §1) — every closeout is a clean point, and `./plan next` prints the
-# resume line from NOW.md's `**Next:**` line on main. So NOW.md must carry exactly one
-# line starting `**Next:**`: none and `plan next` has nothing to print, two and it can't
-# tell which is current. A missing NOW.md is not this check's to report.
+# resume line from NOW.md's `**Next:**` paragraph on main: the `**Next:**` line plus the
+# lines after it up to a blank line or one starting `#`, `- ` or `**`, joined (req-253). So
+# NOW.md must carry exactly one line starting `**Next:**`: none and `plan next` has nothing
+# to print, two and it can't tell which is current. A missing NOW.md is not this check's to
+# report.
 NEXT_LINE_PREFIX = "**Next:**"
 
 

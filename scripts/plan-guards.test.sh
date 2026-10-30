@@ -12,7 +12,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SB="$(mktemp -d)"
+SB="$(cd "$(mktemp -d)" && pwd -P)"   # physical path: `git worktree list` prints it so (req-253)
 trap 'rm -rf "$SB"' EXIT
 fails=0
 ok()  { printf 'ok   - %s\n' "$1"; }
@@ -44,6 +44,32 @@ out="$(cd "$CODE" && "$PLAN" next 2>&1)"; rc=$?
   && ok "next, clean + published: prints CLEAN POINT and the Next line from main (exit $rc)" \
   || bad "next should print CLEAN POINT — rc=$rc out=$out"
 printf '%s\n' "$out" | sed 's/^/    | /'
+
+# req-253: the Next is a paragraph. Each case commits a NOW.md to main (main ahead of planning
+# is still a clean point) and resets main back afterwards.
+next_with_now() {  # $1 = NOW.md text; prints `plan next`'s output
+  ( cd "$CODE" && printf '%s' "$1" > handoff/NOW.md && git commit -qam "now fixture" )
+  ( cd "$CODE" && "$PLAN" next 2>&1 )
+  git -C "$CODE" reset -q --hard HEAD~1
+}
+echo "# next — req-253: a two-line Next paragraph is joined, up to the blank line"
+out="$(next_with_now $'# Now\n\n**Next:** a b\ncontinued c\n\n## X\nnot this\n')"
+printf '%s' "$out" | grep -qxF '  Planner: resume from handoff/NOW.md (Next: a b continued c)' \
+  && ok "next, two-line Next: prints '(Next: a b continued c)'" \
+  || bad "next two-line Next — out=$out"
+printf '%s\n' "$out" | grep 'Planner:' | sed 's/^/    | /'
+echo "# next — req-253 failure case: the paragraph stops at a '- ' bullet or a '**' line"
+out="$(next_with_now $'**Next:** a b\ncontinued c\n- bullet\nmore\n')"
+printf '%s' "$out" | grep -qxF '  Planner: resume from handoff/NOW.md (Next: a b continued c)' \
+  && ok "next stops before '- bullet'" || bad "next must stop at '- bullet' — out=$out"
+printf '%s\n' "$out" | grep 'Planner:' | sed 's/^/    | /'
+out="$(next_with_now $'**Next:** a b\ncontinued c\n**Other:** no\n')"
+printf '%s' "$out" | grep -qxF '  Planner: resume from handoff/NOW.md (Next: a b continued c)' \
+  && ok "next stops before '**Other:**'" || bad "next must stop at '**Other:**' — out=$out"
+printf '%s\n' "$out" | grep 'Planner:' | sed 's/^/    | /'
+out="$(next_with_now $'**Next:** a b\ncontinued c\n# Heading\n')"
+printf '%s' "$out" | grep -qxF '  Planner: resume from handoff/NOW.md (Next: a b continued c)' \
+  && ok "next stops before '# Heading'" || bad "next must stop at '# Heading' — out=$out"
 
 echo "# next — planning tree dirty (req-250 failure case) → no CLEAN POINT"
 ( cd "$PLAN_WT" && printf 'scratch\n' > handoff/scratch.md )
@@ -198,10 +224,26 @@ count="$(printf '%s\n' "$out" | grep -c 'PATH=\|node_modules\|commit early\|do n
     && printf '%s' "$out" | grep -qF 'git checkout -b req-050 main' \
     && printf '%s' "$out" | grep -qF 'Read handoff/BUILDER.md first and follow it' \
     && printf '%s' "$out" | grep -qF 'export PATH="$HOME/.nvm/versions/node/v22.23.4/bin:$PATH"' \
-    && printf '%s' "$out" | grep -qF 'ln -s ~/projects/workout/workout-codebase/node_modules node_modules'; } \
-  && ok "brief req-050: 4 mechanical lines, req path, base main, BUILDER.md, node v22.23.4 from .nvmrc (exit $rc)" \
+    && printf '%s' "$out" | grep -qF "ln -s $CODE/node_modules node_modules" \
+    && printf '%s' "$out" | grep -qF "no deps dir in $CODE"; } \
+  && ok "brief req-050: 4 mechanical lines (no-deps warning included), req path, base main, BUILDER.md, node v22.23.4, main worktree's path (exit $rc)" \
   || bad "brief req-050 — rc=$rc count=$count out=$out"
 printf '%s\n' "$out" | sed 's/^/    | /'
+echo "# brief — req-253: an extra top-level worktree on another branch, listed after main, is not the code dir"
+EXTRA="$SB/extra"
+git -C "$CODE" worktree add -q -b scratch "$EXTRA" main
+mkdir "$CODE/node_modules"   # untracked here: the fixture has no .gitignore, so cleaned up below
+out="$(cd "$EXTRA" && HOME="$FAKEHOME" "$PLAN" brief req-050 --base main 2>&1)"; rc=$?
+count="$(printf '%s\n' "$out" | grep -c 'PATH=\|node_modules\|commit early\|do not merge')"
+{ [ $rc -eq 0 ] && [ "$count" -eq 4 ] \
+    && printf '%s' "$out" | grep -qF "ln -s $CODE/node_modules node_modules" \
+    && ! printf '%s' "$out" | grep -qF "$EXTRA" \
+    && ! printf '%s' "$out" | grep -q 'no deps dir'; } \
+  && ok "brief from the extra worktree names main's path, no warning with deps present (exit $rc)" \
+  || bad "brief with extra worktree — rc=$rc count=$count out=$out"
+printf '%s\n' "$out" | grep 'ln -s' | sed 's/^/    | /'
+rmdir "$CODE/node_modules"
+git -C "$CODE" worktree remove --force "$EXTRA" && git -C "$CODE" branch -q -D scratch
 out="$(cd "$CODE" && HOME="$FAKEHOME" "$PLAN" brief 050 --base planning 2>&1)"; rc=$?
 { [ $rc -eq 0 ] && printf '%s' "$out" | grep -qF 'git checkout -b req-050 planning'; } \
   && ok "brief 050 --base planning: names the base (exit $rc)" || bad "brief --base — rc=$rc out=$out"
