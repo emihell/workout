@@ -274,9 +274,15 @@ and *what now*; the file says *why*.
 1. the answer                     1-3 sentences
 2. detail, only if it changes     optional
    his decision
-3. what's next, if anything       the DEPLOY line, the CLEAN POINT, the migration carve-out,
-                                  or a decision he owns — else nothing
+3. **Your move:**                 ALWAYS last, always present — a numbered list of what Emilio
+                                  does: run the DEPLOY line, /clear + paste the resume line,
+                                  the migration carve-out, a decision he owns. Nothing for him
+                                  → "Your move: nothing — I'm continuing with X."
 ```
+
+**Your move is a fixed, last section (Emilio, 2026-10-31: "be clear with the structure, and always finish with a
+'Todo:' … where you tell me what i should do, like clearing context").** A raw tool block (`./plan next`) never stands
+alone: say in one plain line what it means, and put the CLEAN POINT resume line inside Your move as the thing to paste.
 
 You run the git and drive the loop yourself, so most turns end with a one-line note of
 what you saved/published/merged — not a command block. Emilio has to act only for a
