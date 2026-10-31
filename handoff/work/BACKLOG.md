@@ -15,12 +15,13 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 
 ## Held — READY, waiting for Emilio's go
 
-- Nothing held. Batch 7 (req-239..244) shipped 2026-10-30.
+- **The fix batch (DEC-155)**, in order: req-256 (built, review done, AC2 on the server pending) → req-255 → req-257..265.
+  The "Small issues from reviews" and §Tooling items below that became reqs are marked → req-N.
 
 ## Phase 1 — the in-gym flow
 
 **Open, needs a call or a spec**
-- **Change exercise across types** (req-242 review, latent): a no-history change keeps the item's sets/reps/rest whatever the
+- → **req-264 (a)**, decided DEC-155 §2. **Change exercise across types** (req-242 review, latent): a no-history change keeps the item's sets/reps/rest whatever the
   types — strength → cardio keeps 3 × "8" (Add makes 1 set); timed → strength keeps per-set `durations`. No kg is invented.
   *Q (Emilio):* reset to the new type's default plan when the type changes, or keep as is?
 - **Changing the loop length moves "this week"** [measured 2026-10-26: `loopWeeksState` drops slots past the new length,
@@ -53,6 +54,9 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 - **"Short on time? skip X"** (run 5 item 28): Coach orders each session so the last item is the one to cut; show it on the overview.
 - **Target text is logged as reps** [measured 2026-10-31, `src/workout-log.js:613-615`]: a "10-12" / "AMRAP" target prefills
   Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`); req-254 C6 refuses such targets until fixed. → **req-256** (READY) fixes the "12 reps" half; the range/AMRAP half stays here.
+- **Duration targets the rule still misreads** (req-256 review, latent): "45s each side", "30s/side", "60s x2", "1:30" read as
+  not-a-duration; "tempo 3s" reads as Duration (`src/progress.js:92`). And `countableReps` on strings is masked by
+  `unreadableTarget` (`progress.js:107-110`) — re-check if req-149 loosens the hold.
 - **Coach's app gaps from the training books** (DEC-150, notes in `workout-data/coach/books/`): a planned effort/RIR target
   per item; rep-range progression in the app's recommendation (req-149); a weekly recovery check-in (5 questions); several
   warm-up sets with kg (req-184 item 10); drop sets / myo-reps; a time for a whole item (the S&S bell trigger); left/right
@@ -62,27 +66,27 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 
 **Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
 one is specced.
-- req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).
-- req-173: the active set edit (SetEditForm) saves a blank kg as 0 with no note (History keeps `''`); an unexplained
+- → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).
+- → req-261. req-173: the active set edit (SetEditForm) saves a blank kg as 0 with no note (History keeps `''`); an unexplained
   `targetWeight: 60` on a seed set after the v8→v9 migration (probably `legacyRecommendations`; not shown to the user).
-- req-171: recalc → Routine → an inner editor loses the Back chain (`navForBase`); a stale `from` id (`/history/<deleted>`)
+- → req-263. req-171: recalc → Routine → an inner editor loses the Back chain (`navForBase`); a stale `from` id (`/history/<deleted>`)
   lands Back on "Not found.".
-- req-220: *(Emilio's call)* the import sheet fills "Replace everything" and leaves "Keep my history" plain. Planner
+- → req-264 (b) (DEC-155 §2); the app-path test gap was fixed by req-226. req-220: *(Emilio's call)* the import sheet fills "Replace everything" and leaves "Keep my history" plain. Planner
   recommends flipping that. Separately, the anti-staleness app-path test doesn't cover History edit/recalc, Swap/Add/timed/Skip, or `applyPlan`.
-- Batch 5: *(Emilio's call)* a missed rep lowers only that set, even on an Easy exercise. 11 rendered tests still remount
+- Missed rep on Easy: kept (DEC-155 §2). 11 remounts: fixed by req-226. Days row → req-264 (c); library chunk → req-265. Batch 5: *(Emilio's call)* a missed rep lowers only that set, even on an Easy exercise. 11 rendered tests still remount
   StoreProvider per screen (move them to the L-051 pattern). The Days row reads long in a multi-week loop. The library chunk
   (264 kB gzip) loads on the first log-screen open.
-- req-222/244: `workoutPosition` N = done + 1, so opening exercise 2 before finishing 1 shows "Ex 1 of 9" — in words
+- → req-261 (DEC-155 §2). req-222/244: `workoutPosition` N = done + 1, so opening exercise 2 before finishing 1 shows "Ex 1 of 9" — in words
   (req-244) it reads as "you are on exercise 1". Emilio's call: done count vs the current row's place.
-- req-222: Add set on a swapped-away exercise isn't counted by `workoutPosition` (the cap hides "5/4" as "4/4",
+- Fixed by req-227; the pre-req-188 double count is dropped (only a workout started before req-188). req-222: Add set on a swapped-away exercise isn't counted by `workoutPosition` (the cap hides "5/4" as "4/4",
   `workout-log.js:1157`). A pre-req-188 swap counts both items.
-- req-224: Finish computes its time at mount but the store saves at Save (55 min shown, 50 saved). A left-open earlier-day
+- Shown/saved time and auto-complete line fixed by req-227; Back guard → req-262. req-224: Finish computes its time at mount but the store saves at Save (55 min shown, 50 saved). A left-open earlier-day
   workout saved > 6 h after its last set skips req-116's Back-after-Finish guard. Auto-complete shows the shorter Duration
   with no "left open" line.
-- req-225: past one-date swaps are never pruned. An imported swap whose slot routine is missing has no "Back to".
-- req-180 picker: the sticky Cancel/Add N bar has no background. Empty-search grouping by first muscle puts Burpee under Chest.
-- req-188: a fast double tap on Add N or Swap can commit twice. Sets has no upper bound (99999 accepted).
-- Abandon falls below the fold with the overview note open on a long routine (req-107). The `.ui-navlink` inset misaligns a
+- → req-262. req-225: past one-date swaps are never pruned. An imported swap whose slot routine is missing has no "Back to".
+- Sticky bar fixed; Burpee → req-264 (d). req-180 picker: the sticky Cancel/Add N bar has no background. Empty-search grouping by first muscle puts Burpee under Chest.
+- → req-261. req-188: a fast double tap on Add N or Swap can commit twice. Sets has no upper bound (99999 accepted).
+- Browser checks → req-264 (e); cardio `[0]` → req-262. Abandon falls below the fold with the overview note open on a long routine (req-107). The `.ui-navlink` inset misaligns a
   wrapped second line. Apply on a cardio item writes `suggestedWeights` `[]` → `[0]` (not shown).
 
 ## Phase 2 — program creation
@@ -165,25 +169,25 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
   `src/exerciseCatalog.js` (run 3, run 4 `scripts/build_import.mjs`). → **req-254** shipped 2026-10-31: `./server/ops plan build`.
 - **`plan build` C5 opt-in for a Coach-estimate kg** → **req-255** (READY, DEC-153).
-- **`plan build` warns over every live routine** (run 5 item 7), not only the changed items: run 3's plan left supersets /
+- → **req-260**. **`plan build` warns over every live routine** (run 5 item 7), not only the changed items: run 3's plan left supersets /
   EMOM in 6 untouched routines; run 5 found them with its own `scripts/dec146_scan.py`.
-- **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
+- → **req-257**. **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
   non-planning worktree wins", so `CODE_DIR` — and closeout's merge — may point at an agent/scratch worktree. White-sleeve
   refuses closeout while >1 non-planning worktree exists. Also: `plan ping` still prints the pre-BUILDER.md handover.
 
-- **`plan closeout` exits 1 silently when the req doc has no `# ` title**: `co_title=$(grep -m1 '^# ' …)` under `set -euo
+- → **req-257**. **`plan closeout` exits 1 silently when the req doc has no `# ` title**: `co_title=$(grep -m1 '^# ' …)` under `set -euo
   pipefail` [still there 2026-10-26, `plan:890`]. Fall back to the req id or print why.
-- **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
+- → **req-258**. **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
   `dates-tz.cases.js` defines (L-045).
-- **`plan qa --empty`**: serve a true first-time user. The seed is re-injected whenever storage is empty (`scripts/qa.mjs`).
+- → **req-259**. **`plan qa --empty`**: serve a true first-time user. The seed is re-injected whenever storage is empty (`scripts/qa.mjs`).
 - **A hanging test hangs the gate** (req-239 report, [measured 2026-10-26]): `./check:100` runs `node --test` with no
   `--test-timeout`, and `deploy.yml` sets no `timeout-minutes` (GitHub's default is 6 h). A regression that leaves a rendered test
   waiting (req-239's mutation did) never goes red. With a timeout, the hang is a cancelled test → exit 1 (a 1.5 s probe: exit 1).
   → **req-248** (READY).
-- **Fail `./check` when the test count drops** (req-248 report): one pre-watchdog run ended at 2096 of 2108 tests — req-10's
+- → **req-258** (as "no file runs zero tests"). **Fail `./check` when the test count drops** (req-248 report): one pre-watchdog run ended at 2096 of 2108 tests — req-10's
   12 rendered tests missing, no ✖ line for the file; red only by luck (an unrelated unit failure). Not reproduced. A floor
   (e.g. the count can't fall below main's without a named test edit) would catch a silently dropped file.
-- **CI actions on Node 20** (req-238 run 40354463101): `actions/checkout@v4` / `setup-node@v4` are deprecated, forced to Node 24.
+- → **req-258**. **CI actions on Node 20** (req-238 run 40354463101): `actions/checkout@v4` / `setup-node@v4` are deprecated, forced to Node 24.
   Bump both to their current majors when it's convenient.
 - **[optional] Slim the readiness taxonomy** (`scripts/check_handoff.py`). Only if it gets in the way.
 
