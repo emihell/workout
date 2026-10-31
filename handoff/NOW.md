@@ -4,7 +4,7 @@ Updated 2026-10-31. **Shipped: everything through req-253** (batch 7 complete; t
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 **Next:** Coach review 2026-10-31 → DEC-146..148: brief split (COACH · GOALS · LESSONS), CAPABILITIES gained how a plan runs
-in the workout; `EVIDENCE.md` in progress (research agent → Emilio reviews). Next Coach run (server Mac): move LESSONS'
+in the workout; `EVIDENCE.md` done (DEC-149, Emilio reviews). Next Coach run (server Mac): move LESSONS'
 last section into `CLIENT.md`; rebuild run 4's `import.json` (supersets in notes, DEC-146); the 10-30 barbell session after
 Emilio's 4 answers (`CLIENT.md` §New). Then spec the plan-builder (BACKLOG §Tooling).
 
@@ -29,7 +29,6 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   served change (CLOSEOUT step 4, L-063). Every req → a throwaway agent; stop at every closeout (DEC-144).
 
 **Deploy:** `./server/deploy` is blocked for Planner by the auto-mode classifier: Emilio runs it (`! ./server/deploy && ./server/doctor`).
-
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
 path for copy/comment-only reqs (tests + one SHIPPED line) — open.
