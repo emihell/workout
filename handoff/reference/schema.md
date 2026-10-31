@@ -8,12 +8,16 @@ in the same pass.
 **Updated 2026-10-10 (Planner)** for req-193/194/211/212 from the rescans of `main` 98f94cf (Explore agents, cited per
 line below). Not re-measured from a golden state; a builder touching the schema re-measures.
 
+**Updated 2026-10-31 (Planner, audit 2026-10-30 F-DRIFT-7)** from `main` `78d6bc9`: the server DB, the sync and device keys,
+the load pointer. Read this session, cited per line.
+
 ## Keys, load and write rules
 
 - **Live key** `workout-mvp-v9` (`SCHEMA_VERSION = 9`). **Legacy keys** `-v8`…`-v5` are read for migration and removed
   **only after** the v9 value is read back and confirmed persisted (req-06).
 - **Load:** read v9, else the first legacy key → `JSON.parse` → `migrateState(…, { legacy })` — **version-branched**:
-  `legacy` is true for any legacy key or a v9 key whose `schemaVersion !== 9` (`storage.js` loadState), and for an import,
+  `legacy` is true for any legacy key or a v9 key whose `schemaVersion !== 9` (`persistence.js:187` loadState; since
+  req-164 `storage.js` is only a re-export shim, `storage.js:1-8`), and for an import,
   `backupIsLegacy(raw)` (`exchange.js`). Callers **must** pass `legacy` for pre-v9 input (comment at the signature). A
   missing schedule anchor is defaulted and saved once (req-114); a non-object parse is rejected as unreadable.
 - **Unreadable** (DEC-032): a parse/migrate throw latches the lock; `saveState` refuses every write. The one way out is
@@ -36,7 +40,16 @@ writers). Writers: **M** = `migrateState` (load/import, model.js), **S** = Start
 - `workout-mvp-unreadable-<ISO>[~n]-<v9|v8|…>`: the raw copy kept on an unreadable-state Import (DEC-086); never read or
   deleted by the app. There are req-157-era copies without the suffix.
 - `workout-mvp-analytics` (analytics.js).
-- `workout-dev-notes-v1`, `workout-feedback-enabled-v1` (dev/dev-notes.js).
+- `workout-dev-notes-v1`, `workout-feedback-enabled-v1`, `workout-dev-tools-v1` (`dev/dev-notes.js:21,25,196`).
+- `workout-sync-v1` — the sync meta (`sync/engine.js:47`, defaults `:57-68`): `user` (logged in here; null → login
+  screen), `syncedUser` (who this data last synced as), `rev` + `revId` (the server revision the data is based on; the id
+  because a restore can reuse a number), `syncedAt`, `dirty` + `dirtyMark` (a local change not yet sent; which tab marked
+  it), `notesDirty`, `expired` (server said 401), `diskBehind` (the last state save failed). Not the state itself.
+- `workout-routine-kg-filled` — an ISO time, set once the routine-kg fill has run on this device (`routine-kg-fill.js:19-21`);
+  deliberately outside `workout-mvp-` so the unreadable-copy scan and legacy cleanup skip it.
+
+Not `localStorage`: `workout-mvp-backup` is the Export file's `kind` (`exchange.js:7`); `workout-app-` prefixes the
+service-worker cache names (`sync/sw.js:17`).
 
 `sessionStorage`: `workout-mvp-nav-2` (a one-element array: the last visited path, route.js).
 
@@ -110,6 +123,28 @@ State (`workout-mvp-v9`):
 - `setDraft {key, weight, reps, effort, durationSec?, note}` (L, req-125).
 - `autoFinishDismissed` (bool, req-116).
 - `restEndsAt` / `restPausedRemaining` (L).
+
+## Server DB (`workout.db`)
+
+SQLite (`node:sqlite`), one file per server in the data dir — `~/dev/workout/workout-data/` by default, overridable by
+`WORKOUT_DATA_DIR`, refused inside a git worktree (`server/config.mjs:14-17,40,63`). Schema `server/db.mjs:13-75`;
+`PRAGMA user_version` = 1 (`DB_SCHEMA_VERSION`, `:11`; any other version refuses to open, `:86-91`). New tables/columns
+are additive and added on open, no version bump (`:47-64`, `addRevisionColumns` `:100-113`). Every user-data query filters
+on `user_id` (`:3-4`).
+
+| Table | Columns | Meaning |
+|---|---|---|
+| `users` | `id`, `username` UNIQUE, `password`, `disabled` (0/1), `created_at` | Invite-only accounts. `password` = `scrypt$N$r$p$salt$hash` (`auth.mjs:3,38-39`). |
+| `invites` | `code_hash` PK, `created_at`, `expires_at`, `used_by` → users, `used_at` | Codes stored hashed; valid `INVITE_DAYS` = 7 (`auth.mjs:13,90-92`). |
+| `sessions` | `token_hash` PK, `user_id`, `created_at`, `expires_at` | Login cookie, hashed; `SESSION_DAYS` = 90, pushed out on use (`auth.mjs:12`, `app.mjs:73,192`). |
+| `revisions` | PK (`user_id`, `rev`); `state` (the whole v9 JSON), `base_rev`, `merged` (0/1), `conflicts` (JSON list, `'[]'` = none), `created_at`, `source`, `note` | One row per accepted push — the full document each time (`store.mjs:207-208`). `source`/`note`: who wrote it and why, set by `./server/ops plan apply/revert`, null for a device push (`db.mjs:95-99`, req-245). The revision id is a hash of `rev|created_at|state` (`store.mjs:77-79`). |
+| `pruned_revisions` | PK (`user_id`, `rev`, `rev_id`) | A revision removed by pruning, so a device still based on it reads `pruned`, not `restored` (`store.mjs:274-288`). |
+| `restores` | `user_id`, `rev`, `at` | One row per user each time `./server/restore` puts a backup back: the rev the copy ended at (`db.mjs:56-64`, `store.mjs:240-242`). |
+| `notes` | `id`, `user_id`, `route`, `timestamp`, `text`, `context` (JSON object), `created_at`; UNIQUE (`user_id`, `timestamp`, `text`) | The feedback notes from every screen (`dev/dev-notes.js` record, `store.mjs:303-312`); the UNIQUE makes a resend a no-op. |
+
+**Pruning** (`store.mjs:247-271`, run in the write that adds a revision): drops revisions older than `PRUNE_DAYS` = 14,
+except the newest of each UTC day, any with conflicts, the current one, any a `restores` row names, and any with `source`
+set (Coach's changes stay revertable). Size grows with history on every push — audit 2026-10-30 F-SYNC-2 (BACKLOG).
 
 ## Recommendation increments (`progress.js`)
 

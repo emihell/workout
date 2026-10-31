@@ -16,7 +16,7 @@ Then the DEC-154 features: cues + notes → supersets → intervals. Build here;
 - req-256 AC2: from branch `req-256`, `node scripts/req-256-targets.mjs --db <data>/workout.db --user <id> --rev 79` →
   expect `identical: true`; then `./plan closeout req-256` (app change → deploy). Or Emilio: "merge without AC2".
 - Deploys for every merged app req: `! ./server/deploy && ./server/doctor`.
-- Data dir on this laptop is `~/projects/workout/workout-data` (no DB here); docs still say `~/dev/workout/` (Planner, open).
+- Data dir: server `~/dev/workout/workout-data` (`server/config.mjs:14`, docs right); this laptop keeps `~/projects/workout/workout-data`, no DB.
 
 **Emilio's calls before their req dispatches:** none open (req-263 → READY, DEC-155 §6). All `(unconfirmed)` calls
 accepted (DEC-155 §4); blank kg stays 0 until new functionality touches it (§5).
