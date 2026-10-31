@@ -86,7 +86,7 @@ describe('item 2 — in-workout back link reads the workout name', () => {
   it('source: ExercisesLink falls back to "Workout", never "Exercises"', () => {
     const shared = read('views/shared.jsx')
     assert.match(shared, /\{name \|\| 'Workout'\}/)
-    assert.equal((read('views/workout/item.jsx').match(/<ExercisesLink routineId=\{routineId\} name=\{active\.snapshot\?\.routineName\} \/>/g) || []).length, 2)
+    assert.equal(((read('views/workout/item.jsx') + read('views/workout/review.jsx')).match(/<ExercisesLink routineId=\{routineId\} name=\{active\.snapshot\?\.routineName\} \/>/g) || []).length, 2)
   })
 })
 

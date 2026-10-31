@@ -98,7 +98,7 @@ describe('History detail exercise meta (QA-4)', () => {
 // 375 / 430px (reports/req-152.md); these only stop the class or the CSS silently going.
 describe('rest pill clears the top row (QA-2 source guard; rects measured in the browser)', () => {
   it('each <Screen> rendering <WorkoutPill /> carries ui-screen--rest', () => {
-    for (const rel of ['./views/workout/item.jsx', './views/workout/overview.jsx', './views/workout/finish.jsx']) {
+    for (const rel of ['./views/workout/review.jsx', './views/workout/overview.jsx', './views/workout/finish.jsx']) {
       const lines = read(rel).split('\n')
       // req-186 — the pill was renamed (RestPill → WorkoutPill); fail if none is found, so a
       // rename can't turn this guard vacuous again.

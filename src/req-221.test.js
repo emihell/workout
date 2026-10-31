@@ -47,7 +47,8 @@ async function harness(payload = DB) {
     return child
   }
   view = await render(h(StoreProvider, null, h(Screen), h(ConfirmSheet)))
-  const { WorkoutItemLog, WorkoutItemDone } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemDone } = await importJsx('./views/workout/review.jsx', import.meta.url)
   // One StoreProvider per test (L-051): screens swap inside it.
   const show = (element) => act(async () => captured.setChild(() => element))
   return {

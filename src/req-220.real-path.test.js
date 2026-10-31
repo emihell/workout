@@ -199,7 +199,7 @@ describe('req-226 — the app paths the first run did not reach: no undocumented
     await act(async () => t.store().startWorkout(t.ids.routine))
     const items = t.store().activeWorkout.snapshot.items
     const key = (exerciseId) => items.find((item) => item.exerciseId === exerciseId).routineItemId
-    const views = await importJsx('./views/workout/item.jsx', import.meta.url)
+    const views = await importJsx('./views/workout/index.jsx', import.meta.url)
     const { Workout } = await importJsx('./views/workout/overview.jsx', import.meta.url)
     return {
       press: key(t.ids.press),

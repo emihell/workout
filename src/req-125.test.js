@@ -317,7 +317,7 @@ describe('req-125 draft writer (debounced)', () => {
 })
 
 describe('req-125 no mid-typing reset (static)', () => {
-  const item = readFileSync(new URL('./views/workout/item.jsx', import.meta.url), 'utf8')
+  const item = ['item.jsx', 'item-actions.js', 'item-header.jsx', 'up-next-bar.jsx', 'logged-set-sheet.jsx', 'review.jsx'].map((f) => readFileSync(new URL(`./views/workout/${f}`, import.meta.url), 'utf8')).join('\n')
   const ui = readFileSync(new URL('./ui/index.jsx', import.meta.url), 'utf8')
 
   it('item.jsx reads the draft only in the keyed snapshot (setSeedKey + carry), and keys the form by it', () => {

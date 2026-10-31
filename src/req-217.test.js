@@ -116,7 +116,8 @@ const settle = () => act(async () => new Promise((resolve) => setTimeout(resolve
 async function harness(payload = DB) {
   const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
   const { useStore } = await import('./store-context.js')
-  const { WorkoutItemLog, WorkoutItemDone } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemDone } = await importJsx('./views/workout/review.jsx', import.meta.url)
   localStorage.clear()
   localStorage.setItem('workout-mvp-v8', JSON.stringify({ ...payload, activeWorkout: null }))
   const captured = {}
