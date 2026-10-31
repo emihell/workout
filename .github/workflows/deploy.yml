@@ -22,8 +22,10 @@ jobs:
     # a synchronous one (its 900 s watchdog is longer than this) is caught here.
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # req-258: v7 of both (v4 ran on a deprecated Node, forced onto Node 24 — run 40354463101).
+      # v5–v7 notes read: no input this job uses (node-version-file, cache) was renamed or removed.
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm

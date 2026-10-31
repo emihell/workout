@@ -6,9 +6,19 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const cases = fileURLToPath(new URL('./dates-tz.cases.js', import.meta.url))
+
+// req-258 (L-045): the guard asserts the EXACT number of cases, read from the cases file
+// itself — every `it(` (and `it.skip(` / `it.only(` / `it.todo(`, which must not slip by as
+// "fewer ran") declared there. Adding a case needs no second edit here. `# pass [1-9]` used
+// to pass with 1 of 10 cases run, or with none (a file that exits early counts as one pass).
+const caseCount = (readFileSync(cases, 'utf8').match(/^\s*it(?:\.(?:skip|only|todo))?\(/gm) || []).length
+test('dates-tz.cases.js declares at least one case', () => {
+  assert.ok(caseCount > 0, `no it( found in ${cases}`)
+})
 
 for (const tz of ['Europe/Stockholm', 'America/New_York']) {
   test(`date cases pass under TZ=${tz}`, () => {
@@ -21,8 +31,9 @@ for (const tz of ['Europe/Stockholm', 'America/New_York']) {
     })
     const out = `${run.stdout}\n${run.stderr}`
     assert.equal(run.status, 0, out)
-    // Guard a vacuous pass: the cases really ran, and none failed.
-    assert.match(out, /# pass [1-9]/)
-    assert.match(out, /# fail 0/)
+    // Guard a vacuous pass: every declared case really ran and passed, and none failed.
+    assert.match(out, new RegExp(`^# tests ${caseCount}$`, 'm'), out)
+    assert.match(out, new RegExp(`^# pass ${caseCount}$`, 'm'), out)
+    assert.match(out, /^# fail 0$/m, out)
   })
 }
