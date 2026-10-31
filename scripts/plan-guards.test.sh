@@ -25,8 +25,12 @@ git config user.email t@example.com
 git config user.name  tester
 git symbolic-ref HEAD refs/heads/main
 mkdir -p scripts handoff/work
-cp "$ROOT/plan" ./plan
+# req-257: PLAN_SRC=<path> runs the suite against another copy of `plan` (the self-test
+# against main's). Default: this checkout's.
+PLAN_SRC="${PLAN_SRC:-$ROOT/plan}"
+cp "$PLAN_SRC" ./plan
 cp "$ROOT/scripts/check_handoff.py" scripts/check_handoff.py
+cp "$ROOT/.nvmrc" .nvmrc   # req-257: ping now prints `plan brief`, which reads .nvmrc
 printf '# Now\n\nUpdated. **Shipped: req-01.**\n**Next:** build req-050 (fixture)\n' > handoff/NOW.md
 printf '# spec\n' > handoff/work/req-050-onmain.md
 git add -A
@@ -94,6 +98,20 @@ out="$(cd "$CODE" && "$PLAN" ping req-050 2>&1)"; rc=$?
 { [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'ready to hand off'; } \
   && ok "ping req-050 succeeds (exit 0, prints ping)" \
   || bad "ping req-050 should succeed — rc=$rc out=$out"
+
+echo "# ping — req-257: success prints 'ready to hand off' + plan brief's prompt, byte for byte"
+ping_out="$(cd "$CODE" && "$PLAN" ping req-050 2>/dev/null)"
+brief_out="$(cd "$CODE" && "$PLAN" brief req-050 2>/dev/null)"
+printf '%s\n' "$ping_out" | head -1 | grep -qxF 'plan ping: req-050 is on main and planning is fully published — ready to hand off.' \
+  && ok "ping first line: 'ready to hand off'" || bad "ping first line — got [$(printf '%s\n' "$ping_out" | head -1)]"
+[ -n "$brief_out" ] && [ "$(printf '%s\n' "$ping_out" | tail -n +2)" = "$brief_out" ] \
+  && ok "ping after its first line == plan brief req-050, byte for byte" \
+  || { bad "ping body differs from plan brief:"; diff <(printf '%s\n' "$ping_out" | tail -n +2) <(printf '%s\n' "$brief_out") | sed 's/^/    | /'; }
+printf '%s' "$ping_out" | grep -qF 'handoff/BUILDER.md' \
+  && ok "ping names handoff/BUILDER.md" || bad "ping must name handoff/BUILDER.md"
+n_mech="$(printf '%s\n' "$ping_out" | grep -c 'PATH=\|node_modules\|commit early\|do not merge')"
+[ "$n_mech" = 4 ] && ok "ping carries the four mechanical lines (grep -c = 4)" || bad "ping mechanical lines: $n_mech, want 4"
+printf '%s\n' "$ping_out" | sed 's/^/    | /'
 
 echo "# ping — bad id / missing doc"
 out="$(cd "$CODE" && "$PLAN" ping foo 2>&1)"; rc=$?
@@ -339,6 +357,45 @@ rc="$(printf '%s' "$res" | cut -f1)"; last="$(printf '%s' "$res" | cut -f2)"; me
   && ok "closeout req-097 (touches only handoff/ + its report): exit 0, last line 'no deploy needed'" \
   || bad "closeout req-097 should end 'no deploy needed' — rc=$rc merged=$merged last=[$last]"
 printf '    | last line: %s\n' "$last"
+
+echo "# find_worktrees — req-257: a top-level scratch worktree never becomes CODE_DIR"
+# main + ../workout-planning (planning) + ../workout-scratch (scratch) + a nested agent worktree.
+R257="$SB/r257"
+mkdir -p "$R257"
+git init -q "$R257/repo"
+git -C "$R257/repo" config user.email t@example.com
+git -C "$R257/repo" config user.name tester
+git -C "$R257/repo" symbolic-ref HEAD refs/heads/main
+git -C "$R257/repo" commit -q --allow-empty -m init
+git -C "$R257/repo" worktree add -q -b planning "$R257/workout-planning"
+git -C "$R257/repo" worktree add -q -b scratch "$R257/workout-scratch"
+git -C "$R257/repo" worktree add -q -b agent-x "$R257/repo/.claude/worktrees/agent-x"
+fw_case() {  # prints "CODE_DIR=<path>" on stdout; find_worktrees' stderr to $SB/fw.err
+  ( cd "$R257/repo" && _PLAN_NO_MAIN=1 source "$PLAN" && find_worktrees && echo "CODE_DIR=$CODE_DIR" ) 2>"$SB/fw.err"
+}
+out="$(fw_case)"
+[ "$out" = "CODE_DIR=$R257/repo" ] \
+  && ok "main + planning + scratch + nested agent → CODE_DIR is the main worktree" \
+  || bad "CODE_DIR should be $R257/repo — got [$out]"
+printf '    | %s\n' "$out"; sed 's/^/    | stderr: /' "$SB/fw.err"
+grep -qF "$R257/workout-scratch" "$SB/fw.err" && grep -qF "$R257/repo" "$SB/fw.err" \
+  && ! grep -qF 'agent-x' "$SB/fw.err" \
+  && ok "two top-level candidates are listed on stderr (the nested agent is not)" \
+  || bad "expected stderr to list repo + workout-scratch, not agent-x — got [$(cat "$SB/fw.err")]"
+grep -q 'no worktree on main' "$SB/fw.err" && bad "'no worktree on main' must not print when main has one" \
+  || ok "no 'no worktree on main' line when a worktree is on main"
+
+echo "# find_worktrees — req-257: no worktree on main → the old pick (last listed) + a stderr line"
+git -C "$R257/repo" checkout -q -b other
+old_pick="$(git -C "$R257/repo" worktree list --porcelain | awk '
+  /^worktree /{p=substr($0,10)} /^branch refs\/heads\//{ if ($2!="refs/heads/planning" && index(p,"/.claude/")==0) last=p } END{print last}')"
+out="$(fw_case)"
+{ [ -n "$old_pick" ] && [ "$out" = "CODE_DIR=$old_pick" ] \
+    && grep -qxF "plan: no worktree on main — using $old_pick as the code worktree" "$SB/fw.err"; } \
+  && ok "no main worktree → CODE_DIR=$old_pick (last listed) + 'no worktree on main' on stderr" \
+  || bad "no-main case — want $old_pick, got [$out] stderr=[$(cat "$SB/fw.err")]"
+printf '    | %s\n' "$out"; sed 's/^/    | stderr: /' "$SB/fw.err"
+git -C "$R257/repo" checkout -q main
 
 echo
 if [ "$fails" -eq 0 ]; then echo "plan-guards: all checks passed."; else echo "plan-guards: $fails FAILED"; exit 1; fi
