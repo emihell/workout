@@ -74,6 +74,8 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   (2) Apply on a timed bodyweight item writes `suggestedWeights: [0]` over `[]` (`model.js:476`; hidden by `isWeightedType`).
   Nits: a no-op Swap now writes the schedule when stale swaps exist (`state-reducers.js:343-346`); "Update?" offers Apply
   on an all-cardio workout that now does nothing (`recalc.jsx:24-45`); the prune uses the writing device's local today.
+- **req-269 review nit:** `src/req-202.test.js:94` is titled "… History row meta …" but no longer asserts it; the live
+  "with warm-up" History header (`detail.jsx:134`) has no behaviour test. Retitle + add one.
 **Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
 one is specced.
 - → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).
@@ -201,6 +203,8 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   Planner's doc to fix → being written 2026-10-31.
 - **F-SYNC-2 (needs a decision, stage 2):** whole-state sync stores ~1.5 MB/rev at 200 workouts, 7.4 MB at 1,000; phone
   localStorage ~5 MB ≈ 650 workouts, nothing warns (09-24 F-RISK-6). → §Phase 3, with the sync redesign.
+- **Kept check scripts run in the gate or go** (L-071): the req-164/165 golden scripts broke unnoticed for weeks. Run them
+  in `./check` (cheap?) or delete them; list any other `scripts/*` check nothing runs.
 - **Untriaged audit findings check** (L-068): `check_handoff.py` flags any `F-*` id in `audits/*.md` that appears in no
   BACKLOG line, req or SHIPPED entry (or is marked fixed/rejected in a later audit). The 10-30 audit sat untriaged a day.
 - **Workflow "later" list** (DEC-144 §4 "after Phase 1"): DECISIONS split + digest (2,428 lines today); drop the

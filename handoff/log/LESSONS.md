@@ -641,3 +641,9 @@ as `suggestedWeights: [0]`). To QA current-shape data, write it into `workout-mv
 
 `exportBackup(store)` keeps every non-function field (`src/exchange.js` `dataOnly`). In-memory-only state belongs behind a
 getter (req-262's `getFinishedHere()`), never as a plain field on the store.
+
+## L-071 — a check script nothing runs breaks unnoticed  (req-269, 2026-10-31)
+
+`scripts/req-164-golden.mjs` / `req-165-golden.mjs` threw on every tree since req-178 (they `JSON.parse` every stored value;
+req-178's fill marker is a plain timestamp). No gate runs them, so nobody saw. req-269 fixed the read. A script kept as a
+check either runs in `./check` or is deleted; candidate → BACKLOG §Tooling.

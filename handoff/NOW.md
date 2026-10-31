@@ -1,12 +1,12 @@
 # Now
 
-Updated 2026-10-31. **Shipped: everything through req-254, req-257–258, req-266, req-259, req-261, req-268, req-262** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-31. **Shipped: everything through req-254, req-257–258, req-266, req-259, req-261, req-268, req-262, req-269** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 **Next:** the fix + structure batch (DEC-155 §1, §7: fixes, workflow, structure, cleanups before any feature). Serial, one
 throwaway agent per req, stop at each closeout. Done 10-31: req-257, 258, 266, 259. Order:
 1. ~~req-261~~ merged 10-31 (deploy on server) → 2. ~~req-268~~ merged 10-31 →
-3. ~~req-262~~ merged 10-31 → 4. **req-269** dead code + duplicates → 5. **req-270** split
+3. ~~req-262~~ merged 10-31 → 4. ~~req-269~~ merged 10-31 → 5. **req-270** split
 `workout-log.js` → 6. **req-271** DECISIONS split + digest → **req-272** grants/hook text/size ratchet → 7. **req-263** Back chain → 8. **req-264**
 small UI fixes → 9. **req-265** library chunk. Server-held: **req-256** (built `35b2df0`, reviewed; AC2) → **req-255** → **req-260**.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
