@@ -2307,5 +2307,6 @@ super set workouts, instead, it should prupose a enw req, build superset functio
    2nd warm-up, EMOM) is not built — not as `notes`, text targets or item order. Coach plans without it and proposes the
    feature under "For Planner" → a req.
 2. Why (run 4): supersets written as notes were done as straight sets (≈55 min vs ≈43 planned); the finisher fell off.
-3. Supersets → a req candidate (BACKLOG §Phase 1). `(unconfirmed)`: whether a text target like "6 × 30 s / 30 s" counts as
-   runnable.
+3. Supersets → a req candidate (BACKLOG §Phase 1). **Intervals:** Emilio: "we will build a tabata timer in the app … so that is
+   a req, until then, if really needed it can be a note, but prefferably not" → an interval-timer req candidate; meanwhile Coach
+   avoids interval sets, and a text target is the one allowed exception, named in the report.

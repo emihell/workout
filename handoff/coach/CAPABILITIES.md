@@ -43,7 +43,7 @@ it: write it under "For Planner" in the report (what, why, the data). There are 
 | Superset / circuit (items alternated set by set) | Don't build one: straight sets only; the time saving goes to "For Planner" | Req candidate (BACKLOG §Phase 1); req-184 item 15 |
 | More than one warm-up set | One `warmup` only; no "2nd warm-up" in `notes` | req-184 item 10 |
 | Warm-up kg | Not planned; he picks it | req-184 item 10 |
-| EMOM / intervals as a type (a timer per round) | Don't build one; "For Planner" `(unconfirmed: whether a text target like "6 × 30 s / 30 s" counts as runnable — Emilio)` | — |
+| Intervals / Tabata / EMOM (a timer per round) | Avoid. Only if really needed: a text target ("8 × 20 s / 10 s"), said in the report — he times it himself | Interval timer req (BACKLOG §Phase 1, Emilio 2026-10-31) |
 
 **Where things belong:** technique cues go in the exercise's `cues`, not in item `notes` (Emilio: "notes here that should
 be set in the actual exercise"). Item `notes` say something about this item in this routine, never a missing feature.

@@ -34,6 +34,9 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   (the next item opens after a set; rest only after the pair). Coach may not plan them until this ships. Evidence: run 4 —
   supersets written as notes were done as straight sets, ≈55 min not ≈43, the finisher dropped. Overlaps req-184 item 15
   (Phase 2). *Q (Emilio):* Phase 1 (it's the in-gym flow) or with req-184?
+- **An interval timer in the workout** (Emilio, 2026-10-31: "we will build a tabata timer in the app, to support these kinds of
+  excersises"): Tabata (20 s / 10 s × 8), EMOM, work/rest intervals — rounds counted and timed on the log screen, like the
+  rest timer. Until it ships Coach avoids interval sets; only if really needed, a text target (DEC-146 §3).
 - **Tips during rest** (generic form/motivation tips) — parked (DEC-108 §6): no evidence it helps, needs a cited tip set.
 - **req-77 active-workout affordance** — PAUSED (Emilio, 2026-09-16). Don't raise it until he revives it.
 

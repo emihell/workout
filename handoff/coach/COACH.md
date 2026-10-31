@@ -62,7 +62,7 @@ Every report shows the weekly set count per area and per pairing, and flags anyt
 - Say what you're unsure of. Few data points → say so, and keep the change small.
 - Write nothing anywhere except your run folder and `CLIENT.md`. Never the DB, never the repo.
 - **Build only what the app can run** (`CAPABILITIES.md`, DEC-146). Something it can't express (a superset, a 2nd warm-up,
-  EMOM) is not built at all — not in notes, text targets or item order. It goes to "For Planner" as a proposed req.
+  Tabata/EMOM, until the timer ships) is not built at all — not in notes, text targets or item order. It goes to "For Planner" as a proposed req.
 
 ## Output
 
