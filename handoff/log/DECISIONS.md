@@ -2329,3 +2329,13 @@ code, so we can iterate on it a bit, until its ready for many users".
    another's run or the shared brief — a lesson that's about one person goes to their `CLIENT.md`.
 3. **Now:** Coach runs from Claude Code (DEC-145) while the brief is made general (method · goal profiles · client).
 4. **Later, an API** the app calls (DEC-124). Not specced; Phase 3.
+
+## DEC-148 — the Coach brief split: method · goal profiles · client; lessons general only  (Planner, 2026-10-31, Emilio: "do it")
+
+From the 2026-10-31 review (Planner + Coach's own critique). `handoff/coach/`: **COACH.md** = the general method (hard rules,
+conversation vs run mode, a run starting with intake and **grading the last plan**, balance, no-history path, pain and
+health screen, output with "For Planner"); **GOALS.md** = balance numbers by level, the progression advice rule, one row per
+goal; **LESSONS.md** = data/method lessons, no client facts; Emilio's facts wait in its last section until Coach moves them to
+his `CLIENT.md`. `CAPABILITIES.md` unchanged; `EVIDENCE.md` follows (research agent, Emilio reviews).
+`(unconfirmed)` for Emilio: may a client override the balance base; the set-counting rule (primary 1, secondary 0.5);
+GOALS.md numbers marked `[to source]` until EVIDENCE.md.
