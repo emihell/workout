@@ -124,7 +124,15 @@ if [ -n "${WORKOUT_TEST_LIMIT:-}" ]; then
   limit="$WORKOUT_TEST_LIMIT"
   echo "check: test-suite limit overridden to ${limit}s (WORKOUT_TEST_LIMIT)" >&2
 fi
-WORKOUT_SERVER_TEST=1 node --test --test-timeout=60000 --test-force-exit "${testfiles[@]}" &
+# req-258: a second reporter writes TAP to a temp file, read after a green run (below). The
+# terminal reporter stays what node picks today: spec on a TTY, tap off one (Node 22, CI).
+tapfile="$(mktemp "${TMPDIR:-/tmp}/workout-check-tap.XXXXXX")"
+trap 'rm -f "$tapfile"' EXIT
+if [ -t 1 ]; then termreporter=spec; else termreporter=tap; fi
+WORKOUT_SERVER_TEST=1 node --test --test-timeout=60000 --test-force-exit \
+  --test-reporter="$termreporter" --test-reporter-destination=stdout \
+  --test-reporter=tap --test-reporter-destination="$tapfile" \
+  "${testfiles[@]}" &
 testpid=$!
 (
   waited=0
@@ -150,6 +158,23 @@ if wait "$testpid"; then teststatus=0; else teststatus=$?; fi
 wait "$watchdog" || true
 [ "$teststatus" -eq 0 ] || fail "the test suite"
 
+# req-258 (L-045): green is not enough. A test file that exits before its tests run (e.g. a
+# stray process.exit(0)) is reported by node as ONE passing test named after the file — a
+# file-level `ok N - path.test.js` line — so its tests vanish with no ✖. No file may do that
+# (none does on main, 2026-10-31). And a run with no `# tests N`, or N = 0, ran nothing.
+emptyfiles="$(grep -E '^(not )?ok [0-9]+ - .*\.test\.m?js$' "$tapfile" | sed -E 's/^(not )?ok [0-9]+ - //' || true)"
+if [ -n "$emptyfiles" ]; then
+  while IFS= read -r f; do
+    echo "check: RED — $f ran no tests (it exited before they ran)." >&2
+  done <<< "$emptyfiles"
+  fail "the test suite (a file ran no tests)"
+fi
+testcount="$(sed -nE 's/^# tests ([0-9]+)$/\1/p' "$tapfile" | tail -n 1)"
+if [ -z "$testcount" ] || [ "$testcount" -eq 0 ]; then
+  echo "check: RED — the test run reported ${testcount:-no} '# tests' count; nothing ran." >&2
+  fail "the test suite (no tests ran)"
+fi
+
 # 3. Production build (vite) — main must stay deployable (`./server/deploy` builds it).
 echo "check: building (vite build)…"
 npm run --silent build >/dev/null || fail "the production build"
@@ -159,8 +184,8 @@ npm run --silent build >/dev/null || fail "the production build"
 if [ -n "$smoke" ]; then
   echo "check: smoke test (headless browser, HEAD)…"
   node scripts/smoke.mjs || fail "the smoke test"
-  echo "check: green — lint, skills, no import cycles, ${#testfiles[@]} test file(s), the build, and the smoke test all passed."
+  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), the build, and the smoke test all passed."
   exit 0
 fi
 
-echo "check: green — lint, skills, no import cycles, ${#testfiles[@]} test file(s), and the build all passed."
+echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), and the build all passed."
