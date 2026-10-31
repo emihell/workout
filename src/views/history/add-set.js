@@ -8,6 +8,7 @@
 
 import { historySetFields } from '../set-values.js'
 import { withCardioValues } from '../../cardio-set.js'
+import { MAX_SETS } from '../../routine-item-parse.js'
 
 function idOf(obj) {
   return obj?.routineItemId || obj?.id || ''
@@ -24,6 +25,17 @@ function lastSetFor(workout, exerciseId, routineItemId) {
 export function historyAddItemId(workout, exerciseId, routineItemId = null) {
   const last = lastSetFor(workout, exerciseId, routineItemId)
   return routineItemId || idOf(last) || `history-${workout?.id}-${exerciseId}`
+}
+
+// req-274 review — History "Add set" stops at MAX_SETS like the live one (DEC-155 §4/§10): an
+// item whose working sets in this workout already number MAX_SETS gets no Add set (hidden, no
+// message), and withHistorySet refuses one more working set (a warm-up is not a working set).
+export function historyWorkSetCount(workout, itemId) {
+  return (workout?.sets || []).filter((set) => idOf(set) === itemId && set.setType !== 'wu').length
+}
+
+export function historyCanAddSet(workout, exerciseId, routineItemId = null) {
+  return historyWorkSetCount(workout, historyAddItemId(workout, exerciseId, routineItemId)) < MAX_SETS
 }
 
 // The route of the add form. Both ids are URI-encoded path segments.
@@ -55,6 +67,7 @@ export function historyAddSetDraft(workout, exerciseId, itemId) {
 export function withHistorySet(workout, { exerciseId, itemId, exercise, values }) {
   const fields = historySetFields(values)
   if (!fields) return null
+  if ((fields.setType || 'work') !== 'wu' && historyWorkSetCount(workout, itemId) >= MAX_SETS) return null
   const sets = [
     ...(workout.sets || []),
     {

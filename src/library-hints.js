@@ -97,5 +97,5 @@ export function restNotesShowing(workout, item, now) {
   const sets = workout.sets || []
   const last = sets[sets.length - 1]
   // req-274 — the shared set↔item matcher (was `last.routineItemId === itemKey(item)`).
-  return Boolean(last) && setMatchesItem(last, item)
+  return Boolean(last) && setMatchesItem(last, item, workout.snapshot?.items)
 }

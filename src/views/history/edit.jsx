@@ -7,7 +7,7 @@ import { historySetFields, historySetKind } from '../set-values.js'
 import { withCardioValues } from '../../cardio-set.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
+import { historyAddSetDraft, historyAddSetPath, historyCanAddSet, withHistorySet } from './add-set'
 import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
 import { snapshotItemFor } from './snapshot-item.js'
 import { historyAddSetBack, historyDetailReturn, historySetBack } from './return-paths.js'
@@ -98,7 +98,8 @@ export function HistorySetNew({ workoutId, from = null }) {
       })
     }
   }
-  const choices = [...byKey.values()]
+  // req-274 review — an item already at MAX_SETS working sets is not offered (no message).
+  const choices = [...byKey.values()].filter((choice) => historyCanAddSet(workout, choice.exerciseId, choice.routineItemId))
 
   return (
     <Screen>

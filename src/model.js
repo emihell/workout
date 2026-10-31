@@ -3,6 +3,7 @@ import { dateKey, mondayOf } from './schedule.js'
 import { recommendNextPrescription } from './progress.js'
 import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 import { setMatchesItem } from './workout-items.js'
+import { MAX_SETS } from './routine-item-parse.js'
 
 export const SCHEMA_VERSION = 9
 
@@ -425,15 +426,17 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
       exercises: (routine.exercises || []).map((item) => {
         const next = byKey.get(item.id)
         if (!next) return item
-        const targets = next.targetsTo?.length ? [...next.targetsTo] : [...(item.targets || [])]
+        // req-274 review — what Apply writes keeps the first MAX_SETS (DEC-155 §4): the
+        // recommendation sizes kg to the last logged set + 1, so a 20-set item would come back 21.
+        const targets = (next.targetsTo?.length ? [...next.targetsTo] : [...(item.targets || [])]).slice(0, MAX_SETS)
         // req-274 — `to: null` (a bodyweight item) leaves the routine item's kg exactly as it is.
         const writesKg = Array.isArray(next.to)
-        const suggestedWeights = writesKg ? [...next.to] : item.suggestedWeights || []
+        const suggestedWeights = writesKg ? next.to.slice(0, MAX_SETS) : item.suggestedWeights || []
         return {
           ...item,
           targets,
           ...(writesKg ? { suggestedWeights } : {}),
-          sets: Math.max(Number(item.sets) || 1, targets.length, suggestedWeights.length),
+          sets: Math.min(MAX_SETS, Math.max(Number(item.sets) || 1, targets.length, suggestedWeights.length)),
         }
       }),
     }
@@ -468,7 +471,7 @@ export function progressionForItem(exercises, workout, item) {
   const workSets = (workout?.sets || []).filter(
     (set) =>
       set.setType !== 'wu' &&
-      setMatchesItem(set.routineItemId || !set.sessionItemId ? set : { ...set, routineItemId: set.sessionItemId }, keyed),
+      setMatchesItem(set.routineItemId || !set.sessionItemId ? set : { ...set, routineItemId: set.sessionItemId }, keyed, workout?.snapshot?.items),
   )
   const sets = workSets.filter((set) => !isSkippedSet(set))
   const recommendation = recommendNextPrescription({

@@ -33,7 +33,7 @@ export function routineUpdateOffer(active, routines, item) {
   const sets = Math.max(1, Number(live.sets) || 1)
   const from = Array.isArray(live.suggestedWeights) ? live.suggestedWeights : []
   const to = [...from]
-  const work = setsForItem(active.sets, item).filter((set) => set.setType !== 'wu')
+  const work = setsForItem(active.sets, item, active.snapshot?.items).filter((set) => set.setType !== 'wu')
   work.forEach((set, i) => {
     const kg = Number(set.weight)
     if (i >= sets || isSkippedSet(set) || !(kg > 0)) return

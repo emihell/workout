@@ -17,18 +17,23 @@ export function itemKey(item) {
 // the item's sets carry a key it doesn't have. A key-less item (no id, no routineItemId) also
 // matches a `history-…` set of its own exercise. Read-side only: no stored key changes. A keyed
 // item never takes such a set (its own rules are the two key comparisons).
-export function setMatchesItem(set, item) {
+// req-274 review — `items` (the workout's snapshot items, when the caller has them): a key-less
+// item doesn't take a `history-…` set whose key IS another item's key in the workout (History
+// "Add set" on a migrated workout appends a keyed item `history-<wk>-<ex>`; that item owns it).
+export function setMatchesItem(set, item, items = null) {
   const key = itemKey(item)
   const id = item?.id
   if (key !== '' && set?.routineItemId === key) return true
   if (id != null && set?.routineItemId === id) return true
   if (set?.exerciseId !== item?.exerciseId) return false
   if (!set?.routineItemId) return true
-  return key === '' && id == null && String(set.routineItemId).startsWith('history-')
+  if (key !== '' || id != null || !String(set.routineItemId).startsWith('history-')) return false
+  // (This item is key-less, so the item that owns the key is always another one.)
+  return !(items || []).some((other) => itemKey(other) === set.routineItemId)
 }
 
-export function setsForItem(sets, item) {
-  return (sets || []).filter((set) => setMatchesItem(set, item))
+export function setsForItem(sets, item, items = null) {
+  return (sets || []).filter((set) => setMatchesItem(set, item, items))
 }
 
 export function workCountFor(item) {
@@ -159,8 +164,8 @@ function skippedSet({ item, setType, workIndex }) {
 // the warm-up if it has one and none is logged, then working sets up to its planned
 // count. req-109 — extracted unchanged from withSkippedUnloggedSets so "Skip exercise"
 // records exactly the sets Finish would have recorded as skipped.
-function pushSkippedUnloggedSets(sets, item) {
-  const logged = () => setsForItem(sets, item)
+function pushSkippedUnloggedSets(sets, item, items) {
+  const logged = () => setsForItem(sets, item, items)
   if (item.warmup && !logged().some((set) => set.setType === 'wu')) {
     sets.push(skippedSet({ item, setType: 'wu', workIndex: 0 }))
   }
@@ -174,7 +179,7 @@ function pushSkippedUnloggedSets(sets, item) {
 export function withSkippedUnloggedSets(workout) {
   if (!workout) return workout
   const sets = [...(workout.sets || [])]
-  for (const item of workout.snapshot?.items || []) pushSkippedUnloggedSets(sets, item)
+  for (const item of workout.snapshot?.items || []) pushSkippedUnloggedSets(sets, item, workout.snapshot?.items)
   const keys = (workout.snapshot?.items || []).map((item) => itemKey(item)).filter(Boolean)
   return {
     ...workout,
@@ -191,7 +196,7 @@ export function skipItemPatch(workout, itemId) {
   const item = (workout?.snapshot?.items || []).find((candidate) => itemKey(candidate) === itemId)
   if (!item) return null
   const sets = [...(workout.sets || [])]
-  pushSkippedUnloggedSets(sets, item)
+  pushSkippedUnloggedSets(sets, item, workout.snapshot?.items)
   return { sets, ...markItemDonePatch(workout, item) }
 }
 
@@ -295,7 +300,7 @@ export function appendItemPatch(workout, item) {
 }
 
 export function itemLoggingState(workout, item) {
-  const logged = setsForItem(workout?.sets, item)
+  const logged = setsForItem(workout?.sets, item, workout?.snapshot?.items)
   const wuLogged = logged.some((set) => set.setType === 'wu')
   const workLogged = logged.filter((set) => set.setType !== 'wu')
   const needsWu = Boolean(item?.warmup) && !wuLogged
@@ -379,7 +384,7 @@ export function withLoggedSet(workout, setRecord, activePatch = {}, draftKey = n
 // each of them and leaves every other field — `loggedAt` included — as it was, so the
 // per-set rule in progress.js reads the one exercise effort unchanged.
 export function itemEffortSets(workout, item) {
-  return setsForItem(workout?.sets, item).filter((set) => set.setType !== 'wu' && !isSkippedSet(set))
+  return setsForItem(workout?.sets, item, workout?.snapshot?.items).filter((set) => set.setType !== 'wu' && !isSkippedSet(set))
 }
 
 export function withItemEffort(workout, item, rpe) {

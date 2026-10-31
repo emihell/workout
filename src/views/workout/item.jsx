@@ -986,7 +986,7 @@ export function WorkoutSetEdit({ routineId, index }) {
   const workout = store.activeWorkout
   const set = workout?.routineId === routineId ? workout.sets?.[index] : null
   // req-274 — the shared set↔item matcher (was itemKey(candidate) === set.routineItemId).
-  const item = set ? workout?.snapshot?.items?.find((candidate) => setMatchesItem(set, candidate)) : null
+  const item = set ? workout?.snapshot?.items?.find((candidate) => setMatchesItem(set, candidate, workout.snapshot.items)) : null
   const target = item ? itemSetsPath(routineId, item, workout) : null
 
   useEffect(() => {

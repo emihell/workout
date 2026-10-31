@@ -22,7 +22,7 @@ export function finishSkippedByItem(workout) {
     prev = partial.sets.length
     if (added.length === 0) continue
     const item = items[i]
-    const workLogged = setsForItem(before, item).filter((set) => set.setType !== 'wu' && !isSkippedSet(set)).length
+    const workLogged = setsForItem(before, item, items).filter((set) => set.setType !== 'wu' && !isSkippedSet(set)).length
     out.push({
       index: i,
       item,
@@ -31,7 +31,7 @@ export function finishSkippedByItem(workout) {
       workSkipped: added.filter((set) => set.setType !== 'wu').length,
       workLogged,
       workCount: workCountFor(item),
-      started: setsForItem(before, item).length > 0,
+      started: setsForItem(before, item, items).length > 0,
     })
   }
   return out

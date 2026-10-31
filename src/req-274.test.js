@@ -13,6 +13,7 @@ import { migrateState, progressionForItem, recalculatedState, exerciseById } fro
 import { isWeightedType } from './ids.js'
 import { MAX_SETS } from './routine-item-parse.js'
 import { historyAddSetBack } from './views/history/return-paths.js'
+import { historyCanAddSet, withHistorySet } from './views/history/add-set.js'
 import { parseRoute, withFrom } from './route.js'
 
 const h = React.createElement
@@ -275,5 +276,62 @@ describe('req-274 AC5 — (d) historyAddSetBack drops a from at a deleted workou
     await open(withFrom(add, liveFrom))
     console.log(`AC5 rendered live: Back ${backHref()}`)
     assert.equal(backHref(), liveFrom)
+  })
+})
+
+// ---- review round: History Add set and Apply stop at MAX_SETS; key-less vs a keyed history-… item ----
+describe('req-274 review 1 — History "Add set" and Apply never take an item past MAX_SETS', () => {
+  const workSets = (n) => Array.from({ length: n }, () => ({ routineItemId: 'i1', exerciseId: 'ex', setType: 'work', weight: 40, reps: '8', rpe: 1 }))
+  const values = (setType = 'work') => ({ setType, weight: '40', reps: '8', rpe: '', note: '' })
+  const exercise = { id: 'ex', type: 'machine' }
+  it('History Add set: 20 working sets → no Add set, Save refuses a 21st work set; a warm-up still saves', () => {
+    const w = { id: 'wk', snapshot: { items: [item(20)] }, sets: workSets(20) }
+    const can = historyCanAddSet(w, 'ex', 'i1')
+    const patch = withHistorySet(w, { exerciseId: 'ex', itemId: 'i1', exercise, values: values() })
+    const wu = withHistorySet(w, { exerciseId: 'ex', itemId: 'i1', exercise, values: values('wu') })
+    console.log('review1 History at 20: canAdd', can, '| work Save →', patch, '| warm-up Save → sets', wu?.sets.length)
+    assert.equal(can, false)
+    assert.equal(patch, null)
+    assert.equal(wu.sets.length, 21)
+  })
+  it('History Add set failure case: 19 working sets → Add set offered, Save writes the 20th', () => {
+    const w = { id: 'wk', snapshot: { items: [item(19)] }, sets: workSets(19) }
+    const patch = withHistorySet(w, { exerciseId: 'ex', itemId: 'i1', exercise, values: values() })
+    console.log('review1 History at 19: canAdd', historyCanAddSet(w, 'ex', 'i1'), '| Save → work sets', patch.sets.length)
+    assert.equal(historyCanAddSet(w, 'ex', 'i1'), true)
+    assert.equal(patch.sets.length, 20)
+  })
+  it('Apply over a 20-set item with 20 (or 21) logged → routine item sets 20, 20 targets/kg', () => {
+    for (const logged of [20, 21]) {
+      const { routineItemId: _r, ...own } = item(20)
+      const s = {
+        exercises: [{ id: 'ex', name: 'Press', type: 'machine', weightStep: 2.5 }],
+        routines: [{ id: 'R', name: 'R', exercises: [{ id: 'i1', ...own }] }],
+        workouts: [{ id: 'wk', routineId: 'R', finishedAt: '2026-10-26T17:00:00.000Z', snapshot: { items: [item(20)] }, sets: workSets(logged) }],
+      }
+      const after = recalculatedState(s, 'wk').routines[0].exercises[0]
+      console.log(`review1 Apply, ${logged} logged → sets ${after.sets}, targets ${after.targets.length}, kg ${after.suggestedWeights.length}`)
+      assert.equal(after.sets, 20)
+      assert.equal(after.targets.length, 20)
+      assert.equal(after.suggestedWeights.length, 20)
+    }
+  })
+})
+
+describe('req-274 review 2 — a key-less item never takes the sets of a keyed `history-…` item', () => {
+  it('migrated workout + a keyed item history-wk-ex-x (History Add set) → [0, 3]; the probe stays [2, 1]', () => {
+    const s = migrateState(keylessState())
+    const w = s.workouts[0]
+    const keyed = { routineItemId: 'history-wk-ex-x', exerciseId: 'ex-x', targets: [], suggestedWeights: [] }
+    const items = [w.snapshot.items[0], keyed]
+    const sets = [...w.sets.filter((set) => set.exerciseId === 'ex-x'), { routineItemId: 'history-wk-ex-x', exerciseId: 'ex-x', setType: 'work', weight: 40, reps: '8' }]
+    const counts = items.map((i) => setsForItem(sets, i, items).length)
+    const workout = { ...w, snapshot: { ...w.snapshot, items }, sets }
+    const apply = items.map((i) => progressionForItem(s.exercises, workout, i).sets.length)
+    const probe = w.snapshot.items.map((i) => setsForItem(w.sets, i, w.snapshot.items).length)
+    console.log('review2 key-less + keyed history item:', JSON.stringify(counts), '| progressionForItem:', JSON.stringify(apply), '| probe:', JSON.stringify(probe))
+    assert.deepEqual(counts, [0, 3])
+    assert.deepEqual(apply, [0, 3])
+    assert.deepEqual(probe, [2, 1])
   })
 })
