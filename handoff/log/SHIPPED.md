@@ -2809,3 +2809,8 @@ Gate: `./check` green (2186 tests, 8 new), smoke green; Planner re-ran on a seed
 
 Tooling; throwaway agent, `4b589d1`…`50d5640`. Gate: plan-guards 41 ok + plan-ledger `all checks passed`, `./check` green; new tests fail on
 main's `plan` (title line exits 1 silently; scratch worktree picked). Planner re-ran both suites. No reviewer: no trigger file. `reports/req-257.md`.
+
+## req-258 — dates-tz asserts its case count; ./check red on a file that runs no tests; CI actions v7  (2026-10-31)
+
+Tooling; throwaway agent, `c788a1c`…`44991d8`. Gate: probes fail on main and go red on the branch (1-of-10 cases; `process.exit(0)` file);
+`./check --smoke` green; Planner re-ran the dates-tz guard (3/3). No reviewer: no trigger file. CI v7 confirmed on the merge push. `reports/req-258.md`.

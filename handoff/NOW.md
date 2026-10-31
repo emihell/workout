@@ -1,12 +1,12 @@
 # Now
 
-Updated 2026-10-31. **Shipped: everything through req-254, req-257** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-31. **Shipped: everything through req-254, req-257–258** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 **Next:** the fix batch (DEC-155; Emilio: "that is always the priority, otherwise things go stale or we build opon old
 code"). Serial, one throwaway agent per req, stop at each closeout. All specced 2026-10-31 and READY unless noted:
 1. **req-256** "12 reps" bug — built `req-256` @ `35b2df0`, gate green (2189), reviewer: No blockers. **Waits on AC2 (server).**
-2. **req-255** plan build kg estimate · 3. ~~req-257~~ merged 10-31 · 4. **req-258** test-gate floors + CI actions ·
+2. **req-255** plan build kg estimate · 3. ~~req-257~~ merged 10-31 · 4. ~~req-258~~ merged 10-31 · **req-266** gate drops tests (spec next) ·
 5. **req-259** `plan qa --empty` · 6. **req-260** plan build scans live routines (after 255) · 7. **req-261** Ex N + double
 tap + Sets cap · 8. **req-262** swaps/cardio/Back guard (after 261; backup reminder) · 9. **req-263** Back chain
 (DEC-155 §6 overrides DEC-092) · 10. **req-264** small UI fixes (after 263) · 11. **req-265** library chunk.
@@ -32,7 +32,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446`. Coach run 5 plan applied as rev 79.
 - **Backups:** newest scheduled 10-26 09:00; the next is due ≥ 11-02. Confirm it fires (server).
 - **Working agreement (L-060, DEC-143, DEC-144):** a team, not orders. Merged ≠ live: deploy after any served change.
-  Deploy is Emilio's (`! ./server/deploy && ./server/doctor`; the classifier blocks Planner).
+  Deploy is Emilio's (`! ./server/deploy && ./server/doctor`; the classifier blocks Planner). One planner session at a time (Emilio: "i will never
+  run two planner instances sumiltainiusly"): server work waits for a clean point here.
 - **Emilio's calls, any time:** loop-length re-anchor; req-239/240/242/243 copy `(unconfirmed)`; timer once per side
   (req-240); "Ex" vs "Exercise" (req-244). Planner's lighter path for copy-only reqs — open.
 

@@ -616,3 +616,9 @@ Resuming "coach review" from `NOW.md`, Planner queried the live DB and tabulated
 "this sounds like coach review work, not planner work? coach review should be another agent." **Rule:** Planner doesn't read
 or interpret training data — that's the coach agent's (DEC-140). Planner checks only that new data exists, spawns the coach
 with `coach/COACH.md` + a run folder, saves its report, and keeps for itself only what is app work (a flow bug → a req).
+
+## L-067 — a green gate can be missing tests: compare the count, not only the result  (Planner, 2026-10-31, req-258)
+
+`./check`'s `node --test --test-force-exit` drops part of a file's output on some runs and still exits 0. Main, 5 runs
+[measured]: `# tests` 2187, 2161, 2167, 2187, 2187, all `# fail 0`. req-248's "2096 of 2108" was this, not luck. req-258
+catches only a file that runs zero tests. Until it's fixed (→ BACKLOG §Tooling), read the count on every receipt.
