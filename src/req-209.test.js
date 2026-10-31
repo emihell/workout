@@ -157,7 +157,7 @@ describe('§6 equipmentLabel — one display map', () => {
     assert.equal(equipmentLabel(null, 'Bodyweight'), 'Bodyweight')
   })
   it('every screen that shows equipment reads it through the map', () => {
-    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/item.jsx', 'views/workout/setup.jsx']) {
+    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/item-header.jsx', 'views/workout/setup.jsx']) {
       const source = read(file)
       assert.doesNotMatch(source, /— \{ex\.equipment\}|— \$\{ex\.equipment\}|\|\| 'bodyweight'|"ui-sub">\{ex\.equipment\}/, file)
       assert.match(source, /equipmentLabel\(/, file)

@@ -49,7 +49,6 @@ import { ExercisesLink, Missing } from '../shared'
 import {
   Actions,
   Button,
-  ExerciseHead,
   Field,
   NavLink,
   RestNotes,
@@ -90,43 +89,12 @@ import {
 import { offerOnFinishingSet } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
 import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
-import { equipmentLabel } from '../../equipment-label.js'
 import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
-import { durationLabel, isEachSide, oneSideLine, restNotesFor, restNotesShowing } from '../../library-hints.js'
+import { durationLabel, isEachSide, restNotesFor, restNotesShowing } from '../../library-hints.js'
 import { useExerciseLibrary } from './use-library.js'
-import { liveExercise, exerciseEditorPath, markDoneAndGoToReview, askRoutineUpdate, markNextArrival, useSetDraftWriter } from './item-actions.js'
-
-// `aside` (req-80) renders a small control beside the title — the live log screen
-// passes the "Add note" toggle here so it sits next to the exercise name.
-// req-212 (H5) — the head is the library's ExerciseHead (was ad-hoc markup here).
-// req-219 — `eachSide` (a unilateral library entry) adds one quiet line under the head.
-// req-240 — `eachSide` is isEachSide (own setting, else library); a timed exercise gets the hold line.
-function ExerciseTitle({ routineId, item, ex, bits, aside, eachSide = false }) {
-  const inLibrary = Boolean(item?.exerciseId && ex?.id === item.exerciseId)
-  const name = exerciseName(item)
-  return (
-    <>
-      <ExerciseHead
-        title={inLibrary ? <NavLink to={exerciseEditorPath(routineId, item)} look="plain">{name}</NavLink> : name}
-        aside={aside}
-        subtitle={(bits || []).filter(Boolean).join(' · ')}
-      />
-      {eachSide ? <p className="ui-sub">{oneSideLine(ex)}</p> : null}
-    </>
-  )
-}
-
-// The review's setup lines under the title (the old done view's): equipment, then the routine's
-// note for this exercise. Review round 1 — restored (the spec never asked to remove them).
-function ExerciseSetupHeader({ item, ex }) {
-  return (
-    <>
-      {ex?.equipment ? <p className="ui-sub">{equipmentLabel(ex.equipment)}</p> : null}
-      {item?.notes ? <p className="ui-sub">{item.notes}</p> : null}
-    </>
-  )
-}
+import { liveExercise, markDoneAndGoToReview, askRoutineUpdate, markNextArrival, useSetDraftWriter } from './item-actions.js'
+import { ExerciseTitle, ExerciseSetupHeader } from './item-header.jsx'
 
 export function WorkoutItemLog({ routineId, itemId }) {
   const store = useStore()
