@@ -8,11 +8,15 @@ throwaway agent per req, stop at each closeout. Merged 10-31: req-257, 258, 266,
 Order: nothing buildable here (server first). Server-held: **req-256** (built `35b2df0`, reviewed; AC2) → **req-255** → **req-260**.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
 
-**On the server machine (Emilio, 2026-10-31: "everything that needs the server … continue there"):**
-- req-256 AC2: from branch `req-256`, `node scripts/req-256-targets.mjs --db <data>/workout.db --user <id> --rev 79` →
-  expect `identical: true`; then `./plan closeout req-256` (app change → deploy). Or Emilio: "merge without AC2".
-- Deploy (merged, not live: **req-261, 268, 262, 269, 270, 271, 263, 264, 265, 273, 274**; export a backup on the phone first, DEC-046) : `! ./server/deploy && ./server/doctor`, then `./server/ops duplicates`; live `52637e6`.
-- Data dir: server `~/dev/workout/workout-data` (`server/config.mjs:14`, docs right); this laptop keeps `~/projects/workout/workout-data`, no DB.
+**On the server machine, in this order** (Emilio: one planner at a time; this session stopped 2026-10-31 at a clean point):
+1. `./plan doctor` — if `FIX: grants`, run the paste line it prints (req-272; machine-local).
+2. Emilio: phone → Settings → Export (DEC-046; req-262 rewrites swaps, req-268 adds sync meta).
+3. req-256 AC2 from branch `req-256`: `node scripts/req-256-targets.mjs --db ~/dev/workout/workout-data/workout.db --user <id> --rev 79`
+   → expect `identical: true` → `./plan closeout req-256`.
+4. Deploy everything merged, not live (req-261, 268, 262, 269–276, 256): `! ./server/deploy && ./server/doctor` → record the
+   doctor lines in SHIPPED. Live is still `52637e6`.
+5. `./server/ops duplicates` (req-268; 0 expected; an id → ask-gate 2 req). Confirm the weekly backup fired (due ≥ 11-02).
+6. Build req-255 → req-260 (serial, stop at each closeout). Then the Coach workflow audit (run reports live here; BACKLOG §Phase 3).
 
 **Emilio's calls before their req dispatches:** none open (req-263 → READY, DEC-155 §6). All `(unconfirmed)` calls
 accepted (DEC-155 §4); blank kg stays 0 until new functionality touches it (§5).
