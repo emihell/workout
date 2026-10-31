@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-271` (…`a551a1b`)** · **Lane: tooling** · DEC-144 §4 (moved to now by DEC-155 §7), DEC-087, DEC-155, L-032. Before req-272 (both touch `scripts/check_handoff.py` + `plan`).
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-271` (`72788f7`…`a551a1b`, 3 commits).** · **Lane: tooling** · DEC-144 §4 (moved to now by DEC-155 §7), DEC-087, DEC-155, L-032. Before req-272 (both touch `scripts/check_handoff.py` + `plan`).
 
 # req-271 — DECISIONS.md: a generated index, entries split by range, no dangling DEC refs
 
