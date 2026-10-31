@@ -94,9 +94,9 @@ folder. Plain words, client-facing first, details after:
 8. **For Planner** — what the app can't express (each a proposed req), lessons for the brief (no client facts).
 
 **The plan file** (once settled; DEC-141): `import.json` in the run folder, the app's Export shape (`buildBackup`,
-`src/exchange.js:446`), built **by a script** from the client's newest revision: `workouts` copied unchanged (assert
-identical); only `routines`, `schedule` and new or changed `exercises`. A new library exercise is made as the app makes
-one (`catalogItemToExercise`, `src/exerciseCatalog.js:219`, with its `libraryId`). Validate with the app's own import code
-(`unwrapBackup` / `applyBackup` / `importPreview` / `previewLines`, `src/exchange.js:554-866`, read-only from the code
-worktree) and paste the preview lines and counts. Retired routines are archived (`archivedAt`), never deleted. Until the
-plan-builder ships (BACKLOG §Tooling) each run writes this script.
+`src/exchange.js:446`), built with **`./server/ops plan build <changes.json> --out import.json [--user <u>]`** (req-254): a
+short change list (`kind: workout-plan-changes`; ops `exercise.add`, `item.set`, `routine.items`, `routine.archive`,
+`schedule.set` … — see `work/req-254-plan-builder.md`) applied to the client's newest revision with the app's own builders,
+checked (C1–C7: only named records change, history identical, app-runnable targets, no invented kg) and run through the
+app's import preview. It writes nothing on a refusal and never touches the DB. Paste its lines and counts. Retired
+routines are archived, never deleted. Don't hand-write a build script any more.

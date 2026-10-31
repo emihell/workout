@@ -114,4 +114,5 @@ the minute"), and a timed EMOM logs no reps.
 
 A plan file in the Export shape, applied through `./server/ops plan preview|apply` (req-245, DEC-141): it shows the app's
 own import preview, Emilio approves, it backs up and writes one revision on top of the previewed one. Logged workouts are
-always kept as they are. Coach never writes the DB.
+always kept as they are. Coach never writes the DB. Coach makes the file with `./server/ops plan build` (req-254, COACH.md
+§The plan file). Schedule slots: `week` is **0-based** (0 … `loopWeeks`−1), `loopWeeks` 1–4, `weekday` 0–6 (0 = Sunday).

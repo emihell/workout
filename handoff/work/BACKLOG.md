@@ -139,7 +139,7 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - **A plan-builder for Coach** (DEC-145 §4): a short change list (routine X: order, kg, rest, notes; new library exercise;
   schedule slot) → a full plan file in the Export shape, checked (workouts identical, only the named parts changed) and
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
-  `src/exerciseCatalog.js` (run 3, run 4 `scripts/build_import.mjs`). → **req-254** (READY): `./server/ops plan build`.
+  `src/exerciseCatalog.js` (run 3, run 4 `scripts/build_import.mjs`). → **req-254** shipped 2026-10-31: `./server/ops plan build`.
 - **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
   non-planning worktree wins", so `CODE_DIR` — and closeout's merge — may point at an agent/scratch worktree. White-sleeve
   refuses closeout while >1 non-planning worktree exists. Also: `plan ping` still prints the pre-BUILDER.md handover.

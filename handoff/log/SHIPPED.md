@@ -2798,3 +2798,9 @@ backup `workout-20261030-230642-deploy-52637e6.db` integrity ok.
 
 Tooling; throwaway agent, `ab7c028`. Gate: plan-guards `all checks passed`, check-handoff `all passed`, `./check` green; 6 new
 tests fail on main's `plan`; Planner re-ran both suites + the 10-30 truncated Next. No reviewer: no trigger file. `reports/req-253.md`.
+
+## req-254 — `ops plan build`: Coach's change list → a checked plan file  (2026-10-31)
+
+Tooling; throwaway agent, `dedc47e`…`0115b4a`. `server/plan-build.mjs` + `plan build`: change list → C1–C7 → `--out` only without refusals; choices DEC-152.
+Gate: `./check` green (2186 tests, 8 new), smoke green; Planner re-ran on a seeded copy: counts match preview, "12 reps" refused, DB hash unchanged. No reviewer: no trigger file. AC8 Coach run pending.
+`reports/req-254.md`.

@@ -2371,3 +2371,14 @@ Emilio: "illl go with you recs".
    a set count climbing every week of a block → For Planner (DEC-150 open call).
 4. **`EVIDENCE.md` accepted** (DEC-149).
 5. **Supersets are Phase 1** (in-gym flow), not with req-184.
+
+## DEC-152 — req-254 plan-builder: the choices the spec left open  (Planner, 2026-10-31)
+
+Builder's calls, accepted by Planner (`reports/req-254.md` §Technical). 1. C4: `targets` must match `sets` for strength items;
+timed/cardio may have empty `targets` (as `pickerItem` makes them). 2. C3–C6 check only added/changed items (an odd untouched
+item can't block every plan); C3 checks every slot. 3. `item.set` on an exercise twice in one routine → refused, names both
+item ids, use `routine.items`. 4. Slot `week` is 0-based as stored; `loopWeeks` 1–4, `weekday` 0–6 (0 = Sunday) — in
+CAPABILITIES. 5. A move/swap whose slot `schedule.set` removed may drop (the model drops it); any other change to
+moves/swaps/anchor → C2 refuses. 6. A failing op is skipped so all resolution errors show at once; C3–C7 run only when every
+op succeeded. 7. `exercise.add`: a merged library id is refused naming its target; `lightestWeight`/`unilateral` set after
+`exerciseFromData`; a new routine's focus defaults to `Machines` (as `addRoutine`). Rejected: none raised.
