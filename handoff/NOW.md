@@ -7,7 +7,7 @@ the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACK
 throwaway agent per req, stop at each closeout. Done 10-31: req-257, 258, 266, 259. Order:
 1. **req-261** Ex N + double tap + Sets cap (building) → 2. **req-268** sync merge loses/duplicates a finished workout →
 3. **req-262** swaps/cardio/Back guard (backup reminder) → 4. **req-269** dead code + duplicates → 5. **req-270** split
-`workout-log.js` → 6. **req-271/272** workflow "later" list (specs being written) → 7. **req-263** Back chain → 8. **req-264**
+`workout-log.js` → 6. **req-271** DECISIONS split + digest → **req-272** grants/hook text/size ratchet → 7. **req-263** Back chain → 8. **req-264**
 small UI fixes → 9. **req-265** library chunk. Server-held: **req-256** (built `35b2df0`, reviewed; AC2) → **req-255** → **req-260**.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
 
