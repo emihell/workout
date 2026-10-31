@@ -2,7 +2,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { parseDurations, parseKg, parseReps, parseRoutineItem } from './routine-item-parse.js'
-import { durationTargetFor, setTargetFor } from './workout-log.js'
+import { durationTargetFor, setTargetFor } from './set-seed.js'
 import { buildPlannedWorkout, migrateState } from './model.js'
 import { routineItemMeta } from './ids.js'
 

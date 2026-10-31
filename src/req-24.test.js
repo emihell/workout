@@ -9,7 +9,8 @@ import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { answerConfirm, askConfirm, getPendingConfirm } from './ui/confirm.js'
-import { formFieldsWithDraft, initialSetFields, setDraftFromLoggedSet } from './workout-log.js'
+import { formFieldsWithDraft, setDraftFromLoggedSet } from './workout-log.js'
+import { initialSetFields } from './set-seed.js'
 
 const SRC = fileURLToPath(new URL('.', import.meta.url))
 

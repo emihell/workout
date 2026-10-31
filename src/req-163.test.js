@@ -14,7 +14,7 @@ import {
   previousSameRoutineWorkouts,
   summaryPriorWorkout,
 } from './history-queries.js'
-import { setLogSeed } from './workout-log.js'
+import { setLogSeed } from './set-seed.js'
 import { formatSetLine } from './ids.js'
 
 const { HistorySet, HistorySetAdd } = await importJsx('./views/history/edit.jsx', import.meta.url)

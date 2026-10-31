@@ -19,7 +19,7 @@ import {
   routineInActiveWorkout,
 } from './state-reducers.js'
 import { exercisesInHistory, isFirstRun } from './history-queries.js'
-import { durationTargetFor } from './workout-log.js'
+import { durationTargetFor } from './set-seed.js'
 import { finishedState } from './workout-finish.js'
 import { itemKey, replacementItem, sessionExercise } from './workout-items.js'
 import { isWeightedType } from './ids.js'

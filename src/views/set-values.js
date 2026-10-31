@@ -10,7 +10,7 @@
 import { kgToSave } from '../kg-input.js'
 import { secondsToSave } from '../seconds-input.js'
 import { isSkippedSet } from '../set-rules.js'
-import { nextSeedOverrides, seedOverrideKey } from '../workout-log.js'
+import { nextSeedOverrides, seedOverrideKey } from '../set-seed.js'
 import { CARDIO_KEYS, cardioPatch } from '../cardio-set.js'
 
 // The test for "another set of the same kind as `set`": the same routine item and exercise,

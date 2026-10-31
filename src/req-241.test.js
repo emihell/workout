@@ -7,7 +7,7 @@ import React from 'react'
 import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
 import { skippedSetSave } from './views/set-values.js'
-import { seedOverrideKey } from './workout-log.js'
+import { seedOverrideKey } from './set-seed.js'
 import { clearArrival, markArrival } from './up-next.js'
 
 const h = React.createElement

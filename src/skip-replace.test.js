@@ -12,8 +12,9 @@ import {
   recalculatedState,
 } from './model.js'
 import { historyPrescription, historySetPrefill, lastSetsForExercise } from './history-queries.js'
-import { allItemsDone, initialSetFields, itemAllSkipped, setPreview } from './workout-log.js'
+import { allItemsDone, itemAllSkipped, setPreview } from './workout-log.js'
 import { finishedState } from './workout-finish.js'
+import { initialSetFields } from './set-seed.js'
 import { isAddedMidWorkout } from './set-rules.js'
 import {
   itemIsMarkedDone,

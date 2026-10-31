@@ -6,11 +6,9 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { importJsx, render, act } from './test-support/render.js'
+import { carryForSet, initialSetFields, nextSeedOverrides } from './set-seed.js'
 import {
-  carryForSet,
   currentWorkoutItem,
-  initialSetFields,
-  nextSeedOverrides,
   setDraftFromLoggedSet,
   itemSetPosition,
   loggedSetRowText,

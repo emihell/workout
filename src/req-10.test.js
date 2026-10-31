@@ -13,7 +13,8 @@ import { DEVICE_FILL_KEY } from './routine-kg-fill.js'
 import { moveToValidWeight } from './progress.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 import { finishedState } from './workout-finish.js'
-import { initialSetFields, setLogSeed, setPreview, setupSeedFor } from './workout-log.js'
+import { initialSetFields, setLogSeed, setupSeedFor } from './set-seed.js'
+import { setPreview } from './workout-log.js'
 import { SETUP_TEXT, setTwoSeed, setupAfterSetOneEdit, setupAnsweredPatch, setupPromptShows, setupSheetShows } from './first-time-setup.js'
 
 const h = React.createElement

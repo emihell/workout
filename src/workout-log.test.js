@@ -5,14 +5,6 @@ import {
   allItemsDone,
   restPatchAfterSet,
   restRemaining,
-  carriedWorkingSet,
-  setLogSeed,
-  initialSetFields,
-  seedOverrideKey,
-  nextSeedOverrides,
-  setTargetFor,
-  routineKgFor,
-  durationTargetFor,
   setPreview,
   setPreviewText,
 } from './workout-log.js'
@@ -26,6 +18,16 @@ import {
   addWorkingSetToState,
   withSkippedUnloggedSets,
 } from './workout-items.js'
+import {
+  carriedWorkingSet,
+  setLogSeed,
+  initialSetFields,
+  seedOverrideKey,
+  nextSeedOverrides,
+  setTargetFor,
+  routineKgFor,
+  durationTargetFor,
+} from './set-seed.js'
 import { isSkippedSet } from './set-rules.js'
 import { historySetPrefill, lastSetsForExercise } from './history-queries.js'
 import { DEFAULT_DURATION_SEC } from './model.js'

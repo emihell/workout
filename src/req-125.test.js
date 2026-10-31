@@ -10,15 +10,13 @@ import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import {
   createSetDraftWriter,
   formFieldsWithDraft,
-  initialSetFields,
-  nextSeedOverrides,
-  seedOverrideKey,
   setDraftFor,
   setDraftFromForm,
   setDraftFromLoggedSet,
   setDraftKey,
 } from './workout-log.js'
 import { finishedState } from './workout-finish.js'
+import { initialSetFields, nextSeedOverrides, seedOverrideKey } from './set-seed.js'
 import { itemKey, itemLoggingState, replacementItem, withLoggedSet } from './workout-items.js'
 
 const EXERCISES = [

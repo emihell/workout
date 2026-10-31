@@ -14,7 +14,7 @@ import { isWeightedType } from './ids.js'
 import { HOLD_REASONS, isAssistedExercise, recommendNextPrescription, unreadableTarget, validWeights } from './progress.js'
 import { isSkippedSet } from './set-rules.js'
 import { itemKey, itemLoggingState } from './workout-items.js'
-import { seedOverrideKey, setTargetFor } from './workout-log.js'
+import { seedOverrideKey, setTargetFor } from './set-seed.js'
 
 // The sheet's answers. `rpe` is only the value handed to recommendNextPrescription (the same
 // numbers EFFORT_OPTIONS uses: Easy 2, Medium 3, Hard 4) — it is never written anywhere.

@@ -24,10 +24,10 @@ import {
   autoCompleteArmed,
   formFieldsWithDraft,
   setDraftFromLoggedSet,
-  restoreFromLoggedSet,
 } from './workout-log.js'
 import { finishedState } from './workout-finish.js'
 import { isSkippedSet } from './set-rules.js'
+import { restoreFromLoggedSet } from './set-seed.js'
 import { parseRoute } from './route.js'
 import { historyAddItemId, historyAddSetDraft, historyAddSetPath, withHistorySet } from './views/history/add-set.js'
 
