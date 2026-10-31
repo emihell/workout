@@ -2855,3 +2855,9 @@ main's `plan`). Gate: `./check --smoke` green. Reviewer ×2: No blockers (20k-ca
 Tooling (refactor); throwaway agent, …`ad166a6`. workout-items / -progress / -finish / -timers, set-seed / -drafts / -display; no shim; 65
 importers re-pointed; `lastLoggedSetIndex` deleted (2223 → 2222); boundaries moved to break two cycles; trigger regex + WORKFLOW check 5 name
 all seven. Gate: `./check` 2222 in 149, smoke green; independent reviewer: No blockers (76/76 bodies identical, 2733 imports resolved, each module loads alone). Handoff cites → function names. `reports/req-270.md`.
+
+## req-271 — DECISIONS.md split into range files + a generated index; dangling-DEC, stale-index, superseded-in-digest checks  (2026-10-31)
+
+Tooling; throwaway agent, …`a551a1b`. `scripts/dec_index.py`, `scripts/dec_split.py`, `check_handoff.py` check 5, `plan save` regenerates
+the index. Gate: 14 new tests fail-then-pass; each guard fires on a fixture; `./check` 2236; Planner re-ran the split on a copy (158 headings,
+each in one file). No reviewer: no trigger file. `reports/req-271.md`.
