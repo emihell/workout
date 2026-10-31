@@ -72,7 +72,7 @@ const AC1_CHANGES = [
 
 const countsBlock = (stdout) => stdout.slice(stdout.indexOf('\ncounts\n'), stdout.indexOf('workout in progress'))
 
-test('AC1 + AC6 + AC8 — build exits 0, writes a file preview accepts with no refusals and the same counts; the DB is byte-unchanged', async () => {
+test('AC1 + AC6 — build exits 0, writes a file preview accepts with no refusals and the same counts; the DB is byte-unchanged', async () => {
   const s = await seeded()
   const dir = tempDir('workout-req254-file-')
   try {
