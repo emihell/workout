@@ -99,8 +99,8 @@ say-so, write "unconfirmed" in the entry.
 "most routines are probably empty". When a measurement contradicts the plan, say
 so.
 
-**Append to the logs, never insert.** `log/DECISIONS.md` and `log/LESSONS.md` are
-append-only, newest at the bottom. Append with a command that writes to the end,
+**Append to the logs, never insert.** A new DEC goes at the end of the newest `log/decisions/DEC-<range>.md`
+(start the next file at DEC-201); `log/LESSONS.md` likewise. Both are append-only, newest at the bottom. Append with a command that writes to the end,
 not a hand-anchored edit.
 
 **No auto-memory (Emilio, 2026-09-12).** Never write anything durable to file-based
@@ -360,7 +360,7 @@ comments describing the very function the commit is about.
 
 | | |
 | --- | --- |
-| `DEC-NNN` | a decision, in `log/DECISIONS.md`. Append-only, supersede rather than edit. |
+| `DEC-NNN` | a decision: index + digest in `log/DECISIONS.md`, the entry in `log/decisions/DEC-<range>.md`. Append-only, supersede rather than edit. |
 | `L-NNN` | a lesson — what went wrong, in `log/LESSONS.md`. |
 | `req-NN-name.md` | a requirement in `work/`, one per branch. |
 

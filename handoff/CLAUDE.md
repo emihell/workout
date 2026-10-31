@@ -88,7 +88,7 @@ handoff/
   rules/WORKFLOW.md         how requirements are written and built
   work/BACKLOG.md           the backlog
   work/req-NN-name.md       the requirement you are implementing
-  log/DECISIONS.md          what was chosen and why — don't relitigate
+  log/DECISIONS.md          what was chosen and why (digest + index; entries in log/decisions/) — don't relitigate
   log/LESSONS.md            what went wrong before
   reference/                how things actually behave (schema, migrations)
 ```

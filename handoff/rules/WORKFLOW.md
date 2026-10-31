@@ -157,7 +157,7 @@ screen.
 Not a rundown of every old req — that costs more than it returns. What actually goes
 wrong is narrower and findable in about a minute each:
 
-**1 — Grep `log/DECISIONS.md` for the requirement's nouns.** A decision made three
+**1 — Grep `log/DECISIONS.md` and `log/decisions/` for the requirement's nouns.** A decision made three
 entries ago may already govern the thing you're specifying.
 
 **2 — Name every other requirement that touches the same file, model field, or
