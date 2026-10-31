@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144 §4 (moved to now by DEC-155 §7), DEC-085, L-032, req-100 (NOW limit), req-250. After req-271 (same files: `scripts/check_handoff.py`, `plan`).
+**Status: BUILT, NOT merged — branch `req-272` (…`c1a84b9`)** · **Lane: tooling** · DEC-144 §4 (moved to now by DEC-155 §7), DEC-085, L-032, req-100 (NOW limit), req-250. After req-271 (same files: `scripts/check_handoff.py`, `plan`).
 
 # req-272 — grants trimmed, hook text fixed, a size ratchet on the rule docs
 

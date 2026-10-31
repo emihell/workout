@@ -2861,3 +2861,9 @@ all seven. Gate: `./check` 2222 in 149, smoke green; independent reviewer: No bl
 Tooling; throwaway agent, …`a551a1b`. `scripts/dec_index.py`, `scripts/dec_split.py`, `check_handoff.py` check 5, `plan save` regenerates
 the index. Gate: 14 new tests fail-then-pass; each guard fires on a fixture; `./check` 2236; Planner re-ran the split on a copy (158 headings,
 each in one file). No reviewer: no trigger file. `reports/req-271.md`.
+
+## req-272 — hook names `./plan save`; git commit/reset grants dropped; rule-doc size ratchet  (2026-10-31)
+
+Tooling; throwaway agent, …`c1a84b9`. `scripts/doc_limits.json` (17 docs at today's size; a raise needs a new reason; `plan save`/`publish`
+refuse over); doctor's 12 canonical grants + the paste line. Gate: each guard fires in a sandbox; `./check` 2251 in 151; 6 shell suites pass.
+No reviewer: no trigger file. Pending: Emilio re-pastes the grants line, then a live `./plan save` closes AC1. `reports/req-272.md`.
