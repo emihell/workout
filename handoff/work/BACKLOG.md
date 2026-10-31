@@ -115,6 +115,8 @@ Shipped: req-130, 133, 138–143. **Next, in order:** req-134 → 132 → 137 �
 ## Phase 3 — other users, training together, AI (`work/req-146-backend-design.md`)
 
 Stage 1 (own server, own data) is live. Stage 2 (other users) and stage 3 (together, AI) need Emilio's decisions:
+- **Coach for every user** (DEC-147): a general coach, per-user data isolated, later an in-app API (DEC-124). Iterated from
+  Claude Code until the brief is general.
 accounts and the sharing model (shared routine, own values), privacy/GDPR (what leaves the device, retention, deletion),
 AI cost per user, live group sessions. The in-app AI design is decided (DEC-124).
 - **Before a second user logs in** (req-230 review): logging in as someone else on a device with unsynced changes replaces

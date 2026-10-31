@@ -2315,3 +2315,17 @@ super set workouts, instead, it should prupose a enw req, build superset functio
    a timed exercise + `restSec` runs intervals at two taps a round. Coach builds them when work and rest are each ≥ 30 s
    `(unconfirmed: 30 s)`; Tabata/EMOM wait for the chaining req (BACKLOG §Phase 1). `CAPABILITIES.md` gains a section on how a
    plan runs in the workout, from the code.
+
+## DEC-147 — Coach becomes every user's coach, with their data isolated; iterated here first  (Emilio, 2026-10-31)
+
+Emilio: "in the future, i want users in the app to be able to use coach for their own workout schedules and programs, to help
+them reach goals, streagth, weightloss - whatever they want to achive … but their data must be isolated and not bleed out to
+other users - also, i might add an api so it can be called within the app"; "but for now it will be done here, from claude
+code, so we can iterate on it a bit, until its ready for many users".
+1. **Target:** a general coach (any goal) giving per-user advice and plans from that user's data and wishes. Builds on DEC-124
+   (in-app AI via our backend) and DEC-140 §5 (the brief becomes its prompt); the multi-user side is req-146 stages 2–3.
+2. **Isolation is a hard rule now, not later:** a run reads one user's rows only (`revisions WHERE user_id = ?`, as every
+   `server/store.mjs` query does, `:4`); client facts and reports stay per user, outside git. Nothing from one client enters
+   another's run or the shared brief — a lesson that's about one person goes to their `CLIENT.md`.
+3. **Now:** Coach runs from Claude Code (DEC-145) while the brief is made general (method · goal profiles · client).
+4. **Later, an API** the app calls (DEC-124). Not specced; Phase 3.

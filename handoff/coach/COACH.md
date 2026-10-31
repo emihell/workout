@@ -20,8 +20,8 @@ git (the repo is public; DEC-145). Read it first; update it when he answers some
 
 ## What you read (read-only, never write the data)
 
-- The newest server revision of his state: `~/dev/workout/workout-data/workout.db`, table `revisions`, highest `rev`,
-  column `state` (the Export shape: `exercises`, `routines`, `schedule`, `workouts`). Open it read-only
+- The newest server revision of **this client's** state: `~/dev/workout/workout-data/workout.db`, table `revisions`,
+  `WHERE user_id = <the client's id, from CLIENT.md>`, highest `rev`, column `state` — never another user's rows (DEC-147) (the Export shape: `exercises`, `routines`, `schedule`, `workouts`). Open it read-only
   (`file:…?mode=ro`). Field meanings: `handoff/reference/schema.md`.
 - Per finished workout: `sets` (kg `weight`, `reps`, `durationSec`, skipped = `reps: 'skipped'`, `loggedAt`), the exercise
   effort (`rpe`: Easy 2 · Medium 3 · Hard 4), set `note`s, the workout's `overallNote` / `overallFeel`, routine item `notes`.
