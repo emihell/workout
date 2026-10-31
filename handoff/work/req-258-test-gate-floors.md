@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-258` (`c788a1c`…`44991d8`)** · **Lane: tooling** · req-114 (dates-tz), req-248 (test timeout), req-238 (CI), DEC-155, L-045.
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-258` (`c788a1c`…`44991d8`, 4 commits).** · **Lane: tooling** · req-114 (dates-tz), req-248 (test timeout), req-238 (CI), DEC-155, L-045.
 
 # req-258 — the gate can't pass on tests that didn't run; CI actions to current majors
 
