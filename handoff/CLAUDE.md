@@ -31,7 +31,7 @@ npm run dev        # http://localhost:5173  — single dev instance
 npm run lint       # oxlint
 node --test        # unit tests — every *.test.js under src/ (nested included)
 npm run build      # production build
-./check            # the full gate: lint + tests + build
+./check            # the full gate: lint + tests + build (+ shell suites when touched)
 ```
 
 Live app: Emilio's own server (`./server/deploy` from `main`), `https://macbookpro-intel-2017.tail58ea74.ts.net:8446`.

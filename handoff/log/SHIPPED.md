@@ -2894,3 +2894,9 @@ Gate: new tests fail on main; `./check` 2304; smoke; independent reviewer: No bl
 
 Bug; throwaway agent, …`608654d`. Live + History Add set and Apply clamp at MAX_SETS; matcher takes the workout's items (no double count);
 bodyweight `to: null` (Planner). Gate: 21 new tests fail-then-pass; `./check` 2325; smoke + QA 6/6; independent reviewer ×2: No blockers. `reports/req-274.md`.
+
+## req-275 — closeout never aborts mid-way; `plan` uses its own scripts; untriaged-audit check; shell suites in CI  (2026-10-31)
+
+Tooling; throwaway agent, …`6b4e733`. `scripts/shell-suites.sh` (CI all six; `./check` when touched); golden-recorder test; `dec_split.py`
+deleted; check 7 + `log/AUDIT-TRIAGE.md`. Gate: new plan-guards cases fail on main's `plan`; `./check --smoke` green; Planner ran all six suites
+(green, 33 s). No reviewer: no trigger file. `reports/req-275.md`.
