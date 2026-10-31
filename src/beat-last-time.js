@@ -9,7 +9,7 @@
 // req-210 (DEC-117 §1) — improvementPct puts a number on the same axis: the small "↑ N%"
 // on the in-workout list and the finish screens. Never in History (DEC-050).
 import { isWeightedType } from './ids.js'
-import { isSkippedSet } from './workout-log.js'
+import { isSkippedSet } from './set-rules.js'
 import { exerciseById } from './model.js'
 
 // Parse a stored numeric field defensively. Reps can be non-numeric ("AMRAP") and

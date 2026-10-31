@@ -18,9 +18,8 @@ import {
   initialSetFields,
   setListRows,
   setPreview,
-  skipItemPatch,
-  withLoggedSet,
 } from './workout-log.js'
+import { skipItemPatch, withLoggedSet } from './workout-items.js'
 
 const h = React.createElement
 const catalog = await loadExerciseCatalog()

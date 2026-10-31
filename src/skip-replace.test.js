@@ -16,18 +16,20 @@ import {
   allItemsDone,
   finishedState,
   initialSetFields,
-  isAddedMidWorkout,
   itemAllSkipped,
+  setPreview,
+} from './workout-log.js'
+import { isAddedMidWorkout } from './set-rules.js'
+import {
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
   replaceItemPatch,
   replacementItem,
-  setPreview,
   setsForItem,
   skipItemPatch,
   withSkippedUnloggedSets,
-} from './workout-log.js'
+} from './workout-items.js'
 import { parseRoute } from './route.js'
 import { itemReplacePath } from './workout-paths.js'
 import { snapshotItemFor } from './views/history/snapshot-item.js'

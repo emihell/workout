@@ -5,7 +5,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { historyHasSetAt, historySetPrefill } from './history-queries.js'
-import { carryForSet, initialSetFields, withOneMoreSet } from './workout-log.js'
+import { carryForSet, initialSetFields } from './workout-log.js'
+import { withOneMoreSet } from './workout-items.js'
 
 const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
 

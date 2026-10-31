@@ -7,7 +7,7 @@ import React from 'react'
 import { readFileSync } from 'node:fs'
 import { RPE_OPTIONS, rpeLabel, rpeOptionValue } from './ids.js'
 import { finishSkippedByItem, finishSkippedLines } from './finish-unfinished.js'
-import { withSkippedUnloggedSets } from './workout-log.js'
+import { withSkippedUnloggedSets } from './workout-items.js'
 import { act, importJsx, render } from './test-support/render.js'
 
 const item = (id, name, sets, extra = {}) => ({

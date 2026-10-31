@@ -8,24 +8,26 @@ import assert from 'node:assert/strict'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import {
   addWorkingSetToState,
-  anythingLogged,
-  autoCompleteArmed,
   canRemoveAddedSet,
-  finishedState,
-  formFieldsWithDraft,
-  setDraftFromLoggedSet,
-  isSkippedSet,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
   markItemDonePatch,
   removeAddedSetPatch,
   reopenItemPatch,
-  restoreFromLoggedSet,
   setsForItem,
   withOneLessSet,
   withOneMoreSet,
+} from './workout-items.js'
+import {
+  anythingLogged,
+  autoCompleteArmed,
+  finishedState,
+  formFieldsWithDraft,
+  setDraftFromLoggedSet,
+  restoreFromLoggedSet,
 } from './workout-log.js'
+import { isSkippedSet } from './set-rules.js'
 import { parseRoute } from './route.js'
 import { historyAddItemId, historyAddSetDraft, historyAddSetPath, withHistorySet } from './views/history/add-set.js'
 

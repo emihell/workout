@@ -11,16 +11,14 @@ import {
   currentWorkoutItem,
   initialSetFields,
   nextSeedOverrides,
-  replaceItemPatch,
-  replacementItem,
   setDraftFromLoggedSet,
-  skipItemPatch,
   itemSetPosition,
   loggedSetRowText,
   restClockText,
   setListRows,
   workoutPillState,
 } from './workout-log.js'
+import { replaceItemPatch, replacementItem, skipItemPatch } from './workout-items.js'
 import { liveSetEditPatch, viewedSetSave } from './views/set-values.js'
 
 const h = React.createElement

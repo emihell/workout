@@ -9,14 +9,8 @@ import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import { finishedForPlan } from './current-workout.js'
 import { emptyState } from './persistence.js'
 import { workoutSummaryStats } from './history-queries.js'
-import {
-  anythingLogged,
-  autoCompleteArmed,
-  finishedState,
-  itemKey,
-  loggedSetCount,
-  skipItemPatch,
-} from './workout-log.js'
+import { anythingLogged, autoCompleteArmed, finishedState, loggedSetCount } from './workout-log.js'
+import { itemKey, skipItemPatch } from './workout-items.js'
 import { autoFinishArgs } from './workout-note.js'
 
 const EXERCISES = [{ id: 'ex-p', name: 'Chest Press', equipment: 'Machine', type: 'machine', weightStep: '2.5' }]

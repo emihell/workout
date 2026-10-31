@@ -32,8 +32,8 @@ import {
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,
-  withLoggedSet,
 } from './workout-log.js'
+import { withLoggedSet } from './workout-items.js'
 import { historyPrescription } from './history-queries.js'
 import { pickerItem } from './routine-picker.js'
 import { applyBackup, buildBackup } from './exchange.js'
@@ -416,7 +416,7 @@ describe('the log screen (real store)', () => {
     // "Add set" on the done exercise (WorkoutItemDone, the screen Skip leads to): reopen and add
     // a working set in one tap, then the log screen.
     await t.mount(null)
-    const { reopenItemPatch } = await import('./workout-log.js')
+    const { reopenItemPatch } = await import('./workout-items.js')
     const item = t.active().snapshot.items.find((i) => i.routineItemId === ROWING)
     await act(async () => {
       t.captured.store.patchActive(reopenItemPatch(t.active(), item))

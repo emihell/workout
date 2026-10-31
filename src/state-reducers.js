@@ -4,7 +4,7 @@
 import { buildPlannedWorkout, exerciseById, planSnapshot } from './model.js'
 import { dateKey, mondayOf } from './schedule.js'
 import { patchExercise } from './exercise-names.js'
-import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withItemEffort, withLoggedSet } from './workout-log.js'
+import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withItemEffort, withLoggedSet } from './workout-items.js'
 import { historyPrescription, routinesUsingExercise } from './history-queries.js'
 
 // req-43 / DEC-031 (audit F-DIV-3) — the blast radius of deleting a routine, so the

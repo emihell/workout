@@ -4,7 +4,8 @@
 import { exerciseById, routineById } from './model.js'
 import { isCurrentWorkout } from './current-workout.js'
 import { coveringWorkout, dateKey } from './schedule.js'
-import { isAddedMidWorkout, isSkippedSet, loggedSetCount } from './workout-log.js'
+import { isAddedMidWorkout, isSkippedSet } from './set-rules.js'
+import { loggedSetCount } from './workout-log.js'
 import { durationTargetText, hasCardioFields } from './cardio-set.js'
 
 // req-28 — the workouts finished on a given calendar day (dateKey(finishedAt) ===

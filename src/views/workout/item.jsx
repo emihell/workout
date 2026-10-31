@@ -9,6 +9,18 @@ import { historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../h
 import { useStore } from '../../store-context'
 import {
   canRemoveAddedSet,
+  itemEffort,
+  itemEffortSets,
+  itemIsMarkedDone,
+  itemKey,
+  itemLoggingState,
+  markItemDonePatch,
+  removeAddedSetPatch,
+  reopenItemPatch,
+  sessionExercise,
+  skipItemPatch,
+} from '../../workout-items.js'
+import {
   carryForSet,
   uniformRepsTargets,
   createSetDraftWriter,
@@ -16,32 +28,22 @@ import {
   formFieldsWithDraft,
   initialSetFields,
   routineKgFor,
-  itemEffort,
-  itemEffortSets,
-  itemIsMarkedDone,
-  itemKey,
-  isSkippedSet,
-  itemLoggingState,
   loggedSetRowText,
-  markItemDonePatch,
   nextNotDoneItem,
   nextSeedOverrides,
-  removeAddedSetPatch,
-  reopenItemPatch,
   restPatchAfterSet,
   seedOverrideKey,
-  sessionExercise,
   setDraftFor,
   setDraftFromLoggedSet,
   setDraftKey,
   setListRows,
   setTargetFor,
   setupSeedFor,
-  skipItemPatch,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,
-} from '../../workout-log'
+} from '../../workout-log.js'
+import { isSkippedSet } from '../../set-rules.js'
 import { liveSetWeight, skippedSetSave, viewedSetSave } from '../set-values.js'
 import { ExercisesLink, Missing } from '../shared'
 import {

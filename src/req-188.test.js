@@ -11,15 +11,13 @@ import { buildPlannedWorkout, migrateState, planSnapshot, recalculatedState } fr
 import { itemsAddedState, replaceItemInState } from './state-reducers.js'
 import {
   appendItemPatch,
-  currentWorkoutItem,
-  finishedState,
-  isAddedMidWorkout,
-  itemAllSkipped,
   itemIsMarkedDone,
   itemKey,
   replacementItem,
   skipItemPatch,
-} from './workout-log.js'
+} from './workout-items.js'
+import { currentWorkoutItem, finishedState, itemAllSkipped } from './workout-log.js'
+import { isAddedMidWorkout } from './set-rules.js'
 import { pickerItem } from './routine-picker.js'
 import { needsSetup, noHistoryItem, resolvePicks } from './mid-workout-pick.js'
 import { autoCompleteArmed } from './workout-log.js'

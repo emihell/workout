@@ -1,4 +1,4 @@
-import { itemKey } from './workout-log.js'
+import { itemKey } from './workout-items.js'
 
 // Pure route builders for the in-workout item screens. Extracted from
 // views/workout/helpers.jsx (req-76) so JSX-free modules can share them: notably

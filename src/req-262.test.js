@@ -12,7 +12,8 @@ import { slotSwappedOnDateState } from './state-reducers.js'
 import { doneEarlier } from './schedule.js'
 import { progressionForItem, recalculatedState, migrateState } from './model.js'
 import { finishedForPlan } from './current-workout.js'
-import { finishTimeFor, setsForItem, withSkippedUnloggedSets } from './workout-log.js'
+import { finishTimeFor } from './workout-log.js'
+import { setsForItem, withSkippedUnloggedSets } from './workout-items.js'
 
 const h = React.createElement
 

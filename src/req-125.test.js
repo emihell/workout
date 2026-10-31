@@ -12,17 +12,14 @@ import {
   finishedState,
   formFieldsWithDraft,
   initialSetFields,
-  itemKey,
-  itemLoggingState,
   nextSeedOverrides,
-  replacementItem,
   seedOverrideKey,
   setDraftFor,
   setDraftFromForm,
   setDraftFromLoggedSet,
   setDraftKey,
-  withLoggedSet,
 } from './workout-log.js'
+import { itemKey, itemLoggingState, replacementItem, withLoggedSet } from './workout-items.js'
 
 const EXERCISES = [
   { id: 'ex-a', name: 'Chest Press', equipment: 'Machine', type: 'machine', weightStep: '5' },

@@ -3,7 +3,8 @@
 // effort, Add set, Swap, Finish), then migrated. exchange.test.js / req-220.test.js check it
 // against the export's field map (FIELDS) and round-trip it through export → import.
 import { migrateState } from '../model.js'
-import { addWorkingSetToState, finishedState, setDraftFromForm } from '../workout-log.js'
+import { addWorkingSetToState } from '../workout-items.js'
+import { finishedState, setDraftFromForm } from '../workout-log.js'
 import { itemEffortState, replaceItemInState, setLoggedState, startedWorkoutState } from '../state-reducers.js'
 import { withCardioValues } from '../cardio-set.js'
 

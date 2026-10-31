@@ -6,7 +6,7 @@
 import { isWeightedType } from './ids.js'
 import { routineById } from './model.js'
 import { isSkippedSet } from './set-rules.js'
-import { itemKey, setsForItem, withLoggedSet } from './workout-log.js'
+import { itemKey, setsForItem, withLoggedSet } from './workout-items.js'
 
 // Two kg lists equal as numbers (0 / '' / missing = no weight) and in length.
 export function sameKgList(a, b) {

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import { replaceItemInState } from './state-reducers.js'
-import { itemKey } from './workout-log.js'
+import { itemKey } from './workout-items.js'
 import { itemLogPath } from './workout-paths.js'
 
 const EXERCISES = [

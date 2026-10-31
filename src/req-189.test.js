@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs'
 import { needsSetup, noHistoryItem, swapNoHistoryItem, swapPicks } from './mid-workout-pick.js'
 import { isDumbbellEquipment, kgLabelFor } from './kg-label.js'
 import { doneRowSuffix, itemSwappedAway } from './views/workout/row-label.js'
-import { itemKey, skipItemPatch } from './workout-log.js'
+import { itemKey, skipItemPatch } from './workout-items.js'
 import { act, importJsx, render } from './test-support/render.js'
 
 const h = React.createElement

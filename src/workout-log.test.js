@@ -3,21 +3,11 @@ import assert from 'node:assert/strict'
 import { rpeOptionValue } from './ids.js'
 import {
   allItemsDone,
-  itemIsMarkedDone,
-  itemKey,
-  itemLoggingState,
-  lastLoggedSetIndex,
-  markItemDonePatch,
-  reopenItemPatch,
-  withOneMoreSet,
-  addWorkingSetToState,
-  withSkippedUnloggedSets,
   restPatchAfterSet,
   restRemaining,
   carriedWorkingSet,
   setLogSeed,
   initialSetFields,
-  isSkippedSet,
   seedOverrideKey,
   nextSeedOverrides,
   setTargetFor,
@@ -26,6 +16,17 @@ import {
   setPreview,
   setPreviewText,
 } from './workout-log.js'
+import {
+  itemIsMarkedDone,
+  itemKey,
+  itemLoggingState,
+  markItemDonePatch,
+  reopenItemPatch,
+  withOneMoreSet,
+  addWorkingSetToState,
+  withSkippedUnloggedSets,
+} from './workout-items.js'
+import { isSkippedSet } from './set-rules.js'
 import { historySetPrefill, lastSetsForExercise } from './history-queries.js'
 import { DEFAULT_DURATION_SEC } from './model.js'
 
@@ -138,18 +139,6 @@ describe('workout logging', () => {
     const patch = reopenItemPatch({ completedItemIds: ['si-other', 'si-row'] }, item)
     assert.deepEqual(patch.completedItemIds, ['si-other'])
     assert.equal(itemIsMarkedDone({ completedItemIds: patch.completedItemIds }, item), false)
-  })
-
-  it('finds the last logged set for this exercise so you can go back', () => {
-    const workout = {
-      sets: [
-        { routineItemId: 'si-other', reps: '8' },
-        { routineItemId: 'si-row', setType: 'work', reps: '10' },
-        { routineItemId: 'si-row', setType: 'work', reps: 'skipped' },
-      ],
-    }
-    assert.equal(lastLoggedSetIndex(workout, item), 2)
-    assert.equal(lastLoggedSetIndex({ sets: [] }, item), -1)
   })
 
   it('adds a working set to this workout only, not the routine', () => {

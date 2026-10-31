@@ -40,7 +40,8 @@ import { StoreContext } from './store-context'
 import { routineItemExerciseChanged } from './routine-item-change.js'
 import { exerciseFromData } from './exercise-names.js'
 import { nextWorkoutName, planIds, planToState } from './plan-templates.js'
-import { addWorkingSetToState, finishedState, finishTimeFor } from './workout-log'
+import { addWorkingSetToState } from './workout-items.js'
+import { finishedState, finishTimeFor } from './workout-log.js'
 
 export function StoreProvider({ children, sync = null }) {
   const [state, setStateRaw] = useState(loadState)
