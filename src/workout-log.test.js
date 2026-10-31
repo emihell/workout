@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { rpeOptionValue } from './ids.js'
-import { allItemsDone, restPatchAfterSet, restRemaining } from './workout-log.js'
+import { allItemsDone } from './workout-log.js'
 import {
   itemIsMarkedDone,
   itemKey,
@@ -12,6 +12,7 @@ import {
   addWorkingSetToState,
   withSkippedUnloggedSets,
 } from './workout-items.js'
+import { restPatchAfterSet, restRemaining } from './workout-timers.js'
 import {
   carriedWorkingSet,
   setLogSeed,

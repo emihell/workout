@@ -26,7 +26,7 @@ import {
 import { finishedState } from './workout-finish.js'
 import { formFieldsWithDraft, setDraftFromForm, setDraftKey } from './set-drafts.js'
 import { loggedSetRowText } from './set-display.js'
-import { startStopwatchPatch, stopwatchFor, stopwatchOwner } from './workout-log.js'
+import { startStopwatchPatch, stopwatchFor, stopwatchOwner } from './workout-timers.js'
 import { withLoggedSet } from './workout-items.js'
 import { historyPrescription } from './history-queries.js'
 import { pickerItem } from './routine-picker.js'

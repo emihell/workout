@@ -4,7 +4,7 @@
 // name, never copied into stored data. No entry → nothing extra (DESIGN §1: absent is absent).
 import { libraryEntryFor } from './exerciseLibrary.js'
 import { itemKey } from './workout-items.js'
-import { restRemaining } from './workout-log.js'
+import { restRemaining } from './workout-timers.js'
 
 export const REST_CUES_MAX = 3
 

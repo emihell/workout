@@ -40,13 +40,13 @@ import {
 } from '../../set-drafts.js'
 import { isSkippedSet } from '../../set-rules.js'
 import { loggedSetRowText, setListRows } from '../../set-display.js'
+import { nextNotDoneItem } from '../../workout-log.js'
 import {
-  nextNotDoneItem,
   restPatchAfterSet,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,
-} from '../../workout-log.js'
+} from '../../workout-timers.js'
 import { liveSetWeight, skippedSetSave, viewedSetSave } from '../set-values.js'
 import { ExercisesLink, Missing } from '../shared'
 import {

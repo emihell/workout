@@ -1,6 +1,6 @@
 // req-165 (F-LINT-1) — moved out of rest.jsx so that file exports components only.
 import { useEffect, useState } from 'react'
-import { restRemaining } from '../../workout-log.js'
+import { restRemaining } from '../../workout-timers.js'
 
 // Reads the workout-level rest state (restEndsAt / restPausedRemaining, both
 // already persisted on activeWorkout) and ticks a display clock while a rest is
