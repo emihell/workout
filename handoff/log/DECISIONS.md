@@ -2360,3 +2360,14 @@ effort by load, stall = basics first then ±20 % sets, reactive lighter week, �
 bell rule; strength row fixed (80 % 1RM ≈ ≤ 8 reps). Book = coach experience; where it disagrees with EVIDENCE, the research
 wins (e.g. RP's 2.2 g/kg protein, 8 h sleep, cardio caution). App gaps → BACKLOG §Phase 1.
 `(unconfirmed)`: whether a routine per week in the loop counts as "as built" for week-to-week set changes (DEC-146).
+
+## DEC-151 — Planner's recommendations on the Coach open calls, accepted  (Emilio, 2026-10-31)
+
+Emilio: "illl go with you recs".
+1. **A wish that breaks balance:** Coach explains the trade-off and offers the closest balanced plan; if the client insists,
+   the extra is a focus point on top of the floor (≥ 4 sets per area), never by dropping the base (DEC-148 open call).
+2. **Intervals with today's timers:** work and rest each ≥ 30 s (DEC-146 §4).
+3. **Week-to-week variation:** a second routine on another loop week is as built (a lighter week, heavy/light alternation);
+   a set count climbing every week of a block → For Planner (DEC-150 open call).
+4. **`EVIDENCE.md` accepted** (DEC-149).
+5. **Supersets are Phase 1** (in-gym flow), not with req-184.

@@ -31,6 +31,10 @@ it: write it under "For Planner" in the report (what, why, the data). There are 
 
 **Schedule** — `loopWeeks` (a cycle of N weeks), `slots[]` = routine on week N, weekday (0 = Sunday … 6 = Saturday).
 
+**Week-to-week variation** (DEC-151): a second routine on another week of the `loopWeeks` schedule is as built — use it
+for a lighter week or a heavy/light alternation (a 2-week loop). A set count that climbs every week of a block needs more
+routine copies than that; it goes to "For Planner" instead.
+
 ## Limits and workarounds
 
 **A plan uses only what the workout can run as built (DEC-146).** Something the app can't express is **not built at all**
@@ -48,7 +52,7 @@ it: write it under "For Planner" in the report (what, why, the data). There are 
 **Intervals with the timers that exist** (DEC-146 §4): a timed exercise (`hasDuration`, `durations[]` = work seconds per
 round) with `restSec` = rest seconds. Each round costs two taps — Done (starts rest) and Start (next countdown;
 `src/ui/index.jsx:430`, `src/views/workout/item.jsx:355`) — so build it only when work and rest are each ≥ 30 s
-`(unconfirmed: the threshold — Emilio)`.
+(Emilio, DEC-151).
 
 **Where things belong:** item `notes` say something about this item in this routine, never a missing feature. Technique
 cues: see "Notes and cues" below — today no field shows them reliably in the gym.

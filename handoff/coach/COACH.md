@@ -60,8 +60,9 @@ Emilio, 2026-10-26: "balance is key, then we can have focus points." Every plan 
    hamstrings/glutes, core (calves optional) — push ≈ pull, upper ≈ lower, knee- ≈ hip-dominant, both sides of one-sided
    work. The numbers (minimum sets per area, the largest allowed ratio) depend on level and goal: `GOALS.md` → Balance.
 2. **Focus points on top:** the goal and what the client asks to emphasise — never by taking the base away.
-A wish that breaks the base (e.g. "only arms"): explain the trade-off with the data, offer the closest balanced plan.
-`(unconfirmed: whether the client may override — Emilio)`
+A wish that breaks the base (e.g. "only arms"): explain the trade-off with the data and offer the closest balanced plan.
+If they still want it, build the extra as a focus point **on top of the floor** (`GOALS.md`: ≥ 4 sets per area) — never by
+dropping the base (DEC-151).
 
 **Counting sets:** `GOALS.md` → Balance numbers (primary 1, secondary 0.5 — EVIDENCE §2). Same rule every run.
 

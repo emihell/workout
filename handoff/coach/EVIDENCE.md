@@ -2,7 +2,7 @@
 
 Sources Coach cites (DEC-149). Built 2026-10-31 by a research agent. Every DOI was resolved in Europe PMC and checked
 against its abstract (or the open full text for WHO 2020, PAR-Q+ and AASM). Planner re-resolved the six 2023–2026 DOIs.
-A claim not here = "general knowledge, not yet sourced". **Emilio reviews this file** `(unconfirmed)`. OA = open access.
+A claim not here = "general knowledge, not yet sourced". Accepted by Emilio 2026-10-31 (DEC-151). OA = open access.
 When a newer source replaces an older one, the older one is marked *superseded*.
 
 ## 1. Public-health baseline
