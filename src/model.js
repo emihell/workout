@@ -426,11 +426,13 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
         const next = byKey.get(item.id)
         if (!next) return item
         const targets = next.targetsTo?.length ? [...next.targetsTo] : [...(item.targets || [])]
-        const suggestedWeights = Array.isArray(next.to) ? [...next.to] : [...(item.suggestedWeights || [])]
+        // req-274 — `to: null` (a bodyweight item) leaves the routine item's kg exactly as it is.
+        const writesKg = Array.isArray(next.to)
+        const suggestedWeights = writesKg ? [...next.to] : item.suggestedWeights || []
         return {
           ...item,
           targets,
-          suggestedWeights,
+          ...(writesKg ? { suggestedWeights } : {}),
           sets: Math.max(Number(item.sets) || 1, targets.length, suggestedWeights.length),
         }
       }),
@@ -481,14 +483,16 @@ export function progressionForItem(exercises, workout, item) {
   // holding `[0]` can't write `[0]` either (Planner, req-262).
   const cardio = exercise?.type === 'cardio'
   const ownPlan = !sets.length || cardio
-  // req-274 — a bodyweight item's kg is its own (`[]` stays `[]`): the recommendation's `[0]`s
-  // are kg the user never entered. Its targets still progress (bodyweight reps unchanged).
-  const ownKg = ownPlan || !isWeightedType(exercise?.type)
+  // req-274 (Planner, as req-262's cardio rule) — a non-weighted (bodyweight) item never writes
+  // kg: `to: null` → applyProgressionToRoutines keeps the routine item's own suggestedWeights
+  // exactly as they are (an old snapshot's `[0]` is neither written nor cleaned). Its targets
+  // still progress (bodyweight reps unchanged). Cardio keeps req-262's own-plan `to` (never written).
+  const writesKg = cardio || isWeightedType(exercise?.type)
   return {
     routineItemId: itemIdValue,
     sets,
     recommendation,
-    to: ownKg ? item.suggestedWeights || [] : recommendation.weights,
+    to: !writesKg ? null : ownPlan ? item.suggestedWeights || [] : recommendation.weights,
     targetsTo: ownPlan ? item.targets || [] : recommendation.targets,
     writesRoutine: !cardio,
   }

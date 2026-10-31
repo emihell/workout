@@ -168,20 +168,39 @@ const bwState = (type, target) => ({
   ],
 })
 
-describe('req-274 AC4 — (c) Apply on a bodyweight item keeps its own kg', () => {
+// Planner's call (req-274, as req-262's cardio rule): Apply on a non-weighted item never writes
+// suggestedWeights — the routine item's kg stays exactly as it is; targets still progress.
+describe('req-274 AC4 — (c) Apply on a bodyweight item never writes kg', () => {
   for (const [label, target] of [['timed', '45s'], ['plain', '10']]) {
-    it(`${label} bodyweight → to [] and the routine keeps suggestedWeights []; targets as the recommendation`, () => {
+    it(`${label} bodyweight → to null and the routine keeps suggestedWeights []; targets as the recommendation`, () => {
       const s = bwState('bodyweight', target)
       const p = progressionForItem(s.exercises, s.workouts[0], s.workouts[0].snapshot.items[0])
       const routineItem = recalculatedState(s, 'wk').routines[0].exercises[0]
       console.log(`AC4 ${label}: to ${JSON.stringify(p.to)} targetsTo ${JSON.stringify(p.targetsTo)} recommendation.targets ${JSON.stringify(p.recommendation.targets)} → routine ${JSON.stringify(routineItem)}`)
-      assert.deepEqual(p.to, [])
+      assert.equal(p.to, null)
       assert.deepEqual(p.targetsTo, p.recommendation.targets)
       assert.deepEqual(routineItem.suggestedWeights, [])
       assert.deepEqual(routineItem.targets, p.recommendation.targets)
       assert.equal(p.writesRoutine, true)
     })
   }
+  it('an old snapshot bodyweight item holding [0] → Apply → routine kg byte-identical, targets updated', () => {
+    for (const routineKg of [[], [0], undefined]) {
+      const s = bwState('bodyweight', '10')
+      s.workouts[0].snapshot.items[0].suggestedWeights = [0]
+      s.workouts[0].sets[0] = { ...s.workouts[0].sets[0], reps: '12' }
+      const own = { id: 'i1', exerciseId: 'bw', sets: 1, targets: ['8'] }
+      s.routines[0].exercises[0] = routineKg ? { ...own, suggestedWeights: routineKg } : own
+      const before = JSON.stringify(s.routines[0].exercises[0].suggestedWeights)
+      const after = recalculatedState(s, 'wk').routines[0].exercises[0]
+      const p = progressionForItem(s.exercises, s.workouts[0], s.workouts[0].snapshot.items[0])
+      console.log(`AC4 old [0] snapshot, routine kg ${before} → ${JSON.stringify(after.suggestedWeights)}; targets ["8"] → ${JSON.stringify(after.targets)}`)
+      assert.equal(JSON.stringify(after.suggestedWeights), before)
+      assert.equal('suggestedWeights' in after, routineKg !== undefined)
+      assert.deepEqual(after.targets, p.recommendation.targets)
+      assert.notDeepEqual(after.targets, ['8'])
+    }
+  })
   it('a weighted item\'s Apply is unchanged', () => {
     const item = recalculatedState(bwState('bodyweight', '10'), 'wk').routines[0].exercises[1]
     assert.equal(JSON.stringify(item), '{"id":"i2","exerciseId":"press","sets":2,"targets":["8","8"],"suggestedWeights":[40,40]}')
