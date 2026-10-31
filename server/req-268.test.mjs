@@ -88,6 +88,39 @@ test('a workout in progress whose id is not in history is never dropped, even wh
   assert.ok(!conflicts.some((c) => c.kind === 'finished-elsewhere'))
 })
 
+// Review should-fix 1 — the phone finished wo-2 and started wo-new; the laptop (old base) logs a set
+// on wo-2. The stale wo-2 is dropped, and the phone's live wo-new is kept (not null).
+test('review 1: a stale workout finished elsewhere never ends the other device’s new live workout (both directions)', () => {
+  const { base, A: finished, B, id } = threeStates()
+  const A = { ...finished, activeWorkout: { ...base.activeWorkout, id: 'wo-new', sets: [] } }
+  for (const [mine, theirs] of [
+    [B, A],
+    [A, B],
+  ]) {
+    const { state, conflicts } = mergeStates(base, mine, theirs)
+    assert.equal(state.activeWorkout, A.activeWorkout, 'wo-new kept, verbatim')
+    assert.equal(state.workouts.filter((w) => w.id === id).length, 1)
+    assert.ok(!conflicts.some((c) => c.lost === A.activeWorkout), 'wo-new is not listed as lost: it was kept')
+    if (mine === B) {
+      assert.deepEqual(conflicts.filter((c) => c.field === 'activeWorkout'), [
+        { field: 'activeWorkout', id: null, kind: 'finished-elsewhere', lost: B.activeWorkout },
+      ])
+    }
+  }
+})
+
+test('review 2: an activeWorkout without an id is never matched to history entries without one', () => {
+  const noId = { routineId: 'rtn-a', sets: [] }
+  const base = { activeWorkout: null, workouts: [] }
+  const mine = { activeWorkout: noId, workouts: [{ name: 'no id' }] }
+  const theirs = { activeWorkout: null, workouts: [] }
+  const { state, conflicts } = mergeStates(base, mine, theirs)
+  assert.equal(state.activeWorkout, noId)
+  assert.ok(!conflicts.some((c) => c.kind === 'finished-elsewhere'))
+  const withNull = mergeStates(base, { activeWorkout: noId, workouts: [null] }, theirs)
+  assert.equal(withNull.state.activeWorkout, noId)
+})
+
 // --- step 2: the read-only duplicate-id check (./server/ops duplicates [<db file>]) ---
 async function dataDirWith(state) {
   const dataDir = tempDir('workout-req268-test-')

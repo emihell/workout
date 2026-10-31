@@ -1019,4 +1019,33 @@ describe('req-268 — a workout finished elsewhere never comes back as in progre
     assert.equal(after.workouts.filter((w) => w.id === id).length, 1, 'one history entry on the server')
     assert.equal(after.routines.find((r) => r.id === 'rtn-a').name, 'laptop edit', 'the laptop’s edit is kept')
   })
+
+  // Review should-fix 1 — the phone finished wo-2 AND started wo-new; the laptop's rebase drops its
+  // stale wo-2 and keeps wo-new (never pushes null over the phone's live workout).
+  it('review 1: the rebase keeps the phone’s new live workout, on the laptop and on the server', async () => {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user) // rev 1: wo-2 in progress
+    const laptop = device(emptyState())
+    await laptop.login(user)
+    phone.change((s) => finishedState(s, { overallNote: '', overallFeel: '' }, '2026-10-09T18:00:00.000Z'))
+    phone.change((s) => ({ ...s, activeWorkout: { ...fullState().activeWorkout, id: 'wo-new' } }))
+    await phone.settle() // rev 2: wo-2 finished, wo-new in progress
+    let release
+    laptop.fetch.hold = new Promise((r) => (release = r))
+    laptop.change((s) => renamed(s, 'rtn-a', 'laptop edit'))
+    const out = laptop.engine.flush()
+    await new Promise((r) => setTimeout(r, 30))
+    laptop.change((s) => withSet(s)) // a set on the stale wo-2, while the push is out
+    laptop.fetch.hold = null
+    release()
+    await out
+    assert.equal(laptop.state.activeWorkout?.id, 'wo-new', 'the laptop shows the phone’s live workout')
+    await laptop.settle()
+    assert.equal(server(user).state.activeWorkout?.id, 'wo-new', 'the server still has it in progress')
+    assert.equal(server(user).state.workouts.filter((w) => w.id === 'wo-2').length, 1)
+    await phone.engine.trigger()
+    await phone.engine.idle()
+    assert.equal(phone.state.activeWorkout?.id, 'wo-new', 'the phone’s workout is not ended')
+  })
 })
