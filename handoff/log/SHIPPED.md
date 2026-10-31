@@ -2889,3 +2889,8 @@ main 1 library request → branch 0 (hints 1); 944-entry equality test; freshnes
 
 Bug; throwaway agent, …`f0b27ca`. `bad-conflicts` 400 → drop sent list, warn with the records, re-push; `other` passed only when `restored`.
 Gate: new tests fail on main; `./check` 2304; smoke; independent reviewer: No blockers, should-fix (pruned path) fixed. Latents: rollback server has no `code`; immutable-open race = stale count. `reports/req-273.md`.
+
+## req-274 — Sets ≤ 20 everywhere; key-less items keep their sets after reload; bodyweight Apply writes no kg; add-set Back never "Not found."  (2026-10-31)
+
+Bug; throwaway agent, …`608654d`. Live + History Add set and Apply clamp at MAX_SETS; matcher takes the workout's items (no double count);
+bodyweight `to: null` (Planner). Gate: 21 new tests fail-then-pass; `./check` 2325; smoke + QA 6/6; independent reviewer ×2: No blockers. `reports/req-274.md`.
