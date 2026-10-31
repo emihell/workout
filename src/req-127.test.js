@@ -14,7 +14,7 @@ import {
 } from './exercise-names.js'
 import { uid } from './ids.js'
 import { buildPlannedWorkout, migrateState } from './model.js'
-import { removeExerciseFromState, restoreExerciseInState } from './storage.js'
+import { removeExerciseFromState, restoreExerciseInState } from './state-reducers.js'
 
 const bench = { id: 'ex-bench', name: 'Bench', type: 'free', archivedAt: null }
 const squat = { id: 'ex-squat', name: 'Squat', type: 'free', archivedAt: null }

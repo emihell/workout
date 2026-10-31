@@ -123,11 +123,6 @@ function swapsOn(schedule, key) {
   return out
 }
 
-// req-225 — the swap that makes `slotId` another routine on `date`, or null.
-export function swapOn(schedule, slotId, date) {
-  return swapsOn(schedule, dateKey(date)).get(slotId) || null
-}
-
 // req-211 review — a move counts only while its slot is genuinely on `move.from` (that date's
 // loop week and weekday are the slot's). After a loop resize or a weekday change a stored move
 // can point at a date the slot is no longer on: it is ignored (not rewritten), so it can't put

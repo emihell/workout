@@ -23,7 +23,7 @@ import {
 } from './weight-step.js'
 import { applyBackup, buildBackup } from './exchange.js'
 import { migrateState } from './model.js'
-import { emptyState, loadState } from './storage.js'
+import { emptyState, loadState } from './persistence.js'
 import { exerciseUpdatedState } from './state-reducers.js'
 
 // Every object in db.json that carries a weightStep: the seed exercises and every snapshot

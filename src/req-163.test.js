@@ -13,7 +13,7 @@ import {
   lastSetsForExercise,
   previousSameRoutineWorkouts,
   summaryPriorWorkout,
-} from './storage.js'
+} from './history-queries.js'
 import { setLogSeed } from './workout-log.js'
 import { formatSetLine } from './ids.js'
 

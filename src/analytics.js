@@ -132,6 +132,8 @@ export function loadAnalytics() {
 }
 
 // Every day bucket added up — for reading counts regardless of which day they fell on.
+// Kept though only tests call it (req-269, the req-165 F-DEAD-5 rule): req-191's real-tap
+// tests read their counts through it, whatever day the run lands on.
 export function sumDays(data) {
   const total = emptyDay()
   for (const day of Object.values(isObject(data?.days) ? data.days : {})) {
@@ -182,7 +184,9 @@ export function recordButton(name, now = new Date()) {
   }
 }
 
-// The raw analytics object (live reference).
+// The raw analytics object (live reference). Kept though only tests call it (req-269, the
+// req-165 F-DEAD-5 rule): `data` is module-private, and this is the tests' one read of
+// what recordScreen/recordButton just wrote (analytics.test.js, req-191).
 export function exportAnalytics() {
   return data
 }

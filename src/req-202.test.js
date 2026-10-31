@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
 import { routineItemMeta, formatSetLine, WITH_WARMUP } from './ids.js'
-import { historyGroupMeta } from './views/history/helpers.js'
 import { applyBackup } from './exchange.js'
 import * as route from './route.js'
 
@@ -95,7 +94,6 @@ describe('item 3 — an item\'s warm-up flag reads "with warm-up"', () => {
   it('routine row meta, History row meta; a real warm-up set keeps "Warm-up set"', () => {
     assert.equal(WITH_WARMUP, 'with warm-up')
     assert.equal(routineItemMeta({ warmup: { reps: 12 }, sets: 3 }), 'with warm-up · 3 sets')
-    assert.equal(historyGroupMeta({ role: 'main', warmup: { reps: 12 } }, 4), 'with warm-up · 4 sets')
     assert.equal(formatSetLine({ setType: 'wu', weight: 10, reps: '12' }), 'Warm-up set · 10 kg × 12') // req-209 test edit: one set format "{kg} kg × {reps}" (§3), was " · "
   })
 

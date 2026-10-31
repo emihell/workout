@@ -135,10 +135,11 @@ m="$(merge_req 306 src/model.test.js '## Technical
 tests only.')"
 out="$(reviewer_warning "$R" "$m" req-306)"
 [ -z "$out" ] && ok "only src/model.test.js touched (tests excluded) → no warning" || bad "expected no warning, got '$out'"
-for f in src/store.jsx src/storage.js src/progress.js src/workout-log.js src/views/history/store-bits.js; do
+# req-269: storage.js's successors (req-164 split) are triggers too.
+for f in src/store.jsx src/storage.js src/persistence.js src/history-queries.js src/state-reducers.js src/progress.js src/workout-log.js src/views/history/store-bits.js; do
   printf '%s\n' "$f" | grep -Eq "$REVIEWER_TRIGGER_RE" && ok "trigger regex matches $f" || bad "trigger regex misses $f"
 done
-for f in src/App.jsx src/views/Settings.jsx scripts/model.js; do
+for f in src/App.jsx src/views/Settings.jsx scripts/model.js src/views/history/helpers.js src/persistence.test.js src/set-rules.js; do
   printf '%s\n' "$f" | grep -Eq "$REVIEWER_TRIGGER_RE" && bad "trigger regex wrongly matches $f" || ok "trigger regex skips $f"
 done
 

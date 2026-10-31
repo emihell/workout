@@ -1,8 +1,8 @@
 // req-154 — what each logged-set save writes, from the set forms' RAW field text. Pure
 // and JSX-free so `node --test` can import it; the four callers (item.jsx completeSet
-// and the live Previous → Save, history/edit.jsx HistorySet, history/add-set.js withHistorySet)
+// and LoggedSetSheet's Save, history/edit.jsx HistorySet, history/add-set.js withHistorySet)
 // keep their own "empty" value, as SetEditForm's header describes:
-//   - live log / Previous → Save: a blank kg is 0 (as before);
+//   - live log / LoggedSetSheet Save: a blank kg is 0 (as before);
 //   - History edit / add: a blank kg stays '' (as before).
 // A kg that isn't a number returns null — "don't save". The forms (SetLogForm,
 // SetEditForm) already refuse Complete/Save with an inline error (kg-input.js kgError),
@@ -12,6 +12,17 @@ import { secondsToSave } from '../seconds-input.js'
 import { isSkippedSet } from '../set-rules.js'
 import { nextSeedOverrides, seedOverrideKey } from '../workout-log.js'
 import { CARDIO_KEYS, cardioPatch } from '../cardio-set.js'
+
+// The test for "another set of the same kind as `set`": the same routine item and exercise,
+// and both warm-up or both work. viewedSetSave and skippedSetSave share it, so the set that
+// counts as the carry's source is the same set for an edit and for a skip.
+function sameKind(set) {
+  const type = set.setType === 'wu' ? 'wu' : 'work'
+  return (other) =>
+    (other.routineItemId || '') === (set.routineItemId || '') &&
+    other.exerciseId === set.exerciseId &&
+    (other.setType === 'wu' ? 'wu' : 'work') === type
+}
 
 function effortValue(rpe) {
   return rpe === '' || rpe == null ? null : Number(rpe)
@@ -62,12 +73,7 @@ export function liveSetEditPatch({ weight, reps, effort, durationSec, cardio }, 
 export function viewedSetSave(values, { weighted, timed = false, initialEffort, set, presentedWeight, seedOverrides, sets = [], setIndex = -1 }) {
   const setPatch = liveSetEditPatch(values, { weighted, timed, initialEffort, set })
   if (!setPatch) return null
-  const type = set.setType === 'wu' ? 'wu' : 'work'
-  const sameKind = (other) =>
-    (other.routineItemId || '') === (set.routineItemId || '') &&
-    other.exerciseId === set.exerciseId &&
-    (other.setType === 'wu' ? 'wu' : 'work') === type
-  const latest = !sets.slice(setIndex + 1).some(sameKind)
+  const latest = !sets.slice(setIndex + 1).some(sameKind(set))
   if (!latest) return { setPatch, seedOverrides }
   const overrides = nextSeedOverrides(seedOverrides, {
     exerciseId: set.exerciseId,
@@ -90,17 +96,14 @@ export function skippedSetSave({ weighted, set, seedOverrides, sets = [], setInd
   const setPatch = { weight: 0, reps: 'skipped', note: 'skipped', rpe: null }
   for (const key of CARDIO_KEYS) if (key in set) setPatch[key] = undefined
   const type = set.setType === 'wu' ? 'wu' : 'work'
-  const sameKind = (other) =>
-    (other.routineItemId || '') === (set.routineItemId || '') &&
-    other.exerciseId === set.exerciseId &&
-    (other.setType === 'wu' ? 'wu' : 'work') === type
+  const kind = sameKind(set)
   const unchanged = { setPatch, seedOverrides }
-  if (!weighted || sets.slice(setIndex + 1).some(sameKind)) return unchanged
+  if (!weighted || sets.slice(setIndex + 1).some(kind)) return unchanged
   const map = seedOverrides || {}
   const key = seedOverrideKey(set.exerciseId, type)
   const prev = map[key]
   if (prev?.weight == null || prev.weight === '' || Number(prev.weight) !== Number(set.weight)) return unchanged
-  const source = sets.filter((other, i) => i !== setIndex && sameKind(other) && !isSkippedSet(other) && Number(other.weight) > 0).at(-1)
+  const source = sets.filter((other, i) => i !== setIndex && kind(other) && !isSkippedSet(other) && Number(other.weight) > 0).at(-1)
   if (source) {
     if (Number(source.weight) === Number(prev.weight)) return unchanged
     return { setPatch, seedOverrides: { ...map, [key]: { ...prev, weight: String(source.weight) } } }

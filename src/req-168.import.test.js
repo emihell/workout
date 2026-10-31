@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { importWithBackup, KEEP_NO_SPACE_MESSAGE } from './import-backup.js'
 import { commitBackup } from './exchange.js'
-import { getLoadUnreadable, loadState, saveState, UNREADABLE_COPY_PREFIX } from './storage.js'
+import { getLoadUnreadable, loadState, saveState, UNREADABLE_COPY_PREFIX } from './persistence.js'
 
 const V9 = 'workout-mvp-v9'
 const V8 = 'workout-mvp-v8'

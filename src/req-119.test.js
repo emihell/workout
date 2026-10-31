@@ -8,19 +8,17 @@
 // reducers store.removeExercise / store.removeRoutine now call.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
+import { buildPlannedWorkout, migrateState, planSnapshot, routineById } from './model.js'
 import {
   deletionConfirmHead,
   exerciseDeletionImpact,
   exerciseInActiveWorkout,
-  exercisesInHistory,
-  routineById,
-  isFirstRun,
   removeExerciseFromState,
   removeRoutineFromState,
   routineDeletionImpact,
   routineInActiveWorkout,
-} from './storage.js'
+} from './state-reducers.js'
+import { exercisesInHistory, isFirstRun } from './history-queries.js'
 import { durationTargetFor, finishedState, itemKey, replacementItem, sessionExercise } from './workout-log.js'
 import { isWeightedType } from './ids.js'
 

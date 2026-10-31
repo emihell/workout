@@ -4,24 +4,8 @@
 // removal) is checked statically by grep, so no test names the removed functions.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { historyPrescription, summaryPriorWorkout, workoutSummaryStats } from './storage.js'
-import { historyGroupMeta } from './views/history/helpers.js'
+import { historyPrescription, summaryPriorWorkout, workoutSummaryStats } from './history-queries.js'
 import { wakeLockWanted } from './wake-lock.js'
-
-describe('req-128 1: History detail row meta follows the req-93 rule', () => {
-  it('main / absent role is unlabelled', () => {
-    assert.equal(historyGroupMeta({ role: 'main' }, 3), '3 sets')
-    assert.equal(historyGroupMeta({}, 1), '1 set')
-    assert.equal(historyGroupMeta(null, 2), '2 sets')
-    assert.doesNotMatch(historyGroupMeta({ role: 'main', warmup: true }, 3), /Main/)
-  })
-  it('warm-up / finisher / cardio carry their tag; WU set marker kept', () => {
-    assert.equal(historyGroupMeta({ role: 'warmup' }, 2), 'Warm-up · 2 sets')
-    assert.equal(historyGroupMeta({ role: 'finisher', warmup: true }, 1), 'Finisher · with warm-up · 1 set') // req-202 test edit: was 'Warm-up set'
-    assert.equal(historyGroupMeta({ role: 'cardio' }, 1), 'Cardio · 1 set')
-    assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 4), 'with warm-up · 4 sets') // req-202 test edit
-  })
-})
 
 describe('req-128 2: the summary compares against the latest prior with anything logged', () => {
   const wk = (id, sets, finishedAt) => ({

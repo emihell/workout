@@ -11,7 +11,7 @@ import {
   planSnapshot,
   recalculatedState,
 } from './model.js'
-import { historyPrescription, historySetPrefill, lastSetsForExercise } from './storage.js'
+import { historyPrescription, historySetPrefill, lastSetsForExercise } from './history-queries.js'
 import {
   allItemsDone,
   finishedState,

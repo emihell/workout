@@ -1,6 +1,8 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { completedOnDayKey, emptyState, exerciseDeletionImpact, getLoadUnreadable, getSaveFailed, historyPrescription, historySetPrefill, isExternalStateChange, lastSetsForExercise, loadState, previousSameRoutineWorkouts, routineDeletionImpact, saveState, staleInProgressWorkouts, workoutSummaryStats } from './storage.js'
+import { completedOnDayKey, historyPrescription, historySetPrefill, lastSetsForExercise, previousSameRoutineWorkouts, staleInProgressWorkouts, workoutSummaryStats } from './history-queries.js'
+import { emptyState, getLoadUnreadable, getSaveFailed, isExternalStateChange, loadState, saveState } from './persistence.js'
+import { exerciseDeletionImpact, routineDeletionImpact } from './state-reducers.js'
 import { dateKey, mondayOf } from './schedule.js'
 
 // Swap in a localStorage whose setItem records normally, throws, or silently

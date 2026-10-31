@@ -1,14 +1,14 @@
 // req-161 (DEC-086) — the unreadable-state Import copies EVERY present workout key (a
 // leftover legacy key beside a corrupt v9 too), names each copy by its source, reuses an
 // identical copy instead of piling up retries, and says what to do when storage is full.
-// Runs the real storage.js + importWithBackup against an in-memory localStorage that
+// Runs the real persistence.js + importWithBackup against an in-memory localStorage that
 // enumerates like the real one, and a store stand-in that saves the way store.jsx does.
 import { describe, it, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { importWithBackup, KEEP_FAILED_MESSAGE, KEEP_NO_SPACE_MESSAGE } from './import-backup.js'
 import { commitBackup } from './exchange.js'
-import { getLoadUnreadable, keepUnreadableCopy, loadState, saveState, UNREADABLE_COPY_PREFIX } from './storage.js'
+import { getLoadUnreadable, keepUnreadableCopy, loadState, saveState, UNREADABLE_COPY_PREFIX } from './persistence.js'
 
 const V9 = 'workout-mvp-v9'
 const V8 = 'workout-mvp-v8'

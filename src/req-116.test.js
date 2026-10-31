@@ -7,7 +7,8 @@ import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import { finishedForPlan } from './current-workout.js'
-import { emptyState, workoutSummaryStats } from './storage.js'
+import { emptyState } from './persistence.js'
+import { workoutSummaryStats } from './history-queries.js'
 import {
   anythingLogged,
   autoCompleteArmed,

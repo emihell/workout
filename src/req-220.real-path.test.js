@@ -10,7 +10,7 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { act, importJsx, render } from './test-support/render.js'
 import { undocumentedFields } from './exchange.js'
-import { emptyState } from './storage.js'
+import { emptyState } from './persistence.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 
 const h = React.createElement

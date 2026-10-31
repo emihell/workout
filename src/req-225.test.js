@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
-import { coveringWorkout, doneEarlier, slotsOn, swapOn } from './schedule.js'
+import { coveringWorkout, doneEarlier, slotsOn } from './schedule.js'
 import { migrateState, normaliseSwaps, SCHEMA_VERSION } from './model.js'
 import { applyBackup, buildBackup, importResult, undocumentedFields } from './exchange.js'
 import { removeRoutineFromState, slotRemovedState, slotSwappedOnDateState } from './state-reducers.js'
@@ -83,7 +83,7 @@ describe('AC1 migration: swaps is additive (no version bump)', () => {
       globalThis.localStorage = previous
     })
     it('a v9 doc without swaps: the stored string is byte-identical after load (0 records rewritten)', async () => {
-      const { loadState } = await import('./storage.js')
+      const { loadState } = await import('./persistence.js')
       const doc = v9()
       delete doc.schedule.swaps
       const raw = JSON.stringify(doc)
@@ -160,11 +160,6 @@ describe('AC3 slotsOn applies a swap on its date only', () => {
     assert.equal(moved.routineId, 'sess-push-pull')
     assert.equal(moved.swappedFrom, 'sess-upper')
     assert.equal(thu.find((slot) => slot.id === 's-thu').routineId, 'sess-lower')
-  })
-  it('swapOn finds it by (slotId, date); none on another date', () => {
-    const schedule = sched({ swaps: [SWAP_TUE] })
-    assert.equal(swapOn(schedule, 's-tue', TUE)?.id, 'swap-1')
-    assert.equal(swapOn(schedule, 's-tue', NEXT_TUE), null)
   })
 })
 

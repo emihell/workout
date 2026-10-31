@@ -19,7 +19,7 @@ State is `localStorage` under `workout-mvp-v9`; the seed in `src/db.json` is
 first-run/provenance data, not the live store. To reset or inspect state, use the
 app's own Settings/seed path or clear the key in devtools — don't hand-edit
 `db.json` expecting it to change a running instance. Migrations live in
-`src/storage.js`; a schema bump needs a migration test (older key → v8).
+`src/model.js` (`migrateState`) and `src/persistence.js` (the legacy keys, `loadState`); a schema bump needs a migration test (older key → v8).
 
 ## Rails for changes
 
