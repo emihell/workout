@@ -101,6 +101,8 @@ describe('AC3 — failure case: a double tap on Add / Save commits once (rendere
     const { useStore } = await import('./store-context.js')
     const captured = {}
     function Probe() {
+      // A test harness reading the live store out of the tree (as req-156's).
+      // oxlint-disable-next-line react/immutability
       captured.store = useStore()
       return null
     }
