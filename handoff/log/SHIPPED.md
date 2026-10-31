@@ -2837,3 +2837,9 @@ Planner re-ran the repro (main 1/9 → 2/9). Reviewer: No blockers (10-state pro
 Bug (audit F-SYNC-1); throwaway agent, `128a5df`…`db0dade`. `dropFinished` shared by both merges (keeps the other side's live workout);
 app rebase sends local losses as `pendingConflicts` (sync meta) → server conflict record, deduped (DEC-155 §8-9); `./server/ops duplicates`
 (read-only). Gate: new tests fail on main; `./check` 2218 in 148; smoke green. Reviewer ×2: No blockers (E1–E3 probes, 6/6 runs). `reports/req-268.md`.
+
+## req-262 — old swaps pruned on Swap; cardio Apply leaves the routine alone; Back guard after a left-open Save; key-less items  (2026-10-31)
+
+Bug; throwaway agent, `756a8e5`…`d1f1772`. Prune before this week's Monday (local) on a Swap write; cardio `writesRoutine: false` (Planner);
+`getFinishedHere()` in memory (L-070); `setsForItem` ignores empty keys. Gate: new tests fail on main; `./check` 2232 in 149; smoke + browser
+run green. Reviewer: No blockers (4 TZs incl. DST, 10/10 runs). Backup reminder at deploy (swaps rewritten). `reports/req-262.md`.

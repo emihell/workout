@@ -631,3 +631,13 @@ its file times out at 60 s. Read the count on every receipt anyway.
 `audits/2026-10-30.md` (8 findings, one a sync bug) and the workflow plan's "later" list never reached BACKLOG, although
 `rules/AUDIT.md` "After the audit" step 2 says they must. Found only when Emilio asked "are we done with all audit reqs?".
 Triaged 2026-10-31 (BACKLOG §Tooling). Fix the habit with code, not prose: → BACKLOG §Tooling (an untriaged-finding check).
+
+## L-069 — `plan qa --seed` goes through the v8 migration; it can rewrite the data you meant to test  (req-262, 2026-10-31)
+
+`--seed` writes the file under `workout-mvp-v8`, so the app migrates it on load (req-262: a seeded cardio snapshot came back
+as `suggestedWeights: [0]`). To QA current-shape data, write it into `workout-mvp-v9` in the page and reload.
+
+## L-070 — any non-function field on the store object ends up in backup files  (req-262, 2026-10-31)
+
+`exportBackup(store)` keeps every non-function field (`src/exchange.js` `dataOnly`). In-memory-only state belongs behind a
+getter (req-262's `getFinishedHere()`), never as a plain field on the store.

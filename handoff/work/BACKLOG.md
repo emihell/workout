@@ -69,6 +69,11 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   then refuses to save, and C4 refuses when touched. Masked: no workout has > 20 work sets. Cap Add set, or clamp the copy.
 - **Pill N vs a "· swapped" row** (req-261 review, nit): after swapping item 1 of 9 the replacement is the 2nd row on the
   overview but the pill says "Ex 1 of 9" (N counts items, not on-screen rows). Feel check for Emilio.
+- **req-262 review** (latent, both already on main): (1) key-less snapshot items lose their sets after a reload — `migrateState`
+  re-keys sets to `history-<wk>-<ex>` but leaves the items key-less (`model.js:175-179,246-250`, `workout-log.js:19-28`);
+  (2) Apply on a timed bodyweight item writes `suggestedWeights: [0]` over `[]` (`model.js:476`; hidden by `isWeightedType`).
+  Nits: a no-op Swap now writes the schedule when stale swaps exist (`state-reducers.js:343-346`); "Update?" offers Apply
+  on an all-cardio workout that now does nothing (`recalc.jsx:24-45`); the prune uses the writing device's local today.
 **Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
 one is specced.
 - → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).

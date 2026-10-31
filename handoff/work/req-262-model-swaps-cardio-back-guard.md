@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · DEC-125 §5, DEC-126, DEC-058 §2, req-116, req-224. Fix batch (DEC-155): **after req-261** (both touch
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-262` (`756a8e5`…`d1f1772`, 4 commits).** · **Lane: bug** · DEC-125 §5, DEC-126, DEC-058 §2, req-116, req-224. Fix batch (DEC-155): **after req-261** (both touch
 `src/workout-log.js`). Touches `model.js`, `workout-log.js`, `store.jsx` → reviewer **and** backup reminder (WORKFLOW check 5; part 1 writes stored swaps).
 
 # req-262 — four small model fixes: stale swaps, cardio Apply, Back after a left-open Finish, key-less items
