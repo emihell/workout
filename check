@@ -129,7 +129,12 @@ fi
 tapfile="$(mktemp "${TMPDIR:-/tmp}/workout-check-tap.XXXXXX")"
 trap 'rm -f "$tapfile"' EXIT
 if [ -t 1 ]; then termreporter=spec; else termreporter=tap; fi
-WORKOUT_SERVER_TEST=1 node --test --test-timeout=60000 --test-force-exit \
+# req-266 (L-067): force-exit ended each file's process with its results still queued on the
+# stdout pipe to the runner, so a random file lost its last tests with no ✖ (2171–2187 across 10
+# runs of the same tree). scripts/test-stdio-blocking.mjs, preloaded into the runner and every
+# file's process, makes those pipe writes blocking, so process.exit() has nothing left to drop.
+WORKOUT_SERVER_TEST=1 node --import ./scripts/test-stdio-blocking.mjs \
+  --test --test-timeout=60000 --test-force-exit \
   --test-reporter="$termreporter" --test-reporter-destination=stdout \
   --test-reporter=tap --test-reporter-destination="$tapfile" \
   "${testfiles[@]}" &
