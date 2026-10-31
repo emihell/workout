@@ -1,6 +1,6 @@
 # Now
 
-Updated 2026-10-31. **Shipped: everything through req-254, req-257–258, req-266, req-259, req-261** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-31. **Shipped: everything through req-254, req-257–258, req-266, req-259, req-261, req-268** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 **Next:** the fix + structure batch (DEC-155 §1, §7: fixes, workflow, structure, cleanups before any feature). Serial, one
