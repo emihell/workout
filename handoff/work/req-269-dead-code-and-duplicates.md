@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · audit 2026-10-30 F-DEAD-7/F-DEAD-8/F-STRUCT-9, audit 09-12 F-DEAD-2, req-164 (the shim), req-165 (F-DEAD-5, the kept-for-tests rule), DEC-155. After req-261 (both edit `src/views/set-values.js`) and req-262; before req-270.
+**Status: BUILT, NOT merged — branch `req-269` (`66bb053`…`131939c`)** · **Lane: tooling** · audit 2026-10-30 F-DEAD-7/F-DEAD-8/F-STRUCT-9, audit 09-12 F-DEAD-2, req-164 (the shim), req-165 (F-DEAD-5, the kept-for-tests rule), DEC-155. After req-261 (both edit `src/views/set-values.js`) and req-262; before req-270.
 
 # req-269 — remove the storage.js shim, test-only exports, a duplicated predicate and unused @types
 

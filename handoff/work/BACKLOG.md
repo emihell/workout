@@ -74,6 +74,8 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   (2) Apply on a timed bodyweight item writes `suggestedWeights: [0]` over `[]` (`model.js:476`; hidden by `isWeightedType`).
   Nits: a no-op Swap now writes the schedule when stale swaps exist (`state-reducers.js:343-346`); "Update?" offers Apply
   on an all-cardio workout that now does nothing (`recalc.jsx:24-45`); the prune uses the writing device's local today.
+- **req-269 review nit:** `src/req-202.test.js:94` is titled "… History row meta …" but no longer asserts it; the live
+  "with warm-up" History header (`detail.jsx:134`) has no behaviour test. Retitle + add one.
 **Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
 one is specced.
 - → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).

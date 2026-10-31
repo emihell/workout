@@ -2843,3 +2843,9 @@ app rebase sends local losses as `pendingConflicts` (sync meta) → server confl
 Bug; throwaway agent, `756a8e5`…`d1f1772`. Prune before this week's Monday (local) on a Swap write; cardio `writesRoutine: false` (Planner);
 `getFinishedHere()` in memory (L-070); `setsForItem` ignores empty keys. Gate: new tests fail on main; `./check` 2232 in 149; smoke + browser
 run green. Reviewer: No blockers (4 TZs incl. DST, 10/10 runs). Backup reminder at deploy (swaps rewritten). `reports/req-262.md`.
+
+## req-269 — storage.js shim, test-only exports, duplicate sameKind and unused @types removed; reviewer trigger names storage.js's successors  (2026-10-31)
+
+Tooling; throwaway agent, `66bb053`…`131939c`. 24 test files re-pointed (imports only); 9 tests of deleted exports removed (2232 → 2223, each
+named); golden scripts fixed (broken since req-178, L-071); `plan` REVIEWER_TRIGGER_RE + persistence|history-queries|state-reducers (fails on
+main's `plan`). Gate: `./check --smoke` green. Reviewer ×2: No blockers (20k-case sameKind diff). `reports/req-269.md`.
