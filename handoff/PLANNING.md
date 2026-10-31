@@ -100,7 +100,7 @@ say-so, write "unconfirmed" in the entry.
 so.
 
 **Append to the logs, never insert.** A new DEC goes at the end of the newest `log/decisions/DEC-<range>.md`
-(start the next file at DEC-201); `log/LESSONS.md` likewise. Both are append-only, newest at the bottom. Append with a command that writes to the end,
+(a new range file every 50 entries); `log/LESSONS.md` likewise. Both are append-only, newest at the bottom. Append with a command that writes to the end,
 not a hand-anchored edit.
 
 **No auto-memory (Emilio, 2026-09-12).** Never write anything durable to file-based
