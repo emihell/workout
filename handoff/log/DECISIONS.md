@@ -2348,3 +2348,15 @@ source and DOI, resolved in Europe PMC and checked against the abstract by a res
 2023–2026 DOIs. ACSM 2026 replaces ACSM 2009. Coach cites §N or says "general knowledge, not yet sourced"; `GOALS.md` now
 cites it (set counting 0.5 for secondary muscles = Pelland 2026, so DEC-148's open call 2 is sourced). Books Emilio owns
 may be summarised outside git, next to `CLIENT.md`. `(unconfirmed)`: Emilio reviews the library.
+
+## DEC-150 — Coach learns from three training books: paraphrased notes outside git; research wins a conflict  (Emilio, 2026-10-31)
+
+Emilio owns hard copies of *The Muscle and Strength Pyramid: Training* (3rd ed. 2025), *Scientific Principles of
+Hypertrophy Training* (RP 2020) and *Kettlebell Simple & Sinister* (2013): "scan them and save any lines of information that
+sounds useful". Three agents read the PDFs; the notes are **paraphrased with page references, never copied text**, each
+tagged against EVIDENCE.md, in `workout-data/coach/books/` — outside git (copyright; DEC-068 pattern). Emilio copies the
+folder to the server Mac. `GOALS.md` progression rewritten from them: training status by rate, double progression,
+effort by load, stall = basics first then ±20 % sets, reactive lighter week, ≤ ~11 sets per muscle per session, S&S's own
+bell rule; strength row fixed (80 % 1RM ≈ ≤ 8 reps). Book = coach experience; where it disagrees with EVIDENCE, the research
+wins (e.g. RP's 2.2 g/kg protein, 8 h sleep, cardio caution). App gaps → BACKLOG §Phase 1.
+`(unconfirmed)`: whether a routine per week in the loop counts as "as built" for week-to-week set changes (DEC-146).

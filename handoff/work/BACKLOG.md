@@ -43,6 +43,10 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   should reach the log screen. Coach can't place technique cues anywhere he sees them until then.
 - **Target text is logged as reps** [measured 2026-10-31, `src/workout-log.js:613-615`]: a "10-12" / "AMRAP" target prefills
   Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`).
+- **Coach's app gaps from the training books** (DEC-150, notes in `workout-data/coach/books/`): a planned effort/RIR target
+  per item; rep-range progression in the app's recommendation (req-149); a weekly recovery check-in (5 questions); several
+  warm-up sets with kg (req-184 item 10); drop sets / myo-reps; a time for a whole item (the S&S bell trigger); left/right
+  alternation inside one item; sets that change week to week inside a routine. Each is a req candidate; none specced.
 - **Tips during rest** (generic form/motivation tips) — parked (DEC-108 §6): no evidence it helps, needs a cited tip set.
 - **req-77 active-workout affordance** — PAUSED (Emilio, 2026-09-16). Don't raise it until he revives it.
 
