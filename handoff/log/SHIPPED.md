@@ -2804,3 +2804,8 @@ tests fail on main's `plan`; Planner re-ran both suites + the 10-30 truncated Ne
 Tooling; throwaway agent, `dedc47e`…`0115b4a`. `server/plan-build.mjs` + `plan build`: change list → C1–C7 → `--out` only without refusals; choices DEC-152.
 Gate: `./check` green (2186 tests, 8 new), smoke green; Planner re-ran on a seeded copy: counts match preview, "12 reps" refused, DB hash unchanged. No reviewer: no trigger file. AC8 Coach run pending.
 `reports/req-254.md`.
+
+## req-257 — plan closeout survives a title-less doc; the code worktree is the one on main; ping prints the brief  (2026-10-31)
+
+Tooling; throwaway agent, `4b589d1`…`50d5640`. Gate: plan-guards 41 ok + plan-ledger `all checks passed`, `./check` green; new tests fail on
+main's `plan` (title line exits 1 silently; scratch worktree picked). Planner re-ran both suites. No reviewer: no trigger file. `reports/req-257.md`.

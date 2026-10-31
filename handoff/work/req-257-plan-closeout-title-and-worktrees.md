@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · DEC-144, DEC-155, req-90 (closeout ledger), req-251 (`plan brief`), req-253. Before req-259 (same file).
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-257` (`4b589d1`…`50d5640`, 2 commits).** · **Lane: tooling** · DEC-144, DEC-155, req-90 (closeout ledger), req-251 (`plan brief`), req-253. Before req-259 (same file).
 
 # req-257 — `plan`: closeout survives a doc with no title; the code worktree is never a scratch one; `ping` prints the brief
 
