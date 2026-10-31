@@ -5,7 +5,8 @@ the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACK
 
 **Next:** Coach (DEC-145, now a role: `[COACH]`) takes Emilio's pasted 10-30 barbell session — after he answers: which day, does
 he log it in the app himself, the bar = 20 kg vs plates-only, his 10/8/6 rep rule (`CLIENT.md` §New). Run 4's `import.json`
-(Helkropp A/C reorder, Leg Press 90) is unapplied, built on rev 78. Then spec the plan-builder (BACKLOG §Tooling).
+(Helkropp A/C reorder, Leg Press 90) is unapplied, built on rev 78, and has supersets in notes: **Coach rebuilds it at the
+next run under DEC-146** (Emilio, 2026-10-31), not applied as is. Then spec the plan-builder (BACKLOG §Tooling).
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -19,7 +20,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **Live = `52637e6`** (through req-252), deployed 2026-10-30 23:06, `doctor: all ok`; CI run 41134719643 green.
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446` (stage 1 done, DEC-127..136, DEC-143).
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
-  fully proven. **Next for the coach (DEC-140/141):** review that workout against run 3 (`coach/COACH.md`).
+  fully proven.
 - **Backups:** weekly agent loaded, exit 0; newest scheduled backup 10-26 09:00; the next is due ≥ 11-02 (7 days). Confirm it fires.
 - **Coach run 4 done** 2026-10-30 (report in `workout-data/coach/run-4/`): 2 sessions since run 3 (10-28, 10-30, both on the old
   build), so a session on the new build is still to come.
