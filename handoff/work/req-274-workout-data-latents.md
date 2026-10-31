@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-274` (…`608654d`)** · **Lane: bug** · DEC-155 §4 (Sets 1–20), DEC-155 §6 (stale `from`), DEC-096 (routine kg), req-261/262/263 review latents. Touches `src/workout-items.js`, `src/history-queries.js`, `src/model.js` → independent reviewer (WORKFLOW check 5). No migration or bulk rewrite → no backup reminder (Apply already writes the routine; this only stops it writing invented `0`s).
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-274` (`3bc23f4`…`608654d`, 7 commits).** · **Lane: bug** · DEC-155 §4 (Sets 1–20), DEC-155 §6 (stale `from`), DEC-096 (routine kg), req-261/262/263 review latents. Touches `src/workout-items.js`, `src/history-queries.js`, `src/model.js` → independent reviewer (WORKFLOW check 5). No migration or bulk rewrite → no backup reminder (Apply already writes the routine; this only stops it writing invented `0`s).
 
 # req-274 — four latent workout-data bugs from the req-261/262/263 reviews
 
