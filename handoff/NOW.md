@@ -28,8 +28,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Every req → a throwaway agent; stop at every closeout (DEC-144).
 
-**Batch 7 done:** req-244 (GO pill, two lines) merged 2026-10-30 (`7eb8dc5`, CI 41123118664 green); deployed 21:33 — the batch's last req. `./server/deploy` is blocked for Planner by the auto-mode classifier: Emilio runs it (`! ./server/deploy && ./server/doctor`) unless he adds an allow rule.
-
+**Deploy:** `./server/deploy` is blocked for Planner by the auto-mode classifier: Emilio runs it (`! ./server/deploy && ./server/doctor`).
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
 path for copy/comment-only reqs (tests + one SHIPPED line) — open.
