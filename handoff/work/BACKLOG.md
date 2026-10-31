@@ -182,8 +182,11 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 ## Tooling
 
 **From the 2026-10-30 audits, never triaged until 2026-10-31** (`audits/2026-10-30.md`, `handoff/audits/workflow-plan-2026-10-30.md`):
-- **F-SYNC-1 (bug):** a three-way merge can leave a finished workout in progress → finishing again stores two workouts with
-  one id; `validState` accepts duplicate ids (`src/sync/merge.js:112-131`, `server/store.mjs:27-47`). → **req-268**.
+- **req-268 review latents** (sync): (1) a 400 on the `conflicts` shape leaves `pendingConflicts` pending → every later push
+  400s, sync stuck (masked: `deviceConflicts` accepts exactly what merge.js emits) — harden: drop the list on that 400;
+  (2) `mergeWithoutBase` after a restore can still null the server's live workout (no `other` passed; masked by
+  `activeIsRestoredCopy`); (3) `other` can restore a stale base workout from an already-corrupt state (masked: dropFinished).
+  Nit: `ops duplicates` leaves -wal/-shm beside a closed WAL DB. Run `./server/ops duplicates` on the server (Emilio).
 - **F-STRUCT-8:** `workout-log.js` 1,245 lines (2026-10-31, after req-261), 71 exports, 33 importers — split by job like req-164 did `storage.js`.
   → **req-270**, after req-261/262 (same file).
 - **Cleanup nits:** F-DEAD-8 `storage.js` shim (0 app importers, 22 test importers); F-STRUCT-9 `sameKind` twice in

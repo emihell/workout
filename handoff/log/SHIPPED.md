@@ -2831,3 +2831,9 @@ Gate: new test fails on main, 6/6 on the branch; smoke green; `./check` 2193 in 
 Bug; throwaway agent, `85a294a`…`e686fe7`. `pillItem` shared by pill + count; `useRef` guards in both pickers; `MAX_SETS = 20` in both
 parsers + plan build C4; `activeSetPatch` deleted. Gate: new tests fail on main; `./check` 2201 in 147; smoke green; browser run on `plan qa`;
 Planner re-ran the repro (main 1/9 → 2/9). Reviewer: No blockers (10-state probe, 54/54 runs of the flaky file). `reports/req-261.md`.
+
+## req-268 — sync never keeps a finished workout in progress, never ends a live one, never loses a late set silently  (2026-10-31)
+
+Bug (audit F-SYNC-1); throwaway agent, `128a5df`…`db0dade`. `dropFinished` shared by both merges (keeps the other side's live workout);
+app rebase sends local losses as `pendingConflicts` (sync meta) → server conflict record, deduped (DEC-155 §8-9); `./server/ops duplicates`
+(read-only). Gate: new tests fail on main; `./check` 2218 in 148; smoke green. Reviewer ×2: No blockers (E1–E3 probes, 6/6 runs). `reports/req-268.md`.
