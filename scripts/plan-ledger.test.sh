@@ -5,8 +5,11 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-# shellcheck disable=SC1091
-_PLAN_NO_MAIN=1 source "$ROOT/plan"
+# req-257: PLAN_SRC=<path> runs these checks against another copy of `plan` (the self-test
+# against main's). Default: this checkout's.
+PLAN_SRC="${PLAN_SRC:-$ROOT/plan}"
+# shellcheck disable=SC1090
+_PLAN_NO_MAIN=1 source "$PLAN_SRC"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -138,6 +141,31 @@ done
 for f in src/App.jsx src/views/Settings.jsx scripts/model.js; do
   printf '%s\n' "$f" | grep -Eq "$REVIEWER_TRIGGER_RE" && bad "trigger regex wrongly matches $f" || ok "trigger regex skips $f"
 done
+
+echo "# closeout_title — req-257 (runs after the merge: must never abort under set -euo pipefail)"
+T1="$TMP/titled.md";   printf '**Status: READY**\n\n# req-7 — A title\n\nbody\n' > "$T1"
+T2="$TMP/notitle.md";  printf '**Status: READY**\n\nno heading here\n' > "$T2"
+# Each case runs in a child bash under set -euo pipefail, as closeout does; "reached" proves no abort.
+title_case() {  # $1 doc, $2 reqid → "rc<TAB>stdout<TAB>stderr"
+  local o e rc
+  o="$(_PLAN_NO_MAIN=1 PLAN_SRC="$PLAN_SRC" DOC="$1" RID="$2" bash -c '
+    set -euo pipefail
+    source "$PLAN_SRC"
+    t="$(closeout_title "$DOC" "$RID")"
+    echo "reached:$t"' 2>"$TMP/title.err")"; rc=$?
+  e="$(cat "$TMP/title.err")"
+  printf '%s\t%s\t%s' "$rc" "$o" "$e"
+}
+res="$(title_case "$T1" req-7)"
+[ "$res" = "$(printf '0\treached:A title\t')" ] \
+  && ok "titled doc → 'A title', exit 0, no warning" || bad "titled doc — got [$res]"
+res="$(title_case "$T2" req-7)"
+rc="$(printf '%s' "$res" | cut -f1)"; out="$(printf '%s' "$res" | cut -f2)"; err="$(printf '%s' "$res" | cut -f3)"
+{ [ "$rc" = 0 ] && [ "$out" = "reached:req-7" ] \
+    && [ "$err" = "plan closeout: WARNING — $T2 has no '# ' title; the SHIPPED stub uses \"req-7\"." ]; } \
+  && ok "titleless doc → WARNING on stderr, returns 'req-7', exit 0 under set -euo pipefail" \
+  || bad "titleless doc — rc=$rc out=[$out] err=[$err]"
+printf '    | rc=%s out=[%s] err=[%s]\n' "$rc" "$out" "$err"
 
 echo
 if [ "$fails" -eq 0 ]; then echo "plan-ledger: all checks passed."; else echo "plan-ledger: $fails check(s) FAILED." >&2; fi

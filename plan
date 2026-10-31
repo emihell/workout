@@ -10,8 +10,9 @@ plan publish           merge planning into main, safely
 plan status            where everything is, and what's unpublished
 plan next              the single next command to run, and why
 plan ping req-N        verify req-N's doc is on main AND planning is fully
-                        published, then print a ready-to-paste handoff ping.
-                        Read-only; refuses (pointing to publish) otherwise.
+                        published, then print the same dispatch prompt as
+                        `plan brief req-N` (req-257). Read-only; refuses
+                        (pointing to publish) otherwise.
 plan brief req-N [--base <ref>]
                         print the ready-to-paste dispatch prompt for a build
                         agent: req path, base branch (default main), "read
@@ -97,10 +98,16 @@ worktree_is_nested() {
   return 1
 }
 
+# req-257: a second TOP-LEVEL worktree (a scratch checkout, not nested) used to win as the
+# last one listed, so closeout merged into it and qa took its node_modules. Now the one on
+# `main` is preferred; with none on main, the last candidate is kept (the old pick) with a
+# stderr line; with two or more candidates they are listed on stderr. A warning, never a
+# refusal: a stale scratch tree must not block Planner.
 find_worktrees() {
   PLANNING_DIR=""
   CODE_DIR=""
-  local path="" line all_paths
+  local path="" line all_paths main_dir="" n_cand
+  local candidates=()
   all_paths="$(git worktree list --porcelain | sed -n 's/^worktree //p')"
   while IFS= read -r line; do
     case "$line" in
@@ -114,10 +121,27 @@ find_worktrees() {
         [ -n "$path" ] && PLANNING_DIR="$path"
         ;;
       branch\ refs/heads/*)
-        [ -n "$path" ] && CODE_DIR="$path"
+        if [ -n "$path" ]; then
+          candidates+=("$path")
+          [ "$line" = "branch refs/heads/main" ] && main_dir="$path"
+        fi
         ;;
     esac
   done < <(git worktree list --porcelain)
+
+  n_cand="${#candidates[@]}"
+  if [ "$n_cand" -gt 0 ]; then
+    if [ -n "$main_dir" ]; then
+      CODE_DIR="$main_dir"
+    else
+      CODE_DIR="${candidates[$((n_cand - 1))]}"
+      echo "plan: no worktree on main — using $CODE_DIR as the code worktree" >&2
+    fi
+    if [ "$n_cand" -ge 2 ]; then
+      echo "plan: WARNING — $n_cand top-level non-planning worktrees; using $CODE_DIR. All of them:" >&2
+      printf '  - %s\n' "${candidates[@]}" >&2
+    fi
+  fi
 
   if [ -z "$PLANNING_DIR" ]; then
     echo "plan: no worktree is checked out on branch 'planning'" >&2
@@ -401,23 +425,11 @@ cmd_ping() {
     exit 1
   fi
 
-  # Receipt verified — print the ready-to-paste ping (Planner drops it into
-  # SendMessage). Shape mirrors PLANNING.md's handover section.
-  cat <<EOF
-plan ping: $reqid is on main and planning is fully published — ready to hand off.
-
-Paste to Builder via SendMessage:
-────────────────────────────────────────
-New req to build: $reqid. Full spec + acceptance criteria: $relpath (on main).
-
-Branch $reqid, run ./check, write reports/$reqid.md, report back ready-to-look-at
-(do NOT merge), in this shape:
-  1  what it does            2–3 plain sentences
-  2  what to test            numbered, each answerable yes or no
-  3  what you couldn't       anything needing a browser, a real device, or a
-     verify yourself         judgement about how it feels
-────────────────────────────────────────
-EOF
+  # Receipt verified — print the dispatch prompt. req-257: it is `plan brief`'s, from the
+  # same function (cmd_brief), so ping and brief can't drift; the old pre-BUILDER.md block
+  # (no BUILDER.md pointer, no mechanical lines) is gone.
+  echo "plan ping: $reqid is on main and planning is fully published — ready to hand off."
+  cmd_brief "$reqid"
 }
 
 # req-251 (DEC-144 §5): the dispatch prompt for a build agent, printed instead of retyped
@@ -753,6 +765,20 @@ PY
 # stay the author's (printed as reminders in step 7). Both edits are idempotent —
 # a re-run, or an entry the author has since filled, is left untouched, never
 # doubled — so a closeout re-run is safe.
+
+# req-257: the SHIPPED stub's title — the doc's first `# ` heading minus a `req-N —` prefix.
+# Runs after the merge, so it must never abort under `set -euo pipefail`: no `# ` line made
+# grep exit 1 and killed closeout silently. Now: no title → a WARNING on stderr and $2 (the
+# req id) on stdout, exit 0.
+closeout_title() {
+  local doc="$1" reqid="$2" t
+  t="$({ grep -m1 '^# ' "$doc" 2>/dev/null || true; } | sed -E 's/^# +//; s/^req-[0-9]+ *[—-] *//')"
+  if [ -z "$t" ]; then
+    echo "plan closeout: WARNING — $doc has no '# ' title; the SHIPPED stub uses \"$reqid\"." >&2
+    t="$reqid"
+  fi
+  printf '%s\n' "$t"
+}
 
 # Append a "## req-N — <title>  (merged <date>)" heading + three labelled placeholder
 # lines (What / Gate / Report — req-252, DEC-087 §2: SHIPPED ≤3 lines per req) to
@@ -1108,7 +1134,7 @@ cmd_closeout() {
   # non-fatal — a failure warns and leaves the closeout to publish what it has,
   # never aborting after the merge already landed.
   local co_title co_date shipped now now_lines bump_out
-  co_title="$(grep -m1 '^# ' "$doc" | sed -E 's/^# +//; s/^req-[0-9]+ *[—-] *//')"
+  co_title="$(closeout_title "$doc" "$reqid")"
   co_date="$(date +%F)"
   shipped="$PLANNING_DIR/handoff/log/SHIPPED.md"
   now="$PLANNING_DIR/handoff/NOW.md"
