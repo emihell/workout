@@ -7,7 +7,7 @@ import { historySetFields, historySetKind } from '../set-values.js'
 import { withCardioValues } from '../../cardio-set.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, List, NavLink, Row, Screen, SectionHeader, SegmentedControl, Textarea, Title } from '../../ui/index.jsx'
-import { historyAddSetDraft, historyAddSetPath, withHistorySet } from './add-set'
+import { historyAddSetDraft, historyAddSetPath, historyCanAddSet, withHistorySet } from './add-set'
 import { itemIdOf, workoutRoutineId, workoutRoutineName } from './helpers'
 import { snapshotItemFor } from './snapshot-item.js'
 import { historyAddSetBack, historyDetailReturn, historySetBack } from './return-paths.js'
@@ -98,7 +98,8 @@ export function HistorySetNew({ workoutId, from = null }) {
       })
     }
   }
-  const choices = [...byKey.values()]
+  // req-274 review — an item already at MAX_SETS working sets is not offered (no message).
+  const choices = [...byKey.values()].filter((choice) => historyCanAddSet(workout, choice.exerciseId, choice.routineItemId))
 
   return (
     <Screen>
@@ -135,7 +136,7 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId, from = null }) {
     (workout.snapshot?.items || []).some((item) => itemIdOf(item) === itemId) ||
     (workout.sets || []).some((set) => itemIdOf(set) === itemId)
   // req-171 — and to the exact screen it was opened from (return-paths.js).
-  const backTo = historyAddSetBack(workout.id, itemId, known, from)
+  const backTo = historyAddSetBack(workout.id, itemId, known, from, store.workouts)
   // req-163 — Effort / Duration shown as the live forms decide (historySetKind).
   const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemId, exerciseId), exerciseById(store.exercises, exerciseId))
 

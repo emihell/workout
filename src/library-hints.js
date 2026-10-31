@@ -3,7 +3,7 @@
 // libraryEntryFor (libraryId → exact name → alias, no fuzzy guess) — never from the exercise's
 // name, never copied into stored data. No entry → nothing extra (DESIGN §1: absent is absent).
 import { libraryEntryFor } from './exerciseLibrary.js'
-import { itemKey } from './workout-items.js'
+import { setMatchesItem } from './workout-items.js'
 import { restRemaining } from './workout-timers.js'
 
 export const REST_CUES_MAX = 3
@@ -96,5 +96,6 @@ export function restNotesShowing(workout, item, now) {
   if (!restRemaining(workout, now).resting) return false
   const sets = workout.sets || []
   const last = sets[sets.length - 1]
-  return Boolean(last) && last.routineItemId === itemKey(item)
+  // req-274 — the shared set↔item matcher (was `last.routineItemId === itemKey(item)`).
+  return Boolean(last) && setMatchesItem(last, item, workout.snapshot?.items)
 }

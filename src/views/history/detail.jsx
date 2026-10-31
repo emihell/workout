@@ -6,7 +6,7 @@ import { useStore } from '../../store-context'
 import { loggedSetCount } from '../../workout-progress.js'
 import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, SectionHeader, Title } from '../../ui/index.jsx'
-import { historyAddSetPath } from './add-set'
+import { historyAddSetPath, historyCanAddSet } from './add-set'
 import {
   historyGroupSetsText,
   itemIdOf,
@@ -147,14 +147,17 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId, from = null }) {
       </List>
       {/* req-117 — opens the add form (unsaved until Save); was a Button that wrote a
           placeholder set first. Navigation, so it wears the link treatment (DESIGN §4). */}
-      <p>
-        <NavLink
-          to={childLink(historyAddSetPath(workout, actualExerciseId, itemIdOf(snapshotItem) || null), here, from)}
-          chevron="forward"
-        >
-          Add set
-        </NavLink>
-      </p>
+      {/* req-274 review — hidden at MAX_SETS working sets (no message), as the live Add set. */}
+      {historyCanAddSet(workout, actualExerciseId, itemIdOf(snapshotItem) || null) ? (
+        <p>
+          <NavLink
+            to={childLink(historyAddSetPath(workout, actualExerciseId, itemIdOf(snapshotItem) || null), here, from)}
+            chevron="forward"
+          >
+            Add set
+          </NavLink>
+        </p>
+      ) : null}
     </Screen>
   )
 }

@@ -7,7 +7,7 @@ import { restRemaining } from './workout-timers.js'
 // req-109 — the overview's "skipped" state: the item has sets and every one of them is
 // skipped. Derived from the sets alone (no stored marker); one logged set → not skipped.
 export function itemAllSkipped(workout, item) {
-  const logged = setsForItem(workout?.sets, item)
+  const logged = setsForItem(workout?.sets, item, workout?.snapshot?.items)
   return logged.length > 0 && logged.every(isSkippedSet)
 }
 
@@ -85,7 +85,7 @@ export function currentWorkoutItem(workout) {
   if (!sets.some((set) => !isSkippedSet(set))) return null
   const done = (item) => itemIsMarkedDone(workout, item) || itemLoggingState(workout, item).plannedDone
   const last = sets[sets.length - 1]
-  const at = items.findIndex((item) => setsForItem([last], item).length > 0)
+  const at = items.findIndex((item) => setsForItem([last], item, items).length > 0)
   const owner = at >= 0 ? items[at] : null
   if (owner && !done(owner)) return owner
   const next = at >= 0 ? items[at + 1] : null
@@ -93,7 +93,7 @@ export function currentWorkoutItem(workout) {
     return next
   }
   const lastReal = sets.findLast((set) => !isSkippedSet(set))
-  const realOwner = items.find((item) => setsForItem([lastReal], item).length > 0)
+  const realOwner = items.find((item) => setsForItem([lastReal], item, items).length > 0)
   if (realOwner && !done(realOwner)) return realOwner
   return items.find((item) => !done(item)) || null
 }
@@ -134,7 +134,7 @@ export function workoutPillState(workout, now) {
   if (!item) return null
   const { current, total } = itemSetPosition(workout, item)
   const { remainingMs, resting } = restRemaining(workout, now)
-  const started = setsForItem(workout?.sets || [], item).some((set) => !isSkippedSet(set))
+  const started = setsForItem(workout?.sets || [], item, workout?.snapshot?.items).some((set) => !isSkippedSet(set))
   const setText = started ? `set ${current}/${total}` : ''
   const clock = resting ? restClockText(remainingMs / 1000) : null
   const lead = resting ? clock : 'GO'

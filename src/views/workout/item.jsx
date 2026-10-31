@@ -8,6 +8,7 @@ import { exerciseById } from '../../model.js'
 import { historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import {
+  canAddSet,
   canRemoveAddedSet,
   itemEffort,
   itemEffortSets,
@@ -18,6 +19,7 @@ import {
   removeAddedSetPatch,
   reopenItemPatch,
   sessionExercise,
+  setMatchesItem,
   skipItemPatch,
 } from '../../workout-items.js'
 import {
@@ -939,19 +941,22 @@ function ExerciseReview({ routineId, item }) {
         <NavLink to={`/workout/${routineId}`} look="secondary" block>
           Choose exercise
         </NavLink>
-        <Button
-          variant="quiet"
-          block
-          onClick={() => {
-            // Re-opening a completed exercise: clear the done mark first so the
-            // log screen's markedDone guard doesn't bounce straight back here.
-            store.patchActive(reopenItemPatch(active, item))
-            store.addWorkingSet(itemKey(item))
-            go(itemLogPath(routineId, item), { replace: true })
-          }}
-        >
-          Add set
-        </Button>
+        {/* req-274 (DEC-155 §10) — not shown at MAX_SETS (20): no message. */}
+        {canAddSet(item) ? (
+          <Button
+            variant="quiet"
+            block
+            onClick={() => {
+              // Re-opening a completed exercise: clear the done mark first so the
+              // log screen's markedDone guard doesn't bounce straight back here.
+              store.patchActive(reopenItemPatch(active, item))
+              store.addWorkingSet(itemKey(item))
+              go(itemLogPath(routineId, item), { replace: true })
+            }}
+          >
+            Add set
+          </Button>
+        ) : null}
       </div>
       {editIndex != null ? (
         <LoggedSetSheet
@@ -980,7 +985,8 @@ export function WorkoutSetEdit({ routineId, index }) {
   const store = useStore()
   const workout = store.activeWorkout
   const set = workout?.routineId === routineId ? workout.sets?.[index] : null
-  const item = set ? workout?.snapshot?.items?.find((candidate) => itemKey(candidate) === set.routineItemId) : null
+  // req-274 — the shared set↔item matcher (was itemKey(candidate) === set.routineItemId).
+  const item = set ? workout?.snapshot?.items?.find((candidate) => setMatchesItem(set, candidate, workout.snapshot.items)) : null
   const target = item ? itemSetsPath(routineId, item, workout) : null
 
   useEffect(() => {

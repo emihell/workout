@@ -68,9 +68,11 @@ export function historySetBack(workoutId, itemId, from, workouts) {
 
 // The add-set form (req-117): back to the exercise screen it was opened from; from the
 // workout's Add-set picker, to the exercise's screen when the workout already has it
-// (as before), else to the workout.
-export function historyAddSetBack(workoutId, itemId, known, from) {
-  if (from && parseRoute(from).name === 'history-workout-exercise') return from
+// (as before), else to the workout. req-274 — an exercise `from` at a deleted workout is
+// dropped (liveFrom, as the other helpers) and the fallback below is taken.
+export function historyAddSetBack(workoutId, itemId, known, from, workouts) {
+  const live = liveFrom(from, workouts)
+  if (live && parseRoute(live).name === 'history-workout-exercise') return live
   const detail = historyDetailReturn(workoutId, from)
   if (!known) return detail
   const detailFrom = detail === historyDetailPath(workoutId) ? null : detail

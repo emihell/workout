@@ -2,6 +2,8 @@ import { isWeightedType } from './ids.js'
 import { dateKey, mondayOf } from './schedule.js'
 import { recommendNextPrescription } from './progress.js'
 import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
+import { setMatchesItem } from './workout-items.js'
+import { MAX_SETS } from './routine-item-parse.js'
 
 export const SCHEMA_VERSION = 9
 
@@ -424,13 +426,17 @@ export function applyProgressionToRoutines(routines, routineId, progression) {
       exercises: (routine.exercises || []).map((item) => {
         const next = byKey.get(item.id)
         if (!next) return item
-        const targets = next.targetsTo?.length ? [...next.targetsTo] : [...(item.targets || [])]
-        const suggestedWeights = Array.isArray(next.to) ? [...next.to] : [...(item.suggestedWeights || [])]
+        // req-274 review — what Apply writes keeps the first MAX_SETS (DEC-155 §4): the
+        // recommendation sizes kg to the last logged set + 1, so a 20-set item would come back 21.
+        const targets = (next.targetsTo?.length ? [...next.targetsTo] : [...(item.targets || [])]).slice(0, MAX_SETS)
+        // req-274 — `to: null` (a bodyweight item) leaves the routine item's kg exactly as it is.
+        const writesKg = Array.isArray(next.to)
+        const suggestedWeights = writesKg ? next.to.slice(0, MAX_SETS) : item.suggestedWeights || []
         return {
           ...item,
           targets,
-          suggestedWeights,
-          sets: Math.max(Number(item.sets) || 1, targets.length, suggestedWeights.length),
+          ...(writesKg ? { suggestedWeights } : {}),
+          sets: Math.min(MAX_SETS, Math.max(Number(item.sets) || 1, targets.length, suggestedWeights.length)),
         }
       }),
     }
@@ -458,10 +464,15 @@ export function progressionForItem(exercises, workout, item) {
   const itemIdValue = item.routineItemId || item.sessionItemId || item.id
   // req-112 — every working set in log order, skipped included, so position = the
   // set's own work index (the index the log form uses: count of prior working sets).
-  const workSets = (workout?.sets || []).filter((set) => {
-    const setItemId = set.routineItemId || set.sessionItemId
-    return set.setType !== 'wu' && (setItemId === itemIdValue || setItemId === item.id)
-  })
+  // req-274 — the shared set↔item matcher (workout-items.js setMatchesItem), so a key-less item
+  // reads the sets migrateState re-keyed to `history-…` (was its own rule, which matched none).
+  // The legacy `sessionItemId` key (req-40) is read as routineItemId on both sides first.
+  const keyed = { ...item, routineItemId: item.routineItemId || item.sessionItemId }
+  const workSets = (workout?.sets || []).filter(
+    (set) =>
+      set.setType !== 'wu' &&
+      setMatchesItem(set.routineItemId || !set.sessionItemId ? set : { ...set, routineItemId: set.sessionItemId }, keyed, workout?.snapshot?.items),
+  )
   const sets = workSets.filter((set) => !isSkippedSet(set))
   const recommendation = recommendNextPrescription({
     targets: item.targets,
@@ -475,11 +486,16 @@ export function progressionForItem(exercises, workout, item) {
   // holding `[0]` can't write `[0]` either (Planner, req-262).
   const cardio = exercise?.type === 'cardio'
   const ownPlan = !sets.length || cardio
+  // req-274 (Planner, as req-262's cardio rule) — a non-weighted (bodyweight) item never writes
+  // kg: `to: null` → applyProgressionToRoutines keeps the routine item's own suggestedWeights
+  // exactly as they are (an old snapshot's `[0]` is neither written nor cleaned). Its targets
+  // still progress (bodyweight reps unchanged). Cardio keeps req-262's own-plan `to` (never written).
+  const writesKg = cardio || isWeightedType(exercise?.type)
   return {
     routineItemId: itemIdValue,
     sets,
     recommendation,
-    to: ownPlan ? item.suggestedWeights || [] : recommendation.weights,
+    to: !writesKg ? null : ownPlan ? item.suggestedWeights || [] : recommendation.weights,
     targetsTo: ownPlan ? item.targets || [] : recommendation.targets,
     writesRoutine: !cardio,
   }
