@@ -19,7 +19,9 @@ import {
   routineInActiveWorkout,
 } from './state-reducers.js'
 import { exercisesInHistory, isFirstRun } from './history-queries.js'
-import { durationTargetFor, finishedState, itemKey, replacementItem, sessionExercise } from './workout-log.js'
+import { durationTargetFor } from './set-seed.js'
+import { finishedState } from './workout-finish.js'
+import { itemKey, replacementItem, sessionExercise } from './workout-items.js'
 import { isWeightedType } from './ids.js'
 
 const NOW = '2026-09-23T12:00:00.000Z'

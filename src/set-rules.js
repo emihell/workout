@@ -2,8 +2,8 @@
 // module with no imports, so neither has to import the other: model.js imported these
 // two predicates from workout-log.js, which imported DEFAULT_DURATION_SEC back (a cycle,
 // "safe under live bindings"), and progress.js kept its own isSkipped to stay out of it.
-// model.js re-exports DEFAULT_DURATION_SEC and workout-log.js the two predicates, so every
-// existing import keeps working.
+// model.js re-exports DEFAULT_DURATION_SEC, so every existing import keeps working. req-270 —
+// workout-log.js (which re-exported the two predicates) is gone: their importers import them here.
 
 // req-85 — default target seconds for a timed exercise that has no per-set
 // duration set yet. Used as the exercise-level default and the fallback when a

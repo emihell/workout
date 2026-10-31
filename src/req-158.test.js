@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { migrateState } from './model.js'
 import { migrateState as migrateStateMain } from './req-158.model-main.fixture.js'
-import { finishedState } from './workout-log.js'
+import { finishedState } from './workout-finish.js'
 import { loadState, saveState } from './persistence.js'
 import { filledLike } from './test-support/fill.js'
 // req-211 test edit: main's frozen model predates the additive `schedule.moves`; withEmptyMoves

@@ -3,7 +3,8 @@
 // libraryEntryFor (libraryId → exact name → alias, no fuzzy guess) — never from the exercise's
 // name, never copied into stored data. No entry → nothing extra (DESIGN §1: absent is absent).
 import { libraryEntryFor } from './exerciseLibrary.js'
-import { itemKey, restRemaining } from './workout-log.js'
+import { itemKey } from './workout-items.js'
+import { restRemaining } from './workout-timers.js'
 
 export const REST_CUES_MAX = 3
 

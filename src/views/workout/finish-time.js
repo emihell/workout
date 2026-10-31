@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { finishTimeFor } from '../../workout-log.js'
+import { finishTimeFor } from '../../workout-finish.js'
 
 // req-227 — the finish time a finish screen (Finish, the auto-complete summary) shows and
 // saves. `now` is refreshed on a FINISH_TICK_MS tick while mounted, and (review round 1) on

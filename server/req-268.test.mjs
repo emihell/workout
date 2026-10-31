@@ -15,7 +15,7 @@ import { duplicateWorkoutIds, readOnlyDb } from './ops.mjs'
 import { putState, validState } from './store.mjs'
 import { fullState } from '../src/test-support/full-state.js'
 import { setLoggedState } from '../src/state-reducers.js'
-import { finishedState } from '../src/workout-log.js'
+import { finishedState } from '../src/workout-finish.js'
 
 let n = 0
 const withSet = (s) =>

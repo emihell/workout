@@ -3,7 +3,7 @@
 
 import { isWeightedType } from './ids.js'
 import { recommendNextPrescription } from './progress.js'
-import { isAddedMidWorkout, isSkippedSet } from './workout-log.js'
+import { isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 
 export const SCHEMA_VERSION = 9
 

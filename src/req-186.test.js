@@ -6,21 +6,11 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { importJsx, render, act } from './test-support/render.js'
-import {
-  carryForSet,
-  currentWorkoutItem,
-  initialSetFields,
-  nextSeedOverrides,
-  replaceItemPatch,
-  replacementItem,
-  setDraftFromLoggedSet,
-  skipItemPatch,
-  itemSetPosition,
-  loggedSetRowText,
-  restClockText,
-  setListRows,
-  workoutPillState,
-} from './workout-log.js'
+import { carryForSet, initialSetFields, nextSeedOverrides } from './set-seed.js'
+import { currentWorkoutItem, itemSetPosition, workoutPillState } from './workout-progress.js'
+import { replaceItemPatch, replacementItem, skipItemPatch } from './workout-items.js'
+import { setDraftFromLoggedSet } from './set-drafts.js'
+import { loggedSetRowText, restClockText, setListRows } from './set-display.js'
 import { liveSetEditPatch, viewedSetSave } from './views/set-values.js'
 
 const h = React.createElement

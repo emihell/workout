@@ -141,7 +141,7 @@ function itemProblems(item, exercise, workouts, before) {
   // Warnings (§5): printed, never refusing.
   if (!timed && !cardio && Array.isArray(targets)) {
     const loose = targets.filter((t) => typeof t === 'string' && !/^\d+$/.test(t.trim()) && !isDurationTarget(t))
-    if (loose.length) warnings.push(`target ${json(loose[0])} is not a plain number: it is logged as typed unless he retypes it (workout-log.js:613-615).`)
+    if (loose.length) warnings.push(`target ${json(loose[0])} is not a plain number: it is logged as typed unless he retypes it (set-seed.js setLogSeed).`)
   }
   if (Array.isArray(durations) && durations.some((d) => d < 30)) warnings.push(`a duration under 30 s (${list(durations)}).`)
   if (restSec === 0 && typeof notes === 'string' && notes.trim()) warnings.push('restSec 0 with notes: notes show only during rest, so these never show.')

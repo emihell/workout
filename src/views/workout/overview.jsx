@@ -6,7 +6,8 @@ import { dateKey, planDateFor } from '../../schedule'
 import { routineById } from '../../model.js'
 import { useStore } from '../../store-context'
 import { startOrContinue } from '../../workout-actions'
-import { allItemsDone, autoCompleteArmed, endedOnSkip, itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-log'
+import { allItemsDone, autoCompleteArmed, endedOnSkip } from '../../workout-progress.js'
+import { itemIsMarkedDone, itemKey, itemLoggingState } from '../../workout-items.js'
 import { Back, Missing } from '../shared'
 import { Button, List, NavLink, Row, Screen, Textarea, Title } from '../../ui/index.jsx'
 import { activeNote } from '../../workout-note.js'
@@ -153,7 +154,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
 
   // req-84 — every exercise done (same per-item test the list rows use). When true the
   // overview shows the auto-complete summary instead of the list; NOT before then.
-  // req-105 — the test lives in workout-log.js (allItemsDone) and also drives Finish.
+  // req-105 — the test lives in workout-progress.js (allItemsDone) and also drives Finish.
   // req-116 — the summary's gate is autoCompleteArmed: all done, something logged (an
   // all-skipped workout never auto-finishes, DEC-058 §4), and not yet dismissed. Cancel
   // and Edit set the persisted autoFinishDismissed flag, so Back from Finish (a remount)

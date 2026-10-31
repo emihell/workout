@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { gunzipSync } from 'node:zlib'
 import { migrateState } from './model.js'
 import { loadState, saveState } from './persistence.js'
-import { finishedState } from './workout-log.js'
+import { finishedState } from './workout-finish.js'
 import { OLD_V8, OLD_V9_WITH_PLAN } from './req-165.old-docs.js'
 import { DEVICE_FILL_KEY, diskValue, filledLike, loadFilledLike } from './test-support/fill.js'
 // req-211 test edit: main's golden predates the additive `schedule.moves`; withEmptyMoves adds

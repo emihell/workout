@@ -480,7 +480,7 @@ function DurationTimer({ seconds, onSecondsChange, label = 'Duration (s)' }) {
 // req-194 (DEC-108 §4) — a cardio set's fields: Duration with a stopwatch, an optional
 // Level, an optional Distance with its unit. The stopwatch is NOT component state (review
 // fix 1): `stopwatch` is the active workout's own field ({ draftKey, startedAt, baseSec },
-// workout-log.js startStopwatchPatch), passed in by the caller, so leaving the screen,
+// workout-timers.js startStopwatchPatch), passed in by the caller, so leaving the screen,
 // another exercise's typing or a reload can't drop it. Start runs from 0:00 — or, after a
 // Stop (`watched`: the box holds the stopwatch's own time, not a typed or prefilled one),
 // resumes from it. Stop writes the time into Duration, which stays editable by hand. While

@@ -2,7 +2,7 @@ import { isCurrentWorkout } from './current-workout.js'
 import { go, hashPath } from './route.js'
 import { dateKey } from './schedule.js'
 import { askConfirm } from './ui/confirm.js'
-import { itemIsMarkedDone, itemLoggingState } from './workout-log.js'
+import { itemIsMarkedDone, itemLoggingState } from './workout-items.js'
 import { itemCurrentPath, itemLogPath } from './workout-paths.js'
 import { markArrival } from './up-next.js'
 

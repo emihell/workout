@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { finishSkippedByItem, finishSkippedLines } from './finish-unfinished.js'
-import { setsForItem, withSkippedUnloggedSets } from './workout-log.js'
+import { setsForItem, withSkippedUnloggedSets } from './workout-items.js'
 import { act, importJsx, render } from './test-support/render.js'
 
 const item = (id, name, sets, extra = {}) => ({

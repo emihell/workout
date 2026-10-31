@@ -12,22 +12,21 @@ import {
   recalculatedState,
 } from './model.js'
 import { historyPrescription, historySetPrefill, lastSetsForExercise } from './history-queries.js'
+import { allItemsDone, itemAllSkipped } from './workout-progress.js'
+import { finishedState } from './workout-finish.js'
+import { initialSetFields } from './set-seed.js'
+import { isAddedMidWorkout } from './set-rules.js'
 import {
-  allItemsDone,
-  finishedState,
-  initialSetFields,
-  isAddedMidWorkout,
-  itemAllSkipped,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
   replaceItemPatch,
   replacementItem,
-  setPreview,
   setsForItem,
   skipItemPatch,
   withSkippedUnloggedSets,
-} from './workout-log.js'
+} from './workout-items.js'
+import { setPreview } from './set-display.js'
 import { parseRoute } from './route.js'
 import { itemReplacePath } from './workout-paths.js'
 import { snapshotItemFor } from './views/history/snapshot-item.js'

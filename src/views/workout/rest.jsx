@@ -2,14 +2,15 @@ import { recordButton } from '../../analytics'
 import { go } from '../../route'
 import { useStore } from '../../store-context'
 import { WorkoutPill as UIWorkoutPill } from '../../ui/index.jsx'
-import { itemKey, workoutPillState, workoutPosition } from '../../workout-log'
+import { itemKey } from '../../workout-items.js'
+import { workoutPillState, workoutPosition } from '../../workout-progress.js'
 import { itemLogPath } from '../../workout-paths'
 import { useRestCountdown } from './rest-countdown.js'
 
 // req-186 (DEC-103 §3) — the one workout pill, replacing req-78's RestPill on every
 // in-workout screen. Self-contained: reads activeWorkout only (rest state is the already
 // persisted restEndsAt / restPausedRemaining, so it survives navigation and reload) and is
-// `position: fixed`. What it shows is the pure workoutPillState (workout-log.js): from the
+// `position: fixed`. What it shows is the pure workoutPillState (workout-progress.js): from the
 // start of the workout (req-222) until all is done; resting → "1:12" over "Set 2/4 · Ex 3/7"
 // in words (req-244); rest over → "GO" over the same line.
 // req-192 (DEC-108 §3, supersedes DEC-103 §3's tap rule) — what a tap does depends on where

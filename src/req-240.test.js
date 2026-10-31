@@ -16,7 +16,7 @@ import {
   oneSideLine,
   unilateralPatch,
 } from './library-hints.js'
-import { setPreviewText, loggedSetRowText } from './workout-log.js'
+import { setPreviewText, loggedSetRowText } from './set-display.js'
 import { migrateState } from './model.js'
 import { applyBackup, buildBackup } from './exchange.js'
 import { commonExercises } from './library/common.js'

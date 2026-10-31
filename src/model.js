@@ -266,8 +266,8 @@ function stripLegacyWorkoutKeys(workout) {
 
 // req-165 (F-STRUCT-7) — ONE lookup per entity: the record, or null. Replaces the
 // `{ routine }`-wrapper pair (findRoutineInState / findRoutine, a leftover from the
-// program lookup) and the inline `exercises.find(… .id === …)` copies. storage.js
-// re-exports both for the views.
+// program lookup) and the inline `exercises.find(… .id === …)` copies. The views import
+// both from here.
 export function routineById(routines, routineId) {
   return (routines || []).find((routine) => routine.id === routineId) ?? null
 }

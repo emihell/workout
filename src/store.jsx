@@ -40,7 +40,8 @@ import { StoreContext } from './store-context'
 import { routineItemExerciseChanged } from './routine-item-change.js'
 import { exerciseFromData } from './exercise-names.js'
 import { nextWorkoutName, planIds, planToState } from './plan-templates.js'
-import { addWorkingSetToState, finishedState, finishTimeFor } from './workout-log'
+import { addWorkingSetToState } from './workout-items.js'
+import { finishedState, finishTimeFor } from './workout-finish.js'
 
 export function StoreProvider({ children, sync = null }) {
   const [state, setStateRaw] = useState(loadState)
@@ -71,8 +72,8 @@ export function StoreProvider({ children, sync = null }) {
 
   const api = useMemo(() => {
     // req-164 (F-STRUCT-6) — every reducer is a pure function in state-reducers.js /
-    // workout-log.js / model.js; the store only makes ids and clock readings and hands
-    // them in.
+    // the workout-*.js / set-*.js modules (req-270) / model.js; the store only makes ids and
+    // clock readings and hands them in.
     function patchRoutine(routineId, mutator) {
       setState((s) => routinePatchedState(s, routineId, mutator))
     }
@@ -270,7 +271,7 @@ export function StoreProvider({ children, sync = null }) {
         setState((s) => recalculatedState(s, workoutId))
       },
       // req-112 / DEC-056 — Finish never writes the routine; the pure reducer is in
-      // workout-log.js so the manual and auto-complete paths are unit-tested through it.
+      // workout-finish.js so the manual and auto-complete paths are unit-tested through it.
       // req-224 — the finish time is the last set's when the workout was left open > 3 h
       // (finishTimeFor); finishedState's own default (now) stays for every other caller.
       // req-227 — `finishedAt` given (the Finish screen / auto-complete pass the time they show)

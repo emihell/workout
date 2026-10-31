@@ -9,20 +9,15 @@ import { readFileSync } from 'node:fs'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import {
   createSetDraftWriter,
-  finishedState,
   formFieldsWithDraft,
-  initialSetFields,
-  itemKey,
-  itemLoggingState,
-  nextSeedOverrides,
-  replacementItem,
-  seedOverrideKey,
   setDraftFor,
   setDraftFromForm,
   setDraftFromLoggedSet,
   setDraftKey,
-  withLoggedSet,
-} from './workout-log.js'
+} from './set-drafts.js'
+import { finishedState } from './workout-finish.js'
+import { initialSetFields, nextSeedOverrides, seedOverrideKey } from './set-seed.js'
+import { itemKey, itemLoggingState, replacementItem, withLoggedSet } from './workout-items.js'
 
 const EXERCISES = [
   { id: 'ex-a', name: 'Chest Press', equipment: 'Machine', type: 'machine', weightStep: '5' },

@@ -12,7 +12,7 @@
 //   its last value (Reps as before, Kg per §7, Duration likewise). Blank Sets falls back
 //   to the longest list (or 1).
 // - An empty field is "not set": `[]`, so the exercise default / history applies —
-//   never `[0]` (a 0 s duration target beat the exercise default, workout-log.js:406).
+//   never `[0]` (a 0 s duration target beat the exercise default; set-seed.js durationTargetFor).
 
 import { KG_NUMBER, normalizeKgText } from './kg-input.js'
 

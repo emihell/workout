@@ -15,7 +15,7 @@ import {
   withDefaultAnchor,
 } from './schedule.js'
 
-import { finishTimeFor, finishedState } from './workout-log.js'
+import { finishTimeFor, finishedState } from './workout-finish.js'
 import { doneEarlierText } from './views/schedule-day.js'
 import { workoutDateKey } from './views/history/helpers.js'
 import { leftOpenText } from './finish-unfinished.js'

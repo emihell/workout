@@ -23,17 +23,11 @@ import {
   readLevel,
   withCardioValues,
 } from './cardio-set.js'
-import {
-  finishedState,
-  formFieldsWithDraft,
-  loggedSetRowText,
-  setDraftFromForm,
-  setDraftKey,
-  startStopwatchPatch,
-  stopwatchFor,
-  stopwatchOwner,
-  withLoggedSet,
-} from './workout-log.js'
+import { finishedState } from './workout-finish.js'
+import { formFieldsWithDraft, setDraftFromForm, setDraftKey } from './set-drafts.js'
+import { loggedSetRowText } from './set-display.js'
+import { startStopwatchPatch, stopwatchFor, stopwatchOwner } from './workout-timers.js'
+import { withLoggedSet } from './workout-items.js'
 import { historyPrescription } from './history-queries.js'
 import { pickerItem } from './routine-picker.js'
 import { applyBackup, buildBackup } from './exchange.js'
@@ -416,7 +410,7 @@ describe('the log screen (real store)', () => {
     // "Add set" on the done exercise (WorkoutItemDone, the screen Skip leads to): reopen and add
     // a working set in one tap, then the log screen.
     await t.mount(null)
-    const { reopenItemPatch } = await import('./workout-log.js')
+    const { reopenItemPatch } = await import('./workout-items.js')
     const item = t.active().snapshot.items.find((i) => i.routineItemId === ROWING)
     await act(async () => {
       t.captured.store.patchActive(reopenItemPatch(t.active(), item))

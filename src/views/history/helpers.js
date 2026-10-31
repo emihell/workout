@@ -1,5 +1,5 @@
 import { roleTag, setParts, setValueText } from '../../ids.js'
-import { isSkippedSet } from '../../workout-log.js'
+import { isSkippedSet } from '../../set-rules.js'
 import { dateKey } from '../../schedule.js'
 import { compareWorkoutsNewestFirst, lastSetsForExercise } from '../../history-queries.js'
 

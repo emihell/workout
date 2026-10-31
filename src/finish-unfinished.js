@@ -5,7 +5,7 @@
 // by item in snapshot order, so step i's new sets are precisely what the full call adds
 // for item i — no second counting rule. Pure; the screen only renders `lines`.
 import { isSkippedSet } from './set-rules.js'
-import { setsForItem, withSkippedUnloggedSets, workCountFor } from './workout-log.js'
+import { setsForItem, withSkippedUnloggedSets, workCountFor } from './workout-items.js'
 import { dateKey } from './schedule.js'
 import { weekdayDate } from './views/history/helpers.js'
 

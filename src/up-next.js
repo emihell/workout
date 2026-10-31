@@ -1,4 +1,4 @@
-import { itemKey } from './workout-log.js'
+import { itemKey } from './workout-items.js'
 
 // req-223 (DEC-125 §2) — the "Up next" bar's trigger: an ARRIVAL at an exercise's log screen
 // from a new Start, the review's `Next:` link, or the bar's own Skip. Not a stored fact: the
