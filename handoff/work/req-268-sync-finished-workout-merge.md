@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · audit 2026-10-30 F-SYNC-1, DEC-128 §2 (newest edit wins), DEC-132, DEC-133 round 5 (`no-base-finished`), DEC-143 ("its on you if you edit on multiplate devies"), DEC-155. Touches `src/sync/merge.js` (shared by server + app) → **reviewer**. No stored record rewritten → no backup reminder.
+**Status: BUILT, NOT merged — branch `req-268` (`128a5df`…`db0dade`)** · **Lane: bug** · audit 2026-10-30 F-SYNC-1, DEC-128 §2 (newest edit wins), DEC-132, DEC-133 round 5 (`no-base-finished`), DEC-143 ("its on you if you edit on multiplate devies"), DEC-155. Touches `src/sync/merge.js` (shared by server + app) → **reviewer**. No stored record rewritten → no backup reminder.
 
 # req-268 — a workout finished on one device can't come back as in progress after a sync merge
 
