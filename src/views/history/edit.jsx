@@ -135,7 +135,7 @@ export function HistorySetAdd({ workoutId, exerciseId, itemId, from = null }) {
     (workout.snapshot?.items || []).some((item) => itemIdOf(item) === itemId) ||
     (workout.sets || []).some((set) => itemIdOf(set) === itemId)
   // req-171 — and to the exact screen it was opened from (return-paths.js).
-  const backTo = historyAddSetBack(workout.id, itemId, known, from)
+  const backTo = historyAddSetBack(workout.id, itemId, known, from, store.workouts)
   // req-163 — Effort / Duration shown as the live forms decide (historySetKind).
   const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemId, exerciseId), exerciseById(store.exercises, exerciseId))
 

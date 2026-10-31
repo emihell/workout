@@ -2,6 +2,7 @@ import { isWeightedType } from './ids.js'
 import { dateKey, mondayOf } from './schedule.js'
 import { recommendNextPrescription } from './progress.js'
 import { DEFAULT_DURATION_SEC, isAddedMidWorkout, isSkippedSet } from './set-rules.js'
+import { setMatchesItem } from './workout-items.js'
 
 export const SCHEMA_VERSION = 9
 
@@ -458,10 +459,15 @@ export function progressionForItem(exercises, workout, item) {
   const itemIdValue = item.routineItemId || item.sessionItemId || item.id
   // req-112 — every working set in log order, skipped included, so position = the
   // set's own work index (the index the log form uses: count of prior working sets).
-  const workSets = (workout?.sets || []).filter((set) => {
-    const setItemId = set.routineItemId || set.sessionItemId
-    return set.setType !== 'wu' && (setItemId === itemIdValue || setItemId === item.id)
-  })
+  // req-274 — the shared set↔item matcher (workout-items.js setMatchesItem), so a key-less item
+  // reads the sets migrateState re-keyed to `history-…` (was its own rule, which matched none).
+  // The legacy `sessionItemId` key (req-40) is read as routineItemId on both sides first.
+  const keyed = { ...item, routineItemId: item.routineItemId || item.sessionItemId }
+  const workSets = (workout?.sets || []).filter(
+    (set) =>
+      set.setType !== 'wu' &&
+      setMatchesItem(set.routineItemId || !set.sessionItemId ? set : { ...set, routineItemId: set.sessionItemId }, keyed),
+  )
   const sets = workSets.filter((set) => !isSkippedSet(set))
   const recommendation = recommendNextPrescription({
     targets: item.targets,
@@ -475,11 +481,14 @@ export function progressionForItem(exercises, workout, item) {
   // holding `[0]` can't write `[0]` either (Planner, req-262).
   const cardio = exercise?.type === 'cardio'
   const ownPlan = !sets.length || cardio
+  // req-274 — a bodyweight item's kg is its own (`[]` stays `[]`): the recommendation's `[0]`s
+  // are kg the user never entered. Its targets still progress (bodyweight reps unchanged).
+  const ownKg = ownPlan || !isWeightedType(exercise?.type)
   return {
     routineItemId: itemIdValue,
     sets,
     recommendation,
-    to: ownPlan ? item.suggestedWeights || [] : recommendation.weights,
+    to: ownKg ? item.suggestedWeights || [] : recommendation.weights,
     targetsTo: ownPlan ? item.targets || [] : recommendation.targets,
     writesRoutine: !cardio,
   }

@@ -1,5 +1,6 @@
 // req-270 — split from workout-log.js: edits to a workout's items and sets, and the per-item questions they need (key, sets, logging state, done mark).
 import { isSkippedSet } from './set-rules.js'
+import { MAX_SETS } from './routine-item-parse.js'
 
 // req-165 (F-DEAD-3) — the legacy `session*` fallbacks (sessionItemId, sessionId,
 // sessionName, completedSessionItemIds) are gone from every reader: migrateState strips
@@ -11,15 +12,23 @@ export function itemKey(item) {
 // req-262 — an item with no key ('' from itemKey) or no id matches by neither: '' === '' and
 // undefined === undefined made every key-less item claim every key-less set. Such an item
 // matches by exerciseId alone (the legacy rule). Keyed items are unchanged.
-export function setsForItem(sets, item) {
+// req-274 — migrateState gives a key-less set the fallback key `history-<workoutId>-<exerciseId>`
+// (model.js workoutSnapshot) but leaves a key-less snapshot item as it is, so after a reload
+// the item's sets carry a key it doesn't have. A key-less item (no id, no routineItemId) also
+// matches a `history-…` set of its own exercise. Read-side only: no stored key changes. A keyed
+// item never takes such a set (its own rules are the two key comparisons).
+export function setMatchesItem(set, item) {
   const key = itemKey(item)
   const id = item?.id
-  return (sets || []).filter(
-    (set) =>
-      (key !== '' && set.routineItemId === key) ||
-      (id != null && set.routineItemId === id) ||
-      (!set.routineItemId && set.exerciseId === item?.exerciseId),
-  )
+  if (key !== '' && set?.routineItemId === key) return true
+  if (id != null && set?.routineItemId === id) return true
+  if (set?.exerciseId !== item?.exerciseId) return false
+  if (!set?.routineItemId) return true
+  return key === '' && id == null && String(set.routineItemId).startsWith('history-')
+}
+
+export function setsForItem(sets, item) {
+  return (sets || []).filter((set) => setMatchesItem(set, item))
 }
 
 export function workCountFor(item) {
@@ -101,13 +110,19 @@ export function removeAddedSetPatch(workout, itemId) {
   }
 }
 
+// req-274 (DEC-155 §4) — "Add set" never takes an item past MAX_SETS (the editor's own
+// ceiling, routine-item-parse.js); at the cap the log screen doesn't show it.
+export function canAddSet(item) {
+  return workCountFor(item) < MAX_SETS
+}
+
 export function addWorkingSetToState(state, itemId) {
   const active = state?.activeWorkout
   if (!active) return state
   const key = itemId
   let bumped = null
   const items = (active.snapshot?.items || []).map((item) => {
-    if (itemKey(item) !== key) return item
+    if (itemKey(item) !== key || !canAddSet(item)) return item
     bumped = withOneMoreSet(item)
     return bumped
   })

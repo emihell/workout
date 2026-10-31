@@ -7,6 +7,7 @@ import { coveringWorkout, dateKey } from './schedule.js'
 import { isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 import { loggedSetCount } from './workout-progress.js'
 import { durationTargetText, hasCardioFields } from './cardio-set.js'
+import { MAX_SETS } from './routine-item-parse.js'
 
 // req-28 — the workouts finished on a given calendar day (dateKey(finishedAt) ===
 // dayKey), newest-finished first. The Today page's "Completed today" section reads
@@ -230,7 +231,10 @@ export function historySetPrefill(last, { setType, workIndex } = {}) {
 export function historyPrescription(workouts, exerciseId) {
   const last = lastSetsForExercise(workouts, exerciseId)
   if (!last) return null
-  const work = workingSetsFromHistory(last.sets)
+  // req-274 (DEC-155 §4) — a prescription built from history keeps the first MAX_SETS sets: a
+  // workout logged past the ceiling (before req-274's Add-set cap) must not hand a new routine
+  // item, swap or mid-workout add more sets than the editor accepts.
+  const work = workingSetsFromHistory(last.sets).slice(0, MAX_SETS)
   if (!work.length) return null
   const weights = work.map((set) => Number(set.weight) || 0)
   // req-128 — the exercise can sit in the snapshot twice: its own routine item and a
