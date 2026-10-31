@@ -284,6 +284,9 @@ and *what now*; the file says *why*.
 'Todo:' … where you tell me what i should do, like clearing context").** A raw tool block (`./plan next`) never stands
 alone: say in one plain line what it means, and put the CLEAN POINT resume line inside Your move as the thing to paste.
 
+**Every word earns its place (Emilio, 2026-10-31: "every word must have meaning, cut out anything that is not needed
+for me").** Niceness: at most one line, at the very end, only when truly needed.
+
 You run the git and drive the loop yourself, so most turns end with a one-line note of
 what you saved/published/merged — not a command block. Emilio has to act only for a
 deploy, a `/clear`, the migration carve-out, or a decision. The test before sending:
