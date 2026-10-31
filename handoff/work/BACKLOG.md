@@ -38,6 +38,11 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   (set countdown `src/ui/index.jsx:430`, rest on Done `src/views/workout/item.jsx:355`), but each round needs Done + Start —
   16 taps in a 4-min Tabata. Chain them: the work countdown ends → the set logs → rest runs → the next round starts. EMOM also
   needs rest = the rest of the minute. Until then Coach builds only ≥ 30 s intervals (DEC-146 §4).
+- **Exercise cues are never shown in the workout** [measured 2026-10-31]: `exercise.cues` appears only in the exercise
+  editor; the rest block shows library `formCues` (`src/library-hints.js:52-57`). Emilio wants cues on the exercise; they
+  should reach the log screen. Coach can't place technique cues anywhere he sees them until then.
+- **Target text is logged as reps** [measured 2026-10-31, `src/workout-log.js:613-615`]: a "10-12" / "AMRAP" target prefills
+  Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`).
 - **Tips during rest** (generic form/motivation tips) — parked (DEC-108 §6): no evidence it helps, needs a cited tip set.
 - **req-77 active-workout affordance** — PAUSED (Emilio, 2026-09-16). Don't raise it until he revives it.
 
