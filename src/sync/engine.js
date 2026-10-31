@@ -59,6 +59,8 @@ export const RETRY_MS = [5000, 20000, 60000]
 export const CSRF_HEADER = 'x-workout-request'
 // server/store.mjs BAD_CONFLICTS (a test keeps the two equal): the 400 for a refused `conflicts` list.
 export const BAD_CONFLICTS = 'bad-conflicts'
+// req-273 review — how much of the dropped records' JSON the warning shows (a workout is a few KB).
+const WARN_RECORDS_MAX = 20000
 
 export const LOGIN_OFFLINE = "Can't reach the server. Check your connection and try again."
 export const LOGIN_UNREADABLE = "Your saved data can't be read, so sync is paused. Nothing was sent."
@@ -357,7 +359,10 @@ export function createSync({
         // req-273 — the server refused the list's shape (a newer app on an older server, say): resent,
         // it would block every push. Only the ones sent are dropped (any added since stay), the drop
         // is warned in the console, and the state goes up at once without them.
-        console.warn(`sync: the server refused ${sentConflicts.length} conflict record(s); dropped them and pushed the state without them. Server: ${r.data.error}`)
+        // The records themselves go in the warning too: the console holds their last copy (DEC-155 §10).
+        const records = JSON.stringify(sentConflicts)
+        const shown = records.length > WARN_RECORDS_MAX ? `${records.slice(0, WARN_RECORDS_MAX)}… (${records.length} chars)` : records
+        console.warn(`sync: the server refused ${sentConflicts.length} conflict record(s); dropped them and pushed the state without them. Server: ${r.data.error} Dropped: ${shown}`)
         setMeta({ pendingConflicts: pendingList(meta).filter((c) => !hasConflict(sentConflicts, c)) })
         again = true
         return

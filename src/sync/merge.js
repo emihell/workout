@@ -142,7 +142,7 @@ export function mergeStates(base, mine, theirs) {
 // not an invented value). A conflict that listed the kept `other` as lost is removed (it isn't).
 // One rule for both merges: `mergeStates` lists the drop as `finished-elsewhere` (a device
 // finished it while another kept logging), `mergeWithoutBase` as `no-base-finished` (DEC-133
-// review round 5; req-273 passes `other` there too). Sets logged on the dropped copy are not
+// review round 5; req-273 passes `other` there after a restore only). Sets logged on the dropped copy are not
 // carried into the finished one (DEC-155 §8).
 const inProgress = (v) => v !== null && v !== undefined
 const hasId = (v) => isPlain(v) && v.id !== null && v.id !== undefined
@@ -217,10 +217,11 @@ export function mergeWithoutBase(mine, theirs, { restored = false } = {}) {
     const value = noBase(field, null, mv, tv, conflicts, restored)
     if (value !== undefined) out[field] = value
   }
-  // req-273 — as in mergeStates: the side whose activeWorkout the merge didn't keep. After a restore
-  // the device's stale copy can win here and then be dropped as finished; the server's live workout
-  // (started after the restore) is kept instead of null.
-  const other = out.activeWorkout === mine.activeWorkout ? theirs.activeWorkout : mine.activeWorkout
+  // req-273 — AFTER A RESTORE only, as in mergeStates: the side whose activeWorkout the merge didn't
+  // keep. The device's stale copy can win here and then be dropped as finished; the server's live
+  // workout (started after the restore) is kept instead of null. Never on a pruned base (DEC-133
+  // round 5 #1: there the incoming device's workout never wins, so null as before).
+  const other = !restored ? null : out.activeWorkout === mine.activeWorkout ? theirs.activeWorkout : mine.activeWorkout
   dropFinished(out, conflicts, 'no-base-finished', other)
   return { state: out, conflicts }
 }

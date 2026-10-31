@@ -1257,6 +1257,7 @@ describe('req-273 — a refused conflict list never blocks sync', () => {
     assert.equal(warn.mock.callCount(), 1, 'one warn line')
     console.log('warn:', ...warn.mock.calls[0].arguments)
     assert.match(String(warn.mock.calls[0].arguments.join(' ')), /1 conflict.*conflicts must be a list/)
+    assert.ok(String(warn.mock.calls[0].arguments[0]).includes(JSON.stringify([refused])), 'the dropped records are in the warning')
     assert.equal(server(user).rev, 2, 'rev +1')
     assert.equal(server(user).state.routines.find((r) => r.id === 'rtn-a').name, 'renamed offline', 'the state is on the server')
     assert.equal(d.engine.getStatus().error, null)

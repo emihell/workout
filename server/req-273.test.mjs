@@ -77,6 +77,32 @@ test('criterion 5: the other side’s workout is in the merged history too → n
   ])
 })
 
+// Review should-fix 1 — on a PRUNED base (restored=false) nothing changes: the server's workout wo-X is
+// already in its own history (an F-SYNC-1 leftover); a stale laptop's live wo-L must not win (DEC-133
+// round 5 #1). Main's result: null, the laptop's wo-L listed as no-base-differs, wo-X as no-base-finished.
+test('review 1: pruned base, server’s workout already in history → null with main’s conflicts, never the laptop’s wo-L', () => {
+  const { finished, stale } = probe()
+  const doneX = { ...finished.workouts.find((w) => w.id === stale.id), id: 'wo-X' }
+  const liveX = { ...stale, id: 'wo-X' }
+  const laptopL = { ...stale, id: 'wo-L', sets: [] }
+  const cases = {
+    'A: wo-X only in the server’s history': [{ ...finished, activeWorkout: laptopL }, { ...finished, workouts: [...finished.workouts, doneX], activeWorkout: liveX }],
+    'B: wo-X in both histories': [
+      { ...finished, workouts: [...finished.workouts, doneX], activeWorkout: laptopL },
+      { ...finished, workouts: [...finished.workouts, doneX], activeWorkout: liveX },
+    ],
+  }
+  for (const [label, [laptop, srv]] of Object.entries(cases)) {
+    const { state, conflicts } = mergeWithoutBase(laptop, srv, { restored: false })
+    console.log(label, '→ active:', state.activeWorkout?.id ?? null, conflicts.filter((c) => c.field === 'activeWorkout').map((c) => `${c.kind}:${c.lost?.id}`))
+    assert.equal(state.activeWorkout, null, label)
+    assert.deepEqual(conflicts.filter((c) => c.field === 'activeWorkout'), [
+      { field: 'activeWorkout', id: null, kind: 'no-base-differs', lost: laptopL },
+      { field: 'activeWorkout', id: null, kind: 'no-base-finished', lost: liveX },
+    ], label)
+  }
+})
+
 // --- criterion 6: ./server/ops duplicates on a WAL database ---
 async function dataDirWith(state) {
   const dataDir = tempDir('workout-req273-test-')
