@@ -125,7 +125,8 @@ Shipped: req-130, 133, 138–143. **Next, in order:** req-134 → 132 → 137 �
   exercises get a muscle pick (stored field → persisted-data gate). Also the feedback note carries `libraryId` (was req-136).
 - **`req-132` one Add screen**: your exercises first, then library hits, then "Create '<name>'". "Link to library" on an
   unlinked exercise. Offline never blocks.
-- **`req-137` offline library + images** (service worker cache). Before own images.
+- **`req-137` own exercise images offline** (service worker cache). The library chunk is already cached by the server build's
+  service worker (audit 2026-10-30 F-DRIFT-8, `src/sync/sw.js:29-31`); only images are open. Before own images.
 - **`req-131` "How to" button**: free-db start/end photos flipping, else the exercise's video link (new optional field).
   No RepDB pictures (DEC-069).
 - **`req-135` alternatives**: same pattern + primary muscle, your equipment first.
@@ -175,6 +176,21 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 
 ## Tooling
 
+**From the 2026-10-30 audits, never triaged until 2026-10-31** (`audits/2026-10-30.md`, `handoff/audits/workflow-plan-2026-10-30.md`):
+- **F-SYNC-1 (bug):** a three-way merge can leave a finished workout in progress → finishing again stores two workouts with
+  one id; `validState` accepts duplicate ids (`src/sync/merge.js:112-131`, `server/store.mjs:27-47`). → **req-268**.
+- **F-STRUCT-8:** `workout-log.js` 1,232 lines, 71 exports, 33 importers — split by job like req-164 did `storage.js`.
+  → **req-270**, after req-261/262 (same file).
+- **Cleanup nits:** F-DEAD-8 `storage.js` shim (0 app importers, 22 test importers); F-STRUCT-9 `sameKind` twice in
+  `set-values.js:66-69,93-96`; 09-12 F-DEAD-2 unused `@types/*` (`package.json:24-25`, 3rd audit); F-DEAD-7's other
+  test-only exports. → **req-269**, after req-261 (same file). (F-DEAD-7 `activeSetPatch` itself is in req-261.)
+- **F-DRIFT-7:** `reference/schema.md` lacks the server tables + sync keys; stale `storage.js` pointer (schema.md:16).
+  Planner's doc to fix → being written 2026-10-31.
+- **F-SYNC-2 (needs a decision, stage 2):** whole-state sync stores ~1.5 MB/rev at 200 workouts, 7.4 MB at 1,000; phone
+  localStorage ~5 MB ≈ 650 workouts, nothing warns (09-24 F-RISK-6). → §Phase 3, with the sync redesign.
+- **Workflow "later" list** (DEC-144 §4 "after Phase 1"): DECISIONS split + digest (2,428 lines today); drop the
+  `git commit/reset` grants + doctor's list; hook text; doc-size ratchet. *Emilio's call:* keep "after Phase 1", or now (DEC-155)?
+
 - **A plan-builder for Coach** (DEC-145 §4): a short change list (routine X: order, kg, rest, notes; new library exercise;
   schedule slot) → a full plan file in the Export shape, checked (workouts identical, only the named parts changed) and
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
@@ -193,10 +209,6 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - → **req-258**. **dates-tz guard passes on an empty cases file**: `/# pass [1-9]/` (`src/dates-tz.test.js:25`). Assert the count
   `dates-tz.cases.js` defines (L-045).
 - → **req-259**. **`plan qa --empty`**: serve a true first-time user. The seed is re-injected whenever storage is empty (`scripts/qa.mjs`).
-- **A hanging test hangs the gate** (req-239 report, [measured 2026-10-26]): `./check:100` runs `node --test` with no
-  `--test-timeout`, and `deploy.yml` sets no `timeout-minutes` (GitHub's default is 6 h). A regression that leaves a rendered test
-  waiting (req-239's mutation did) never goes red. With a timeout, the hang is a cancelled test → exit 1 (a 1.5 s probe: exit 1).
-  → **req-248** (READY).
 - → **req-258** (as "no file runs zero tests"; partial files → req-266). **Fail `./check` when the test count drops** (req-248 report): one pre-watchdog run ended at 2096 of 2108 tests — req-10's
   12 rendered tests missing, no ✖ line for the file; red only by luck (an unrelated unit failure). Not reproduced. A floor
   (e.g. the count can't fall below main's without a named test edit) would catch a silently dropped file.
