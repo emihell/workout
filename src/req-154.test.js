@@ -130,7 +130,7 @@ describe('site 4 — History add set (history/add-set.js withHistorySet)', () =>
 
 describe('the forms refuse Complete / Save with an inline error', () => {
   it('SetLogForm checks kgError before onComplete and shows it', () => {
-    const ui = src('./ui/index.jsx')
+    const ui = src('./ui/set-log-form.jsx')
     // req-189 — and the blank-Reps check (`|| missingReps`, replacing the input's `required`).
     // req-155 — the same gate now also checks the Duration (`|| seconds?.error`); the kg
     // check still runs first and still returns before onComplete.
