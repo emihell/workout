@@ -1,12 +1,12 @@
 # Now
 
-Updated 2026-10-30. **Shipped: everything through req-253** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
+Updated 2026-10-31. **Shipped: everything through req-253** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** Coach (DEC-145, now a role: `[COACH]`) takes Emilio's pasted 10-30 barbell session — after he answers: which day, does
-he log it in the app himself, the bar = 20 kg vs plates-only, his 10/8/6 rep rule (`CLIENT.md` §New). Run 4's `import.json`
-(Helkropp A/C reorder, Leg Press 90) is unapplied, built on rev 78, and has supersets in notes: **Coach rebuilds it at the
-next run under DEC-146** (Emilio, 2026-10-31), not applied as is. Then spec the plan-builder (BACKLOG §Tooling).
+**Next:** Coach review 2026-10-31 → DEC-146..148: brief split (COACH · GOALS · LESSONS), CAPABILITIES gained how a plan runs
+in the workout; `EVIDENCE.md` in progress (research agent → Emilio reviews). Next Coach run (server Mac): move LESSONS'
+last section into `CLIENT.md`; rebuild run 4's `import.json` (supersets in notes, DEC-146); the 10-30 barbell session after
+Emilio's 4 answers (`CLIENT.md` §New). Then spec the plan-builder (BACKLOG §Tooling).
 
 ## Milestone (Emilio, 2026-09-07)
 
