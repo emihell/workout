@@ -7,7 +7,7 @@ alwaysApply: true
 
 **The workout's kg is the routine's kg** — a number the user typed or confirmed (DEC-096). The routine gets it from **history** when an exercise is added (`historyPrescription`: the picker's `pickerItem`, `RoutineExerciseNew`, a plan slot, a mid-workout replacement's first set), and from the **user's confirmed update** after an exercise (the "Update <routine>" offer, `routineUpdateOffer` → `store.applyRoutineUpdate`, that routine only). Nothing else writes it silently: Finish never does (DEC-056); History's recalculation writes only on Apply.
 
-## The live set form (`setLogSeed` / `initialSetFields` / `setPreview`, `workout-log.js`)
+## The live set form (`setLogSeed` / `initialSetFields`, `set-seed.js`; `setPreview`, `set-display.js`)
 
 A **work set's kg**, highest first:
 1. an unsaved draft of this set (req-125), or the set just un-logged via Previous;
