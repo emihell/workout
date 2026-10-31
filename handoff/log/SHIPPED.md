@@ -2825,3 +2825,9 @@ probes red; Planner re-ran 3/3 = 2187. No reviewer: no trigger file. `reports/re
 
 Tooling; throwaway agent, `0692352`…`fbb501a`. No seed script with `--empty` (stays empty after clear + reload); `--empty --seed` refused.
 Gate: new test fails on main, 6/6 on the branch; smoke green; `./check` 2193 in 145. Planner re-ran the tests + the refusal. No reviewer. `reports/req-259.md`.
+
+## req-261 — "Ex N" is the open row's place; Add commits once per tap; Sets 1–20  (2026-10-31)
+
+Bug; throwaway agent, `85a294a`…`e686fe7`. `pillItem` shared by pill + count; `useRef` guards in both pickers; `MAX_SETS = 20` in both
+parsers + plan build C4; `activeSetPatch` deleted. Gate: new tests fail on main; `./check` 2201 in 147; smoke green; browser run on `plan qa`;
+Planner re-ran the repro (main 1/9 → 2/9). Reviewer: No blockers (10-state probe, 54/54 runs of the flaky file). `reports/req-261.md`.

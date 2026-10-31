@@ -21,7 +21,7 @@ it: write it under "For Planner" in the report (what, why, the data). There are 
 **Routine** — a reusable session: `name`, `focus`, an ordered list of items. Retire one with `archivedAt`; never delete.
 
 **Routine item** — one exercise in a routine, in order:
-- `sets` (number), `targets[]` per set (text: `"8"`, `"10-12"`, `"AMRAP"`, `"60s"`, `"6 × 30 s hårt / 30 s lugnt"`).
+- `sets` (whole number 1–20; `plan build` C4 refuses more, req-261), `targets[]` per set (text: `"8"`, `"10-12"`, `"AMRAP"`, `"60s"`, `"6 × 30 s hårt / 30 s lugnt"`).
 - `suggestedWeights[]` per set (kg) — the kg the workout starts from (DEC-096). From history, or blank.
 - `durations[]` per set (seconds) for timed sets.
 - `restSec` — rest after each set of this item.
