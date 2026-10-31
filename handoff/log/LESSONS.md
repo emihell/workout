@@ -625,3 +625,9 @@ catches only a file that runs zero tests. **Cause (req-266, proved):** `--test-f
 is still queued on the child's stdout pipe (async on POSIX); the lost tests never show as failures. Fixed by dropping it.
 Rule: a rendered test that clicks a download wraps it in `catchLongTimers()` (`src/test-support/long-timers.js`), or
 its file times out at 60 s. Read the count on every receipt anyway.
+
+## L-068 — an audit's findings were never triaged; a rule in prose didn't hold  (Planner, 2026-10-31)
+
+`audits/2026-10-30.md` (8 findings, one a sync bug) and the workflow plan's "later" list never reached BACKLOG, although
+`rules/AUDIT.md` "After the audit" step 2 says they must. Found only when Emilio asked "are we done with all audit reqs?".
+Triaged 2026-10-31 (BACKLOG §Tooling). Fix the habit with code, not prose: → BACKLOG §Tooling (an untriaged-finding check).

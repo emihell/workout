@@ -188,6 +188,8 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   Planner's doc to fix → being written 2026-10-31.
 - **F-SYNC-2 (needs a decision, stage 2):** whole-state sync stores ~1.5 MB/rev at 200 workouts, 7.4 MB at 1,000; phone
   localStorage ~5 MB ≈ 650 workouts, nothing warns (09-24 F-RISK-6). → §Phase 3, with the sync redesign.
+- **Untriaged audit findings check** (L-068): `check_handoff.py` flags any `F-*` id in `audits/*.md` that appears in no
+  BACKLOG line, req or SHIPPED entry (or is marked fixed/rejected in a later audit). The 10-30 audit sat untriaged a day.
 - **Workflow "later" list** (DEC-144 §4 "after Phase 1"): DECISIONS split + digest (2,428 lines today); drop the
   `git commit/reset` grants + doctor's list; hook text; doc-size ratchet. *Emilio's call:* keep "after Phase 1", or now (DEC-155)?
 
