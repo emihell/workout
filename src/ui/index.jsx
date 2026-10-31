@@ -349,11 +349,12 @@ export function ConfirmSheet() {
         {pending.choices ? (
           <div className="ui-sheet__choices">
             {pending.choices.map((choice) => (
-              // req-220 review round 1 — `destructive: true` wears the confirm's destructive look.
+              // req-220 review round 1 — `destructive: true` wears the confirm's destructive look;
+              // req-264 — `primary: true` wears the same filled look (the highlighted choice).
               <button
                 key={choice.value}
                 type="button"
-                className={`ui-btn ${choice.destructive ? 'ui-btn--primary' : 'ui-btn--secondary'} ui-btn--block`}
+                className={`ui-btn ${choice.destructive || choice.primary ? 'ui-btn--primary' : 'ui-btn--secondary'} ui-btn--block`}
                 onClick={() => answerConfirm(choice.value)}
               >
                 {choice.label}

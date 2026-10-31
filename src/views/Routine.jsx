@@ -9,6 +9,7 @@ import { deletionConfirmHead, routineDeletionImpact, routineInActiveWorkout, rou
 import { useStore } from '../store-context'
 import { startOrContinue } from '../workout-actions'
 import { nameError, routineStartable } from '../exercise-names.js'
+import { changeTakesStartingPlan } from '../routine-item-change.js'
 import { nextWorkoutName } from '../plan-templates.js'
 import { daysRowText, daysToggle, hasActiveWorkout, routineWeekdays } from '../schedule-days.js'
 import { ExerciseNew, ExerciseNewManual, ExerciseNewSearch } from './Exercises'
@@ -687,9 +688,10 @@ export function RoutineExerciseChange({ routineId, itemId, paths }) {
         cancelTo={back}
         max={1}
         addLabel={() => 'Change'}
-        // req-242 review — a no-history pick keeps the item's own plan (not the Add picker's
-        // starting plan), so its row says what will happen.
-        startingLabel={CHANGE_KEEPS_LABEL}
+        // req-242 review — a no-history pick keeps the item's own plan, so its row says so;
+        // req-264 (DEC-155 §2) — unless it is another plan kind: then Add's starting plan, and
+        // its label (routine-item-change.js changeTakesStartingPlan).
+        startingLabel={(plan, picked) => (changeTakesStartingPlan(ex, picked) ? plan.label : CHANGE_KEEPS_LABEL)}
         inWorkout={new Set(routine.exercises.map((candidate) => candidate.exerciseId))}
         onAdd={([picked]) => {
           if (picked) store.changeRoutineExercise(routine.id, itemId, picked.exerciseId)

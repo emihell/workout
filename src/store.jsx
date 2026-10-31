@@ -114,9 +114,10 @@ export function StoreProvider({ children, sync = null }) {
         patchRoutine(routineId, (routine) => routineItemRemoved(routine, index))
       },
       // req-242 — "Change exercise": the item (by id) takes another exercise; its values come
-      // from that exercise's history or stay, kg blank (routine-item-change.js).
+      // from that exercise's history, or stay (same plan kind) / its starting plan (another kind),
+      // kg blank (routine-item-change.js; req-264 passes the exercise records).
       changeRoutineExercise(routineId, itemId, exerciseId) {
-        setState((s) => routinePatchedState(s, routineId, (routine) => routineItemExerciseChanged(routine, itemId, exerciseId, s.workouts)))
+        setState((s) => routinePatchedState(s, routineId, (routine) => routineItemExerciseChanged(routine, itemId, exerciseId, s.workouts, s.exercises)))
       },
       // req-178 (DEC-096 §3–4) — the confirmed "update routine" offer (routine-update-offer.js):
       // that routine's item only, through the normal edit path. Located by item id at write

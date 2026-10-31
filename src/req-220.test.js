@@ -434,8 +434,9 @@ describe('req-220 — through the real in-app sheet (the default ask)', () => {
     assert.equal(pending.title, HISTORY_CHANGED_TITLE)
     assert.deepEqual(pending.choices, IMPORT_CHOICES)
     assert.deepEqual(IMPORT_CHOICES.map((choice) => choice.label), ['Keep my history', 'Replace everything'])
-    // review round 1 item 7 — Replace everything is the destructive one; Keep is not.
-    assert.deepEqual(IMPORT_CHOICES.map((choice) => Boolean(choice.destructive)), [false, true])
+    // req-264 test edit (DEC-155 §2 reverses review round 1 item 7): Keep my history is the
+    // highlighted (primary) choice; neither carries the destructive marking.
+    assert.deepEqual(IMPORT_CHOICES.map((choice) => [Boolean(choice.primary), Boolean(choice.destructive)]), [[true, false], [false, false]])
     assert.match(pending.message, /Logged history: 1 logged workout removed/)
     assert.match(pending.message, /A copy of your current data downloads first\./)
     answerConfirm('keep')

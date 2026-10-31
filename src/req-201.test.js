@@ -160,7 +160,10 @@ describe('the routine delete confirm names the days (F18)', () => {
     assert.equal(routineScheduledDaysText(state(1, [[0, 5]]), 'r'), 'Fri')
   })
   it('a longer loop names the week', () => {
-    assert.equal(routineScheduledDaysText(state(2, [[1, 1], [0, 1]]), 'r'), 'Mon (week 1) and Mon (week 2)')
+    // req-264 test edit (DEC-155 §2): a day on in every loop week is named once, bare; one on in
+    // only some weeks keeps its week.
+    assert.equal(routineScheduledDaysText(state(2, [[1, 1], [0, 1]]), 'r'), 'Mon')
+    assert.equal(routineScheduledDaysText(state(2, [[1, 1]]), 'r'), 'Mon (week 2)')
   })
   it('no slot, or only another routine\'s → ""', () => {
     assert.equal(routineScheduledDaysText(state(1, [[0, 1, 'other']]), 'r'), '')
