@@ -2426,3 +2426,6 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
    affects it" — a recorded decision stands until new functionality touches it; then it is re-opened, not before.
 6. **req-263 overrides DEC-092's two "limits kept"** (recalc → routine → inner editor loses the Back chain; a stale `from` id
    is accepted). Emilio: "yes". DEC-092's limits list now keeps only "the active overview is a hub".
+7. **Widened, standing** (Emilio: "i always want to prioratize workflow/architecture/project/files/structure/cleanups - before
+   we do any new function"): structure, workflow and cleanup work joins fixes ahead of every feature. Overrides DEC-144 §4
+   ("DECISIONS split + digest: after Phase 1"): the workflow "later" list is specced now (req-271, req-272).

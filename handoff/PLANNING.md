@@ -176,8 +176,9 @@ self-contained — the rule, the measurements and the reasoning in the prompt it
 
 ## Build: dispatch, review, close, stop (DEC-144)
 
-**Fixes before features, always (DEC-155).** Open review findings, bugs, tooling and workflow items are built before any new
-feature; keep that queue empty so nothing goes stale or gets built on old code.
+**Fixes and structure before features, always (DEC-155 §1, §7).** Open review/audit findings, bugs, tooling, workflow,
+architecture, file structure and cleanups are built before any new feature; keep that queue empty so nothing goes stale
+or gets built on old code. An audit's findings reach BACKLOG the same day (L-068).
 
 **Only `READY` reqs with their Lane tag go out;** a `NEEDS DECISION` req is settled with Emilio first. Pre-spec a known
 work-list up front (several `READY` reqs published at once); builds still run one at a time.
