@@ -14,8 +14,7 @@ import { kgError, readKg } from '../kg-input.js'
 import { kgHints } from '../kg-hints.js'
 import { readSeconds, secondsToSave } from '../seconds-input.js'
 import { DISTANCE_UNITS, cardioValues, clockText, readDuration, stopwatchSeconds } from '../cardio-set.js'
-
-const cx = (...parts) => parts.filter(Boolean).join(' ')
+import { cx } from './cx.js'
 
 // ---- Controls ----
 
