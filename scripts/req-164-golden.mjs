@@ -30,7 +30,17 @@ const DB = JSON.parse(readFileSync('src/db.json', 'utf8'))
 
 export const FINISHED_AT = '2026-09-25T12:00:00.000Z'
 const plain = (v) => JSON.parse(JSON.stringify(v))
-const snapshotDisk = () => Object.fromEntries([...disk].map(([k, v]) => [k, JSON.parse(v)]))
+// req-269 — a disk value parsed as JSON, or the raw string: since req-178 the device fill marker
+// is a plain ISO time, and JSON.parse threw on it, so neither script recorded a tree after req-178.
+// A tree before req-178 stores only JSON, so its recording is unchanged.
+const diskValue = (raw) => {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return raw
+  }
+}
+const snapshotDisk = () => Object.fromEntries([...disk].map(([k, v]) => [k, diskValue(v)]))
 
 export const DOCS = { db_v8: ['workout-mvp-v8', DB, true], old_v8: ['workout-mvp-v8', OLD_V8, true], old_v9: ['workout-mvp-v9', OLD_V9_WITH_PLAN, false] }
 

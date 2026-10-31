@@ -26,12 +26,22 @@ const { loadState } = await import(at(existsSync('src/persistence.js') ? 'src/pe
 const { finishedState } = await import(at('src/workout-log.js'))
 const { OLD_V8, OLD_V9_WITH_PLAN } = await import(at('src/req-165.old-docs.js'))
 
+// req-269 — a disk value parsed as JSON, or the raw string: since req-178 the device fill marker
+// is a plain ISO time, and JSON.parse threw on it, so neither script recorded a tree after req-178.
+// A tree before req-178 stores only JSON, so its recording is unchanged.
+const diskValue = (raw) => {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return raw
+  }
+}
 const FINISHED_AT = '2026-09-25T12:00:00.000Z'
 function load(key, doc) {
   disk.clear()
   disk.set(key, JSON.stringify(doc))
   const state = loadState()
-  return { state: JSON.parse(JSON.stringify(state)), disk: Object.fromEntries([...disk].map(([k, v]) => [k, JSON.parse(v)])) }
+  return { state: JSON.parse(JSON.stringify(state)), disk: Object.fromEntries([...disk].map(([k, v]) => [k, diskValue(v)])) }
 }
 const loadV8 = load('workout-mvp-v8', OLD_V8)
 const loadV9 = load('workout-mvp-v9', OLD_V9_WITH_PLAN)
