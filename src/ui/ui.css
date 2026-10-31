@@ -504,17 +504,16 @@ html:has(.ui-picker-strip) {
 .ui-row__chev {
   overflow-wrap: normal;
 }
-/* req-264 — a row's label keeps a short word whole when its value is long: `break-word` (not
- * `anywhere`) keeps the label's min-content at its longest word, so the value wraps first
- * [measured: "Da/ys" beside "Mon, Wed, Thu (week 2) and Fri" at 390px]. Capped at the row's
- * width, so one word longer than the row still breaks inside it (req-123). */
-.ui-row > span:first-child,
-.ui-row__link > .ui-row__label {
+/* req-264 — a row's label beside a value keeps a short word whole: `break-word` (not
+ * `anywhere`) keeps its min-content at its longest word, so a long value wraps first
+ * [measured: "Da/ys" beside "Mon, Wed, Thu (week 2) and Fri" at 390px; main breaks it too].
+ * The cap leaves the value and chevron room, so one word longer than that still breaks inside
+ * the label instead of widening the page (req-123). Rows without a value are unchanged. */
+.ui-row > span:first-child:has(+ .ui-row__value),
+.ui-row__link > .ui-row__label:has(+ .ui-row__value) {
   overflow-wrap: break-word;
-  max-width: 100%;
-}
-.ui-row__link > .ui-row__label {
   min-width: auto;
+  max-width: calc(100% - 3.5em);
 }
 /* req-207 — a row with several actions (the day screen's Start now · ⋯, req-208): when they
  * don't fit beside the name, they wrap to their own line (right-aligned) instead of squeezing
