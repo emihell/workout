@@ -2873,3 +2873,10 @@ No reviewer: no trigger file. AC1 closed live: grants re-pasted (`doctor: ok gra
 Bug; throwaway agent, …`6a4a16e`. `navForBase` gains `from` + `up`; create screens take `nav`; History Back helpers drop a `from` naming a
 deleted workout (DEC-155 §6 overrides DEC-092's two limits). Gate: AC1 fails on main (ends `/history`), passes; `./check` 2267; smoke green;
 Planner's browser walk on `plan qa`: 4 Backs → Today, 0 dialogs / Not found / errors. No reviewer: no trigger file. `reports/req-263.md`.
+
+## req-264 — kind change resets the plan; import highlights Keep; Days row collapses; Burpee → Legs; row labels never break mid-word  (2026-10-31)
+
+UI; throwaway agent, …`f0127f1`. Warm-up dropped on a change to cardio/timed (DEC-155 §10); `primary` flag on import choices; partial-week
+days as "Mon (week 1), Mon (week 3)"; `clampLoopWeeks` in the Days text; label `min-width: min(3.5em, 40%)` (main broke "Days" to "D/a/y/s").
+Gate: `./check` 2288, smoke, test list 10/10; independent reviewer ×2: No blockers, its should-fix (long-word overflow) fixed — crawl 90 pages ×
+320/390 overflow 0. Planner viewed the screens. `reports/req-264.md`.
