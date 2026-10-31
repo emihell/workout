@@ -56,7 +56,7 @@ node -e "import('./src/routine-item-parse.js').then(m=>{const r=m.parseRoutineIt
    Both callers follow automatically; no view change.
 2. **One commit per tap:** a `useRef` flag set on the first call in `ExercisePicker`'s `add` and `MidWorkoutPicker`'s `commit`;
    a second call while it's set does nothing. The step's `save` with errors doesn't set it (the user fixes and taps again).
-3. **A ceiling on Sets: `MAX_SETS = 20`** `(unconfirmed)`, one exported constant used by `noHistoryItem` and `parseRoutineItem`.
+3. **A ceiling on Sets: `MAX_SETS = 20`** (confirmed DEC-155 §4), one exported constant used by `noHistoryItem` and `parseRoutineItem`.
    Above it → the field's inline error, same style as today: "Sets must be a whole number from 1 to 20." `plan build` C4
    refuses above it too, with that number in the message.
 4. **Delete `activeSetPatch`** and the assertions that only test it (`req-154.test.js:75-92` site 2, keeping its `:93`
@@ -109,11 +109,11 @@ node -e "import('./src/routine-item-parse.js').then(m=>{const r=m.parseRoutineIt
 3. Deferrals: the blank-kg split stays as recorded (Out of scope).
 4. Numbers: from the commands above. `MAX_SETS = 20` is a Planner pick with no measured source (unconfirmed below).
 5. Trigger: `workout-log.js` → independent reviewer. No migration, no stored record rewritten → no backup reminder.
-6. `(unconfirmed)`: the ceiling value and its message.
+6. (confirmed DEC-155 §4): the ceiling value and its message.
 
 ## Decisions made on Emilio's behalf
 
-- **behaviour `(unconfirmed)`:** Sets ceiling **20**, error text "Sets must be a whole number from 1 to 20." Builder: report
+- **behaviour (confirmed DEC-155 §4):** Sets ceiling **20**, error text "Sets must be a whole number from 1 to 20." Builder: report
   the largest `sets` in `src/db.json`; Emilio's live data was not read (no DB on this machine).
 - **implementation:** N from the pill's own item pick (one rule for pill and words); a `useRef` guard rather than a
   disabled-after-click state; one `MAX_SETS` shared by app and `plan build`; `activeSetPatch` deleted, not kept for tests.

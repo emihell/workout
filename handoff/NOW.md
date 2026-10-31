@@ -18,10 +18,8 @@ Then the DEC-154 features: cues + notes → supersets → intervals. Build here;
 - Deploys for every merged app req: `! ./server/deploy && ./server/doctor`.
 - Data dir on this laptop is `~/projects/workout/workout-data` (no DB here); docs still say `~/dev/workout/` (Planner, open).
 
-**Emilio's calls before their req dispatches:** req-263 — does DEC-155 override DEC-092? `(unconfirmed)` to confirm:
-req-261 Sets cap 20; req-263 stale `from` → the screen's fixed parent; req-264 kind = cardio/timed/reps, note/role/warm-up
-kept on a kind change, Replace = plain secondary, Days "Mon, Wed, Thu (week 2) and Fri", Burpee → Legs, layout fixes
-CSS-only. Blank kg on Previous→Save stays 0 (req-154 split recorded) — a BACKLOG line only if he wants it changed.
+**Emilio's calls before their req dispatches:** req-263 — does DEC-155 override DEC-092? All `(unconfirmed)` calls
+accepted (DEC-155 §4); blank kg stays 0 until new functionality touches it (§5).
 
 ## Milestone (Emilio, 2026-09-07)
 

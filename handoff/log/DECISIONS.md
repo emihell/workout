@@ -2418,3 +2418,9 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
    - A missed rep on an Easy exercise → **keep as is**; the item is dropped from BACKLOG.
 3. Not in the batch (parked or new behaviour): dead first Back (DEC-084, iPhone test first), loop-length re-anchor (open),
    target range/AMRAP logging, rest editing, learned rest timer, Coach's app gaps, `[optional]` taxonomy slim.
+4. **The batch's `(unconfirmed)` calls, accepted** (Emilio: "ill go with your recommendations"): Sets cap 20 (req-261);
+   kind = cardio/timed/reps, note/role/warm-up kept on a kind change, "Replace everything" plain secondary, Days row
+   "Mon, Wed, Thu (week 2) and Fri", Burpee → Legs, the two layout fixes CSS-only (req-264); a stale `from` → the screen's
+   fixed parent (req-263, if built).
+5. **Blank kg on Previous → Save stays 0** (req-154's split). Emilio: "dec can change if there is new funcitonality that
+   affects it" — a recorded decision stands until new functionality touches it; then it is re-opened, not before.

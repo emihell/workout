@@ -46,7 +46,7 @@ readers get the new text.
 
 **Repro** [measured, `staplesByMuscle` over `src/library/exercises.json`]: `Chest: Burpee` — its `muscleGroups` is
 `["Chest","Legs"]` (primary `quadriceps, chest`, `src/library/common.js:202`) and the empty-search list takes the first
-group in `MUSCLE_GROUPS` order (`src/routine-picker.js:38-47`, "(unconfirmed)" there). A general "first primary muscle"
+group in `MUSCLE_GROUPS` order (`src/routine-picker.js:38-47`, "(confirmed DEC-155 §4)" there). A general "first primary muscle"
 rule was measured and **rejected**: it moves 11 of 194 staples, several worse (Mountain Climbers Core→Legs, Close-Grip
 Bench Chest→Arms, Bird Dog Back→Core). **Scope:** a small per-id override for the picker's grouping only:
 Burpee → **Legs**. No other staple moves (assert the full grouping is identical except Burpee).
@@ -110,15 +110,15 @@ Burpee → **Legs**. No other staple moves (assert the full grouping is identica
 4. Numbers: the repro commands above, 2026-10-31; "11 of 194 staples" from the same run.
 5. Trigger: `store.jsx` (the change wiring) → independent reviewer. Stored records are written only by the user's own
    Change tap, no bulk write → no backup reminder.
-6. `(unconfirmed)` calls: below.
+6. (confirmed DEC-155 §4) calls: below.
 
 ## Decisions made on Emilio's behalf
 
-- **behaviour (unconfirmed):** "kind" = cardio / timed / reps; machine ↔ free ↔ bodyweight is the same kind (plan kept).
-- **behaviour (unconfirmed):** the kind-change plan keeps the item's note, role and warm-up switch.
-- **behaviour (unconfirmed):** Replace everything wears the plain secondary look — no other "destructive" marking.
-- **behaviour (unconfirmed):** Days row wording — every-week days bare, partial days with "(week N)", e.g.
+- **behaviour (confirmed DEC-155 §4):** "kind" = cardio / timed / reps; machine ↔ free ↔ bodyweight is the same kind (plan kept).
+- **behaviour (confirmed DEC-155 §4):** the kind-change plan keeps the item's note, role and warm-up switch.
+- **behaviour (confirmed DEC-155 §4):** Replace everything wears the plain secondary look — no other "destructive" marking.
+- **behaviour (confirmed DEC-155 §4):** Days row wording — every-week days bare, partial days with "(week N)", e.g.
   "Mon, Wed, Thu (week 2) and Fri"; same text in the delete confirm.
-- **behaviour (unconfirmed):** Burpee's picker group is **Legs**.
-- **behaviour (unconfirmed):** (e) fixes only if layout/CSS-only; anything bigger goes back to BACKLOG.
+- **behaviour (confirmed DEC-155 §4):** Burpee's picker group is **Legs**.
+- **behaviour (confirmed DEC-155 §4):** (e) fixes only if layout/CSS-only; anything bigger goes back to BACKLOG.
 - **implementation:** where the override map lives; how the store hands exercise records to `changedRoutineItem`.

@@ -90,10 +90,10 @@ after a Delete [inferred — no in-app link found that builds a `from` to a dele
 4. Numbers: none.
 5. Trigger files: none of `store.jsx` / `model.js` / `storage.js` / `progress.js` / `workout-log.js` → no reviewer
    required; `navForBase` is shared by four flows (criterion 3 is the domino guard). No stored data → no backup reminder.
-6. `(unconfirmed)`: below.
+6. (confirmed DEC-155 §4): below.
 
 ## Decisions made on Emilio's behalf
 
-- **behaviour (unconfirmed):** a stale `from` falls back to the screen's fixed parent (the workout, or the History list),
+- **behaviour (confirmed DEC-155 §4):** a stale `from` falls back to the screen's fixed parent (the workout, or the History list),
   not to Today (`Missing`'s Back) and not a message.
 - **implementation:** how `from` reaches the inner screens (an argument to `navForBase` vs per-screen `childLink`).
