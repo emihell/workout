@@ -6,6 +6,7 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
+import { catchLongTimers } from './test-support/long-timers.js'
 
 const h = React.createElement
 const KEY = 'workout-mvp-v9'
@@ -37,6 +38,7 @@ describe('req-220 — Backup & data (rendered)', () => {
     // the download link's click is a no-op here, so the screen stays on Backup & data.
     const anchorClick = window.HTMLAnchorElement.prototype.click
     window.HTMLAnchorElement.prototype.click = () => {}
+    const longTimers = catchLongTimers() // req-266: the download's 60 s revoke timer must not hold the file open
     try {
       window.location.hash = '#/settings'
       const { default: App } = await importJsx('./App.jsx', import.meta.url)
@@ -59,6 +61,7 @@ describe('req-220 — Backup & data (rendered)', () => {
     } finally {
       URL.createObjectURL = original
       window.HTMLAnchorElement.prototype.click = anchorClick
+      longTimers.release()
     }
   })
 })
