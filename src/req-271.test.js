@@ -1,11 +1,11 @@
-// req-271 — the DEC log split: scripts/dec_split.py (a proven move), scripts/dec_index.py (the
-// generated index) and check_handoff.py's three DEC checks, on fixture repos in temp dirs.
+// req-271 — the DEC log split: scripts/dec_index.py (the generated index)
+// and check_handoff.py's three DEC checks, on fixture repos in temp dirs.
 // Nothing under the real handoff/ is read or written. Dangling ids are built at runtime
 // ('DEC-' + n) so this file cites none itself (check a scans src/).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
@@ -72,8 +72,16 @@ const write = (root, p, text) => {
   mkdirSync(dirname(join(root, p)), { recursive: true })
   writeFileSync(join(root, p), text)
 }
+// req-275: the split layout, written directly — scripts/dec_split.py (the one-shot that made it,
+// req-271) is deleted. Same bytes it wrote for this fixture (checked against main's dec_split.py,
+// reports/req-275.md): the header stays in DECISIONS.md, the entries are cut at `## DEC-052`
+// into their two range files, and dec_index.py appends the generated index.
 const split = (root) => {
-  const r = py('dec_split.py', ['--root', root])
+  const cut = ENTRIES.indexOf('## DEC-052')
+  write(root, 'handoff/log/decisions/DEC-001-050.md', ENTRIES.slice(0, cut))
+  write(root, 'handoff/log/decisions/DEC-051-100.md', ENTRIES.slice(cut))
+  write(root, 'handoff/log/DECISIONS.md', HEADER)
+  const r = py('dec_index.py', ['--root', root])
   assert.equal(r.status, 0, r.stdout + r.stderr)
   return r
 }
@@ -89,46 +97,8 @@ const commitAll = (root) => {
 }
 const checkHandoff = (root) => py('check_handoff.py', ['--repo', root])
 
-describe('req-271 dec_split.py — a move, proven', () => {
-  it('range files concatenate byte-equal to the entry text; header kept; each heading in one file', () => {
-    const root = fixture()
-    const r = split(root)
-    assert.match(r.stdout, /→ byte-equal/)
-    assert.match(r.stdout, /dec_split: proven/)
-    const files = readdirSync(join(root, 'handoff/log/decisions')).sort()
-    assert.deepEqual(files, ['DEC-001-050.md', 'DEC-051-100.md'])
-    const concat = files.map((f) => read(root, `handoff/log/decisions/${f}`)).join('')
-    assert.equal(concat, ENTRIES)
-    const md = read(root, 'handoff/log/DECISIONS.md')
-    assert.ok(md.startsWith(HEADER), 'the header (format example + digest) is kept byte for byte')
-    // The addendum moved with DEC-003; the format example stayed in the header.
-    assert.match(read(root, 'handoff/log/decisions/DEC-001-050.md'), /^## DEC-003 follow-up/m)
-    assert.equal(md.split('\n').filter((l) => l.startsWith('## DEC-001 — short title')).length, 1)
-    const all = [md, ...files.map((f) => read(root, `handoff/log/decisions/${f}`))].join('\n')
-    for (const h of (HEADER + ENTRIES).split('\n').filter((l) => l.startsWith('## '))) {
-      assert.equal(all.split('\n').filter((l) => l === h).length, 1, h)
-    }
-  })
-
-  it('refuses a second split (decisions/ already holds range files), writing nothing', () => {
-    const root = fixture()
-    split(root)
-    const before = read(root, 'handoff/log/DECISIONS.md')
-    const r = py('dec_split.py', ['--root', root])
-    assert.equal(r.status, 2)
-    assert.match(r.stderr, /already holds range files/)
-    assert.equal(read(root, 'handoff/log/DECISIONS.md'), before)
-  })
-
-  it('--dry-run proves the same and writes nothing', () => {
-    const root = fixture()
-    const r = py('dec_split.py', ['--root', root, '--dry-run'])
-    assert.equal(r.status, 0, r.stderr)
-    assert.match(r.stdout, /proven/)
-    assert.equal(existsSync(join(root, 'handoff/log/decisions')), false)
-    assert.equal(read(root, 'handoff/log/DECISIONS.md'), HEADER + ENTRIES)
-  })
-})
+// req-275 test edit: the three `dec_split.py — a move, proven` tests are deleted with the script
+// they ran (a finished one-shot, req-271; the real split is done and in git).
 
 describe('req-271 dec_index.py — the generated index', () => {
   it('one line per DEC: id · date · title · status, from markers; the heading date, else the body\'s', () => {

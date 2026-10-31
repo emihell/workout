@@ -184,13 +184,23 @@ fi
 echo "check: building (vite build)…"
 npm run --silent build >/dev/null || fail "the production build"
 
+# 3b. req-275 (L-071): the six shell suites (scripts/*.test.sh — plan, check_handoff, the skills
+# check, the pre-push hook) — only those whose subject this checkout changed vs main (diff from the
+# merge base, plus the working tree): all six take ≈34 s against this gate's ≈9 s. CI runs all six
+# on every push (.github/workflows/deploy.yml). The selection table is scripts/shell-suites.sh.
+echo "check: shell suites for this change (scripts/shell-suites.sh --changed)…"
+suites_out="$(bash scripts/shell-suites.sh --changed)" || { printf '%s\n' "$suites_out"; fail "a shell suite (scripts/shell-suites.sh)"; }
+printf '%s\n' "$suites_out" | sed 's/^/check:   /'
+suites_ran="$(printf '%s\n' "$suites_out" | sed -n 's/^shell suites: green — //p')"
+suites_note="${suites_ran:+, the shell suites ($suites_ran)}"
+
 # 4. (--smoke only) the browser smoke test — HEAD's committed tree, not the
 # working copy (it builds from `git archive HEAD`).
 if [ -n "$smoke" ]; then
   echo "check: smoke test (headless browser, HEAD)…"
   node scripts/smoke.mjs || fail "the smoke test"
-  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), the build, and the smoke test all passed."
+  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), the build${suites_note}, and the smoke test all passed."
   exit 0
 fi
 
-echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), and the build all passed."
+echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), and the build${suites_note} all passed."

@@ -691,7 +691,7 @@ def check_shipped_size(repo: str, ref: str) -> list[Finding]:
 #   a. every DEC-NNN cited in DEC_REF_SCOPE resolves to exactly one entry heading;
 #   b. (split layout) DECISIONS.md's generated index equals scripts/dec_index.py's output;
 #   c. the topical digest cites no DEC whose status is `superseded` (audit 2026-10-30 §E1).
-# Works on both layouts: before scripts/dec_split.py runs, the entries are still inside
+# Works on both layouts: before the split (req-271), the entries were still inside
 # DECISIONS.md and (b) has nothing to compare. No DECISIONS.md at ref (a fixture repo) → no check.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import dec_index as di  # noqa: E402

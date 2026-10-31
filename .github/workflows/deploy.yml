@@ -33,6 +33,9 @@ jobs:
       # req-34: the same gate the local flow runs (lint + tests + build). ./check is the one
       # source of truth — CI can't drift from what `plan publish` enforces.
       - run: ./check
+      # req-275 (L-071): all six shell suites (plan, check_handoff, skills check, pre-push hook) on
+      # every push — ./check runs only those whose subject a local change touched (on main: none).
+      - run: bash scripts/shell-suites.sh --all
       # req-159: the core loop by real clicks in headless Chrome (scripts/smoke.mjs) on an
       # isolated build of this commit. Chrome comes from puppeteer's npm ci download; CI=true
       # makes it run --no-sandbox (Ubuntu 23.10+ runners can block Chrome's user-namespace sandbox).
