@@ -17,6 +17,11 @@
 import { KG_NUMBER, normalizeKgText } from './kg-input.js'
 
 const WHOLE = /^\d+$/
+
+// req-261 (DEC-155 §4) — the most sets one item can have. One number for every Sets field
+// (this parser, the mid-workout step's noHistoryItem) and for `plan build`'s C4.
+export const MAX_SETS = 20
+export const SETS_RANGE_MESSAGE = `Sets must be a whole number from 1 to ${MAX_SETS}.`
 const NEGATIVE = /^-\s*\d/
 
 function tokens(text, separator) {
@@ -85,6 +90,14 @@ export function parseRoutineItem({ sets, reps, kg, duration, timed = false }) {
   let count
   if (!setsText) {
     count = Math.max(r.list.length, k.list.length, d.list.length, 1)
+    // req-261 — a blank Sets counts the lists; more than MAX_SETS entries is the same ceiling.
+    if (count > MAX_SETS) {
+      errors.sets = { position: null, message: SETS_RANGE_MESSAGE }
+      count = 1
+    }
+  } else if (WHOLE.test(setsText) && Number(setsText) > MAX_SETS) {
+    errors.sets = { position: null, message: SETS_RANGE_MESSAGE }
+    count = 1
   } else if (WHOLE.test(setsText) && Number(setsText) > 0) {
     count = Number(setsText)
   } else {

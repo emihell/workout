@@ -51,14 +51,18 @@ describe('req-227 AC1 — a reopened swapped-away exercise counts', () => {
     assert.equal(pos.current <= pos.total, true)
     assert.equal(workoutPillState(w, NOW).countText, '2/8')
   })
-  it('everything else done, A reopened → "8/8", never "N/M" with N > M (and not "7/7" with work left)', () => {
+  // req-261 (DEC-155 §2) — N is the open row's place: A (i2) is 2nd of the 8 counted, so "2/8"
+  // (was "8/8" when N was done + 1). Still never N > M, and never "7/7" with work left.
+  it('everything else done, A reopened → "2/8" (A\'s place), never "N/M" with N > M (and not "7/7" with work left)', () => {
     let w = reopenAndAddSet(swapped(), 'i2')
     for (const key of ['i3', 'i4', 'i5', 'i6', 'i7', 'i2-new']) {
       w = { ...w, ...markItemDonePatch(w, w.snapshot.items.find((it) => it.routineItemId === key)) }
     }
     const pos = workoutPosition(w)
-    assert.equal(JSON.stringify(pos), JSON.stringify({ current: 8, total: 8, done: 7 }))
-    assert.equal(workoutPillState(w, NOW).countText, '8/8')
+    assert.equal(JSON.stringify(pos), JSON.stringify({ current: 2, total: 8, done: 7 }))
+    assert.equal(pos.current <= pos.total, true)
+    assert.equal(workoutPillState(w, NOW).item.routineItemId, 'i2')
+    assert.equal(workoutPillState(w, NOW).countText, '2/8')
   })
 })
 
