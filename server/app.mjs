@@ -288,7 +288,7 @@ export function createApp({ db, secret, maxBody = MAX_BODY, appDir = null }) {
         res.once('finish', () => req.socket.destroy())
         return send(res, 413, { error: error.message }, { connection: 'close' })
       }
-      if (error instanceof ClientError) return send(res, error.status, { error: error.message })
+      if (error instanceof ClientError) return send(res, error.status, { error: error.message, ...(error.code ? { code: error.code } : {}) })
       console.error(error)
       if (!res.headersSent) send(res, 500, { error: 'Server error.' })
       else res.end()

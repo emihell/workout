@@ -10,10 +10,12 @@ import { emptyState } from '../src/persistence.js'
 import { inTransaction } from './db.mjs'
 import { mergeStates, mergeWithoutBase } from './merge.mjs'
 
+// `code` (req-273): an optional machine-readable reason, sent beside `error` in the reply body.
 export class ClientError extends Error {
-  constructor(status, message) {
+  constructor(status, message, code = null) {
     super(message)
     this.status = status
+    this.code = code
   }
 }
 
@@ -161,6 +163,10 @@ export function getRevision(db, userId, rev) {
 // req-268 (DEC-155 §9) — `conflicts` on a push: what the app's rebase (src/sync/engine.js) dropped
 // while a request was in flight, in the merge's own shape {field, id, kind, lost}. Optional (an
 // older app sends none). Stored as sent (JSON), on the revision this push makes.
+// req-273 — the 400 for a refused list carries `code: BAD_CONFLICTS`: the app drops the list it sent
+// and pushes its state again without it, so a list this server can't take never blocks sync.
+// src/sync/engine.js holds the same text (a test keeps the two equal).
+export const BAD_CONFLICTS = 'bad-conflicts'
 function deviceConflicts(value) {
   if (value === undefined) return []
   const ok =
@@ -175,7 +181,7 @@ function deviceConflicts(value) {
         (c.id === null || typeof c.id === 'string' || typeof c.id === 'number') &&
         'lost' in c,
     )
-  if (!ok) throw new ClientError(400, 'conflicts must be a list of {field, id, kind, lost}.')
+  if (!ok) throw new ClientError(400, 'conflicts must be a list of {field, id, kind, lost}.', BAD_CONFLICTS)
   return value.map(({ field, id, kind, lost }) => JSON.parse(JSON.stringify({ field, id, kind, lost: lost ?? null })))
 }
 

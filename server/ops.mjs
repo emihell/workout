@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process'
 import { accessSync, constants, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, join, sep } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { DatabaseSync, backup as sqliteBackup } from 'node:sqlite'
 import { DB_FILE, NODE_FLOOR_TEXT, assertNotLiveUnderTest, assertOutsideRepo, nodeVersionOk } from './config.mjs'
 import { openDb } from './db.mjs'
@@ -183,7 +184,14 @@ export function counts(dbFile) {
 // req-268 (audit F-SYNC-1) — per user, the latest revision's workout ids that appear more than once
 // in history, and whether the workout in progress is already in history (the state the merge fix
 // stops producing). Read-only: the DB is opened `readOnly`, so a write through it is refused.
-export const readOnlyDb = (dbFile) => new DatabaseSync(dbFile, { readOnly: true })
+// req-273 — a read-only open of a CLOSED WAL database leaves `-wal`/`-shm` beside it (it can't delete
+// them). With no `-wal` there (no writer has it open in WAL mode) it is opened `immutable=1`, which
+// creates neither. With a `-wal` it is opened as before: immutable ignores the WAL, so it would miss
+// the newest revisions while the server runs.
+export const readOnlyDb = (dbFile) =>
+  existsSync(`${dbFile}-wal`)
+    ? new DatabaseSync(dbFile, { readOnly: true })
+    : new DatabaseSync(`${pathToFileURL(dbFile).href}?immutable=1`, { readOnly: true })
 export function duplicateWorkoutIds(dbFile) {
   const db = readOnlyDb(dbFile)
   try {
