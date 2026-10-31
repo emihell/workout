@@ -2798,3 +2798,14 @@ backup `workout-20261030-230642-deploy-52637e6.db` integrity ok.
 
 Tooling; throwaway agent, `ab7c028`. Gate: plan-guards `all checks passed`, check-handoff `all passed`, `./check` green; 6 new
 tests fail on main's `plan`; Planner re-ran both suites + the 10-30 truncated Next. No reviewer: no trigger file. `reports/req-253.md`.
+
+## req-254 — `ops plan build`: Coach's change list → a checked plan file  (2026-10-31)
+
+Tooling; throwaway agent, `dedc47e`…`0115b4a`. New `server/plan-build.mjs` (pure) + `plan build` in `server/ops-cli.mjs`:
+reads the newest revision read-only, applies the change list with the app's builders, checks C1–C7 (C7 = preview's own
+`readPlanFile` + `planChange`), writes `--out` (`wx`) only without refusals. Choices → DEC-152. Gate: `./check` green
+(144 files, 2186 tests, 8 new), `smoke: green — 13 steps`. Planner re-ran on a fresh seeded copy: build and preview counts
+identical (`routines: 0 added, 2 changed, 0 removed, 1 archived` · `logged workouts: 2 · identical after: yes`), a "12 reps"
+target refused with no file, DB sha256 unchanged. No reviewer: no trigger file (read-only tooling). AC8's Coach run pending
+(run 5). Server tooling only — the served app is unchanged. `reports/req-254.md`.
+
