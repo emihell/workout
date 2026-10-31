@@ -2820,3 +2820,8 @@ Tooling; throwaway agent, `c788a1c`…`44991d8`. Gate: probes fail on main and g
 Tooling; throwaway agent, `0319c86`…`ac39812`. `check` drops `--test-force-exit` (it cut queued TAP output); two download tests clear their
 60 s timer via `src/test-support/long-timers.js`. Gate: main 10 runs, 5 distinct counts; branch 10/10 = 2187 = per-file sum; hang/handle/zero-test
 probes red; Planner re-ran 3/3 = 2187. No reviewer: no trigger file. `reports/req-266.md`.
+
+## req-259 — `plan qa <ref> --empty` serves a true first-time user  (2026-10-31)
+
+Tooling; throwaway agent, `0692352`…`fbb501a`. No seed script with `--empty` (stays empty after clear + reload); `--empty --seed` refused.
+Gate: new test fails on main, 6/6 on the branch; smoke green; `./check` 2193 in 145. Planner re-ran the tests + the refusal. No reviewer. `reports/req-259.md`.

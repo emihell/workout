@@ -7,7 +7,7 @@ the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACK
 code"). Serial, one throwaway agent per req, stop at each closeout. All specced 2026-10-31 and READY unless noted:
 1. **req-256** "12 reps" bug — built `req-256` @ `35b2df0`, gate green (2189), reviewer: No blockers. **Waits on AC2 (server).**
 2. **req-255** plan build kg estimate · 3. ~~req-257~~ merged 10-31 · 4. ~~req-258~~ merged 10-31 · ~~req-266~~ merged 10-31 ·
-5. **req-259** `plan qa --empty` · 6. **req-260** plan build scans live routines (after 255) · 7. **req-261** Ex N + double
+5. ~~req-259~~ merged 10-31 · 6. **req-260** plan build scans live routines (after 255) · 7. **req-261** Ex N + double
 tap + Sets cap · 8. **req-262** swaps/cardio/Back guard (after 261; backup reminder) · 9. **req-263** Back chain
 (DEC-155 §6 overrides DEC-092) · 10. **req-264** small UI fixes (after 263) · 11. **req-265** library chunk.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
