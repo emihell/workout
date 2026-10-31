@@ -14,6 +14,15 @@ describe('req-44 isDurationTarget (was duplicated in item.jsx)', () => {
     assert.equal(isDurationTarget(null), false)
     assert.equal(isDurationTarget(undefined), false)
   })
+  // req-256 — a trailing "s" is a duration only right after a digit.
+  it('is false for a word ending in "s" (req-256)', () => {
+    for (const t of ['12 reps', '8 reps', '3 sets', '10 reps each']) assert.equal(isDurationTarget(t), false, t)
+  })
+  it('keeps the real durations in his data (req-256)', () => {
+    for (const t of ['45 s', '60s', '5-8 min', '5–8 min', '8 min: 1 min snabbt / 1 min lugnt', '60 sec']) {
+      assert.equal(isDurationTarget(t), true, t)
+    }
+  })
 })
 
 describe('dated recommendation loads', () => {

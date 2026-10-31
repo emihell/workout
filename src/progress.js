@@ -88,7 +88,8 @@ function parseReps(value) {
 
 export function isDurationTarget(value) {
   const t = String(value || '').toLowerCase()
-  return t.includes('min') || t.includes('sec') || /s$/.test(t.replace(/\s/g, ''))
+  // req-256 — a trailing "s" counts only right after a digit ("45s", "45 s"), never "12 reps" / "3 sets".
+  return t.includes('min') || t.includes('sec') || /\ds$/.test(t.replace(/\s/g, ''))
 }
 
 function isAmrap(value) {

@@ -197,7 +197,7 @@ test('AC5 — failure cases: exit 1, the refusal on screen, no --out file', asyn
       ['hidden library id', s, [{ op: 'exercise.add', libraryId: HIDDEN }], new RegExp(`library entry "${HIDDEN}" is hidden`)],
       ['merged library id names its target', s, [{ op: 'exercise.add', libraryId: LIBRARY.find((e) => e.mergedInto).id }], new RegExp(`merged into "${LIBRARY.find((e) => e.mergedInto).mergedInto}"`)],
       ['library id already an exercise', s, [{ op: 'exercise.add', libraryId: 'Leverage_Chest_Press' }], /already exercise ex-press "Chest Press" — use that one/],
-      ['"12 reps" on a strength item', s, [{ op: 'item.set', routine: 'Upper', exercise: 'Chest Press', set: { targets: ['12 reps', '12 reps'] } }], /target "12 reps" shows as Duration on a reps item: write reps as a bare number/],
+      ['"60s" on a strength item', s, [{ op: 'item.set', routine: 'Upper', exercise: 'Chest Press', set: { targets: ['60s', '60s'] } }], /target "60s" shows as Duration on a reps item: write reps as a bare number/],
       ['timed 3-set item, rest 20', s, [{ op: 'routine.items', routine: 'Core', items: [{ exercise: 'Plank', sets: 3, durations: [40, 40, 40], restSec: 20 }] }], /a timed 3-set item with restSec 20/],
       ['a workout in progress (C7)', live, [{ op: 'item.set', routine: 'Upper', exercise: 'Chest Press', set: { restSec: 120 } }], /REFUSED: A workout is in progress \(the server’s activeWorkout\)/],
       ['kg 40 on an exercise without history (C5)', s, [{ op: 'exercise.add', ref: 'rdl', libraryId: 'Romanian_Deadlift' }, { op: 'routine.items', routine: 'Core', items: [{ exercise: 'Plank' }, { exercise: 'rdl', suggestedWeights: [40, 40, 40] }] }], /kg 40\/40\/40 on Romanian Deadlift, which has no logged history/],
