@@ -31,8 +31,12 @@ selected=()
 case "$mode" in
   --all) selected=("${SUITES[@]}") ;;
   --changed)
+    # WORKOUT_SUITES_BASE: compare against another ref than main — only to prove the selection on a
+    # branch whose main lacks this runner (req-275's own receipts). Said loudly, like WORKOUT_TEST_LIMIT.
+    base="${WORKOUT_SUITES_BASE:-main}"
+    [ "$base" = main ] || echo "shell suites: base overridden to $base (WORKOUT_SUITES_BASE)" >&2
     changed="$(
-      if git rev-parse --verify -q main >/dev/null; then git diff --name-only main...HEAD; fi
+      if git rev-parse --verify -q "$base" >/dev/null; then git diff --name-only "$base...HEAD"; fi
       git diff --name-only HEAD
       git ls-files --others --exclude-standard
     )"
