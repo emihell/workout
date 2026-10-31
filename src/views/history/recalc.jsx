@@ -1,11 +1,10 @@
 import { childLink, go } from '../../route'
 import { useStore } from '../../store-context'
 import { RoutineScreens } from '../Routine'
-import { navForBase } from '../routine-nav.js'
 import { Back, Missing } from '../shared'
 import { Actions, Button, NavLink, Screen, Title } from '../../ui/index.jsx'
 import { whenLabel, workoutRoutineId, workoutRoutineName } from './helpers'
-import { historyDetailReturn } from './return-paths.js'
+import { historyDetailReturn, historyRoutinePaths } from './return-paths.js'
 
 export function HistoryRecalculate({ workoutId, from = null }) {
   const store = useStore()
@@ -58,12 +57,8 @@ export function HistoryRoutine({ workoutId, screen = 'detail', itemId, exerciseI
     return <Missing>Not found.</Missing>
   }
   // req-171 — the routine's own screen returns to the recalc it was opened from (and so
-  // on up the chain); its inner editor screens keep their fixed routine parent.
-  const paths = navForBase(`/history/${workoutId}/routine`, from || `/history/${workoutId}/recalculate`, {
-    extra: whenLabel(workout),
-    showDelete: false,
-    showDays: false,
-  })
+  // on up the chain); req-263 — its inner editor screens keep that chain too.
+  const paths = historyRoutinePaths(workoutId, screen, from, { extra: whenLabel(workout), workouts: store.workouts })
   return (
     <RoutineScreens
       routineId={routineId}

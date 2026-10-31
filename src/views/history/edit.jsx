@@ -178,7 +178,7 @@ export function HistorySet({ workoutId, index, from = null }) {
   // req-163 — Effort hidden on a warm-up / cardio set (saves rpe null), Duration on a timed
   // exercise's work set (historySetKind, the live forms' rule).
   const kind = historySetKind(snapshotItemFor(workout.snapshot?.items, itemIdOf(set), set.exerciseId), exerciseById(store.exercises, set.exerciseId))
-  const back = historySetBack(workout.id, itemIdOf(set) || set.exerciseId, from)
+  const back = historySetBack(workout.id, itemIdOf(set) || set.exerciseId, from, store.workouts)
   // req-171 — the recalc after a change returns to the workout as it was opened.
   const recalc = childLink(`/history/${workout.id}/recalculate`, `/history/${workout.id}/set/${index}`, from)
 

@@ -39,7 +39,7 @@ export function HistoryDetail({ workoutId, from = null }) {
   const here = historyDetailPath(workout.id)
   return (
     <Screen>
-      <Back to={historyDetailBack(from)} />
+      <Back to={historyDetailBack(from, store.workouts)} />
       <Title>
         {snapshot
           ? snapshot.programName
@@ -96,7 +96,7 @@ export function HistoryDetail({ workoutId, from = null }) {
         onClick={async () => {
           if (!(await askConfirm(`Delete ${sessionLabel(workout, routine)}?`, { confirmLabel: 'Delete' }))) return
           store.removeWorkout(workout.id)
-          go(historyDetailBack(from))
+          go(historyDetailBack(from, store.workouts))
         }}
       >
         Delete
@@ -127,7 +127,7 @@ export function HistoryWorkoutExercise({ workoutId, exerciseId, from = null }) {
   const here = historyExercisePath(workout.id, exerciseId)
   return (
     <Screen>
-      <Back to={historyExerciseBack(workout.id, from)} />
+      <Back to={historyExerciseBack(workout.id, from, store.workouts)} />
       <Title>{snapshotItem?.exerciseName || ex?.name || exerciseId}</Title>
       <p className="ui-sub">
         {/* req-128 — req-93 rule: main unlabelled (roleTag), non-main tagged. */}

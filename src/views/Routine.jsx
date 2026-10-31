@@ -324,7 +324,7 @@ export function RoutineEdit({ routineId, paths }) {
 
   return (
     <Screen>
-      <Back to={nav.base} />
+      <Back to={nav.up} />
       <Title>Name</Title>
       <form
         onSubmit={(e) => {
@@ -333,13 +333,13 @@ export function RoutineEdit({ routineId, paths }) {
           if (nameError(name)) return
           // req-179 — name only: a stored `focus` is left as it is (unread, DEC-099 §1).
           store.updateRoutine(routine.id, { name: name.trim() })
-          go(nav.base)
+          go(nav.up)
         }}
       >
         <Field label="Name" value={name} aria-invalid={Boolean(error)} onChange={(e) => setName(e.target.value)} />
         {error ? <FieldError>{error}</FieldError> : null}
         <Actions
-          retreat={<NavLink to={nav.base} look="quiet">Cancel</NavLink>}
+          retreat={<NavLink to={nav.up} look="quiet">Cancel</NavLink>}
           forward={<Button type="submit" variant="primary">Save</Button>}
         />
       </form>
@@ -362,16 +362,16 @@ export function RoutineExercisePick({ routineId, paths }) {
 
   return (
     <Screen>
-      <Back to={nav.base} />
+      <Back to={nav.up} />
       <Title>Add exercise</Title>
       <ExercisePicker
-        cancelTo={nav.base}
+        cancelTo={nav.up}
         createTo={nav.create}
         // req-216 — rows already in this routine say "In this workout" (still pickable).
         inWorkout={new Set(routine.exercises.map((item) => item.exerciseId))}
         onAdd={(added) => {
           for (const { exerciseId, item } of added) store.addRoutineExercise(routine.id, { exerciseId, ...item })
-          go(nav.base)
+          go(nav.up)
         }}
       />
     </Screen>
@@ -599,7 +599,7 @@ export function RoutineExerciseNew({ routineId, exerciseId, paths }) {
         cancelTo={nav.pick}
         onChange={(patch) => {
           store.addRoutineExercise(routine.id, { exerciseId: ex.id, ...patch })
-          go(nav.base)
+          go(nav.up)
         }}
       />
     </Screen>
@@ -613,7 +613,7 @@ export function RoutineExerciseEdit({ routineId, itemId, paths }) {
   const index = routine?.exercises?.findIndex((candidate) => candidate.id === itemId)
   const item = routine?.exercises?.[index]
   const ex = exerciseById(store.exercises, item?.exerciseId)
-  const parent = routine ? nav.base : '/routines'
+  const parent = routine ? nav.up : '/routines'
 
   if (!routine || index < 0 || !item) {
     return <Missing>Not found.</Missing>
@@ -703,9 +703,9 @@ export function RoutineExerciseChange({ routineId, itemId, paths }) {
 export function RoutineScreens({ routineId, paths, screen = 'detail', itemId, exerciseId, top = null }) {
   if (screen === 'edit') return <RoutineEdit routineId={routineId} paths={paths} />
   if (screen === 'exercise-pick') return <RoutineExercisePick routineId={routineId} paths={paths} />
-  if (screen === 'exercise-create') return <ExerciseNew returnBase={paths.base} />
-  if (screen === 'exercise-create-manual') return <ExerciseNewManual returnBase={paths.base} />
-  if (screen === 'exercise-create-search') return <ExerciseNewSearch returnBase={paths.base} />
+  if (screen === 'exercise-create') return <ExerciseNew returnBase={paths.base} nav={paths} />
+  if (screen === 'exercise-create-manual') return <ExerciseNewManual returnBase={paths.base} nav={paths} />
+  if (screen === 'exercise-create-search') return <ExerciseNewSearch returnBase={paths.base} nav={paths} />
   if (screen === 'exercise-new') {
     return <RoutineExerciseNew routineId={routineId} exerciseId={exerciseId} paths={paths} />
   }
