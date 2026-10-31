@@ -33,6 +33,9 @@
    `isAddedMidWorkout`/`isSkippedSet` importers move to `set-rules.js`.
 3. `workout-log.js` is deleted at the end.
 
+**Reviewer trigger (req-269 review):** every new module split out of `workout-log.js` is added to `plan`'s
+`REVIEWER_TRIGGER_RE` (`plan:856`), with a `scripts/plan-ledger.test.sh` assertion per name; Planner updates WORKFLOW check 5.
+
 ## Out of scope
 
 - Any behaviour change, renamed export, or new export.
