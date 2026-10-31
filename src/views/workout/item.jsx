@@ -69,9 +69,8 @@ import {
   itemLogPath,
   itemSetsPath,
   skipExercise,
-  swapExercisePath,
 } from './workout-helpers.js'
-import { UP_NEXT_MS, arrivalFor, clearArrival, markArrival } from '../../up-next.js'
+import { arrivalFor, clearArrival, markArrival } from '../../up-next.js'
 import { WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
@@ -95,6 +94,7 @@ import { durationLabel, isEachSide, restNotesFor, restNotesShowing } from '../..
 import { useExerciseLibrary } from './use-library.js'
 import { liveExercise, markDoneAndGoToReview, askRoutineUpdate, markNextArrival, useSetDraftWriter } from './item-actions.js'
 import { ExerciseTitle, ExerciseSetupHeader } from './item-header.jsx'
+import { UpNextBar } from './up-next-bar.jsx'
 
 export function WorkoutItemLog({ routineId, itemId }) {
   const store = useStore()
@@ -124,63 +124,6 @@ export function WorkoutItemLog({ routineId, itemId }) {
   // req-186 — keyed by item, so the view state (req-212: the set open in the edit sheet)
   // never carries over when the pill opens another exercise on this same route shape.
   return <WorkoutItemLive key={itemKey(item)} routineId={routineId} item={item} />
-}
-
-// req-223 (DEC-125 §2) — "Up next: {name}", a 5 s "Starting in N…" countdown, and Skip · Swap
-// · Start now. Shown on ARRIVAL only (up-next.js). The countdown writes nothing and starts
-// nothing: at 0 it only hides the bar (onHide), as Start now does. Its timer is UI-only (a
-// deadline + 250 ms tick, auto-complete.jsx's pattern), cleared on unmount — leaving the screen,
-// logging a set (the parent stops rendering it), Skip or Swap.
-function UpNextBar({ item, routineId, onHide, onSkip }) {
-  const [deadline] = useState(() => Date.now() + UP_NEXT_MS)
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const t = setInterval(() => {
-      const n = Date.now()
-      setNow(n)
-      if (n >= deadline) {
-        clearInterval(t)
-        onHide()
-      }
-    }, 250)
-    return () => clearInterval(t)
-    // deadline is set once; onHide only sets the parent's state. Run-once interval.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deadline])
-  const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
-  return (
-    <div className="ui-up-next" role="group" aria-label="Up next">
-      <p className="ui-up-next__name">Up next: {exerciseName(item)}</p>
-      <p className="ui-sub" aria-live="polite">
-        Starting in {secondsLeft}…
-      </p>
-      {/* DESIGN §4 — Skip and Swap are lateral, Start now (forward) on the right. Swap is
-          navigation, so a link wearing the button look beside the real Buttons (DEC-040). */}
-      <Actions
-        lateral={
-          <>
-            <Button variant="secondary" onClick={onSkip}>
-              Skip
-            </Button>
-            <NavLink to={swapExercisePath(routineId, item)} look="secondary">
-              Swap
-            </NavLink>
-          </>
-        }
-        forward={
-          <Button
-            variant="primary"
-            onClick={() => {
-              recordButton('up-next-start-now')
-              onHide()
-            }}
-          >
-            Start now
-          </Button>
-        }
-      />
-    </div>
-  )
 }
 
 function WorkoutItemLive({ routineId, item }) {
