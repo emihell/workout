@@ -1,5 +1,6 @@
 // req-130 — regenerate src/library/exercises.json (our exercise library) from the
-// pinned free-exercise-db dist/exercises.json + the tables in src/exerciseLibrary.js.
+// pinned free-exercise-db dist/exercises.json + the tables in src/exerciseLibrary.js,
+// and src/library/hints.json from it (req-265).
 // Refuses unless the source matches the pinned sha256. Deterministic: re-running it on
 // an unchanged source and tables writes the same bytes.
 //
@@ -10,8 +11,11 @@ import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { deriveLibrary, FREE_DB_SHA256, FREE_DB_SOURCE_URL } from '../src/exerciseLibrary.js'
+import { libraryHintsText } from '../src/library-hints.js'
 
 const OUT = fileURLToPath(new URL('../src/library/exercises.json', import.meta.url))
+// req-265 — the log screen's hint list, from the same derived list (a test checks it is fresh).
+const HINTS_OUT = fileURLToPath(new URL('../src/library/hints.json', import.meta.url))
 
 const localPath = process.argv[2]
 const text = localPath
@@ -29,4 +33,5 @@ if (sha !== FREE_DB_SHA256) {
 
 const library = deriveLibrary(JSON.parse(text))
 writeFileSync(OUT, `${JSON.stringify(library, null, 2)}\n`)
-console.log(`build-library: wrote ${library.length} entries to src/library/exercises.json (source sha256 ok).`)
+writeFileSync(HINTS_OUT, libraryHintsText(library))
+console.log(`build-library: wrote ${library.length} entries to src/library/exercises.json + src/library/hints.json (source sha256 ok).`)
