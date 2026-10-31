@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { activeFeel, activeNote, autoFinishArgs } from './workout-note.js'
 import { migrateState } from './model.js'
-import { emptyState } from './storage.js'
+import { emptyState } from './persistence.js'
 
 test('auto-finish saves the overview note, not an empty string', () => {
   const args = autoFinishArgs({ overallNote: 'Shoulder felt tight' })

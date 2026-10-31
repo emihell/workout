@@ -1,7 +1,7 @@
 // req-157 (audit F-RISK-5, DEC-085 §2, refines DEC-032) — Import from the "unreadable data"
 // state never loses the raw value: after the confirm it keeps an on-device copy (read back
 // ===), downloads the raw string, and only then lifts the write lock and saves the import.
-// Any failure before that point keeps the lock with nothing saved. Runs the real storage.js
+// Any failure before that point keeps the lock with nothing saved. Runs the real persistence.js
 // (loadState / saveState / the lock / the copy) against an in-memory localStorage, and a
 // store stand-in that saves the way store.jsx's setState does.
 import { describe, it, beforeEach, afterEach } from 'node:test'
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { importWithBackup, downloadText, KEEP_FAILED_MESSAGE, REPLACE_MESSAGE, REPLACE_UNREADABLE_MESSAGE } from './import-backup.js'
 import { commitBackup } from './exchange.js'
-import { getLoadUnreadable, loadState, readUnreadableValues, saveState, UNREADABLE_COPY_PREFIX } from './storage.js'
+import { getLoadUnreadable, loadState, readUnreadableValues, saveState, UNREADABLE_COPY_PREFIX } from './persistence.js'
 
 const KEY = 'workout-mvp-v9'
 // Cut mid-emoji: ends in an unpaired high surrogate, the shape a truncated value has.

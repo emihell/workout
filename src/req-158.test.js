@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { migrateState } from './model.js'
 import { migrateState as migrateStateMain } from './req-158.model-main.fixture.js'
 import { finishedState } from './workout-log.js'
-import { loadState, saveState } from './storage.js'
+import { loadState, saveState } from './persistence.js'
 import { filledLike } from './test-support/fill.js'
 // req-211 test edit: main's frozen model predates the additive `schedule.moves`; withEmptyMoves
 // adds exactly `moves: []` to its schedule, so the rest still deep-equals main.

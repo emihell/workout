@@ -26,7 +26,7 @@ import {
   setPreview,
   setPreviewText,
 } from './workout-log.js'
-import { historySetPrefill, lastSetsForExercise } from './storage.js'
+import { historySetPrefill, lastSetsForExercise } from './history-queries.js'
 import { DEFAULT_DURATION_SEC } from './model.js'
 
 describe('req-44 isSkippedSet (one shared guarded predicate)', () => {
@@ -811,7 +811,7 @@ describe('req-108 per-set reps (weight carries, reps stay per set)', () => {
 })
 
 // req-106 — the start-of-exercise preview. Uses the REAL history path
-// (lastSetsForExercise + historySetPrefill from storage.js), the same the view binds.
+// (lastSetsForExercise + historySetPrefill from history-queries.js), the same the view binds.
 describe('req-106 setPreview (start-of-exercise set preview)', () => {
   const finished = (sets, finishedAt = '2026-09-20T10:00:00Z') => ({ finishedAt, sets })
   const hist = (exerciseId, rows) =>

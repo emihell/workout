@@ -83,7 +83,7 @@ describe('AC1 migration: swaps is additive (no version bump)', () => {
       globalThis.localStorage = previous
     })
     it('a v9 doc without swaps: the stored string is byte-identical after load (0 records rewritten)', async () => {
-      const { loadState } = await import('./storage.js')
+      const { loadState } = await import('./persistence.js')
       const doc = v9()
       delete doc.schedule.swaps
       const raw = JSON.stringify(doc)

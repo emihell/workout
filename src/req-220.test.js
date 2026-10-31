@@ -3,7 +3,7 @@
 //             description fails here (the receipt: a deliberately undocumented fixture field).
 //  scope 4:   importPreview counts what a file changes; Keep my history leaves the device's
 //             logged records byte-identical; Replace everything takes the file; Cancel and a bad
-//             file write nothing. Runs the real storage.js against an in-memory localStorage and
+//             file write nothing. Runs the real persistence.js against an in-memory localStorage and
 //             a store stand-in that saves the way store.jsx's setState does (as req-157).
 import { describe, it, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
@@ -22,7 +22,7 @@ import {
 } from './exchange.js'
 import { HISTORY_CHANGED_TITLE, IMPORT_CHOICES, REPLACE_MESSAGE, exportBackup, importMode, importWithBackup } from './import-backup.js'
 import { migrateState } from './model.js'
-import { loadState, saveState } from './storage.js'
+import { loadState, saveState } from './persistence.js'
 import { answerConfirm, getPendingConfirm } from './ui/confirm.js'
 import { fullState } from './test-support/full-state.js'
 

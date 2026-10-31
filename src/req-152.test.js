@@ -4,7 +4,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { historyHasSetAt, historySetPrefill } from './storage.js'
+import { historyHasSetAt, historySetPrefill } from './history-queries.js'
 import { carryForSet, initialSetFields, withOneMoreSet } from './workout-log.js'
 import { historyGroupMeta } from './views/history/helpers.js'
 

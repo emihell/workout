@@ -6,7 +6,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { migrateState } from './model.js'
-import { loadState } from './storage.js'
+import { loadState } from './persistence.js'
 import { BACKUP_KIND, applyBackup, backupIsLegacy } from './exchange.js'
 
 function withLocalStorage(seed, run) {

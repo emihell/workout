@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { BACKUP_KIND, applyBackup, buildBackup, commitBackup } from './exchange.js'
 import { emptyAnalytics } from './analytics.js'
-import { emptyState, getLoadUnreadable, loadState, saveState } from './storage.js'
+import { emptyState, getLoadUnreadable, loadState, saveState } from './persistence.js'
 
 // req-115 (audit D) — a bad import must throw to the caller with state unchanged,
 // never inside the setState updater (which blanked the whole app).

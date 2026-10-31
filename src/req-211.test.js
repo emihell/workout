@@ -164,7 +164,7 @@ describe('the real load path writes nothing for a v9 store', () => {
     globalThis.localStorage = previous
   })
   it('loadState of a v9 doc without moves: the stored string is byte-identical after load', async () => {
-    const { loadState } = await import('./storage.js')
+    const { loadState } = await import('./persistence.js')
     const v9 = JSON.stringify(migrateState(structuredClone(seed), { legacy: true }))
     const doc = JSON.parse(v9)
     delete doc.schedule.moves

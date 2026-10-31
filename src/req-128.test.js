@@ -4,7 +4,7 @@
 // removal) is checked statically by grep, so no test names the removed functions.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { historyPrescription, summaryPriorWorkout, workoutSummaryStats } from './storage.js'
+import { historyPrescription, summaryPriorWorkout, workoutSummaryStats } from './history-queries.js'
 import { historyGroupMeta } from './views/history/helpers.js'
 import { wakeLockWanted } from './wake-lock.js'
 
