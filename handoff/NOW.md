@@ -14,7 +14,7 @@ Then the DEC-154 features: cues + notes → supersets → intervals. Build here;
 **On the server machine (Emilio, 2026-10-31: "everything that needs the server … continue there"):**
 - req-256 AC2: from branch `req-256`, `node scripts/req-256-targets.mjs --db <data>/workout.db --user <id> --rev 79` →
   expect `identical: true`; then `./plan closeout req-256` (app change → deploy). Or Emilio: "merge without AC2".
-- Deploy (merged, not live: **req-261, 268, 262**; export a backup on the phone first, DEC-046) : `! ./server/deploy && ./server/doctor`, then `./server/ops duplicates`; live `52637e6`.
+- Deploy (merged, not live: **req-261, 268, 262, 269**; export a backup on the phone first, DEC-046) : `! ./server/deploy && ./server/doctor`, then `./server/ops duplicates`; live `52637e6`.
 - Data dir: server `~/dev/workout/workout-data` (`server/config.mjs:14`, docs right); this laptop keeps `~/projects/workout/workout-data`, no DB.
 
 **Emilio's calls before their req dispatches:** none open (req-263 → READY, DEC-155 §6). All `(unconfirmed)` calls
