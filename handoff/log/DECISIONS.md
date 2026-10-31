@@ -2404,3 +2404,17 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
 2. **The barbell session done outside the app is not logged** (Emilio: "leave it"): the app can't enter a past date, and a
    workout dated today would put it on the wrong weekday in Coach's stats. It waits for "Log a past workout" (BACKLOG
    §Phase 2); Coach may use its numbers as labelled estimates under DEC-153 once req-255 ships.
+
+## DEC-155 — fixes before features, always: review, tooling and workflow items are cleared first  (Emilio, 2026-10-31)
+
+1. **Standing priority.** Emilio: "i want to build anything that is not new funcitonality, i want to finish all reqs that
+   where spawned from review or has witht tooling or workflows" — "that is always the priority, otherwise things go stale
+   or we build opon old code". Open review findings, bugs, tooling and workflow items go before any new feature, now and
+   from here on. Amends DEC-154 §1: req-256 and req-255 lead, then the fix batch; cues/notes → supersets → intervals after.
+2. **Emilio's calls settled for the batch** (Planner's recommendations, accepted):
+   - Change exercise across types with no history → **reset to the new type's default plan**, as Add does (req-242 latent).
+   - Import sheet → **"Keep my history" is the highlighted option** (req-220).
+   - Pill "Ex N of M" → **N is the open row's place**, not done + 1 (req-222/244).
+   - A missed rep on an Easy exercise → **keep as is**; the item is dropped from BACKLOG.
+3. Not in the batch (parked or new behaviour): dead first Back (DEC-084, iPhone test first), loop-length re-anchor (open),
+   target range/AMRAP logging, rest editing, learned rest timer, Coach's app gaps, `[optional]` taxonomy slim.
