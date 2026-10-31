@@ -24,11 +24,9 @@ import {
   withCardioValues,
 } from './cardio-set.js'
 import { finishedState } from './workout-finish.js'
+import { formFieldsWithDraft, setDraftFromForm, setDraftKey } from './set-drafts.js'
 import {
-  formFieldsWithDraft,
   loggedSetRowText,
-  setDraftFromForm,
-  setDraftKey,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,

@@ -19,13 +19,9 @@ import {
   withOneLessSet,
   withOneMoreSet,
 } from './workout-items.js'
-import {
-  anythingLogged,
-  autoCompleteArmed,
-  formFieldsWithDraft,
-  setDraftFromLoggedSet,
-} from './workout-log.js'
+import { anythingLogged, autoCompleteArmed } from './workout-log.js'
 import { finishedState } from './workout-finish.js'
+import { formFieldsWithDraft, setDraftFromLoggedSet } from './set-drafts.js'
 import { isSkippedSet } from './set-rules.js'
 import { restoreFromLoggedSet } from './set-seed.js'
 import { parseRoute } from './route.js'

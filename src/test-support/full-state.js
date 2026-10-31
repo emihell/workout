@@ -5,7 +5,7 @@
 import { migrateState } from '../model.js'
 import { addWorkingSetToState } from '../workout-items.js'
 import { finishedState } from '../workout-finish.js'
-import { setDraftFromForm } from '../workout-log.js'
+import { setDraftFromForm } from '../set-drafts.js'
 import { itemEffortState, replaceItemInState, setLoggedState, startedWorkoutState } from '../state-reducers.js'
 import { withCardioValues } from '../cardio-set.js'
 

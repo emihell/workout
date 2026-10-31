@@ -14,7 +14,7 @@ import {
   setDraftFromForm,
   setDraftFromLoggedSet,
   setDraftKey,
-} from './workout-log.js'
+} from './set-drafts.js'
 import { finishedState } from './workout-finish.js'
 import { initialSetFields, nextSeedOverrides, seedOverrideKey } from './set-seed.js'
 import { itemKey, itemLoggingState, replacementItem, withLoggedSet } from './workout-items.js'

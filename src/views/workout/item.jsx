@@ -34,18 +34,20 @@ import {
 import {
   createSetDraftWriter,
   formFieldsWithDraft,
-  loggedSetRowText,
-  nextNotDoneItem,
-  restPatchAfterSet,
   setDraftFor,
   setDraftFromLoggedSet,
   setDraftKey,
+} from '../../set-drafts.js'
+import { isSkippedSet } from '../../set-rules.js'
+import {
+  loggedSetRowText,
+  nextNotDoneItem,
+  restPatchAfterSet,
   setListRows,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,
 } from '../../workout-log.js'
-import { isSkippedSet } from '../../set-rules.js'
 import { liveSetWeight, skippedSetSave, viewedSetSave } from '../set-values.js'
 import { ExercisesLink, Missing } from '../shared'
 import {

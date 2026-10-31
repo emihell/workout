@@ -9,7 +9,6 @@ import { importJsx, render, act } from './test-support/render.js'
 import { carryForSet, initialSetFields, nextSeedOverrides } from './set-seed.js'
 import {
   currentWorkoutItem,
-  setDraftFromLoggedSet,
   itemSetPosition,
   loggedSetRowText,
   restClockText,
@@ -17,6 +16,7 @@ import {
   workoutPillState,
 } from './workout-log.js'
 import { replaceItemPatch, replacementItem, skipItemPatch } from './workout-items.js'
+import { setDraftFromLoggedSet } from './set-drafts.js'
 import { liveSetEditPatch, viewedSetSave } from './views/set-values.js'
 
 const h = React.createElement
