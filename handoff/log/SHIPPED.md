@@ -2867,3 +2867,9 @@ each in one file). No reviewer: no trigger file. `reports/req-271.md`.
 Tooling; throwaway agent, …`c1a84b9`. `scripts/doc_limits.json` (17 docs at today's size; a raise needs a new reason; `plan save`/`publish`
 refuse over); doctor's 12 canonical grants + the paste line. Gate: each guard fires in a sandbox; `./check` 2251 in 151; 6 shell suites pass.
 No reviewer: no trigger file. AC1 closed live: grants re-pasted (`doctor: ok grants`, 12), hooksPath set relative, `plan save` committed under them. `reports/req-272.md`.
+
+## req-263 — History's routine editor keeps the Back chain; a stale `from` falls back to the fixed parent  (2026-10-31)
+
+Bug; throwaway agent, …`6a4a16e`. `navForBase` gains `from` + `up`; create screens take `nav`; History Back helpers drop a `from` naming a
+deleted workout (DEC-155 §6 overrides DEC-092's two limits). Gate: AC1 fails on main (ends `/history`), passes; `./check` 2267; smoke green;
+Planner's browser walk on `plan qa`: 4 Backs → Today, 0 dialogs / Not found / errors. No reviewer: no trigger file. `reports/req-263.md`.
