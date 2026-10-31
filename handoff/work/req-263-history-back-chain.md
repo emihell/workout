@@ -1,7 +1,6 @@
-**Status: NEEDS DECISIONS** · **Lane: bug** · DEC-092 (its two "limits kept"), DEC-051, DEC-155. Before req-264 (both touch `src/views/Routine.jsx`).
+**Status: READY** · **Lane: bug** · DEC-092 (its two "limits kept"), DEC-051, DEC-155. Before req-264 (both touch `src/views/Routine.jsx`).
 
-> **Open (Emilio):** DEC-092 kept both of these as limits. Does DEC-155 ("finish all reqs spawned from review") override it?
-> (a) yes — build req-263 as written · (b) no — withdraw req-263, DEC-092 stands.
+> **Decided (Emilio, 2026-10-31: "yes", DEC-155 §6):** DEC-155 overrides DEC-092's two "limits kept"; build as written.
 
 # req-263 — History's routine editor keeps the Back chain; a stale `from` falls back
 

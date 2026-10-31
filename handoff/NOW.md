@@ -9,7 +9,7 @@ code"). Serial, one throwaway agent per req, stop at each closeout. All specced 
 2. **req-255** plan build kg estimate · 3. **req-257** plan closeout/worktrees · 4. **req-258** test-gate floors + CI actions ·
 5. **req-259** `plan qa --empty` · 6. **req-260** plan build scans live routines (after 255) · 7. **req-261** Ex N + double
 tap + Sets cap · 8. **req-262** swaps/cardio/Back guard (after 261; backup reminder) · 9. **req-263** Back chain
-(**NEEDS DECISIONS**: DEC-092 override) · 10. **req-264** small UI fixes (after 263) · 11. **req-265** library chunk.
+(DEC-155 §6 overrides DEC-092) · 10. **req-264** small UI fixes (after 263) · 11. **req-265** library chunk.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
 
 **On the server machine (Emilio, 2026-10-31: "everything that needs the server … continue there"):**
@@ -18,7 +18,7 @@ Then the DEC-154 features: cues + notes → supersets → intervals. Build here;
 - Deploys for every merged app req: `! ./server/deploy && ./server/doctor`.
 - Data dir on this laptop is `~/projects/workout/workout-data` (no DB here); docs still say `~/dev/workout/` (Planner, open).
 
-**Emilio's calls before their req dispatches:** req-263 — does DEC-155 override DEC-092? All `(unconfirmed)` calls
+**Emilio's calls before their req dispatches:** none open (req-263 → READY, DEC-155 §6). All `(unconfirmed)` calls
 accepted (DEC-155 §4); blank kg stays 0 until new functionality touches it (§5).
 
 ## Milestone (Emilio, 2026-09-07)

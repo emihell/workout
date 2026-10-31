@@ -2424,3 +2424,5 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
    fixed parent (req-263, if built).
 5. **Blank kg on Previous → Save stays 0** (req-154's split). Emilio: "dec can change if there is new funcitonality that
    affects it" — a recorded decision stands until new functionality touches it; then it is re-opened, not before.
+6. **req-263 overrides DEC-092's two "limits kept"** (recalc → routine → inner editor loses the Back chain; a stale `from` id
+   is accepted). Emilio: "yes". DEC-092's limits list now keeps only "the active overview is a hub".
