@@ -286,6 +286,9 @@ and *what now*; the file says *why*.
 **Your move is a fixed, last section (Emilio, 2026-10-31: "be clear with the structure, and always finish with a
 'Todo:' … where you tell me what i should do, like clearing context").** A raw tool block (`./plan next`) never stands
 alone: say in one plain line what it means, and put the CLEAN POINT resume line inside Your move as the thing to paste.
+**Super clear, step by step** (Emilio, 2026-10-31: "i get a little bit confused … be super clear, step by step, make sure
+everything you can do is done, and be very to the point"): do all Planner work first; then one numbered list, in order,
+each step one action with *where* (here / server); no choices buried in prose; nothing he needn't do.
 
 **Every word earns its place (Emilio, 2026-10-31: "every word must have meaning, cut out anything that is not needed
 for me").** Niceness: at most one line, at the very end, only when truly needed.

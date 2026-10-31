@@ -167,7 +167,7 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - **The gate passes with tests missing** (req-258 report, L-067) [measured 2026-10-31, main, 5 runs: 2187/2161/2167/2187/2187,
   all exit 0]. A different file is cut off partway each time (`storage.test.js`, `req-220.test.js`, `req-139.test.js`).
   Without `--test-force-exit` counts were complete 6/6 but `req-203.test.js` and `req-220.rendered.test.js` keep a handle
-  open → 60 s timeout. Likely: force-exit kills a child before its output reaches the runner [inferred]. **Next req.**
+  open → 60 s timeout. Likely: force-exit kills a child before its output reaches the runner [inferred]. → **req-266**.
 - **A plan-builder for Coach** (DEC-145 §4): a short change list (routine X: order, kg, rest, notes; new library exercise;
   schedule slot) → a full plan file in the Export shape, checked (workouts identical, only the named parts changed) and
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
