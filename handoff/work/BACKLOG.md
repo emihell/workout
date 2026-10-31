@@ -56,7 +56,7 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`); req-254 C6 refuses such targets until fixed. → **req-256** (READY) fixes the "12 reps" half; the range/AMRAP half stays here.
 - **Duration targets the rule still misreads** (req-256 review, latent): "45s each side", "30s/side", "60s x2", "1:30" read as
   not-a-duration; "tempo 3s" reads as Duration (`src/progress.js:92`). And `countableReps` on strings is masked by
-  `unreadableTarget` (`progress.js:107-110`) — re-check if req-149 loosens the hold.
+  `unreadableTarget`. After req-256: own req, *Emilio picks the rule* (candidate: leading number/range + unit, or m:ss).
 - **Coach's app gaps from the training books** (DEC-150, notes in `workout-data/coach/books/`): a planned effort/RIR target
   per item; rep-range progression in the app's recommendation (req-149); a weekly recovery check-in (5 questions); several
   warm-up sets with kg (req-184 item 10); drop sets / myo-reps; a time for a whole item (the S&S bell trigger); left/right
