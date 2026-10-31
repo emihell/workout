@@ -7,13 +7,16 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
-import { libraryEntryFor, loadExerciseLibrary } from './exerciseLibrary.js'
+import { libraryEntryFor, loadExerciseLibrary, loadLibraryHints } from './exerciseLibrary.js'
 import { REST_CUES_MAX, isEachSide, restNotesFor, restNotesShowing } from './library-hints.js'
 import { eachSideReps, loggedSetRowText, setPreviewText } from './set-display.js'
 
 const h = React.createElement
 const DB = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
 const library = await loadExerciseLibrary()
+// req-265 — the screens' hook loads the hint list, not the full library; import it up front as
+// the full library was, so `settle()`'s one tick is enough for the hook (no assertion changed).
+await loadLibraryHints()
 const ROW = 'si-sess-push-pull-2-ex-one-arm-db-row' // One-Arm DB Row: warm-up + 12 / 10 / 12, note, rest 90
 const PRESS = 'si-sess-push-pull-3-ex-overhead-db-press' // Overhead DB Press (two-arm): 10 / 8 / 5
 const ROW_CUES = ['Back flat and level', 'Pull the dumbbell to the hip', 'Shoulders stay square']

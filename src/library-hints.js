@@ -8,6 +8,36 @@ import { restRemaining } from './workout-timers.js'
 
 export const REST_CUES_MAX = 3
 
+// The resolved entry's form cues as the rest block shows them: non-blank strings, at most
+// REST_CUES_MAX. Shared by restNotesFor and libraryHintEntries so the two cannot drift.
+function restCuesOf(entry) {
+  return (Array.isArray(entry?.formCues) ? entry.formCues : [])
+    .filter((cue) => typeof cue === 'string' && cue.trim() !== '')
+    .slice(0, REST_CUES_MAX)
+}
+
+// req-265 — the hint list (src/library/hints.json, written by scripts/build-library.mjs from the
+// same derived list as exercises.json; never hand-edited): per library entry only what
+// libraryEntryFor resolves on (id, name, displayName, aliases) and what the two hints read
+// (unilateral: true, the rest cues). Absent stays absent. ~28 kB gzip vs ~264 kB for the full
+// library, so the log screen no longer downloads the whole library (useExerciseLibrary).
+export function libraryHintEntries(library) {
+  return library.map((entry) => {
+    const hint = { id: entry.id, name: entry.name }
+    if (entry.displayName !== undefined) hint.displayName = entry.displayName
+    if (Array.isArray(entry.aliases) && entry.aliases.length) hint.aliases = entry.aliases
+    if (entry.unilateral === true) hint.unilateral = true
+    const cues = restCuesOf(entry)
+    if (cues.length) hint.formCues = cues
+    return hint
+  })
+}
+
+// The file's bytes: one entry per line, so a library rebuild diffs per exercise.
+export function libraryHintsText(library) {
+  return `[\n${libraryHintEntries(library).map((hint) => JSON.stringify(hint)).join(',\n')}\n]\n`
+}
+
 // req-240 (DEC-137, DEC-063 §3) — the exercise's own `unilateral` boolean (the Details
 // checkbox, written only by the user's edit) wins when present; absent → the library entry,
 // true only when it is marked `unilateral: true`. Never for cardio (the spec: every type but
@@ -53,9 +83,7 @@ export function durationLabel(eachSide) {
 export function restNotesFor(item, exercise, library) {
   const note = String(item?.notes || '').trim()
   const entry = libraryEntryFor(exercise, library)
-  const cues = (Array.isArray(entry?.formCues) ? entry.formCues : [])
-    .filter((cue) => typeof cue === 'string' && cue.trim() !== '')
-    .slice(0, REST_CUES_MAX)
+  const cues = restCuesOf(entry)
   if (!note && !cues.length) return null
   return { note, cues }
 }

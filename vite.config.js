@@ -71,7 +71,8 @@ export default defineConfig(({ command }) => ({
   base: '/',
   // req-165 (F-BUNDLE-1) — the one chunk over Vite's 500 kB default is the LAZY exercise
   // library (exerciseLibrary.js loadExerciseLibrary → library/exercises.json), measured
-  // 1,538.3 kB (263.6 kB gzip) on 2026-09-25; only the Library's search screen loads it.
+  // 1,538.3 kB (263.6 kB gzip) on 2026-09-25; only the picker / search load it (req-265: the log
+  // screen reads the small hints chunk, library/hints.json).
   // The main chunk is 349.0 kB. Vite's limit is global, so this sits just above the
   // library: a main chunk that grows past 1.6 MB still warns, but 500 kB–1.6 MB won't.
   build: { chunkSizeWarningLimit: 1600 },

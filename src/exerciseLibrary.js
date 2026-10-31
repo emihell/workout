@@ -541,21 +541,31 @@ export function deriveLibrary(freeDb) {
   return list
 }
 
+// A lazy chunk loader: one import in flight / cached; a failed import is not cached, so the
+// next call retries (req-139, req-265 criterion 4).
+export function lazyChunk(importer) {
+  let promise = null
+  return function load() {
+    if (!promise) {
+      promise = importer()
+        .then((mod) => mod.default)
+        .catch((error) => {
+          promise = null
+          throw error
+        })
+    }
+    return promise
+  }
+}
+
 // Lazy chunk (1,538 kB minified, 264 kB gzip, measured req-165; the JSON is 1.8 MB) so the
 // main bundle doesn't carry it; vite.config.js sets the chunk-size warning just above it. The `with` attribute is
-// required by node --test (ERR_IMPORT_ATTRIBUTE_MISSING without it).
-let libraryPromise = null
-export function loadExerciseLibrary() {
-  if (!libraryPromise) {
-    libraryPromise = import('./library/exercises.json', { with: { type: 'json' } })
-      .then((mod) => mod.default)
-      .catch((error) => {
-        libraryPromise = null
-        throw error
-      })
-  }
-  return libraryPromise
-}
+// required by node --test (ERR_IMPORT_ATTRIBUTE_MISSING without it). The picker / search / catalog load it.
+export const loadExerciseLibrary = lazyChunk(() => import('./library/exercises.json', { with: { type: 'json' } }))
+
+// req-265 — the hint list (library-hints.js libraryHintEntries; generated): what the log screen,
+// its review and the Details editor read (resolution + "each side" + rest cues). Its own lazy chunk.
+export const loadLibraryHints = lazyChunk(() => import('./library/hints.json', { with: { type: 'json' } }))
 
 const indexes = new WeakMap()
 function indexFor(library) {
