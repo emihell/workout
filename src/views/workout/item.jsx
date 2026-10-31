@@ -1,10 +1,8 @@
 import { Fragment, useEffect, useState } from 'react'
-import { flushSync } from 'react-dom'
 import { EFFORT_OPTIONS, isWeightedType, roleTag } from '../../ids'
 import { go, hashPath, parseRoute } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
-import { exerciseById } from '../../model.js'
 import { historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import {
@@ -15,10 +13,8 @@ import {
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
-  markItemDonePatch,
   removeAddedSetPatch,
   reopenItemPatch,
-  sessionExercise,
   setMatchesItem,
   skipItemPatch,
 } from '../../workout-items.js'
@@ -34,7 +30,6 @@ import {
   setupSeedFor,
 } from '../../set-seed.js'
 import {
-  createSetDraftWriter,
   formFieldsWithDraft,
   setDraftFor,
   setDraftFromLoggedSet,
@@ -81,7 +76,7 @@ import { UP_NEXT_MS, arrivalFor, clearArrival, markArrival } from '../../up-next
 import { WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
-import { askChoice, askConfirm } from '../../ui/confirm.js'
+import { askChoice } from '../../ui/confirm.js'
 import {
   SETUP_FEELS,
   SETUP_TEXT,
@@ -92,7 +87,7 @@ import {
   setupPromptShows,
   setupSheetShows,
 } from '../../first-time-setup.js'
-import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
+import { offerOnFinishingSet } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
 import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
 import { equipmentLabel } from '../../equipment-label.js'
@@ -100,16 +95,7 @@ import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js
 import { previousSameRoutineWorkouts } from '../../history-queries.js'
 import { durationLabel, isEachSide, oneSideLine, restNotesFor, restNotesShowing } from '../../library-hints.js'
 import { useExerciseLibrary } from './use-library.js'
-
-// req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
-// workout-items.js); weight step and cues stay live. Old snapshots read live as before.
-function liveExercise(store, item) {
-  return sessionExercise(exerciseById(store.exercises, item.exerciseId), item)
-}
-
-function exerciseEditorPath(routineId, item) {
-  return `/workout/${routineId}/item/${itemKey(item)}/exercise`
-}
+import { liveExercise, exerciseEditorPath, markDoneAndGoToReview, askRoutineUpdate, markNextArrival, useSetDraftWriter } from './item-actions.js'
 
 // `aside` (req-80) renders a small control beside the title — the live log screen
 // passes the "Add note" toggle here so it sits next to the exercise name.
@@ -142,33 +128,6 @@ function ExerciseSetupHeader({ item, ex }) {
   )
 }
 
-// req-11 / DEC-013 — completing the last set marks the exercise done. req-212 (DEC-119 §1)
-// — it then lands on the exercise review (WorkoutItemDone: the sets, the one effort, Next),
-// not the overview. Re-entering a completed exercise from the overview opens the same review.
-function markDoneAndGoToReview(store, workout, routineId, item) {
-  store.patchActive(markItemDonePatch(workout, item))
-  go(itemDonePath(routineId, item), { replace: true })
-}
-
-// req-187 (DEC-103 §1) — the routine-kg confirm, opened on the set that finishes the
-// exercise when its kg differs from the routine (offerOnFinishingSet). It is the one
-// ConfirmSheet with `stayOn`: req-212 — the exercise review, so the navigation there
-// (markDoneAndGoToReview, called first) does not dismiss it. Update → store.applyRoutineUpdate (the existing write
-// path); Keep / backdrop / Escape / any other navigation → nothing written. Rest is
-// untouched either way: it was armed by store.completeSet before this opens.
-function askRoutineUpdate(store, routineId, item, offer) {
-  const text = offerSheetText(offer, exerciseName(item))
-  askConfirm(text.body, {
-    title: text.title,
-    confirmLabel: text.updateLabel,
-    cancelLabel: text.keepLabel,
-    stayOn: itemDonePath(routineId, item),
-  }).then((update) => {
-    recordButton(update ? 'routine-update-apply' : 'routine-update-keep')
-    if (update) store.applyRoutineUpdate(offer)
-  })
-}
-
 export function WorkoutItemLog({ routineId, itemId }) {
   const store = useStore()
   const active = store.activeWorkout
@@ -197,47 +156,6 @@ export function WorkoutItemLog({ routineId, itemId }) {
   // req-186 — keyed by item, so the view state (req-212: the set open in the edit sheet)
   // never carries over when the pill opens another exercise on this same route shape.
   return <WorkoutItemLive key={itemKey(item)} routineId={routineId} item={item} />
-}
-
-// req-117 — restoreFromLoggedSet moved to workout-log.js, now set-seed.js (pure, unit-tested; it now
-// also restores a timed set's logged seconds).
-
-// req-78 — the req-27 RestUpcoming panel (an editable "next weight" shown during a
-// blocking rest) is gone. Rest no longer blocks: the next set's own log form is shown
-// immediately on completing a set, and its weight field IS the editable surface, so the
-// separate panel and its nextSetWeight override folded away. The rest itself now shows
-// only as the floating pill (req-186: the WorkoutPill).
-
-// req-125 — the set-form draft writer (createSetDraftWriter, set-drafts.js: debounced,
-// unit-tested) bound to the store. store.patchActive only calls the store's stable
-// setState, so the first render's function stays valid for the component's life. A
-// pending write is flushed on unmount (leaving the screen) and synchronously
-// (flushSync, so saveState runs before the page goes) when the tab is hidden or
-// unloaded — iOS reloading a backgrounded tab.
-function useSetDraftWriter(store) {
-  const [writer] = useState(() =>
-    createSetDraftWriter({
-      write: (setDraft, sync) => {
-        const patch = () => store.patchActive({ setDraft })
-        if (sync) flushSync(patch)
-        else patch()
-      },
-    }),
-  )
-  useEffect(() => {
-    const onHide = () => {
-      if (document.visibilityState === 'hidden') writer.flush(true)
-    }
-    const onPageHide = () => writer.flush(true)
-    document.addEventListener('visibilitychange', onHide)
-    window.addEventListener('pagehide', onPageHide)
-    return () => {
-      document.removeEventListener('visibilitychange', onHide)
-      window.removeEventListener('pagehide', onPageHide)
-      writer.flush()
-    }
-  }, [writer])
-  return writer
 }
 
 // req-223 (DEC-125 §2) — "Up next: {name}", a 5 s "Starting in N…" countdown, and Skip · Swap
@@ -868,13 +786,6 @@ export function WorkoutItemDone({ routineId, itemId }) {
   if (!mine) return <NotInWorkout routineId={routineId} />
   if (!item) return <MissingItem />
   return <ExerciseReview key={itemKey(item)} routineId={routineId} item={item} />
-}
-
-// req-223 review fix 2 — only a plain left click navigates THIS tab; a modified or middle click
-// (new tab / window, download) must not leave a marker behind for a later list-row open.
-function markNextArrival(e, routineId, next) {
-  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
-  markArrival(routineId, next)
 }
 
 function ExerciseReview({ routineId, item }) {
