@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · DEC-092 (its two "limits kept"), DEC-051, DEC-155. Before req-264 (both touch `src/views/Routine.jsx`).
+**Status: BUILT, NOT merged — branch `req-263` (…`6a4a16e`)** · **Lane: bug** · DEC-092 (its two "limits kept"), DEC-051, DEC-155. Before req-264 (both touch `src/views/Routine.jsx`).
 
 > **Decided (Emilio, 2026-10-31: "yes", DEC-155 §6):** DEC-155 overrides DEC-092's two "limits kept"; build as written.
 

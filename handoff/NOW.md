@@ -6,14 +6,14 @@ the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACK
 **Next:** the fix + structure batch (DEC-155 §1, §7: fixes, workflow, structure, cleanups before any feature). Serial, one
 throwaway agent per req, stop at each closeout. Done 10-31: req-257, 258, 266, 259. Order:
 1. ~~req-261~~ merged 10-31 (deploy on server) → 2. ~~req-268~~ merged 10-31 →
-3. ~~req-262~~ merged 10-31 → 4. ~~req-269~~ merged 10-31 → 5. ~~req-270~~ merged 10-31 → 6. ~~req-271~~ merged 10-31 → ~~req-272~~ merged 10-31 → 7. **req-263** Back chain → 8. **req-264**
+3. ~~req-262~~ merged 10-31 → 4. ~~req-269~~ merged 10-31 → 5. ~~req-270~~ merged 10-31 → 6. ~~req-271~~ merged 10-31 → ~~req-272~~ merged 10-31 → 7. ~~req-263~~ merged 10-31 → 8. **req-264**
 small UI fixes → 9. **req-265** library chunk. Server-held: **req-256** (built `35b2df0`, reviewed; AC2) → **req-255** → **req-260**.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
 
 **On the server machine (Emilio, 2026-10-31: "everything that needs the server … continue there"):**
 - req-256 AC2: from branch `req-256`, `node scripts/req-256-targets.mjs --db <data>/workout.db --user <id> --rev 79` →
   expect `identical: true`; then `./plan closeout req-256` (app change → deploy). Or Emilio: "merge without AC2".
-- Deploy (merged, not live: **req-261, 268, 262, 269, 270, 271**; export a backup on the phone first, DEC-046) : `! ./server/deploy && ./server/doctor`, then `./server/ops duplicates`; live `52637e6`.
+- Deploy (merged, not live: **req-261, 268, 262, 269, 270, 271, 263**; export a backup on the phone first, DEC-046) : `! ./server/deploy && ./server/doctor`, then `./server/ops duplicates`; live `52637e6`.
 - Data dir: server `~/dev/workout/workout-data` (`server/config.mjs:14`, docs right); this laptop keeps `~/projects/workout/workout-data`, no DB.
 
 **Emilio's calls before their req dispatches:** none open (req-263 → READY, DEC-155 §6). All `(unconfirmed)` calls
