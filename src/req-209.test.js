@@ -16,7 +16,9 @@ import { scheduleRowText } from './views/schedule-day.js'
 import { exerciseLastTimeText, historyGroupSetsText, shortDate, topSetText } from './views/history/helpers.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const read = (path) => readFileSync(join(here, path), 'utf8')
+const readOne = (path) => readFileSync(join(here, path), 'utf8')
+// req-276 test edit — item.jsx was split into six modules; its guards read them joined (main's scope).
+const read = (path) => (path === 'views/workout/item.jsx' ? ['item.jsx', 'item-actions.js', 'item-header.jsx', 'up-next-bar.jsx', 'logged-set-sheet.jsx', 'review.jsx'].map((f) => readOne(`views/workout/${f}`)).join('\n') : readOne(path))
 const h = React.createElement
 const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
 const devNotes = () => importJsx('./dev/dev-notes.js', import.meta.url)
@@ -96,7 +98,7 @@ describe('§3 one set format: "{kg} kg × {reps}"', () => {
     // the per-set effort word left those lines (one effort per exercise, DEC-119 §1).
     // req-217 test edit — the call gained a trailing `eachSide` (reps read "12 each side" for a
     // unilateral library entry); the formatter is unchanged, so the same call is matched.
-    assert.match(read('views/workout/review.jsx'), /loggedSetRowText\(label, set, weighted, cardioFields, eachSide\)/)
+    assert.match(read('views/workout/item.jsx'), /loggedSetRowText\(label, set, weighted, cardioFields, eachSide\)/)
     assert.match(read('views/history/list.jsx'), /topSetText\(w\.sets, exerciseId\)/)
   })
 })
@@ -157,7 +159,7 @@ describe('§6 equipmentLabel — one display map', () => {
     assert.equal(equipmentLabel(null, 'Bodyweight'), 'Bodyweight')
   })
   it('every screen that shows equipment reads it through the map', () => {
-    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/item-header.jsx', 'views/workout/setup.jsx']) {
+    for (const file of ['views/Exercises.jsx', 'views/ExercisePicker.jsx', 'views/workout/item.jsx', 'views/workout/setup.jsx']) {
       const source = read(file)
       assert.doesNotMatch(source, /— \{ex\.equipment\}|— \$\{ex\.equipment\}|\|\| 'bodyweight'|"ui-sub">\{ex\.equipment\}/, file)
       assert.match(source, /equipmentLabel\(/, file)

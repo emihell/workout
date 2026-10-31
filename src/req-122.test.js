@@ -19,7 +19,8 @@ function jsxUnder(dir) {
   return readdirSync(dir).flatMap((name) => {
     const p = join(dir, name)
     if (statSync(p).isDirectory()) return jsxUnder(p)
-    return p.endsWith('.jsx') ? [p] : []
+    // req-276 test edit — .js too (item-actions.js came out of item.jsx), test files excluded, as req-201.
+    return /\.jsx?$/.test(p) && !p.endsWith('.test.js') ? [p] : []
   })
 }
 const views = jsxUnder(join(here, 'views')).map((p) => ({ file: relative(here, p), src: readFileSync(p, 'utf8') }))

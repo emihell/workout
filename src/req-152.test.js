@@ -8,7 +8,9 @@ import { historyHasSetAt, historySetPrefill } from './history-queries.js'
 import { carryForSet, initialSetFields } from './set-seed.js'
 import { withOneMoreSet } from './workout-items.js'
 
-const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
+const readOne = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
+// req-276 test edit — item.jsx was split into six modules; its guards read them joined (main's scope).
+const read = (rel) => (rel === './views/workout/item.jsx' ? ['item.jsx', 'item-actions.js', 'item-header.jsx', 'up-next-bar.jsx', 'logged-set-sheet.jsx', 'review.jsx'].map((f) => readOne(`./views/workout/${f}`)).join('\n') : readOne(rel))
 
 // ---- QA-1 / DEC-081 — the exits to Today replace ----
 // req-153 — the behaviour tests (go's replace, the Finish/Abandon exits via
@@ -98,7 +100,7 @@ describe('History detail exercise meta (QA-4)', () => {
 // 375 / 430px (reports/req-152.md); these only stop the class or the CSS silently going.
 describe('rest pill clears the top row (QA-2 source guard; rects measured in the browser)', () => {
   it('each <Screen> rendering <WorkoutPill /> carries ui-screen--rest', () => {
-    for (const rel of ['./views/workout/review.jsx', './views/workout/overview.jsx', './views/workout/finish.jsx']) {
+    for (const rel of ['./views/workout/item.jsx', './views/workout/overview.jsx', './views/workout/finish.jsx']) {
       const lines = read(rel).split('\n')
       // req-186 — the pill was renamed (RestPill → WorkoutPill); fail if none is found, so a
       // rename can't turn this guard vacuous again.
