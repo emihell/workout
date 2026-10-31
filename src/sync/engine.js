@@ -41,6 +41,11 @@
 //     longer its history (GET `baseOk: false`, or a PUT on it), the push is merged WITHOUT a base
 //     on the server: never a fast-forward, every disagreement listed, the server's value kept
 //     where they differ. The device then takes the result as usual.
+//   req-268 (DEC-155 §9):
+//   - What the rebase drops (e.g. a set logged on a workout another device finished meanwhile) is
+//     never lost silently: its conflicts wait in the meta (`pendingConflicts`, survives a reload),
+//     force a push, and go up with it (`conflicts` in the PUT body); the server stores them on
+//     that revision. A failed push keeps them pending; they are cleared only by a successful one.
 import { deepEqual } from './equal.js'
 import { mergeStates } from './merge.js'
 
@@ -65,11 +70,16 @@ const META_DEFAULTS = {
   expired: false, // the server said 401: log in again to sync
   dirtyMark: null, // who marked `dirty` last (one random id per tab) — review round 1, two tabs
   diskBehind: false, // the last state save failed: the stored copy is older than this meta says
+  // req-268 (DEC-155 §9) — what this device's rebase dropped ({field, id, kind, lost}, the merge's
+  // shape), not yet on the server. Sent with the next push, cleared when that push succeeds.
+  pendingConflicts: [],
 }
 
 // State as the server stores it (JSON): drops `undefined`-valued keys, so they never read as a change.
 const norm = (state) => JSON.parse(JSON.stringify(state))
 const bytes = (text) => new TextEncoder().encode(text).length
+const pendingList = (m) => (Array.isArray(m?.pendingConflicts) ? m.pendingConflicts : [])
+const hasConflict = (list, c) => list.some((x) => deepEqual(x, c))
 
 export function readMeta(storage) {
   try {
@@ -123,6 +133,9 @@ export function createSync({
       next.dirty = true
       next.dirtyMark = disk.dirtyMark
     }
+    // req-268 — pending conflicts another tab added since this tab's last write are kept.
+    const others = pendingList(disk).filter((c) => !hasConflict(pendingList(meta), c) && !hasConflict(pendingList(next), c))
+    if (others.length) next.pendingConflicts = [...pendingList(next), ...others]
     meta = next
     try {
       storage.setItem(META_KEY, JSON.stringify(meta))
@@ -197,13 +210,25 @@ export function createSync({
     return true
   }
 
-  // The server's copy, rebased under whatever changed locally since `sent` was read.
+  // req-268 — conflicts the rebase produced, kept in the meta until a push carries them up. The
+  // same conflict twice (the rebase runs on `latest` and again as the store update) is kept once.
+  function addPending(conflicts) {
+    const list = pendingList(meta)
+    const fresh = []
+    for (const c of norm(conflicts)) if (!hasConflict(list, c) && !hasConflict(fresh, c)) fresh.push(c)
+    if (fresh.length) setMeta({ pendingConflicts: [...list, ...fresh], dirty: true, dirtyMark: tabMark })
+    return fresh.length > 0
+  }
+
+  // The server's copy, rebased under whatever changed locally since `sent` was read. Anything the
+  // merge drops is queued for the server's conflict record (req-268); the merged state is unchanged.
   function rebaseOnto(server, sent) {
     return (prev) => {
       if (deepEqual(prev, server)) return prev
       const mine = norm(prev)
       if (deepEqual(mine, server)) return prev
-      const merged = mergeStates(norm(sent), mine, server).state
+      const { state: merged, conflicts } = mergeStates(norm(sent), mine, server)
+      if (conflicts.length && addPending(conflicts) && store) schedule()
       return deepEqual(merged, server) ? server : merged
     }
   }
@@ -214,7 +239,9 @@ export function createSync({
     // Computed here as well, so a sync queued behind this one sends the rebased state even
     // before React has run the store update.
     latest = rebase(latest)
-    setMeta({ rev, revId, syncedAt: new Date(now()).toISOString(), dirty: !deepEqual(norm(latest), server) })
+    const pending = pendingList(meta).length > 0
+    setMeta({ rev, revId, syncedAt: new Date(now()).toISOString(), dirty: pending || !deepEqual(norm(latest), server) })
+    if (pending) again = true
     if (store) store.adopt(rebase)
   }
 
@@ -286,9 +313,16 @@ export function createSync({
       return
     }
     const sent = latest
-    const changedHere = meta.dirty || (agreed !== null && !deepEqual(norm(sent), agreed))
+    // req-268 — pending conflicts force a push even when the state is the server's.
+    const sentConflicts = pendingList(meta)
+    const changedHere = meta.dirty || sentConflicts.length > 0 || (agreed !== null && !deepEqual(norm(sent), agreed))
     if (changedHere) {
-      const body = JSON.stringify({ baseRev: meta.rev, ...(meta.revId ? { baseId: meta.revId } : {}), state: sent })
+      const body = JSON.stringify({
+        baseRev: meta.rev,
+        ...(meta.revId ? { baseId: meta.revId } : {}),
+        state: sent,
+        ...(sentConflicts.length ? { conflicts: sentConflicts } : {}),
+      })
       const size = bytes(body)
       if (size > MAX_BYTES) {
         error = { kind: 'too-large', bytes: size }
@@ -305,6 +339,8 @@ export function createSync({
         return serverBehind(g.data.rev)
       }
       if (!settle(r, size)) return
+      // On the server now: cleared (any added since stay). A failed push leaves them all pending.
+      if (sentConflicts.length) setMeta({ pendingConflicts: pendingList(meta).filter((c) => !hasConflict(sentConflicts, c)) })
       accept(r.data, sent)
       return
     }
@@ -419,6 +455,7 @@ export function createSync({
       dirty: false,
       expired: false,
       notesDirty: loadNotes().length > 0,
+      pendingConflicts: [], // req-268: the data they came from was just replaced by this account's
     })
     if (meta.notesDirty) run()
     return { ok: true }

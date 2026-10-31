@@ -82,6 +82,7 @@ function deviceFetch() {
       cookie = value.endsWith('=') ? null : value
     }
     if (f.hold && init.method === 'PUT') await f.hold
+    if (f.holdGet && init.method === 'GET') await f.holdGet // req-268: parks GET responses the same way
     return res
   }
   f.log = []
@@ -1047,5 +1048,147 @@ describe('req-268 — a workout finished elsewhere never comes back as in progre
     await phone.engine.trigger()
     await phone.engine.idle()
     assert.equal(phone.state.activeWorkout?.id, 'wo-new', 'the phone’s workout is not ended')
+  })
+})
+
+// req-268 (DEC-155 §9) — what the app's rebase drops reaches the server's conflict record.
+describe('req-268 — the rebase’s conflicts go up with the next push', () => {
+  const recorded = (user) => {
+    const id = userId(user)
+    return listRevisions(srv.db, id).flatMap((r) => getRevision(srv.db, id, r.rev).conflicts)
+  }
+  const sameJson = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+  const finishedHere = (lost) => (c) => c.field === 'activeWorkout' && c.kind === 'finished-elsewhere' && sameJson(c.lost, lost)
+  const json = (v) => JSON.parse(JSON.stringify(v))
+  const pending = (d) => JSON.parse(d.storage.getItem(META_KEY)).pendingConflicts ?? []
+
+  // Phone finishes wo-2 (rev 2); the laptop, still on rev 1, logs a set on wo-2 while a request is out.
+  async function setup() {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user)
+    const laptop = device(emptyState())
+    await laptop.login(user)
+    phone.change((s) => finishedState(s, { overallNote: '', overallFeel: '' }, '2026-10-09T18:00:00.000Z'))
+    await phone.settle()
+    return { user, phone, laptop }
+  }
+
+  it('1. PUT in flight: the late set is in a server conflict record (lost = the dropped workout)', async () => {
+    const { user, laptop } = await setup()
+    let release
+    laptop.fetch.hold = new Promise((r) => (release = r))
+    laptop.change((s) => renamed(s, 'rtn-a', 'laptop edit'))
+    const out = laptop.engine.flush()
+    await new Promise((r) => setTimeout(r, 30))
+    laptop.change((s) => withSet(s))
+    const dropped = json(laptop.state.activeWorkout)
+    laptop.fetch.hold = null
+    release()
+    await out
+    await laptop.engine.idle()
+    assert.equal(laptop.state.activeWorkout, null)
+    const hits = recorded(user).filter(finishedHere(dropped))
+    assert.equal(hits.length, 1, 'recorded once')
+    assert.deepEqual(hits[0].lost, dropped)
+    assert.ok(setNotes({ activeWorkout: hits[0].lost }).length >= 1, 'the late set is in it')
+    assert.deepEqual(pending(laptop), [], 'nothing left pending')
+  })
+
+  it('1b. GET in flight (nothing changed here): the late set is recorded the same way', async () => {
+    const { user, laptop } = await setup()
+    let release
+    laptop.fetch.holdGet = new Promise((r) => (release = r))
+    const out = laptop.engine.trigger()
+    await new Promise((r) => setTimeout(r, 30))
+    laptop.change((s) => withSet(s))
+    const dropped = json(laptop.state.activeWorkout)
+    laptop.fetch.holdGet = null
+    release()
+    await out
+    await laptop.engine.idle()
+    assert.equal(laptop.state.activeWorkout, null)
+    assert.equal(recorded(user).filter(finishedHere(dropped)).length, 1)
+    assert.deepEqual(pending(laptop), [])
+  })
+
+  it('2. pull-first (the last save failed): the late set is recorded the same way', async () => {
+    const { user, laptop } = await setup()
+    laptop.unmount()
+    laptop.storage.setItem(META_KEY, JSON.stringify({ ...JSON.parse(laptop.storage.getItem(META_KEY)), diskBehind: true }))
+    const reload = device(undefined, { storage: laptop.storage, fetch: laptop.fetch })
+    let release
+    reload.fetch.holdGet = new Promise((r) => (release = r))
+    reload.mount() // the pull-first GET goes out
+    await new Promise((r) => setTimeout(r, 30))
+    reload.change((s) => withSet(s))
+    const dropped = json(reload.state.activeWorkout)
+    reload.fetch.holdGet = null
+    release()
+    await reload.engine.idle()
+    assert.equal(reload.state.activeWorkout, null)
+    assert.equal(recorded(user).filter(finishedHere(dropped)).length, 1)
+    assert.deepEqual(pending(reload), [])
+  })
+
+  it('3. the push fails after the rebase → still pending after a reload, sent by the next push, recorded once', async () => {
+    const { user, laptop } = await setup()
+    let release
+    laptop.fetch.holdGet = new Promise((r) => (release = r))
+    laptop.fetch.respond = (e) => (e.method === 'PUT' ? Promise.reject(new TypeError('fetch failed')) : null)
+    const putsBefore = puts(laptop).length
+    const out = laptop.engine.trigger()
+    await new Promise((r) => setTimeout(r, 30))
+    laptop.change((s) => withSet(s))
+    const dropped = json(laptop.state.activeWorkout)
+    laptop.fetch.holdGet = null
+    release()
+    await out
+    await laptop.engine.idle()
+    assert.ok(puts(laptop).length > putsBefore, 'the forced push was tried (and failed)')
+    assert.ok(pending(laptop).some(finishedHere(dropped)), 'pending in the stored meta')
+    assert.equal(recorded(user).filter(finishedHere(dropped)).length, 0, 'not on the server yet')
+    laptop.unmount()
+    laptop.fetch.respond = null
+    const reload = device(undefined, { storage: laptop.storage, fetch: laptop.fetch }) // the app reopened
+    assert.ok(pending(reload).length > 0, 'survived the reload')
+    reload.mount()
+    await reload.engine.idle()
+    assert.equal(recorded(user).filter(finishedHere(dropped)).length, 1, 'recorded')
+    assert.deepEqual(pending(reload), [])
+    await reload.engine.trigger()
+    await reload.engine.idle()
+    assert.equal(recorded(user).filter(finishedHere(dropped)).length, 1, 'not duplicated')
+  })
+
+  it('4. no conflicts → no extra push and no extra revision', async () => {
+    const user = await newAccount()
+    const d = device()
+    await d.login(user) // rev 1
+    let release
+    d.fetch.hold = new Promise((r) => (release = r))
+    d.change((s) => renamed(s, 'rtn-a', 'first'))
+    const out = d.engine.flush()
+    await new Promise((r) => setTimeout(r, 30))
+    d.change((s) => withSet(s)) // rebased: no conflict
+    d.fetch.hold = null
+    release()
+    await out
+    await d.settle()
+    assert.deepEqual(pending(d), [])
+    assert.equal(puts(d).length, 3, 'login push, the rename, the set')
+    assert.equal(listRevisions(srv.db, userId(user)).length, 3)
+    // A GET that brings another device's change, nothing changed here: no push at all.
+    const other = device(emptyState())
+    await other.login(user)
+    other.change((s) => renamed(s, 'rtn-a', 'from other'))
+    await other.settle()
+    const before = puts(d).length
+    await d.engine.trigger()
+    await d.engine.idle()
+    assert.equal(d.state.routines.find((r) => r.id === 'rtn-a').name, 'from other')
+    assert.equal(puts(d).length, before)
+    assert.equal(listRevisions(srv.db, userId(user)).length, 4)
+    assert.deepEqual(recorded(user), [])
   })
 })

@@ -121,6 +121,29 @@ test('review 2: an activeWorkout without an id is never matched to history entri
   assert.equal(withNull.state.activeWorkout, noId)
 })
 
+// DEC-155 §9 — a push's `conflicts` (what the app's rebase dropped) are stored on the revision it makes.
+test('§9: device conflicts are stored with the push; a retry after a lost reply does not store them twice; a bad shape is refused', async () => {
+  const { A, B } = threeStates()
+  const s = await dataDirWith(A) // rev 1
+  const deps = openDataDir(s.dataDir)
+  try {
+    const uid = findUser(deps.db, 'emilio').id
+    const c = { field: 'activeWorkout', id: null, kind: 'finished-elsewhere', lost: B.activeWorkout }
+    const first = putState(deps.db, uid, { baseRev: 1, state: A, conflicts: [c] })
+    assert.equal(first.rev, 2, 'a state equal to the server’s still makes a revision when it carries conflicts')
+    assert.deepEqual(first.conflicts, [JSON.parse(JSON.stringify(c))])
+    const retry = putState(deps.db, uid, { baseRev: 1, state: A, conflicts: [c] }) // the reply to the first was lost
+    assert.equal(retry.unchanged, true, 'already recorded since rev 1 → nothing new stored')
+    const none = putState(deps.db, uid, { baseRev: 2, state: A })
+    assert.equal(none.unchanged, true, 'no conflicts, same state → no revision')
+    assert.throws(() => putState(deps.db, uid, { baseRev: 2, state: A, conflicts: [{ kind: 'x' }] }), /conflicts must be/)
+    assert.throws(() => putState(deps.db, uid, { baseRev: 2, state: A, conflicts: 'x' }), /conflicts must be/)
+  } finally {
+    deps.db.close()
+    s.cleanup()
+  }
+})
+
 // --- step 2: the read-only duplicate-id check (./server/ops duplicates [<db file>]) ---
 async function dataDirWith(state) {
   const dataDir = tempDir('workout-req268-test-')
