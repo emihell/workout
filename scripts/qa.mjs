@@ -1,7 +1,7 @@
 // req-159 — an isolated browser build of any git ref, on its own origin. The recipe
 // planning and build have both been running by hand (L-033), as one command:
 //
-//   node scripts/qa.mjs start <ref> [--seed <file>] [--node-modules <dir>]
+//   node scripts/qa.mjs start <ref> [--seed <file> | --empty] [--node-modules <dir>]
 //   node scripts/qa.mjs stop
 //   node scripts/qa.mjs status
 //
@@ -17,6 +17,9 @@
 // no v9 and no v8 doc, writes the seed under the v8 key — so the first load migrates
 // it through the real legacy path, and later loads keep whatever the app saved.
 // Default seed src/db.json (of the invoking checkout); --seed <file> replaces it.
+// --empty (req-259) serves the build with no seed script at all: a true first-time
+// user, whose origin stays empty after a clear + reload. --empty and --seed refuse
+// together.
 //
 // scripts/smoke.mjs imports buildRef/serveDir to run the same build in-process.
 
@@ -67,6 +70,35 @@ export function injectSeed(dist, seedJson) {
   writeFileSync(file, html.replace('<head>', `<head>${script}`))
 }
 
+// req-259: the seed step, or none. `empty` leaves index.html exactly as vite built it.
+export function prepareDist(dist, { empty, seedJson }) {
+  if (!empty) injectSeed(dist, seedJson)
+}
+
+// The seed's line for the start and status output.
+export const seedLabel = ({ empty, seed }) => (empty ? 'seed: none (--empty)' : `seed: ${seed}`)
+
+// `start`'s arguments. Pure (no build, no fs), so it is testable without vite.
+export function parseStartArgs(args, { root = ROOT } = {}) {
+  let ref = null
+  let seed = null
+  let empty = false
+  let nodeModules = join(root, 'node_modules')
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--seed') {
+      if (i + 1 >= args.length) throw new Error('--seed needs a file')
+      seed = resolve(args[++i])
+    } else if (args[i] === '--empty') empty = true
+    else if (args[i] === '--node-modules') nodeModules = resolve(args[++i])
+    else if (!ref && !args[i].startsWith('-')) ref = args[i]
+    else throw new Error(`unknown argument: ${args[i]}`)
+  }
+  if (empty && seed) throw new Error('--empty and --seed are exclusive')
+  if (!ref) throw new Error('usage: plan qa <ref> [--seed <file> | --empty] | plan qa --stop')
+  if (!empty && !seed) seed = join(root, 'src/db.json')
+  return { ref, seed, empty, nodeModules }
+}
+
 const CONTENT_TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' }
 
 // A static server for `dir`; unknown paths fall back to index.html. Port 0 = a free one.
@@ -113,25 +145,16 @@ function stop({ quiet = false } = {}) {
 }
 
 async function start(args) {
-  let ref = null
-  let seed = join(ROOT, 'src/db.json')
-  let nodeModules = join(ROOT, 'node_modules')
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--seed') seed = resolve(args[++i])
-    else if (args[i] === '--node-modules') nodeModules = resolve(args[++i])
-    else if (!ref && !args[i].startsWith('-')) ref = args[i]
-    else throw new Error(`unknown argument: ${args[i]}`)
-  }
-  if (!ref) throw new Error('usage: plan qa <ref> [--seed <file>] | plan qa --stop')
-  const seedJson = readFileSync(seed, 'utf8')
-  JSON.parse(seedJson) // refuse a broken seed before building
+  const { ref, seed, empty, nodeModules } = parseStartArgs(args)
+  const seedJson = empty ? null : readFileSync(seed, 'utf8')
+  if (!empty) JSON.parse(seedJson) // refuse a broken seed before building
   const sha = resolveRef(ref)
   stop({ quiet: true }) // one qa server at a time; a re-run replaces it
   mkdirSync(STATE_DIR, { recursive: true })
   const dir = mkdtempSync(join(tmpdir(), `qa-dist-${sha.slice(0, 7)}-`))
   console.log(`plan qa: building ${ref} (${sha.slice(0, 7)}) in ${dir}…`)
   buildRef(sha, dir, { nodeModules })
-  injectSeed(dir, seedJson)
+  prepareDist(dir, { empty, seedJson })
   // Find a free port here, then hand it to a detached server that outlives us.
   const probe = await serveDir(dir)
   const port = probe.address().port
@@ -149,8 +172,8 @@ async function start(args) {
     await new Promise((r) => setTimeout(r, 100))
     if (i === 39) throw new Error(`server did not come up on ${url}`)
   }
-  writeFileSync(STATE_FILE, JSON.stringify({ ref, sha, pid: child.pid, port, dir, seed }, null, 2))
-  console.log(`plan qa: ${ref} (${sha.slice(0, 7)}) serving, seeded from ${seed} under ${LEGACY_KEY}:`)
+  writeFileSync(STATE_FILE, JSON.stringify({ ref, sha, pid: child.pid, port, dir, seed, empty }, null, 2))
+  console.log(`plan qa: ${ref} (${sha.slice(0, 7)}) serving, ${empty ? seedLabel({ empty }) + ' — the origin starts empty' : `${seedLabel({ seed })} under ${LEGACY_KEY}`}:`)
   console.log(`    ${url}`)
   console.log('  stop when done:  ./plan qa --stop')
 }
@@ -161,10 +184,10 @@ async function main() {
   if (cmd === 'stop') return stop()
   if (cmd === 'status') {
     const s = readState()
-    return console.log(s && alive(s.pid) ? `plan qa: ${s.ref} (${s.sha.slice(0, 7)}) on http://127.0.0.1:${s.port}/ (pid ${s.pid})` : 'plan qa: nothing running')
+    return console.log(s && alive(s.pid) ? `plan qa: ${s.ref} (${s.sha.slice(0, 7)}) on http://127.0.0.1:${s.port}/ (pid ${s.pid}) — ${seedLabel(s)}` : 'plan qa: nothing running')
   }
   if (cmd === 'serve') return serveDir(rest[0], Number(rest[1])) // the detached child
-  throw new Error('usage: qa.mjs start <ref> [--seed <file>] | stop | status')
+  throw new Error('usage: qa.mjs start <ref> [--seed <file> | --empty] | stop | status')
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
