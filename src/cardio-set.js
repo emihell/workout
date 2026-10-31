@@ -9,7 +9,7 @@
 //   distance      a number, in `distanceUnit`
 //   distanceUnit  'm' | 'km' (present only with `distance`)
 //
-// Pure and JSX-free so `node --test` imports it. Callers: ui/index.jsx SetLogForm (live
+// Pure and JSX-free so `node --test` imports it. Callers: ui/set-log-form.jsx SetLogForm (live
 // cardio form + stopwatch), views/set-edit.jsx SetEditForm (active set edit + History edit /
 // add), views/set-values.js (the save patches), ids.js formatSetLine (History / done list)
 // and set-display.js loggedSetRowText (the log screen's set list).

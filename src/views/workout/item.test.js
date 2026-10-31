@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url)) // src/views/workout
-const src = readFileSync(join(here, 'item.jsx'), 'utf8')
+const src = ['item.jsx', 'review.jsx'].map((file) => readFileSync(join(here, file), 'utf8')).join('\n')
 const css = readFileSync(join(here, '..', '..', 'ui', 'ui.css'), 'utf8')
 
 function fnBody(name) {

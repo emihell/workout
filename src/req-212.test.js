@@ -58,7 +58,8 @@ async function harness(payload = DB) {
     await act(async () => host.swap((screen) => ({ n: screen.n + 1, child })))
   }
   await mount(null)
-  const { WorkoutItemLog, WorkoutItemDone } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemDone } = await importJsx('./views/workout/review.jsx', import.meta.url)
   return {
     captured,
     mount,

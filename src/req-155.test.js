@@ -75,7 +75,7 @@ describe('2 — a typed duration in whole seconds', () => {
     assert.ok(defaultDurationToSave('abc', 45).error)
   })
   it('SetLogForm gates Complete on the duration and shows the error', () => {
-    const ui = src('./ui/index.jsx')
+    const ui = src('./ui/set-log-form.jsx')
     // req-189 edit — the gate may also check blank Reps (`|| missingReps`); the duration part is unchanged.
     assert.match(ui, /const seconds = timed \? secondsToSave\(duration, 0\) : null\n\s*if \(error \|\| seconds\?\.error(?: \|\| missingReps)?\) \{[^}]*setDurationError\(seconds\?\.error \?\? null\)\n\s*return\n\s*\}/)
     assert.match(ui, /durationSec: timed \? seconds\.value : undefined,/)

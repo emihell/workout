@@ -1,5 +1,5 @@
 // req-154 (audit F-TRUST-1, DEC-058 §1) — the one parse for a TYPED kg. The kg inputs
-// are `inputMode="decimal"` (ui/index.jsx NumberField), and a Swedish keypad types a
+// are `inputMode="decimal"` (ui/fields.jsx NumberField), and a Swedish keypad types a
 // comma: `22,5` means 22.5. Before this, the set-log / set-edit saves ran plain
 // Number() on the text, so `22,5` became 0 on the live log and NaN (→ null) in History.
 // Pure, no imports: routine-item-parse.js (routine editor Kg, per `/` token),

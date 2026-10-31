@@ -16,7 +16,9 @@ import { scheduleRowText } from './views/schedule-day.js'
 import { exerciseLastTimeText, historyGroupSetsText, shortDate, topSetText } from './views/history/helpers.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const read = (path) => readFileSync(join(here, path), 'utf8')
+const readOne = (path) => readFileSync(join(here, path), 'utf8')
+// req-276 test edit — item.jsx was split into six modules; its guards read them joined (main's scope).
+const read = (path) => (path === 'views/workout/item.jsx' ? ['item.jsx', 'item-actions.js', 'item-header.jsx', 'up-next-bar.jsx', 'logged-set-sheet.jsx', 'review.jsx'].map((f) => readOne(`views/workout/${f}`)).join('\n') : readOne(path))
 const h = React.createElement
 const flush = () => act(async () => new Promise((resolve) => setTimeout(resolve, 0)))
 const devNotes = () => importJsx('./dev/dev-notes.js', import.meta.url)

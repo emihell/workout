@@ -139,7 +139,8 @@ const PRESS = 'si-sess-push-pull-3-ex-overhead-db-press' // made own / Side Plan
 async function harness(payload) {
   const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
   const { useStore } = await import('./store-context.js')
-  const { WorkoutItemLog, WorkoutItemDone } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemDone } = await importJsx('./views/workout/review.jsx', import.meta.url)
   const { ExerciseEdit } = await importJsx('./views/Exercises.jsx', import.meta.url)
   const { DEVICE_FILL_KEY } = await import('./routine-kg-fill.js')
   localStorage.clear()

@@ -74,7 +74,8 @@ const settle = () => act(async () => new Promise((resolve) => setTimeout(resolve
 async function harness(payload) {
   const { StoreProvider } = await importJsx('./store.jsx', import.meta.url)
   const { useStore } = await import('./store-context.js')
-  const { WorkoutItemLog, WorkoutItemDone } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemLog } = await importJsx('./views/workout/item.jsx', import.meta.url)
+  const { WorkoutItemDone } = await importJsx('./views/workout/review.jsx', import.meta.url)
   const { DEVICE_FILL_KEY } = await import('./routine-kg-fill.js')
   localStorage.clear()
   localStorage.setItem(DEVICE_FILL_KEY, '2026-09-26T00:00:00.000Z')

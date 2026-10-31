@@ -8,7 +8,9 @@ import { historyHasSetAt, historySetPrefill } from './history-queries.js'
 import { carryForSet, initialSetFields } from './set-seed.js'
 import { withOneMoreSet } from './workout-items.js'
 
-const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
+const readOne = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
+// req-276 test edit — item.jsx was split into six modules; its guards read them joined (main's scope).
+const read = (rel) => (rel === './views/workout/item.jsx' ? ['item.jsx', 'item-actions.js', 'item-header.jsx', 'up-next-bar.jsx', 'logged-set-sheet.jsx', 'review.jsx'].map((f) => readOne(`./views/workout/${f}`)).join('\n') : readOne(rel))
 
 // ---- QA-1 / DEC-081 — the exits to Today replace ----
 // req-153 — the behaviour tests (go's replace, the Finish/Abandon exits via

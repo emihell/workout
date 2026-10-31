@@ -19,7 +19,8 @@ function jsxUnder(dir) {
   return readdirSync(dir).flatMap((name) => {
     const p = join(dir, name)
     if (statSync(p).isDirectory()) return jsxUnder(p)
-    return p.endsWith('.jsx') ? [p] : []
+    // req-276 test edit — .js too (item-actions.js came out of item.jsx), test files excluded, as req-201.
+    return /\.jsx?$/.test(p) && !p.endsWith('.test.js') ? [p] : []
   })
 }
 const views = jsxUnder(join(here, 'views')).map((p) => ({ file: relative(here, p), src: readFileSync(p, 'utf8') }))
@@ -55,7 +56,7 @@ test('lookClass emits exactly the classes the call sites used to hand-write', ()
 })
 
 test('library NavLink defaults to the link look; the base keeps none', () => {
-  const ui = read('ui/index.jsx')
+  const ui = read('ui/controls.jsx')
   assert.match(ui, /export function NavLink\(\{ look = 'link', \.\.\.rest \}\) \{\n\s*return <BaseNavLink look=\{look\} \{\.\.\.rest\} \/>/)
   const shared = read('views/shared.jsx')
   assert.match(shared, /export function NavLink\(\{ to, children, className, chevron, look, block = false, \.\.\.rest \}\)/)
@@ -66,7 +67,7 @@ test('library NavLink defaults to the link look; the base keeps none', () => {
 })
 
 test('failure case — order: Actions renders retreat, then lateral, then forward (DESIGN §4)', () => {
-  const ui = read('ui/index.jsx')
+  const ui = read('ui/controls.jsx')
   const start = ui.indexOf('export function Actions(')
   assert.ok(start >= 0, 'Actions not found')
   const body = ui.slice(start, ui.indexOf('\n}\n', start))

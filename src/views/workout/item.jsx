@@ -1,24 +1,17 @@
 import { Fragment, useEffect, useState } from 'react'
-import { flushSync } from 'react-dom'
-import { EFFORT_OPTIONS, isWeightedType, roleTag } from '../../ids'
+import { isWeightedType, roleTag } from '../../ids'
 import { go, hashPath, parseRoute } from '../../route'
 import { recordButton } from '../../analytics'
 import { isDurationTarget } from '../../progress'
-import { exerciseById } from '../../model.js'
 import { historyHasSetAt, historySetPrefill, lastSetsForExercise } from '../../history-queries.js'
 import { useStore } from '../../store-context'
 import {
-  canAddSet,
   canRemoveAddedSet,
   itemEffort,
-  itemEffortSets,
   itemIsMarkedDone,
   itemKey,
   itemLoggingState,
-  markItemDonePatch,
   removeAddedSetPatch,
-  reopenItemPatch,
-  sessionExercise,
   setMatchesItem,
   skipItemPatch,
 } from '../../workout-items.js'
@@ -34,14 +27,11 @@ import {
   setupSeedFor,
 } from '../../set-seed.js'
 import {
-  createSetDraftWriter,
   formFieldsWithDraft,
   setDraftFor,
-  setDraftFromLoggedSet,
   setDraftKey,
 } from '../../set-drafts.js'
-import { isSkippedSet } from '../../set-rules.js'
-import { loggedSetRowText, setListRows } from '../../set-display.js'
+import { setListRows } from '../../set-display.js'
 import { nextNotDoneItem } from '../../workout-progress.js'
 import {
   restPatchAfterSet,
@@ -49,19 +39,14 @@ import {
   stopwatchFor,
   stopwatchOwner,
 } from '../../workout-timers.js'
-import { liveSetWeight, skippedSetSave, viewedSetSave } from '../set-values.js'
+import { liveSetWeight } from '../set-values.js'
 import { ExercisesLink, Missing } from '../shared'
 import {
   Actions,
   Button,
-  ExerciseHead,
   Field,
-  NavLink,
   RestNotes,
   Screen,
-  SectionHeader,
-  SegmentedControl,
-  SetEditSheet,
   SetList,
   SetLogForm,
 } from '../../ui/index.jsx'
@@ -75,99 +60,30 @@ import {
   itemLogPath,
   itemSetsPath,
   skipExercise,
-  swapExercisePath,
 } from './workout-helpers.js'
-import { UP_NEXT_MS, arrivalFor, clearArrival, markArrival } from '../../up-next.js'
+import { arrivalFor, clearArrival, markArrival } from '../../up-next.js'
 import { WorkoutPill } from './rest'
 import { useRestCountdown } from './rest-countdown.js'
 import { unlockAudio } from '../../rest-cue'
-import { askChoice, askConfirm } from '../../ui/confirm.js'
+import { askChoice } from '../../ui/confirm.js'
 import {
   SETUP_FEELS,
   SETUP_TEXT,
   firstTimeSetupFor,
   firstTimeSetupPatch,
-  setupAfterSetOneEdit,
   setupAnsweredPatch,
   setupPromptShows,
   setupSheetShows,
 } from '../../first-time-setup.js'
-import { offerOnFinishingSet, offerSheetText } from '../../routine-update-offer.js'
+import { offerOnFinishingSet } from '../../routine-update-offer.js'
 import { kgLabelFor } from '../../kg-label.js'
-import { cardioFormText, clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
-import { equipmentLabel } from '../../equipment-label.js'
-import { exerciseImprovementPct, improvementText } from '../../beat-last-time.js'
-import { previousSameRoutineWorkouts } from '../../history-queries.js'
-import { durationLabel, isEachSide, oneSideLine, restNotesFor, restNotesShowing } from '../../library-hints.js'
+import { clockText, lastDistanceUnit, targetDurationSec, withCardioValues } from '../../cardio-set.js'
+import { durationLabel, isEachSide, restNotesFor, restNotesShowing } from '../../library-hints.js'
 import { useExerciseLibrary } from './use-library.js'
-
-// req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
-// workout-items.js); weight step and cues stay live. Old snapshots read live as before.
-function liveExercise(store, item) {
-  return sessionExercise(exerciseById(store.exercises, item.exerciseId), item)
-}
-
-function exerciseEditorPath(routineId, item) {
-  return `/workout/${routineId}/item/${itemKey(item)}/exercise`
-}
-
-// `aside` (req-80) renders a small control beside the title — the live log screen
-// passes the "Add note" toggle here so it sits next to the exercise name.
-// req-212 (H5) — the head is the library's ExerciseHead (was ad-hoc markup here).
-// req-219 — `eachSide` (a unilateral library entry) adds one quiet line under the head.
-// req-240 — `eachSide` is isEachSide (own setting, else library); a timed exercise gets the hold line.
-function ExerciseTitle({ routineId, item, ex, bits, aside, eachSide = false }) {
-  const inLibrary = Boolean(item?.exerciseId && ex?.id === item.exerciseId)
-  const name = exerciseName(item)
-  return (
-    <>
-      <ExerciseHead
-        title={inLibrary ? <NavLink to={exerciseEditorPath(routineId, item)} look="plain">{name}</NavLink> : name}
-        aside={aside}
-        subtitle={(bits || []).filter(Boolean).join(' · ')}
-      />
-      {eachSide ? <p className="ui-sub">{oneSideLine(ex)}</p> : null}
-    </>
-  )
-}
-
-// The review's setup lines under the title (the old done view's): equipment, then the routine's
-// note for this exercise. Review round 1 — restored (the spec never asked to remove them).
-function ExerciseSetupHeader({ item, ex }) {
-  return (
-    <>
-      {ex?.equipment ? <p className="ui-sub">{equipmentLabel(ex.equipment)}</p> : null}
-      {item?.notes ? <p className="ui-sub">{item.notes}</p> : null}
-    </>
-  )
-}
-
-// req-11 / DEC-013 — completing the last set marks the exercise done. req-212 (DEC-119 §1)
-// — it then lands on the exercise review (WorkoutItemDone: the sets, the one effort, Next),
-// not the overview. Re-entering a completed exercise from the overview opens the same review.
-function markDoneAndGoToReview(store, workout, routineId, item) {
-  store.patchActive(markItemDonePatch(workout, item))
-  go(itemDonePath(routineId, item), { replace: true })
-}
-
-// req-187 (DEC-103 §1) — the routine-kg confirm, opened on the set that finishes the
-// exercise when its kg differs from the routine (offerOnFinishingSet). It is the one
-// ConfirmSheet with `stayOn`: req-212 — the exercise review, so the navigation there
-// (markDoneAndGoToReview, called first) does not dismiss it. Update → store.applyRoutineUpdate (the existing write
-// path); Keep / backdrop / Escape / any other navigation → nothing written. Rest is
-// untouched either way: it was armed by store.completeSet before this opens.
-function askRoutineUpdate(store, routineId, item, offer) {
-  const text = offerSheetText(offer, exerciseName(item))
-  askConfirm(text.body, {
-    title: text.title,
-    confirmLabel: text.updateLabel,
-    cancelLabel: text.keepLabel,
-    stayOn: itemDonePath(routineId, item),
-  }).then((update) => {
-    recordButton(update ? 'routine-update-apply' : 'routine-update-keep')
-    if (update) store.applyRoutineUpdate(offer)
-  })
-}
+import { liveExercise, markDoneAndGoToReview, askRoutineUpdate, useSetDraftWriter } from './item-actions.js'
+import { ExerciseTitle } from './item-header.jsx'
+import { UpNextBar } from './up-next-bar.jsx'
+import { LoggedSetSheet } from './logged-set-sheet.jsx'
 
 export function WorkoutItemLog({ routineId, itemId }) {
   const store = useStore()
@@ -197,104 +113,6 @@ export function WorkoutItemLog({ routineId, itemId }) {
   // req-186 — keyed by item, so the view state (req-212: the set open in the edit sheet)
   // never carries over when the pill opens another exercise on this same route shape.
   return <WorkoutItemLive key={itemKey(item)} routineId={routineId} item={item} />
-}
-
-// req-117 — restoreFromLoggedSet moved to workout-log.js, now set-seed.js (pure, unit-tested; it now
-// also restores a timed set's logged seconds).
-
-// req-78 — the req-27 RestUpcoming panel (an editable "next weight" shown during a
-// blocking rest) is gone. Rest no longer blocks: the next set's own log form is shown
-// immediately on completing a set, and its weight field IS the editable surface, so the
-// separate panel and its nextSetWeight override folded away. The rest itself now shows
-// only as the floating pill (req-186: the WorkoutPill).
-
-// req-125 — the set-form draft writer (createSetDraftWriter, set-drafts.js: debounced,
-// unit-tested) bound to the store. store.patchActive only calls the store's stable
-// setState, so the first render's function stays valid for the component's life. A
-// pending write is flushed on unmount (leaving the screen) and synchronously
-// (flushSync, so saveState runs before the page goes) when the tab is hidden or
-// unloaded — iOS reloading a backgrounded tab.
-function useSetDraftWriter(store) {
-  const [writer] = useState(() =>
-    createSetDraftWriter({
-      write: (setDraft, sync) => {
-        const patch = () => store.patchActive({ setDraft })
-        if (sync) flushSync(patch)
-        else patch()
-      },
-    }),
-  )
-  useEffect(() => {
-    const onHide = () => {
-      if (document.visibilityState === 'hidden') writer.flush(true)
-    }
-    const onPageHide = () => writer.flush(true)
-    document.addEventListener('visibilitychange', onHide)
-    window.addEventListener('pagehide', onPageHide)
-    return () => {
-      document.removeEventListener('visibilitychange', onHide)
-      window.removeEventListener('pagehide', onPageHide)
-      writer.flush()
-    }
-  }, [writer])
-  return writer
-}
-
-// req-223 (DEC-125 §2) — "Up next: {name}", a 5 s "Starting in N…" countdown, and Skip · Swap
-// · Start now. Shown on ARRIVAL only (up-next.js). The countdown writes nothing and starts
-// nothing: at 0 it only hides the bar (onHide), as Start now does. Its timer is UI-only (a
-// deadline + 250 ms tick, auto-complete.jsx's pattern), cleared on unmount — leaving the screen,
-// logging a set (the parent stops rendering it), Skip or Swap.
-function UpNextBar({ item, routineId, onHide, onSkip }) {
-  const [deadline] = useState(() => Date.now() + UP_NEXT_MS)
-  const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const t = setInterval(() => {
-      const n = Date.now()
-      setNow(n)
-      if (n >= deadline) {
-        clearInterval(t)
-        onHide()
-      }
-    }, 250)
-    return () => clearInterval(t)
-    // deadline is set once; onHide only sets the parent's state. Run-once interval.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deadline])
-  const secondsLeft = Math.max(0, Math.ceil((deadline - now) / 1000))
-  return (
-    <div className="ui-up-next" role="group" aria-label="Up next">
-      <p className="ui-up-next__name">Up next: {exerciseName(item)}</p>
-      <p className="ui-sub" aria-live="polite">
-        Starting in {secondsLeft}…
-      </p>
-      {/* DESIGN §4 — Skip and Swap are lateral, Start now (forward) on the right. Swap is
-          navigation, so a link wearing the button look beside the real Buttons (DEC-040). */}
-      <Actions
-        lateral={
-          <>
-            <Button variant="secondary" onClick={onSkip}>
-              Skip
-            </Button>
-            <NavLink to={swapExercisePath(routineId, item)} look="secondary">
-              Swap
-            </NavLink>
-          </>
-        }
-        forward={
-          <Button
-            variant="primary"
-            onClick={() => {
-              recordButton('up-next-start-now')
-              onHide()
-            }}
-          >
-            Start now
-          </Button>
-        }
-      />
-    </div>
-  )
 }
 
 function WorkoutItemLive({ routineId, item }) {
@@ -771,208 +589,6 @@ function WorkoutItemLive({ routineId, item }) {
       {/* req-26 — the equipment + cues block that sat under the buttons is removed
           to declutter the mid-set screen. Cues stay reachable: the exercise Title
           is a link to the exercise editor (which shows them). */}
-    </Screen>
-  )
-}
-
-// req-212 (DEC-119 §1) — one logged set in the edit sheet (SetEditSheet), opened from a done
-// row of the set list (live screen) or a set line (review). Its own fields only — kg + reps,
-// a timed set's seconds, or a cardio set's fields; no effort. Save writes through
-// store.updateActiveSet (the sets array only: restEndsAt / restPausedRemaining untouched, as
-// req-186's Save did) with the same patch and seed-override rerun (viewedSetSave, DEC-052);
-// `loggedAt` is never in the patch, so it is kept. `onSaved` runs after the write (the review
-// re-applies its effort). Cancel / backdrop / Escape write nothing.
-function LoggedSetSheet({ item, ex, index, eachSide = false, onClose, onSaved }) {
-  const store = useStore()
-  const active = store.activeWorkout
-  const set = active?.sets?.[index]
-  if (!set) return null
-  const last = lastSetsForExercise(store.workouts, item.exerciseId)
-  const workLogged = itemLoggingState(active, item).workLogged
-  const type = set.setType === 'wu' ? 'wu' : 'work'
-  const workIndex = Math.max(0, workLogged.indexOf(set))
-  const weighted = isWeightedType(ex?.type)
-  const timed = Boolean(ex?.hasDuration) && type === 'work'
-  const cardio = ex?.type === 'cardio' && !timed
-  const target = setTargetFor(item, type, workIndex)
-  const init = setDraftFromLoggedSet('', set)
-  const skipped = isSkippedSet(set)
-  function save(values) {
-    const result = viewedSetSave(values, {
-      weighted,
-      timed,
-      initialEffort: '',
-      set,
-      presentedWeight: weighted ? init.weight : '',
-      seedOverrides: active.seedOverrides,
-      sets: active.sets || [],
-      setIndex: index,
-    })
-    if (!result) return
-    recordButton('save-set')
-    store.updateActiveSet(index, result.setPatch)
-    if (result.seedOverrides !== active.seedOverrides) store.patchActive({ seedOverrides: result.seedOverrides })
-    // req-10 review round 1 — set 1 edited before set 2 is logged: the first-time setup's set-2
-    // seed is recomputed from the edited set (same answer), against the state the writes above
-    // leave (a functional patch, queued after them). Any other set / no setup → nothing.
-    if (type === 'work' && workIndex === 0) store.patchActive((current) => setupAfterSetOneEdit(current, item, ex))
-    onSaved?.()
-    onClose()
-  }
-  // req-241 — Done tapped by mistake: the set becomes a skip record through the same writes as
-  // Save (one updateActiveSet, the carry re-run, set 1's setup seed); no confirm, since filling it
-  // back in and saving un-skips it. A skip has no effort, so the review's onSaved isn't run.
-  function skip() {
-    const result = skippedSetSave({ weighted, set, seedOverrides: active.seedOverrides, sets: active.sets || [], setIndex: index })
-    recordButton('skip-done-set')
-    store.updateActiveSet(index, result.setPatch)
-    if (result.seedOverrides !== active.seedOverrides) store.patchActive({ seedOverrides: result.seedOverrides })
-    if (type === 'work' && workIndex === 0) store.patchActive((current) => setupAfterSetOneEdit(current, item, ex))
-    onClose()
-  }
-  return (
-    <SetEditSheet
-      title={type === 'wu' ? 'Warm-up set' : `Set ${workIndex + 1}`}
-      weighted={weighted}
-      timed={timed}
-      cardio={cardio}
-      repsLabel={ex?.type === 'cardio' || isDurationTarget(target) ? 'Duration' : eachSide ? 'Reps each side' : 'Reps'}
-      durationLabel={durationLabel(eachSide)}
-      kgLabel={kgLabelFor(ex)}
-      initialWeight={weighted ? init.weight : ''}
-      initialReps={init.reps}
-      // Review round 1 — a skipped timed set starts blank: the target is never written as if measured.
-      initialDuration={timed && !skipped ? init.durationSec ?? durationTargetFor(item, ex, workIndex) : ''}
-      skipped={skipped}
-      onSkip={skipped ? undefined : skip}
-      initialCardio={cardio ? cardioFormText(set, lastDistanceUnit(last?.sets)) : null}
-      cardioHint={cardio && set.durationSec == null && init.reps ? `Logged as ${init.reps}` : ''}
-      onSave={save}
-      onCancel={onClose}
-    />
-  )
-}
-
-// req-212 (DEC-119 §1) — the exercise review (replaces the req-11 done view): where the last
-// Done lands, and what re-entering a done exercise opens. The name, each set (tap → the edit
-// sheet), the "↑ N%" line (DEC-117 §1, the overview's helper), one Effort for the whole
-// exercise (Easy · Medium · Hard, nothing preselected; hidden with no work set to carry it —
-// warm-up-only, all skipped, or cardio), then Next: {next exercise} / Finish, Choose exercise
-// and Add set.
-export function WorkoutItemDone({ routineId, itemId }) {
-  const store = useStore()
-  const active = store.activeWorkout
-  const mine = isActiveFor(active, routineId)
-  const item = mine ? findItem(active.snapshot?.items, itemId) : null
-
-  if (!mine) return <NotInWorkout routineId={routineId} />
-  if (!item) return <MissingItem />
-  return <ExerciseReview key={itemKey(item)} routineId={routineId} item={item} />
-}
-
-// req-223 review fix 2 — only a plain left click navigates THIS tab; a modified or middle click
-// (new tab / window, download) must not leave a marker behind for a later list-row open.
-function markNextArrival(e, routineId, next) {
-  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
-  markArrival(routineId, next)
-}
-
-function ExerciseReview({ routineId, item }) {
-  const store = useStore()
-  const active = store.activeWorkout
-  const [editIndex, setEditIndex] = useState(null)
-  const ex = liveExercise(store, item)
-  const weighted = isWeightedType(ex?.type)
-  // req-217 — the set lines read "12 each side" for a unilateral library entry.
-  const library = useExerciseLibrary()
-  const eachSide = isEachSide(ex, library)
-  // req-194 — a non-timed cardio exercise's sets read "1 · 12:30 · level 8 · 1.5 km".
-  const cardioFields = ex?.type === 'cardio' && !ex?.hasDuration
-  const { logged, workLogged } = itemLoggingState(active, item)
-  const rows = logged.map((set) => {
-    const label = set.setType === 'wu' ? 'Warm-up' : String(workLogged.indexOf(set) + 1)
-    const setIndex = (active.sets || []).indexOf(set)
-    return { key: String(setIndex), status: 'done', setIndex, text: loggedSetRowText(label, set, weighted, cardioFields, eachSide), highlighted: editIndex === setIndex }
-  })
-  const pct = exerciseImprovementPct(active, previousSameRoutineWorkouts(active, store.workouts, store.routines), item.exerciseId, store.exercises)
-  // Effort: hidden on cardio (no effort, req-156) and when no logged, non-skipped work set exists.
-  const showEffort = ex?.type !== 'cardio' && itemEffortSets(active, item).length > 0
-  const effort = itemEffort(active, item)
-  const next = nextNotDoneItem(active, item)
-
-  function pickEffort(value) {
-    recordButton('exercise-effort')
-    store.setItemEffort(itemKey(item), value)
-  }
-
-  return (
-    <Screen className="ui-screen--rest">
-      <ExercisesLink routineId={routineId} name={active.snapshot?.routineName} />
-      <WorkoutPill />
-      <ExerciseTitle routineId={routineId} item={item} ex={ex} bits={[roleTag(item.role)]} eachSide={eachSide} />
-      <ExerciseSetupHeader item={item} ex={ex} />
-      {pct != null ? <p className="ui-sub">{improvementText(pct)}</p> : null}
-      {rows.length ? (
-        <SetList rows={rows} onOpen={(row) => setEditIndex(row.setIndex)} />
-      ) : (
-        <p className="ui-sub">None.</p>
-      )}
-      {showEffort ? (
-        <>
-          <SectionHeader>Effort</SectionHeader>
-          {/* clearable (req-221): tap the picked one again → none (rpe null on those sets). */}
-          <SegmentedControl clearable options={EFFORT_OPTIONS} value={effort} onChange={pickEffort} ariaLabel="Effort" />
-        </>
-      ) : null}
-      {/* Navigation only (nothing written), so links wearing the button look (DEC-040). Finish:
-          the auto-complete summary on the overview when it is armed (as the last Done reached
-          before req-212), else the Finish screen. */}
-      <div className="ui-workout-end">
-        {next ? (
-          // req-223 — Next is an arrival: the next exercise opens with its Up next bar.
-          <NavLink to={itemLogPath(routineId, next)} look="primary" block onClick={(e) => markNextArrival(e, routineId, next)}>
-            Next: {exerciseName(next)}
-          </NavLink>
-        ) : (
-          <NavLink to={finishTarget(active, routineId)} look="primary" block>
-            Finish
-          </NavLink>
-        )}
-        <NavLink to={`/workout/${routineId}`} look="secondary" block>
-          Choose exercise
-        </NavLink>
-        {/* req-274 (DEC-155 §10) — not shown at MAX_SETS (20): no message. */}
-        {canAddSet(item) ? (
-          <Button
-            variant="quiet"
-            block
-            onClick={() => {
-              // Re-opening a completed exercise: clear the done mark first so the
-              // log screen's markedDone guard doesn't bounce straight back here.
-              store.patchActive(reopenItemPatch(active, item))
-              store.addWorkingSet(itemKey(item))
-              go(itemLogPath(routineId, item), { replace: true })
-            }}
-          >
-            Add set
-          </Button>
-        ) : null}
-      </div>
-      {editIndex != null ? (
-        <LoggedSetSheet
-          key={editIndex}
-          item={item}
-          ex={ex}
-          index={editIndex}
-          eachSide={eachSide}
-          onClose={() => setEditIndex(null)}
-          // An edit that turns a skipped set into a real one: the effort picked for the
-          // exercise covers it too (re-applied from the latest state).
-          onSaved={() => {
-            if (effort !== '') store.setItemEffort(itemKey(item), effort)
-          }}
-        />
-      ) : null}
     </Screen>
   )
 }

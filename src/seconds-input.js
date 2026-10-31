@@ -1,5 +1,5 @@
 // req-155 (DEC-058 §1) — the one parse for a TYPED single duration in seconds: a timed
-// set's Duration (ui/index.jsx SetLogForm / DurationTimer) and an exercise's default
+// set's Duration (ui/set-log-form.jsx SetLogForm / DurationTimer) and an exercise's default
 // duration (Exercises.jsx). Same discipline as kg-input.js: the fields are
 // `inputMode="decimal"`, so a Swedish keypad types `30,5`, which is 30.5 s. Seconds are
 // stored whole, so it is rounded half up (Planner's call, req-155): 30,5 → 31. Before,
