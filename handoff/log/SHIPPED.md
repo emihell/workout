@@ -2884,3 +2884,8 @@ Gate: `./check` 2288, smoke, 10/10; independent reviewer ×2: No blockers, shoul
 
 Bug (perf); throwaway agent, …`e17b86e`. `src/library/hints.json` from `scripts/build-library.mjs`; shared `lazyChunk`. Gate: network on `plan qa`
 main 1 library request → branch 0 (hints 1); 944-entry equality test; freshness test; `./check` 2293 ×3; smoke green. No reviewer: no trigger file. `reports/req-265.md`.
+
+## req-273 — a refused conflict list no longer stalls sync; a restore keeps the live workout; `ops duplicates` leaves no -wal/-shm  (2026-10-31)
+
+Bug; throwaway agent, …`f0b27ca`. `bad-conflicts` 400 → drop sent list, warn with the records, re-push; `other` passed only when `restored`.
+Gate: new tests fail on main; `./check` 2304; smoke; independent reviewer: No blockers, should-fix (pruned path) fixed. Latents: rollback server has no `code`; immutable-open race = stale count. `reports/req-273.md`.

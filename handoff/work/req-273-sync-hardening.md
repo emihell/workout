@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · DEC-133 (restore keeps the live workout), DEC-155 §8–9 (no silent loss), DEC-143, req-268 review latents. Touches `src/sync/` → independent reviewer (WORKFLOW check 5). No stored record rewritten → no backup reminder.
+**Status: BUILT, NOT merged — branch `req-273` (…`f0b27ca`)** · **Lane: bug** · DEC-133 (restore keeps the live workout), DEC-155 §8–9 (no silent loss), DEC-143, req-268 review latents. Touches `src/sync/` → independent reviewer (WORKFLOW check 5). No stored record rewritten → no backup reminder.
 
 # req-273 — sync can't get stuck on a refused conflict list; a restore merge never ends a live workout
 
