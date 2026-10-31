@@ -257,6 +257,16 @@ test('warnings print but do not refuse: a range target, a short duration, rest 0
   s.cleanup()
 })
 
+// req-256 — a word ending in "s" is not a duration: "12 reps" on a strength item builds, no C6, with the warning.
+test('req-256 — "12 reps" on a non-timed strength item builds: no C6 refusal, the "not a plain number" warning', async () => {
+  const s = await seeded()
+  const r = build(s.base, [{ op: 'item.set', routine: 'Upper', exercise: 'Chest Press', set: { targets: ['12 reps', '12 reps'] } }])
+  assert.deepEqual(r.refusals, [])
+  assert.ok(r.file)
+  assert.match(r.warnings.join('\n'), /target "12 reps" is not a plain number/)
+  s.cleanup()
+})
+
 test('item ids carry history: a rebuilt item with a fresh id loses its logged sets (why routine.items keeps ids)', async () => {
   const s = await seeded()
   const workout = s.base.workouts.find((w) => w.sets.some((x) => x.routineItemId === 'si-press'))
