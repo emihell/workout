@@ -1,4 +1,4 @@
-import { roleTag, setParts, setValueText, WITH_WARMUP } from '../../ids.js'
+import { roleTag, setParts, setValueText } from '../../ids.js'
 import { isSkippedSet } from '../../workout-log.js'
 import { dateKey } from '../../schedule.js'
 import { compareWorkoutsNewestFirst, lastSetsForExercise } from '../../history-queries.js'
@@ -6,24 +6,6 @@ import { compareWorkoutsNewestFirst, lastSetsForExercise } from '../../history-q
 // Shared helpers for the history screens (req-19 split of History.jsx): id/name
 // resolution, date formatting + grouping. Used by more than one history/ screen module. `workoutMonthKey` stays
 // internal (only groupWorkoutsByMonth uses it).
-
-// req-128 — a History detail exercise row's meta after the name: the req-93 rule, so
-// main (or an absent role) is unlabelled and only warm-up/finisher/cardio carry a tag
-// (roleTag); then the existing `WU set` marker and the set count. Was `roleLabel`, which
-// printed "Main" on nearly every row.
-//
-// req-152 (QA-4) — `skipped`: every set of the exercise was skipped, so the count reads
-// "skipped" instead (the live overview's word, req-109). The caller passes the count of
-// logged (non-skipped) sets, as the header does (req-116).
-export function historyGroupMeta(snapshotItem, setCount, { skipped = false } = {}) {
-  return [
-    roleTag(snapshotItem?.role),
-    snapshotItem?.warmup ? WITH_WARMUP : '',
-    skipped ? 'skipped' : `${setCount} set${setCount === 1 ? '' : 's'}`,
-  ]
-    .filter(Boolean)
-    .join(' · ')
-}
 
 export function itemIdOf(obj) {
   return obj?.routineItemId || obj?.id || ''

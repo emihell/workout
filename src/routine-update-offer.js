@@ -45,7 +45,7 @@ export function routineUpdateOffer(active, routines, item) {
 }
 
 // "105/105/100" — a set with no weight reads "—" (req-113).
-export function kgListText(list) {
+function kgListText(list) {
   return (list || []).map((value) => (Number(value) > 0 ? String(Number(value)) : '—')).join('/')
 }
 

@@ -6,7 +6,6 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { historyHasSetAt, historySetPrefill } from './history-queries.js'
 import { carryForSet, initialSetFields, withOneMoreSet } from './workout-log.js'
-import { historyGroupMeta } from './views/history/helpers.js'
 
 const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8')
 
@@ -86,17 +85,9 @@ describe('History detail exercise meta (QA-4)', () => {
   // req-153 review — a source pin that stays: detail.jsx is .jsx (node can't load it), and
   // this is the only link between the screen and the behaviour-tested row text.
   // req-209 test edit: the row now renders its sets inline (§2) through historyGroupSetsText,
-  // whose all-skipped case keeps "skipped" (req-209.test.js); the old row-meta helper was deleted in req-269.
+  // whose all-skipped case keeps "skipped" (req-209.test.js); the old row-meta helpers were deleted in req-269.
   it('detail.jsx renders each row through historyGroupSetsText', () => {
     assert.match(read('./views/history/detail.jsx'), /historyGroupSetsText\(snapshotItem, group\.items, /)
-  })
-  it('all sets skipped → "· skipped" (the overview word), no count', () => {
-    assert.equal(historyGroupMeta({ role: 'main', warmup: true }, 0, { skipped: true }), 'with warm-up · skipped') // req-202 test edit: was 'Warm-up set'
-  })
-  it('2 of 4 skipped → the logged count, no "skipped"', () => {
-    const meta = historyGroupMeta({ role: 'main' }, 2, { skipped: false })
-    assert.equal(meta, '2 sets')
-    assert.doesNotMatch(meta, /skipped/)
   })
 })
 
