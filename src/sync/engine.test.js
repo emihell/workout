@@ -1161,6 +1161,32 @@ describe('req-268 — the rebase’s conflicts go up with the next push', () => 
     assert.equal(recorded(user).filter(finishedHere(dropped)).length, 1, 'not duplicated')
   })
 
+  // DEC-155 §9 (Planner) — a conflict whose lost value is the SERVER's (its history holds it) is not sent.
+  it('5. only the server’s value lost in the rebase → nothing pending, nothing recorded, no extra revision', async () => {
+    const user = await newAccount()
+    const d = device()
+    await d.login(user) // rev 1
+    const other = device(emptyState())
+    await other.login(user)
+    other.change((s) => renamed(s, 'rtn-a', 'theirs'))
+    await other.settle() // rev 2
+    let release
+    d.fetch.hold = new Promise((r) => (release = r))
+    d.change((s) => ({ ...s, exercises: [...s.exercises, { ...s.exercises[0], id: 'ex-d', name: 'D exercise' }] }))
+    const out = d.engine.flush() // rev 3 (merged: rtn-a stays 'theirs')
+    await new Promise((r) => setTimeout(r, 30))
+    d.change((s) => renamed(s, 'rtn-a', 'mine')) // rebase: edited-on-both, lost = the server's 'theirs'
+    d.fetch.hold = null
+    release()
+    await out
+    assert.deepEqual(pending(d), [], 'the server’s own value is not queued')
+    assert.equal(d.state.routines.find((r) => r.id === 'rtn-a').name, 'mine', 'merged state as before: local wins')
+    await d.settle()
+    assert.equal(server(user).state.routines.find((r) => r.id === 'rtn-a').name, 'mine')
+    assert.deepEqual(recorded(user), [], 'nothing recorded')
+    assert.equal(listRevisions(srv.db, userId(user)).length, 4, 'login, other, the exercise, the rename — no extra')
+  })
+
   it('4. no conflicts → no extra push and no extra revision', async () => {
     const user = await newAccount()
     const d = device()

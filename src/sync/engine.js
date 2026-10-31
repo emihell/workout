@@ -80,6 +80,13 @@ const norm = (state) => JSON.parse(JSON.stringify(state))
 const bytes = (text) => new TextEncoder().encode(text).length
 const pendingList = (m) => (Array.isArray(m?.pendingConflicts) ? m.pendingConflicts : [])
 const hasConflict = (list, c) => list.some((x) => deepEqual(x, c))
+// req-268 — is a conflict's `lost` value this device's own (the merge's `mine` input, by reference)?
+function fromLocal(c, mine) {
+  if (c.lost === null || c.lost === undefined) return false
+  const value = mine[c.field]
+  if (c.id !== null && Array.isArray(value)) return value.some((r) => r === c.lost)
+  return value === c.lost
+}
 
 export function readMeta(storage) {
   try {
@@ -228,7 +235,11 @@ export function createSync({
       const mine = norm(prev)
       if (deepEqual(mine, server)) return prev
       const { state: merged, conflicts } = mergeStates(norm(sent), mine, server)
-      if (conflicts.length && addPending(conflicts) && store) schedule()
+      // DEC-155 §9 (Planner) — only what came from THIS side: the server's history already holds
+      // its own values. Told by reference to the merge's input (`mine` is a fresh copy, so a value
+      // from it is never the server's object), never by guessing.
+      const local = conflicts.filter((c) => fromLocal(c, mine))
+      if (local.length && addPending(local) && store) schedule()
       return deepEqual(merged, server) ? server : merged
     }
   }
