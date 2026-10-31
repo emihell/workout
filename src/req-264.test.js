@@ -1,6 +1,6 @@
 // req-264 — small UI fixes (DEC-155 §2):
 //  (a) Change exercise to another plan kind with no history → that kind's starting plan
-//      (pickerItem), id/notes/role/warmup kept; same kind / with history byte-identical to main.
+//      (pickerItem), id/notes/role kept, warm-up kept only to reps (DEC-155 §10); same kind / with history byte-identical to main.
 //  (b) the import sheet: Keep my history is the filled primary, Replace the secondary.
 //  (c) the Days row / delete confirm in a multi-week loop: every-week days bare.
 //  (d) the picker's empty-search grouping: Burpee under Legs; nothing else moves.
@@ -43,7 +43,7 @@ describe('req-264 (a) — changedRoutineItem across plan kinds (pure)', () => {
     assert.deepEqual(EXERCISES.map(planKind), ['reps', 'cardio', 'timed', 'timed', 'reps', 'reps'])
   })
 
-  it('AC1 strength → cardio, no history: the starting plan (1 set, no reps, rest 0), id/notes/role/warmup kept', () => {
+  it('AC1 strength → cardio, no history: the starting plan (1 set, no reps, rest 0), id/notes/role kept, warm-up dropped (DEC-155 §10)', () => {
     const out = changedRoutineItem(squatItem, 'rower', [], EXERCISES)
     console.log('strength→cardio', JSON.stringify(out))
     const start = pickerItem([], ROWER).item
@@ -55,6 +55,7 @@ describe('req-264 (a) — changedRoutineItem across plan kinds (pure)', () => {
       durations: start.durations,
       restSec: start.restSec,
       suggestedWeights: [],
+      warmup: null,
     })
     assert.deepEqual([out.sets, out.targets, out.durations, out.restSec], [1, [], [], 0])
     assert.notDeepEqual(out, mainNoHistory(squatItem, 'rower'), 'differs from main')
@@ -76,7 +77,19 @@ describe('req-264 (a) — changedRoutineItem across plan kinds (pure)', () => {
 
   it('reps → timed, no history: STARTING_SETS × the exercise\'s seconds', () => {
     const out = changedRoutineItem(squatItem, 'wallsit', [], EXERCISES)
-    assert.deepEqual([out.sets, out.targets, out.durations, out.restSec, out.notes, out.warmup], [3, [], [45, 45, 45], 90, 'n', { reps: 10 }])
+    assert.deepEqual([out.sets, out.targets, out.durations, out.restSec, out.notes, out.role, out.warmup], [3, [], [45, 45, 45], 90, 'n', 'main', null])
+  })
+
+  it('DEC-155 §10 — warm-up: to cardio / timed dropped, to reps kept, same kind unchanged', () => {
+    const warm = { reps: 10 }
+    const timedWarm = { ...plankItem, warmup: warm }
+    assert.equal(changedRoutineItem(squatItem, 'rower', [], EXERCISES).warmup, null, 'reps → cardio')
+    assert.equal(changedRoutineItem(squatItem, 'wallsit', [], EXERCISES).warmup, null, 'reps → timed')
+    assert.deepEqual(changedRoutineItem(timedWarm, 'press', [], EXERCISES).warmup, warm, 'timed → reps keeps it')
+    assert.deepEqual(changedRoutineItem(squatItem, 'legpress', [], EXERCISES).warmup, warm, 'reps → reps (same kind)')
+    assert.deepEqual(changedRoutineItem(timedWarm, 'wallsit', [], EXERCISES).warmup, warm, 'timed → timed (same kind) unchanged')
+    const cardioOut = changedRoutineItem(squatItem, 'rower', [], EXERCISES)
+    assert.deepEqual([cardioOut.notes, cardioOut.role], ['n', 'main'], 'note and role kept')
   })
 
   it('AC1 same kind (machine → machine, free → machine, timed → timed): byte-identical to main', () => {

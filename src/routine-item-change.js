@@ -6,7 +6,8 @@
 //   kg is blank (DESIGN §1 — no kg carried from the old exercise; DEC-106's Swap pattern);
 // - req-264 (DEC-155 §2) — no history, another plan kind (cardio / timed / reps, planKind) →
 //   Add's starting plan for the new exercise (pickerItem): its sets, targets, durations, rest,
-//   kg blank. A missing exercise record (either side) → the same-kind rule (no reset).
+//   kg blank. DEC-155 §10: to cardio / timed the warm-up switch is dropped (null); to reps kept.
+//   A missing exercise record (either side) → the same-kind rule (no reset).
 // Pure: the store hands in the finished workouts and the exercise records. Finished history and
 // an active workout's snapshot are never read for writing — only the routine's item changes.
 import { historyPrescription } from './history-queries.js'
@@ -26,7 +27,10 @@ export function changedRoutineItem(item, exerciseId, workouts, exercises = []) {
     const to = byId(exercises, exerciseId)
     if (changeTakesStartingPlan(from, to)) {
       const { sets, targets, durations, restSec } = pickerItem([], to).item
-      return { ...item, exerciseId, sets, targets, durations, restSec, suggestedWeights: [] }
+      const changed = { ...item, exerciseId, sets, targets, durations, restSec, suggestedWeights: [] }
+      // DEC-155 §10 — a warm-up set doesn't carry to a cardio or timed plan: dropped (null, the
+      // stored "no warm-up", model.js). To reps it stays.
+      return planKind(to) === 'reps' ? changed : { ...changed, warmup: null }
     }
     return { ...item, exerciseId, suggestedWeights: [] }
   }
