@@ -2,7 +2,7 @@
 // (state, …) → state functions for store.jsx's setState, plus the delete blast-radius
 // reads and wording the confirms show before them.
 import { buildPlannedWorkout, exerciseById, planSnapshot } from './model.js'
-import { dateKey } from './schedule.js'
+import { dateKey, mondayOf } from './schedule.js'
 import { patchExercise } from './exercise-names.js'
 import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withItemEffort, withLoggedSet } from './workout-log.js'
 import { historyPrescription, routinesUsingExercise } from './history-queries.js'
@@ -328,15 +328,22 @@ export function slotRemovedState(s, slotId) {
 // replaced; swapping back to the slot's own routine removes it ("Back to …"). Nothing else is
 // touched — not the slot, not another date's swap. `id` is made by the caller (store.jsx), so a
 // re-run updater writes the same record. An unknown slot → the same state.
-export function slotSwappedOnDateState(s, { id, slotId, date, routineId }) {
+// req-262 — `today` (a date key, from the store) prunes on write: every swap dated before the
+// Monday of today's week is dropped (no screen reads an earlier week; doneEarlier reads this
+// week's earlier days, so they stay). No `today`, or not a YYYY-MM-DD key → nothing pruned
+// (fails closed: an unreadable date would otherwise compare above every key and drop them all).
+export function slotSwappedOnDateState(s, { id, slotId, date, routineId, today = null }) {
   const slot = (s.schedule?.slots || []).find((candidate) => candidate.id === slotId)
   if (!slot) return s
-  const swaps = Array.isArray(s.schedule?.swaps) ? s.schedule.swaps : []
+  const stored = Array.isArray(s.schedule?.swaps) ? s.schedule.swaps : []
+  const firstKey = typeof today === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(today) ? dateKey(mondayOf(today)) : null
+  const swaps = firstKey ? stored.filter((swap) => !(typeof swap?.date === 'string' && swap.date < firstKey)) : stored
+  const pruned = swaps.length !== stored.length
   const current = swaps.find((swap) => swap.slotId === slotId && swap.date === date)
-  if (!current && routineId === slot.routineId) return s
-  if (current && current.routineId === routineId) return s
+  const unchanged = (!current && routineId === slot.routineId) || (current && current.routineId === routineId)
+  if (unchanged && !pruned) return s
   const rest = swaps.filter((swap) => !(swap.slotId === slotId && swap.date === date))
-  const next = routineId === slot.routineId ? rest : [...rest, { id, slotId, date, routineId }]
+  const next = unchanged ? swaps : routineId === slot.routineId ? rest : [...rest, { id, slotId, date, routineId }]
   return { ...s, schedule: { ...s.schedule, swaps: next } }
 }
 

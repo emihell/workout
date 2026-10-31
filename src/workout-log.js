@@ -13,12 +13,16 @@ export function itemKey(item) {
   return item?.routineItemId || item?.id || ''
 }
 
+// req-262 — an item with no key ('' from itemKey) or no id matches by neither: '' === '' and
+// undefined === undefined made every key-less item claim every key-less set. Such an item
+// matches by exerciseId alone (the legacy rule). Keyed items are unchanged.
 export function setsForItem(sets, item) {
   const key = itemKey(item)
+  const id = item?.id
   return (sets || []).filter(
     (set) =>
-      set.routineItemId === key ||
-      set.routineItemId === item?.id ||
+      (key !== '' && set.routineItemId === key) ||
+      (id != null && set.routineItemId === id) ||
       (!set.routineItemId && set.exerciseId === item?.exerciseId),
   )
 }

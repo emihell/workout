@@ -48,7 +48,12 @@ export function otherTodayOccurrences(todays, active, todayKey) {
 // Wed 00:10) lands on the ad hoc preview dated Wed, which no date test covers. So for
 // the ad hoc plan a same-routine workout FINISHED within the last 6 h also covers it —
 // the DEC-058 §2 window (CURRENT_WINDOW_MS), as isCurrentWorkout uses. `now` injected.
-export function finishedForPlan(workouts, plan, now = new Date()) {
+// req-262 — a left-open Finish saves finishedAt = the last set's time (finishTimeFor), often
+// > 6 h before the Save, so the window above missed it and Back offered Start again.
+// `finishedHere` ({ id, at }: the workout this tab last finished and when — the store's
+// in-memory record, never persisted or synced) covers the ad hoc plan of its routine within
+// 6 h of `at`. Absent (a reload, another device) → exactly the rule above.
+export function finishedForPlan(workouts, plan, now = new Date(), { finishedHere = null } = {}) {
   if (!plan) return null
   const sameRoutine = (w) => w.routineId === plan.routineId
   const exact = (workouts || []).find(
@@ -61,8 +66,12 @@ export function finishedForPlan(workouts, plan, now = new Date()) {
   return (
     (workouts || []).find((w) => {
       if (!w.finishedAt || !sameRoutine(w)) return false
-      const elapsed = nowMs - new Date(w.finishedAt).getTime()
-      return elapsed >= 0 && elapsed <= CURRENT_WINDOW_MS
+      const within = (ms) => {
+        const elapsed = nowMs - ms
+        return elapsed >= 0 && elapsed <= CURRENT_WINDOW_MS
+      }
+      if (within(new Date(w.finishedAt).getTime())) return true
+      return Boolean(finishedHere && w.id && finishedHere.id === w.id && within(Number(finishedHere.at)))
     }) || null
   )
 }

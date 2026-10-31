@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { uid } from './ids'
 import { commitBackup } from './exchange.js'
 import { buildPlannedWorkout, recalculatedState } from './model'
-import { clampLoopWeeks } from './schedule'
+import { clampLoopWeeks, dateKey } from './schedule'
 import { loadState, saveState } from './persistence.js'
 import {
   activePatchedState,
@@ -44,6 +44,10 @@ import { addWorkingSetToState, finishedState, finishTimeFor } from './workout-lo
 
 export function StoreProvider({ children, sync = null }) {
   const [state, setStateRaw] = useState(loadState)
+  // req-262 — the workout this tab last finished, and when ({ id, at }). In memory only: not in
+  // `state`, so never saved (saveState) or synced; a reload forgets it. Read by the preview's
+  // Back-after-Finish guard (finishedForPlan).
+  const [finishedHere, setFinishedHere] = useState(null)
 
   const setState = useCallback((updater) => {
     setStateRaw((prev) => {
@@ -75,6 +79,11 @@ export function StoreProvider({ children, sync = null }) {
 
     return {
       ...state,
+      // req-262 — a function, not a field: exportBackup(store) keeps every non-function field
+      // (exchange.js dataOnly), so a field here would land in the backup file.
+      getFinishedHere() {
+        return finishedHere
+      },
       addRoutine({ name, focus }) {
         const routine = {
           id: uid('rtn'),
@@ -163,7 +172,9 @@ export function StoreProvider({ children, sync = null }) {
       // (schedule.swaps); `routineId` = the slot's own removes the swap ("Back to …").
       swapSlotOnDate({ slotId, date, routineId }) {
         const id = uid('swap')
-        setState((s) => slotSwappedOnDateState(s, { id, slotId, date, routineId }))
+        // req-262 — today's key prunes swaps dated before this week's Monday (on write only).
+        const today = dateKey(new Date())
+        setState((s) => slotSwappedOnDateState(s, { id, slotId, date, routineId, today }))
       },
       addExercise(data) {
         // req-127 — the record is built by exerciseFromData (exercise-names.js), unchanged.
@@ -267,6 +278,7 @@ export function StoreProvider({ children, sync = null }) {
       // Date, an event object) → computed here at save time, as before.
       finishWorkout(args, finishedAt) {
         const given = typeof finishedAt === 'string' && Number.isFinite(Date.parse(finishedAt)) ? finishedAt : null
+        if (state.activeWorkout?.id) setFinishedHere({ id: state.activeWorkout.id, at: Date.now() })
         setState((s) => finishedState(s, args, given ?? finishTimeFor(s.activeWorkout, Date.now()).finishedAt))
       },
       // req-115 — validate + migrate first, then set; a bad file throws to the caller.
@@ -275,7 +287,7 @@ export function StoreProvider({ children, sync = null }) {
         return commitBackup(payload, setState, { keepHistory, current: state })
       },
     }
-  }, [state, setState])
+  }, [state, setState, finishedHere])
 
   return <StoreContext.Provider value={api}>{children}</StoreContext.Provider>
 }

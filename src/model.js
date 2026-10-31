@@ -469,12 +469,15 @@ export function progressionForItem(exercises, workout, item) {
     sets: workSets,
     exercise,
   })
+  // req-262 — a cardio item keeps its own plan: the recommendation's kg/reps (`[0]` / `[""]`
+  // from a duration set) are data the user never entered, so Apply writes the item's own back.
+  const ownPlan = !sets.length || exercise?.type === 'cardio'
   return {
     routineItemId: itemIdValue,
     sets,
     recommendation,
-    to: sets.length ? recommendation.weights : item.suggestedWeights || [],
-    targetsTo: sets.length ? recommendation.targets : item.targets || [],
+    to: ownPlan ? item.suggestedWeights || [] : recommendation.weights,
+    targetsTo: ownPlan ? item.targets || [] : recommendation.targets,
   }
 }
 
