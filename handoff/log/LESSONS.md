@@ -647,3 +647,10 @@ getter (req-262's `getFinishedHere()`), never as a plain field on the store.
 `scripts/req-164-golden.mjs` / `req-165-golden.mjs` threw on every tree since req-178 (they `JSON.parse` every stored value;
 req-178's fill marker is a plain timestamp). No gate runs them, so nobody saw. req-269 fixed the read. A script kept as a
 check either runs in `./check` or is deleted; candidate → BACKLOG §Tooling.
+
+## L-072 — a req that changes `plan` and `check_handoff.py` together trips its own closeout  (Planner, 2026-10-31, req-272)
+
+Closeout runs the merged `plan` (code worktree), whose `plan save` calls the planning worktree's `check_handoff.py` — still
+the old one until publish. req-272's new `--only doc-limits` flag → "unrecognized arguments" → refused after the local merge.
+Recovery: the planning worktree's own `./plan save` + `./plan publish` (brings the new scripts in), then re-run closeout
+(idempotent). For a req touching both: expect it, or have `plan` tolerate an older `check_handoff.py`.
