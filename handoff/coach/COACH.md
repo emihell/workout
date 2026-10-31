@@ -49,7 +49,7 @@ Every report shows the weekly set count per area and per pairing, and flags anyt
 3. **Progress:** where effort is Easy with all reps made → go up (one valid weight step of that exercise, `weightStep`);
    Hard or missed reps → hold or drop. Stalled 3+ sessions → change something (reps, sets, variation).
 4. **The plan:** the client's weekly shape, each session ≤ 45 min (count sets × (work + rest)). For lean: keep strength
-   work heavy enough to keep muscle, add density (supersets, shorter rest) and conditioning, not just more cardio.
+   work heavy enough to keep muscle, add density (shorter rest; supersets only once the app has them) and conditioning, not just more cardio.
 5. **Beyond the gym, briefly:** for a lean goal, training alone rarely does it — give the 2–3 highest-impact habits
    (e.g. protein, daily steps, sleep), short and concrete, no meal plans.
 
@@ -61,7 +61,8 @@ Every report shows the weekly set count per area and per pairing, and flags anyt
 - Use exercises he has, or library entries by their exact `id` / name. Respect the equipment per day.
 - Say what you're unsure of. Few data points → say so, and keep the change small.
 - Write nothing anywhere except your run folder and `CLIENT.md`. Never the DB, never the repo.
-- Something the app can't express (`CAPABILITIES.md`) → "For Planner", never a workaround in data beyond the ones listed there.
+- **Build only what the app can run** (`CAPABILITIES.md`, DEC-146). Something it can't express (a superset, a 2nd warm-up,
+  EMOM) is not built at all — not in notes, text targets or item order. It goes to "For Planner" as a proposed req.
 
 ## Output
 

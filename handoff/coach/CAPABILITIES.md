@@ -4,8 +4,8 @@ What the app can express today, for Coach to build plans from without reading `s
 `reference/schema.md`; this file says what each field means **for a plan** and where the limits are. Planner owns it and
 updates it when a req ships something new. Measured 2026-10-31 from rev 78 and `main` `a82e735`.
 
-**Not here = not possible.** If a plan needs something this file doesn't list, don't approximate it in data: write it
-under "For Planner" in the report (what, why, the data), and use the listed workaround meanwhile.
+**Not here = not possible.** If a plan needs something this file doesn't list, don't approximate it in data and don't build
+it: write it under "For Planner" in the report (what, why, the data). There are no workarounds (DEC-146).
 
 ## The pieces
 
@@ -33,13 +33,20 @@ under "For Planner" in the report (what, why, the data), and use the listed work
 
 ## Limits and workarounds
 
-| Can't express | Workaround now | Status |
+**A plan uses only what the workout can run as built (DEC-146).** Something the app can't express is **not built at all**
+— no notes, text targets or item order standing in for it. Plan without it, and write it under "For Planner" in the report
+(what, why, the data) so it becomes a req. Run 4 is why: planned supersets written as notes were done as straight sets
+(≈55 min, not ≈43) and the last pair and the finisher fell off.
+
+| Can't express | In a plan now | Status |
 |---|---|---|
-| Superset / circuit (items alternated set by set) | Put them next to each other; say "superset with X, alternate" in `notes`. The workout lets him jump between items. | Asked for by Emilio (28 Oct notes); req-184 item 15, Phase 2 |
-| More than one warm-up set | One `warmup` + say "2nd warm-up: …" in `notes` | — |
-| Warm-up kg | Leave to him; a note may suggest "about half" | — |
-| EMOM / intervals as a type | `targets` text (`"EMOM 5 × 12"`, `"6 × 30 s / 30 s"`) | — |
-| Technique cues per exercise from a plan | Put cues in the exercise's `cues`, not in item `notes` | Emilio: "notes here that should be set in the actual exercise" |
+| Superset / circuit (items alternated set by set) | Don't build one: straight sets only; the time saving goes to "For Planner" | Req candidate (BACKLOG §Phase 1); req-184 item 15 |
+| More than one warm-up set | One `warmup` only; no "2nd warm-up" in `notes` | req-184 item 10 |
+| Warm-up kg | Not planned; he picks it | req-184 item 10 |
+| EMOM / intervals as a type (a timer per round) | Don't build one; "For Planner" `(unconfirmed: whether a text target like "6 × 30 s / 30 s" counts as runnable — Emilio)` | — |
+
+**Where things belong:** technique cues go in the exercise's `cues`, not in item `notes` (Emilio: "notes here that should
+be set in the actual exercise"). Item `notes` say something about this item in this routine, never a missing feature.
 
 **What the app's recommendation reads:** only plain-number targets and logged kg/reps/effort. A range, AMRAP, duration or
 text target holds (schema.md §Recommendation).

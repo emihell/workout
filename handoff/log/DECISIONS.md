@@ -2297,3 +2297,15 @@ relay that owrk to planner/builder" → Planner's proposal (both, split on "can 
 4. **Next, a Builder req (queued, BACKLOG §Tooling):** a fixed plan-builder tool, a short change list → a checked plan file
    for `./server/ops plan`, so Coach stops writing a build script against `src/` each run. Until then, runs do as run 4 did.
 5. Unchanged: Coach never writes the DB; `ops plan apply` asks Emilio (DEC-141/142). History is never changed.
+
+## DEC-146 — Coach builds only what the app can run; a missing feature becomes a req, never a workaround  (Emilio, 2026-10-31)
+
+Emilio: "coach also needs deep knoledge on how to build workouts in the app, an example is the superset notes it gave me, if
+the app does not have built in superset functionality, for a smooth trnasition between excersises, then it should not build
+super set workouts, instead, it should prupose a enw req, build superset functionality in the app".
+1. Tightens DEC-145 §3: `CAPABILITIES.md` lists **no workarounds**. A structure the workout can't run (superset, circuit, a
+   2nd warm-up, EMOM) is not built — not as `notes`, text targets or item order. Coach plans without it and proposes the
+   feature under "For Planner" → a req.
+2. Why (run 4): supersets written as notes were done as straight sets (≈55 min vs ≈43 planned); the finisher fell off.
+3. Supersets → a req candidate (BACKLOG §Phase 1). `(unconfirmed)`: whether a text target like "6 × 30 s / 30 s" counts as
+   runnable.
