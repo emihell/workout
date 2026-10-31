@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · DEC-155 §2 (Ex N), DEC-125 §3, DEC-104/107, DEC-102 §2. Fix batch (DEC-155): before req-262
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-261` (`88d1278`…`e686fe7`, 3 commits).** · **Lane: bug** · DEC-155 §2 (Ex N), DEC-125 §3, DEC-104/107, DEC-102 §2. Fix batch (DEC-155): before req-262
 (both touch `src/workout-log.js`). Touches `workout-log.js` → reviewer (WORKFLOW check 5); no stored records rewritten → no backup reminder.
 
 # req-261 — "Ex N" is the open exercise; one tap on Add commits once; Sets has a ceiling

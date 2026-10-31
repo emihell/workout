@@ -2429,3 +2429,7 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
 7. **Widened, standing** (Emilio: "i always want to prioratize workflow/architecture/project/files/structure/cleanups - before
    we do any new function"): structure, workflow and cleanup work joins fixes ahead of every feature. Overrides DEC-144 §4
    ("DECISIONS split + digest: after Phase 1"): the workflow "later" list is specced now (req-271, req-272).
+8. **req-268/271/272 calls, Planner's recommendations accepted** (Emilio: "your rec"): a set logged on device B after
+   device A finished that workout is not added to it — it survives only in the server's conflict record (DEC-133 r5, DEC-143);
+   DECISIONS.md stays the entry point (digest + generated index, full entries in range files); Emilio re-pastes one grants
+   line once after req-272; a rule doc over its size limit blocks `plan save`/`publish` until raised with a reason.

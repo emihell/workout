@@ -64,6 +64,11 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 - **Tips during rest** (generic form/motivation tips) — parked (DEC-108 §6): no evidence it helps, needs a cited tip set.
 - **req-77 active-workout affordance** — PAUSED (Emilio, 2026-09-16). Don't raise it until he revives it.
 
+- **Sets can pass 20 through history** (req-261 review, latent): Add set has no cap (`workout-log.js:105`), and the history
+  prescription copies `sets: work.length` (`history-queries.js:253`) into a new routine item → a 21-set item that the editor
+  then refuses to save, and C4 refuses when touched. Masked: no workout has > 20 work sets. Cap Add set, or clamp the copy.
+- **Pill N vs a "· swapped" row** (req-261 review, nit): after swapping item 1 of 9 the replacement is the 2nd row on the
+  overview but the pill says "Ex 1 of 9" (N counts items, not on-screen rows). Feel check for Emilio.
 **Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
 one is specced.
 - → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).

@@ -68,7 +68,7 @@ The same merge runs in the app when it rebases a change made during a sync (`src
 
 ## Decisions made on Emilio's behalf
 
-- *(unconfirmed)* B's set logged after A finished is **not** added to the finished workout; it survives only in the
+- *(confirmed DEC-155 §8)* B's set logged after A finished is **not** added to the finished workout; it survives only in the
   server's conflict record (as DEC-133 round 5 does for the no-base case; DEC-143 accepts multi-device losses). Emilio
   sees: the workout is finished on both devices; the late set is not in History.
 - Implementation: one shared helper; conflict kind `finished-elsewhere` for the three-way path.
