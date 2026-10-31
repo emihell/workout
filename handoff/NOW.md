@@ -39,6 +39,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 
 ## Needs decisions — parked until their phase
 
+- req-267 Researcher MVP (design; "not now … an mvp of it soon"): 5 questions. After the fix batch.
 - req-149 progression rules (Emilio, DEC-075).
 - req-184 creation design session 2: the program model (Phase 2).
 - req-146 stages 2–3: accounts, sharing, privacy, AI cost (Phase 3).
