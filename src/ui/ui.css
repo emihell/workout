@@ -507,10 +507,11 @@ html:has(.ui-picker-strip) {
 /* req-264 — a label beside a value gets a floor, so a long value can't squeeze it to a letter
  * per line [measured: "Da/ys" beside "Mon, Wed, Thu (week 2) and Fri" at 390px; main breaks it
  * too]. req-123's `anywhere` stays, so one word longer than the label still breaks inside it
- * and never widens the page (a `break-word` + cap version overflowed link rows: review round 2). */
+ * and never widens the page (a `break-word` + cap version overflowed link rows: review round 2).
+ * 3.5em, not 5em: at 320px "Days · Not scheduled · Change" pushed Change 17px out at 5em. */
 .ui-row > span:first-child:has(+ .ui-row__value),
 .ui-row__link > .ui-row__label:has(+ .ui-row__value) {
-  min-width: min(5em, 40%);
+  min-width: min(3.5em, 40%);
 }
 /* req-207 — a row with several actions (the day screen's Start now · ⋯, req-208): when they
  * don't fit beside the name, they wrap to their own line (right-aligned) instead of squeezing
