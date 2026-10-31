@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # handoff/ is written by the planning session, not by code agents.
-# Emilio lands planning changes with:  HANDOFF=1 git commit ...
+# Planning changes land through `./plan save "msg"` from the planning worktree; it sets
+# the HANDOFF bypass below itself (L-032: never a raw git commit, never a hand-set bypass).
 if [ -n "$HANDOFF" ]; then
   exit 0
 fi
@@ -13,7 +14,7 @@ if [ -n "$staged" ]; then
   echo >&2
   echo "If a code agent did this, recover with:" >&2
   echo "  git restore --staged --worktree handoff/" >&2
-  echo "If this is intentional planning work:" >&2
-  echo "  HANDOFF=1 git commit ..." >&2
+  echo "If this is intentional planning work, save it from the planning worktree:" >&2
+  echo "  ./plan save \"message\"" >&2
   exit 1
 fi

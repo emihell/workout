@@ -60,6 +60,11 @@ function fixture() {
   const root = mkdtempSync(join(tmpdir(), 'req-271-'))
   mkdirSync(join(root, 'handoff/log'), { recursive: true })
   writeFileSync(join(root, 'handoff/log/DECISIONS.md'), HEADER + ENTRIES)
+  // req-272: check_handoff fails a repo with no doc-size table; one fixture doc at its ceiling.
+  mkdirSync(join(root, 'handoff/rules'), { recursive: true })
+  mkdirSync(join(root, 'scripts'), { recursive: true })
+  writeFileSync(join(root, 'handoff/rules/RULE.md'), '# rule\n')
+  writeFileSync(join(root, 'scripts/doc_limits.json'), '{ "docs": { "handoff/rules/RULE.md": { "ceiling": 1, "reason": "fixture" } } }\n')
   return root
 }
 const read = (root, p) => readFileSync(join(root, p), 'utf8')

@@ -1,0 +1,73 @@
+{
+  "_about": "req-272 doc-size ratchet, read by scripts/check_handoff.py (check 6) and ./plan save. A doc over its ceiling fails. Raise a ceiling only in the same commit as the growth, with a new non-empty reason. Never listed: handoff/log/, handoff/work/req-*, reports/, NOW.md.",
+  "docs": {
+    "handoff/PLANNING.md": {
+      "ceiling": 393,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/rules/WORKFLOW.md": {
+      "ceiling": 344,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/work/BACKLOG.md": {
+      "ceiling": 241,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/reference/PAGES.md": {
+      "ceiling": 192,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/reference/schema.md": {
+      "ceiling": 159,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/rules/DESIGN.md": {
+      "ceiling": 149,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "README.md": {
+      "ceiling": 146,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/rules/AUDIT.md": {
+      "ceiling": 143,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/CLAUDE.md": {
+      "ceiling": 128,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/coach/CAPABILITIES.md": {
+      "ceiling": 118,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/coach/EVIDENCE.md": {
+      "ceiling": 118,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/coach/COACH.md": {
+      "ceiling": 111,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/BUILDER.md": {
+      "ceiling": 102,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/rules/CLOSEOUT.md": {
+      "ceiling": 80,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/coach/GOALS.md": {
+      "ceiling": 59,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/rules/BACKEND.md": {
+      "ceiling": 40,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    },
+    "handoff/coach/LESSONS.md": {
+      "ceiling": 29,
+      "reason": "req-272 baseline: line count on main 2026-10-31"
+    }
+  }
+}

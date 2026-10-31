@@ -67,8 +67,9 @@ git worktree add ../workout-planning planning
 #     (machine-local, gitignored by design — recreate on every machine)
 #     Written with printf, not a heredoc: a heredoc's closing word breaks the
 #     moment a paste indents it, and this line survives any indentation.
+#     No git commit/reset grant: ./plan save runs both itself (L-032, req-272).
 mkdir -p ../workout-planning/.claude
-printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git commit:*)", "Bash(git reset:*)", "Bash(git restore:*)", "Bash(git push origin planning:*)", "Bash(git push origin main planning:*)", "Bash(../workout-codebase/plan save:*)", "Bash(../workout-codebase/plan status:*)", "Bash(../workout-codebase/plan publish:*)", "Bash(../workout-codebase/plan closeout:*)" ] } }' > ../workout-planning/.claude/settings.local.json
+printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git restore:*)", "Bash(git push origin planning:*)", "Bash(git push origin main planning:*)", "Bash(./plan save:*)", "Bash(./plan status:*)", "Bash(./plan publish:*)", "Bash(./plan closeout:*)", "Bash(../workout-codebase/plan save:*)", "Bash(../workout-codebase/plan status:*)", "Bash(../workout-codebase/plan publish:*)", "Bash(../workout-codebase/plan closeout:*)" ] } }' > ../workout-planning/.claude/settings.local.json
 
 # 6 — verify the whole setup: checks layout, hooks, deps, grants and git
 #     identity, then prints status. Every line should read `ok`; a `FIX:` line

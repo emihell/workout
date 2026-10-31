@@ -237,6 +237,21 @@ cmd_save() {
     fi
   fi
 
+  # req-272: the doc-size ratchet, on the working tree, before anything is staged — like the
+  # NOW.md guard above. Ceilings come from scripts/doc_limits.json via check_handoff (never
+  # restated here); a raise is compared against HEAD's table. Warnings ("tighten to N") print
+  # and don't block.
+  local ratchet_out
+  if ! ratchet_out="$(python3 "$PLANNING_DIR/scripts/check_handoff.py" --repo "$PLANNING_DIR" --only doc-limits --worktree)"; then
+    echo "plan save: refusing — the doc-size ratchet (scripts/doc_limits.json); nothing staged:" >&2
+    printf '%s\n' "$ratchet_out" | sed 's/^/  /' >&2
+    exit 1
+  fi
+  if [ -n "$ratchet_out" ]; then
+    echo "plan save: doc-size notes (non-blocking):" >&2
+    printf '%s\n' "$ratchet_out" | sed 's/^/  /' >&2
+  fi
+
   # req-271: DECISIONS.md's DEC index is generated from the range files (handoff/log/decisions/
   # *.md). When one changed (staged, unstaged or new), regenerate it before the commit so the
   # committed index is never stale. A refusal (a malformed heading, an entry with no date) writes
@@ -259,7 +274,9 @@ cmd_save() {
   fi
 
   local outside
-  outside="$(printf '%s\n' "$staged" | grep -v '^handoff/' || true)"
+  # req-272: the ratchet's limits table rides with handoff/ — a ceiling is raised in the same
+  # save as the growth that needs it.
+  outside="$(printf '%s\n' "$staged" | grep -v '^handoff/' | grep -vx 'scripts/doc_limits.json' || true)"
 
   if [ -n "$outside" ]; then
     git reset >/dev/null
@@ -328,6 +345,15 @@ cmd_publish() {
     echo "plan publish: refusing — the test gate (./check) failed on $CODE_DIR." >&2
     echo "plan publish: fix the suite, or bypass explicitly:" >&2
     echo "  WORKOUT_SKIP_CHECK=1 ./plan publish" >&2
+    exit 1
+  fi
+
+  # req-272 (DEC-155 §8): the doc-size ratchet blocks, unlike the drift warning below. Checked
+  # on planning, before the merge, with main as the base a raised ceiling is compared against.
+  local ratchet_out
+  if ! ratchet_out="$(python3 "$CODE_DIR/scripts/check_handoff.py" --repo "$CODE_DIR" --ref planning --base main --only doc-limits)"; then
+    echo "plan publish: refusing — the doc-size ratchet failed on planning; nothing merged:" >&2
+    printf '%s\n' "$ratchet_out" | sed 's/^/  /' >&2
     exit 1
   fi
 
@@ -1286,28 +1312,41 @@ cmd_doctor() {
   # 4. Grants — the planning session's machine-local permissions file exists AND
   #    its permissions.allow matches the canonical grant set exactly (catches
   #    content drift: a stale, narrowed, or over-broad list — DEC-028 follow-up).
-  #    The canonical list below is the ten grants from README §Setup step 5
+  #    The canonical list below is the grant line in README §Setup step 5
   #    (DEC-005 / DEC-026). KEEP IN SYNC WITH README §Setup step 5 — the one
-  #    coupling: if the grants there change, change them here too.
+  #    coupling; src/req-272.test.js fails when the two differ.
+  #    req-272 (L-032, DEC-155 §8): no `git commit:*` / `git reset:*` — `plan save` runs both
+  #    inside the script, and a grant matches the Bash call (`… plan save:*`), not what it
+  #    runs. Both `./plan …` (what Planner types in the planning worktree) and the
+  #    `../workout-codebase/plan …` form.
   if [ -n "$pd" ]; then
     local grants_file="$pd/.claude/settings.local.json"
+    local canonical_grants=(
+      'Bash(git add:*)'
+      'Bash(git restore:*)'
+      'Bash(git push origin planning:*)'
+      'Bash(git push origin main planning:*)'
+      'Bash(./plan save:*)'
+      'Bash(./plan status:*)'
+      'Bash(./plan publish:*)'
+      'Bash(./plan closeout:*)'
+      'Bash(../workout-codebase/plan save:*)'
+      'Bash(../workout-codebase/plan status:*)'
+      'Bash(../workout-codebase/plan publish:*)'
+      'Bash(../workout-codebase/plan closeout:*)'
+    )
+    # The exact line to paste, built from the list (README carries the same JSON).
+    local grants_json="" g
+    for g in "${canonical_grants[@]}"; do
+      grants_json="${grants_json:+$grants_json, }\"$g\""
+    done
+    local paste_line
+    paste_line="printf '%s\\n' '{ \"permissions\": { \"allow\": [ $grants_json ] } }' > '$grants_file'"
     if [ ! -f "$grants_file" ]; then
-      echo "FIX: grants — no .claude/settings.local.json in the planning worktree ($pd)."
-      echo "     Re-paste the grant block from README §Setup step 5."
+      echo "FIX: grants — no .claude/settings.local.json in the planning worktree ($pd). Paste (README §Setup step 5):"
+      echo "     $paste_line"
       fail=1
     else
-      local canonical_grants=(
-        'Bash(git add:*)'
-        'Bash(git commit:*)'
-        'Bash(git reset:*)'
-        'Bash(git restore:*)'
-        'Bash(git push origin planning:*)'
-        'Bash(git push origin main planning:*)'
-        'Bash(../workout-codebase/plan save:*)'
-        'Bash(../workout-codebase/plan status:*)'
-        'Bash(../workout-codebase/plan publish:*)'
-        'Bash(../workout-codebase/plan closeout:*)'
-      )
       # python3 is already a dependency (scripts/check_handoff.py). Read
       # permissions.allow as JSON and diff (order-independent set comparison);
       # a malformed/unreadable file returns a PARSE line, never a stack trace.
@@ -1343,12 +1382,14 @@ PY
           ;;
         DRIFT)
           echo "FIX: grants — ${rest//$'\t'/; }"
-          echo "     Re-paste the grant block from README §Setup step 5."
+          echo "     Paste (replaces the file; README §Setup step 5):"
+          echo "     $paste_line"
           fail=1
           ;;
         *)
           echo "FIX: grants — could not read permissions.allow from $grants_file: $rest"
-          echo "     Re-paste the grant block from README §Setup step 5."
+          echo "     Paste (replaces the file; README §Setup step 5):"
+          echo "     $paste_line"
           fail=1
           ;;
       esac

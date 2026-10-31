@@ -36,7 +36,10 @@ cd "$CODE"
 git config user.email t@example.com
 git config user.name  tester
 git symbolic-ref HEAD refs/heads/main
-mkdir -p handoff/work
+mkdir -p handoff/work handoff/rules scripts
+# req-272: the doc-size ratchet needs its limits table (missing = a failure); one fixture doc at its ceiling.
+printf '# rule\n' > handoff/rules/RULE.md
+printf '{ "docs": { "handoff/rules/RULE.md": { "ceiling": 1, "reason": "fixture" } } }\n' > scripts/doc_limits.json
 
 # a code file, so landing commits touch something outside handoff/ (the
 # planning session's own handoff-only commits are not merge evidence).

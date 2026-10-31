@@ -34,6 +34,10 @@ cp "$ROOT/scripts/dec_index.py" scripts/dec_index.py   # req-271: check_handoff 
 cp "$ROOT/.nvmrc" .nvmrc   # req-257: ping now prints `plan brief`, which reads .nvmrc
 printf '# Now\n\nUpdated. **Shipped: req-01.**\n**Next:** build req-050 (fixture)\n' > handoff/NOW.md
 printf '# spec\n' > handoff/work/req-050-onmain.md
+# req-272: the doc-size ratchet's table (missing = a failure); one fixture rule doc, 3 lines, ceiling 3.
+mkdir -p handoff/rules
+printf 'a\nb\nc\n' > handoff/rules/RULE.md
+printf '{ "docs": { "handoff/rules/RULE.md": { "ceiling": 3, "reason": "fixture baseline" } } }\n' > scripts/doc_limits.json
 git add -A
 git commit -qm init
 PLAN="$CODE/plan"
@@ -166,6 +170,70 @@ after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
   && ok "save at 50 lines commits normally (exit $rc)" \
   || bad "save at 50 lines should commit — rc=$rc out=$out"
 
+echo "# save — req-272: a rule doc 1 line past its ceiling → refuse before staging, working tree untouched"
+before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+( cd "$PLAN_WT" && printf 'd\n' >> handoff/rules/RULE.md )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked" 2>&1)"; rc=$?
+after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+status="$(cd "$PLAN_WT" && git status --porcelain handoff/rules/RULE.md)"
+{ [ $rc -ne 0 ] && [ "$before" = "$after" ] \
+    && printf '%s' "$out" | grep -q 'plan save: refusing — the doc-size ratchet' \
+    && printf '%s' "$out" | grep -qF 'handoff/rules/RULE.md — is 4 lines, over its ceiling of 3' \
+    && [ "$status" = ' M handoff/rules/RULE.md' ] \
+    && [ -z "$(git -C "$PLAN_WT" diff --cached --name-only)" ]; } \
+  && ok "save refuses at ceiling+1: no commit, nothing staged, RULE.md still ' M' (exit $rc)" \
+  || bad "save should refuse past the ceiling — rc=$rc status='$status' out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+
+echo "# save — req-272: the ceiling raised with an empty reason → refuse; with a new reason → commits table + doc"
+( cd "$PLAN_WT" && printf '{ "docs": { "handoff/rules/RULE.md": { "ceiling": 4, "reason": "" } } }\n' > scripts/doc_limits.json )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked" 2>&1)"; rc=$?
+{ [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'empty "reason"'; } \
+  && ok "save refuses a raise with an empty reason (exit $rc)" || bad "empty reason should refuse — rc=$rc out=$out"
+( cd "$PLAN_WT" && printf '{ "docs": { "handoff/rules/RULE.md": { "ceiling": 4, "reason": "fixture baseline" } } }\n' > scripts/doc_limits.json )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked" 2>&1)"; rc=$?
+{ [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'ceiling raised 3 → 4 with the old "reason"'; } \
+  && ok "save refuses a raise that keeps the old reason (exit $rc)" || bad "same-reason raise should refuse — rc=$rc out=$out"
+( cd "$PLAN_WT" && printf '{ "docs": { "handoff/rules/RULE.md": { "ceiling": 4, "reason": "fixture: a 4th rule line" } } }\n' > scripts/doc_limits.json )
+out="$(cd "$PLAN_WT" && "$PLAN" save "raise RULE ceiling" 2>&1)"; rc=$?
+files="$(git -C "$PLAN_WT" show --name-only --format= HEAD)"
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'committed' \
+    && printf '%s\n' "$files" | grep -qx 'scripts/doc_limits.json' \
+    && printf '%s\n' "$files" | grep -qx 'handoff/rules/RULE.md'; } \
+  && ok "save with a reasoned raise commits the table and the doc together (exit $rc)" \
+  || bad "a reasoned raise should commit — rc=$rc files=$files out=$out"
+
+echo "# save — req-272: scripts/ files other than doc_limits.json are still refused"
+( cd "$PLAN_WT" && printf 'x\n' > scripts/other.txt )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked" 2>&1)"; rc=$?
+{ [ $rc -ne 0 ] && printf '%s' "$out" | grep -q 'scripts/other.txt' && ! printf '%s' "$out" | grep -q 'doc_limits'; } \
+  && ok "save still refuses scripts/other.txt outside handoff/ (exit $rc)" || bad "other scripts/ file should refuse — rc=$rc out=$out"
+( cd "$PLAN_WT" && rm -f scripts/other.txt )
+
+echo "# doctor — req-272: grants without git commit/reset → ok; the old ten-grant file → FIX + the line to paste"
+mkdir -p "$PLAN_WT/.claude"
+new_line="$(grep -E "^printf '%s\\\\n' '\\{ \"permissions\"" "$ROOT/README.md")"
+( cd "$PLAN_WT" && eval "${new_line/..\/workout-planning\/.claude\/settings.local.json/.claude/settings.local.json}" )
+out="$(cd "$CODE" && "$PLAN" doctor 2>&1)"
+printf '%s\n' "$out" | grep -q '^ok   grants — .* matches all 12 canonical grants' \
+  && ok "doctor: README's grant line (no git commit/reset) → ok grants" \
+  || bad "doctor should accept README's grant line — $(printf '%s\n' "$out" | grep grants)"
+printf '%s\n' "$out" | grep 'grants' | sed 's/^/    | /'
+printf '%s\n' '{ "permissions": { "allow": [ "Bash(git add:*)", "Bash(git commit:*)", "Bash(git reset:*)", "Bash(git restore:*)", "Bash(git push origin planning:*)", "Bash(git push origin main planning:*)", "Bash(../workout-codebase/plan save:*)", "Bash(../workout-codebase/plan status:*)", "Bash(../workout-codebase/plan publish:*)", "Bash(../workout-codebase/plan closeout:*)" ] } }' > "$PLAN_WT/.claude/settings.local.json"
+out="$(cd "$CODE" && "$PLAN" doctor 2>&1)"
+paste="$(printf '%s\n' "$out" | grep -A2 '^FIX: grants' | tail -1 | sed 's/^     //')"
+{ printf '%s\n' "$out" | grep -q '^FIX: grants — missing: Bash(./plan closeout:\*)' \
+    && printf '%s\n' "$out" | grep -q 'extra: Bash(git commit:\*), Bash(git reset:\*)' \
+    && [ "${paste%% > *}" = "${new_line%% > *}" ]; } \
+  && ok "doctor: the old file → FIX: grants, and the printed paste line carries README's JSON" \
+  || bad "doctor old grants — paste=[$paste] out=$(printf '%s\n' "$out" | grep -A2 grants)"
+printf '%s\n' "$out" | grep -A2 '^FIX: grants' | sed 's/^/    | /'
+( cd "$PLAN_WT" && eval "$paste" )
+out="$(cd "$CODE" && "$PLAN" doctor 2>&1)"
+printf '%s\n' "$out" | grep -q '^ok   grants' \
+  && ok "doctor: running the printed paste line → ok grants" || bad "the printed line should fix it — $(printf '%s\n' "$out" | grep grants)"
+rm -rf "$PLAN_WT/.claude"
+
 echo "# save — req-271: a changed handoff/log/decisions/ file → the DEC index is regenerated into the commit"
 ( cd "$PLAN_WT" && mkdir -p handoff/log/decisions \
     && printf '# Decisions\n\n## Current rules digest\n\n- a rule → **DEC-001**\n\n---\n\n## Decision index\n\n(stale)\n' > handoff/log/DECISIONS.md \
@@ -223,6 +291,17 @@ out="$(cd "$PLAN_WT" && "$PLAN" publish 2>&1)"; rc=$?
 out="$(cd "$CODE" && "$PLAN" status 2>&1)"; rc=$?
 [ $rc -eq 0 ] && ok "status also runs with the nested worktree present (exit $rc)" || bad "status — rc=$rc out=$out"
 git -C "$CODE" worktree remove --force "$CODE/.claude/worktrees/zz-agent-req120"
+
+echo "# publish — req-272: a planning commit past a ceiling (committed around save) → refuse, nothing merged"
+( cd "$PLAN_WT" && printf 'e\n' >> handoff/rules/RULE.md && git add -A && HANDOFF=1 git commit -qm "grow past ceiling" )
+before="$(git -C "$CODE" rev-parse main)"
+out="$(cd "$PLAN_WT" && "$PLAN" publish 2>&1)"; rc=$?
+{ [ $rc -ne 0 ] && [ "$before" = "$(git -C "$CODE" rev-parse main)" ] \
+    && printf '%s' "$out" | grep -q 'plan publish: refusing — the doc-size ratchet failed on planning' \
+    && printf '%s' "$out" | grep -qF 'RULE.md — is 5 lines, over its ceiling of 4'; } \
+  && ok "publish refuses past a ceiling, main unmoved (exit $rc)" || bad "publish should refuse — rc=$rc out=$out"
+printf '%s\n' "$out" | grep -A1 'ratchet' | sed 's/^/    | /'
+( cd "$PLAN_WT" && git reset -q --hard HEAD~1 )
 
 echo "# save — local planning BEHIND origin/planning (req-249) → refuse, commit nothing; level → commits"
 # A fake origin (bare repo in the sandbox) and a second clone that pushes one commit to its
