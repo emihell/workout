@@ -2433,3 +2433,6 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
    device A finished that workout is not added to it — it survives only in the server's conflict record (DEC-133 r5, DEC-143);
    DECISIONS.md stays the entry point (digest + generated index, full entries in range files); Emilio re-pastes one grants
    line once after req-272; a rule doc over its size limit blocks `plan save`/`publish` until raised with a reason.
+9. **No silent-loss path in sync** (req-268 review finding 2; Emilio: "your rec" → option a): when the app's own rebase
+   (`rebaseOnto`, `src/sync/engine.js:201-207`) drops a value, its conflicts reach the server's conflict record too, so §8's
+   "survives only in the server's conflict record" holds on every path. Fixed inside req-268, not as a follow-up.
