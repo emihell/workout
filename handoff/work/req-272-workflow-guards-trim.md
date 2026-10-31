@@ -70,10 +70,10 @@ lines in 36 days (+33.5%). The workflow plan's "later" row adds a "doc-size ratc
 
 ## Decisions made on Emilio's behalf
 
-- `(unconfirmed)` **Grants** (audit: "[Emilio: grants]"): option (a) — remove `git commit:*`/`git reset:*`; add the `./plan`
+- (confirmed DEC-155 §8) **Grants** (audit: "[Emilio: grants]"): option (a) — remove `git commit:*`/`git reset:*`; add the `./plan`
   forms. **His step changes:** he re-pastes one grants line (the report gives it), because the file is his and build
   agents can't edit it.
-- `(unconfirmed)` **Ratchet blocks, not warns:** growth past a ceiling stops `plan publish` until the ceiling is raised
+- (confirmed DEC-155 §8) **Ratchet blocks, not warns:** growth past a ceiling stops `plan publish` until the ceiling is raised
   with a reason. Planner's habit changes, not Emilio's.
 - Implementation: the table format, the 10 % tighten threshold, which docs are covered.
 

@@ -79,7 +79,7 @@ lines, add 091/094/095/127/128/141/143/144/155); point CLAUDE.md:91, WORKFLOW:16
 ## Decisions made on Emilio's behalf
 
 - Implementation: range files of 50, the index format, the generator run by `plan save`.
-- `(unconfirmed)` — Emilio reading decisions: `DECISIONS.md` stays the entry point (digest + index); a full entry opens
+- (confirmed DEC-155 §8) — Emilio reading decisions: `DECISIONS.md` stays the entry point (digest + index); a full entry opens
   from its range file. His steps don't otherwise change.
 
 ## Siblings
