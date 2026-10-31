@@ -141,12 +141,12 @@ export function importMode(answer, preview) {
 export const HISTORY_CHANGED_TITLE = 'This file changes your logged history'
 export const KEEP_HISTORY_LINE =
   'Keep my history takes the workouts, exercises and schedule from the file and keeps your logged history on this device as it is. A copy of your current data downloads first.'
-// Review round 1 — "Replace everything" wears the sheet's destructive look (ink-filled, as the
-// confirm's Replace / Delete button; the library has no separate danger variant, DEC-017).
-// Keep my history stays first and is the default answer (`true`).
+// req-264 (DEC-155 §2, reversing req-220 review round 1) — "Keep my history" is the highlighted
+// choice (filled primary); "Replace everything" wears the plain secondary look, no other
+// "destructive" marking (DEC-017: no danger variant). Keep stays first and the default answer.
 export const IMPORT_CHOICES = [
-  { value: 'keep', label: 'Keep my history' },
-  { value: 'replace', label: 'Replace everything', destructive: true },
+  { value: 'keep', label: 'Keep my history', primary: true },
+  { value: 'replace', label: 'Replace everything' },
 ]
 
 // The default `ask`: the in-app sheet with the preview above the question (req-220). On a

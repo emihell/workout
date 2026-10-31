@@ -12,7 +12,8 @@
 //   lateral — an extra control between Cancel and the primary (a plan slot's Skip).
 //   req-188 (DEC-104) — each onPick pick also carries `source` ('history' | 'starting');
 //   startingLabel — shown on a selected no-history row instead of the starting plan (the
-//   workout's pickers don't use that plan: they ask for sets and rest next).
+//   workout's pickers don't use that plan: they ask for sets and rest next). req-264 — or a
+//   function (plan, exercise) → label, for a row whose text depends on the pick (Change exercise).
 //   req-190 — onPick's second argument is the picker's own selection; passing it back as
 //   `initialSelection` reopens the picker with the same rows ticked (machines-first Back).
 //   req-216 (DEC-119 §5) — an "Added: …" strip above the bar names the picks in tap order (a
@@ -108,8 +109,10 @@ export function ExercisePicker({
   const hits = found ? (restDirect || showRest ? [...found.common, ...found.rest] : found.common).filter(shown) : []
 
   const pickPlan = (pick) => {
-    const plan = pickerItem(workouts, pick.kind === 'own' ? pick.exercise : catalogItemToExercise(pick.entry))
-    return startingLabel && plan.source === 'starting' ? { ...plan, label: startingLabel } : plan
+    const exercise = pick.kind === 'own' ? pick.exercise : catalogItemToExercise(pick.entry)
+    const plan = pickerItem(workouts, exercise)
+    if (!startingLabel || plan.source !== 'starting') return plan
+    return { ...plan, label: typeof startingLabel === 'function' ? startingLabel(plan, exercise) : startingLabel }
   }
   const ownPicked = (exercise) => picks.find((pick) => pick.kind === 'own' && pick.exercise.id === exercise.id)
   const libraryPicked = (entry) =>

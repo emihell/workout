@@ -32,12 +32,18 @@ export function ownRecentFirst(exercises, workouts) {
 
 // → [{ group, items }] in MUSCLE_GROUPS order, listable staples only, each A→Z by the
 // shown name. A staple in several groups is listed under its first group only (unconfirmed).
+// req-264 (DEC-155 §2) — the picker's group for a staple whose first group misleads; this list
+// only (the record's muscleGroups are unchanged). A general "first primary muscle" rule was
+// measured and rejected (it moves 11 of 194 staples, several worse).
+export const PICKER_GROUP_OVERRIDES = { 'own-burpee': 'Legs' }
+
 export function staplesByMuscle(catalog) {
   const groups = Object.keys(MUSCLE_GROUPS)
   const out = new Map(groups.map((group) => [group, []]))
   for (const item of catalog || []) {
     if (!item?.staple || !listable(item)) continue
-    const group = (item.muscleGroups || []).find((name) => out.has(name))
+    const override = PICKER_GROUP_OVERRIDES[item.id]
+    const group = out.has(override) ? override : (item.muscleGroups || []).find((name) => out.has(name))
     if (group) out.get(group).push(item)
   }
   return groups
@@ -105,6 +111,14 @@ function sameOrSlash(list, unit = '') {
 //   warm-up set / role as the per-exercise form after req-179 (DEC-099: null / main).
 // - 'starting': a plan by logging kind, never a kg (DEC-097 §4, DESIGN §1's one exception).
 // `label` is what the selected row shows, so the plan is never silent.
+// req-264 — the plan kind pickerItem's starting plan branches on (DEC-155 §2): cardio, timed
+// (hasDuration), else reps. Machine / free / bodyweight are all 'reps' (one kind).
+export function planKind(exercise) {
+  if (exercise?.type === 'cardio') return 'cardio'
+  if (exercise?.hasDuration) return 'timed'
+  return 'reps'
+}
+
 export function pickerItem(workouts, exercise) {
   const history = exercise?.id ? historyPrescription(workouts, exercise.id) : null
   if (history) {
@@ -117,11 +131,12 @@ export function pickerItem(workouts, exercise) {
     return { source: 'history', item, label }
   }
   const base = { role: 'main', warmup: null, notes: '', suggestedWeights: [] }
-  if (exercise?.type === 'cardio') {
+  const kind = planKind(exercise)
+  if (kind === 'cardio') {
     const item = { ...base, sets: 1, targets: [], durations: [], restSec: 0 }
     return { source: 'starting', item, label: 'Starting plan: 1 set — change any time' }
   }
-  if (exercise?.hasDuration) {
+  if (kind === 'timed') {
     const seconds = exercise.durationSec != null ? Number(exercise.durationSec) : DEFAULT_DURATION_SEC
     const item = {
       ...base,

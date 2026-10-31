@@ -2,7 +2,7 @@
 // (state, …) → state functions for store.jsx's setState, plus the delete blast-radius
 // reads and wording the confirms show before them.
 import { buildPlannedWorkout, exerciseById, planSnapshot } from './model.js'
-import { dateKey, mondayOf } from './schedule.js'
+import { clampLoopWeeks, dateKey, mondayOf } from './schedule.js'
 import { patchExercise } from './exercise-names.js'
 import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withItemEffort, withLoggedSet } from './workout-items.js'
 import { historyPrescription, routinesUsingExercise } from './history-queries.js'
@@ -37,15 +37,33 @@ export function routineDeletionImpact(state, routineId) {
 }
 
 // req-201 (review F18) — the days a routine is scheduled on, for its delete confirm: "Mon and
-// Thu" (was "2 schedule slots"). Mon-first; a loop longer than one week names the week
-// ("Mon (week 2)"). '' when it is on no day.
+// Thu" (was "2 schedule slots"). Mon-first; a loop longer than one week names the week of a day
+// that is not on in every week ("Mon, Wed, Thu (week 2) and Fri", req-264). '' when on no day.
 const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export function routineScheduledDaysText(state, routineId) {
-  const loop = Number(state?.schedule?.loopWeeks) || 1
+  const loop = clampLoopWeeks(state?.schedule?.loopWeeks) // as the Schedule screen (review)
   const slots = (state?.schedule?.slots || []).filter((slot) => slot.routineId === routineId)
   const mondayFirst = (weekday) => (Number(weekday) + 6) % 7
-  const sorted = [...slots].sort((a, b) => (a.week || 0) - (b.week || 0) || mondayFirst(a.weekday) - mondayFirst(b.weekday))
-  const words = [...new Set(sorted.map((slot) => `${DAY_SHORT[slot.weekday]}${loop > 1 ? ` (week ${(slot.week || 0) + 1})` : ''}`))]
+  let words
+  if (loop > 1) {
+    // req-264 — a weekday on in every loop week is named once, bare ("Mon"); one on in only
+    // some weeks keeps each week ("Thu (week 2)"). Mon-first, then by week.
+    const weeksByDay = new Map()
+    for (const slot of slots) {
+      const day = Number(slot.weekday)
+      if (!weeksByDay.has(day)) weeksByDay.set(day, new Set())
+      weeksByDay.get(day).add(Number(slot.week) || 0)
+    }
+    words = [...weeksByDay.keys()].sort((a, b) => mondayFirst(a) - mondayFirst(b)).flatMap((day) => {
+      const weeks = weeksByDay.get(day)
+      const everyWeek = Array.from({ length: loop }, (_, week) => week).every((week) => weeks.has(week))
+      if (everyWeek) return [DAY_SHORT[day]]
+      return [...weeks].sort((a, b) => a - b).map((week) => `${DAY_SHORT[day]} (week ${week + 1})`)
+    })
+  } else {
+    const sorted = [...slots].sort((a, b) => (a.week || 0) - (b.week || 0) || mondayFirst(a.weekday) - mondayFirst(b.weekday))
+    words = [...new Set(sorted.map((slot) => DAY_SHORT[slot.weekday]))]
+  }
   return words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`
 }
 

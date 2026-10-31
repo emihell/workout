@@ -216,7 +216,8 @@ describe('AC4 / AC6 — the Days row (rendered)', () => {
     assert.deepEqual(on.filter((s) => s.routineId === 'r1').map((s) => [s.week, s.weekday]), [[0, WED], [1, WED]])
     assert.equal(on.length, 3)
     assert.deepEqual(pressed(), ['Wed'])
-    assert.match(view.text(), /Wed \(week 1\) and Wed \(week 2\)/)
+    // req-264 test edit (DEC-155 §2): on in both loop weeks → named once, bare.
+    assert.match(view.text(), /DaysWedDone/)
     await tap(chip('Wed'))
     assert.deepEqual(stored().schedule.slots, [{ id: 'other-wed', week: 0, weekday: WED, routineId: 'r2' }])
     assert.match(view.text(), /DaysNot scheduled/)
