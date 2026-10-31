@@ -31,7 +31,7 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 - **Dead first Back after finishing an exercise** (parked, DEC-084; req-153's fix dropped as too fragile). History ends
   `[…, /workout/x, /workout/x]`. Idea: on a popstate that lands on the entry just left, step back once more. iPhone test first.
 - **Supersets / circuits in the workout** (Emilio, 2026-10-31, DEC-146): items alternated set by set with a smooth hand-over
-  (the next item opens after a set; rest only after the pair). Coach may not plan them until this ships. Evidence: run 4 —
+  (the next item opens after a set; rest only after the pair). Coach may not plan them until this ships. Supersets save time with no loss of gains (coach/EVIDENCE.md §11). Run 4 —
   supersets written as notes were done as straight sets, ≈55 min not ≈43, the finisher dropped. Overlaps req-184 item 15
   (Phase 2). *Q (Emilio):* Phase 1 (it's the in-gym flow) or with req-184?
 - **Interval chaining in the workout** (Emilio, 2026-10-31: "we will build a tabata timer in the app"): both timers exist

@@ -2339,3 +2339,12 @@ goal; **LESSONS.md** = data/method lessons, no client facts; Emilio's facts wait
 his `CLIENT.md`. `CAPABILITIES.md` unchanged; `EVIDENCE.md` follows (research agent, Emilio reviews).
 `(unconfirmed)` for Emilio: may a client override the balance base; the set-counting rule (primary 1, secondary 0.5);
 GOALS.md numbers marked `[to source]` until EVIDENCE.md.
+
+## DEC-149 — Coach's evidence library: checked sources, newest first  (Emilio, 2026-10-31)
+
+Emilio: "can we also load up the coach with information? modern workout books/guides/articles/studies or other things it can
+base its information on? not only relying on anthropic?" → `handoff/coach/EVIDENCE.md`: 17 topics, each claim with its
+source and DOI, resolved in Europe PMC and checked against the abstract by a research agent; Planner re-resolved the six
+2023–2026 DOIs. ACSM 2026 replaces ACSM 2009. Coach cites §N or says "general knowledge, not yet sourced"; `GOALS.md` now
+cites it (set counting 0.5 for secondary muscles = Pelland 2026, so DEC-148's open call 2 is sourced). Books Emilio owns
+may be summarised outside git, next to `CLIENT.md`. `(unconfirmed)`: Emilio reviews the library.

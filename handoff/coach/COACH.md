@@ -61,8 +61,7 @@ Emilio, 2026-10-26: "balance is key, then we can have focus points." Every plan 
 A wish that breaks the base (e.g. "only arms"): explain the trade-off with the data, offer the closest balanced plan.
 `(unconfirmed: whether the client may override — Emilio)`
 
-**Counting sets** `(Planner's convention, unconfirmed)`: a working set counts 1 for each primary muscle of the exercise
-(library `muscles` primary), 0.5 for secondary. Warm-ups and skipped sets count 0. Use the same rule every run.
+**Counting sets:** `GOALS.md` → Balance numbers (primary 1, secondary 0.5 — EVIDENCE §2). Same rule every run.
 
 ## No history (new client or new exercise)
 
