@@ -46,6 +46,8 @@
 //     never lost silently: its conflicts wait in the meta (`pendingConflicts`, survives a reload),
 //     force a push, and go up with it (`conflicts` in the PUT body); the server stores them on
 //     that revision. A failed push keeps them pending; they are cleared only by a successful one.
+//   req-273: or by a 400 `bad-conflicts` (the server can't take their shape): dropped with a
+//   console warning, the state pushed again at once without them. Any other refusal: as above.
 import { deepEqual } from './equal.js'
 import { mergeStates } from './merge.js'
 
@@ -55,6 +57,8 @@ export const DEBOUNCE_MS = 2000
 export const MAX_BYTES = 20 * 1024 * 1024
 export const RETRY_MS = [5000, 20000, 60000]
 export const CSRF_HEADER = 'x-workout-request'
+// server/store.mjs BAD_CONFLICTS (a test keeps the two equal): the 400 for a refused `conflicts` list.
+export const BAD_CONFLICTS = 'bad-conflicts'
 
 export const LOGIN_OFFLINE = "Can't reach the server. Check your connection and try again."
 export const LOGIN_UNREADABLE = "Your saved data can't be read, so sync is paused. Nothing was sent."
@@ -348,6 +352,15 @@ export function createSync({
         const g = await request('GET', '/api/state')
         if (gen !== generation || !settle(g)) return
         return serverBehind(g.data.rev)
+      }
+      if (r.status === 400 && r.data?.code === BAD_CONFLICTS && sentConflicts.length) {
+        // req-273 — the server refused the list's shape (a newer app on an older server, say): resent,
+        // it would block every push. Only the ones sent are dropped (any added since stay), the drop
+        // is warned in the console, and the state goes up at once without them.
+        console.warn(`sync: the server refused ${sentConflicts.length} conflict record(s); dropped them and pushed the state without them. Server: ${r.data.error}`)
+        setMeta({ pendingConflicts: pendingList(meta).filter((c) => !hasConflict(sentConflicts, c)) })
+        again = true
+        return
       }
       if (!settle(r, size)) return
       // On the server now: cleared (any added since stay). A failed push leaves them all pending.

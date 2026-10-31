@@ -7,14 +7,14 @@ import { startTestServer } from '../../server/test-helpers.mjs'
 import { after, before, describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { createInvite, registerUser, findUser } from '../../server/auth.mjs'
-import { dropRevisions, getRevision, getState, listRevisions, getNotes } from '../../server/store.mjs'
+import { BAD_CONFLICTS as SERVER_BAD_CONFLICTS, dropRevisions, getRevision, getState, listRevisions, getNotes } from '../../server/store.mjs'
 import { MAX_BODY } from '../../server/app.mjs'
 import { buildBackup, commitBackup } from '../exchange.js'
 import { emptyState } from '../persistence.js'
 import { setLoggedState } from '../state-reducers.js'
 import { finishedState } from '../workout-finish.js'
 import { fullState } from '../test-support/full-state.js'
-import { DEBOUNCE_MS, LOGIN_UNREADABLE, MAX_BYTES, META_KEY, RETRY_MS, createSync } from './engine.js'
+import { BAD_CONFLICTS, DEBOUNCE_MS, LOGIN_UNREADABLE, MAX_BYTES, META_KEY, RETRY_MS, createSync } from './engine.js'
 import { NOT_SYNCED, syncLine } from './status.js'
 
 const KEY = 'workout-mvp-v9'
@@ -1216,5 +1216,107 @@ describe('req-268 — the rebase’s conflicts go up with the next push', () => 
     assert.equal(puts(d).length, before)
     assert.equal(listRevisions(srv.db, userId(user)).length, 4)
     assert.deepEqual(recorded(user), [])
+  })
+})
+
+// req-273 — a conflict list the server refuses (400 `bad-conflicts`) is dropped after one try, so the
+// state itself still reaches the server; any other refusal keeps today's behaviour.
+describe('req-273 — a refused conflict list never blocks sync', () => {
+  const pending = (d) => JSON.parse(d.storage.getItem(META_KEY)).pendingConflicts ?? []
+  const refused = { field: 'activeWorkout', id: null, kind: 'shape-from-a-newer-app', lost: null }
+  const reply = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
+  const badConflicts = () => reply(400, { error: 'conflicts must be a list of {field, id, kind, lost}.', code: 'bad-conflicts' })
+  const sentWith = (e, c) => (e.body?.conflicts ?? []).some((x) => JSON.stringify(x) === JSON.stringify(c))
+
+  // Logged in (rev 1); the app closes with a local rename and `refused` pending; `fake` answers PUTs first.
+  async function reopened(fake, conflicts = [refused]) {
+    const user = await newAccount()
+    const first = device()
+    await first.login(user)
+    first.unmount()
+    first.storage.setItem(KEY, JSON.stringify(renamed(first.stored(), 'rtn-a', 'renamed offline')))
+    const meta = JSON.parse(first.storage.getItem(META_KEY))
+    first.storage.setItem(META_KEY, JSON.stringify({ ...meta, dirty: true, pendingConflicts: conflicts }))
+    first.fetch.respond = fake
+    first.fetch.log.length = 0
+    const d = device(undefined, { storage: first.storage, fetch: first.fetch })
+    return { user, d }
+  }
+
+  it('1. PUT with conflicts → 400 bad-conflicts: dropped, one warn, pushed again at once without them (rev +1), no error', async (t) => {
+    const warn = t.mock.method(console, 'warn', () => {})
+    const { user, d } = await reopened((e) => (e.method === 'PUT' && e.body.conflicts ? badConflicts() : null))
+    d.mount()
+    await d.engine.idle()
+    const ps = puts(d)
+    console.log('puts', ps.length, 'with conflicts', ps.filter((e) => e.body.conflicts).length, '| pending left', pending(d).length, '| error', JSON.stringify(d.engine.getStatus().error), '| rev', server(user).rev)
+    assert.equal(ps.length, 2, 'the refused push, then one without the list')
+    assert.ok(sentWith(ps[0], refused))
+    assert.equal(ps[1].body.conflicts, undefined, 'the second push carries no conflicts')
+    assert.deepEqual(pending(d), [])
+    assert.equal(warn.mock.callCount(), 1, 'one warn line')
+    console.log('warn:', ...warn.mock.calls[0].arguments)
+    assert.match(String(warn.mock.calls[0].arguments.join(' ')), /1 conflict.*conflicts must be a list/)
+    assert.equal(server(user).rev, 2, 'rev +1')
+    assert.equal(server(user).state.routines.find((r) => r.id === 'rtn-a').name, 'renamed offline', 'the state is on the server')
+    assert.equal(d.engine.getStatus().error, null)
+    assert.equal(d.engine.getStatus().dirty, false)
+  })
+
+  for (const [label, fake] of [
+    ['a 400 without the code', () => reply(400, { error: 'conflicts must be a list of {field, id, kind, lost}.' })],
+    ['a 403', () => reply(403, { error: 'Forbidden.' })],
+  ]) {
+    it(`2. ${label} → the list stays pending and the error is set, as today (no drop, no extra push)`, async (t) => {
+      const warn = t.mock.method(console, 'warn', () => {})
+      const { user, d } = await reopened((e) => (e.method === 'PUT' ? fake() : null))
+      d.mount()
+      await d.engine.idle()
+      assert.equal(puts(d).length, 1, 'no extra push')
+      assert.deepEqual(pending(d), [refused], 'still pending')
+      assert.equal(d.engine.getStatus().error?.kind, 'server')
+      assert.equal(warn.mock.callCount(), 0)
+      assert.equal(server(user).rev, 1, 'nothing reached the server')
+    })
+  }
+
+  it('3. a conflict queued while the refused push was out survives the drop and goes up with the next push', async (t) => {
+    t.mock.method(console, 'warn', () => {})
+    const later = { field: 'routines', id: 'rtn-a', kind: 'edited-on-both', lost: { id: 'rtn-a', name: 'from another tab' } }
+    let d
+    const { user, d: dev } = await reopened((e) => {
+      if (e.method !== 'PUT' || !sentWith(e, refused)) return null
+      // Another tab queues a conflict while this push is out (it writes the shared meta).
+      const meta = JSON.parse(d.storage.getItem(META_KEY))
+      d.storage.setItem(META_KEY, JSON.stringify({ ...meta, pendingConflicts: [...meta.pendingConflicts, later] }))
+      return badConflicts()
+    })
+    d = dev
+    d.mount()
+    await d.engine.idle()
+    const ps = puts(d)
+    assert.equal(ps.length, 2)
+    assert.deepEqual(ps[1].body.conflicts, [later], 'the next push carries the one added mid-flight, not the refused one')
+    assert.deepEqual(pending(d), [], 'accepted, so cleared')
+    const id = userId(user)
+    const stored = listRevisions(srv.db, id).flatMap((r) => getRevision(srv.db, id, r.rev).conflicts)
+    assert.deepEqual(stored, [later], 'recorded on the server; the refused one is not')
+    assert.equal(d.engine.getStatus().error, null)
+  })
+
+  it('1b. end to end: the real server’s 400 for a bad shape carries the code; the list is dropped, the state goes up', async (t) => {
+    assert.equal(BAD_CONFLICTS, SERVER_BAD_CONFLICTS, 'app and server name the code alike')
+    const warn = t.mock.method(console, 'warn', () => {})
+    const bad = { kind: 'no field' } // a shape server/store.mjs deviceConflicts refuses
+    const { user, d } = await reopened(null, [bad])
+    d.mount()
+    await d.engine.idle()
+    assert.equal(puts(d).length, 2)
+    assert.deepEqual(puts(d)[0].body.conflicts, [bad])
+    assert.equal(warn.mock.callCount(), 1)
+    assert.deepEqual(pending(d), [])
+    assert.equal(server(user).rev, 2)
+    assert.equal(server(user).state.routines.find((r) => r.id === 'rtn-a').name, 'renamed offline')
+    assert.equal(d.engine.getStatus().error, null)
   })
 })
