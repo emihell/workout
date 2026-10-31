@@ -76,7 +76,7 @@ export function isExternalStateChange(event) {
 // and mounts a fresh module, clearing it) — there is nothing to un-warn about while
 // this tab still holds its stale snapshot. The window listener is registered lazily
 // on first subscribe and removed on last unsubscribe; `typeof window` guards it so
-// storage.js still imports under `node --test` (no window, listener never wired).
+// persistence.js still imports under `node --test` (no window, listener never wired).
 let externalChanged = false
 const externalChangeListeners = new Set()
 let storageEventHandler = null

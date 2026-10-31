@@ -160,7 +160,7 @@ export function writeEnabled(storage, value) {
 
 // ---- req-87 enabled flag (subscribable browser store) ----
 //
-// Mirrors the storage.js signal trio (getX/subscribeX): an in-memory boolean plus a
+// Mirrors the persistence.js signal trio (getX/subscribeX): an in-memory boolean plus a
 // listener set, so App.jsx's gate and the Settings toggle both track it via
 // useSyncExternalStore and a flip in Settings shows/hides the button live (no
 // reload). Initialized once from localStorage at module load, so a reload restores

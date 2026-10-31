@@ -41,7 +41,7 @@ import puppeteer from 'puppeteer'
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const DIST = join(ROOT, 'dist')
-const STORAGE_KEY = 'workout-mvp-v9' // must match src/storage.js
+const STORAGE_KEY = 'workout-mvp-v9' // must match src/persistence.js
 
 function parseArgs(argv) {
   const opts = { route: '/', viewport: '390x844', wait: 250, full: false, build: false, actions: [], scrollBottom: false }

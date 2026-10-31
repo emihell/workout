@@ -31,8 +31,8 @@ import { extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
-const LEGACY_KEY = 'workout-mvp-v8' // storage.js LEGACY_KEYS[0]
-const CURRENT_KEY = 'workout-mvp-v9' // storage.js STORAGE_KEY
+const LEGACY_KEY = 'workout-mvp-v8' // persistence.js LEGACY_KEYS[0]
+const CURRENT_KEY = 'workout-mvp-v9' // persistence.js STORAGE_KEY
 const STATE_DIR = join(tmpdir(), 'workout-plan-qa')
 const STATE_FILE = join(STATE_DIR, 'state.json')
 

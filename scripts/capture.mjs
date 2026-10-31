@@ -34,7 +34,7 @@ import { fileURLToPath } from 'node:url'
 import puppeteer from 'puppeteer'
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)))
-const STORAGE_KEY = 'workout-mvp-v9' // must match src/storage.js
+const STORAGE_KEY = 'workout-mvp-v9' // must match src/persistence.js
 const FROZEN_NOW = new Date('2026-09-23T10:00:00').getTime()
 const VIEWPORT = { width: 390, height: 844, deviceScaleFactor: 2 }
 const SETTLE_MS = 400
