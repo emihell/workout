@@ -31,7 +31,7 @@ the load pointer. Read this session, cited per line.
 
 Measured from the migrated golden state (key paths and types), plus the fields only a live session writes (grep of the
 writers). Writers: **M** = `migrateState` (load/import, model.js), **S** = Start (`store.startWorkout` /
-`buildPlannedWorkout`), **L** = live logging (store.jsx / workout-log.js), **F** = Finish (`finishedState`),
+`buildPlannedWorkout`), **L** = live logging (store.jsx / the req-270 workout modules, `workout-*.js`, `set-*.js`), **F** = Finish (`finishedState`),
 **H** = History edits, **E** = exercise/routine editors, **I** = import (exchange.js → M).
 
 `localStorage` keys:
@@ -110,7 +110,7 @@ State (`workout-mvp-v9`):
 - `reps` (string, or `'skipped'`).
 - `rpe` (number | null; null on WU/cardio since req-156). **Since req-212 (DEC-119 §1) effort is per exercise:** Done logs
   `null`; the exercise review writes one value (2 Easy · 3 Medium · 4 Hard) to every logged non-skipped work set of that item;
-  a set logged after a pick inherits it (`workout-log.js:778-799`, `item.jsx:280-284`). 5 (Failure) is legacy, still read.
+  a set logged after a pick inherits it (`set-drafts.js` `formFieldsWithDraft`, `workout-items.js` `withItemEffort`, `item.jsx:280-284`). 5 (Failure) is legacy, still read.
 - `note`.
 - `targetReps`, `targetWeight` (number | null).
 - `durationSec` (timed work sets; History too since req-163; cardio duration since req-194).
