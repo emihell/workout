@@ -504,6 +504,18 @@ html:has(.ui-picker-strip) {
 .ui-row__chev {
   overflow-wrap: normal;
 }
+/* req-264 — a row's label keeps a short word whole when its value is long: `break-word` (not
+ * `anywhere`) keeps the label's min-content at its longest word, so the value wraps first
+ * [measured: "Da/ys" beside "Mon, Wed, Thu (week 2) and Fri" at 390px]. Capped at the row's
+ * width, so one word longer than the row still breaks inside it (req-123). */
+.ui-row > span:first-child,
+.ui-row__link > .ui-row__label {
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.ui-row__link > .ui-row__label {
+  min-width: auto;
+}
 /* req-207 — a row with several actions (the day screen's Start now · ⋯, req-208): when they
  * don't fit beside the name, they wrap to their own line (right-aligned) instead of squeezing
  * the name to a letter per line [measured: "Lowe/r/Body" at 390px]. req-208: a button label
