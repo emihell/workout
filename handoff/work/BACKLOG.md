@@ -76,6 +76,8 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   on an all-cardio workout that now does nothing (`recalc.jsx:24-45`); the prune uses the writing device's local today.
 - **req-269 review nit:** `src/req-202.test.js:94` is titled "… History row meta …" but no longer asserts it; the live
   "with warm-up" History header (`detail.jsx:134`) has no behaviour test. Retitle + add one.
+- **`server/plan-build.mjs:144` warning text cites "(workout-log.js:613-615)"** (req-270 report): point it at `set-seed.js`
+  `setLogSeed` (changes output text; one line).
 **Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
 one is specced.
 - → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).

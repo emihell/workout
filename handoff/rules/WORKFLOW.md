@@ -175,7 +175,8 @@ stated source is a number nobody has checked.
 
 **5 — Trigger the safety checks from the FILES, not the tag (DEC-057).** If the req touches `store.jsx`,
 `model.js`, `persistence.js`, `history-queries.js`, `state-reducers.js` (req-164's split of the old `storage.js`, deleted
-in req-269), `progress.js`, `workout-log.js` (and its req-270 successors), `src/sync/`, or any migration/load path, then: an **independent
+in req-269), `progress.js`, the workout modules split from `workout-log.js` in req-270 (`workout-items.js`, `workout-progress.js`,
+`workout-finish.js`, `set-seed.js`, `set-drafts.js`, `set-display.js`, `workout-timers.js`), `src/sync/`, or any migration/load path, then: an **independent
 reviewer** runs on the diff before merge, **and** Emilio gets the **backup reminder** (DEC-046) before merge.
 This applies whatever the Gate tag says. (2026-09-23: req-111 and req-112 were tagged `[functional]`, touched
 storage, store, model and progress, and got neither.) For any field on `activeWorkout` or a snapshot, name the
