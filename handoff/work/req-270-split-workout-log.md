@@ -20,7 +20,8 @@
 | `set-display.js` | set text and rows | `setPreview setPreviewText setListRows loggedSetRowText eachSideReps restClockText` (6) |
 | `workout-timers.js` | stopwatch + rest | `stopwatchFor stopwatchOwner startStopwatchPatch restPatchAfterSet restRemaining` (5) |
 
-70 named + the `isAddedMidWorkout, isSkippedSet` re-export from `set-rules.js` (`:7`) = 71. **`lastLoggedSetIndex`**
+69 in the table + `lastLoggedSetIndex` = 70 named, + the `isAddedMidWorkout, isSkippedSet` re-export line from
+`set-rules.js` (`:7`) = 71. **`lastLoggedSetIndex`**
 (`:468`, test-only, audit F-DEAD-7) is deleted, not moved. Re-measure after req-261/262: they add/change exports.
 
 ## Scope

@@ -3,13 +3,12 @@
 Updated 2026-10-31. **Shipped: everything through req-254, req-257–258, req-266, req-259** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** the fix batch (DEC-155; Emilio: "that is always the priority, otherwise things go stale or we build opon old
-code"). Serial, one throwaway agent per req, stop at each closeout. All specced 2026-10-31 and READY unless noted:
-1. **req-256** "12 reps" bug — built `req-256` @ `35b2df0`, gate green (2189), reviewer: No blockers. **Waits on AC2 (server).**
-2. **req-255** plan build kg estimate · 3. ~~req-257~~ merged 10-31 · 4. ~~req-258~~ merged 10-31 · ~~req-266~~ merged 10-31 ·
-5. ~~req-259~~ merged 10-31 · 6. **req-260** plan build scans live routines (after 255) · 7. **req-261** Ex N + double
-tap + Sets cap · 8. **req-262** swaps/cardio/Back guard (after 261; backup reminder) · 9. **req-263** Back chain
-(DEC-155 §6 overrides DEC-092) · 10. **req-264** small UI fixes (after 263) · 11. **req-265** library chunk.
+**Next:** the fix + structure batch (DEC-155 §1, §7: fixes, workflow, structure, cleanups before any feature). Serial, one
+throwaway agent per req, stop at each closeout. Done 10-31: req-257, 258, 266, 259. Order:
+1. **req-261** Ex N + double tap + Sets cap (building) → 2. **req-268** sync merge loses/duplicates a finished workout →
+3. **req-262** swaps/cardio/Back guard (backup reminder) → 4. **req-269** dead code + duplicates → 5. **req-270** split
+`workout-log.js` → 6. **req-271/272** workflow "later" list (specs being written) → 7. **req-263** Back chain → 8. **req-264**
+small UI fixes → 9. **req-265** library chunk. Server-held: **req-256** (built `35b2df0`, reviewed; AC2) → **req-255** → **req-260**.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
 
 **On the server machine (Emilio, 2026-10-31: "everything that needs the server … continue there"):**
