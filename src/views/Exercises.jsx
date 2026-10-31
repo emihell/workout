@@ -165,7 +165,19 @@ export function Exercises({ type = null }) {
   )
 }
 
-function createPaths(returnBase) {
+// req-263 — `nav`: a routine editor's route set (routine-nav.js navForBase), whose create
+// paths carry the routine screen's `?from=` chain when it has one. With no `from` they are
+// the same strings as the `returnBase` branch below.
+function createPaths(returnBase, nav = null) {
+  if (returnBase && nav) {
+    return {
+      hub: nav.create,
+      pick: nav.pick,
+      manual: nav.createManual,
+      search: nav.createSearch,
+      afterCreate: nav.newItem,
+    }
+  }
   if (returnBase) {
     return {
       hub: `${returnBase}/exercise/create`,
@@ -184,8 +196,8 @@ function createPaths(returnBase) {
   }
 }
 
-export function ExerciseNew({ returnBase = null }) {
-  const paths = createPaths(returnBase)
+export function ExerciseNew({ returnBase = null, nav = null }) {
+  const paths = createPaths(returnBase, nav)
   return (
     <Screen>
       <Back to={paths.pick} />
@@ -207,9 +219,9 @@ function NameError({ children }) {
   ) : null
 }
 
-export function ExerciseNewManual({ returnBase = null }) {
+export function ExerciseNewManual({ returnBase = null, nav = null }) {
   const store = useStore()
-  const paths = createPaths(returnBase)
+  const paths = createPaths(returnBase, nav)
   const [name, setName] = useState('')
   const [type, setType] = useState('free')
   // req-127 — the name error shows after the first Save attempt, then tracks each edit.
@@ -311,9 +323,9 @@ function NameMatch({ match, paths, returnBase, store, onCreate }) {
   )
 }
 
-export function ExerciseNewSearch({ returnBase = null }) {
+export function ExerciseNewSearch({ returnBase = null, nav = null }) {
   const store = useStore()
-  const paths = createPaths(returnBase)
+  const paths = createPaths(returnBase, nav)
   const [query, setQuery] = useState('')
   const [catalog, setCatalog] = useState(null)
   const [error, setError] = useState('')
