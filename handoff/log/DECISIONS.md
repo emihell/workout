@@ -2310,3 +2310,8 @@ super set workouts, instead, it should prupose a enw req, build superset functio
 3. Supersets → a req candidate (BACKLOG §Phase 1). **Intervals:** Emilio: "we will build a tabata timer in the app … so that is
    a req, until then, if really needed it can be a note, but prefferably not" → an interval-timer req candidate; meanwhile Coach
    avoids interval sets, and a text target is the one allowed exception, named in the report.
+4. **Intervals with today's timers** (Emilio: "but we do have timers, both for rest and for the excersises, so could it not be
+   done with what we have now?" → "these things the coach must know, so it knows also how to set it up properly in the app"):
+   a timed exercise + `restSec` runs intervals at two taps a round. Coach builds them when work and rest are each ≥ 30 s
+   `(unconfirmed: 30 s)`; Tabata/EMOM wait for the chaining req (BACKLOG §Phase 1). `CAPABILITIES.md` gains a section on how a
+   plan runs in the workout, from the code.

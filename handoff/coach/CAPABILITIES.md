@@ -43,7 +43,12 @@ it: write it under "For Planner" in the report (what, why, the data). There are 
 | Superset / circuit (items alternated set by set) | Don't build one: straight sets only; the time saving goes to "For Planner" | Req candidate (BACKLOG §Phase 1); req-184 item 15 |
 | More than one warm-up set | One `warmup` only; no "2nd warm-up" in `notes` | req-184 item 10 |
 | Warm-up kg | Not planned; he picks it | req-184 item 10 |
-| Intervals / Tabata / EMOM (a timer per round) | Avoid. Only if really needed: a text target ("8 × 20 s / 10 s"), said in the report — he times it himself | Interval timer req (BACKLOG §Phase 1, Emilio 2026-10-31) |
+| Short intervals (Tabata 20 s / 10 s) and EMOM (rest = the rest of the minute) | Avoid. Only if really needed: a text target, said in the report | Interval-chaining req (BACKLOG §Phase 1) |
+
+**Intervals with the timers that exist** (DEC-146 §4): a timed exercise (`hasDuration`, `durations[]` = work seconds per
+round) with `restSec` = rest seconds. Each round costs two taps — Done (starts rest) and Start (next countdown;
+`src/ui/index.jsx:430`, `src/views/workout/item.jsx:355`) — so build it only when work and rest are each ≥ 30 s
+`(unconfirmed: the threshold — Emilio)`.
 
 **Where things belong:** technique cues go in the exercise's `cues`, not in item `notes` (Emilio: "notes here that should
 be set in the actual exercise"). Item `notes` say something about this item in this routine, never a missing feature.
