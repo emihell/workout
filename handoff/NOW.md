@@ -4,9 +4,9 @@ Updated 2026-10-31. **Shipped: everything through req-253** (batch 7 complete; t
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 **Next:** Coach review 2026-10-31 → DEC-146..148: brief split (COACH · GOALS · LESSONS), CAPABILITIES gained how a plan runs
-in the workout; `EVIDENCE.md` done (DEC-149, Emilio reviews). Next Coach run (server Mac): move LESSONS'
-last section into `CLIENT.md`; rebuild run 4's `import.json` (supersets in notes, DEC-146); the 10-30 barbell session after
-Emilio's 4 answers (`CLIENT.md` §New). Then spec the plan-builder (BACKLOG §Tooling).
+in the workout; `EVIDENCE.md` done (DEC-149, Emilio reviews). Next Coach run (server Mac): move LESSONS' last section into
+`CLIENT.md`; rebuild run 4's `import.json` (DEC-146); the 10-30 barbell session after Emilio's 4 answers. **req-254** plan-builder (`ops plan build`) READY: dispatch on Emilio's go.
+Phase 1 order proposed (not agreed): "12 reps" bug → cues in the workout → supersets → interval chaining; book gaps triaged, no spec.
 
 ## Milestone (Emilio, 2026-09-07)
 

@@ -33,16 +33,16 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 - **Supersets / circuits in the workout** (Emilio, 2026-10-31, DEC-146): items alternated set by set with a smooth hand-over
   (the next item opens after a set; rest only after the pair). Coach may not plan them until this ships. Supersets save time with no loss of gains (coach/EVIDENCE.md §11). Run 4 —
   supersets written as notes were done as straight sets, ≈55 min not ≈43, the finisher dropped. Overlaps req-184 item 15
-  (Phase 2). **Phase 1** (Emilio, DEC-151).
+  (Phase 2). **Phase 1** (Emilio, DEC-151). Extends req-254's `ITEM` + checks if it ships after it.
 - **Interval chaining in the workout** (Emilio, 2026-10-31: "we will build a tabata timer in the app"): both timers exist
   (set countdown `src/ui/index.jsx:430`, rest on Done `src/views/workout/item.jsx:355`), but each round needs Done + Start —
   16 taps in a 4-min Tabata. Chain them: the work countdown ends → the set logs → rest runs → the next round starts. EMOM also
-  needs rest = the rest of the minute. Until then Coach builds only ≥ 30 s intervals (DEC-146 §4).
+  needs rest = the rest of the minute. Until then Coach builds only ≥ 30 s intervals (DEC-146 §4); req-254 C6 refuses shorter — relax it here.
 - **Exercise cues are never shown in the workout** [measured 2026-10-31]: `exercise.cues` appears only in the exercise
   editor; the rest block shows library `formCues` (`src/library-hints.js:52-57`). Emilio wants cues on the exercise; they
   should reach the log screen. Coach can't place technique cues anywhere he sees them until then.
 - **Target text is logged as reps** [measured 2026-10-31, `src/workout-log.js:613-615`]: a "10-12" / "AMRAP" target prefills
-  Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`).
+  Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`); req-254 C6 refuses such targets until fixed.
 - **Coach's app gaps from the training books** (DEC-150, notes in `workout-data/coach/books/`): a planned effort/RIR target
   per item; rep-range progression in the app's recommendation (req-149); a weekly recovery check-in (5 questions); several
   warm-up sets with kg (req-184 item 10); drop sets / myo-reps; a time for a whole item (the S&S bell trigger); left/right
@@ -139,7 +139,7 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 - **A plan-builder for Coach** (DEC-145 §4): a short change list (routine X: order, kg, rest, notes; new library exercise;
   schedule slot) → a full plan file in the Export shape, checked (workouts identical, only the named parts changed) and
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
-  `src/exerciseCatalog.js` (run 3, run 4 `scripts/build_import.mjs`). Next to spec.
+  `src/exerciseCatalog.js` (run 3, run 4 `scripts/build_import.mjs`). → **req-254** (READY): `./server/ops plan build`.
 - **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
   non-planning worktree wins", so `CODE_DIR` — and closeout's merge — may point at an agent/scratch worktree. White-sleeve
   refuses closeout while >1 non-planning worktree exists. Also: `plan ping` still prints the pre-BUILDER.md handover.
