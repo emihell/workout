@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { readKg } from './kg-input.js'
 import { defaultDurationToSave, readSeconds, secondsError, secondsToSave } from './seconds-input.js'
-import { activeSetPatch, historySetFields, liveSetWeight } from './views/set-values.js'
+import { historySetFields, liveSetWeight } from './views/set-values.js'
 import { withHistorySet } from './views/history/add-set.js'
 import { parseKg } from './routine-item-parse.js'
 
@@ -24,16 +24,15 @@ describe('1 — a trailing separator on a kg is the whole number', () => {
   const add = (weight) =>
     withHistorySet(workout, { exerciseId: 'ex-a', itemId: 'ri-a', exercise: null, values: values(weight) })
   for (const typed of ['22,', '22.']) {
-    it(`"${typed}" → 22 at the live log, active set edit, History edit and History add`, () => {
+    // req-261 — the active set edit line went with its helper (dead since req-212).
+    it(`"${typed}" → 22 at the live log, History edit and History add`, () => {
       assert.equal(liveSetWeight(typed, true), 22)
-      assert.equal(activeSetPatch(values(typed)).weight, 22)
       assert.equal(historySetFields(values(typed)).weight, 22)
       assert.equal(add(typed).sets[0].weight, 22)
     })
   }
-  it('"2,5,5" is still refused at all four', () => {
+  it('"2,5,5" is still refused at all three', () => {
     assert.equal(liveSetWeight('2,5,5', true), null)
-    assert.equal(activeSetPatch(values('2,5,5')), null)
     assert.equal(historySetFields(values('2,5,5')), null)
     assert.equal(add('2,5,5'), null)
   })

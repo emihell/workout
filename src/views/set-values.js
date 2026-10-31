@@ -1,8 +1,8 @@
 // req-154 — what each logged-set save writes, from the set forms' RAW field text. Pure
 // and JSX-free so `node --test` can import it; the four callers (item.jsx completeSet
-// and WorkoutSetEdit, history/edit.jsx HistorySet, history/add-set.js withHistorySet)
+// and the live Previous → Save, history/edit.jsx HistorySet, history/add-set.js withHistorySet)
 // keep their own "empty" value, as SetEditForm's header describes:
-//   - live log / active set edit: a blank kg is 0 (as before);
+//   - live log / Previous → Save: a blank kg is 0 (as before);
 //   - History edit / add: a blank kg stays '' (as before).
 // A kg that isn't a number returns null — "don't save". The forms (SetLogForm,
 // SetEditForm) already refuse Complete/Save with an inline error (kg-input.js kgError),
@@ -110,17 +110,6 @@ export function skippedSetSave({ weighted, set, seedOverrides, sets = [], setInd
   if (Object.keys(rest).length) next[key] = rest
   else delete next[key]
   return { setPatch, seedOverrides: next }
-}
-
-// WorkoutSetEdit's patch. `showLoad` false (cardio / bodyweight): the kg field isn't
-// shown, so the stored weight is left as it is rather than re-read.
-// req-194 — `cardio` (SetEditForm's parsed cardio values, a cardio set only): merged as
-// cardioPatch (blank → undefined → absent once saved).
-export function activeSetPatch({ weight, reps, rpe, note, cardio }, { showLoad = true } = {}) {
-  const patch = { reps, rpe: effortValue(rpe), note, ...(cardio ? cardioPatch(cardio) : {}) }
-  if (!showLoad) return patch
-  const kg = kgToSave(weight, 0)
-  return kg.error ? null : { weight: kg.value, ...patch }
 }
 
 // HistorySet's (and History add set's) set fields. A blank kg stays ''.

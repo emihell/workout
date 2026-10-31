@@ -79,12 +79,13 @@ describe('AC3 / AC6 — a Swap: M counts the replacement, not the original', () 
   })
 })
 
-describe('AC4 — N counts done items, not the row position', () => {
-  it('items 5 and 6 done, rest not → N = 3, current = item 1', () => {
+// req-261 (DEC-155 §2) — N is the open row's place, not done + 1: was '3/7' here.
+describe('AC4 — N is the open row\'s place (req-261; was: done items + 1)', () => {
+  it('items 5 and 6 done, rest not → current = item 1, N = 1', () => {
     const pill = workoutPillState(workout(seven(), [...four('i5'), ...four('i6')]), NOW)
     assert.equal(pill.item.routineItemId, 'i1')
-    assert.equal(pill.countText, '3/7')
-    assert.equal(pill.label, 'GO · 3/7')
+    assert.equal(pill.countText, '1/7')
+    assert.equal(pill.label, 'GO · 1/7')
   })
 })
 

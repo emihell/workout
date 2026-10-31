@@ -7,7 +7,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { kgError, kgToSave, normalizeKgText, readKg } from './kg-input.js'
-import { activeSetPatch, historySetFields, liveSetWeight } from './views/set-values.js'
+import { historySetFields, liveSetWeight } from './views/set-values.js'
 import { withHistorySet } from './views/history/add-set.js'
 import { parseKg } from './routine-item-parse.js'
 import { parseWeightStep } from './weight-step.js'
@@ -72,28 +72,16 @@ describe('site 1 — live log (item.jsx completeSet → liveSetWeight)', () => {
   })
 })
 
-describe('site 2 — active set edit (item.jsx WorkoutSetEdit → activeSetPatch)', () => {
-  const values = (weight) => ({ weight, reps: '8', rpe: '4', note: 'n' })
-  it('22,5 / 22.5 / " 20 " / blank', () => {
-    assert.deepEqual(activeSetPatch(values('22,5')), { weight: 22.5, reps: '8', rpe: 4, note: 'n' })
-    assert.equal(activeSetPatch(values('22.5')).weight, 22.5)
-    assert.equal(activeSetPatch(values(' 20 ')).weight, 20)
-    assert.equal(activeSetPatch(values('')).weight, 0, 'blank stays 0, as before')
-  })
-  it('bad text → no patch (null)', () => {
-    for (const bad of BAD) assert.equal(activeSetPatch(values(bad)), null, bad)
-  })
-  it('kg hidden (cardio / bodyweight): weight is left as stored, not re-read', () => {
-    const patch = activeSetPatch(values('abc'), { showLoad: false })
-    assert.deepEqual(patch, { reps: '8', rpe: 4, note: 'n' })
-  })
+// req-261 — the active-set patch helper (no production caller since req-212) deleted with its three tests;
+// what stays is the guard that WorkoutSetEdit writes nothing.
+describe('site 2 — active set edit (item.jsx WorkoutSetEdit)', () => {
   // req-212 test edit (review round 1) — WorkoutSetEdit no longer has a form (the route redirects
   // to the set's exercise, where the edit sheet saves via viewedSetSave → updateActiveSet, which
   // also refuses unreadable kg: req-212.test.js). It must not write at all now.
   it('WorkoutSetEdit writes nothing (the route only redirects)', () => {
     const item = src('./views/workout/item.jsx')
     const body = item.slice(item.indexOf('export function WorkoutSetEdit'))
-    assert.doesNotMatch(body, /updateActiveSet|activeSetPatch|SetEditForm/)
+    assert.doesNotMatch(body, /updateActiveSet|SetEditForm/)
   })
 })
 

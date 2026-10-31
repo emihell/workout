@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '../../store-context'
 import { needsSetup, resolvePicks, setupDefaults, swapPicks } from '../../mid-workout-pick.js'
 import { Actions, Button, Field, NavLink, SectionHeader } from '../../ui/index.jsx'
@@ -23,7 +23,13 @@ export function MidWorkoutPicker({ max = Infinity, addLabel, cancelTo, onDone, c
   const [values, setValues] = useState([])
   const [errors, setErrors] = useState({})
 
+  // req-261 — one commit per tap: a second Save (or Add) before the screen moves on would
+  // create the records and add the items twice. Set only by a commit: a step Save with
+  // errors returns before it, so the user fixes the field and taps again.
+  const committed = useRef(false)
   const commit = (picks) => {
+    if (committed.current) return
+    committed.current = true
     const added = picks.map((pick) => {
       let exerciseId
       if (pick.kind === 'library') exerciseId = store.addExercise(pick.data)

@@ -1135,6 +1135,14 @@ export function restClockText(seconds) {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
+// req-261 — the item the pill is on: currentWorkoutItem, else (before any logged set) the
+// first not-done item in snapshot order; null when everything is done. One pick for the pill
+// and its "N/M" (workoutPosition), so the words and the item can't disagree.
+function pillItem(workout) {
+  const done = (candidate) => itemIsMarkedDone(workout, candidate) || itemLoggingState(workout, candidate).plannedDone
+  return currentWorkoutItem(workout) || (workout?.snapshot?.items || []).find((candidate) => !done(candidate)) || null
+}
+
 // req-186 — everything the workout pill shows, pure: null when there's no current
 // exercise; else the item, "set N/M", and either the rest clock (resting) or GO.
 // req-203 §7 (Lena s20) — once the last set of an exercise is logged the pill moves on to
@@ -1148,8 +1156,7 @@ export function restClockText(seconds) {
 // workoutPosition): "GO · set 2/4 · 3/7", resting "1:12 · set 2/4 · 3/7", "GO · 3/7"
 // before a set of the current item. All done (or no items) → null, as before.
 export function workoutPillState(workout, now) {
-  const done = (candidate) => itemIsMarkedDone(workout, candidate) || itemLoggingState(workout, candidate).plannedDone
-  const item = currentWorkoutItem(workout) || (workout?.snapshot?.items || []).find((candidate) => !done(candidate)) || null
+  const item = pillItem(workout)
   if (!item) return null
   const { current, total } = itemSetPosition(workout, item)
   const { remainingMs, resting } = restRemaining(workout, now)
@@ -1183,8 +1190,11 @@ export function itemSwappedAway(workout, item) {
 // req-222 (DEC-125 §3) — "how far along" the whole workout is, for the pill's "N/M":
 //   M = snapshot items minus originals a Swap replaced (the replacement counts instead; an
 //       Add exercise item counts; a plain Skip exercise still counts — it is done);
-//   N = done items among those (skipped included; the overview's done test) + 1, capped at M.
-// N counts done items, not the current row's position. No counted items → null.
+//   N = the 1-based place, among the counted items, of the item the pill is on (pillItem).
+// req-261 (DEC-155 §2) — N is the open row's place, not done + 1 (it read "Ex 1 of 9" on item
+// 2). Nothing open (all done), or the pill's item not among the counted → min(M, done + 1).
+// `done` = done items among the counted (skipped included; the overview's done test).
+// No counted items → null.
 // req-227 — a swapped-away original that is NOT done (reopened by Add set on its review) is
 // work left, so it counts again (in M, and as current); a swapped-away done one stays out.
 export function workoutPosition(workout) {
@@ -1192,7 +1202,10 @@ export function workoutPosition(workout) {
   const counted = (workout?.snapshot?.items || []).filter((item) => !itemSwappedAway(workout, item) || !done(item))
   if (counted.length === 0) return null
   const doneCount = counted.filter(done).length
-  return { current: Math.min(counted.length, doneCount + 1), total: counted.length, done: doneCount }
+  const open = pillItem(workout)
+  const at = open ? counted.indexOf(open) : -1
+  const current = at >= 0 ? at + 1 : Math.min(counted.length, doneCount + 1)
+  return { current, total: counted.length, done: doneCount }
 }
 
 // req-25 — the rest-patch decision, made pure so "when does rest run after a set"

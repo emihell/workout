@@ -38,7 +38,7 @@ import { historyPrescription } from './history-queries.js'
 import { pickerItem } from './routine-picker.js'
 import { applyBackup, buildBackup } from './exchange.js'
 import { migrateState } from './model.js'
-import { activeSetPatch, historySetFields, liveSetEditPatch } from './views/set-values.js'
+import { historySetFields, liveSetEditPatch } from './views/set-values.js'
 import { withHistorySet } from './views/history/add-set.js'
 
 const h = React.createElement
@@ -136,15 +136,13 @@ describe('draft carries the cardio fields', () => {
 })
 
 describe('save paths', () => {
-  it('Previous → Save (liveSetEditPatch) and active set edit (activeSetPatch): blank → undefined (dropped on save)', () => {
+  // req-261 — the active set edit half removed with its helper (dead since req-212).
+  it('Previous → Save (liveSetEditPatch): blank → undefined (dropped on save)', () => {
     const values = { durationSec: 600, level: null, distance: 2000, distanceUnit: 'm' }
     const live = liveSetEditPatch({ weight: '', reps: '', effort: null, cardio: values }, { weighted: false, set: { reps: '' } })
     assert.equal(live.durationSec, 600)
     assert.equal(live.distance, 2000)
     assert.equal(JSON.parse(JSON.stringify({ ...{ level: 7 }, ...live })).level, undefined)
-    const edit = activeSetPatch({ reps: '', rpe: '', note: '', cardio: values }, { showLoad: false })
-    assert.equal(edit.distanceUnit, 'm')
-    assert.equal('level' in JSON.parse(JSON.stringify(edit)), false)
   })
 
   it('History add set writes the cardio fields, without a `cardio` key on the record', () => {

@@ -1,4 +1,5 @@
 import { STARTING_REST_SEC, STARTING_SETS } from './routine-picker.js'
+import { MAX_SETS, SETS_RANGE_MESSAGE } from './routine-item-parse.js'
 
 // req-188 / DEC-104 (Emilio, 2026-10-06; amends DEC-059 §1) — what a mid-workout pick (Swap or
 // Add exercise) puts in the workout. Pure, so `node --test` drives it; the screens
@@ -33,6 +34,7 @@ export function noHistoryItem({ sets = '', rest = '' } = {}) {
   const setsN = /^\d+$/.test(setsText) ? Number(setsText) : NaN
   if (!setsText) errors.sets = 'Enter the number of sets.'
   else if (!(setsN >= 1)) errors.sets = 'Sets must be a whole number, 1 or more.'
+  else if (setsN > MAX_SETS) errors.sets = SETS_RANGE_MESSAGE // req-261
   let restSec = 0
   if (restText) {
     if (/^\d+$/.test(restText)) restSec = Number(restText)

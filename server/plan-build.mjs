@@ -17,6 +17,7 @@ import { historyPrescription } from '../src/history-queries.js'
 import { ROUTINE_ROLES, uid } from '../src/ids.js'
 import { isDurationTarget } from '../src/progress.js'
 import { pickerItem } from '../src/routine-picker.js'
+import { MAX_SETS } from '../src/routine-item-parse.js'
 import { routineItemAdded } from '../src/state-reducers.js'
 import { planChange, readPlanFile } from './plan.mjs'
 
@@ -106,7 +107,7 @@ function itemProblems(item, exercise, workouts, before) {
   const cardio = exercise?.type === 'cardio'
   const { sets, targets, suggestedWeights: kg, durations, restSec, role, warmup, notes } = item
   // C4 — item shape (CAPABILITIES §How a plan runs).
-  if (!isInt(sets) || sets < 1) refusals.push(`sets must be a whole number ≥ 1 (got ${json(sets)}).`)
+  if (!isInt(sets) || sets < 1 || sets > MAX_SETS) refusals.push(`sets must be a whole number from 1 to ${MAX_SETS} (got ${json(sets)}).`)
   if (!Array.isArray(targets) || targets.some((t) => typeof t !== 'string')) refusals.push('targets: a list of strings ("10", not 10).')
   else if (isInt(sets) && (targets.length || (!timed && !cardio)) && targets.length !== sets) {
     refusals.push(`targets has ${targets.length} entries for ${sets} sets.`)

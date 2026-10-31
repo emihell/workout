@@ -6,7 +6,7 @@ import { describe, it, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import React from 'react'
 import { importJsx, render } from './test-support/render.js'
-import { activeSetPatch, historySetFields } from './views/set-values.js'
+import { historySetFields } from './views/set-values.js'
 import { historyAddSetDraft, withHistorySet } from './views/history/add-set.js'
 
 const { SetLogForm } = await importJsx('./ui/index.jsx', import.meta.url)
@@ -85,11 +85,12 @@ describe('SetEditForm (render) — active set edit and History', () => {
   it('active edit of a warm-up that already has rpe 3 (Effort hidden) → rpe null', async () => {
     const values = await editSet({ set: { setType: 'wu', weight: 10, reps: '12', rpe: 3 }, showEffort: false })
     assert.equal(values.rpe, '')
-    assert.equal(activeSetPatch(values).rpe, null)
   })
   it('active edit of a work set keeps the effort it shows', async () => {
     const values = await editSet({ set: { setType: 'work', weight: 20, reps: '8', rpe: 4 }, showEffort: true })
-    assert.equal(activeSetPatch(values).rpe, 4)
+    // req-261 — was "the active-set patch keeps rpe 4" (that helper deleted, dead since req-212):
+    // the form's own submitted value is what's left to check.
+    assert.equal(values.rpe, '4')
   })
   it('History add set: the draft has no effort, so a warm-up saved as-is stores rpe null', async () => {
     const workout = { id: 'w1', sets: [], snapshot: { items: [] } }
@@ -143,10 +144,7 @@ describe('live log screen (render) — WorkoutItemLog + the real store', () => {
 })
 
 describe('save paths — a hidden / blank effort is rpe null', () => {
-  it('active set edit: activeSetPatch', () => {
-    assert.equal(activeSetPatch({ weight: '10', reps: '12', rpe: '', note: '' }).rpe, null)
-    assert.equal(activeSetPatch({ weight: '', reps: '20 min', rpe: '', note: '' }, { showLoad: false }).rpe, null)
-  })
+  // req-261 — 'active set edit' removed with the active-set patch helper (dead since req-212).
   it('History edit: historySetFields', () => {
     assert.equal(historySetFields({ weight: '10', reps: '12', rpe: '', note: '', setType: 'wu' }).rpe, null)
   })

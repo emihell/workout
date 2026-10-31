@@ -18,7 +18,7 @@
 //   req-216 (DEC-119 §5) — an "Added: …" strip above the bar names the picks in tap order (a
 //   tap on a name unticks it); `inWorkout` (a Set of exercise ids, the routine picker's) marks
 //   those rows "In this workout" — marked, still pickable.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { catalogItemToExercise, loadExerciseCatalog, searchCommonFirst, shownName } from '../exerciseCatalog.js'
 import { libraryItemMatch } from '../exercise-names.js'
 import { equipmentLabel } from '../equipment-label.js'
@@ -173,7 +173,14 @@ export function ExercisePicker({
     return rows
   }
 
+  // req-261 — one commit per tap: a second tap on "Add N" before the screen moves on (a fast
+  // double tap lands before React re-renders) would add the picks twice and, for a library
+  // pick, create the record twice. Every caller leaves the screen on a commit, so the flag
+  // never needs resetting; a remount (Back into the picker) starts a fresh one.
+  const committed = useRef(false)
   const add = () => {
+    if (committed.current) return
+    committed.current = true
     if (onPick) {
       onPick(
         picks.map((pick) => {
