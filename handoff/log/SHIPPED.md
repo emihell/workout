@@ -2854,4 +2854,4 @@ main's `plan`). Gate: `./check --smoke` green. Reviewer ×2: No blockers (20k-ca
 
 Tooling (refactor); throwaway agent, …`ad166a6`. workout-items / -progress / -finish / -timers, set-seed / -drafts / -display; no shim; 65
 importers re-pointed; `lastLoggedSetIndex` deleted (2223 → 2222); boundaries moved to break two cycles; trigger regex + WORKFLOW check 5 name
-all seven. Reviewer: No blockers (76/76 bodies identical, 2733 imports resolved, each module loads alone). Handoff cites → function names. `reports/req-270.md`.
+all seven. Gate: `./check` 2222 in 149, smoke green; independent reviewer: No blockers (76/76 bodies identical, 2733 imports resolved, each module loads alone). Handoff cites → function names. `reports/req-270.md`.
