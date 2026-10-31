@@ -15,7 +15,8 @@ fixes is "nobody ran the check", not "there's no check to run":
 
 Later additions: NOW.md carries exactly one `**Next:**` line (req-250), and
 a SHIPPED entry dated after 2026-10-30 with more than 3 body lines warns
-(req-252; a warning, never a failure).
+(req-252; a warning, never a failure). The doc-size ratchet (req-272): each rule doc in
+scripts/doc_limits.json at or under its ceiling — over it fails; ≥10 % under warns "tighten".
 
 (A former backlog-index check — `## Sections` / `### N.N` against
 `work/backlog/tier-*.md` — was retired in req-102 when that structure
@@ -37,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import functools
+import json
 import re
 import subprocess
 import sys
@@ -757,15 +759,124 @@ def check_dec_log(repo: str, ref: str) -> list[Finding]:
     return findings
 
 
+# ------------------------------------------- check 6: the doc-size ratchet (req-272)
+
+# Each rule doc has a ceiling in DOC_LIMITS_PATH (one table, one place): its line count when the
+# ratchet was set. Over the ceiling → fail (`plan publish` and `plan save` refuse). Raising one =
+# edit the table in the same commit, with a non-empty `reason` that differs from the base's (a
+# raise that keeps the old reason is a raise with no reason). ≥ TIGHTEN_FRACTION under the
+# ceiling → a warning naming the new number; never edited here (no auto-correction, above).
+# The table lives in scripts/ so code commits can carry it; `plan save` lets that one file
+# through with handoff/ so Planner can raise a ceiling in the same save as the growth.
+DOC_LIMITS_PATH = "scripts/doc_limits.json"
+TIGHTEN_FRACTION = 0.10
+# Never ratcheted: append-only logs (req-271), requirement docs, build reports. NOW.md has its
+# own ≤NOW_MD_RULE_LIMIT rule (check 2).
+DOC_LIMITS_EXCLUDED = ("handoff/log/", "handoff/work/req-", "reports/", NOW_MD_PATH)
+
+
+def _parse_limits(text: str) -> dict:
+    data = json.loads(text)
+    docs = data.get("docs") if isinstance(data, dict) else None
+    if not isinstance(docs, dict) or not docs:
+        raise ValueError('no "docs" object with at least one entry')
+    return docs
+
+
+def doc_limit_findings(read, base_read=None) -> list[Finding]:
+    """`read(path)` / `base_read(path)` return a file's text or None — git objects at a ref,
+    or the working tree (`--worktree`, for `plan save` before it stages anything)."""
+    raise_hint = f"raise it in {DOC_LIMITS_PATH} in the same commit, with a new non-empty \"reason\""
+    text = read(DOC_LIMITS_PATH)
+    if text is None:
+        return [Finding("doc-limits", "fail", DOC_LIMITS_PATH,
+                        "the ratchet's limits table is missing — restore it; no doc is size-checked without it")]
+    try:
+        docs = _parse_limits(text)
+    except ValueError as e:
+        return [Finding("doc-limits", "fail", DOC_LIMITS_PATH, f"unreadable limits table: {e}")]
+
+    base_docs: dict = {}
+    if base_read is not None:
+        base_text = base_read(DOC_LIMITS_PATH)
+        if base_text is not None:
+            try:
+                base_docs = _parse_limits(base_text)
+            except ValueError:
+                base_docs = {}
+
+    findings: list[Finding] = []
+    for path, row in sorted(docs.items()):
+        where = f"{DOC_LIMITS_PATH} [{path}]"
+        if any(path.startswith(x) or path == x for x in DOC_LIMITS_EXCLUDED):
+            findings.append(Finding("doc-limits", "fail", where,
+                                    "this path is excluded from the ratchet (log/, work/req-*, reports/, NOW.md) "
+                                    "— remove the row"))
+            continue
+        ceiling = row.get("ceiling") if isinstance(row, dict) else None
+        reason = row.get("reason") if isinstance(row, dict) else None
+        if not isinstance(ceiling, int) or isinstance(ceiling, bool) or ceiling <= 0:
+            findings.append(Finding("doc-limits", "fail", where, f"ceiling must be a positive integer, got {ceiling!r}"))
+            continue
+        if not isinstance(reason, str) or not reason.strip():
+            findings.append(Finding("doc-limits", "fail", where,
+                                    "empty \"reason\" — every ceiling says why it is that number"))
+        base_row = base_docs.get(path)
+        if isinstance(base_row, dict) and isinstance(base_row.get("ceiling"), int) \
+                and ceiling > base_row["ceiling"] and isinstance(reason, str) and reason.strip() \
+                and reason.strip() == str(base_row.get("reason", "")).strip():
+            findings.append(Finding("doc-limits", "fail", where,
+                                    f"ceiling raised {base_row['ceiling']} → {ceiling} with the old \"reason\" "
+                                    f"— write why it grew"))
+        content = read(path)
+        if content is None:
+            findings.append(Finding("doc-size", "fail", path,
+                                    f"listed in {DOC_LIMITS_PATH} but not found — restore it, or remove its row"))
+            continue
+        count = content.count("\n")
+        if count > ceiling:
+            findings.append(Finding("doc-size", "fail", path,
+                                    f"is {count} lines, over its ceiling of {ceiling} — trim it, or {raise_hint}"))
+        elif ceiling - count >= ceiling * TIGHTEN_FRACTION:
+            findings.append(Finding("doc-size", "warn", path,
+                                    f"is {count} lines, ≥{int(TIGHTEN_FRACTION * 100)}% under its ceiling of "
+                                    f"{ceiling} — tighten to {count} in {DOC_LIMITS_PATH}"))
+    return findings
+
+
+def _base_ref(repo: str, ref: str) -> str | None:
+    out = _git(repo, ["rev-parse", "--verify", "--quiet", f"{ref}^"]).strip()
+    return out or None
+
+
+def check_doc_limits(repo: str, ref: str, base: str | None = None) -> list[Finding]:
+    base = base or _base_ref(repo, ref)
+    base_read = (lambda p: read_file(repo, base, p)) if base else None
+    return doc_limit_findings(lambda p: read_file(repo, ref, p), base_read)
+
+
+def check_doc_limits_worktree(repo: str) -> list[Finding]:
+    root = Path(repo)
+
+    def read(p: str) -> str | None:
+        f = root / p
+        return f.read_text() if f.is_file() else None
+
+    has_head = bool(_git(repo, ["rev-parse", "--verify", "--quiet", "HEAD"]).strip())
+    base_read = (lambda p: read_file(repo, "HEAD", p)) if has_head else None
+    return doc_limit_findings(read, base_read)
+
+
 # --------------------------------------------------------------------- driver
 
-def run_checks(repo: str, ref: str) -> list[Finding]:
+def run_checks(repo: str, ref: str, base: str | None = None) -> list[Finding]:
     findings: list[Finding] = []
     findings.extend(check_status_lines(repo, ref))
     findings.extend(check_size_claims(repo, ref))
     findings.extend(check_next_line(repo, ref))
     findings.extend(check_shipped_size(repo, ref))
     findings.extend(check_dec_log(repo, ref))
+    findings.extend(check_doc_limits(repo, ref, base))
     return findings
 
 
@@ -778,9 +889,28 @@ def main(argv: list[str] | None = None) -> int:
         help="also print 'unknown' and 'info' findings (permanent, non-failing shape of the "
              "data — a SHELVED requirement, tier-2's unnumbered sections) alongside fail/warn",
     )
+    parser.add_argument(
+        "--only", choices=["doc-limits"],
+        help="run one check: doc-limits (the req-272 ratchet; `plan save` / `plan publish` refuse on it)",
+    )
+    parser.add_argument(
+        "--base", default=None,
+        help="ref whose limits table a raise is compared against (default: REF^)",
+    )
+    parser.add_argument(
+        "--worktree", action="store_true",
+        help="with --only doc-limits: read the docs and table from the working tree at --repo "
+             "(compared against HEAD's table) — `plan save`, before it stages anything",
+    )
     args = parser.parse_args(argv)
 
-    findings = run_checks(args.repo, args.ref)
+    if args.worktree and args.only != "doc-limits":
+        parser.error("--worktree needs --only doc-limits")
+    if args.only == "doc-limits":
+        findings = (check_doc_limits_worktree(args.repo) if args.worktree
+                    else check_doc_limits(args.repo, args.ref, args.base))
+    else:
+        findings = run_checks(args.repo, args.ref, args.base)
     failing = [f for f in findings if f.severity == "fail"]
     warning = [f for f in findings if f.severity == "warn"]
 
