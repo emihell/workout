@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · L-068, L-071, L-072, req-257 report, req-269 review, DEC-155 §7. After req-264 and req-265 (no shared file; keeps the gate stable under them). Touches `plan`, `check`, `scripts/check_handoff.py`, `.github/workflows/deploy.yml`, `src/req-202.test.js`.
+**Status: BUILT, NOT merged — branch `req-275` (…`6b4e733`)** · **Lane: tooling** · L-068, L-071, L-072, req-257 report, req-269 review, DEC-155 §7. After req-264 and req-265 (no shared file; keeps the gate stable under them). Touches `plan`, `check`, `scripts/check_handoff.py`, `.github/workflows/deploy.yml`, `src/req-202.test.js`.
 
 # req-275 — tooling guards 2: closeout traps, untriaged audits, unrun suites, plan/check lockstep
 

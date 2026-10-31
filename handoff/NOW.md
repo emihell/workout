@@ -4,7 +4,7 @@ Updated 2026-10-31. **Shipped: everything through req-254, req-257–258, req-26
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
 **Next:** the fix + structure batch (DEC-155 §1, §7: fixes, workflow, structure, cleanups before any feature). Serial, one
-throwaway agent per req, stop at each closeout. Merged 10-31: req-257, 258, 266, 259, 261, 268, 262, 269, 270, 271, 272, 263, 264, 265, 273, 274.
+throwaway agent per req, stop at each closeout. Merged 10-31: req-257, 258, 266, 259, 261, 268, 262, 269, 270, 271, 272, 263, 264, 265, 273, 274, 275.
 Order: **req-275** tooling
 guards 2 → **req-276** split item.jsx + ui. Server-held: **req-256** (built `35b2df0`, reviewed; AC2) → **req-255** → **req-260**.
 Then the DEC-154 features: cues + notes → supersets → intervals. Build here; merges here; deploys on the server.
