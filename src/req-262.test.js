@@ -117,6 +117,18 @@ describe('req-262 AC2 — Apply on a cardio item keeps its own plan', () => {
     assert.deepEqual(item.suggestedWeights, [])
     assert.deepEqual(item.targets, [])
   })
+  // Planner's call: cardio Apply leaves the routine item untouched — an old snapshot holding
+  // `[0]` / ["5-8 min"] (db.json's shape) writes nothing, whatever the routine holds now.
+  it('an old cardio snapshot with suggestedWeights [0] → Apply → routine item byte-identical', () => {
+    const s = cardioState()
+    s.routines[0].exercises[0] = { id: 'i1', exerciseId: 'row', sets: 2, targets: ['10 min', '5 min'], suggestedWeights: [] }
+    s.workouts[0].snapshot.items[0] = { ...s.workouts[0].snapshot.items[0], targets: ['5-8 min'], suggestedWeights: [0] }
+    const before = JSON.stringify(s.routines[0].exercises[0])
+    const after = recalculatedState(s, 'wk').routines[0].exercises[0]
+    console.log('AC2 old [0] snapshot, routine item before:', before, 'after:', JSON.stringify(after))
+    assert.equal(JSON.stringify(after), before)
+    assert.equal(after, s.routines[0].exercises[0], 'not even re-spread')
+  })
   it('a strength item\'s Apply is byte-identical to main', () => {
     const item = recalculatedState(cardioState(), 'wk').routines[0].exercises[1]
     const text = JSON.stringify(item)
