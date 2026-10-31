@@ -23,8 +23,8 @@ import {
   readLevel,
   withCardioValues,
 } from './cardio-set.js'
+import { finishedState } from './workout-finish.js'
 import {
-  finishedState,
   formFieldsWithDraft,
   loggedSetRowText,
   setDraftFromForm,

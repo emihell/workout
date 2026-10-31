@@ -9,7 +9,6 @@ import { readFileSync } from 'node:fs'
 import { buildPlannedWorkout, migrateState, planSnapshot } from './model.js'
 import {
   createSetDraftWriter,
-  finishedState,
   formFieldsWithDraft,
   initialSetFields,
   nextSeedOverrides,
@@ -19,6 +18,7 @@ import {
   setDraftFromLoggedSet,
   setDraftKey,
 } from './workout-log.js'
+import { finishedState } from './workout-finish.js'
 import { itemKey, itemLoggingState, replacementItem, withLoggedSet } from './workout-items.js'
 
 const EXERCISES = [

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict'
 import './test-support/locale.js' // req-228: date text is asserted in en-US on any machine locale
 import React from 'react'
 import { readFileSync } from 'node:fs'
-import { LEFT_OPEN_MS, finishTimeFor, finishedState, lastSetAt } from './workout-log.js'
+import { LEFT_OPEN_MS, finishTimeFor, finishedState, lastSetAt } from './workout-finish.js'
 import { durationLabel } from './history-queries.js'
 import { leftOpenText } from './finish-unfinished.js'
 import { doneEarlierText } from './views/schedule-day.js'

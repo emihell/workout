@@ -4,7 +4,8 @@
 // against the export's field map (FIELDS) and round-trip it through export → import.
 import { migrateState } from '../model.js'
 import { addWorkingSetToState } from '../workout-items.js'
-import { finishedState, setDraftFromForm } from '../workout-log.js'
+import { finishedState } from '../workout-finish.js'
+import { setDraftFromForm } from '../workout-log.js'
 import { itemEffortState, replaceItemInState, setLoggedState, startedWorkoutState } from '../state-reducers.js'
 import { withCardioValues } from '../cardio-set.js'
 

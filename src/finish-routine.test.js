@@ -13,7 +13,7 @@ import {
   recalculatedState,
 } from './model.js'
 import { recommendNextPrescription } from './progress.js'
-import { finishedState } from './workout-log.js'
+import { finishedState } from './workout-finish.js'
 import { itemKey } from './workout-items.js'
 import { autoFinishArgs } from './workout-note.js'
 

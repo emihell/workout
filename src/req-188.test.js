@@ -16,7 +16,8 @@ import {
   replacementItem,
   skipItemPatch,
 } from './workout-items.js'
-import { currentWorkoutItem, finishedState, itemAllSkipped } from './workout-log.js'
+import { currentWorkoutItem, itemAllSkipped } from './workout-log.js'
+import { finishedState } from './workout-finish.js'
 import { isAddedMidWorkout } from './set-rules.js'
 import { pickerItem } from './routine-picker.js'
 import { needsSetup, noHistoryItem, resolvePicks } from './mid-workout-pick.js'
