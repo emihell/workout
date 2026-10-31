@@ -32,7 +32,8 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   Server `https://macbookpro-intel-2017.tail58ea74.ts.net:8446`. Coach run 5 plan applied as rev 79.
 - **Backups:** newest scheduled 10-26 09:00; the next is due ≥ 11-02. Confirm it fires (server).
 - **Working agreement (L-060, DEC-143, DEC-144):** a team, not orders. Merged ≠ live: deploy after any served change.
-  Deploy is Emilio's (`! ./server/deploy && ./server/doctor`; the classifier blocks Planner).
+  Deploy is Emilio's (`! ./server/deploy && ./server/doctor`; the classifier blocks Planner). One planner session at a time (Emilio: "i will never
+  run two planner instances sumiltainiusly"): server work waits for a clean point here.
 - **Emilio's calls, any time:** loop-length re-anchor; req-239/240/242/243 copy `(unconfirmed)`; timer once per side
   (req-240); "Ex" vs "Exercise" (req-244). Planner's lighter path for copy-only reqs — open.
 
