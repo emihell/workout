@@ -200,8 +200,8 @@ suites_note="${suites_ran:+, the shell suites ($suites_ran)}"
 if [ -n "$smoke" ]; then
   echo "check: smoke test (headless browser, HEAD)…"
   node scripts/smoke.mjs || fail "the smoke test"
-  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), the build${suites_note}, and the smoke test all passed."
+  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s)${suites_note}, the build, and the smoke test all passed."
   exit 0
 fi
 
-echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), and the build${suites_note} all passed."
+echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s)${suites_note}, and the build all passed."
