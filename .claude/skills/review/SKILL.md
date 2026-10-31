@@ -11,7 +11,8 @@ how a branch is reviewed — the same file, §Reviewing a branch; the guards —
    is required before merge; say which files triggered it.
 2. **Spawn one fresh agent** (Agent tool, read-only brief: it may run commands and tests, never edit, commit, or
    merge). Give it only: the branch, the req doc path, the report path, `git diff main...<branch>`, and the DECs whose
-   nouns the diff touches (grep `handoff/log/DECISIONS.md`, WORKFLOW READY check 1). No conversation history — that
+   nouns the diff touches (grep the index in `handoff/log/DECISIONS.md`, then read the entry in its range file
+   under handoff/log/decisions/; WORKFLOW READY check 1). No conversation history — that
    is the point, and why step 4 exists.
 3. **Required output format** (put this in the brief):
    - Each finding: severity (`blocker` / `should-fix` / `nit` / `latent`), `file:line`, a **failure scenario**

@@ -681,6 +681,82 @@ def check_shipped_size(repo: str, ref: str) -> list[Finding]:
     return findings
 
 
+# ----------------------------------------------- check 5: the DEC log (req-271)
+
+# Three failures, read from git objects at `ref` like everything above:
+#   a. every DEC-NNN cited in DEC_REF_SCOPE resolves to exactly one entry heading;
+#   b. (split layout) DECISIONS.md's generated index equals scripts/dec_index.py's output;
+#   c. the topical digest cites no DEC whose status is `superseded` (audit 2026-10-30 §E1).
+# Works on both layouts: before scripts/dec_split.py runs, the entries are still inside
+# DECISIONS.md and (b) has nothing to compare. No DECISIONS.md at ref (a fixture repo) → no check.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import dec_index as di  # noqa: E402
+
+DEC_REF_SCOPE = ["handoff", "src", "server", "scripts", "plan", "check", "README.md", ".githooks", ".claude/skills"]
+RANGE_NAME_RE = re.compile(r"\bDEC-\d{3}-\d{3}\.md\b")
+# File → DEC numbers allowed to dangle there: the planted fixture that tests a dangling id fires
+# (check-skills.test.sh), and the req that specified this check, which names the fixture ids in
+# its text. Numbers, not `DEC-NNN` text, so this file doesn't cite them itself.
+DEC_REF_ALLOW = {
+    "scripts/check-skills.test.sh": {999},
+    "handoff/work/req-271-decisions-split-digest.md": {777, 999},
+}
+
+
+def _dec_log(repo: str, ref: str) -> tuple[str, list, bool] | Finding | None:
+    md = read_file(repo, ref, di.DECISIONS_PATH)
+    if md is None:
+        return None
+    names = [p for p in list_files(repo, ref, di.DECISIONS_DIR) if p.endswith(".md")]
+    try:
+        if names:
+            files = {Path(p).name: read_file(repo, ref, p) or "" for p in names}
+            return md, di.parse_range_files(files), True
+        return md, di.parse_legacy(md), False
+    except di.DecError as e:
+        return Finding("dec-log", "fail", str(e).split(": ", 1)[0],
+                       f"{str(e).split(': ', 1)[-1]} — fix it, then run: {di.REGEN_COMMAND}")
+
+
+def check_dec_log(repo: str, ref: str) -> list[Finding]:
+    loaded = _dec_log(repo, ref)
+    if loaded is None:
+        return []
+    if isinstance(loaded, Finding):
+        return [loaded]
+    md, entries, split = loaded
+    by_num = {e.num: e for e in entries}
+    findings: list[Finding] = []
+
+    out = _git(repo, ["grep", "-n", "-I", "-E", r"DEC-[0-9]{3,}", ref, "--"] + DEC_REF_SCOPE)
+    prefix = f"{ref}:"
+    for row in out.splitlines():
+        if row.startswith(prefix):
+            row = row[len(prefix):]
+        path, lineno, text = (row.split(":", 2) + ["", ""])[:3]
+        # A range file's name (`decisions/DEC-051-100.md`) names a file, not a decision.
+        text = RANGE_NAME_RE.sub("", text)
+        for m in di.DEC_ID_RE.finditer(text):
+            did = m.group(0)
+            if int(m.group(1)) in by_num or int(m.group(1)) in DEC_REF_ALLOW.get(path, ()):
+                continue
+            findings.append(Finding("dec-ref", "fail", f"{path}:{lineno}",
+                                    f"cites {did}, which has no `## {did} — …` entry heading"))
+
+    if split and di.render(md, entries) != md:
+        findings.append(Finding("dec-index", "fail", di.DECISIONS_PATH,
+                                f"the generated index is stale (a range file in {di.DECISIONS_DIR}/ changed) "
+                                f"— run: {di.REGEN_COMMAND}  (./plan save runs it)"))
+
+    for lineno, text in di.digest_lines(md):
+        for m in di.DEC_ID_RE.finditer(text):
+            e = by_num.get(int(m.group(1)))
+            if e is not None and e.kind == "superseded":
+                findings.append(Finding("dec-digest", "fail", f"{di.DECISIONS_PATH}:{lineno}",
+                                        f"the digest cites {e.id}, which is {e.status} — point at the live DEC"))
+    return findings
+
+
 # --------------------------------------------------------------------- driver
 
 def run_checks(repo: str, ref: str) -> list[Finding]:
@@ -689,6 +765,7 @@ def run_checks(repo: str, ref: str) -> list[Finding]:
     findings.extend(check_size_claims(repo, ref))
     findings.extend(check_next_line(repo, ref))
     findings.extend(check_shipped_size(repo, ref))
+    findings.extend(check_dec_log(repo, ref))
     return findings
 
 

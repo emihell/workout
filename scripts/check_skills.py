@@ -44,7 +44,11 @@ def main():
         if line.startswith("#")
     )
     lessons = open("handoff/log/LESSONS.md", encoding="utf8").read()
-    decisions = open("handoff/log/DECISIONS.md", encoding="utf8").read()
+    # req-271: the entries live in handoff/log/decisions/*.md once split; DECISIONS.md before.
+    decisions = "".join(
+        open(f, encoding="utf8").read()
+        for f in ["handoff/log/DECISIONS.md"] + sorted(glob.glob("handoff/log/decisions/*.md"))
+    )
     rule_runs = set()
     for f in glob.glob("handoff/**/*.md", recursive=True) + ["CLAUDE.md", "README.md"]:
         rule_runs |= runs(words(open(f, encoding="utf8").read()), args.words)

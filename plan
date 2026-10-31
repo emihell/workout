@@ -5,7 +5,9 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-plan save "message"    commit handoff/ changes from the planning worktree
+plan save "message"    commit handoff/ changes from the planning worktree;
+                        regenerates the DEC index in handoff/log/DECISIONS.md
+                        first when a handoff/log/decisions/ file changed (req-271)
 plan publish           merge planning into main, safely
 plan status            where everything is, and what's unpublished
 plan next              the single next command to run, and why
@@ -231,6 +233,17 @@ cmd_save() {
     now_limit="$(now_md_limit "$PLANNING_DIR/scripts")"
     if [ "$now_lines" -gt "$now_limit" ]; then
       echo "plan save: refusing — handoff/NOW.md is $now_lines lines, over its own ≤$now_limit-line rule. Trim it, then save." >&2
+      exit 1
+    fi
+  fi
+
+  # req-271: DECISIONS.md's DEC index is generated from the range files (handoff/log/decisions/
+  # *.md). When one changed (staged, unstaged or new), regenerate it before the commit so the
+  # committed index is never stale. A refusal (a malformed heading, an entry with no date) writes
+  # nothing and stops the save before anything is staged.
+  if [ -n "$(git -C "$PLANNING_DIR" status --porcelain -- handoff/log/decisions/)" ]; then
+    if ! python3 "$PLANNING_DIR/scripts/dec_index.py" --root "$PLANNING_DIR"; then
+      echo "plan save: refusing — scripts/dec_index.py could not regenerate the DEC index (above); nothing committed." >&2
       exit 1
     fi
   fi
