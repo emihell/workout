@@ -2,7 +2,7 @@
 // (state, …) → state functions for store.jsx's setState, plus the delete blast-radius
 // reads and wording the confirms show before them.
 import { buildPlannedWorkout, exerciseById, planSnapshot } from './model.js'
-import { dateKey, mondayOf } from './schedule.js'
+import { clampLoopWeeks, dateKey, mondayOf } from './schedule.js'
 import { patchExercise } from './exercise-names.js'
 import { appendItemPatch, itemKey, replaceItemPatch, replacementItem, skipItemPatch, withItemEffort, withLoggedSet } from './workout-items.js'
 import { historyPrescription, routinesUsingExercise } from './history-queries.js'
@@ -41,7 +41,7 @@ export function routineDeletionImpact(state, routineId) {
 // that is not on in every week ("Mon, Wed, Thu (week 2) and Fri", req-264). '' when on no day.
 const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export function routineScheduledDaysText(state, routineId) {
-  const loop = Number(state?.schedule?.loopWeeks) || 1
+  const loop = clampLoopWeeks(state?.schedule?.loopWeeks) // as the Schedule screen (review)
   const slots = (state?.schedule?.slots || []).filter((slot) => slot.routineId === routineId)
   const mondayFirst = (weekday) => (Number(weekday) + 6) % 7
   let words

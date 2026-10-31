@@ -226,6 +226,12 @@ describe('req-264 (c) — Days row in a multi-week loop', () => {
     const s = stateWith(4, [[2, MON], [0, MON], [1, FRI]])
     assert.equal(routineScheduledDaysText(s, 'r'), 'Mon (week 1), Mon (week 3) and Fri (week 2)')
   })
+  it('review: loopWeeks is clamped as the Schedule screen does (an imported 6 reads as 4)', () => {
+    const s = stateWith(6, everyWeek(4, [MON]))
+    console.log('loop 6', routineScheduledDaysText(s, 'r'))
+    assert.equal(routineScheduledDaysText(s, 'r'), 'Mon')
+    assert.equal(routineScheduledDaysText(stateWith(0, [[0, MON], [0, THU]]), 'r'), 'Mon and Thu')
+  })
   it('a 1-week loop and an unscheduled routine read as on main', () => {
     assert.equal(routineScheduledDaysText(stateWith(1, [[0, FRI], [0, MON], [0, 0]]), 'r'), 'Mon, Fri and Sun')
     assert.equal(routineScheduledDaysText(stateWith(1, [[0, WED]]), 'r'), 'Wed')
