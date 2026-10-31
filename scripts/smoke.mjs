@@ -207,7 +207,7 @@ async function main() {
       workout = [...saved.workouts].filter((w) => w.finishedAt).sort((a, b) => b.finishedAt.localeCompare(a.finishedAt))[0]
       if (!workout || workout.routineId !== 'sess-upper') throw new StepFailure(`no finished ${ROUTINE} workout stored (newest: ${workout?.id})`)
       const itemFor = (name) => workout.snapshot.items.find((i) => i.exerciseName === name)
-      const key = (item) => item.routineItemId || item.id // workout-log.itemKey
+      const key = (item) => item.routineItemId || item.id // workout-items.itemKey
       const logItem = itemFor(LOG_EXERCISE)
       logKey = key(logItem)
       const skipItem = itemFor(SKIP_EXERCISE)

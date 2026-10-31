@@ -471,7 +471,7 @@ export function activeSetUpdatedState(s, index, patch) {
 }
 
 // req-212 (DEC-119 §1) — the exercise review's effort onto the item's logged work sets
-// (withItemEffort, workout-log.js), from the latest state. Unknown item → same state.
+// (withItemEffort, workout-items.js), from the latest state. Unknown item → same state.
 export function itemEffortState(s, itemId, rpe) {
   if (!s.activeWorkout) return s
   const item = (s.activeWorkout.snapshot?.items || []).find((candidate) => itemKey(candidate) === itemId)

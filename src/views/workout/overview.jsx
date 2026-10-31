@@ -154,7 +154,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
 
   // req-84 — every exercise done (same per-item test the list rows use). When true the
   // overview shows the auto-complete summary instead of the list; NOT before then.
-  // req-105 — the test lives in workout-log.js (allItemsDone) and also drives Finish.
+  // req-105 — the test lives in workout-progress.js (allItemsDone) and also drives Finish.
   // req-116 — the summary's gate is autoCompleteArmed: all done, something logged (an
   // all-skipped workout never auto-finishes, DEC-058 §4), and not yet dismissed. Cancel
   // and Edit set the persisted autoFinishDismissed flag, so Back from Finish (a remount)

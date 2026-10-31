@@ -100,7 +100,7 @@ import { durationLabel, isEachSide, oneSideLine, restNotesFor, restNotesShowing 
 import { useExerciseLibrary } from './use-library.js'
 
 // req-119 — type / Timed / name / equipment come from the snapshot (sessionExercise,
-// workout-log.js); weight step and cues stay live. Old snapshots read live as before.
+// workout-items.js); weight step and cues stay live. Old snapshots read live as before.
 function liveExercise(store, item) {
   return sessionExercise(exerciseById(store.exercises, item.exerciseId), item)
 }
@@ -197,7 +197,7 @@ export function WorkoutItemLog({ routineId, itemId }) {
   return <WorkoutItemLive key={itemKey(item)} routineId={routineId} item={item} />
 }
 
-// req-117 — restoreFromLoggedSet moved to workout-log.js (pure, unit-tested; it now
+// req-117 — restoreFromLoggedSet moved to workout-log.js, now set-seed.js (pure, unit-tested; it now
 // also restores a timed set's logged seconds).
 
 // req-78 — the req-27 RestUpcoming panel (an editable "next weight" shown during a
@@ -206,7 +206,7 @@ export function WorkoutItemLog({ routineId, itemId }) {
 // separate panel and its nextSetWeight override folded away. The rest itself now shows
 // only as the floating pill (req-186: the WorkoutPill).
 
-// req-125 — the set-form draft writer (createSetDraftWriter, workout-log.js: debounced,
+// req-125 — the set-form draft writer (createSetDraftWriter, set-drafts.js: debounced,
 // unit-tested) bound to the store. store.patchActive only calls the store's stable
 // setState, so the first render's function stays valid for the component's life. A
 // pending write is flushed on unmount (leaving the screen) and synchronously
@@ -336,7 +336,7 @@ function WorkoutItemLive({ routineId, item }) {
   const library = useExerciseLibrary()
   const eachSide = isEachSide(ex, library)
   // req-125 — the log form's values are kept as a draft on the active workout
-  // (`setDraft`, see setDraftKey in workout-log.js) so navigation and a tab reload don't
+  // (`setDraft`, see setDraftKey in set-drafts.js) so navigation and a tab reload don't
   // lose them. The draft is written as the user edits (useSetDraftWriter, debounced) and
   // read only when the current set changes (draftSnap below).
   const setSeedKey = setDraftKey(item, currentType, currentWorkIndex)
@@ -513,7 +513,7 @@ function WorkoutItemLive({ routineId, item }) {
   // Review fix 3 — a single-time target ("20 min", "12:30") prefills Duration (DESIGN §1, the
   // set's target, as Reps was for cardio before); a range ("5-8 min") stays a note.
   const targetSec = cardioForm ? targetDurationSec(target) : null
-  // Review fix 1 — the stopwatch is its own activeWorkout field (workout-log.js): this set's,
+  // Review fix 1 — the stopwatch is its own activeWorkout field (workout-timers.js): this set's,
   // or the exercise whose live stopwatch refuses a second Start here.
   const stopwatch = cardioForm ? stopwatchFor(active, setSeedKey) : null
   const stopwatchHolder = cardioForm && !stopwatch ? stopwatchOwner(active) : null
@@ -647,7 +647,7 @@ function WorkoutItemLive({ routineId, item }) {
         bits={[
           roleTag(item.role),
           // req-186 — the small "N/M" left the title: the set list and the workout pill
-          // carry it (itemSetPosition, workout-log.js).
+          // carry it (itemSetPosition, workout-progress.js).
           currentType === 'wu' ? 'Warm-up set' : null,
         ]}
         eachSide={eachSide}

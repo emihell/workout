@@ -42,7 +42,7 @@ export const SETUP_TEXT = {
 // belong to it).
 // `answered` is the sheet's answer: so it asks once, and so an edit of set 1 can recompute the
 // seed (setupAfterSetOneEdit). `overrideWeight`: this exercise's session kg override when the seed
-// was written — a later override (the user's own kg) beats the seed (setupSeedFor, workout-log.js).
+// was written — a later override (the user's own kg) beats the seed (setupSeedFor, set-seed.js).
 // All of it is dropped at Finish.
 export function firstTimeSetupFor(workout, exerciseId) {
   const map = workout?.firstTimeSetup
