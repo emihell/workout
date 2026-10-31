@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: ui** · DEC-155 §2 (a, b decided), DEC-097 §4, DEC-017, DEC-092, req-242, req-220, req-215, req-180. After req-263 (both touch `src/views/Routine.jsx`). Touches `store.jsx` → reviewer.
+**Status: BUILT, NOT merged — branch `req-264` (…`f0127f1`)** · **Lane: ui** · DEC-155 §2 (a, b decided), DEC-097 §4, DEC-017, DEC-092, req-242, req-220, req-215, req-180. After req-263 (both touch `src/views/Routine.jsx`). Touches `store.jsx` → reviewer.
 
 # req-264 — small UI fixes from reviews: Change exercise across types, import highlight, Days row, Burpee, two checks
 
