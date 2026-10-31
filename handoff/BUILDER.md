@@ -55,7 +55,8 @@ edit through the normal UI path, or work against a throwaway/mocked store needs 
 Planner reads your receipts and spot-checks one item; it does not redo the QA. The order (detail and the why:
 `.claude/skills/qa-branch/SKILL.md`, L-033, L-036):
 
-1. `./plan qa <branch>` serves the branch on an isolated origin. Test on the URL it prints and nothing else (not the
+1. `./plan qa <branch>` serves the branch on an isolated origin (seeded; it re-seeds after a clear). First-run screens:
+   `./plan qa <branch> --empty` (req-259). Test on the URL it prints and nothing else (not the
    dev server, not the live site).
 2. `node scripts/smoke.mjs --url <url>` → the last line is `smoke: green`. Red is the finding: stop and report the step
    and what the screen showed.
