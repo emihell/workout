@@ -184,7 +184,7 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 **From the 2026-10-30 audits, never triaged until 2026-10-31** (`audits/2026-10-30.md`, `handoff/audits/workflow-plan-2026-10-30.md`):
 - **F-SYNC-1 (bug):** a three-way merge can leave a finished workout in progress → finishing again stores two workouts with
   one id; `validState` accepts duplicate ids (`src/sync/merge.js:112-131`, `server/store.mjs:27-47`). → **req-268**.
-- **F-STRUCT-8:** `workout-log.js` 1,232 lines, 71 exports, 33 importers — split by job like req-164 did `storage.js`.
+- **F-STRUCT-8:** `workout-log.js` 1,245 lines (2026-10-31, after req-261), 71 exports, 33 importers — split by job like req-164 did `storage.js`.
   → **req-270**, after req-261/262 (same file).
 - **Cleanup nits:** F-DEAD-8 `storage.js` shim (0 app importers, 22 test importers); F-STRUCT-9 `sameKind` twice in
   `set-values.js:66-69,93-96`; 09-12 F-DEAD-2 unused `@types/*` (`package.json:24-25`, 3rd audit); F-DEAD-7's other
