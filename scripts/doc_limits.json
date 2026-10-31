@@ -10,8 +10,8 @@
       "reason": "req-272 baseline: line count on main 2026-10-31"
     },
     "handoff/work/BACKLOG.md": {
-      "ceiling": 241,
-      "reason": "req-272 baseline: line count on main 2026-10-31"
+      "ceiling": 208,
+      "reason": "tightened 2026-10-31: merged req items pruned (req-264 recording pass)"
     },
     "handoff/reference/PAGES.md": {
       "ceiling": 192,

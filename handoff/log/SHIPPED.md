@@ -2878,5 +2878,4 @@ Planner's browser walk on `plan qa`: 4 Backs → Today, 0 dialogs / Not found / 
 
 UI; throwaway agent, …`f0127f1`. Warm-up dropped on a change to cardio/timed (DEC-155 §10); `primary` flag on import choices; partial-week
 days as "Mon (week 1), Mon (week 3)"; `clampLoopWeeks` in the Days text; label `min-width: min(3.5em, 40%)` (main broke "Days" to "D/a/y/s").
-Gate: `./check` 2288, smoke, test list 10/10; independent reviewer ×2: No blockers, its should-fix (long-word overflow) fixed — crawl 90 pages ×
-320/390 overflow 0. Planner viewed the screens. `reports/req-264.md`.
+Gate: `./check` 2288, smoke, 10/10; independent reviewer ×2: No blockers, should-fix fixed (crawl 90 pages × 320/390, overflow 0). `reports/req-264.md`.
