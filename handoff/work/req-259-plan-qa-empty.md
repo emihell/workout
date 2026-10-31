@@ -1,4 +1,4 @@
-**Status: BUILT, NOT merged — branch `req-259` (`0692352`…`fbb501a`)** · **Lane: tooling** · req-159 (`plan qa`), DEC-155, L-033. After req-257 (same file `plan`).
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-259` (`0692352`…`fbb501a`, 2 commits).** · **Lane: tooling** · req-159 (`plan qa`), DEC-155, L-033. After req-257 (same file `plan`).
 
 # req-259 — `plan qa <ref> --empty`: serve a true first-time user
 
