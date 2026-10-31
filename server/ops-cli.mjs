@@ -8,13 +8,14 @@
 //   plan preview <file> [--user <u>]     req-245: the coach's plan file against the DB (reads only)
 //   plan apply <file> --source <s> --note <t> [--yes --expect-rev <n>] [--user <u>]   backup, then one new revision
 //   plan revert <rev> [--yes --expect-rev <n>] [--note <t>] [--user <u>]             that revision's setup, as a new one
+//   plan build <changes.json> --out <file> [--user <u>]   req-254: Coach's change list → a checked plan file (reads only)
 //   (WORKOUT_REPO_DIR: where the live DEPLOYED sha is looked up; default this checkout, then ~/dev/workout/workout-codebase)
 // Environment, as the scripts set it: WORKOUT_DATA_DIR, WORKOUT_PORT, WORKOUT_HTTPS_PORT (8446),
 // WORKOUT_LABEL (com.workout.server), WORKOUT_LIVE_DIR (~/dev/workout/workout-live),
 // WORKOUT_AGENTS_DIR (~/Library/LaunchAgents — where the doctor reads <label>.plist; a test seam).
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { DB_FILE, LIVE_DATA_DIR, NODE_FLOOR_TEXT, REPO_ROOT, SECRET_FILE, isInside, nodeVersionOk, realish, serverConfig } from './config.mjs'
@@ -295,6 +296,40 @@ async function plan(args) {
     return
   }
 
+  if (sub === 'build') {
+    // req-254: the newest revision, opened read-only exactly as preview opens it; --out only without refusals.
+    const { positional, opts } = parseArgs(rest, ['--user', '--out'], [])
+    if (positional.length !== 1 || !opts.out) throw new Error('usage: plan build <changes.json> --out <file> [--user <name>]')
+    const out = resolve(opts.out)
+    if (existsSync(out)) throw new Error(`Refused, nothing written: --out ${out} already exists (build never overwrites).`)
+    const changes = readJson(positional[0])
+    const { buildPlan } = await import('./plan-build.mjs')
+    const library = JSON.parse(readFileSync(new URL('../src/library/exercises.json', import.meta.url), 'utf8'))
+    const db = new DatabaseSync(dbFileOf(), { readOnly: true })
+    try {
+      const user = pickUser(db, opts.user)
+      const { getState } = await import('./store.mjs')
+      const current = getState(db, user.id)
+      const built = buildPlan(current.state, changes, { library })
+      console.log(`built on rev ${current.rev} for ${user.username}`)
+      for (const line of built.lines) console.log(`  ${line}`)
+      for (const w of built.warnings) console.log(`warning: ${w}`)
+      if (built.plan) printPlan(`plan preview of the result (Keep my history), against rev ${current.rev}`, built.plan)
+      if (built.refusals.length) {
+        for (const r of built.refusals) if (!built.plan?.refusals.some((p) => r.endsWith(p))) console.log(`REFUSED: ${r}`)
+        console.log(`Nothing written: no ${out}.`)
+        process.exitCode = 1
+        return
+      }
+      writeFileSync(out, JSON.stringify(built.file, null, 2) + '\n', { flag: 'wx' })
+      console.log(`wrote ${out} (sha256 ${fileHash(out)})`)
+      console.log(`next: ./server/ops plan preview ${out}${opts.user ? ` --user ${opts.user}` : ''}`)
+    } finally {
+      db.close()
+    }
+    return
+  }
+
   if (sub === 'apply' || sub === 'revert') {
     const apply = sub === 'apply'
     const { positional, opts } = parseArgs(rest, apply ? ['--user', '--source', '--note', '--expect-rev'] : ['--user', '--note', '--expect-rev'], ['--yes'])
@@ -380,7 +415,7 @@ async function plan(args) {
     }
     return
   }
-  throw new Error('usage: plan preview|apply|revert …')
+  throw new Error('usage: plan preview|apply|revert|build …')
 }
 
 const [command, ...args] = process.argv.slice(2)
