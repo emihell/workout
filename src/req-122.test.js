@@ -55,7 +55,7 @@ test('lookClass emits exactly the classes the call sites used to hand-write', ()
 })
 
 test('library NavLink defaults to the link look; the base keeps none', () => {
-  const ui = read('ui/index.jsx')
+  const ui = read('ui/controls.jsx')
   assert.match(ui, /export function NavLink\(\{ look = 'link', \.\.\.rest \}\) \{\n\s*return <BaseNavLink look=\{look\} \{\.\.\.rest\} \/>/)
   const shared = read('views/shared.jsx')
   assert.match(shared, /export function NavLink\(\{ to, children, className, chevron, look, block = false, \.\.\.rest \}\)/)
@@ -66,7 +66,7 @@ test('library NavLink defaults to the link look; the base keeps none', () => {
 })
 
 test('failure case — order: Actions renders retreat, then lateral, then forward (DESIGN §4)', () => {
-  const ui = read('ui/index.jsx')
+  const ui = read('ui/controls.jsx')
   const start = ui.indexOf('export function Actions(')
   assert.ok(start >= 0, 'Actions not found')
   const body = ui.slice(start, ui.indexOf('\n}\n', start))
