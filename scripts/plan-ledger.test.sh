@@ -139,7 +139,11 @@ out="$(reviewer_warning "$R" "$m" req-306)"
 for f in src/store.jsx src/storage.js src/persistence.js src/history-queries.js src/state-reducers.js src/progress.js src/workout-log.js src/views/history/store-bits.js; do
   printf '%s\n' "$f" | grep -Eq "$REVIEWER_TRIGGER_RE" && ok "trigger regex matches $f" || bad "trigger regex misses $f"
 done
-for f in src/App.jsx src/views/Settings.jsx scripts/model.js src/views/history/helpers.js src/persistence.test.js src/set-rules.js; do
+# req-270: workout-log.js's successors (the split, no shim) are triggers too, one assertion each.
+for f in src/workout-items.js src/workout-progress.js src/workout-finish.js src/workout-timers.js src/set-seed.js src/set-drafts.js src/set-display.js; do
+  printf '%s\n' "$f" | grep -Eq "$REVIEWER_TRIGGER_RE" && ok "trigger regex matches $f" || bad "trigger regex misses $f"
+done
+for f in src/App.jsx src/views/Settings.jsx scripts/model.js src/views/history/helpers.js src/persistence.test.js src/set-rules.js src/set-seed.test.js src/workout-note.js; do
   printf '%s\n' "$f" | grep -Eq "$REVIEWER_TRIGGER_RE" && bad "trigger regex wrongly matches $f" || ok "trigger regex skips $f"
 done
 

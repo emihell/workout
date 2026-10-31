@@ -23,7 +23,8 @@ globalThis.localStorage = {
 const { migrateState } = await import(at('src/model.js'))
 // persistence.js since req-164; an older tree only has storage.js (deleted in req-269).
 const { loadState } = await import(at(existsSync('src/persistence.js') ? 'src/persistence.js' : 'src/storage.js'))
-const { finishedState } = await import(at('src/workout-log.js'))
+// req-270 — finishedState lives in workout-finish.js; an older tree only has workout-log.js.
+const { finishedState } = await import(at(existsSync('src/workout-finish.js') ? 'src/workout-finish.js' : 'src/workout-log.js'))
 const { OLD_V8, OLD_V9_WITH_PLAN } = await import(at('src/req-165.old-docs.js'))
 
 // req-269 — a disk value parsed as JSON. One exception: since req-178 the device fill marker

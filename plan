@@ -849,12 +849,14 @@ PY
 # merged `reports/<reqid>.md` names no reviewer. Prints nothing otherwise.
 # Non-blocking by design — it is a reminder, never a refusal.
 #   trigger paths: src/ store*, model, storage, progress, workout-log, storage.js's successors
-#   (persistence, history-queries, state-reducers — req-164 split, req-269 deleted the shim), and the
+#   (persistence, history-queries, state-reducers — req-164 split, req-269 deleted the shim),
+#   workout-log.js's successors (workout-items, workout-progress, workout-finish, workout-timers,
+#   set-seed, set-drafts, set-display — req-270 split, no shim), and the
 #   migration/load path (migrat*, load*, exchange, import-backup); *.test.js
 #   files are excluded — a test edit changes no stored data or prefill.
 #   reviewer: the report matches `reviewer` case-insensitively (which covers
 #   "Reviewer" and "independent reviewer", the req-129 wording).
-REVIEWER_TRIGGER_RE='^src/(.*/)?(store[^/]*|model|storage|persistence|history-queries|state-reducers|progress|workout-log|migrat[^/]*|load[^/]*|exchange|import-backup)\.(js|jsx|mjs)$'
+REVIEWER_TRIGGER_RE='^src/(.*/)?(store[^/]*|model|storage|persistence|history-queries|state-reducers|progress|workout-log|workout-items|workout-progress|workout-finish|workout-timers|set-seed|set-drafts|set-display|migrat[^/]*|load[^/]*|exchange|import-backup)\.(js|jsx|mjs)$'
 
 reviewer_warning() {
   local code_dir="$1" merge="$2" reqid="$3" touched report
