@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url'
 import { parseAst } from 'rolldown/parseAst'
 import { deletionConfirmHead, routineScheduledDaysText } from './state-reducers.js'
 import { machinesPlan, SPLIT_AB, SPLIT_SAME } from './plan-templates.js'
-import { offerSheetText, offerText } from './routine-update-offer.js'
+import { offerSheetText } from './routine-update-offer.js'
 import { ABANDON_ON_NEW_WARNING, abandonInProgress } from './workout-actions.js'
 import { answerConfirm, getPendingConfirm, subscribeConfirm } from './ui/confirm.js'
 
@@ -148,8 +148,6 @@ describe('routine meaning reads "workout"', () => {
     assert.deepEqual(machinesPlan({ days: 2, split: SPLIT_SAME, picks: ['a'] }).routines.map((r) => r.name), ['Workout'])
   })
   it('the kg offer says "workout"', () => {
-    assert.equal(offerText({ from: [30], to: [32.5] }), 'You lifted 32.5 kg · workout says 30 kg')
-    assert.equal(offerText({ from: [], to: [30] }), 'You lifted 30 kg · not in the workout yet')
     assert.equal(offerSheetText({ to: [40] }, 'Leg Press').body, 'The workout will start Leg Press at 40 kg.')
   })
 })

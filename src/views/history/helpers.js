@@ -25,15 +25,6 @@ export function historyGroupMeta(snapshotItem, setCount, { skipped = false } = {
     .join(' · ')
 }
 
-// req-153 — the meta for one History detail row from its group's sets ({ s, index }
-// pairs, groupSetsByExercise): skipped sets aren't counted (as in the header, req-116),
-// and an exercise whose every set was skipped reads "skipped".
-export function historyGroupRowMeta(snapshotItem, groupItems) {
-  const items = groupItems || []
-  const logged = items.filter(({ s }) => !isSkippedSet(s)).length
-  return historyGroupMeta(snapshotItem, logged, { skipped: items.length > 0 && logged === 0 })
-}
-
 export function itemIdOf(obj) {
   return obj?.routineItemId || obj?.id || ''
 }

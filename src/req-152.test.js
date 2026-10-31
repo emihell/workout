@@ -86,7 +86,7 @@ describe('History detail exercise meta (QA-4)', () => {
   // req-153 review — a source pin that stays: detail.jsx is .jsx (node can't load it), and
   // this is the only link between the screen and the behaviour-tested row text.
   // req-209 test edit: the row now renders its sets inline (§2) through historyGroupSetsText,
-  // whose all-skipped case keeps "skipped" (req-209.test.js); was historyGroupRowMeta.
+  // whose all-skipped case keeps "skipped" (req-209.test.js); the old row-meta helper was deleted in req-269.
   it('detail.jsx renders each row through historyGroupSetsText', () => {
     assert.match(read('./views/history/detail.jsx'), /historyGroupSetsText\(snapshotItem, group\.items, /)
   })
