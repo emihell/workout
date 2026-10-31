@@ -18,7 +18,7 @@ import { lookClass } from './nav-look.js'
 // No look (or 'plain') adds no class — the bare base the bottom menu and the in-text
 // exercise-title link build on. Views import the library NavLink (ui/index.jsx),
 // which defaults `look` to 'link'; this base is its building block and stays here so
-// shared.jsx keeps no ui/ import (ui/index.jsx imports from here — one-way). The
+// shared.jsx keeps no ui/ import (ui/controls.jsx imports from here — one-way). The
 // look → class mapping is ./nav-look.js (plain JS, unit-tested).
 export function NavLink({ to, children, className, chevron, look, block = false, ...rest }) {
   const classes = [lookClass(look, block), className].filter(Boolean).join(' ')

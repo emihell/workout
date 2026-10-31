@@ -217,7 +217,7 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
                 {pct != null ? <span className="ui-arrow">{improvementText(pct)}</span> : null}
               </Row>
               {/* req-187 — no inline routine-kg offer here any more: it is a sheet on the
-                  exercise's last Complete (item.jsx askRoutineUpdate). */}
+                  exercise's last Complete (item-actions.js askRoutineUpdate). */}
             </Fragment>
           )
         })}

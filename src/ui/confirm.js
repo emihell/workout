@@ -2,7 +2,7 @@
 //
 // A tiny module-level store, not React state, so plain modules (workout-actions.js,
 // import-backup.js) can ask too. `askConfirm(message, { confirmLabel })` opens the one
-// bottom sheet (<ConfirmSheet/> in ui/index.jsx, mounted once in App) and resolves
+// bottom sheet (<ConfirmSheet/> in ui/confirm-sheet.jsx, mounted once in App) and resolves
 // true on the destructive button, false on Cancel / backdrop / Escape / navigation.
 // Only one question is open at a time: a new ask cancels (resolves false) the old one.
 // Pure JS, so `node --test` drives it with answerConfirm() — no DOM needed.

@@ -11,7 +11,7 @@ const NO_ERRORS = Object.freeze({})
 // already-logged set, used by both WorkoutSetEdit (a set in the active workout)
 // and HistorySet (a set in a finished, historical workout). It lives here rather
 // than in shared.jsx because it imports ui/ primitives, and shared.jsx is kept
-// free of ui/ imports (ui/index.jsx imports NavLink from it — one-way).
+// free of ui/ imports (ui/controls.jsx imports NavLink from it — one-way).
 //
 // The two callers differ ONLY in things passed as props; the form owns the field
 // state and layout:
