@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # req-166 — self-test for check_handoff's Lane / DECIDED rules (DEC-085 §6), in a throwaway
 # git repo (check_handoff reads handoff/ via `git show <ref>:<path>`). Nothing in the real
-# repo is touched. Manual, like check-handoff.test.sh:  bash scripts/check-lanes.test.sh
+# repo is touched. Run by scripts/shell-suites.sh (req-275); alone:  bash scripts/check-lanes.test.sh
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CHECK="${CHECK_HANDOFF:-$ROOT/scripts/check_handoff.py}"

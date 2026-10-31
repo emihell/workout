@@ -5,8 +5,8 @@
 # so a shipped req can sit under a forward-looking section and the check stays
 # green. If the parser stops matching today's prose, this test goes red.
 #
-# Manual; NOT wired into ./check (precedent: plan-guards.test.sh,
-# plan-ledger.test.sh). Run:  bash scripts/check-handoff.test.sh
+# Run by scripts/shell-suites.sh: in CI always, in ./check when its subject changed (req-275).
+# Run alone:  bash scripts/check-handoff.test.sh
 #
 # check_handoff reads handoff/ via `git show <ref>:<path>`, so the fixture has
 # to be a real committed git repo. We build a throwaway one, plant a req doc
