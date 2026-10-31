@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { rpeOptionValue } from './ids.js'
-import { allItemsDone } from './workout-log.js'
+import { allItemsDone } from './workout-progress.js'
 import {
   itemIsMarkedDone,
   itemKey,

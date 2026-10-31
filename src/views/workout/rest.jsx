@@ -3,7 +3,7 @@ import { go } from '../../route'
 import { useStore } from '../../store-context'
 import { WorkoutPill as UIWorkoutPill } from '../../ui/index.jsx'
 import { itemKey } from '../../workout-items.js'
-import { workoutPillState, workoutPosition } from '../../workout-log.js'
+import { workoutPillState, workoutPosition } from '../../workout-progress.js'
 import { itemLogPath } from '../../workout-paths'
 import { useRestCountdown } from './rest-countdown.js'
 

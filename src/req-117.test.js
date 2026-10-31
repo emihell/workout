@@ -19,7 +19,7 @@ import {
   withOneLessSet,
   withOneMoreSet,
 } from './workout-items.js'
-import { anythingLogged, autoCompleteArmed } from './workout-log.js'
+import { anythingLogged, autoCompleteArmed } from './workout-progress.js'
 import { finishedState } from './workout-finish.js'
 import { formFieldsWithDraft, setDraftFromLoggedSet } from './set-drafts.js'
 import { isSkippedSet } from './set-rules.js'

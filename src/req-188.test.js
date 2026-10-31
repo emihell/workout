@@ -16,12 +16,12 @@ import {
   replacementItem,
   skipItemPatch,
 } from './workout-items.js'
-import { currentWorkoutItem, itemAllSkipped } from './workout-log.js'
+import { currentWorkoutItem, itemAllSkipped } from './workout-progress.js'
 import { finishedState } from './workout-finish.js'
 import { isAddedMidWorkout } from './set-rules.js'
 import { pickerItem } from './routine-picker.js'
 import { needsSetup, noHistoryItem, resolvePicks } from './mid-workout-pick.js'
-import { autoCompleteArmed } from './workout-log.js'
+import { autoCompleteArmed } from './workout-progress.js'
 import { routineUpdateOffer } from './routine-update-offer.js'
 import { answerConfirm, askChoice, askConfirm, getPendingConfirm } from './ui/confirm.js'
 import { parseRoute } from './route.js'

@@ -16,7 +16,7 @@ import {
   replaceItemPatch,
   replacementItem,
 } from './workout-items.js'
-import { workoutPillState, workoutPosition } from './workout-log.js'
+import { workoutPillState, workoutPosition } from './workout-progress.js'
 import { leftOpenText } from './finish-unfinished.js'
 
 const h = React.createElement

@@ -8,7 +8,7 @@ import React from 'react'
 import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
 import { itemKey, replaceItemPatch, replacementItem, skipItemPatch } from './workout-items.js'
-import { workoutPillState, workoutPosition } from './workout-log.js'
+import { workoutPillState, workoutPosition } from './workout-progress.js'
 
 const h = React.createElement
 const DB = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))

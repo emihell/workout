@@ -12,7 +12,7 @@ import { act, importJsx, render } from './test-support/render.js'
 import { catchLongTimers } from './test-support/long-timers.js'
 import { addDays, dateKey, mondayOf } from './schedule.js'
 import { withFrom } from './route.js'
-import { workoutPillState } from './workout-log.js'
+import { workoutPillState } from './workout-progress.js'
 import { topSetText } from './views/history/helpers.js'
 import {
   dayEveryText,

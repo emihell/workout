@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import React from 'react'
 import { act, importJsx, render } from './test-support/render.js'
 import { addWorkingSetToState, markItemDonePatch, reopenItemPatch, replaceItemPatch, replacementItem } from './workout-items.js'
-import { workoutPillState, workoutPosition } from './workout-log.js'
+import { workoutPillState, workoutPosition } from './workout-progress.js'
 import { noHistoryItem } from './mid-workout-pick.js'
 import { MAX_SETS, parseRoutineItem } from './routine-item-parse.js'
 

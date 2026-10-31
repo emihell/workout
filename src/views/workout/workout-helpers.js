@@ -1,6 +1,6 @@
 // req-165 (F-LINT-1) — the in-workout screens' shared plain helpers, moved out of
 // helpers.jsx (which now exports components only). JSX-free.
-import { autoCompleteArmed } from '../../workout-log.js'
+import { autoCompleteArmed } from '../../workout-progress.js'
 import { itemKey, itemLoggingState } from '../../workout-items.js'
 import { itemCurrentPath, itemDonePath, itemLogPath, itemReplacePath } from '../../workout-paths'
 import { recordButton } from '../../analytics'

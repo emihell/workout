@@ -40,7 +40,7 @@ import {
 } from '../../set-drafts.js'
 import { isSkippedSet } from '../../set-rules.js'
 import { loggedSetRowText, setListRows } from '../../set-display.js'
-import { nextNotDoneItem } from '../../workout-log.js'
+import { nextNotDoneItem } from '../../workout-progress.js'
 import {
   restPatchAfterSet,
   startStopwatchPatch,

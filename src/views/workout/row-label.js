@@ -4,7 +4,7 @@
 // replacementItem), else " · skipped" (⋯ → Skip exercise, or every set skipped by hand).
 // req-222 — itemSwappedAway now lives in workout-log.js (the pill's whole-workout count uses it
 // too); re-exported here so its callers are unchanged.
-import { itemAllSkipped, itemSwappedAway } from '../../workout-log.js'
+import { itemAllSkipped, itemSwappedAway } from '../../workout-progress.js'
 
 export { itemSwappedAway }
 

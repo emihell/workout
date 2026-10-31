@@ -1,3 +1,4 @@
+// req-270 — split from workout-log.js: where the workout stands.
 import { isAddedMidWorkout, isSkippedSet } from './set-rules.js'
 import { restClockText } from './set-display.js'
 import { itemIsMarkedDone, itemKey, itemLoggingState, setsForItem } from './workout-items.js'
