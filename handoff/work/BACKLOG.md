@@ -152,6 +152,10 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   coach up to date with the latest scientific data on the hu man body/mind and excersice"): a role like Coach (DEC-145) that
   searches new studies and proposes checked updates to `coach/EVIDENCE.md` (DEC-149's method), replacing book notes (DEC-150).
   Needs a design pass with Emilio: cadence, what happens to the 3 existing book notes, who approves an EVIDENCE change.
+  Emilio's brief: `researcher/EMILIO-BRIEF-2026-10-31.md`. **Not now; an MVP soon** (Emilio, 2026-10-31). Planner's read:
+  adopt its rigour (hierarchy, levels, full-text/abstract/metadata, retractions, finding vs interpretation vs advice), grow
+  scope from Coach's questions rather than all 20 domains, own summaries + metadata in git (no abstracts), dashboard later.
+  Open for the MVP design: scope, storage, cadence, book notes keep/retire.
 - **Audit the Coach workflow** (Emilio asked when, 2026-10-31): no review of the Coach role has run since DEC-145; five runs
   done. A read-only audit (`rules/AUDIT.md` style) of COACH.md/CAPABILITIES/GOALS/EVIDENCE + run 1–5 reports + what came back
   to Planner. Run reports live on the server (`workout-data/coach/run-*`), so it runs there.
