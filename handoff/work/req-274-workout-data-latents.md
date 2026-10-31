@@ -105,7 +105,7 @@ Back after adding a set then lands on "Not found." when that workout was deleted
 
 ## Decisions made on Emilio's behalf
 
-- `(unconfirmed)` (a): at 20 sets "Add set" is not shown (no message); history-built items keep the first 20 sets.
+- (confirmed DEC-155 §10) (a): at 20 sets "Add set" is not shown (no message); history-built items keep the first 20 sets.
 - implementation: (b) read-side matcher instead of re-keying stored items; (c) via `isWeightedType`.
 
 ## Siblings

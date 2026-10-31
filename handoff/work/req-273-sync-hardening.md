@@ -95,7 +95,7 @@ after immutable URI (file:…?immutable=1, readOnly): t.db         ← count rea
 - implementation: the `code` field name; the warn text; reopening via immutable only when no `-wal` exists.
 - behaviour (invisible in the app): a conflict record the server refused is dropped after one try rather than blocking
   sync — the record is lost, the state is not. DEC-155 §9's "never lost silently" holds for data the server accepts;
-  a refused record is warned in the console. `(unconfirmed)`
+  a refused record is warned in the console. (confirmed DEC-155 §10)
 
 ## Siblings
 
