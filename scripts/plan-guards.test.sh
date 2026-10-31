@@ -468,6 +468,55 @@ rc="$(printf '%s' "$res" | cut -f1)"; last="$(printf '%s' "$res" | cut -f2)"; me
   || bad "closeout req-097 should end 'no deploy needed' — rc=$rc merged=$merged last=[$last]"
 printf '    | last line: %s\n' "$last"
 
+echo "# closeout — req-275 (a): a req doc with no **Status:** span → merge lands, WARNING, save/publish/push still run, exit 0"
+( cd "$PLAN_WT" && printf '# req-098 — no-status fixture\n\nThis doc carries no status span.\n' > handoff/work/req-098-nostatus.md \
+    && git add -A && git commit -qm "req-098 spec" )
+git -C "$CODE" checkout -q -b req-098
+( cd "$CODE" && printf 'r098\n' > r098.txt \
+    && printf '# req-098\n\n## What I ran\n\n%s\ncheck: all green\n%s\n\n## For Emilio\n\nnothing\n' "$FENCE" "$FENCE" > reports/req-098.md \
+    && git add -A && git commit -qm "req-098 work" )
+git -C "$CODE" checkout -q main
+out="$(cd "$CODE" && "$PLAN" closeout req-098 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && git -C "$CODE" cat-file -e main:r098.txt \
+    && printf '%s' "$out" | grep -qxF 'plan closeout: WARNING — req-098-nostatus.md has no **Status:** span; flip it by hand' \
+    && printf '%s' "$out" | grep -q '^plan publish: ' \
+    && [ "$(git --git-dir="$ORIGIN" rev-parse main)" = "$(git -C "$CODE" rev-parse main)" ] \
+    && git --git-dir="$ORIGIN" cat-file -e main:r098.txt \
+    && ! git -C "$CODE" rev-parse --verify -q refs/heads/req-098 >/dev/null; } \
+  && ok "closeout req-098 (no Status span): exit 0, merged, WARNING printed, published, pushed (origin main = main), branch dropped" \
+  || bad "closeout with no Status span must warn and finish — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+
+echo "# closeout — req-275 (a): a reviewer_warning that returns 1 (re-run path) → no abort"
+# Sourced under set -euo pipefail with reviewer_warning stubbed to fail, then cmd_closeout called as
+# a plain statement (inside an && list set -e would be off and the test would prove nothing).
+# req-096 is already merged (above), so this is the re-run path where review_warn is computed.
+out="$(cd "$CODE" && bash -c 'set -euo pipefail; _PLAN_NO_MAIN=1 source "$1"; reviewer_warning() { return 1; }; cmd_closeout req-096; echo "REACHED-END"' _ "$PLAN" 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -qx 'REACHED-END' \
+    && printf '%s' "$out" | grep -qF 'req-096 is already on main'; } \
+  && ok "closeout re-run of req-096 with reviewer_warning → 1: exit 0, runs to the end" \
+  || bad "a failing reviewer_warning must not abort the closeout — rc=$rc out=$out"
+printf '%s\n' "$out" | tail -3 | sed 's/^/    | /'
+
+echo "# save — req-275 (d): the planning worktree's check_handoff.py is OLDER than plan's (L-072) → save uses the one beside plan"
+# The planning copy only takes --repo (as main's did before req-272's flags); the code-side `plan`
+# passes --only doc-limits --worktree. Committed straight on planning (save refuses scripts/), undone after.
+( cd "$PLAN_WT" && printf 'import argparse\np = argparse.ArgumentParser()\np.add_argument("--repo")\np.parse_args()\n' > scripts/check_handoff.py \
+    && git add scripts/check_handoff.py && git commit -qm "old check_handoff fixture" \
+    && printf '# l072\n' > handoff/work/l072-note.md )
+out="$(cd "$PLAN_WT" && "$PLAN" save "l072 fixture" 2>&1)"; rc=$?
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '^plan save: committed' \
+    && ! printf '%s' "$out" | grep -q 'unrecognized arguments' \
+    && git -C "$PLAN_WT" cat-file -e HEAD:handoff/work/l072-note.md; } \
+  && ok "save with an old planning-side check_handoff.py: exit 0, committed, no 'unrecognized arguments'" \
+  || bad "save must use the check_handoff.py beside plan — rc=$rc out=$out"
+printf '%s\n' "$out" | sed 's/^/    | /'
+if git -C "$PLAN_WT" cat-file -e HEAD:handoff/work/l072-note.md 2>/dev/null; then
+  git -C "$PLAN_WT" reset -q --hard HEAD~2
+else
+  git -C "$PLAN_WT" reset -q --hard HEAD~1; rm -f "$PLAN_WT/handoff/work/l072-note.md"
+fi
+
 echo "# find_worktrees — req-257: a top-level scratch worktree never becomes CODE_DIR"
 # main + ../workout-planning (planning) + ../workout-scratch (scratch) + a nested agent worktree.
 R257="$SB/r257"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """req-271 — the DEC index: one generated line per decision, from the range files.
 
-Layout (after `scripts/dec_split.py` has run once):
+Layout (since req-271's one-shot split; scripts/dec_split.py, which did it, was deleted in req-275):
 
   handoff/log/DECISIONS.md           header + the topical digest + the generated index
   handoff/log/decisions/DEC-001-050.md, DEC-051-100.md, …   the entries, 50 per file
@@ -22,7 +22,7 @@ file's first entry. `./plan save` runs it whenever a range file changed.
   python3 scripts/dec_index.py [--root DIR] [--check]
 
 --check writes nothing and exits 1 when the committed index differs from the output.
-The parsing is shared: scripts/dec_split.py and scripts/check_handoff.py import it.
+The parsing is shared: scripts/check_handoff.py imports it.
 """
 from __future__ import annotations
 
@@ -298,7 +298,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     decisions_md, files = read_fs(args.root)
     if not files:
-        print(f"dec_index: {DECISIONS_DIR}/ has no range files — not split yet; run python3 scripts/dec_split.py",
+        print(f"dec_index: {DECISIONS_DIR}/ has no range files — nothing to index (req-271 split them out; restore them from git)",
               file=sys.stderr)
         return 2
     try:

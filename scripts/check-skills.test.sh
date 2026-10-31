@@ -2,7 +2,7 @@
 # req-160 — planted-failure self-test for check_skills.py: it must pass on the real
 # skills, and FIRE on each planted fault (copied rule text, a dead L-/DEC-/§ pointer,
 # a missing path) in a throwaway skills dir. Nothing in the repo is touched.
-# Manual; not wired into ./check (precedent: check-handoff.test.sh).
+# Run by scripts/shell-suites.sh: in CI always, in ./check when its subject changed (req-275).
 #   bash scripts/check-skills.test.sh
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

@@ -5,8 +5,8 @@
 # so a shipped req can sit under a forward-looking section and the check stays
 # green. If the parser stops matching today's prose, this test goes red.
 #
-# Manual; NOT wired into ./check (precedent: plan-guards.test.sh,
-# plan-ledger.test.sh). Run:  bash scripts/check-handoff.test.sh
+# Run by scripts/shell-suites.sh: in CI always, in ./check when its subject changed (req-275).
+# Run alone:  bash scripts/check-handoff.test.sh
 #
 # check_handoff reads handoff/ via `git show <ref>:<path>`, so the fixture has
 # to be a real committed git repo. We build a throwaway one, plant a req doc
@@ -368,6 +368,59 @@ out="$(run_check)"; rc=$?
   && ok "req-252: new 4-line entry -> warns, exit 0, names only req-193" \
   || bad "req-252: a 4-line new entry should warn with exit 0 — rc=$rc out=[$out]"
 printf '    | %s\n' "$out"
+
+# --- req-275: every audit triaged ---------------------------------------------
+# put <path> <text> / del <path>: write or remove one file and commit (check_handoff reads git objects).
+put() { mkdir -p "$CODE/$(dirname "$1")"; printf '%s' "$2" > "$CODE/$1"; ( cd "$CODE" && git add -A && git commit -qm "put $1" ); }
+del() { ( cd "$CODE" && git rm -q "$1" && git commit -qm "del $1" ); }
+
+put audits/2026-10-01.md $'# Audit 2026-10-01\n\n### F-TEST-1 — a finding nobody filed\n### F-TEST-12 — filed\n'
+put handoff/work/BACKLOG.md $'# Backlog\n\n- F-TEST-12 is here.\n'
+out="$(run_check)"
+{ printf '%s\n' "$out" | grep -qxF '[fail] audit: audits/2026-10-01.md — F-TEST-1 untriaged — name it in a req, BACKLOG, or a handoff/log/ entry' \
+    && [ "$(printf '%s\n' "$out" | grep -c '] audit:')" = 1 ]; } \
+  && ok "req-275: an F-id named nowhere else -> [fail] audit: … F-TEST-1 untriaged (F-TEST-12, in BACKLOG, passes; no prefix match)" \
+  || bad "req-275: F-TEST-1 should be the one audit fail — out=[$out]"
+printf '    | %s\n' "$(printf '%s\n' "$out" | grep '] audit:')"
+put audits/2026-10-02.md $'# Audit 2026-10-02\n\n| 10-01 F-TEST-1 | still open |\n'
+out="$(run_check)"
+printf '%s' "$out" | grep -q '] audit:' \
+  && bad "req-275: a later audit citing F-TEST-1 must triage it — out=[$out]" \
+  || ok "req-275: F-TEST-1 cited by a later audit -> no audit finding (the later citation is not a new id)"
+del audits/2026-10-02.md
+put handoff/log/SHIPPED.md $'# Shipped\n\n## req-300 — fixes F-TEST-1  (2026-10-01)\n'
+out="$(run_check)"
+printf '%s' "$out" | grep -q '] audit:' && bad "req-275: F-TEST-1 in handoff/log/ must count — out=[$out]" \
+  || ok "req-275: F-TEST-1 named in handoff/log/SHIPPED.md -> no audit finding"
+del handoff/log/SHIPPED.md
+del audits/2026-10-01.md
+
+put handoff/audits/workflow-2026-11-01.md $'# Workflow audit\n\n**E1** something\n'
+out="$(run_check)"
+printf '%s\n' "$out" | grep -qF '[fail] audit: handoff/audits/workflow-2026-11-01.md — not triaged — add `Triaged: handoff/audits/workflow-2026-11-01.md YYYY-MM-DD`' \
+  && ok "req-275: workflow audit dated 2026-11-01, no AUDIT-TRIAGE.md -> [fail] not triaged" \
+  || bad "req-275: an untriaged 11-01 workflow audit must fail — out=[$out]"
+printf '    | %s\n' "$(printf '%s\n' "$out" | grep '] audit:')"
+put handoff/log/AUDIT-TRIAGE.md $'# Audit triage\n\nTriaged: handoff/audits/workflow-2026-11-02.md 2026-11-02\n'
+out="$(run_check)"
+printf '%s' "$out" | grep -qF 'workflow-2026-11-01.md — not triaged' \
+  && ok "req-275: a Triaged: line naming a DIFFERENT file -> still fails" \
+  || bad "req-275: the marker must name this file — out=[$out]"
+put handoff/log/AUDIT-TRIAGE.md $'# Audit triage\n\nTriaged: handoff/audits/workflow-2026-11-01.md 2026-11-01\n'
+out="$(run_check)"
+printf '%s' "$out" | grep -q '] audit:' && bad "req-275: a named audit must pass — out=[$out]" \
+  || ok "req-275: 'Triaged: handoff/audits/workflow-2026-11-01.md 2026-11-01' -> passes"
+del handoff/audits/workflow-2026-11-01.md
+put handoff/audits/workflow-2026-10-30.md $'# Workflow audit\n\n**E1** something\n'
+out="$(run_check)"
+printf '%s' "$out" | grep -q '] audit:' && bad "req-275: a 10-30 workflow audit is grandfathered — out=[$out]" \
+  || ok "req-275: workflow audit dated 2026-10-30, not named -> passes (grandfathered)"
+put audits/2026-11-01.md $'# Audit 2026-11-01\n\nNo findings.\n'
+out="$(run_check)"
+printf '%s' "$out" | grep -qF '[fail] audit: audits/2026-11-01.md — not triaged' \
+  && ok "req-275: a root audit dated 2026-11-01, not named -> fails (the marker covers audits/ too)" \
+  || bad "req-275: audits/2026-11-01.md must need a Triaged: line — out=[$out]"
+del audits/2026-11-01.md
 
 # ----------------------------------------------------------------------------
 if [ "$fails" -eq 0 ]; then

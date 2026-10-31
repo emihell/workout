@@ -109,9 +109,10 @@ echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
 # the whole run, not only for test files that import server/test-helpers.mjs.
 # req-248 (from req-239's mutation check): a hanging test must turn the gate red, not hang it
 # (and `plan publish` / CI with it). --test-timeout cancels any test or hook still running after
-# 60 s (measured 2026-10-26: slowest test 5.2 s local / 2.9 s CI, slowest hook — builds.test.js's
-# two vite builds — 1.3 s; a loaded Mac ran the suite ~3x slower (288 s vs 80–105 s), so ~15.7 s,
-# and ~3x that again, rounded up — a busy machine must not turn the gate red at random).
+# 60 s. Measured 2026-10-31 (req-275, node 22.23.4, 12-core Mac): slowest test 1.23–1.45 s, the
+# whole node --test step 10.3–10.9 s (2324 tests, 157 files; req-266 had 8.80 s). Why 60 s, from
+# 2026-10-26: the slowest test was then 5.2 s local / 2.9 s CI, a loaded Mac ran ~3x slower, so
+# ~15.7 s, and ~3x that again, rounded up — a busy machine must not turn the gate red at random.
 # The same 60 s also bounds each test FILE: the runner kills a file's process still alive then
 # (node 22.23, measured 2026-10-31), so a test that left a timer or socket open turns red, named.
 # req-266 (L-067): no --test-force-exit. It ended each file's process with process.exit() the moment
@@ -184,13 +185,23 @@ fi
 echo "check: building (vite build)…"
 npm run --silent build >/dev/null || fail "the production build"
 
+# 3b. req-275 (L-071): the six shell suites (scripts/*.test.sh — plan, check_handoff, the skills
+# check, the pre-push hook) — only those whose subject this checkout changed vs main (diff from the
+# merge base, plus the working tree): all six take ≈34 s against this gate's ≈9 s. CI runs all six
+# on every push (.github/workflows/deploy.yml). The selection table is scripts/shell-suites.sh.
+echo "check: shell suites for this change (scripts/shell-suites.sh --changed)…"
+suites_out="$(bash scripts/shell-suites.sh --changed)" || { printf '%s\n' "$suites_out"; fail "a shell suite (scripts/shell-suites.sh)"; }
+printf '%s\n' "$suites_out" | sed 's/^/check:   /'
+suites_ran="$(printf '%s\n' "$suites_out" | sed -n 's/^shell suites: green — //p')"
+suites_note="${suites_ran:+, the shell suites ($suites_ran)}"
+
 # 4. (--smoke only) the browser smoke test — HEAD's committed tree, not the
 # working copy (it builds from `git archive HEAD`).
 if [ -n "$smoke" ]; then
   echo "check: smoke test (headless browser, HEAD)…"
   node scripts/smoke.mjs || fail "the smoke test"
-  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), the build, and the smoke test all passed."
+  echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s)${suites_note}, the build, and the smoke test all passed."
   exit 0
 fi
 
-echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s), and the build all passed."
+echo "check: green — lint, skills, no import cycles, ${testcount} test(s) in ${#testfiles[@]} file(s)${suites_note}, and the build all passed."

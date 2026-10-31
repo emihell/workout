@@ -17,6 +17,8 @@ Later additions: NOW.md carries exactly one `**Next:**` line (req-250), and
 a SHIPPED entry dated after 2026-10-30 with more than 3 body lines warns
 (req-252; a warning, never a failure). The doc-size ratchet (req-272): each rule doc in
 scripts/doc_limits.json at or under its ceiling — over it fails; ≥10 % under warns "tighten".
+Every audit triaged (req-275, check 7): each audits/*.md F-id is in handoff/work/, handoff/log/ or a
+later audit, and each audit file dated from 2026-10-31 is named in handoff/log/AUDIT-TRIAGE.md.
 
 (A former backlog-index check — `## Sections` / `### N.N` against
 `work/backlog/tier-*.md` — was retired in req-102 when that structure
@@ -689,7 +691,7 @@ def check_shipped_size(repo: str, ref: str) -> list[Finding]:
 #   a. every DEC-NNN cited in DEC_REF_SCOPE resolves to exactly one entry heading;
 #   b. (split layout) DECISIONS.md's generated index equals scripts/dec_index.py's output;
 #   c. the topical digest cites no DEC whose status is `superseded` (audit 2026-10-30 §E1).
-# Works on both layouts: before scripts/dec_split.py runs, the entries are still inside
+# Works on both layouts: before the split (req-271), the entries were still inside
 # DECISIONS.md and (b) has nothing to compare. No DECISIONS.md at ref (a fixture repo) → no check.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import dec_index as di  # noqa: E402
@@ -867,6 +869,57 @@ def check_doc_limits_worktree(repo: str) -> list[Finding]:
     return doc_limit_findings(read, base_read)
 
 
+# ------------------------------------------- check 7: every audit triaged (req-275)
+
+# L-068: the 2026-10-30 audit sat a day with none of its findings in a req or the backlog.
+#   a. every `F-<AREA>-<N>` id in audits/*.md appears in handoff/work/, handoff/log/, or a LATER
+#      audits/*.md (a later audit's "still open" table carries it forward);
+#   b. every audit file (audits/*.md, handoff/audits/*.md) is named on a `Triaged: <path> YYYY-MM-DD`
+#      line in handoff/log/AUDIT-TRIAGE.md — <path> repo-relative, as listed by `git ls-files`.
+#      Workflow audits' E-ids restart per file, so (b) is their only cover. Files dated (first
+#      YYYY-MM-DD in the name) before AUDIT_TRIAGE_CUTOFF are exempt from (b), not from (a).
+AUDIT_DIRS = ("audits", "handoff/audits")
+AUDIT_TRIAGE_PATH = "handoff/log/AUDIT-TRIAGE.md"
+AUDIT_TRIAGE_CUTOFF = "2026-10-31"
+AUDIT_FINDING_RE = re.compile(r"\bF-[A-Z]+-[0-9]+(?![0-9])")
+TRIAGED_LINE_RE = re.compile(r"^Triaged:\s+(\S+)\s+\d{4}-\d{2}-\d{2}\b", re.M)
+
+
+def _audit_files(repo: str, ref: str, folder: str) -> list[str]:
+    return sorted(p for p in list_files(repo, ref, folder)
+                  if p.endswith(".md") and p.rsplit("/", 1)[0] == folder)
+
+
+def check_audits(repo: str, ref: str) -> list[Finding]:
+    findings: list[Finding] = []
+    root_audits = _audit_files(repo, ref, "audits")   # YYYY-MM-DD.md: name order is date order
+    if root_audits:
+        tracked = set(AUDIT_FINDING_RE.findall(
+            _git(repo, ["grep", "-h", "-o", "-E", r"F-[A-Z]+-[0-9]+", ref, "--", "handoff/work", "handoff/log"])))
+        ids_by_file = {p: AUDIT_FINDING_RE.findall(read_file(repo, ref, p) or "") for p in root_audits}
+        for i, path in enumerate(root_audits):
+            # An id belongs to the first audit that names it (the series numbers ids across files);
+            # a later audit re-citing it ("09-12 F-DRIFT-1 … fixed") is that later audit's triage of it.
+            earlier = {fid for p in root_audits[:i] for fid in ids_by_file[p]}
+            later = {fid for p in root_audits[i + 1:] for fid in ids_by_file[p]}
+            for fid in sorted(set(ids_by_file[path]), key=lambda s: (s.rsplit("-", 1)[0], int(s.rsplit("-", 1)[1]))):
+                if fid not in tracked and fid not in later and fid not in earlier:
+                    findings.append(Finding("audit", "fail", path,
+                                            f"{fid} untriaged — name it in a req, BACKLOG, or a handoff/log/ entry"))
+
+    triaged = set(TRIAGED_LINE_RE.findall(read_file(repo, ref, AUDIT_TRIAGE_PATH) or ""))
+    for folder in AUDIT_DIRS:
+        for path in _audit_files(repo, ref, folder):
+            dated = ISO_DATE_RE.search(path.rsplit("/", 1)[1])
+            if dated and dated.group(1) < AUDIT_TRIAGE_CUTOFF:
+                continue
+            if path not in triaged:
+                findings.append(Finding("audit", "fail", path,
+                                        f"not triaged — add `Triaged: {path} YYYY-MM-DD` to {AUDIT_TRIAGE_PATH} "
+                                        f"once every finding is in a req, BACKLOG or the log"))
+    return findings
+
+
 # --------------------------------------------------------------------- driver
 
 def run_checks(repo: str, ref: str, base: str | None = None) -> list[Finding]:
@@ -877,6 +930,7 @@ def run_checks(repo: str, ref: str, base: str | None = None) -> list[Finding]:
     findings.extend(check_shipped_size(repo, ref))
     findings.extend(check_dec_log(repo, ref))
     findings.extend(check_doc_limits(repo, ref, base))
+    findings.extend(check_audits(repo, ref))
     return findings
 
 
