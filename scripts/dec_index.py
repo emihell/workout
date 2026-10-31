@@ -293,6 +293,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true", help="write nothing; exit 1 if the index is stale")
     args = ap.parse_args(argv)
 
+    if not os.path.isfile(os.path.join(args.root, DECISIONS_PATH)):
+        print(f"dec_index: no {DECISIONS_PATH} under {args.root} — nothing to index into", file=sys.stderr)
+        return 2
     decisions_md, files = read_fs(args.root)
     if not files:
         print(f"dec_index: {DECISIONS_DIR}/ has no range files — not split yet; run python3 scripts/dec_split.py",

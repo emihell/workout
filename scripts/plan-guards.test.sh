@@ -30,6 +30,7 @@ mkdir -p scripts handoff/work
 PLAN_SRC="${PLAN_SRC:-$ROOT/plan}"
 cp "$PLAN_SRC" ./plan
 cp "$ROOT/scripts/check_handoff.py" scripts/check_handoff.py
+cp "$ROOT/scripts/dec_index.py" scripts/dec_index.py   # req-271: check_handoff imports it; plan save runs it
 cp "$ROOT/.nvmrc" .nvmrc   # req-257: ping now prints `plan brief`, which reads .nvmrc
 printf '# Now\n\nUpdated. **Shipped: req-01.**\n**Next:** build req-050 (fixture)\n' > handoff/NOW.md
 printf '# spec\n' > handoff/work/req-050-onmain.md
@@ -164,6 +165,36 @@ after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
 { [ $rc -eq 0 ] && [ "$before" != "$after" ] && printf '%s' "$out" | grep -q 'committed'; } \
   && ok "save at 50 lines commits normally (exit $rc)" \
   || bad "save at 50 lines should commit — rc=$rc out=$out"
+
+echo "# save — req-271: a changed handoff/log/decisions/ file → the DEC index is regenerated into the commit"
+( cd "$PLAN_WT" && mkdir -p handoff/log/decisions \
+    && printf '# Decisions\n\n## Current rules digest\n\n- a rule → **DEC-001**\n\n---\n\n## Decision index\n\n(stale)\n' > handoff/log/DECISIONS.md \
+    && printf '## DEC-001 — a fixture rule  (2026-10-31)\n\nBody.\n' > handoff/log/decisions/DEC-001-050.md )
+out="$(cd "$PLAN_WT" && "$PLAN" save "dec fixture" 2>&1)"; rc=$?
+idx="$(git -C "$PLAN_WT" show HEAD:handoff/log/DECISIONS.md)"
+{ [ $rc -eq 0 ] && printf '%s' "$out" | grep -q 'dec_index: wrote the index' \
+    && printf '%s\n' "$idx" | grep -qxF -- '- DEC-001 · 2026-10-31 · a fixture rule · live' \
+    && ! printf '%s' "$idx" | grep -q '(stale)' \
+    && [ -z "$(git -C "$PLAN_WT" status --porcelain)" ]; } \
+  && ok "save regenerated the index and committed it (exit $rc)" \
+  || bad "save should regenerate the DEC index — rc=$rc out=$out idx=$idx"
+
+echo "# save — req-271 failure case: a malformed range-file heading → refuse, commit nothing, index untouched"
+before="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+( cd "$PLAN_WT" && printf '\n## DEC-2 — two-digit id  (2026-10-31)\n' >> handoff/log/decisions/DEC-001-050.md )
+out="$(cd "$PLAN_WT" && "$PLAN" save "should be blocked" 2>&1)"; rc=$?
+after="$(cd "$PLAN_WT" && git rev-parse HEAD)"
+{ [ $rc -ne 0 ] && [ "$before" = "$after" ] \
+    && printf '%s' "$out" | grep -q 'DEC-001-050.md:5: malformed heading' \
+    && printf '%s' "$out" | grep -q 'plan save: refusing' \
+    && [ -z "$(git -C "$PLAN_WT" status --porcelain handoff/log/DECISIONS.md)" ] \
+    && [ -z "$(git -C "$PLAN_WT" diff --cached --name-only)" ]; } \
+  && ok "save refuses on a malformed DEC heading: no commit, nothing staged, DECISIONS.md unchanged (exit $rc)" \
+  || bad "save should refuse a malformed DEC heading — rc=$rc out=$out"
+( cd "$PLAN_WT" && git checkout -q -- handoff/log/decisions/DEC-001-050.md )
+# The later cases' fixture has no DEC log: remove it, or check_handoff's DEC checks report every
+# DEC id in the copied `plan` as dangling against this one-entry fixture.
+( cd "$PLAN_WT" && git rm -rq handoff/log && git commit -qm "drop dec fixture" )
 
 echo "# publish — a build agent's worktree NESTED in the code worktree, on req-120 (req-129)"
 # The real layout: workout-codebase/.claude/worktrees/agent-*/ on a req branch,

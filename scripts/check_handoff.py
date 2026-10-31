@@ -693,13 +693,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import dec_index as di  # noqa: E402
 
 DEC_REF_SCOPE = ["handoff", "src", "server", "scripts", "plan", "check", "README.md", ".githooks", ".claude/skills"]
-# (file, id) pairs allowed to dangle: planted fixtures that test a dangling id fires, and the
-# req that specified this check, which names those fixture ids in its text.
 RANGE_NAME_RE = re.compile(r"\bDEC-\d{3}-\d{3}\.md\b")
+# File → DEC numbers allowed to dangle there: the planted fixture that tests a dangling id fires
+# (check-skills.test.sh), and the req that specified this check, which names the fixture ids in
+# its text. Numbers, not `DEC-NNN` text, so this file doesn't cite them itself.
 DEC_REF_ALLOW = {
-    ("scripts/check-skills.test.sh", "DEC-999"),
-    ("handoff/work/req-271-decisions-split-digest.md", "DEC-999"),
-    ("handoff/work/req-271-decisions-split-digest.md", "DEC-777"),
+    "scripts/check-skills.test.sh": {999},
+    "handoff/work/req-271-decisions-split-digest.md": {777, 999},
 }
 
 
@@ -738,7 +738,7 @@ def check_dec_log(repo: str, ref: str) -> list[Finding]:
         text = RANGE_NAME_RE.sub("", text)
         for m in di.DEC_ID_RE.finditer(text):
             did = m.group(0)
-            if int(m.group(1)) in by_num or (path, did) in DEC_REF_ALLOW:
+            if int(m.group(1)) in by_num or int(m.group(1)) in DEC_REF_ALLOW.get(path, ()):
                 continue
             findings.append(Finding("dec-ref", "fail", f"{path}:{lineno}",
                                     f"cites {did}, which has no `## {did} — …` entry heading"))
