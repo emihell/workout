@@ -6,7 +6,7 @@
 //   POST /api/logout                                → cookie cleared, session deleted
 //   GET  /api/me                    → {username}
 //   GET  /api/state[?baseRev&baseId] → {rev, revId, state[, baseOk]}  (req-230 review round 2)
-//   PUT  /api/state {baseRev, state} → {rev, state, merged, conflicts[, unchanged]}
+//   PUT  /api/state {baseRev, state[, conflicts]} → {rev, state, merged, conflicts[, unchanged]}  (conflicts: req-268)
 //   GET  /api/revisions             → [{rev, baseRev, merged, conflicts, createdAt, source, note}]  (req-245)
 //   GET  /api/revisions/:rev        → {rev, …, conflicts, state}
 //   GET  /api/export                → the app's Export file

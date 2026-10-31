@@ -158,6 +158,34 @@ export function getRevision(db, userId, rev) {
   }
 }
 
+// req-268 (DEC-155 §9) — `conflicts` on a push: what the app's rebase (src/sync/engine.js) dropped
+// while a request was in flight, in the merge's own shape {field, id, kind, lost}. Optional (an
+// older app sends none). Stored as sent (JSON), on the revision this push makes.
+function deviceConflicts(value) {
+  if (value === undefined) return []
+  const ok =
+    Array.isArray(value) &&
+    value.every(
+      (c) =>
+        c !== null &&
+        typeof c === 'object' &&
+        !Array.isArray(c) &&
+        typeof c.field === 'string' &&
+        typeof c.kind === 'string' &&
+        (c.id === null || typeof c.id === 'string' || typeof c.id === 'number') &&
+        'lost' in c,
+    )
+  if (!ok) throw new ClientError(400, 'conflicts must be a list of {field, id, kind, lost}.')
+  return value.map(({ field, id, kind, lost }) => JSON.parse(JSON.stringify({ field, id, kind, lost: lost ?? null })))
+}
+
+function conflictsSince(db, userId, baseRev) {
+  return db
+    .prepare('SELECT conflicts FROM revisions WHERE user_id = ? AND rev > ? ORDER BY rev')
+    .all(userId, baseRev)
+    .flatMap((row) => JSON.parse(row.conflicts))
+}
+
 // PUT /api/state. `baseRev` = the rev the device last synced.
 //   baseRev = current → stored as rev+1 (fast-forward).
 //   baseRev < current → three-way merge (base = baseRev's state, rev 0 = REV0),
@@ -173,6 +201,7 @@ export function putState(db, userId, body, at = new Date(), { source = null, not
   if (!Number.isInteger(baseRev) || baseRev < 0) throw new ClientError(400, 'baseRev must be a whole number ≥ 0.')
   if (baseId !== undefined && (typeof baseId !== 'string' || !baseId)) throw new ClientError(400, 'baseId must be text.')
   const incoming = validState(body.state)
+  const sentConflicts = deviceConflicts(body.conflicts)
   return inTransaction(db, () => {
     const current = getState(db, userId)
     // Review round 2 — with a `baseId`, a base that is not (or no longer) this server's history —
@@ -198,6 +227,12 @@ export function putState(db, userId, body, at = new Date(), { source = null, not
       // passes the app's own checks.
       state = validState(result.state)
       conflicts = result.conflicts
+    }
+    // req-268 (DEC-155 §9) — what the app's own rebase dropped, stored with this revision's own.
+    // One already recorded since the device's base (a retry after a lost reply) is not stored twice.
+    if (sentConflicts.length) {
+      const seen = diverged ? [] : conflictsSince(db, userId, baseRev)
+      conflicts = [...conflicts, ...sentConflicts.filter((c) => !seen.some((s) => isDeepStrictEqual(s, c)))]
     }
     if (current.rev > 0 && conflicts.length === 0 && isDeepStrictEqual(state, current.state)) {
       return { rev: current.rev, revId: current.revId, state: current.state, merged, conflicts, unchanged: true }

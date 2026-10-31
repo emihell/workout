@@ -180,6 +180,30 @@ export function counts(dbFile) {
   }
 }
 
+// req-268 (audit F-SYNC-1) — per user, the latest revision's workout ids that appear more than once
+// in history, and whether the workout in progress is already in history (the state the merge fix
+// stops producing). Read-only: the DB is opened `readOnly`, so a write through it is refused.
+export const readOnlyDb = (dbFile) => new DatabaseSync(dbFile, { readOnly: true })
+export function duplicateWorkoutIds(dbFile) {
+  const db = readOnlyDb(dbFile)
+  try {
+    return db
+      .prepare('SELECT id, username FROM users ORDER BY id')
+      .all()
+      .map(({ id, username }) => {
+        const row = db.prepare('SELECT rev, state FROM revisions WHERE user_id = ? ORDER BY rev DESC LIMIT 1').get(id)
+        const state = row ? JSON.parse(row.state) : {}
+        const seen = new Map()
+        for (const w of Array.isArray(state.workouts) ? state.workouts : []) seen.set(w?.id, (seen.get(w?.id) ?? 0) + 1)
+        const duplicates = [...seen].filter(([, n]) => n > 1).map(([wid, n]) => ({ id: wid, count: n }))
+        const activeId = state.activeWorkout?.id ?? null
+        return { username, rev: row ? row.rev : 0, duplicates, activeInHistory: activeId !== null && seen.has(activeId) ? activeId : null }
+      })
+  } finally {
+    db.close()
+  }
+}
+
 // `./server/restore <backup> --to <dir>`: the backup as a throwaway instance's data dir (a new
 // secret is made when that instance first starts; passwords don't depend on it). Nothing else is
 // touched. The dir must be new or empty, and outside every git working tree.
