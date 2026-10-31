@@ -621,4 +621,7 @@ with `coach/COACH.md` + a run folder, saves its report, and keeps for itself onl
 
 `./check`'s `node --test --test-force-exit` drops part of a file's output on some runs and still exits 0. Main, 5 runs
 [measured]: `# tests` 2187, 2161, 2167, 2187, 2187, all `# fail 0`. req-248's "2096 of 2108" was this, not luck. req-258
-catches only a file that runs zero tests. Until it's fixed (→ BACKLOG §Tooling), read the count on every receipt.
+catches only a file that runs zero tests. **Cause (req-266, proved):** `--test-force-exit` calls `process.exit()` while TAP
+is still queued on the child's stdout pipe (async on POSIX); the lost tests never show as failures. Fixed by dropping it.
+Rule: a rendered test that clicks a download wraps it in `catchLongTimers()` (`src/test-support/long-timers.js`), or
+its file times out at 60 s. Read the count on every receipt anyway.

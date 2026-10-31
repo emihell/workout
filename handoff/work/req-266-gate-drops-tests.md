@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** · L-067, req-248 (timeout + force-exit), req-258 (zero-test files), DEC-155. Before req-259..265: every later merge trusts this gate.
+**Status: BUILT, NOT merged — branch `req-266` (`0319c86`…`ac39812`)** · **Lane: tooling** · L-067, req-248 (timeout + force-exit), req-258 (zero-test files), DEC-155. Before req-259..265: every later merge trusts this gate.
 
 # req-266 — the gate counts every test on every run
 

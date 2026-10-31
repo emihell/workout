@@ -2814,3 +2814,9 @@ main's `plan` (title line exits 1 silently; scratch worktree picked). Planner re
 
 Tooling; throwaway agent, `c788a1c`…`44991d8`. Gate: probes fail on main and go red on the branch (1-of-10 cases; `process.exit(0)` file);
 `./check --smoke` green; Planner re-ran the dates-tz guard (3/3). No reviewer: no trigger file. CI v7 confirmed on the merge push. `reports/req-258.md`.
+
+## req-266 — the gate counts every test on every run  (2026-10-31)
+
+Tooling; throwaway agent, `0319c86`…`ac39812`. `check` drops `--test-force-exit` (it cut queued TAP output); two download tests clear their
+60 s timer via `src/test-support/long-timers.js`. Gate: main 10 runs, 5 distinct counts; branch 10/10 = 2187 = per-file sum; hang/handle/zero-test
+probes red; Planner re-ran 3/3 = 2187. No reviewer: no trigger file. `reports/req-266.md`.

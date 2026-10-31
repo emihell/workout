@@ -164,10 +164,6 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
 
 ## Tooling
 
-- **The gate passes with tests missing** (req-258 report, L-067) [measured 2026-10-31, main, 5 runs: 2187/2161/2167/2187/2187,
-  all exit 0]. A different file is cut off partway each time (`storage.test.js`, `req-220.test.js`, `req-139.test.js`).
-  Without `--test-force-exit` counts were complete 6/6 but `req-203.test.js` and `req-220.rendered.test.js` keep a handle
-  open → 60 s timeout. Likely: force-exit kills a child before its output reaches the runner [inferred]. → **req-266**.
 - **A plan-builder for Coach** (DEC-145 §4): a short change list (routine X: order, kg, rest, notes; new library exercise;
   schedule slot) → a full plan file in the Export shape, checked (workouts identical, only the named parts changed) and
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
@@ -190,11 +186,12 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   `--test-timeout`, and `deploy.yml` sets no `timeout-minutes` (GitHub's default is 6 h). A regression that leaves a rendered test
   waiting (req-239's mutation did) never goes red. With a timeout, the hang is a cancelled test → exit 1 (a 1.5 s probe: exit 1).
   → **req-248** (READY).
-- → **req-258** (as "no file runs zero tests"; partial files: see the first item). **Fail `./check` when the test count drops** (req-248 report): one pre-watchdog run ended at 2096 of 2108 tests — req-10's
+- → **req-258** (as "no file runs zero tests"; partial files → req-266). **Fail `./check` when the test count drops** (req-248 report): one pre-watchdog run ended at 2096 of 2108 tests — req-10's
   12 rendered tests missing, no ✖ line for the file; red only by luck (an unrelated unit failure). Not reproduced. A floor
   (e.g. the count can't fall below main's without a named test edit) would catch a silently dropped file.
 - → **req-258**. **CI actions on Node 20** (req-238 run 40354463101): `actions/checkout@v4` / `setup-node@v4` are deprecated, forced to Node 24.
   Bump both to their current majors when it's convenient.
+- **`check`'s req-248 comment says the suite takes 80–105 s**; it takes ~9 s (req-266 report). Trim the comment.
 - **[optional] Slim the readiness taxonomy** (`scripts/check_handoff.py`). Only if it gets in the way.
 
 ## Already built — don't re-spec
