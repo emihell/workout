@@ -112,9 +112,14 @@ echo "check: running ${#testfiles[@]} test file(s) (node --test)…"
 # 60 s (measured 2026-10-26: slowest test 5.2 s local / 2.9 s CI, slowest hook — builds.test.js's
 # two vite builds — 1.3 s; a loaded Mac ran the suite ~3x slower (288 s vs 80–105 s), so ~15.7 s,
 # and ~3x that again, rounded up — a busy machine must not turn the gate red at random).
-# --test-force-exit is what makes it end: a cancelled test that left a timer or socket open
-# otherwise keeps its file's process, and the run, alive.
-# Neither fires on a SYNCHRONOUS hang (req-239's mutation: a render loop, the file's process at
+# The same 60 s also bounds each test FILE: the runner kills a file's process still alive then
+# (node 22.23, measured 2026-10-31), so a test that left a timer or socket open turns red, named.
+# req-266 (L-067): no --test-force-exit. It ended each file's process with process.exit() the moment
+# its tests finished, while the results were still queued on the stdout pipe to the runner (pipe
+# writes are async on POSIX): a random file lost its last tests with no ✖, exit 0 (2171–2187 tests
+# across 10 runs of one tree). A file now exits on its own, after its output is written — so a
+# test must not leave a handle open (src/test-support/long-timers.js for the download's timer).
+# None of this fires on a SYNCHRONOUS hang (req-239's mutation: a render loop, the file's process at
 # 100%+ CPU, so no in-process timer ever runs). The watchdog below bounds the whole step from
 # outside: past the limit it names the still-running test files and kills them. 900 s is ~3x the
 # slowest full run measured (288 s, local under load; CI ~96 s). WORKOUT_TEST_LIMIT overrides it,
@@ -129,12 +134,7 @@ fi
 tapfile="$(mktemp "${TMPDIR:-/tmp}/workout-check-tap.XXXXXX")"
 trap 'rm -f "$tapfile"' EXIT
 if [ -t 1 ]; then termreporter=spec; else termreporter=tap; fi
-# req-266 (L-067): force-exit ended each file's process with its results still queued on the
-# stdout pipe to the runner, so a random file lost its last tests with no ✖ (2171–2187 across 10
-# runs of the same tree). scripts/test-stdio-blocking.mjs, preloaded into the runner and every
-# file's process, makes those pipe writes blocking, so process.exit() has nothing left to drop.
-WORKOUT_SERVER_TEST=1 node --import ./scripts/test-stdio-blocking.mjs \
-  --test --test-timeout=60000 --test-force-exit \
+WORKOUT_SERVER_TEST=1 node --test --test-timeout=60000 \
   --test-reporter="$termreporter" --test-reporter-destination=stdout \
   --test-reporter=tap --test-reporter-destination="$tapfile" \
   "${testfiles[@]}" &

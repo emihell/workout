@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { act, importJsx, render } from './test-support/render.js'
+import { catchLongTimers } from './test-support/long-timers.js'
 import { addDays, dateKey, mondayOf } from './schedule.js'
 import { withFrom } from './route.js'
 import { workoutPillState } from './workout-log.js'
@@ -268,6 +269,7 @@ describe('§4 Backup & data is plain', () => {
       if (this.download) clicks.push(this.download)
       else anchorClick.call(this)
     }
+    const longTimers = catchLongTimers() // req-266: the download's 60 s revoke timer must not hold the file open
     try {
       await open('/settings?dev=1') // req-209 test edit: the Developer group shows only with the device flag on (§1); its default-off case is in req-209.test.js
       const text = view.text()
@@ -285,6 +287,7 @@ describe('§4 Backup & data is plain', () => {
       URL.createObjectURL = saved.create
       URL.revokeObjectURL = saved.revoke
       window.HTMLAnchorElement.prototype.click = anchorClick
+      longTimers.release()
     }
   })
 })
