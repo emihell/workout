@@ -10,8 +10,8 @@
       "reason": "req-272 baseline: line count on main 2026-10-31"
     },
     "handoff/work/BACKLOG.md": {
-      "ceiling": 208,
-      "reason": "tightened 2026-10-31: merged req items pruned (req-264 recording pass)"
+      "ceiling": 210,
+      "reason": "2026-10-31: + req-265 lazy-chunk retry finding (2 lines)"
     },
     "handoff/reference/PAGES.md": {
       "ceiling": 192,

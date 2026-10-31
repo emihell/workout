@@ -61,6 +61,8 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 - **Tips during rest** (generic form/motivation tips) — parked (DEC-108 §6): no evidence it helps, needs a cited tip set.
 - **req-77 active-workout affordance** — PAUSED (Emilio, 2026-09-16). Don't raise it until he revives it.
 
+- **A failed lazy chunk never reloads until a page reload** (req-265 report, also on main): Chrome caches a failed `import()`;
+  `lazyChunk`/catalog "next open retries" (req-139) only retry in Node. Needs a cache-busting retry URL. Offline-first: check the SW path.
 - **Change picker:** a row whose name wraps draws a slightly smaller checkbox (req-264 report).
 - **req-173 leftover:** an unexplained `targetWeight: 60` on a seed set after the v8→v9 migration (probably
   `legacyRecommendations`; not shown). Blank kg on live edit stays 0 (DEC-155 §5).

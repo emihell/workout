@@ -2879,3 +2879,8 @@ Planner's browser walk on `plan qa`: 4 Backs → Today, 0 dialogs / Not found / 
 UI; throwaway agent, …`f0127f1`. Warm-up dropped on a change to cardio/timed (DEC-155 §10); `primary` flag on import choices; partial-week
 days as "Mon (week 1), Mon (week 3)"; `clampLoopWeeks` in the Days text; label `min-width: min(3.5em, 40%)` (main broke "Days" to "D/a/y/s").
 Gate: `./check` 2288, smoke, 10/10; independent reviewer ×2: No blockers, should-fix fixed (crawl 90 pages × 320/390, overflow 0). `reports/req-264.md`.
+
+## req-265 — the log screen loads a 27 kB generated hints file, not the 264 kB library  (2026-10-31)
+
+Bug (perf); throwaway agent, …`e17b86e`. `src/library/hints.json` from `scripts/build-library.mjs`; shared `lazyChunk`. Gate: network on `plan qa`
+main 1 library request → branch 0 (hints 1); 944-entry equality test; freshness test; `./check` 2293 ×3; smoke green. No reviewer: no trigger file. `reports/req-265.md`.

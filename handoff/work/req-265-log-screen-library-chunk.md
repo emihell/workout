@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: bug** · DEC-119 §6 / req-217 (library read at display time), req-240 (`unilateral`), req-165 (the lazy chunk), DEC-155. No trigger file.
+**Status: BUILT, NOT merged — branch `req-265` (…`e17b86e`)** · **Lane: bug** · DEC-119 §6 / req-217 (library read at display time), req-240 (`unilateral`), req-165 (the lazy chunk), DEC-155. No trigger file.
 
 # req-265 — the log screen stops downloading the whole exercise library
 
