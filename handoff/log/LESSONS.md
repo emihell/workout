@@ -654,3 +654,8 @@ Closeout runs the merged `plan` (code worktree), whose `plan save` calls the pla
 the old one until publish. req-272's new `--only doc-limits` flag → "unrecognized arguments" → refused after the local merge.
 Recovery: the planning worktree's own `./plan save` + `./plan publish` (brings the new scripts in), then re-run closeout
 (idempotent). For a req touching both: expect it, or have `plan` tolerate an older `check_handoff.py`.
+
+## L-073 — a gate behind a pipe reports the pipe's exit code  (req-276, 2026-10-31)
+
+`./check | tail -5 && git commit` committed with lint red: `&&` saw `tail`'s exit 0, not `./check`'s. Gate a commit on the
+command's own status (`./check > log; rc=$?`, or `set -o pipefail`), never through a pipe. Caught by the builder before handoff.
