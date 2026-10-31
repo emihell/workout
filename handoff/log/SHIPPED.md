@@ -2849,3 +2849,9 @@ run green. Reviewer: No blockers (4 TZs incl. DST, 10/10 runs). Backup reminder 
 Tooling; throwaway agent, `66bb053`…`131939c`. 24 test files re-pointed (imports only); 9 tests of deleted exports removed (2232 → 2223, each
 named); golden scripts fixed (broken since req-178, L-071); `plan` REVIEWER_TRIGGER_RE + persistence|history-queries|state-reducers (fails on
 main's `plan`). Gate: `./check --smoke` green. Reviewer ×2: No blockers (20k-case sameKind diff). `reports/req-269.md`.
+
+## req-270 — `workout-log.js` split into seven modules, no behaviour change  (2026-10-31)
+
+Tooling (refactor); throwaway agent, …`ad166a6`. workout-items / -progress / -finish / -timers, set-seed / -drafts / -display; no shim; 65
+importers re-pointed; `lastLoggedSetIndex` deleted (2223 → 2222); boundaries moved to break two cycles; trigger regex + WORKFLOW check 5 name
+all seven. Gate: `./check` 2222 in 149, smoke green; independent reviewer: No blockers (76/76 bodies identical, 2733 imports resolved, each module loads alone). Handoff cites → function names. `reports/req-270.md`.

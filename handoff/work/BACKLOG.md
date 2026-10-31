@@ -76,8 +76,6 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   on an all-cardio workout that now does nothing (`recalc.jsx:24-45`); the prune uses the writing device's local today.
 - **req-269 review nit:** `src/req-202.test.js:94` is titled "… History row meta …" but no longer asserts it; the live
   "with warm-up" History header (`detail.jsx:134`) has no behaviour test. Retitle + add one.
-**Small issues from reviews** — each logged with file:line when found and not re-checked since. Recheck against `main` when
-one is specced.
 - → req-262. req-176: a snapshot item with neither `id` nor `routineItemId` would miscount skips (`workout-log.js`; no known producer).
 - → req-261. req-173: the active set edit (SetEditForm) saves a blank kg as 0 with no note (History keeps `''`); an unexplained
   `targetWeight: 60` on a seed set after the v8→v9 migration (probably `legacyRecommendations`; not shown to the user).
@@ -194,8 +192,8 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   (2) `mergeWithoutBase` after a restore can still null the server's live workout (no `other` passed; masked by
   `activeIsRestoredCopy`); (3) `other` can restore a stale base workout from an already-corrupt state (masked: dropFinished).
   Nit: `ops duplicates` leaves -wal/-shm beside a closed WAL DB. Run `./server/ops duplicates` on the server (Emilio).
-- **F-STRUCT-8:** `workout-log.js` ≈1.25k lines, ~71 exports, 33 importers — split by job like req-164 did `storage.js`.
-  → **req-270**, after req-261/262 (same file).
+- **Next splits** (req-270 out of scope): `src/views/workout/item.jsx` (~990 lines), `src/ui/index.jsx` (~1,000 lines); rename
+  `src/workout-log.test.js` to match the req-270 modules.
 - **Cleanup nits:** F-DEAD-8 `storage.js` shim (0 app importers, 22 test importers); F-STRUCT-9 `sameKind` twice in
   `set-values.js:66-69,93-96`; 09-12 F-DEAD-2 unused `@types/*` (`package.json:24-25`, 3rd audit); F-DEAD-7's other
   test-only exports. → **req-269**, after req-261 (same file). (F-DEAD-7 `activeSetPatch` itself is in req-261.)

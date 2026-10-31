@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** (a pure refactor, as req-164) · audit 2026-10-30 F-STRUCT-8, req-164 (the pattern), DEC-155. After req-261, req-262 (both edit `workout-log.js`) and req-269. Touches `workout-log.js` → **independent reviewer** (WORKFLOW check 5).
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-270` (`7af0f0f`…`ad166a6`, 13 commits).** · **Lane: tooling** (a pure refactor, as req-164) · audit 2026-10-30 F-STRUCT-8, req-164 (the pattern), DEC-155. After req-261, req-262 (both edit `workout-log.js`) and req-269. Touches `workout-log.js` → **independent reviewer** (WORKFLOW check 5).
 
 # req-270 — split `workout-log.js` by job
 
