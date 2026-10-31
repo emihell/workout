@@ -29,6 +29,7 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
   served change (CLOSEOUT step 4, L-063). Every req → a throwaway agent; stop at every closeout (DEC-144).
 
 **Deploy:** `./server/deploy` is blocked for Planner by the auto-mode classifier: Emilio runs it (`! ./server/deploy && ./server/doctor`).
+
 **Planner's recommended order (not yet agreed by Emilio):** a real gym session on the new build → coach review → a small
 tooling batch (BACKLOG §Tooling) → re-check the old review issues (BACKLOG §Phase 1) → Phase 2. Planner also proposed a lighter
 path for copy/comment-only reqs (tests + one SHIPPED line) — open.
