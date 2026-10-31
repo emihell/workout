@@ -192,7 +192,7 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   (2) `mergeWithoutBase` after a restore can still null the server's live workout (no `other` passed; masked by
   `activeIsRestoredCopy`); (3) `other` can restore a stale base workout from an already-corrupt state (masked: dropFinished).
   Nit: `ops duplicates` leaves -wal/-shm beside a closed WAL DB. Run `./server/ops duplicates` on the server (Emilio).
-- **F-STRUCT-8:** `workout-log.js` 1,245 lines (2026-10-31, after req-261), 71 exports, 33 importers — split by job like req-164 did `storage.js`.
+- **F-STRUCT-8:** `workout-log.js` ≈1.25k lines, ~71 exports, 33 importers — split by job like req-164 did `storage.js`.
   → **req-270**, after req-261/262 (same file).
 - **Cleanup nits:** F-DEAD-8 `storage.js` shim (0 app importers, 22 test importers); F-STRUCT-9 `sameKind` twice in
   `set-values.js:66-69,93-96`; 09-12 F-DEAD-2 unused `@types/*` (`package.json:24-25`, 3rd audit); F-DEAD-7's other
