@@ -986,3 +986,37 @@ describe('req-231 — a device that synced with a test server, at go-live', () =
     assert.equal(getNotes(srv.db, userId(user)).length, 0)
   })
 })
+
+// req-268 (audit F-SYNC-1) — the app runs the same three-way merge when it rebases a change made
+// while a sync was in flight (engine.js rebaseOnto). The phone finished wo-2; the laptop (same base,
+// not pulled) pushes an unrelated edit and, while that push is out, logs one more set. The server's
+// reply holds wo-2 finished; the rebase must not put wo-2 back in progress next to its history entry.
+describe('req-268 — a workout finished elsewhere never comes back as in progress', () => {
+  it('3. the engine rebase gives the same null result (nothing re-shown as in progress)', async () => {
+    const user = await newAccount()
+    const phone = device()
+    await phone.login(user) // rev 1: wo-2 in progress
+    const laptop = device(emptyState())
+    await laptop.login(user) // the laptop holds rev 1
+    const id = laptop.state.activeWorkout.id
+    phone.change((s) => finishedState(s, { overallNote: '', overallFeel: '' }, '2026-10-09T18:00:00.000Z'))
+    await phone.settle() // rev 2: wo-2 finished
+    assert.equal(server(user).state.activeWorkout, null)
+    let release
+    laptop.fetch.hold = new Promise((r) => (release = r))
+    laptop.change((s) => renamed(s, 'rtn-a', 'laptop edit'))
+    const out = laptop.engine.flush()
+    await new Promise((r) => setTimeout(r, 30))
+    laptop.change((s) => withSet(s)) // logged while the push is out
+    laptop.fetch.hold = null
+    release()
+    await out
+    assert.equal(laptop.state.activeWorkout, null, 'not in progress on the laptop after the rebase')
+    assert.equal(laptop.state.workouts.filter((w) => w.id === id).length, 1, 'one history entry')
+    await laptop.settle()
+    const after = server(user).state
+    assert.equal(after.activeWorkout, null, 'nor on the server')
+    assert.equal(after.workouts.filter((w) => w.id === id).length, 1, 'one history entry on the server')
+    assert.equal(after.routines.find((r) => r.id === 'rtn-a').name, 'laptop edit', 'the laptop’s edit is kept')
+  })
+})

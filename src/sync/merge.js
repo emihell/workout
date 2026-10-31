@@ -127,7 +127,23 @@ export function mergeStates(base, mine, theirs) {
     if (conflict) conflicts.push({ field, id: null, kind: conflictKind(bv, mv, tv), lost: tv ?? null })
     if (value !== undefined) out[field] = value
   }
+  dropFinished(out, conflicts, 'finished-elsewhere')
   return { state: out, conflicts }
+}
+
+// req-268 (audit F-SYNC-1) — a finished workout can't be in progress. If the merged
+// `activeWorkout` has the id of a workout in the merged history, it becomes `null` (the app's own
+// "no workout in progress", not an invented value) and the dropped one is listed verbatim as
+// `lost`. One rule for both merges: `mergeStates` lists it as `finished-elsewhere` (a device
+// finished it while another kept logging), `mergeWithoutBase` as `no-base-finished` (DEC-133
+// review round 5). Sets logged on the dropped copy are not carried into the finished one (DEC-155 §8).
+const inProgress = (v) => v !== null && v !== undefined
+function dropFinished(out, conflicts, kind) {
+  const active = out.activeWorkout
+  if (inProgress(active) && Array.isArray(out.workouts) && out.workouts.some((w) => w?.id === active.id)) {
+    conflicts.push({ field: 'activeWorkout', id: null, kind, lost: active })
+    out.activeWorkout = null
+  }
 }
 
 // req-230 review round 1 (#3) — the merge when the base is GONE (its revision was pruned: a
@@ -153,8 +169,8 @@ export function mergeStates(base, mine, theirs) {
 //   - Review round 5 (#3): a finished workout can't be in progress. If the result's `activeWorkout`
 //     has the id of a workout in the merged history, it is `null` instead (the app's own "no workout
 //     in progress", not an invented value), and the dropped one is listed (`kind: 'no-base-finished'`).
+//     req-268: the same rule (dropFinished) now runs in mergeStates too.
 // Every value in the result is one of the two inputs' values, verbatim.
-const inProgress = (v) => v !== null && v !== undefined
 function noBase(field, id, m, t, conflicts, restored = false) {
   if (same(m, t)) return m
   if (restored && field === 'activeWorkout' && id === null && inProgress(m)) {
@@ -187,10 +203,6 @@ export function mergeWithoutBase(mine, theirs, { restored = false } = {}) {
     const value = noBase(field, null, mv, tv, conflicts, restored)
     if (value !== undefined) out[field] = value
   }
-  const active = out.activeWorkout
-  if (inProgress(active) && Array.isArray(out.workouts) && out.workouts.some((w) => w?.id === active.id)) {
-    conflicts.push({ field: 'activeWorkout', id: null, kind: 'no-base-finished', lost: active })
-    out.activeWorkout = null
-  }
+  dropFinished(out, conflicts, 'no-base-finished')
   return { state: out, conflicts }
 }
