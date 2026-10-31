@@ -35,6 +35,8 @@
 
 **Reviewer trigger (req-269 review):** every new module split out of `workout-log.js` is added to `plan`'s
 `REVIEWER_TRIGGER_RE` (`plan:856`), with a `scripts/plan-ledger.test.sh` assertion per name; Planner updates WORKFLOW check 5.
+**Stale comments (req-269 report):** `src/model.js:269-270` ("storage.js re-exports both") and `src/workout-log.js:964`
+("free of storage.js") — fix while there; `storage.js` was deleted in req-269.
 
 ## Out of scope
 
