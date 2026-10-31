@@ -25,12 +25,8 @@ import {
 } from './cardio-set.js'
 import { finishedState } from './workout-finish.js'
 import { formFieldsWithDraft, setDraftFromForm, setDraftKey } from './set-drafts.js'
-import {
-  loggedSetRowText,
-  startStopwatchPatch,
-  stopwatchFor,
-  stopwatchOwner,
-} from './workout-log.js'
+import { loggedSetRowText } from './set-display.js'
+import { startStopwatchPatch, stopwatchFor, stopwatchOwner } from './workout-log.js'
 import { withLoggedSet } from './workout-items.js'
 import { historyPrescription } from './history-queries.js'
 import { pickerItem } from './routine-picker.js'

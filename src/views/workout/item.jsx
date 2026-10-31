@@ -39,11 +39,10 @@ import {
   setDraftKey,
 } from '../../set-drafts.js'
 import { isSkippedSet } from '../../set-rules.js'
+import { loggedSetRowText, setListRows } from '../../set-display.js'
 import {
-  loggedSetRowText,
   nextNotDoneItem,
   restPatchAfterSet,
-  setListRows,
   startStopwatchPatch,
   stopwatchFor,
   stopwatchOwner,

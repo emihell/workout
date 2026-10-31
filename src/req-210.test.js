@@ -8,7 +8,7 @@ import { importJsx, render } from './test-support/render.js'
 import * as beatLastTime from './beat-last-time.js'
 import { exerciseImprovementPct, improvementList, improvementPct, improvementText } from './beat-last-time.js'
 import { carryForSet, setLogSeed, setTargetFor, uniformRepsTargets } from './set-seed.js'
-import { setListRows } from './workout-log.js'
+import { setListRows } from './set-display.js'
 import * as historyQueries from './history-queries.js'
 
 const h = React.createElement

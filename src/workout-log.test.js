@@ -1,13 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { rpeOptionValue } from './ids.js'
-import {
-  allItemsDone,
-  restPatchAfterSet,
-  restRemaining,
-  setPreview,
-  setPreviewText,
-} from './workout-log.js'
+import { allItemsDone, restPatchAfterSet, restRemaining } from './workout-log.js'
 import {
   itemIsMarkedDone,
   itemKey,
@@ -29,6 +23,7 @@ import {
   durationTargetFor,
 } from './set-seed.js'
 import { isSkippedSet } from './set-rules.js'
+import { setPreview, setPreviewText } from './set-display.js'
 import { historySetPrefill, lastSetsForExercise } from './history-queries.js'
 import { DEFAULT_DURATION_SEC } from './model.js'
 

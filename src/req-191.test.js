@@ -11,8 +11,9 @@ import { MUSCLE_GROUPS } from './exerciseLibrary.js'
 import { machinesPlan, planDaysText, SPLIT_AB, SPLIT_SAME } from './plan-templates.js'
 import { resolvePicks, setupDefaults } from './mid-workout-pick.js'
 import { pickerItem } from './routine-picker.js'
-import { autoCompleteArmed, endedOnSkip, setListRows, setPreview } from './workout-log.js'
+import { autoCompleteArmed, endedOnSkip } from './workout-log.js'
 import { carryForSet, initialSetFields } from './set-seed.js'
+import { setListRows, setPreview } from './set-display.js'
 import { skipItemPatch, withLoggedSet } from './workout-items.js'
 
 const h = React.createElement

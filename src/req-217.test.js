@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs'
 import { act, importJsx, render } from './test-support/render.js'
 import { libraryEntryFor, loadExerciseLibrary } from './exerciseLibrary.js'
 import { REST_CUES_MAX, isEachSide, restNotesFor, restNotesShowing } from './library-hints.js'
-import { eachSideReps, loggedSetRowText, setPreviewText } from './workout-log.js'
+import { eachSideReps, loggedSetRowText, setPreviewText } from './set-display.js'
 
 const h = React.createElement
 const DB = JSON.parse(readFileSync(new URL('./db.json', import.meta.url), 'utf8'))
