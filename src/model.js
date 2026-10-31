@@ -469,19 +469,26 @@ export function progressionForItem(exercises, workout, item) {
     sets: workSets,
     exercise,
   })
+  // req-262 — a cardio item keeps its own plan: the recommendation's kg/reps (`[0]` / `[""]`
+  // from a duration set) are data the user never entered. `writesRoutine: false` → Apply
+  // leaves the routine item untouched (progressionFromWorkout drops it), so an old snapshot
+  // holding `[0]` can't write `[0]` either (Planner, req-262).
+  const cardio = exercise?.type === 'cardio'
+  const ownPlan = !sets.length || cardio
   return {
     routineItemId: itemIdValue,
     sets,
     recommendation,
-    to: sets.length ? recommendation.weights : item.suggestedWeights || [],
-    targetsTo: sets.length ? recommendation.targets : item.targets || [],
+    to: ownPlan ? item.suggestedWeights || [] : recommendation.weights,
+    targetsTo: ownPlan ? item.targets || [] : recommendation.targets,
+    writesRoutine: !cardio,
   }
 }
 
 export function progressionFromWorkout(state, workout) {
-  return (workout?.snapshot?.items || []).map((item) => {
-    const { routineItemId, to, targetsTo } = progressionForItem(state.exercises, workout, item)
-    return { routineItemId, to, targetsTo }
+  return (workout?.snapshot?.items || []).flatMap((item) => {
+    const { routineItemId, to, targetsTo, writesRoutine } = progressionForItem(state.exercises, workout, item)
+    return writesRoutine ? [{ routineItemId, to, targetsTo }] : []
   })
 }
 

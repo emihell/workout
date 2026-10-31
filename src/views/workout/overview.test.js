@@ -59,7 +59,8 @@ test('one allDone test gates both the summary and the Finish style', () => {
 // req-116 — the preview guard: a covered occurrence shows Done + History, not Start.
 test('the preview shows Done (finishedForPlan) instead of Start once finished', () => {
   const w = fnBody('Workout')
-  assert.match(w, /const done = finishedForPlan\(store\.workouts, plan\)/)
+  // req-262 — plus this tab's in-memory finished-here record (Back after a left-open Finish).
+  assert.match(w, /const done = finishedForPlan\(store\.workouts, plan, new Date\(\), \{ finishedHere: store\.getFinishedHere\?\.\(\) \?\? null \}\)/)
   assert.ok(w.indexOf('{done ? (') < w.indexOf('startOrContinue('), 'the Done branch comes before Start')
   // req-171 — the link carries this preview as its `from`, so the detail's Back returns here.
   assert.match(w, /to=\{withFrom\(`\/history\/\$\{done\.id\}`, here\)\}/)

@@ -85,7 +85,8 @@ export function Workout({ routineId, scheduleSlotId = null, date = null }) {
     const previewMeta = plan.date || ''
     // req-116 — the guard for Back after Finish: an occurrence that already has a
     // finished workout shows Done and a link to it in History, never a fresh Start.
-    const done = finishedForPlan(store.workouts, plan)
+    // req-262 — and a workout finished in this tab (in memory) within 6 h of its Save.
+    const done = finishedForPlan(store.workouts, plan, new Date(), { finishedHere: store.getFinishedHere?.() ?? null })
     // req-171 — the History detail opened from here returns here.
     const here = scheduleSlotId && date ? `/workout/${routineId}/${scheduleSlotId}/${date}` : `/workout/${routineId}`
     return (
