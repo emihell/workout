@@ -10,8 +10,8 @@
       "reason": "req-272 baseline: line count on main 2026-10-31"
     },
     "handoff/work/BACKLOG.md": {
-      "ceiling": 210,
-      "reason": "2026-10-31: + req-265 lazy-chunk retry finding (2 lines)"
+      "ceiling": 213,
+      "reason": "2026-10-31: + req-274 review leftovers (4 lines)"
     },
     "handoff/reference/PAGES.md": {
       "ceiling": 192,

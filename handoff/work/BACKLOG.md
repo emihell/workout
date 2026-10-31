@@ -63,6 +63,9 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
 
 - **A failed lazy chunk never reloads until a page reload** (req-265 report, also on main): Chrome caches a failed `import()`;
   `lazyChunk`/catalog "next open retries" (req-139) only retry in Node. Needs a cache-busting retry URL. Offline-first: check the SW path.
+- **req-274 review leftovers** (none visible today): History add-set Save at 20 does nothing silently (`edit.jsx:161`); editing a
+  warm-up into Work can make a 21st work set (`edit.jsx:204`); Apply reads the live exercise type, the offer the snapshot's
+  (`model.js:490` vs `routine-update-offer.js:26`); a keyed item takes key-less `''` sets in-session (`model.js:467`, as main).
 - **Change picker:** a row whose name wraps draws a slightly smaller checkbox (req-264 report).
 - **req-173 leftover:** an unexplained `targetWeight: 60` on a seed set after the v8→v9 migration (probably
   `legacyRecommendations`; not shown). Blank kg on live edit stays 0 (DEC-155 §5).
