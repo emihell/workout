@@ -34,7 +34,7 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   supersets written as notes were done as straight sets, ≈55 min not ≈43, the finisher dropped. Overlaps req-184 item 15
   (Phase 2). **Phase 1** (Emilio, DEC-151). Extends req-254's `ITEM` + checks if it ships after it.
 - **Interval chaining in the workout** (Emilio, 2026-10-31: "we will build a tabata timer in the app"): both timers exist
-  (set countdown `src/ui/index.jsx:430`, rest on Done `src/views/workout/item.jsx:355`), but each round needs Done + Start —
+  (set countdown `ui/set-log-form.jsx` `DurationTimer`, rest on Done `views/workout/item.jsx` `WorkoutItemLive`), but each round needs Done + Start —
   16 taps in a 4-min Tabata. Chain them: the work countdown ends → the set logs → rest runs → the next round starts. EMOM also
   needs rest = the rest of the minute. Until then Coach builds only ≥ 30 s intervals (DEC-146 §4); req-254 C6 refuses shorter — relax it here.
   **Cardio too** (run 5 item 5): Rowing is `cardio` without `hasDuration`, so a 30 s / 30 s row is only text; run 5 dropped
@@ -177,8 +177,6 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   (2) `mergeWithoutBase` after a restore can still null the server's live workout (no `other` passed; masked by
   `activeIsRestoredCopy`); (3) `other` can restore a stale base workout from an already-corrupt state (masked: dropFinished).
   Nit: `ops duplicates` leaves -wal/-shm beside a closed WAL DB. Run `./server/ops duplicates` on the server (Emilio).
-- **Next splits** (req-270 out of scope): `src/views/workout/item.jsx` (~990 lines), `src/ui/index.jsx` (~1,000 lines); rename
-  `src/workout-log.test.js` to match the req-270 modules.
 - **Cleanup nits:** F-DEAD-8 `storage.js` shim (0 app importers, 22 test importers); F-STRUCT-9 `sameKind` twice in
   `set-values.js:66-69,93-96`; 09-12 F-DEAD-2 unused `@types/*` (`package.json:24-25`, 3rd audit); F-DEAD-7's other
   test-only exports. → **req-269**, after req-261 (same file). (F-DEAD-7 `activeSetPatch` itself is in req-261.)

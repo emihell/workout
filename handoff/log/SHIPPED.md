@@ -2900,3 +2900,8 @@ bodyweight `to: null` (Planner). Gate: 21 new tests fail-then-pass; `./check` 23
 Tooling; throwaway agent, …`6b4e733`. `scripts/shell-suites.sh` (CI all six; `./check` when touched); golden-recorder test; `dec_split.py`
 deleted; check 7 + `log/AUDIT-TRIAGE.md`. Gate: new plan-guards cases fail on main's `plan`; `./check --smoke` green; Planner ran all six suites
 (green, 33 s). No reviewer: no trigger file. `reports/req-275.md`.
+
+## req-276 — `item.jsx` → 6 modules, `ui/index.jsx` → 8 (+ re-export entry), `workout-log.test.js` → 5 files; no behaviour change  (2026-10-31)
+
+Tooling (refactor); throwaway agent, …`12ef75c`. Bodies identical (15 + 29), 3230 imports resolve, CSS byte-identical, 2324 tests same names.
+Gate: `./check` green; smoke + 6-item walk; independent reviewer: No blockers, narrowed guards restored (probes red). Handoff cites → names. `reports/req-276.md`.

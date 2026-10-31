@@ -1,4 +1,4 @@
-**Status: READY** · **Lane: tooling** (refactor, no behaviour change) · audit 2026-10-30 F-STRUCT-8 (candidates), req-270 (method), req-164, DEC-155 §7. **After req-264 and req-265** (both edit `src/views/workout/item.jsx` / `src/ui/`); re-measure on the main they leave.
+**Status: BUILT, NOT merged — branch `req-276` (…`12ef75c`)** · **Lane: tooling** (refactor, no behaviour change) · audit 2026-10-30 F-STRUCT-8 (candidates), req-270 (method), req-164, DEC-155 §7. **After req-264 and req-265** (both edit `src/views/workout/item.jsx` / `src/ui/`); re-measure on the main they leave.
 
 # req-276 — split `item.jsx` and `ui/index.jsx` by job; `workout-log.test.js` follows req-270's modules
 
