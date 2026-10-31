@@ -27,6 +27,7 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   no re-anchor, `src/state-reducers.js:289`]. *Q (Emilio):* re-anchor so this week stays this week?
 - **Edit rest during an exercise** (DEC-104 §3 follow-up; Emilio: "rest can be filled in during the sets"): an item added
   mid-workout with blank rest can't get a rest on the log screen. Small ui req.
+  Run 5 item 29: also edit a **running** rest (only skip exists); real rests on 30 Oct ran about twice the written ones.
 - **A rest timer learned from your own set gaps** (H8, DEC-119). Sets carry `loggedAt` since req-212, so the data exists.
 - **Dead first Back after finishing an exercise** (parked, DEC-084; req-153's fix dropped as too fragile). History ends
   `[…, /workout/x, /workout/x]`. Idea: on a popstate that lands on the entry just left, step back once more. iPhone test first.
@@ -38,9 +39,18 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   (set countdown `src/ui/index.jsx:430`, rest on Done `src/views/workout/item.jsx:355`), but each round needs Done + Start —
   16 taps in a 4-min Tabata. Chain them: the work countdown ends → the set logs → rest runs → the next round starts. EMOM also
   needs rest = the rest of the minute. Until then Coach builds only ≥ 30 s intervals (DEC-146 §4); req-254 C6 refuses shorter — relax it here.
+  **Cardio too** (run 5 item 5): Rowing is `cardio` without `hasDuration`, so a 30 s / 30 s row is only text; run 5 dropped
+  three rowing finishers. Work/rest × rounds must cover cardio items.
 - **Exercise cues are never shown in the workout** [measured 2026-10-31]: `exercise.cues` appears only in the exercise
   editor; the rest block shows library `formCues` (`src/library-hints.js:52-57`). Emilio wants cues on the exercise; they
   should reach the log screen. Coach can't place technique cues anywhere he sees them until then.
+- **Notes before set 1** (Coach run 5, item 22): item notes show only during rest (CAPABILITIES), so a starting-weight
+  instruction ("empty bar × 10, then add plates") arrives after the set it's for. Show them when the item opens. Pairs with cues.
+- **Bar weight on barbell exercises + plate helper** (run 5 items 4, 25; Emilio: "all erxcersises that are bar with weights,
+  it should be prefilled with 20kg, but you should be able to change the bar weight in the actual exercise settings"). Barbell
+  kg includes the bar from now on; helper shows bar + plates a side (50 = 20 + 15 a side; 1.25 plates exist). His one
+  plates-only log (Romanian Deadlift 2026-10-09) reads +20 under this rule — a data question before any build.
+- **"Short on time? skip X"** (run 5 item 28): Coach orders each session so the last item is the one to cut; show it on the overview.
 - **Target text is logged as reps** [measured 2026-10-31, `src/workout-log.js:613-615`]: a "10-12" / "AMRAP" target prefills
   Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`); req-254 C6 refuses such targets until fixed.
 - **Coach's app gaps from the training books** (DEC-150, notes in `workout-data/coach/books/`): a planned effort/RIR target
@@ -93,6 +103,15 @@ one is specced.
   what's there. The weight step belongs to a gym's machine, not the exercise. A workout knows which gym. A shared gym library
   needs other users (Phase 3).
 - **Programs from the library**: movement patterns + muscles + level balance a program.
+- **Log a past workout** (run 5 items 1, 24): a session done outside the app (a date, exercises, sets). Today a workout
+  can only be logged live, dated now; a past session can't be entered with its real date [measured 2026-10-31: no date
+  edit in `src/views/history/`]. Emilio's 2026-10-30 barbell session waits for this.
+- **Schedule history + weekly adherence view** (run 5 items 10, 27): the schedule is stored only since 2026-10-25, so planned
+  sessions skipped can't be counted. Emilio: "I want to get better" at consistency.
+- **Calendar export (.ics)** of the schedule (run 5 item 26): missed sessions come from lunch meetings.
+- **An "optional" schedule slot** (run 5 item 20): weekend routines carry "(bonus)" in the name today.
+- **Running import (Strava/GPX)** (run 5 item 9): his runs live in Strava; cardio sets already take duration + distance.
+- Gyms (above) — run 5 item 8 repeats it: Emilio: "we might need a way to add gyms/machines that are available to you".
 
 ## Exercise library (DEC-060/064)
 
@@ -123,6 +142,11 @@ Stage 1 (own server, own data) is live. Stage 2 (other users) and stage 3 (toget
   Claude Code until the brief is general.
 accounts and the sharing model (shared routine, own values), privacy/GDPR (what leaves the device, retention, deletion),
 AI cost per user, live group sessions. The in-app AI design is decided (DEC-124).
+- **Two training partners get accounts soon** (run 5 item 12): each needs a coach folder + `CLIENT.md` (DEC-147) once their
+  user exists on the server. Before a second client gets a Coach plan: DEC-153 §5 (show "estimate" in-app?).
+- **A nutrition app** (run 5 items 11, 19): a separate product with its own Nutritionist coach; Coach's MVP brief is
+  `workout-data/coach/nutrition-app-brief.md` (outside git: it holds client facts). Emilio wants bodyweight/waist out of
+  this app. Not started; needs Emilio's go on when, and on one login across both apps or two.
 - **Before a second user logs in** (req-230 review): logging in as someone else on a device with unsynced changes replaces
   them; an expired-session re-login unmounts the open screen (data survives, timers reset); a change rebased during an
   in-flight sync isn't recorded as a conflict (the loser survives only as an unmarked revision, pruned after 14 days).
@@ -140,6 +164,9 @@ AI cost per user, live group sessions. The in-app AI design is decided (DEC-124)
   schedule slot) → a full plan file in the Export shape, checked (workouts identical, only the named parts changed) and
   ready for `./server/ops plan preview`. Today each coach run writes its own build script against `src/exchange.js` /
   `src/exerciseCatalog.js` (run 3, run 4 `scripts/build_import.mjs`). → **req-254** shipped 2026-10-31: `./server/ops plan build`.
+- **`plan build` C5 opt-in for a Coach-estimate kg** → **req-255** (READY, DEC-153).
+- **`plan build` warns over every live routine** (run 5 item 7), not only the changed items: run 3's plan left supersets /
+  EMOM in 6 untouched routines; run 5 found them with its own `scripts/dec146_scan.py`.
 - **`find_worktrees` can pick the wrong code worktree** (req-251 report): with an extra top-level worktree, "last
   non-planning worktree wins", so `CODE_DIR` — and closeout's merge — may point at an agent/scratch worktree. White-sleeve
   refuses closeout while >1 non-planning worktree exists. Also: `plan ping` still prints the pre-BUILDER.md handover.

@@ -2382,3 +2382,17 @@ CAPABILITIES. 5. A move/swap whose slot `schedule.set` removed may drop (the mod
 moves/swaps/anchor → C2 refuses. 6. A failing op is skipped so all resolution errors show at once; C3–C7 run only when every
 op succeeded. 7. `exercise.add`: a merged library id is refused naming its target; `lightestWeight`/`unilateral` set after
 `exerciseFromData`; a new routine's focus defaults to `Machines` (as `addRoutine`). Rejected: none raised.
+
+## DEC-153 — a routine's kg may be a Coach estimate: labelled in the backend, calibration only  (Emilio, 2026-10-31, Coach run 5)
+
+Extends DEC-096 ("a number the user typed or confirmed"). Emilio: "- or recommended by you"; "label it in the backend, dont
+expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md` item 30 (answers item 23).
+1. **Allowed only where the exercise has no history.** Once it's logged, history and the app's normal rules take over.
+2. **Conservative:** Coach aims for 2–3 reps in reserve (an estimate too heavy on a barbell lift is the injury risk).
+3. **Labelled in the backend, not the app:** the label and its reasoning live in Coach's change list, the `plan build` lines
+   and the run report; the app shows the kg like any other. Still DEC-096-honest: Emilio confirms it at `plan apply`
+   (DEC-141/142). Planner's call: no new field on the stored item (that would be a model + sync change for a label
+   nobody reads in-app) `(unconfirmed)`.
+4. **Built as an explicit opt-in per item in `plan build` C5** (req-255); an unlabelled kg with no history is still refused.
+5. **Revisit for other users** (Coach): Emilio knows which numbers are estimates; a new user won't. Before a second
+   client gets a Coach plan, decide whether "estimate" shows in-app.

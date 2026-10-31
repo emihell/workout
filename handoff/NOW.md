@@ -3,10 +3,11 @@
 Updated 2026-10-31. **Shipped: everything through req-254** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next:** Coach review 2026-10-31 → DEC-146..148: brief split (COACH · GOALS · LESSONS), CAPABILITIES gained how a plan runs
-in the workout; `EVIDENCE.md` accepted (DEC-151). Book notes on the server Mac (2026-10-31). Coach run 5 (here, ready): LESSONS' last section →
-`CLIENT.md`; rebuild run 4's `import.json` (DEC-146); the 10-30 barbell session (Coach asks Emilio's 4 questions at run start, COACH step 0 — not Planner). **req-254** `ops plan build` merged 2026-10-31: Coach run 5 uses it (its AC8).
-Phase 1 order proposed (not agreed): "12 reps" bug → cues in the workout → supersets → interval chaining; book gaps triaged, no spec.
+**Next:** Coach run 5 done 2026-10-31: plan applied as **rev 79** (backup `before-plan-coach-run-5`; run 4's `import.json`
+superseded). Triaged → DEC-153 (Coach-estimate kg, backend label), **req-255** READY (`plan build` opt-in), COACH.md lessons,
+BACKLOG §Phase 1/2/3/Tooling (source `workout-data/coach/run-5/for-planner.md`). The 10-30 barbell session is **not** logged:
+no way to enter a past date (BACKLOG §Phase 2 "Log a past workout") — Emilio's call. Phase 1 order proposed (not agreed):
+"12 reps" bug → cues + notes before set 1 → supersets → interval chaining (incl. cardio); req-255 fits anywhere (tooling).
 
 ## Milestone (Emilio, 2026-09-07)
 
@@ -22,8 +23,6 @@ Phase 1 in-gym flow (now) · Phase 2 program-creation · Phase 3 other users / t
 - **First finished workout synced** [measured, read-only]: 2026-10-28 11:16–11:52, 25 sets (rev 53; 24 workouts). Go-live is
   fully proven.
 - **Backups:** weekly agent loaded, exit 0; newest scheduled backup 10-26 09:00; the next is due ≥ 11-02 (7 days). Confirm it fires.
-- **Coach run 4 done** 2026-10-30 (report in `workout-data/coach/run-4/`): 2 sessions since run 3 (10-28, 10-30, both on the old
-  build), so a session on the new build is still to come.
 - **Feedback notes:** server `notes` table, 0 rows (2026-10-30).
 - **Working agreement (L-060, DEC-143):** a team, not orders — Planner weighs and pushes back. Merged ≠ live: deploy after any
   served change (CLOSEOUT step 4, L-063). Every req → a throwaway agent; stop at every closeout (DEC-144).
