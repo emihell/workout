@@ -3,6 +3,13 @@
 # anything this doesn't cover, use git directly.
 set -euo pipefail
 
+# req-275 (L-072): the Python helpers `plan save` runs (check_handoff.py, dec_index.py) are the
+# ones BESIDE this `plan`, never the planning worktree's copy. Closeout runs the code worktree's
+# `plan` (just merged) for `plan save`, so a merge that changed both used to pair the new `plan`
+# with the planning worktree's old script ("unrecognized arguments: --only doc-limits
+# --worktree", req-272 closeout). The repo they read is still passed explicitly (--repo/--root).
+PLAN_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 usage() {
   cat <<'EOF'
 plan save "message"    commit handoff/ changes from the planning worktree;
@@ -230,7 +237,7 @@ cmd_save() {
   if [ -f "$now_md" ]; then
     local now_lines now_limit
     now_lines="$(wc -l < "$now_md" | tr -d ' ')"
-    now_limit="$(now_md_limit "$PLANNING_DIR/scripts")"
+    now_limit="$(now_md_limit "$PLAN_HOME/scripts")"
     if [ "$now_lines" -gt "$now_limit" ]; then
       echo "plan save: refusing — handoff/NOW.md is $now_lines lines, over its own ≤$now_limit-line rule. Trim it, then save." >&2
       exit 1
@@ -242,7 +249,7 @@ cmd_save() {
   # restated here); a raise is compared against HEAD's table. Warnings ("tighten to N") print
   # and don't block.
   local ratchet_out
-  if ! ratchet_out="$(python3 "$PLANNING_DIR/scripts/check_handoff.py" --repo "$PLANNING_DIR" --only doc-limits --worktree)"; then
+  if ! ratchet_out="$(python3 "$PLAN_HOME/scripts/check_handoff.py" --repo "$PLANNING_DIR" --only doc-limits --worktree)"; then
     echo "plan save: refusing — the doc-size ratchet (scripts/doc_limits.json); nothing staged:" >&2
     printf '%s\n' "$ratchet_out" | sed 's/^/  /' >&2
     exit 1
@@ -257,7 +264,7 @@ cmd_save() {
   # committed index is never stale. A refusal (a malformed heading, an entry with no date) writes
   # nothing and stops the save before anything is staged.
   if [ -n "$(git -C "$PLANNING_DIR" status --porcelain -- handoff/log/decisions/)" ]; then
-    if ! python3 "$PLANNING_DIR/scripts/dec_index.py" --root "$PLANNING_DIR"; then
+    if ! python3 "$PLAN_HOME/scripts/dec_index.py" --root "$PLANNING_DIR"; then
       echo "plan save: refusing — scripts/dec_index.py could not regenerate the DEC index (above); nothing committed." >&2
       exit 1
     fi
@@ -296,7 +303,7 @@ cmd_save() {
   # must not block a save) — the commit above already succeeded. check_handoff
   # reads git objects at HEAD (the commit just made), never the working tree.
   local save_drift
-  save_drift="$(python3 "$PLANNING_DIR/scripts/check_handoff.py" --repo "$PLANNING_DIR")" || true
+  save_drift="$(python3 "$PLAN_HOME/scripts/check_handoff.py" --repo "$PLANNING_DIR")" || true
   if [ -n "$save_drift" ]; then
     echo "plan save: handoff drift — fix before publish (non-blocking):" >&2
     printf '%s\n' "$save_drift" | sed 's/^/  /' >&2
@@ -1165,8 +1172,13 @@ cmd_closeout() {
     today="$(date +%F)"
     word="commits"; [ "$count" -eq 1 ] && word="commit"
     status_line="**Status: BUILT AND MERGED, ${today} — branch \`${reqid}\` (\`${first}\`…\`${last}\`, ${count} ${word}).**"
-    flip_status "$doc" "$status_line"
-    echo "plan closeout: flipped $(basename "$doc") -> BUILT AND MERGED (${first}…${last}, ${count} ${word})"
+    # req-275: the merge has landed — a doc with no Status span must not abort the closeout
+    # (set -e) before the save, publish and push below. Warn and carry on.
+    if flip_status "$doc" "$status_line"; then
+      echo "plan closeout: flipped $(basename "$doc") -> BUILT AND MERGED (${first}…${last}, ${count} ${word})"
+    else
+      echo "plan closeout: WARNING — $(basename "$doc") has no **Status:** span; flip it by hand" >&2
+    fi
   else
     echo "plan closeout: WARNING — could not compute the commit range; leaving the doc Status unchanged." >&2
   fi
@@ -1212,7 +1224,7 @@ cmd_closeout() {
   # merging). Printed now and in the final summary. Never blocks: the merge has landed.
   local review_warn=""
   if [ -n "$merge_commit" ] && [ -n "$already_merged" ]; then
-    review_warn="$(reviewer_warning "$CODE_DIR" "$merge_commit" "$reqid")"
+    review_warn="$(reviewer_warning "$CODE_DIR" "$merge_commit" "$reqid")" || true   # req-275: never abort after the merge
     [ -z "$review_warn" ] || printf '%s\n' "$review_warn" >&2
   fi
 
