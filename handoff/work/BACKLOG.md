@@ -52,7 +52,7 @@ The server for Emilio's own data is live (stage 1, DEC-127..136); it no longer g
   plates-only log (Romanian Deadlift 2026-10-09) reads +20 under this rule — a data question before any build.
 - **"Short on time? skip X"** (run 5 item 28): Coach orders each session so the last item is the one to cut; show it on the overview.
 - **Target text is logged as reps** [measured 2026-10-31, `src/workout-log.js:613-615`]: a "10-12" / "AMRAP" target prefills
-  Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`); req-254 C6 refuses such targets until fixed.
+  Reps and is logged as typed unless retyped. And `isDurationTarget` labels "12 reps" as Duration (`src/progress.js:89-92`); req-254 C6 refuses such targets until fixed. → **req-256** (READY) fixes the "12 reps" half; the range/AMRAP half stays here.
 - **Coach's app gaps from the training books** (DEC-150, notes in `workout-data/coach/books/`): a planned effort/RIR target
   per item; rep-range progression in the app's recommendation (req-149); a weekly recovery check-in (5 questions); several
   warm-up sets with kg (req-184 item 10); drop sets / myo-reps; a time for a whole item (the S&S bell trigger); left/right

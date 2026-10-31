@@ -2396,3 +2396,11 @@ expose it to the user in app". Source: `workout-data/coach/run-5/for-planner.md`
 4. **Built as an explicit opt-in per item in `plan build` C5** (req-255); an unlabelled kg with no history is still refused.
 5. **Revisit for other users** (Coach): Emilio knows which numbers are estimates; a new user won't. Before a second
    client gets a Coach plan, decide whether "estimate" shows in-app.
+
+## DEC-154 — Phase 1 order agreed; the 2026-10-30 barbell session stays unlogged  (Emilio, 2026-10-31)
+
+1. **Order:** "12 reps" bug (req-256) → exercise cues + notes before set 1 → supersets → interval chaining (incl. cardio).
+   req-255 (tooling) fits anywhere. Emilio: "go (dont build anything yet)" — specs only; no dispatch until he says.
+2. **The barbell session done outside the app is not logged** (Emilio: "leave it"): the app can't enter a past date, and a
+   workout dated today would put it on the wrong weekday in Coach's stats. It waits for "Log a past workout" (BACKLOG
+   §Phase 2); Coach may use its numbers as labelled estimates under DEC-153 once req-255 ships.
