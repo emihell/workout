@@ -4,6 +4,7 @@
 //   restore <backup> --to <new dir>      the backup as a throwaway data dir (the drill)
 //   restore <backup> [--yes]             into the data dir: server stopped, pre-restore backup, marker
 //   counts [<db file>]                   record counts (default: the data dir's DB)
+//   duplicates [<db file>]               req-268: duplicate workout ids in each user's latest revision (reads only)
 //   doctor                               bind, funnel, tailscale mapping, data path, launchd, weekly backup
 //   plan preview <file> [--user <u>]     req-245: the coach's plan file against the DB (reads only)
 //   plan apply <file> --source <s> --note <t> [--yes --expect-rev <n>] [--user <u>]   backup, then one new revision
@@ -73,6 +74,21 @@ function printCounts(title, c) {
         ` · workout in progress ${u.activeWorkout ? 'yes' : 'no'} · notes ${u.notes}`,
     )
   }
+}
+
+// req-268 — the read-only duplicate-id check. The last line is the total, e.g. `0 duplicate workout ids`.
+function duplicates([file]) {
+  const dbFile = resolve(file ?? join(config.dataDir, DB_FILE))
+  const users = ops.duplicateWorkoutIds(dbFile)
+  console.log(`${dbFile} (read-only)`)
+  let total = 0
+  for (const u of users) {
+    total += u.duplicates.length
+    const dupes = u.duplicates.map((d) => `${d.id} ×${d.count}`).join(', ') || 'none'
+    const active = u.activeInHistory ? ` · workout in progress ${u.activeInHistory} is also in history` : ''
+    console.log(`  ${u.username}: rev ${u.rev} · duplicate workout ids: ${dupes}${active}`)
+  }
+  console.log(`${total} duplicate workout id${total === 1 ? '' : 's'}`)
 }
 
 async function backup(args) {
@@ -424,10 +440,11 @@ const commands = {
   restore,
   doctor,
   plan,
+  duplicates,
   counts: async ([file]) => printCounts(file ?? join(config.dataDir, DB_FILE), ops.counts(resolve(file ?? join(config.dataDir, DB_FILE)))),
 }
 if (!commands[command]) {
-  console.error('usage: ops-cli.mjs backup|restore|counts|doctor|plan …')
+  console.error('usage: ops-cli.mjs backup|restore|counts|duplicates|doctor|plan …')
   process.exit(1)
 }
 try {

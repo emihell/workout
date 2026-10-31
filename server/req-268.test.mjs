@@ -1,10 +1,18 @@
 // req-268 — a workout finished on one device can't come back as in progress after a three-way merge
 // (audit 2026-10-30 F-SYNC-1). Real reducers, real merge, the server's own validator.
-import './test-helpers.mjs'
+import { tempDir } from './test-helpers.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
+import { readFileSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { bootstrapUser, findUser } from './auth.mjs'
+import { DB_FILE } from './config.mjs'
+import { openDataDir } from './db.mjs'
 import { mergeStates } from './merge.mjs'
-import { validState } from './store.mjs'
+import { duplicateWorkoutIds, readOnlyDb } from './ops.mjs'
+import { putState, validState } from './store.mjs'
 import { fullState } from '../src/test-support/full-state.js'
 import { setLoggedState } from '../src/state-reducers.js'
 import { finishedState } from '../src/workout-log.js'
@@ -78,4 +86,66 @@ test('a workout in progress whose id is not in history is never dropped, even wh
   const { state, conflicts } = mergeStates(base, B, A)
   assert.equal(state.activeWorkout, B.activeWorkout)
   assert.ok(!conflicts.some((c) => c.kind === 'finished-elsewhere'))
+})
+
+// --- step 2: the read-only duplicate-id check (./server/ops duplicates [<db file>]) ---
+async function dataDirWith(state) {
+  const dataDir = tempDir('workout-req268-test-')
+  const deps = openDataDir(dataDir)
+  await bootstrapUser(deps.db, { username: 'emilio', password: 'sixsix' })
+  putState(deps.db, findUser(deps.db, 'emilio').id, { baseRev: 0, state })
+  deps.db.close()
+  return { dataDir, dbFile: join(dataDir, DB_FILE), cleanup: () => rmSync(dataDir, { recursive: true, force: true }) }
+}
+const cli = (dataDir, dbFile) =>
+  spawnSync(process.execPath, [fileURLToPath(new URL('./ops-cli.mjs', import.meta.url)), 'duplicates', dbFile], {
+    encoding: 'utf8',
+    env: { ...process.env, WORKOUT_DATA_DIR: dataDir },
+  })
+
+test('criterion 5: the check reports 0 on a clean DB and names the id on a seeded duplicate; it opens the DB read-only', async () => {
+  const { A: finished, id } = threeStates() // wo-2 finished
+  const clean = await dataDirWith(finished)
+  // The duplicate is what finishing again stored before this fix: validState accepts it (store.mjs).
+  const dup = await dataDirWith({ ...finished, workouts: [...finished.workouts, finished.workouts.find((w) => w.id === id)] })
+  try {
+    const before = readFileSync(clean.dbFile)
+    const c = cli(clean.dataDir, clean.dbFile)
+    assert.equal(c.status, 0, c.stderr)
+    console.log(c.stdout)
+    assert.match(c.stdout, /emilio: rev 1 · duplicate workout ids: none\n/)
+    assert.match(c.stdout, /\n0 duplicate workout ids\n$/)
+    assert.deepEqual(duplicateWorkoutIds(clean.dbFile), [{ username: 'emilio', rev: 1, duplicates: [], activeInHistory: null }])
+
+    const d = cli(dup.dataDir, dup.dbFile)
+    assert.equal(d.status, 0, d.stderr)
+    console.log(d.stdout)
+    assert.match(d.stdout, new RegExp(`emilio: rev 1 · duplicate workout ids: ${id} ×2\\n`))
+    assert.match(d.stdout, /\n1 duplicate workout id\n$/)
+
+    // Read-only: a write through the same handle is refused, and the check left the file as it was.
+    const db = readOnlyDb(clean.dbFile)
+    try {
+      assert.throws(() => db.exec("UPDATE users SET username = 'x'"), /readonly/i)
+    } finally {
+      db.close()
+    }
+    assert.deepEqual(readFileSync(clean.dbFile), before, 'the DB file is byte-identical after the check')
+  } finally {
+    clean.cleanup()
+    dup.cleanup()
+  }
+})
+
+test('the check also names a workout in progress that is already in history (the state the merge fix stops producing)', async () => {
+  const { base, A } = threeStates()
+  const s = await dataDirWith({ ...A, activeWorkout: base.activeWorkout })
+  try {
+    const out = cli(s.dataDir, s.dbFile)
+    assert.equal(out.status, 0, out.stderr)
+    assert.match(out.stdout, new RegExp(`workout in progress ${base.activeWorkout.id} is also in history`))
+    assert.match(out.stdout, /\n0 duplicate workout ids\n$/)
+  } finally {
+    s.cleanup()
+  }
 })
