@@ -148,6 +148,13 @@ accounts and the sharing model (shared routine, own values), privacy/GDPR (what 
 AI cost per user, live group sessions. The in-app AI design is decided (DEC-124).
 - **Two training partners get accounts soon** (run 5 item 12): each needs a coach folder + `CLIENT.md` (DEC-147) once their
   user exists on the server. Before a second client gets a Coach plan: DEC-153 §5 (show "estimate" in-app?).
+- **A Researcher role** (Emilio, 2026-10-31: "i have an idea for a researcher as well, instead of saving books, and to keep our
+  coach up to date with the latest scientific data on the hu man body/mind and excersice"): a role like Coach (DEC-145) that
+  searches new studies and proposes checked updates to `coach/EVIDENCE.md` (DEC-149's method), replacing book notes (DEC-150).
+  Needs a design pass with Emilio: cadence, what happens to the 3 existing book notes, who approves an EVIDENCE change.
+- **Audit the Coach workflow** (Emilio asked when, 2026-10-31): no review of the Coach role has run since DEC-145; five runs
+  done. A read-only audit (`rules/AUDIT.md` style) of COACH.md/CAPABILITIES/GOALS/EVIDENCE + run 1–5 reports + what came back
+  to Planner. Run reports live on the server (`workout-data/coach/run-*`), so it runs there.
 - **A nutrition app** (run 5 items 11, 19): a separate product with its own Nutritionist coach; Coach's MVP brief is
   `workout-data/coach/nutrition-app-brief.md` (outside git: it holds client facts). Emilio wants bodyweight/waist out of
   this app. Not started; needs Emilio's go on when, and on one login across both apps or two.
