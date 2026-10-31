@@ -1,4 +1,4 @@
-**Status: BUILT 2026-10-31 — branch `req-254` (`dedc47e`…`0115b4a`), NOT merged** · **Lane: tooling** · DEC-145 §4, DEC-146, DEC-151, DEC-141/142, DEC-128 §5. After req-245 (builds on `server/plan.mjs`).
+**Status: BUILT AND MERGED, 2026-10-31 — branch `req-254` (`dedc47e`…`0115b4a`, 3 commits).** · **Lane: tooling** · DEC-145 §4, DEC-146, DEC-151, DEC-141/142, DEC-128 §5. After req-245 (builds on `server/plan.mjs`).
 
 # req-254 — `ops plan build`: a short change list → a checked plan file for `ops plan preview`
 
