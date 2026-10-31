@@ -3,7 +3,7 @@
 Updated 2026-10-31. **Shipped: everything through req-254** (batch 7 complete; the workflow update req-249..252 merged + deployed; req-253 tooling) except req-32 (dropped), req-77 (PAUSED), req-246 (withdrawn) and
 the reqs below — `log/SHIPPED.md`. Reqs `work/req-*.md`; open items `work/BACKLOG.md`. ≤50 lines.
 
-**Next: the fix batch (DEC-155)** — Emilio, 2026-10-31: "i want to build anything that is not new funcitonality" … "that
+**Next:** the fix batch (DEC-155) — Emilio, 2026-10-31: "i want to build anything that is not new funcitonality" … "that
 is always the priority, otherwise things go stale or we build opon old code". Fixes before features, standing. Order:
 **req-256** "12 reps" bug (READY) → **req-255** `plan build` Coach-estimate kg (READY) → the review/tooling reqs being specced
 from BACKLOG §Phase 1 "Small issues" + §Tooling (re-checked against `main` first). Batch mode (WORKFLOW §Batch mode): one
